@@ -12,15 +12,16 @@ class BaseModel:
 
 	def save_record(self, message):
 		""""Inserts login with discord name into database"""
-		login = str(message.content).split(" ", 1)[1] # gets login from command
-		db = sqlite3.connect('database.db') # sqlite connection
+		login = str(message.content).split(" ", 1)[1]  # gets login from command
+		db = sqlite3.connect('database.db')   # sqlite connection
 		cursor = db.cursor()
 		insert = cursor.execute("INSERT INTO bot_permit (login, discord_name) VALUES (?,?)", (login, str(message.author)))
 		db.commit()
 		db.close()
 		return insert
 
-	def info(self):
+	@staticmethod
+	def info():
 		info = '```====================\n RUBBERGOD COMMANDS \n====================\n'
 		info = info + '!roll x y - Generates random integer from interval <x, y> \n'
 		info = info + '!flip - Flips a coin \n'
