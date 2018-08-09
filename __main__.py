@@ -1,13 +1,19 @@
 import discord
-import model
+import BaseModel
 import karma
 import config
 import utils
+import rng
+import user
 
 
 client = discord.Client()
 config = config.Config()
 utils = utils.Utils()
+karma = karma.Karma()
+rng = rng.Rng()
+user = user.User()
+BaseModel = BaseModel.BaseModel()
 
 
 @client.event
@@ -18,10 +24,10 @@ async def on_ready():
 
 async def permit(message):
 	""""Verify if VUT login is from database"""
-	if not model.has_role(message, config.verification_role):
-		if model.find_login(message):
+	if not user.has_role(message, config.verification_role):
+		if user.find_login(message):
 			role = discord.utils.get(message.server.roles, name=config.verification_role)  # get server permit role
-			model.save_record(message)
+			BaseModel.save_record(message)
 			await client.add_roles(message.author, role)
 			await client.send_message(message.channel, "Congrats, you have been verified! {}".format(utils.generate_mention(message.author.id)))
 		else:
@@ -32,7 +38,7 @@ async def permit(message):
 
 async def pick(message):
 	""""Pick an option"""
-	option = model.pick_option(message)
+	option = rng.pick_option(message)
 	if option:
 		await client.send_message(message.channel, "{} {}".format(option, utils.generate_mention(message.author.id)))
 
@@ -68,10 +74,10 @@ async def on_message(message):
 		await permit(message)
 
 	elif message.content.startswith("!roll"):
-		await client.send_message(message.channel, model.generate_number(message))
+		await client.send_message(message.channel, rng.generate_number(message))
 
 	elif message.content.startswith("!flip"):
-		await client.send_message(message.channel, model.flip())
+		await client.send_message(message.channel, rng.flip())
 
 	elif message.content.startswith("!pick"):
 		await pick(message)
@@ -83,7 +89,7 @@ async def on_message(message):
 		await karma_leaderboard(message)
 
 	elif message.content.startswith("!god"):
-		await client.send_message(message.channel, model.info())
+		await client.send_message(message.channel, BaseModel.info())
 
 
 @client.event
