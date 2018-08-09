@@ -23,18 +23,11 @@ async def permit(message):
 			role = discord.utils.get(message.server.roles, name=config.verification_role)  # get server permit role
 			model.save_record(message)
 			await client.add_roles(message.author, role)
-			await client.send_message(message.channel,
-									  "Congrats, you have been verified! {}"
-									  .format(utils.generate_mention(message.author.id)))
+			await client.send_message(message.channel, "Congrats, you have been verified! {}".format(utils.generate_mention(message.author.id)))
 		else:
-			await client.send_message(message.channel,
-									  "Not found {} {}"
-									  .format(utils.generate_mention(message.author.id),
-										  utils.generate_mention(config.admin_id)))
+			await client.send_message(message.channel, "Not found {} {}".format(utils.generate_mention(message.author.id), utils.generate_mention(config.admin_id)))
 	else:
-		await client.send_message(message.channel, "You have already been verified {} {}".
-								  format(utils.generate_mention(message.author.id),
-										 utils.generate_mention(config.admin_id)))
+		await client.send_message(message.channel, "You have already been verified {} {}".format(utils.generate_mention(message.author.id), utils.generate_mention(config.admin_id)))
 
 
 async def pick(message):
@@ -58,9 +51,7 @@ async def karma_leaderboard(message):
 
 
 async def show_karma(message):
-	await client.send_message(message.channel, "Hey {}, your karma is: {}."
-							  .format(utils.generate_mention(message.author.id),
-									  str(karma.get_karma(message.author.id))))
+	await client.send_message(message.channel, "Hey {}, your karma is: {}.".format(utils.generate_mention(message.author.id), str(karma.get_karma(message.author.id))))
 
 
 #                                      #
