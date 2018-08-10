@@ -18,16 +18,6 @@ user = user.User()
 async def on_ready():
 	"""If RGod is ready"""
 	print("Ready")
-	# lite = sqlite3.connect('database.db')  # sqlite connection
-	# db = mysql.connector.connect(**config.connection)
-	# cursorl = lite.cursor()
-	# cursor = db.cursor()
-	# fetch = cursorl.execute('SELECT * FROM bot_karma_emoji').fetchall()
-	# sql = 'INSERT INTO bot_karma_emoji (emoji_id, `value`) VALUES (%s, %s)'
-	# cursor.executemany(sql, fetch)
-	# lite.close()
-	# db.commit()
-	# db.close()
 
 
 async def permit(message):
