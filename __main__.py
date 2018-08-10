@@ -1,8 +1,6 @@
 import discord
 from repository import rng, karma, user, utils
 from config import config
-import sqlite3
-from pprint import pprint
 import mysql.connector
 
 
