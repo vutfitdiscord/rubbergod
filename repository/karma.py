@@ -1,4 +1,5 @@
 from repository.base_repository import BaseRepository
+import mysql.connector
 
 
 class Karma(BaseRepository):
@@ -8,17 +9,18 @@ class Karma(BaseRepository):
 		return row[1] if row else 0
 
 	def update_karma(self, member, emoji_value):
-		cursor = self.db.cursor()
+		db = mysql.connector.connect(**self.config.connection)
+		cursor = db.cursor()
 		if self.get_karma(member.id):
 			cursor.execute('SELECT karma FROM bot_karma WHERE member_id = "{}"'.format(member.id))
 			updated = cursor.fetchone()
-			print(type(emoji_value))
 			update = int(updated[0]) + emoji_value
 			cursor.execute('UPDATE bot_karma SET karma = "{}" WHERE member_id = "{}"'.format(update, member.id))
 		else:
 			cursor.execute('INSERT INTO bot_karma (member_id, karma) VALUES ("{}","{}")'.format(member.id, emoji_value))
 
-		self.db.commit()
+		db.commit()
+		db.close()
 
 	def karma_emoji(self, member, emoji_id):
 		emoji_value = self.valid_emoji(emoji_id)
@@ -35,7 +37,9 @@ class Karma(BaseRepository):
 		return row[1] if row else 0
 
 	def get_leaderboard(self):
-		cursor = self.db.cursor()
+		db = mysql.connector.connect(**self.config.connection)
+		cursor = db.cursor()
 		cursor.execute('SELECT * FROM bot_karma ORDER BY karma DESC LIMIT 10')
 		leaderboard = cursor.fetchall()
+		db.close()
 		return leaderboard

@@ -6,10 +6,11 @@ class BaseRepository:
 
 	def __init__(self):
 		self.config = config.Config()
-		self.db = mysql.connector.connect(**self.config.connection)
 
 	def get_row(self, table, where):
-		cursor = self.db.cursor()
+		db = mysql.connector.connect(**self.config.connection)
+		cursor = db.cursor()
 		cursor.execute("SELECT * FROM {} WHERE {}".format(table, where))
 		row = cursor.fetchone()
+		db.close()
 		return row
