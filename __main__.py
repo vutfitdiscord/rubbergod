@@ -1,10 +1,9 @@
 import discord
-import BaseModel
-import karma
-import config
-import utils
-import rng
-import user
+from repository import rng, karma, user, utils
+from config import config
+import sqlite3
+from pprint import pprint
+import mysql.connector
 
 
 client = discord.Client()
@@ -13,13 +12,22 @@ utils = utils.Utils()
 karma = karma.Karma()
 rng = rng.Rng()
 user = user.User()
-BaseModel = BaseModel.BaseModel()
 
 
 @client.event
 async def on_ready():
 	"""If RGod is ready"""
 	print("Ready")
+	# lite = sqlite3.connect('database.db')  # sqlite connection
+	# db = mysql.connector.connect(**config.connection)
+	# cursorl = lite.cursor()
+	# cursor = db.cursor()
+	# fetch = cursorl.execute('SELECT * FROM bot_karma_emoji').fetchall()
+	# sql = 'INSERT INTO bot_karma_emoji (emoji_id, `value`) VALUES (%s, %s)'
+	# cursor.executemany(sql, fetch)
+	# lite.close()
+	# db.commit()
+	# db.close()
 
 
 async def permit(message):
@@ -27,7 +35,7 @@ async def permit(message):
 	if not user.has_role(message, config.verification_role):
 		if user.find_login(message):
 			role = discord.utils.get(message.server.roles, name=config.verification_role)  # get server permit role
-			BaseModel.save_record(message)
+			user.save_record(message)
 			await client.add_roles(message.author, role)
 			await client.send_message(message.channel, "Congrats, you have been verified! {}".format(utils.generate_mention(message.author.id)))
 		else:
@@ -89,16 +97,16 @@ async def on_message(message):
 		await karma_leaderboard(message)
 
 	elif message.content.startswith("!god"):
-		await client.send_message(message.channel, BaseModel.info())
+		await client.send_message(message.channel, config.info())
 
 
 @client.event
-async def on_reaction_add(reaction):
+async def on_reaction_add(reaction, user):
 	karma.karma_emoji(reaction.message.author, reaction.emoji.id)
 
 
 @client.event
-async def on_reaction_remove(reaction):
+async def on_reaction_remove(reaction, user):
 	karma.karma_emoji_remove(reaction.message.author, reaction.emoji.id)
 
 
