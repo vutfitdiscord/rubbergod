@@ -1,5 +1,4 @@
 from repository.base_repository import BaseRepository
-import sqlite3
 
 
 class User(BaseRepository):
