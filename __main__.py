@@ -49,6 +49,7 @@ async def karma_leaderboard(message):
 		line = '{} - {} - {} pts\n'.format(i, username, user[1])
 		output = output + line
 		i = i + 1
+	output = output + '\n Full leaderboard - http://bit.ly/godboard \n'
 	await client.send_message(message.channel, output)
 
 
