@@ -15,7 +15,23 @@ user = user.User()
 @client.event
 async def on_ready():
 	"""If RGod is ready"""
+	# update_web()
 	print("Ready")
+
+
+def update_web():
+	db = mysql.connector.connect(**config.connection)
+	cursor = db.cursor()
+	cursor.execute('SELECT * FROM bot_karma')
+	karma = cursor.fetchall()
+	for item in karma:
+		user = await
+		client.get_user_info(item[0])
+		username = str(user.name).split('#')[0]
+		cursor.execute('UPDATE bot_karma SET nick="{}", avatar_url="{}" WHERE member_id="{}"'.format(username, user.avatar_url.replace(".webp", ".png"), item[0]))
+		print("{} - {}".format(username, user.avatar_url.replace(".webp", ".png")))
+	db.commit()
+	db.close()
 
 
 async def permit(message):
