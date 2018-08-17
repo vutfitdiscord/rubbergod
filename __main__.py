@@ -25,7 +25,7 @@ def update_web():
 	cursor.execute('SELECT * FROM bot_karma')
 	karma = cursor.fetchall()
 	for item in karma:
-		user = await
+		user = await client.get_user_info(item[0])
 		client.get_user_info(item[0])
 		username = str(user.name).split('#')[0]
 		cursor.execute('UPDATE bot_karma SET nick="{}", avatar_url="{}" WHERE member_id="{}"'.format(username, user.avatar_url.replace(".webp", ".png"), item[0]))
