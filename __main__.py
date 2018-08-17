@@ -15,11 +15,11 @@ user = user.User()
 @client.event
 async def on_ready():
 	"""If RGod is ready"""
-	# update_web()
+	# await update_web()
 	print("Ready")
 
 
-def update_web():
+async def update_web():
 	db = mysql.connector.connect(**config.connection)
 	cursor = db.cursor()
 	cursor.execute('SELECT * FROM bot_karma')
