@@ -92,6 +92,9 @@ async def on_message(message):
 	elif message.content.startswith("!flip"):
 		await client.send_message(message.channel, rng.flip())
 
+	elif message.content.startswith("!week"):
+		await client.send_message(message.channel, rng.week())
+
 	elif message.content.startswith("!pick"):
 		await pick(message)
 

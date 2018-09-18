@@ -1,4 +1,5 @@
 from random import randint
+from datetime import date
 
 
 class Rng:
@@ -30,3 +31,11 @@ class Rng:
 	@staticmethod
 	def flip():
 		return "True" if randint(0, 1) else "False"
+
+	@staticmethod
+	def week():
+		week = date.today().isocalendar()[1]  # get actual week number
+		if week % 2 == 0:
+			return "Sudý kal, lichý stud"
+		else:
+			return "Lichý kal, sudý stud"
