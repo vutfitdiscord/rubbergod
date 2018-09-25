@@ -1,4 +1,5 @@
 class Utils:
 
-	def generate_mention(self, user_id):
+	@staticmethod
+	def generate_mention(user_id):
 		return '<@' + str(user_id) + '>'

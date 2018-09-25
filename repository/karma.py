@@ -1,8 +1,11 @@
 from repository.base_repository import BaseRepository
+from repository import utils
 import mysql.connector
 
 
 class Karma(BaseRepository):
+
+	utils = utils.Utils()
 
 	def valid_emoji(self, emoji_id):
 		row = self.get_row("bot_karma_emoji", "emoji_id = {}".format(emoji_id))
@@ -32,9 +35,10 @@ class Karma(BaseRepository):
 		if emoji_value:
 			self.update_karma(member, emoji_value * (-1))
 
-	def get_karma(self, user_id):
-		row = self.get_row("bot_karma", "member_id = {}".format(user_id))
-		return row[1] if row else 0
+	def get_karma(self, message):
+		row = self.get_row("bot_karma", "member_id = {}".format(message.author.id))
+		value = row[1] if row else 0
+		return "Hey {}, your karma is: {}.".format(self.utils.generate_mention(message.author.id), str(value))
 
 	def get_leaderboard(self):
 		db = mysql.connector.connect(**self.config.connection)

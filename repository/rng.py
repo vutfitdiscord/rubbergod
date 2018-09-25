@@ -34,8 +34,11 @@ class Rng:
 
 	@staticmethod
 	def week():
+		starting_week = 37  # School started at 37th week
 		week = date.today().isocalendar()[1]  # get actual week number
-		if week % 2 == 0:
-			return "Sudý kal, lichý stud"
-		else:
-			return "Lichý kal, sudý stud"
+		stud_week = week - starting_week
+		odd = "Lichý"
+		even = "Sudý"
+		cal_type = even if week % 2 == 0 else odd
+		stud_type = even if stud_week % 2 == 0 else odd
+		return "Cal\t{}\t{}\nStd\t{}\t{}".format(cal_type, week, stud_type, stud_week)
