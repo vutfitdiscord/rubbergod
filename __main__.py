@@ -84,7 +84,7 @@ async def on_message(message):
 		return
 
 	elif message.content.startswith("!permit"):
-		await permit(message)
+		# await permit(message)
 
 	elif message.content.startswith("!roll"):
 		await client.send_message(message.channel, rng.generate_number(message))
