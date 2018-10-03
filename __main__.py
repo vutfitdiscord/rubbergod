@@ -70,7 +70,7 @@ async def karma_leaderboard(message):
 
 
 async def show_karma(message):
-	await client.send_message(message.channel, "Hey {}, your karma is: {}.".format(utils.generate_mention(message.author.id), str(karma.get_karma(message.author.id))))
+	await client.send_message(message.channel, str(karma.get_karma(message.author.id)))
 
 
 #                                      #
@@ -84,7 +84,7 @@ async def on_message(message):
 		return
 
 	elif message.content.startswith("!permit"):
-		# await permit(message)
+		await permit(message)
 
 	elif message.content.startswith("!roll"):
 		await client.send_message(message.channel, rng.generate_number(message))

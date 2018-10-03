@@ -35,10 +35,10 @@ class Karma(BaseRepository):
 		if emoji_value:
 			self.update_karma(member, emoji_value * (-1))
 
-	def get_karma(self, message):
-		row = self.get_row("bot_karma", "member_id = {}".format(message.author.id))
+	def get_karma(self, member):
+		row = self.get_row("bot_karma", "member_id = {}".format(member))
 		value = row[1] if row else 0
-		return "Hey {}, your karma is: {}.".format(self.utils.generate_mention(message.author.id), str(value))
+		return "Hey {}, your karma is: {}.".format(self.utils.generate_mention(member), str(value))
 
 	def get_leaderboard(self):
 		db = mysql.connector.connect(**self.config.connection)
