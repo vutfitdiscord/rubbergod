@@ -10,6 +10,7 @@ class User(BaseRepository):
 		login = str(message.content).split(" ", 1)[1]  # gets login from command
 		cursor = db.cursor()
 		insert = cursor.execute('INSERT INTO bot_permit (login, discord_name) VALUES ("{}", "{}")'.format(login, str(message.author)))
+		cursor.execute('UPDATE bot_valid_persons SET status="{}" WHERE login="{}"'.format(0 ,login))
 		db.commit()
 		db.close()
 		return insert
