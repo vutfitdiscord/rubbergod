@@ -110,12 +110,14 @@ async def on_message(message):
 
 @client.event
 async def on_reaction_add(reaction, user):
-	karma.karma_emoji(reaction.message.author, reaction.emoji.id)
+	if type(reaction.emoji) is not str:
+		karma.karma_emoji(reaction.message.author, reaction.emoji.id)
 
 
 @client.event
 async def on_reaction_remove(reaction, user):
-	karma.karma_emoji_remove(reaction.message.author, reaction.emoji.id)
+	if type(reaction.emoji) is not str:
+		karma.karma_emoji_remove(reaction.message.author, reaction.emoji.id)
 
 
 client.run(config.key)
