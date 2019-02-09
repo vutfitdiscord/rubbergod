@@ -1,1 +1,1 @@
-rubbergod
+Discord BOT
