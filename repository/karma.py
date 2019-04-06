@@ -14,7 +14,7 @@ class Karma(BaseRepository):
 	def update_karma(self, member, emoji_value):
 		db = mysql.connector.connect(**self.config.connection)
 		cursor = db.cursor()
-		if self.get_karma(member.id):
+		if self.get_karma_value(member.id):
 			cursor.execute('SELECT karma FROM bot_karma WHERE member_id = "{}"'.format(member.id))
 			updated = cursor.fetchone()
 			update = int(updated[0]) + emoji_value
@@ -35,10 +35,12 @@ class Karma(BaseRepository):
 		if emoji_value:
 			self.update_karma(member, emoji_value * (-1))
 
+    def get_karma_value(self, member):
+        row = self.get_row("bot_karma", "member_id = {}".format(member))
+		return row[1] if row else 0
+
 	def get_karma(self, member):
-		row = self.get_row("bot_karma", "member_id = {}".format(member))
-		value = row[1] if row else 0
-		return "Hey {}, your karma is: {}.".format(self.utils.generate_mention(member), str(value))
+		return "Hey {}, your karma is: {}.".format(self.utils.generate_mention(member), str(get_karma_value(self, member)))
 
 	def get_leaderboard(self):
 		db = mysql.connector.connect(**self.config.connection)
