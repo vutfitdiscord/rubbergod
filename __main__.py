@@ -27,8 +27,13 @@ async def update_web():
         user = await client.get_user_info(item[0])
         client.get_user_info(item[0])
         username = str(user.name).split('#')[0]
-        cursor.execute('UPDATE bot_karma SET nick="{}", avatar_url="{}" WHERE member_id="{}"'.format(username, user.avatar_url.replace(".webp", ".png"), item[0]))
-        print("{} - {}".format(username, user.avatar_url.replace(".webp", ".png")))
+        cursor.execute('UPDATE bot_karma SET nick="{}", '
+                       'avatar_url="{}" WHERE member_id="{}"'
+                       .format(username,
+                               user.avatar_url.replace(".webp", ".png"),
+                               item[0]))
+        print("{} - {}".format(username,
+                               user.avatar_url.replace(".webp", ".png")))
     db.commit()
     db.close()
 
@@ -37,14 +42,29 @@ async def permit(message):
     """"Verify if VUT login is from database"""
     if not user.has_role(message, config.verification_role):
         if user.find_login(message):
-            role = discord.utils.get(message.server.roles, name=config.verification_role)  # get server permit role
+            # get server permit role
+            role = discord.utils.get(message.server.roles,
+                                     name=config.verification_role)
             user.save_record(message)
             await client.add_roles(message.author, role)
-            await client.send_message(message.channel, "Congrats, you have been verified! {}".format(utils.generate_mention(message.author.id)))
+            await client.send_message(message.channel,
+                                      "Congrats, you have been verified! {}"
+                                      .format(utils.generate_mention(
+                                                  message.author.id)))
         else:
-            await client.send_message(message.channel, "Not found {} {}".format(utils.generate_mention(message.author.id), utils.generate_mention(config.admin_id)))
+            await client.send_message(message.channel,
+                                      "Not found {} {}"
+                                      .format(utils.generate_mention(
+                                                  message.author.id),
+                                              utils.generate_mention(
+                                                  config.admin_id)))
     else:
-        await client.send_message(message.channel, "You have already been verified {} {}".format(utils.generate_mention(message.author.id), utils.generate_mention(config.admin_id)))
+        await client.send_message(message.channel,
+                                  "You have already been verified {} {}"
+                                  .format(utils.generate_mention(
+                                              message.author.id),
+                                          utils.generate_mention(
+                                              config.admin_id)))
     await client.delete_message(message)
 
 
@@ -52,7 +72,11 @@ async def pick(message):
     """"Pick an option"""
     option = rng.pick_option(message)
     if option:
-        await client.send_message(message.channel, "{} {}".format(option, utils.generate_mention(message.author.id)))
+        await client.send_message(message.channel,
+                                  "{} {}"
+                                  .format(option,
+                                          utils.generate_mention(
+                                              message.author.id)))
 
 
 async def karma_leaderboard(message):
@@ -70,7 +94,8 @@ async def karma_leaderboard(message):
 
 
 async def show_karma(message):
-    await client.send_message(message.channel, str(karma.get_karma(message.author.id)))
+    await client.send_message(message.channel,
+                              str(karma.get_karma(message.author.id)))
 
 
 #                                      #
@@ -87,7 +112,8 @@ async def on_message(message):
         await permit(message)
 
     elif message.content.startswith("!roll"):
-        await client.send_message(message.channel, rng.generate_number(message))
+        await client.send_message(message.channel,
+                                  rng.generate_number(message))
 
     elif message.content.startswith("!flip"):
         await client.send_message(message.channel, rng.flip())
