@@ -47,24 +47,21 @@ async def permit(message):
                                      name=config.verification_role)
             user.save_record(message)
             await client.add_roles(message.author, role)
-            await client.send_message(message.channel,
-                                      "Congrats, you have been verified! {}"
-                                      .format(utils.generate_mention(
-                                                  message.author.id)))
+            await message.channel.send("Congrats, you have been verified! {}"
+                                       .format(utils.generate_mention(
+                                                   message.author.id)))
         else:
-            await client.send_message(message.channel,
-                                      "Not found {} {}"
-                                      .format(utils.generate_mention(
-                                                  message.author.id),
-                                              utils.generate_mention(
-                                                  config.admin_id)))
+            await message.channel.send("Not found {} {}"
+                                       .format(utils.generate_mention(
+                                                   message.author.id),
+                                               utils.generate_mention(
+                                                   config.admin_id)))
     else:
-        await client.send_message(message.channel,
-                                  "You have already been verified {} {}"
-                                  .format(utils.generate_mention(
-                                              message.author.id),
-                                          utils.generate_mention(
-                                              config.admin_id)))
+        await message.channel.send("You have already been verified {} {}"
+                                   .format(utils.generate_mention(
+                                               message.author.id),
+                                           utils.generate_mention(
+                                               config.admin_id)))
     await client.delete_message(message)
 
 
@@ -72,11 +69,10 @@ async def pick(message):
     """"Pick an option"""
     option = rng.pick_option(message)
     if option:
-        await client.send_message(message.channel,
-                                  "{} {}"
-                                  .format(option,
-                                          utils.generate_mention(
-                                              message.author.id)))
+        await message.channel.send("{} {}"
+                                   .format(option,
+                                           utils.generate_mention(
+                                               message.author.id)))
 
 
 async def karma_leaderboard(message):
@@ -90,12 +86,11 @@ async def karma_leaderboard(message):
         output = output + line
         i = i + 1
     output = output + '\n Full leaderboard - http://bit.ly/godboard \n'
-    await client.send_message(message.channel, output)
+    await message.channel.send(output)
 
 
 async def show_karma(message):
-    await client.send_message(message.channel,
-                              str(karma.get_karma(message.author.id)))
+    await message.channel.send(str(karma.get_karma(message.author.id)))
 
 
 #                                      #
@@ -112,14 +107,13 @@ async def on_message(message):
         await permit(message)
 
     elif message.content.startswith("!roll"):
-        await client.send_message(message.channel,
-                                  rng.generate_number(message))
+        await message.channel.send(rng.generate_number(message))
 
     elif message.content.startswith("!flip"):
-        await client.send_message(message.channel, rng.flip())
+        await message.channel.send(rng.flip())
 
     elif message.content.startswith("!week"):
-        await client.send_message(message.channel, rng.week())
+        await message.channel.send(rng.week())
 
     elif message.content.startswith("!pick"):
         await pick(message)
@@ -131,7 +125,7 @@ async def on_message(message):
         await karma_leaderboard(message)
 
     elif message.content.startswith("!god"):
-        await client.send_message(message.channel, config.info())
+        await message.channel.send(config.info())
 
 
 @client.event

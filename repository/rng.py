@@ -22,8 +22,19 @@ class Rng:
     def generate_number(message):
         """"Generate random number from interval"""
         string = message.content.split(" ")
-        x = int(string[1])
-        y = int(string[2])
+        if len(string) != 3 and len(string) != 2:
+            return ("Usage: !roll x [y]\n" + 
+                    "Where x, y is range from which to pick a number\n" + 
+                    "x, y should be integers\n" + 
+                    "If y is not specified, 0 assumed")
+        try:
+            x = int(string[1])
+            if len(string) == 3:
+                y = int(string[2])
+            else:
+                y = 0
+        except ValueError:
+            return "Please provide **integers**"
         if x > y:
             x, y = y, x  # variable values swap
         return randint(x, y)
