@@ -8,6 +8,7 @@ client = discord.Client()
 config = config.Config()
 utils = utils.Utils()
 karma = karma.Karma()
+roles = roles.Roles()
 rng = rng.Rng()
 user = user.User()
 
@@ -138,12 +139,14 @@ async def on_message(message):
 async def on_reaction_add(reaction, user):
     if type(reaction.emoji) is not str:
         karma.karma_emoji(reaction.message.author, reaction.emoji.id)
+        # roles.role_check(reaction.message, user, reaction.emoji.id)
 
 
 @client.event
 async def on_reaction_remove(reaction, user):
     if type(reaction.emoji) is not str:
         karma.karma_emoji_remove(reaction.message.author, reaction.emoji.id)
+        # roles.role_check_remove(reaction.message, user, reaction.emoji.id)
 
 
 client.run(config.key)
