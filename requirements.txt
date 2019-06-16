@@ -1,0 +1,3 @@
+discord
+mysql
+mysql-connector-python-rf
