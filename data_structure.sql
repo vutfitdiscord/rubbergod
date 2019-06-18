@@ -51,9 +51,10 @@ CREATE TABLE IF NOT EXISTS `bot_permit` (
 
 -- Dumping structure for table rubbergod.bot_valid_persons
 CREATE TABLE IF NOT EXISTS `bot_valid_persons` (
-  `login` text UNIQUE,
+  `login` varchar(64) UNIQUE,
   `name` text,
   `year` text,
+  `code` text DEFAULT NULL,
   `status` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
