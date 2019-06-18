@@ -53,13 +53,12 @@ async def verify(message):
             verify = discord.utils.get(message.guild.roles,
                                        name=config.verification_role)
 
-            print(db_record)
             if db_record[2] == "FIT BIT 1r":
                 year = discord.utils.get(message.guild.roles,
-                                         name="bit1")
+                                         name="1BIT")
             elif db_record[2] == "FIT BIT 2r":
                 year = discord.utils.get(message.guild.roles,
-                                         name="bit2")
+                                         name="2BIT")
             else:
                 await message.channel.send(
                     "Hey {}, I'll let {} handle this manualy\nYear:`{}`"
