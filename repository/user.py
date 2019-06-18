@@ -13,10 +13,10 @@ class User(BaseRepository):
                        .format(login))
         row = cursor.fetchone()
         insert = cursor.execute('INSERT INTO bot_permit '
-                                '(login, discord_name, discord_id, user_id) '
-                                'VALUES ("{}", "{}", {}, {})'
+                                '(login, discord_name, discord_id) '
+                                'VALUES ("{}", "{}", {})'
                                 .format(login, str(message.author),
-                                        message.author.id, row[0]))
+                                        message.author.id))
         cursor.execute('UPDATE bot_valid_persons SET status="{}" '
                        'WHERE login="{}"'.format(0, login))
         db.commit()

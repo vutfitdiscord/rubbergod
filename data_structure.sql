@@ -40,9 +40,9 @@ CREATE TABLE IF NOT EXISTS `bot_karma_emoji` (
 
 -- Dumping structure for table rubbergod.bot_permit
 CREATE TABLE IF NOT EXISTS `bot_permit` (
-  `id` int(11) DEFAULT NULL,
-  `login` text,
-  `discord_name` text
+  `login` varchar(64) UNIQUE,
+  `discord_name` text,
+  `discord_id` text,
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- Dumping data for table rubbergod.bot_permit: ~0 rows (approximately)

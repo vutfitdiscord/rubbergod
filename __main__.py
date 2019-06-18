@@ -54,12 +54,12 @@ async def verify(message):
                                        name=config.verification_role)
 
             print(db_record)
-            if db_record[3] == "FIT BIT 1r":
+            if db_record[2] == "FIT BIT 1r":
                 year = discord.utils.get(message.guild.roles,
-                                         "bit1")
-            elif db_record[3] == "FIT BIT 2r":
+                                         name="bit1")
+            elif db_record[2] == "FIT BIT 2r":
                 year = discord.utils.get(message.guild.roles,
-                                         "bit2")
+                                         name="bit2")
             else:
                 await message.channel.send(
                     "Hey {}, I'll let {} handle this manualy\nYear:`{}`"
@@ -67,7 +67,7 @@ async def verify(message):
                                 message.author.id),
                             utils.generate_mention(
                                 config.admin_id),
-                            db_record[3]))
+                            db_record[2]))
                 return
 
             user.save_record(message)
