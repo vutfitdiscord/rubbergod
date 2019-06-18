@@ -38,15 +38,35 @@ async def update_web():
     db.close()
 
 
-async def permit(message):
+async def verify(message):
     """"Verify if VUT login is from database"""
     if not user.has_role(message, config.verification_role):
-        if user.find_login(message):
+        db_record = user.find_login(message)
+        if db_record:
             # get server permit role
-            role = discord.utils.get(message.server.roles,
-                                     name=config.verification_role)
+            verify = discord.utils.get(message.server.roles,
+                                       name=config.verification_role)
+
+            print(db_record)
+            if db_record[3] == "FIT BIT 1r":
+                year = discord.utils.get(message.server.roles,
+                                         "bit1")
+            elif db_record[3] == "FIT BIT 2r":
+                year = discord.utils.get(message.server.roles,
+                                         "bit2")
+            else:
+                await message.channel.send(
+                    "Hey {}, I'll let {} handle this manualy\nYear:`{}`"
+                    .format(utils.generate_mention(
+                                message.author.id),
+                            utils.generate_mention(
+                                config.admin_id),
+                            db_record[3]))
+                return
+
             user.save_record(message)
-            await client.add_roles(message.author, role)
+            await client.add_roles(message.author, verify)
+            await client.add_roles(message.author, year)
             await message.channel.send("Congrats, you have been verified! {}"
                                        .format(utils.generate_mention(
                                                    message.author.id)))
@@ -103,8 +123,8 @@ async def on_message(message):
     if message.author == client.user:
         return
 
-    elif message.content.startswith("!permit"):
-        await permit(message)
+    elif message.content.startswith("!verify"):
+        await verify(message)
 
     elif message.content.startswith("!roll"):
         await message.channel.send(rng.generate_number(message))
