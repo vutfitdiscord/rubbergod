@@ -44,15 +44,15 @@ async def verify(message):
         db_record = user.find_login(message)
         if db_record:
             # get server permit role
-            verify = discord.utils.get(message.server.roles,
+            verify = discord.utils.get(message.guild.roles,
                                        name=config.verification_role)
 
             print(db_record)
             if db_record[3] == "FIT BIT 1r":
-                year = discord.utils.get(message.server.roles,
+                year = discord.utils.get(message.guild.roles,
                                          "bit1")
             elif db_record[3] == "FIT BIT 2r":
-                year = discord.utils.get(message.server.roles,
+                year = discord.utils.get(message.guild.roles,
                                          "bit2")
             else:
                 await message.channel.send(
@@ -82,7 +82,7 @@ async def verify(message):
                                                message.author.id),
                                            utils.generate_mention(
                                                config.admin_id)))
-    await client.delete_message(message)
+    await message.delete()
 
 
 async def pick(message):
