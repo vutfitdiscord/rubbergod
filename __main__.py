@@ -40,6 +40,12 @@ async def update_web():
 
 async def verify(message):
     """"Verify if VUT login is from database"""
+    if len(str(message.content).split(" ")) != 3:
+        await message.channel.send(
+                "Debile musis to volat s 2ma argumentama " +
+                "ale to ti matthew nerekne")
+        return
+
     if not user.has_role(message, config.verification_role):
         db_record = user.find_login(message)
         if db_record:
