@@ -63,57 +63,57 @@ async def verify(message):
                 year = discord.utils.get(message.guild.roles,
                                          name="3BIT")
             elif (db_record[2] == "FIT BIT 4r" or
-        		  db_record[2] == "FIT BIT 5r" or
-        		  db_record[2] == "FIT BIT 6r" or
-        		  db_record[2] == "FIT BIT 7r" or):
+                  db_record[2] == "FIT BIT 5r" or
+                  db_record[2] == "FIT BIT 6r" or
+                  db_record[2] == "FIT BIT 7r"):
                 year = discord.utils.get(message.guild.roles,
                                          name="4BIT+")
             elif (db_record[2] == "FIT MBS 1r" or
-            	  db_record[2] == "FIT MBI 1r" or
-            	  db_record[2] == "FIT MIS 1r" or
-            	  db_record[2] == "FIT MIN 1r" or
-            	  db_record[2] == "FIT MMI 1r" or
-            	  db_record[2] == "FIT MMM 1r" or
-            	  db_record[2] == "FIT MGM 1r" or
-            	  db_record[2] == "FIT MGMe 1r" or
-            	  db_record[2] == "FIT MPV 1r" or
-            	  db_record[2] == "FIT MSK 1r" or):
-            		year = discord.utils.get(message.guild.roles,
+                  db_record[2] == "FIT MBI 1r" or
+                  db_record[2] == "FIT MIS 1r" or
+                  db_record[2] == "FIT MIN 1r" or
+                  db_record[2] == "FIT MMI 1r" or
+                  db_record[2] == "FIT MMM 1r" or
+                  db_record[2] == "FIT MGM 1r" or
+                  db_record[2] == "FIT MGMe 1r" or
+                  db_record[2] == "FIT MPV 1r" or
+                  db_record[2] == "FIT MSK 1r"):
+                year = discord.utils.get(message.guild.roles,
                                          name="1MIT")
             elif (db_record[2] == "FIT MBS 2r" or
-            			db_record[2] == "FIT MBI 2r" or
-            			db_record[2] == "FIT MIS 2r" or
-            			db_record[2] == "FIT MIN 2r" or
-            			db_record[2] == "FIT MMI 2r" or
-            			db_record[2] == "FIT MMM 2r" or
-            			db_record[2] == "FIT MGM 2r" or
-            			db_record[2] == "FIT MGMe 2r" or
-            			db_record[2] == "FIT MPV 2r" or
-            			db_record[2] == "FIT MSK 2r" or):
-            		year = discord.utils.get(message.guild.roles,
+                  db_record[2] == "FIT MBI 2r" or
+                  db_record[2] == "FIT MIS 2r" or
+                  db_record[2] == "FIT MIN 2r" or
+                  db_record[2] == "FIT MMI 2r" or
+                  db_record[2] == "FIT MMM 2r" or
+                  db_record[2] == "FIT MGM 2r" or
+                  db_record[2] == "FIT MGMe 2r" or
+                  db_record[2] == "FIT MPV 2r" or
+                  db_record[2] == "FIT MSK 2r"):
+                year = discord.utils.get(message.guild.roles,
                                          name="2MIT")
             elif (db_record[2] == "FIT MBS 3r" or
-            			db_record[2] == "FIT MBI 3r" or
-            			db_record[2] == "FIT MIS 3r" or
-            			db_record[2] == "FIT MIN 3r" or
-            			db_record[2] == "FIT MMI 3r" or
-            			db_record[2] == "FIT MMM 3r" or
-            			db_record[2] == "FIT MGM 3r" or
-            			db_record[2] == "FIT MGMe 3r" or
-            			db_record[2] == "FIT MPV 3r" or
-            			db_record[2] == "FIT MSK 3r" or):
-            		year = discord.utils.get(message.guild.roles,
+                  db_record[2] == "FIT MBI 3r" or
+                  db_record[2] == "FIT MIS 3r" or
+                  db_record[2] == "FIT MIN 3r" or
+                  db_record[2] == "FIT MMI 3r" or
+                  db_record[2] == "FIT MMM 3r" or
+                  db_record[2] == "FIT MGM 3r" or
+                  db_record[2] == "FIT MGMe 3r" or
+                  db_record[2] == "FIT MPV 3r" or
+                  db_record[2] == "FIT MSK 3r" or):
+                year = discord.utils.get(message.guild.roles,
                                          name="3MIT+")
             # TODO: Add people who are 4MIT+ automaticly to 3MIT+
             elif (db_record[2] == "FIT DVI4 1r" or
-            			db_record[2] == "FIT DVI4 2r" or
-            			db_record[2] == "FIT DVI4 3r" or
-            			db_record[2] == "FIT DVI4 4r" or
-            			db_record[2] == "FIT DVI4 5r" or
-            			db_record[2] == "FIT DVI4 6r" or
-            			db_record[2] == "FIT DVI4 7r" or
-            			db_record[2] == "FIT DVI4 8r" or):
-            		year = discord.utils.get(message.guild.roles,
+                  db_record[2] == "FIT DVI4 2r" or
+                  db_record[2] == "FIT DVI4 3r" or
+                  db_record[2] == "FIT DVI4 4r" or
+                  db_record[2] == "FIT DVI4 5r" or
+                  db_record[2] == "FIT DVI4 6r" or
+                  db_record[2] == "FIT DVI4 7r" or
+                  db_record[2] == "FIT DVI4 8r" or):
+                year = discord.utils.get(message.guild.roles,
                                          name="PhD+")
             else:
                 await message.channel.send(
@@ -175,14 +175,14 @@ async def show_karma(message):
 
 # Returns list of role names and emotes that represent them
 async def get_join_role_data(message):
-	input_string = (message.content[message.content.index('\n')+1:]
-									.split('\n')[:-1])
-	output = []
-	for line in input_string:
-			line = line.split()
-			line = [line[0], line[1]]
-			output.append(line)
-	return output
+        input_string = (message.content[message.content.index('\n')+1:]
+                                                                        .split('\n')[:-1])
+        output = []
+        for line in input_string:
+                        line = line.split()
+                        line = [line[0], line[1]]
+                        output.append(line)
+        return output
 
 # Adds reactions to message
 async def message_role_reactions(message, data):
@@ -224,7 +224,7 @@ async def on_message(message):
         await message.channel.send(config.info())
 
     elif message.content.startswith("Join roles"):
-    	role_data = await get_join_role_data(message)
+        role_data = await get_join_role_data(message)
 
 
 
