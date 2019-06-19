@@ -57,26 +57,26 @@ async def send_hash(message):
                                           string.digits, k=20))
 
             password = "rubbergod7297"
-            port = 1337
+            port = 465
             context = ssl.create_default_context()
             login = str(message.content).split(" ")[1]
             sender_email = "toasterrubbergod@gmail.com"
             receiver_email = login + "@stud.fit.vutbr.cz"
-            message = hash
+            mail_content = hash
 
             with smtplib.SMTP_SSL("smtp.gmail.com", port,
                                   context=context) as server:
                 server.login("toasterrubbergod@gmail.com", password)
-                server.sendmail(sender_email, receiver_email, message)
+                server.sendmail(sender_email, receiver_email, mail_content)
 
             user.save_mail(message, hash)
 
-            await message.channel.send("An email with hash has been sent " +
-                                       "to your school mail " +
-                                       "(@stud.fit.vutbr.cz)! {}" +
-                                       "Pro verifikaci pouzij:" +
-                                       "!verify xlogin00 hash"
-                                       .format(utils.generate_mention(
+            await message.channel.send(("An email with hash has been sent " +
+                                        "to your school mail " +
+                                        "(@stud.fit.vutbr.cz)! {}\n" +
+                                        "Pro verifikaci pouzij:\n" +
+                                        "!verify xlogin00 hash"
+                                       ).format(utils.generate_mention(
                                                    message.author.id)))
         else:
             await message.channel.send("Login not found {} {}"
@@ -89,7 +89,7 @@ async def send_hash(message):
                                    .format(utils.generate_mention(
                                                message.author.id),
                                            utils.generate_mention(
-                                               config.admin_id)))
+                                           config.admin_id)))
     await message.delete()
 
 
@@ -112,11 +112,11 @@ async def verify(message):
             year = None
             if len(db_record) == 3:
                 if db_record[0] == "FIT":
-                    db_record[2] == int(db_record[2][:-1])
+                    db_record[2] = int(db_record[2][:-1])
                     if db_record[1] == "BIT":
                         year = "BIT"
                         if db_record[2] < 4:
-                            year = str(db_record) + year
+                            year = str(db_record[2]) + year
                         else:
                             year = "4BIT+"
                     elif db_record[1] in ["MBS", "MBI", "MIS", "MIN",
@@ -124,7 +124,7 @@ async def verify(message):
                                           "MPV", "MSK"]:
                         year = "MIT"
                         if db_record[2] < 3:
-                            year = str(db_record) + year
+                            year = str(db_record[2]) + year
                         else:
                             year = "3MIT+"
                     elif db_record[1] == "DVI4":
@@ -140,9 +140,11 @@ async def verify(message):
                             str(db_record)))
                 return
 
-            user.save_record(message)
+
+            year = discord.utils.get(message.guild.roles, name=year)
             await message.author.add_roles(verify)
             await message.author.add_roles(year)
+            user.save_record(message)
             await message.channel.send("Congrats, you have been verified! {}"
                                        .format(utils.generate_mention(
                                                    message.author.id)))
