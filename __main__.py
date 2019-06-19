@@ -101,7 +101,7 @@ async def verify(message):
                   db_record[2] == "FIT MGM 3r" or
                   db_record[2] == "FIT MGMe 3r" or
                   db_record[2] == "FIT MPV 3r" or
-                  db_record[2] == "FIT MSK 3r" or):
+                  db_record[2] == "FIT MSK 3r"):
                 year = discord.utils.get(message.guild.roles,
                                          name="3MIT+")
             # TODO: Add people who are 4MIT+ automaticly to 3MIT+
@@ -112,7 +112,7 @@ async def verify(message):
                   db_record[2] == "FIT DVI4 5r" or
                   db_record[2] == "FIT DVI4 6r" or
                   db_record[2] == "FIT DVI4 7r" or
-                  db_record[2] == "FIT DVI4 8r" or):
+                  db_record[2] == "FIT DVI4 8r"):
                 year = discord.utils.get(message.guild.roles,
                                          name="PhD+")
             else:
@@ -173,25 +173,28 @@ async def karma_leaderboard(message):
 async def show_karma(message):
     await message.channel.send(str(karma.get_karma(message.author.id)))
 
+
 # Returns list of role names and emotes that represent them
 async def get_join_role_data(message):
-        input_string = (message.content[message.content.index('\n')+1:]
-                                                                        .split('\n')[:-1])
-        output = []
-        for line in input_string:
-                        line = line.split()
-                        line = [line[0], line[1]]
-                        output.append(line)
-        return output
+    input_string = (message.content[message.content.index('\n')+1:]
+                    .split('\n')[:-1])
+    output = []
+    for line in input_string:
+        line = line.split()
+        line = [line[0], line[1]]
+        output.append(line)
+    return output
+
 
 # Adds reactions to message
 async def message_role_reactions(message, data):
     for line in data:
-        message.add_reaction(line[1])
+        await message.add_reaction(line[1])
 
 #                                      #
 #              COMMANDS                #
 #                                      #
+
 
 @client.event
 async def on_message(message):
@@ -225,8 +228,7 @@ async def on_message(message):
 
     elif message.content.startswith("Join roles"):
         role_data = await get_join_role_data(message)
-
-
+        await message_role_reactions(message, role_data)
 
 
 @client.event
