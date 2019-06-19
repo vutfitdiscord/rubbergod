@@ -64,9 +64,9 @@ async def verify(message):
                             year = str(db_record) + year
                         else:
                             year = "4BIT+"
-                    elif db_record[1] in ["MBS", "MBI", "MIS", "MIN"
-                                          "MMI", "MMM", "MGM", "MGMe"
-                                          "MPV", "MSK"]
+                    elif db_record[1] in ["MBS", "MBI", "MIS", "MIN",
+                                          "MMI", "MMM", "MGM", "MGMe",
+                                          "MPV", "MSK"]:
                         year = "MIT"
                         if db_record[2] < 3:
                             year = str(db_record) + year
@@ -86,8 +86,8 @@ async def verify(message):
                 return
 
             user.save_record(message)
-            await client.add_roles(message.author, verify)
-            await client.add_roles(message.author, year)
+            await message.autor.add_roles(verify)
+            await message.autor.add_roles(year)
             await message.channel.send("Congrats, you have been verified! {}"
                                        .format(utils.generate_mention(
                                                    message.author.id)))
@@ -152,10 +152,10 @@ async def message_role_reactions(message, data):
         await message.add_reaction(line[1])
 
 
-async def add_role_on_reaction(role, user):
+async def add_role_on_reaction(role, user, message):
     role = discord.utils.get(message.guild.roles,
                              name=role)
-    await client.add_roles(user, role)
+    await user.add_roles(role)
 
 
 #                                      #
@@ -204,7 +204,7 @@ async def on_reaction_add(reaction, user):
         role_data = await get_join_role_data(reaction.message)
         for line in role_data:
             if reaction.emoji == line[1]:
-                add_role_on_reaction(line[0], user)
+                await add_role_on_reaction(line[0], user, reaction.message)
                 break
     if type(reaction.emoji) is not str:
         karma.karma_emoji(reaction.message.author, reaction.emoji.id)
