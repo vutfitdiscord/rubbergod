@@ -151,11 +151,17 @@ async def message_role_reactions(message, data):
     for line in data:
         await message.add_reaction(line[1])
 
-
+# Adds a role for user based on reaction
 async def add_role_on_reaction(role, user, message):
     role = discord.utils.get(message.guild.roles,
                              name=role)
     await user.add_roles(role)
+
+# Removes a role for user based on reaction
+async def remove_role_on_reaction(role, user, message):
+    role = discord.utils.get(message.guild.roles,
+                             name=role)
+    await user.remove_roles(role)
 
 
 #                                      #
@@ -213,6 +219,12 @@ async def on_reaction_add(reaction, user):
 
 @client.event
 async def on_reaction_remove(reaction, user):
+    if reaction.message.content.startswith("Join roles"):
+        role_data = await get_join_role_data(reaction.message)
+        for line in role_data:
+            if reaction.emoji == line[1]:
+                await remove_role_on_reaction(line[0], user, reaction.message)
+                break
     if type(reaction.emoji) is not str:
         karma.karma_emoji_remove(reaction.message.author, reaction.emoji.id)
 
