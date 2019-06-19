@@ -53,76 +53,36 @@ async def verify(message):
             verify = discord.utils.get(message.guild.roles,
                                        name=config.verification_role)
 
-            if db_record[2] == "FIT BIT 1r":
-                year = discord.utils.get(message.guild.roles,
-                                         name="1BIT")
-            elif db_record[2] == "FIT BIT 2r":
-                year = discord.utils.get(message.guild.roles,
-                                         name="2BIT")
-            elif db_record[2] == "FIT BIT 3r":
-                year = discord.utils.get(message.guild.roles,
-                                         name="3BIT")
-            elif (db_record[2] == "FIT BIT 4r" or
-                  db_record[2] == "FIT BIT 5r" or
-                  db_record[2] == "FIT BIT 6r" or
-                  db_record[2] == "FIT BIT 7r"):
-                year = discord.utils.get(message.guild.roles,
-                                         name="4BIT+")
-            elif (db_record[2] == "FIT MBS 1r" or
-                  db_record[2] == "FIT MBI 1r" or
-                  db_record[2] == "FIT MIS 1r" or
-                  db_record[2] == "FIT MIN 1r" or
-                  db_record[2] == "FIT MMI 1r" or
-                  db_record[2] == "FIT MMM 1r" or
-                  db_record[2] == "FIT MGM 1r" or
-                  db_record[2] == "FIT MGMe 1r" or
-                  db_record[2] == "FIT MPV 1r" or
-                  db_record[2] == "FIT MSK 1r"):
-                year = discord.utils.get(message.guild.roles,
-                                         name="1MIT")
-            elif (db_record[2] == "FIT MBS 2r" or
-                  db_record[2] == "FIT MBI 2r" or
-                  db_record[2] == "FIT MIS 2r" or
-                  db_record[2] == "FIT MIN 2r" or
-                  db_record[2] == "FIT MMI 2r" or
-                  db_record[2] == "FIT MMM 2r" or
-                  db_record[2] == "FIT MGM 2r" or
-                  db_record[2] == "FIT MGMe 2r" or
-                  db_record[2] == "FIT MPV 2r" or
-                  db_record[2] == "FIT MSK 2r"):
-                year = discord.utils.get(message.guild.roles,
-                                         name="2MIT")
-            elif (db_record[2] == "FIT MBS 3r" or
-                  db_record[2] == "FIT MBI 3r" or
-                  db_record[2] == "FIT MIS 3r" or
-                  db_record[2] == "FIT MIN 3r" or
-                  db_record[2] == "FIT MMI 3r" or
-                  db_record[2] == "FIT MMM 3r" or
-                  db_record[2] == "FIT MGM 3r" or
-                  db_record[2] == "FIT MGMe 3r" or
-                  db_record[2] == "FIT MPV 3r" or
-                  db_record[2] == "FIT MSK 3r"):
-                year = discord.utils.get(message.guild.roles,
-                                         name="3MIT+")
-            # TODO: Add people who are 4MIT+ automaticly to 3MIT+
-            elif (db_record[2] == "FIT DVI4 1r" or
-                  db_record[2] == "FIT DVI4 2r" or
-                  db_record[2] == "FIT DVI4 3r" or
-                  db_record[2] == "FIT DVI4 4r" or
-                  db_record[2] == "FIT DVI4 5r" or
-                  db_record[2] == "FIT DVI4 6r" or
-                  db_record[2] == "FIT DVI4 7r" or
-                  db_record[2] == "FIT DVI4 8r"):
-                year = discord.utils.get(message.guild.roles,
-                                         name="PhD+")
-            else:
+            db_record = db_record[2].split()
+            year = None
+            if len(db_record) == 3:
+                if db_record[0] == "FIT":
+                    db_record[2] == int(db_record[2][:-1])
+                    if db_record[1] == "BIT":
+                        year = "BIT"
+                        if db_record[2] < 4:
+                            year = str(db_record) + year
+                        else:
+                            year = "4BIT+"
+                    elif db_record[1] in ["MBS", "MBI", "MIS", "MIN"
+                                          "MMI", "MMM", "MGM", "MGMe"
+                                          "MPV", "MSK"]
+                        year = "MIT"
+                        if db_record[2] < 3:
+                            year = str(db_record) + year
+                        else:
+                            year = "3MIT+"
+                    elif db_record[1] == "DVI4":
+                        year = "PhD+"
+
+            if year is None:
                 await message.channel.send(
                     "Hey {}, I'll let {} handle this manualy\nYear:`{}`"
                     .format(utils.generate_mention(
                                 message.author.id),
                             utils.generate_mention(
                                 config.admin_id),
-                            db_record[2]))
+                            str(db_record)))
                 return
 
             user.save_record(message)
