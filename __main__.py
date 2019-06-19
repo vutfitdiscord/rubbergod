@@ -56,8 +56,6 @@ async def send_hash(message):
             hash = ''.join(random.choices(string.ascii_uppercase +
                                           string.digits, k=20))
 
-            user.save_mail(message, hash)
-
             password = "rubbergod7297"
             port = 1337
             context = ssl.create_default_context()
@@ -70,6 +68,8 @@ async def send_hash(message):
                                   context=context) as server:
                 server.login("toasterrubbergod@gmail.com", password)
                 server.sendmail(sender_email, receiver_email, message)
+
+            user.save_mail(message, hash)
 
             await message.channel.send("An email with hash has been sent " +
                                        "to your school mail " +
