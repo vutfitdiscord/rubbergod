@@ -86,8 +86,8 @@ async def verify(message):
                 return
 
             user.save_record(message)
-            await message.autor.add_roles(verify)
-            await message.autor.add_roles(year)
+            await message.author.add_roles(verify)
+            await message.author.add_roles(year)
             await message.channel.send("Congrats, you have been verified! {}"
                                        .format(utils.generate_mention(
                                                    message.author.id)))
@@ -200,14 +200,15 @@ async def on_message(message):
 
 @client.event
 async def on_reaction_add(reaction, user):
-    if reaction.message.content.startswith("Join roles"):
-        role_data = await get_join_role_data(reaction.message)
-        for line in role_data:
-            if reaction.emoji == line[1]:
-                await add_role_on_reaction(line[0], user, reaction.message)
-                break
-    if type(reaction.emoji) is not str:
-        karma.karma_emoji(reaction.message.author, reaction.emoji.id)
+    if not(user.bot):
+        if reaction.message.content.startswith("Join roles"):
+            role_data = await get_join_role_data(reaction.message)
+            for line in role_data:
+                if reaction.emoji == line[1]:
+                    await add_role_on_reaction(line[0], user, reaction.message)
+                    break
+        if type(reaction.emoji) is not str:
+            karma.karma_emoji(reaction.message.author, reaction.emoji.id)
 
 
 @client.event
