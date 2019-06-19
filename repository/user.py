@@ -4,6 +4,17 @@ import mysql.connector
 
 class User(BaseRepository):
 
+    def save_mail(self, message, code):
+        """"Inserts login with discord name into database"""
+        db = mysql.connector.connect(**self.config.connection)
+        login = str(message.content).split(" ")[1]  # gets login from command
+        cursor = db.cursor()
+        cursor.execute('UPDATE bot_valid_persons SET status="{}", code="{}"'
+                       'WHERE login="{}"'.format(2, code, login))
+        db.commit()
+        db.close()
+        return
+
     def save_record(self, message):
         """"Inserts login with discord name into database"""
         db = mysql.connector.connect(**self.config.connection)
@@ -31,6 +42,17 @@ class User(BaseRepository):
             if str(user_role) == role:
                 has_role = True
         return has_role
+
+    def find_login_to_mail(self, message):
+        """"Finds login from database"""
+        db = mysql.connector.connect(**self.config.connection)
+        login = str(message.content).split(" ")[1]  # gets login from command
+        cursor = db.cursor()
+        cursor.execute('SELECT * FROM bot_valid_persons WHERE `login`="{}" '
+                       'AND status = 1'.format(login))
+        login = cursor.fetchone()
+        db.close()
+        return login
 
     def find_login(self, message):
         """"Finds login from database"""

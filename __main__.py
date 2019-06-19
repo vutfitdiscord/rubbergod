@@ -2,6 +2,10 @@ import discord
 from repository import rng, karma, user, utils
 from config import config
 import mysql.connector
+import random
+import string
+import smtplib
+import ssl
 
 
 client = discord.Client()
@@ -38,12 +42,63 @@ async def update_web():
     db.close()
 
 
+async def send_hash(message):
+    if len(str(message.content).split(" ")) != 2:
+        await message.channel.send(
+                "Ocekavam 1 argument (login)\n")
+        return
+
+    if not user.has_role(message, config.verification_role):
+        db_record = user.find_login_to_mail(message)
+        if db_record:
+            # get server permit role
+
+            hash = ''.join(random.choices(string.ascii_uppercase +
+                                          string.digits, k=20))
+
+            user.save_mail(message, hash)
+
+            password = "rubbergod7297"
+            port = 1337
+            context = ssl.create_default_context()
+            login = str(message.content).split(" ")[1]
+            sender_email = "toasterrubbergod@gmail.com"
+            receiver_email = login + "@stud.fit.vutbr.cz"
+            message = hash
+
+            with smtplib.SMTP_SSL("smtp.gmail.com", port,
+                                  context=context) as server:
+                server.login("toasterrubbergod@gmail.com", password)
+                server.sendmail(sender_email, receiver_email, message)
+
+            await message.channel.send("An email with hash has been sent " +
+                                       "to your school mail " +
+                                       "(@stud.fit.vutbr.cz)! {}" +
+                                       "Pro verifikaci pouzij:" +
+                                       "!verify xlogin00 hash"
+                                       .format(utils.generate_mention(
+                                                   message.author.id)))
+        else:
+            await message.channel.send("Login not found {} {}"
+                                       .format(utils.generate_mention(
+                                                   message.author.id),
+                                               utils.generate_mention(
+                                                   config.admin_id)))
+    else:
+        await message.channel.send("You have already been verified {} {}"
+                                   .format(utils.generate_mention(
+                                               message.author.id),
+                                           utils.generate_mention(
+                                               config.admin_id)))
+    await message.delete()
+
+
 async def verify(message):
     """"Verify if VUT login is from database"""
     if len(str(message.content).split(" ")) != 3:
         await message.channel.send(
-                "Debile musis to volat s 2ma argumentama " +
-                "ale to ti matthew nerekne")
+                "Ocekavam 2 argumenty (login a hash)\n" +
+                "Pro ziskani hashe pouzij `!get-hash xlogin00`")
         return
 
     if not user.has_role(message, config.verification_role):
@@ -177,6 +232,9 @@ async def on_message(message):
 
     elif message.content.startswith("!verify"):
         await verify(message)
+
+    elif message.content.startswith("!get-hash"):
+        await send_hash(message)
 
     elif message.content.startswith("!roll"):
         await message.channel.send(rng.generate_number(message))
