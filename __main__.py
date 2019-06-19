@@ -177,7 +177,7 @@ async def show_karma(message):
 # Returns list of role names and emotes that represent them
 async def get_join_role_data(message):
     input_string = (message.content[message.content.index('\n')+1:]
-                    .split('\n')[:-1])
+                    .strip().split('\n'))
     output = []
     for line in input_string:
         line = line.split()
