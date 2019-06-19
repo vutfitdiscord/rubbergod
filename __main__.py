@@ -191,6 +191,13 @@ async def message_role_reactions(message, data):
     for line in data:
         await message.add_reaction(line[1])
 
+
+async def add_role_on_reaction(role, user):
+    role = discord.utils.get(message.guild.roles,
+                             name=role)
+    await client.add_roles(user, role)
+
+
 #                                      #
 #              COMMANDS                #
 #                                      #
@@ -233,6 +240,12 @@ async def on_message(message):
 
 @client.event
 async def on_reaction_add(reaction, user):
+    if reaction.message.content.startswith("Join roles"):
+        role_data = await get_join_role_data(reaction.message)
+        for line in role_data:
+            if reaction.emoji == line[1]:
+                add_role_on_reaction(line[0], user)
+                break
     if type(reaction.emoji) is not str:
         karma.karma_emoji(reaction.message.author, reaction.emoji.id)
 
