@@ -332,6 +332,7 @@ async def on_raw_reaction_add(payload):
                 if emoji == line[1]:
                     await add_role_on_reaction(line[0], member, message)
                     break
+            message.remove_reaction(emoji, member)
         if type(emoji) is not str:
             karma.karma_emoji(message.author, payload.emoji.id)
 
