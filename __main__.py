@@ -110,10 +110,6 @@ async def verify(message):
     if not user.has_role(message, config.verification_role):
         db_record = user.find_login(message)
         if db_record:
-            # get server permit role
-            verify = discord.utils.get(message.guild.roles,
-                                       name=config.verification_role)
-
             db_record = db_record[2].split()
             year = None
             if len(db_record) == 3:
@@ -146,9 +142,22 @@ async def verify(message):
                             str(db_record)))
                 return
 
-            year = discord.utils.get(message.guild.roles, name=year)
-            await message.author.add_roles(verify)
-            await message.author.add_roles(year)
+            try:
+                # get server permit role
+                verify = discord.utils.get(message.guild.roles,
+                                           name=config.verification_role)
+                year = discord.utils.get(message.guild.roles, name=year)
+                member = message.author
+            except AttributeError:
+                # jsme v PM
+                guild = client.get_guild(config.guild_id)
+                verify = discord.utils.get(guild.roles,
+                                           name=config.verification_role)
+                year = discord.utils.get(guild.roles, name=year)
+                member = guild.get_member(message.author.id)
+
+            await member.add_roles(verify)
+            await member.add_roles(year)
             user.save_record(message)
             await message.channel.send("Gratuluji, byl si verifikován! {}"
                                        .format(utils.generate_mention(
@@ -166,7 +175,10 @@ async def verify(message):
                                                message.author.id),
                                            utils.generate_mention(
                                                config.admin_id)))
-    await message.delete()
+    try:
+        await message.delete()
+    except discord.errors.Forbidden:
+        return
 
 
 async def pick(message):
@@ -332,7 +344,7 @@ async def on_raw_reaction_add(payload):
                 if emoji == line[1]:
                     await add_role_on_reaction(line[0], member, message)
                     break
-            message.remove_reaction(emoji, member)
+            await message.remove_reaction(emoji, member)
         if type(emoji) is not str:
             karma.karma_emoji(message.author, payload.emoji.id)
 
