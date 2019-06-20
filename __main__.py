@@ -286,7 +286,7 @@ async def on_message(message):
 @client.event
 async def on_raw_reaction_add(payload):
     user = client.get_user(payload.user_id)
-    channel = await client.get_channel(payload.channel_id)
+    channel = client.get_channel(payload.channel_id)
     message = await channel.fetch_message(payload.message_id) 
     if not(user.bot):
         if message.content.startswith("Join roles"):
@@ -302,7 +302,7 @@ async def on_raw_reaction_add(payload):
 @client.event
 async def on_raw_reaction_remove(payload):
     user = client.get_user(payload.user_id)
-    channel = await client.get_channel(payload.channel_id)
+    channel = client.get_channel(payload.channel_id)
     message = await channel.fetch_message(payload.message_id)
     if message.content.startswith("Join roles"):
         role_data = await get_join_role_data(message)
