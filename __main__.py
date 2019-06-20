@@ -196,9 +196,15 @@ async def get_join_role_data(message):
     input_string = input_string.replace(" - ", " ")
     input_string = input_string.replace(": ", " ")
     input_string = input_string.replace("**", "")
-    input_string = (input_string[input_string.index('\n')+1:]
-                    .strip().split('\n'))
     output = []
+    try:
+        input_string = (input_string[input_string.index('\n')+1:]
+                        .strip().split('\n'))
+    except ValueError:
+        await message.channel.send("{} nesprávny formát. Použi !god"
+                                   .format(utils.generate_mention(
+                                        message.author.id), line[0]))
+        return output
     for line in input_string:
         line = line.split()
         if len(line) > 1:
@@ -283,7 +289,7 @@ async def on_message(message):
     elif message.content.startswith("!god"):
         await message.channel.send(config.info())
 
-    elif message.content.startswith("Join roles"):
+    elif message.content.startswith("Role"):
         role_data = await get_join_role_data(message)
         await message_role_reactions(message, role_data)
 
@@ -298,7 +304,7 @@ async def on_raw_reaction_add(payload):
     else:
         emoji = payload.emoji.name
     if not(member.bot):
-        if message.content.startswith("Join roles"):
+        if message.content.startswith("Role"):
             role_data = await get_join_role_data(message)
             for line in role_data:
                 if emoji == line[1]:
@@ -317,7 +323,7 @@ async def on_raw_reaction_remove(payload):
         emoji = client.get_emoji(payload.emoji.id)
     else:
         emoji = payload.emoji.name
-    if message.content.startswith("Join roles"):
+    if message.content.startswith("Role"):
         role_data = await get_join_role_data(message)
         for line in role_data:
             if emoji == line[1]:
