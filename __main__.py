@@ -247,7 +247,7 @@ async def add_role_on_reaction(role, member, message):
         else:
             await message.channel.send("{} na pridanie role {} nemáš práva"
                                        .format(utils.generate_mention(
-                                          message.author.id), role.name))
+                                          member.id), role.name))
 
 
 # Removes a role for user based on reaction
@@ -262,7 +262,7 @@ async def remove_role_on_reaction(role, member, message):
         else:
             await message.channel.send("{} na odobranie role {} nemáš práva"
                                        .format(utils.generate_mention(
-                                          message.author.id), role.name))
+                                          member.id), role.name))
 
 
 #                                      #
