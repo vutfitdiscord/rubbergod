@@ -23,10 +23,10 @@ class Rng:
         """"Generate random number from interval"""
         string = message.content.split(" ")
         if len(string) != 3 and len(string) != 2:
-            return ("Usage: !roll x [y]\n" + 
-                    "Where x, y is range from which to pick a number\n" + 
-                    "x, y should be integers\n" + 
-                    "If y is not specified, 0 assumed")
+            return ("Použití: !roll x [y]\n" + 
+                    "Kde x, y je rozmezí čísel\n" + 
+                    "x, y jsou celá čísla\n" + 
+                    "Ak y není specifikováno, je považováno za 0")
         try:
             x = int(string[1])
             if len(string) == 3:
@@ -34,7 +34,7 @@ class Rng:
             else:
                 y = 0
         except ValueError:
-            return "Please provide **integers**"
+            return "Prosím zadej validní **integers**"
         if x > y:
             x, y = y, x  # variable values swap
         return randint(x, y)
