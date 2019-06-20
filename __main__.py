@@ -76,8 +76,8 @@ async def send_hash(message):
                                         "(@stud.fit.vutbr.cz)! {}\n" +
                                         "Pro verifikaci použij:\n" +
                                         "!verify xlogin00 hash"
-                                       ).format(utils.generate_mention(
-                                                   message.author.id)))
+                                        ).format(utils.generate_mention(
+                                                     message.author.id)))
         else:
             await message.channel.send("Login nebyl nalezen {} {}"
                                        .format(utils.generate_mention(
@@ -139,7 +139,6 @@ async def verify(message):
                                 config.admin_id),
                             str(db_record)))
                 return
-
 
             year = discord.utils.get(message.guild.roles, name=year)
             await message.author.add_roles(verify)
@@ -210,32 +209,33 @@ async def get_join_role_data(message):
 # Adds reactions to message
 async def message_role_reactions(message, data):
     for line in data:
-        if type(line[1]) != discord.Emoji:
+        if type(line[1]) in client.emojis:
             await message.channel.send("{} {} pre rolu {} nie je emote"
-                                        .format(utils.generate_mention(
-                                            message.author.id),
-                                        line[1], line[0]))
+                                       .format(utils.generate_mention(
+                                                   message.author.id),
+                                               line[1], line[0]))
         elif (discord.utils.get(message.guild.roles,
-                                name=line[0]) == None):
+                                name=line[0]) is None):
             await message.channel.send("{} {} nie je rola"
-                                        .format(utils.generate_mention(
-                                            message.author.id),
-                                        line[0]))
+                                       .format(utils.generate_mention(
+                                           message.author.id), line[0]))
         else:
             await message.add_reaction(line[1])
+
 
 # Adds a role for user based on reaction
 async def add_role_on_reaction(role, user, message):
     role = discord.utils.get(message.guild.roles,
                              name=role)
-    if role != None:
+    if role is not None:
         await user.add_roles(role)
+
 
 # Removes a role for user based on reaction
 async def remove_role_on_reaction(role, user, message):
     role = discord.utils.get(message.guild.roles,
                              name=role)
-    if role != None:
+    if role is not None:
         await user.remove_roles(role)
 
 
