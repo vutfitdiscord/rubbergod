@@ -209,18 +209,19 @@ async def get_join_role_data(message):
 # Adds reactions to message
 async def message_role_reactions(message, data):
     for line in data:
-        if type(line[1]) in client.emojis:
-            await message.channel.send("{} {} pre rolu {} nie je emote"
-                                       .format(utils.generate_mention(
-                                                   message.author.id),
-                                               line[1], line[0]))
-        elif (discord.utils.get(message.guild.roles,
-                                name=line[0]) is None):
+        if (discord.utils.get(message.guild.roles,
+                              name=line[0]) is None):
             await message.channel.send("{} {} nie je rola"
                                        .format(utils.generate_mention(
                                            message.author.id), line[0]))
         else:
-            await message.add_reaction(line[1])
+            try:
+                await message.add_reaction(line[1])
+            except discord.errors.HTTPException:
+                await message.channel.send("{} {} pre rolu {} nie je emote"
+                                           .format(utils.generate_mention(
+                                               message.author.id),
+                                               line[1], line[0]))
 
 
 # Adds a role for user based on reaction
