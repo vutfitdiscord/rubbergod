@@ -62,7 +62,8 @@ async def send_hash(message):
             login = str(message.content).split(" ")[1]
             sender_email = "toasterrubbergod@gmail.com"
             receiver_email = login + "@stud.fit.vutbr.cz"
-            mail_content = hash
+            subject = "FIT Discord verifikace"
+            mail_content = 'Subject: {}\n\n{}'.format(subject, hash)
 
             with smtplib.SMTP_SSL("smtp.gmail.com", port,
                                   context=context) as server:
