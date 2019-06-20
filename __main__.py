@@ -45,7 +45,7 @@ async def update_web():
 async def send_hash(message):
     if len(str(message.content).split(" ")) != 2:
         await message.channel.send(
-                "Ocekavam 1 argument (login)\n")
+                "Očekávám 1 argument (login)\n")
         return
 
     if not user.has_role(message, config.verification_role):
@@ -71,21 +71,21 @@ async def send_hash(message):
 
             user.save_mail(message, hash)
 
-            await message.channel.send(("An email with hash has been sent " +
-                                        "to your school mail " +
+            await message.channel.send(("Hash byl odoslán " +
+                                        "na tvůj mail " +
                                         "(@stud.fit.vutbr.cz)! {}\n" +
-                                        "Pro verifikaci pouzij:\n" +
+                                        "Pro verifikaci použij:\n" +
                                         "!verify xlogin00 hash"
                                        ).format(utils.generate_mention(
                                                    message.author.id)))
         else:
-            await message.channel.send("Login not found {} {}"
+            await message.channel.send("Login nebyl nalezen {} {}"
                                        .format(utils.generate_mention(
                                                    message.author.id),
                                                utils.generate_mention(
                                                    config.admin_id)))
     else:
-        await message.channel.send("You have already been verified {} {}"
+        await message.channel.send("Už si byl verifikován {} {}"
                                    .format(utils.generate_mention(
                                                message.author.id),
                                            utils.generate_mention(
@@ -132,7 +132,7 @@ async def verify(message):
 
             if year is None:
                 await message.channel.send(
-                    "Hey {}, I'll let {} handle this manualy\nYear:`{}`"
+                    "Čauec {}, nechám {} aby to udělal manuálne\nYear:`{}`"
                     .format(utils.generate_mention(
                                 message.author.id),
                             utils.generate_mention(
@@ -145,17 +145,17 @@ async def verify(message):
             await message.author.add_roles(verify)
             await message.author.add_roles(year)
             user.save_record(message)
-            await message.channel.send("Congrats, you have been verified! {}"
+            await message.channel.send("Gratuluji, byl si verifikován! {}"
                                        .format(utils.generate_mention(
                                                    message.author.id)))
         else:
-            await message.channel.send("Not found {} {}"
+            await message.channel.send("Nenalezeno {} {}"
                                        .format(utils.generate_mention(
                                                    message.author.id),
                                                utils.generate_mention(
                                                    config.admin_id)))
     else:
-        await message.channel.send("You have already been verified {} {}"
+        await message.channel.send("Už si byl verifikován {} {}"
                                    .format(utils.generate_mention(
                                                message.author.id),
                                            utils.generate_mention(
