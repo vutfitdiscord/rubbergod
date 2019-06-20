@@ -239,16 +239,30 @@ async def message_role_reactions(message, data):
 async def add_role_on_reaction(role, member, message):
     role = discord.utils.get(message.guild.roles,
                              name=role)
+    max_role = discord.utils.get(message.guild.roles,
+                                 name="Rubbergod")
     if role is not None:
-        await member.add_roles(role)
+        if role < max_role:
+            await member.add_roles(role)
+        else:
+            await message.channel.send("{} na pridanie role {} nemáš práva"
+                                       .format(utils.generate_mention(
+                                          message.author.id), role.name))
 
 
 # Removes a role for user based on reaction
 async def remove_role_on_reaction(role, member, message):
     role = discord.utils.get(message.guild.roles,
                              name=role)
+    max_role = discord.utils.get(message.guild.roles,
+                                 name="Rubbergod")
     if role is not None:
-        await member.remove_roles(role)
+        if role < max_role:
+            await member.remove_roles(role)
+        else:
+            await message.channel.send("{} na odobranie role {} nemáš práva"
+                                       .format(utils.generate_mention(
+                                          message.author.id), role.name))
 
 
 #                                      #
