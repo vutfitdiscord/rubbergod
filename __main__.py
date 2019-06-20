@@ -203,7 +203,7 @@ async def get_join_role_data(message):
     except ValueError:
         await message.channel.send("{} nesprávny formát. Použi !god"
                                    .format(utils.generate_mention(
-                                        message.author.id), line[0]))
+                                        message.author.id)))
         return output
     for line in input_string:
         line = line.split()
@@ -257,12 +257,13 @@ async def remove_role_on_reaction(role, member, message):
     max_role = discord.utils.get(message.guild.roles,
                                  name="Rubbergod")
     if role is not None:
-        if role < max_role:
-            await member.remove_roles(role)
-        else:
-            await message.channel.send("{} na odobranie role {} nemáš práva"
-                                       .format(utils.generate_mention(
-                                          member.id), role.name))
+        if role in member.roles:
+            if role < max_role:
+                await member.remove_roles(role)
+            else:
+                await message.channel.send("{} na odobranie role {} nemáš práva"
+                                           .format(utils.generate_mention(
+                                              member.id), role.name))
 
 
 #                                      #
