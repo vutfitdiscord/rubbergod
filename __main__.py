@@ -284,28 +284,34 @@ async def on_message(message):
 
 
 @client.event
-async def on_reaction_add(reaction, user):
+async def on_raw_reaction_add(payload):
+    user = await client.get_user(payload.user_id)
+    channel = await client.get_channel(payload.channel_id)
+    message = await channel.fetch_message(payload.message_id) 
     if not(user.bot):
-        if reaction.message.content.startswith("Join roles"):
-            role_data = await get_join_role_data(reaction.message)
+        if message.content.startswith("Join roles"):
+            role_data = await get_join_role_data(message)
             for line in role_data:
-                if reaction.emoji == line[1]:
-                    await add_role_on_reaction(line[0], user, reaction.message)
+                if payload.emoji == line[1]:
+                    await add_role_on_reaction(line[0], user, message)
                     break
-        if type(reaction.emoji) is not str:
-            karma.karma_emoji(reaction.message.author, reaction.emoji.id)
+        if type(payload.emoji) is not str:
+            karma.karma_emoji(message.author, payload.emoji.id)
 
 
 @client.event
-async def on_reaction_remove(reaction, user):
-    if reaction.message.content.startswith("Join roles"):
-        role_data = await get_join_role_data(reaction.message)
+async def on_raw_reaction_remove(payload):
+    user = await client.get_user(payload.user_id)
+    channel = await client.get_channel(payload.channel_id)
+    message = await channel.fetch_message(payload.message_id)
+    if message.content.startswith("Join roles"):
+        role_data = await get_join_role_data(message)
         for line in role_data:
-            if reaction.emoji == line[1]:
-                await remove_role_on_reaction(line[0], user, reaction.message)
+            if payload.emoji == line[1]:
+                await remove_role_on_reaction(line[0], user, message)
                 break
-    if type(reaction.emoji) is not str:
-        karma.karma_emoji_remove(reaction.message.author, reaction.emoji.id)
+    if type(payload.emoji) is not str:
+        karma.karma_emoji_remove(message.author, payload.emoji.id)
 
 
 client.run(config.key)
