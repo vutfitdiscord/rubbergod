@@ -37,11 +37,10 @@ class User(BaseRepository):
     @staticmethod
     def has_role(message, role):
         """"Checks if user has defined role"""
-        has_role = False
-        for user_role in message.author.roles:
-            if str(user_role) == role:
-                has_role = True
-        return has_role
+        try:
+            return True if role in message.autor.roles else False
+        except AttributeError:
+            return False
 
     def find_login_to_mail(self, message):
         """"Finds login from database"""

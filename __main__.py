@@ -81,18 +81,22 @@ async def send_hash(message):
                                         ).format(utils.generate_mention(
                                                      message.author.id)))
         else:
-            await message.channel.send("Login nebyl nalezen {} {}"
-                                       .format(utils.generate_mention(
-                                                   message.author.id),
-                                               utils.generate_mention(
-                                                   config.admin_id)))
+            await message.channel.send(("Login nenalezen nebo jsi jiz " +
+                                        "prosel timhle krokem {} {}"
+                                        ).format(utils.generate_mention(
+                                                     message.author.id),
+                                                 utils.generate_mention(
+                                                     config.admin_id)))
     else:
         await message.channel.send("Už si byl verifikován {} {}"
                                    .format(utils.generate_mention(
                                                message.author.id),
                                            utils.generate_mention(
                                            config.admin_id)))
-    await message.delete()
+    try:
+        await message.delete()
+    except discord.errors.Forbidden:
+        return
 
 
 async def verify(message):
@@ -150,11 +154,12 @@ async def verify(message):
                                        .format(utils.generate_mention(
                                                    message.author.id)))
         else:
-            await message.channel.send("Nenalezeno {} {}"
-                                       .format(utils.generate_mention(
-                                                   message.author.id),
-                                               utils.generate_mention(
-                                                   config.admin_id)))
+            await message.channel.send(("Login nenalezen nebo jsi jiz " +
+                                        "prosel timhle krokem {} {}"
+                                        ).format(utils.generate_mention(
+                                                     message.author.id),
+                                                 utils.generate_mention(
+                                                     config.admin_id)))
     else:
         await message.channel.send("Už si byl verifikován {} {}"
                                    .format(utils.generate_mention(
