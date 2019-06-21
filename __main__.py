@@ -49,6 +49,14 @@ async def send_hash(message):
         return
 
     if not user.has_role(message, config.verification_role):
+        if str(message.content).split(" ")[1] == "xlogin00":
+            fp = message.channel.guild.fetch_emoji(591700868211146806)
+            await message.channel.send("Tvuj login {} {}"
+                                       .format(str(fp),
+                                               utils.generate_mention(
+                                                   message.author.id)))
+            return
+
         db_record = user.find_login_to_mail(message)
         if db_record:
             # get server permit role
@@ -108,6 +116,21 @@ async def verify(message):
         return
 
     if not user.has_role(message, config.verification_role):
+        if str(message.content).split(" ")[1] == "xlogin00":
+            fp = message.channel.guild.fetch_emoji(591700868211146806)
+            await message.channel.send("Tvuj login {} {}"
+                                       .format(str(fp),
+                                               utils.generate_mention(
+                                                   message.author.id)))
+            return
+        if str(message.content).split(" ")[2] == "hash":
+            fp = message.channel.guild.fetch_emoji(591700868211146806)
+            await message.channel.send("Hash ktery ti prisel na mail {} {}"
+                                       .format(str(fp),
+                                               utils.generate_mention(
+                                                   message.author.id)))
+            return
+
         db_record = user.find_login(message)
         if db_record:
             db_record = db_record[2].split()
