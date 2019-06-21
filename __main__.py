@@ -195,13 +195,16 @@ async def karma_leaderboard(message):
     board = karma.get_leaderboard()
     i = 1
     output = "==================\n KARMA LEADERBOARD \n==================\n"
+    guild = client.get_guild(config.guild_id)
     for user in board:
-        username = await client.get_user_info(user[0])
-        username = str(username).split('#')[0]
+        username = guild.get_member(int(user[0]))
+        if username is None:
+            continue
+        username = str(username.name)
         line = '{} - {} - {} pts\n'.format(i, username, user[1])
         output = output + line
         i = i + 1
-    output = output + '\n Full leaderboard - http://bit.ly/godboard \n'
+    output = output + '\n Full leaderboard - TO BE ADDED (SOON*tm*) \n'
     await message.channel.send(output)
 
 
@@ -341,12 +344,12 @@ async def on_raw_reaction_add(payload):
         if message.content.startswith("Role"):
             role_data = await get_join_role_data(message)
             for line in role_data:
-                if emoji == line[1]:
+                if str(emoji) == line[1]:
                     await add_role_on_reaction(line[0], member, message)
                     break
             else:
                 await message.remove_reaction(emoji, member)
-        if type(emoji) is not str:
+        if type(emoji) is not str and member.id != message.author.id:
             karma.karma_emoji(message.author, payload.emoji.id)
 
 
@@ -362,10 +365,10 @@ async def on_raw_reaction_remove(payload):
     if message.content.startswith("Role"):
         role_data = await get_join_role_data(message)
         for line in role_data:
-            if emoji == line[1]:
+            if str(emoji) == line[1]:
                 await remove_role_on_reaction(line[0], member, message)
                 break
-    if type(emoji) is not str:
+    if type(emoji) is not str and member.id != message.author.id:
         karma.karma_emoji_remove(message.author, payload.emoji.id)
 
 
