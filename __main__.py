@@ -50,7 +50,7 @@ async def send_hash(message):
 
     if not user.has_role(message, config.verification_role):
         if str(message.content).split(" ")[1] == "xlogin00":
-            fp = message.channel.guild.fetch_emoji(591700868211146806)
+            fp = await message.channel.guild.fetch_emoji(585915845146968093)
             await message.channel.send("Tvuj login {} {}"
                                        .format(str(fp),
                                                utils.generate_mention(
@@ -117,14 +117,14 @@ async def verify(message):
 
     if not user.has_role(message, config.verification_role):
         if str(message.content).split(" ")[1] == "xlogin00":
-            fp = message.channel.guild.fetch_emoji(591700868211146806)
+            fp = await message.channel.guild.fetch_emoji(585915845146968093)
             await message.channel.send("Tvuj login {} {}"
                                        .format(str(fp),
                                                utils.generate_mention(
                                                    message.author.id)))
             return
         if str(message.content).split(" ")[2] == "hash":
-            fp = message.channel.guild.fetch_emoji(591700868211146806)
+            fp = await message.channel.guild.fetch_emoji(585915845146968093)
             await message.channel.send("Hash ktery ti prisel na mail {} {}"
                                        .format(str(fp),
                                                utils.generate_mention(
@@ -371,7 +371,10 @@ async def on_raw_reaction_add(payload):
                     await add_role_on_reaction(line[0], member, message)
                     break
             else:
-                await message.remove_reaction(emoji, member)
+                if emoji is None:
+                    await message.remove_reaction(payload.emoji, member)
+                else:
+                    await message.remove_reaction(emoji, member)
         if type(emoji) is not str and member.id != message.author.id:
             karma.karma_emoji(message.author, payload.emoji.id)
 
