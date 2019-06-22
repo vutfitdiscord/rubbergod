@@ -64,7 +64,7 @@ class Karma(BaseRepository):
         return leaderboard
 
     async def emote_vote(self, channel, emote):
-        delay = 1 * 60
+        delay = 60 * 60
         message = await channel.send(
                 ("Hlasovani o karma ohodnoceni emotu {}\n" +
                  "Hlasovani skonci za {} minut"

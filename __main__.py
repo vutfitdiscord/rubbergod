@@ -14,6 +14,7 @@ utils = utils.Utils()
 karma = karma.Karma()
 rng = rng.Rng()
 user = user.User()
+voting = False
 
 
 @client.event
@@ -371,18 +372,24 @@ async def on_message(message):
         await karma.get(message)
 
     elif message.content.startswith("!karma revote"):
-        if not await guild_check(message):
-            await message.channel.send(
-                    "Tohle funguje jen na VUT FIT serveru")
-        else:
-            await karma.revote(message)
+        if not voting:
+            voting = True
+            if not await guild_check(message):
+                await message.channel.send(
+                        "Tohle funguje jen na VUT FIT serveru")
+            else:
+                await karma.revote(message)
+            voting = False
 
     elif message.content.startswith("!karma vote"):
-        if not await guild_check(message):
-            await message.channel.send(
-                    "Tohle funguje jen na VUT FIT serveru")
-        else:
-            await karma.vote(message)
+        if not voting:
+            voting = True
+            if not await guild_check(message):
+                await message.channel.send(
+                        "Tohle funguje jen na VUT FIT serveru")
+            else:
+                await karma.vote(message)
+            voting = False
 
     elif message.content.startswith("!karma"):
         await show_karma(message)
