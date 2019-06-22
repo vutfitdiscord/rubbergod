@@ -200,7 +200,6 @@ class Karma(BaseRepository):
                     "Emote jsem na serveru nenasel")
             return
 
-        row = self.get_row("bot_karma_emoji", "emote_id = {}".format(emote.id))
-        return row[1] if row else None
+        row = self.get_row("bot_karma_emoji", "emoji_id = {}".format(emote.id))
         await message.channel.send(
-                "Hodnota {} : {}".format(str(emote), str(row[1] if row else None))
+                "Hodnota {} : {}".format(str(emote), str(row[1] if row else None)))
