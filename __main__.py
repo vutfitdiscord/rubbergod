@@ -45,10 +45,9 @@ async def update_web():
 async def botroom_check(message):
     guild = client.get_guild(config.guild_id)
     if message.channel.guild == guild:
-        print(message.channel.name)
         if message.channel.name != "bot-room":
             await message.channel.send(
-                    "\n")
+                    "<:sadcat:576171980118687754> 👉 <#461549842896781312>\n")
 
 
 async def send_code(message):
@@ -339,30 +338,30 @@ async def on_message(message):
 
     elif message.content.startswith("!roll"):
         await message.channel.send(rng.generate_number(message))
-        botroom_check(message)
+        await botroom_check(message)
 
     elif message.content.startswith("!flip"):
         await message.channel.send(rng.flip())
-        botroom_check(message)
+        await botroom_check(message)
 
     elif message.content.startswith("!week"):
         await message.channel.send(rng.week())
 
     elif message.content.startswith("!pick"):
         await pick(message)
-        botroom_check(message)
+        await botroom_check(message)
 
     elif message.content.startswith("!karma"):
         await show_karma(message)
-        botroom_check(message)
+        await botroom_check(message)
 
     elif message.content.startswith("!leaderboard"):
         await karma_leaderboard(message, 'DESC')
-        botroom_check(message)
+        await botroom_check(message)
 
     elif message.content.startswith("!bajkarboard"):
         await karma_leaderboard(message, 'ASC')
-        botroom_check(message)
+        await botroom_check(message)
 
     elif message.content.startswith("!god"):
         await message.channel.send(config.info())
@@ -370,9 +369,6 @@ async def on_message(message):
     elif message.content.startswith("Role"):
         role_data = await get_join_role_data(message)
         await message_role_reactions(message, role_data)
-
-    else:
-        print(message.content)
 
 
 @client.event
