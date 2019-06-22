@@ -17,6 +17,12 @@ class Config:
             'use_pure': False,
         }
 
+        # Roll dice
+        self.max_dice_at_once = 1000
+        self.dice_before_collation = 20
+        self.max_dice_groups = 10
+        self.max_dice_sides = 10000
+
     @staticmethod
     def info():
         info = '```'\

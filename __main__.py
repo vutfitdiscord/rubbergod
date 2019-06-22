@@ -1,5 +1,5 @@
 import discord
-from repository import rng, karma, user, utils
+from repository import rng, karma, user, utils, roll_dice
 from config import config
 import mysql.connector
 import random
@@ -14,6 +14,7 @@ utils = utils.Utils()
 karma = karma.Karma()
 rng = rng.Rng()
 user = user.User()
+roll_dice = roll_dice.Roll()
 voting = False
 
 
@@ -405,6 +406,9 @@ async def on_message(message):
 
     elif message.content.startswith("!god"):
         await message.channel.send(config.info())
+
+    elif message.content.startswith("!roll"):
+        await message.channel.send(roll_dice.roll_dice(message, config))
 
     elif message.content.startswith("Role"):
         role_data = await get_join_role_data(message)
