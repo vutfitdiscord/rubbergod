@@ -425,7 +425,7 @@ async def on_raw_reaction_add(payload):
         if message.content.startswith("Hlasovani o karma ohodnoceni"):
             if emoji is None:
                 await message.remove_reaction(payload.emoji, member)
-            elif emoji.name not in ["✅", "❌", "0⃣"]:
+            elif emoji not in ["✅", "❌", "0⃣"]:
                 await message.remove_reaction(emoji, member)
         if type(emoji) is not str and member.id != message.author.id:
             karma.karma_emoji(message.author, payload.emoji.id)
