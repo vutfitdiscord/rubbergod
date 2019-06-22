@@ -104,8 +104,11 @@ class Karma(BaseRepository):
         guild = message.channel.guild
         vote_value = 0
         the_emote = None
+        id_array = []
+        for emote in emotes:
+            id_array.append(emote[0])
         for emote in guild.emojis:
-            if emote.id not in emotes and not emote.animated:
+            if emote.id not in id_array and not emote.animated:
                 vote_value = await self.emote_vote(message.channel, emote)
                 the_emote = emote
                 break
@@ -115,9 +118,13 @@ class Karma(BaseRepository):
                     "Hlasovalo se jiz o kazdem emote")
             return
 
-        cursor.execute('INSERT INTO bot_karma_emoji (emoji_id, value) '
-                       'VALUES ("{}", {})'
+        cursor.close()
+        cursor = db.cursor()
+        result = cursor.execute('INSERT INTO bot_karma_emoji (emoji_id, value) '
+                       'VALUES ("{}", "{}")'
                        .format(the_emote.id, vote_value))
+        print(result)
+        db.commit()
         db.close()
         await message.channel.send(
                 "Vysledek hlasovani o emotu {} je {}"
@@ -133,7 +140,7 @@ class Karma(BaseRepository):
 
         emote = content[2]
         try:
-            emote_id = int(emote.split(':')[:-2])
+            emote_id = int(emote.split(':')[2][:-1])
         except (AttributeError, IndexError):
             await message.channel.send(
                     "Ocekavam pouze **emote**")
@@ -153,6 +160,8 @@ class Karma(BaseRepository):
 
         vote_value = await self.emote_vote(message.channel, emote)
 
+        cursor.close()
+        cursor = db.cursor()
         if emote.id not in emotes:
             cursor.execute('INSERT INTO bot_karma_emoji (emoji_id, value) '
                            'VALUES ("{}", "{}")'
@@ -161,6 +170,7 @@ class Karma(BaseRepository):
             cursor.execute('UPDATE bot_karma_emoji SET value = "{}" '
                            'WHERE emoji_id = "{}"'
                            .format(str(vote_value), emote.id))
+        db.commit()
         db.close()
         await message.channel.send(
                 "Vysledek hlasovani o emotu {} je {}"
