@@ -74,13 +74,15 @@ class Karma(BaseRepository):
         await message.add_reaction("0⃣")
         await asyncio.sleep(delay)
 
+        message = await channel.fetch_message(message.id)
+
         for reaction in message.reactions:
             if reaction.emoji == "✅":
-                plus = reaction.count
+                plus = reaction.count - 1
             elif reaction.emoji == "❌":
-                minus = reaction.count
+                minus = reaction.count - 1
             elif reaction.emoji == "0⃣":
-                neutral = reaction.count
+                neutral = reaction.count - 1
 
         if plus > minus + neutral:
             return 1
