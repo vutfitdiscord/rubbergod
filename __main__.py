@@ -51,6 +51,11 @@ async def botroom_check(message):
                     .format(utils.generate_mention(message.author.id)))
 
 
+async def guild_check(message):
+    guild = client.get_guild(config.guild_id)
+    return message.channel.guild == guild
+
+
 async def send_code(message):
     if len(str(message.content).split(" ")) != 2:
         await message.channel.send(
@@ -231,7 +236,7 @@ async def karma_leaderboard(message, order):
     i = 1
     if order == "DESC":
         output = "==================\n KARMA LEADERBOARD \n==================\n"
-    else: 
+    else:
         output = "==================\n KARMA BAJKARBOARD \n==================\n"
     guild = client.get_guild(config.guild_id)
     for user in board:
@@ -357,6 +362,20 @@ async def on_message(message):
     elif message.content.startswith("!pick"):
         await pick(message)
         await botroom_check(message)
+
+    elif message.content.startswith("!karma revote"):
+        if not guild_check(message):
+            await message.channel.send(
+                    "Tohle funguje jen na VUT FIT serveru")
+        else:
+            await karma.revote(message)
+
+    elif message.content.startswith("!karma vote"):
+        if not guild_check(message):
+            await message.channel.send(
+                    "Tohle funguje jen na VUT FIT serveru")
+        else:
+            await karma.vote(message)
 
     elif message.content.startswith("!karma"):
         await show_karma(message)

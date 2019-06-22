@@ -1,6 +1,8 @@
 from repository.base_repository import BaseRepository
 from repository import utils
 import mysql.connector
+import asyncio
+import discord
 
 
 class Karma(BaseRepository):
@@ -60,3 +62,99 @@ class Karma(BaseRepository):
         leaderboard = cursor.fetchall()
         db.close()
         return leaderboard
+
+    async def emote_vote(self, channel, emote):
+        delay = 5 * 60
+        message = await channel.send(
+                ("Hlasovani o karma ohodnoceni emotu {}\n" +
+                 "Hlasovani skonci za {} minut"
+                 ).format(str(emote), str(delay // 60)))
+        await message.add_reaction("✅")
+        await message.add_reaction("❌")
+        await message.add_reaction("0️")
+        await asyncio.sleep(delay)
+
+        for reaction in message.reactions:
+            if reaction.emoji == "✅":
+                plus = reaction.count
+            elif reaction.emoji == "❌":
+                minus = reaction.count
+            elif reaction.emoji == "0️":
+                neutral = reaction.count
+
+        if plus > minus + neutral:
+            return 1
+        elif minus > plus + neutral:
+            return -1
+        else:
+            return 0
+
+    async def vote(self, message):
+        if len(message.content.split()) != 2:
+            await message.channel.send(
+                    "Neocekavam argument")
+            return
+        db = mysql.connector.connect(**self.config.connection)
+        cursor = db.cursor()
+        cursor.execute('SELECT emoji_id FROM bot_karma_emoji')
+        emotes = cursor.fetchall()
+
+        guild = message.channel.guild
+        vote_value = 0
+        the_emote = None
+        for emote in guild.emojis:
+            if emote.id not in emotes and not emote.animated:
+                vote_value = await self.emote_vote(message.channel, emote)
+                the_emote = emote
+                break
+        else:
+            db.close()
+            await message.channel.send(
+                    "Hlasovalo se jiz o kazdem emote")
+            return
+
+        cursor.execute('INSERT INTO bot_karma_emoji (emoji_id, value) '
+                       'VALUES ("{}", {})'
+                       .format(the_emote.id, vote_value))
+        db.close()
+        return
+
+    async def revote(self, message):
+        content = message.content.split()
+        if len(content) != 3:
+            await message.channel.send(
+                    "Ocekavam pouze emote")
+            return
+
+        emote = content[2]
+        try:
+            emote_id = int(emote.split(':')[:-2])
+        except (AttributeError, IndexError):
+            await message.channel.send(
+                    "Ocekavam pouze **emote**")
+            return
+
+        try:
+            emote = await message.channel.guild.fetch_emoji(emote_id)
+        except discord.NotFound:
+            await message.channel.send(
+                    "Emote jsem na serveru nenasel")
+            return
+
+        db = mysql.connector.connect(**self.config.connection)
+        cursor = db.cursor()
+        cursor.execute('SELECT emoji_id FROM bot_karma_emoji')
+        emotes = cursor.fetchall()
+
+        vote_value = await self.emote_vote(message.channel, emote)
+
+        if emote.id not in emotes:
+            cursor.execute('INSERT INTO bot_karma_emoji (emoji_id, value) '
+                           'VALUES ("{}", "{}")'
+                           .format(emote.id, str(vote_value)))
+        else:
+            cursor.execute('UPDATE bot_karma_emoji SET value = "{}" '
+                           'WHERE emoji_id = "{}"'
+                           .format(str(vote_value), emote.id))
+        db.close()
+        return
