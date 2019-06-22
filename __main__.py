@@ -201,8 +201,13 @@ async def get_join_role_data(message):
     output = []
     for line in input_string:
         line = line.split()
-        line = [line[0], line[1]]
-        output.append(line)
+        if len(line) > 1:
+            line = [line[0], line[1]]
+            output.append(line)
+        else:
+            await message.channel.send("{} {} je neplatný riadok"
+                                       .format(utils.generate_mention(
+                                            message.author.id), line[0]))
     return output
 
 
@@ -225,19 +230,19 @@ async def message_role_reactions(message, data):
 
 
 # Adds a role for user based on reaction
-async def add_role_on_reaction(role, user, message):
+async def add_role_on_reaction(role, member, message):
     role = discord.utils.get(message.guild.roles,
                              name=role)
     if role is not None:
-        await user.add_roles(role)
+        await member.add_roles(role)
 
 
 # Removes a role for user based on reaction
-async def remove_role_on_reaction(role, user, message):
+async def remove_role_on_reaction(role, member, message):
     role = discord.utils.get(message.guild.roles,
                              name=role)
     if role is not None:
-        await user.remove_roles(role)
+        await member.remove_roles(role)
 
 
 #                                      #
@@ -285,32 +290,40 @@ async def on_message(message):
 
 @client.event
 async def on_raw_reaction_add(payload):
-    user = client.get_user(payload.user_id)
     channel = client.get_channel(payload.channel_id)
-    message = await channel.fetch_message(payload.message_id) 
-    if not(user.bot):
+    member = channel.guild.get_member(payload.user_id)
+    message = await channel.fetch_message(payload.message_id)
+    if payload.emoji.is_custom_emoji():
+        emoji = client.get_emoji(payload.emoji.id)
+    else:
+        emoji = payload.emoji.name
+    if not(member.bot):
         if message.content.startswith("Join roles"):
             role_data = await get_join_role_data(message)
             for line in role_data:
-                if payload.emoji == line[1]:
-                    await add_role_on_reaction(line[0], user, message)
+                if emoji == line[1]:
+                    await add_role_on_reaction(line[0], member, message)
                     break
-        if type(payload.emoji) is not str:
+        if type(emoji) is not str:
             karma.karma_emoji(message.author, payload.emoji.id)
 
 
 @client.event
 async def on_raw_reaction_remove(payload):
-    user = client.get_user(payload.user_id)
     channel = client.get_channel(payload.channel_id)
+    member = channel.guild.get_member(payload.user_id)
     message = await channel.fetch_message(payload.message_id)
+    if payload.emoji.is_custom_emoji():
+        emoji = client.get_emoji(payload.emoji.id)
+    else:
+        emoji = payload.emoji.name
     if message.content.startswith("Join roles"):
         role_data = await get_join_role_data(message)
         for line in role_data:
-            if payload.emoji == line[1]:
-                await remove_role_on_reaction(line[0], user, message)
+            if emoji == line[1]:
+                await remove_role_on_reaction(line[0], member, message)
                 break
-    if type(payload.emoji) is not str:
+    if type(emoji) is not str:
         karma.karma_emoji_remove(message.author, payload.emoji.id)
 
 
