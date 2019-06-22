@@ -344,6 +344,7 @@ async def remove_role_on_reaction(role, member, message):
 
 @client.event
 async def on_message(message):
+    global voting
 
     if message.author == client.user:
         return
