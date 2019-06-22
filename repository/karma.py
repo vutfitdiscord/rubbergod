@@ -109,7 +109,7 @@ class Karma(BaseRepository):
             id_array.append(emote[0])
         for emote in guild.emojis:
             if not emote.animated:
-                if self.get_row("bot_karma_emoji", "emote_id = {}".format(emote.id)):
+                if self.get_row("bot_karma_emoji", "emoji_id = {}".format(emote.id)) is None:
                     vote_value = await self.emote_vote(message.channel, emote)
                     the_emote = emote
                     break
