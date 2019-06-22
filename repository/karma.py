@@ -176,3 +176,30 @@ class Karma(BaseRepository):
                 "Vysledek hlasovani o emotu {} je {}"
                 .format(str(emote), str(vote_value)))
         return
+
+    async def get(self, message):
+        content = message.content.split()
+        if len(content) != 3:
+            await message.channel.send(
+                    "Ocekavam pouze emote")
+            return
+
+        emote = content[2]
+        try:
+            emote_id = int(emote.split(':')[2][:-1])
+        except (AttributeError, IndexError):
+            await message.channel.send(
+                    "Ocekavam pouze **emote**")
+            return
+
+        try:
+            emote = await message.channel.guild.fetch_emoji(emote_id)
+        except discord.NotFound:
+            await message.channel.send(
+                    "Emote jsem na serveru nenasel")
+            return
+
+        row = self.get_row("bot_karma_emoji", "emote_id = {}".format(emote.id))
+        return row[1] if row else None
+        await message.channel.send(
+                "Hodnota {} : {}".format(str(emote), str(row[1] if row else None))
