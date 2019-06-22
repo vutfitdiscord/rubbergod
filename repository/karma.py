@@ -108,10 +108,11 @@ class Karma(BaseRepository):
         for emote in emotes:
             id_array.append(emote[0])
         for emote in guild.emojis:
-            if emote.id not in id_array and not emote.animated:
-                vote_value = await self.emote_vote(message.channel, emote)
-                the_emote = emote
-                break
+            if not emote.animated:
+                if self.get_row("bot_karma_emoji", "emote_id = {}".format(emote.id)):
+                    vote_value = await self.emote_vote(message.channel, emote)
+                    the_emote = emote
+                    break
         else:
             db.close()
             await message.channel.send(
