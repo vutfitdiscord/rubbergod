@@ -15,7 +15,6 @@ karma = karma.Karma()
 rng = rng.Rng()
 user = user.User()
 roll_dice = roll_dice.Roll()
-voting = False
 
 
 @client.event
@@ -344,7 +343,6 @@ async def remove_role_on_reaction(role, member, message):
 
 @client.event
 async def on_message(message):
-    global voting
 
     if message.author == client.user:
         return
@@ -374,24 +372,18 @@ async def on_message(message):
         await karma.get(message)
 
     elif message.content.startswith("!karma revote"):
-        if not voting:
-            voting = True
-            if not await guild_check(message):
-                await message.channel.send(
-                        "Tohle funguje jen na VUT FIT serveru")
-            else:
-                await karma.revote(message)
-            voting = False
+        if not await guild_check(message):
+            await message.channel.send(
+                    "Tohle funguje jen na VUT FIT serveru")
+        else:
+            await karma.revote(message)
 
     elif message.content.startswith("!karma vote"):
-        if not voting:
-            voting = True
-            if not await guild_check(message):
-                await message.channel.send(
-                        "Tohle funguje jen na VUT FIT serveru")
-            else:
-                await karma.vote(message)
-            voting = False
+        if not await guild_check(message):
+            await message.channel.send(
+                    "Tohle funguje jen na VUT FIT serveru")
+        else:
+            await karma.vote(message)
 
     elif message.content.startswith("!karma"):
         await show_karma(message)

@@ -110,6 +110,10 @@ class Karma(BaseRepository):
         for emote in guild.emojis:
             if not emote.animated:
                 if self.get_row("bot_karma_emoji", "emoji_id = {}".format(emote.id)) is None:
+                    cursor.execute('INSERT INTO bot_karma_emoji (emoji_id, value)'
+                                   ' VALUES ("{}", "{}")'
+                                   .format(the_emote.id, 0))
+                    db.commit()
                     vote_value = await self.emote_vote(message.channel, emote)
                     the_emote = emote
                     break
@@ -119,12 +123,9 @@ class Karma(BaseRepository):
                     "Hlasovalo se jiz o kazdem emote")
             return
 
-        cursor.close()
-        cursor = db.cursor()
-        result = cursor.execute('INSERT INTO bot_karma_emoji (emoji_id, value)'
-                                ' VALUES ("{}", "{}")'
-                                .format(the_emote.id, vote_value))
-        print(result)
+        cursor.execute('UPDATE bot_karma_emoji SET value = "{}" '
+                       'WHERE emoji_id = "{}"'
+                       .format(vote_value, the_emote.id))
         db.commit()
         db.close()
         await message.channel.send(
