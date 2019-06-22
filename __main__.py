@@ -408,7 +408,7 @@ async def on_message(message):
     elif message.content.startswith("!god"):
         await message.channel.send(config.info())
 
-    elif message.content.startswith("!roll"):
+    elif message.content.startswith("!diceroll"):
         await message.channel.send(roll_dice.roll_dice(message, config))
 
     elif message.content.startswith("Role"):
