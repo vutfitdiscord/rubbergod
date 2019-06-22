@@ -119,6 +119,9 @@ class Karma(BaseRepository):
                        'VALUES ("{}", {})'
                        .format(the_emote.id, vote_value))
         db.close()
+        await message.channel.send(
+                "Vysledek hlasovani o emotu {} je {}"
+                .format(str(the_emote), str(vote_value)))
         return
 
     async def revote(self, message):
