@@ -44,11 +44,15 @@ async def update_web():
 
 async def botroom_check(message):
     guild = client.get_guild(config.guild_id)
-    if message.channel.guild == guild:
-        if message.channel.name != "bot-room":
-            await message.channel.send(
-                    "{} <:sadcat:576171980118687754> 👉 <#461549842896781312>\n"
-                    .format(utils.generate_mention(message.author.id)))
+    try:
+        if message.channel.guild == guild:
+            if message.channel.name != "bot-room":
+                await message.channel.send(
+                        "{} <:sadcat:576171980118687754> 👉 <#461549842896781312>\n"
+                        .format(utils.generate_mention(message.author.id)))
+    except AttributeError:
+        # Jsme v PM
+        return
 
 
 async def guild_check(message):
