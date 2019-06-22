@@ -56,7 +56,7 @@ async def botroom_check(message):
 
 
 async def guild_check(message):
-    guild = await client.get_guild(config.guild_id)
+    guild = client.get_guild(config.guild_id)
     return message.channel.guild == guild
 
 
