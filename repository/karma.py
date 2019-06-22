@@ -52,10 +52,11 @@ class Karma(BaseRepository):
                 .format(self.utils.generate_mention(member),
                         str(karma)))
 
-    def get_leaderboard(self):
+    def get_leaderboard(self, order):
         db = mysql.connector.connect(**self.config.connection)
         cursor = db.cursor()
-        cursor.execute('SELECT * FROM bot_karma ORDER BY karma DESC LIMIT 10')
+        cursor.execute('SELECT * FROM bot_karma ORDER BY karma ' + order +
+                       ' LIMIT 10')
         leaderboard = cursor.fetchall()
         db.close()
         return leaderboard
