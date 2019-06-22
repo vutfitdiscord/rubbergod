@@ -59,7 +59,8 @@ async def send_code(message):
 
     if not user.has_role(message, config.verification_role):
         if str(message.content).split(" ")[1] == "xlogin00":
-            fp = await message.channel.guild.fetch_emoji(585915845146968093)
+            guild = client.get_guild(config.guild_id)
+            fp = await guild.fetch_emoji(585915845146968093)
             await message.channel.send("Tvuj login {} {}"
                                        .format(str(fp),
                                                utils.generate_mention(
@@ -126,14 +127,16 @@ async def verify(message):
 
     if not user.has_role(message, config.verification_role):
         if str(message.content).split(" ")[1] == "xlogin00":
-            fp = await message.channel.guild.fetch_emoji(585915845146968093)
+            guild = client.get_guild(config.guild_id)
+            fp = await guild.fetch_emoji(585915845146968093)
             await message.channel.send("Tvuj login {} {}"
                                        .format(str(fp),
                                                utils.generate_mention(
                                                    message.author.id)))
             return
         if str(message.content).split(" ")[2] == "kod":
-            fp = await message.channel.guild.fetch_emoji(585915845146968093)
+            guild = client.get_guild(config.guild_id)
+            fp = await guild.fetch_emoji(585915845146968093)
             await message.channel.send("Kod ktery ti prisel na mail {} {}"
                                        .format(str(fp),
                                                utils.generate_mention(
