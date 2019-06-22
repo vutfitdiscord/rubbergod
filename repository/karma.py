@@ -64,7 +64,7 @@ class Karma(BaseRepository):
         return leaderboard
 
     async def emote_vote(self, channel, emote):
-        delay = 5 * 60
+        delay = 1 * 60
         message = await channel.send(
                 ("Hlasovani o karma ohodnoceni emotu {}\n" +
                  "Hlasovani skonci za {} minut"
@@ -75,11 +75,11 @@ class Karma(BaseRepository):
         await asyncio.sleep(delay)
 
         for reaction in message.reactions:
-            if reaction.emoji.name == "✅":
+            if reaction.emoji == "✅":
                 plus = reaction.count
-            elif reaction.emoji.name == "❌":
+            elif reaction.emoji == "❌":
                 minus = reaction.count
-            elif reaction.emoji.name == "0⃣":
+            elif reaction.emoji == "0⃣":
                 neutral = reaction.count
 
         if plus > minus + neutral:
@@ -157,4 +157,7 @@ class Karma(BaseRepository):
                            'WHERE emoji_id = "{}"'
                            .format(str(vote_value), emote.id))
         db.close()
+        await message.channel.send(
+                "Vysledek hlasovani o emotu {} je {}"
+                .format(str(emote), str(vote_value)))
         return
