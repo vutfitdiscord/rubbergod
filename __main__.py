@@ -47,7 +47,8 @@ async def botroom_check(message):
     if message.channel.guild == guild:
         if message.channel.name != "bot-room":
             await message.channel.send(
-                    "<:sadcat:576171980118687754> 👉 <#461549842896781312>\n")
+                    "{} <:sadcat:576171980118687754> 👉 <#461549842896781312>\n"
+                    .format(utils.generate_mention(message.author.id)))
 
 
 async def send_code(message):
@@ -222,20 +223,23 @@ async def pick(message):
                                                message.author.id)))
 
 
-async def karma_leaderboard(message):
-    board = karma.get_leaderboard('DESC')
+async def karma_leaderboard(message, order):
+    board = karma.get_leaderboard(order)
     i = 1
-    output = "==================\n KARMA LEADERBOARD \n==================\n"
+    if order == "DESC":
+        output = "==================\n KARMA LEADERBOARD \n==================\n"
+    else: 
+        output = "==================\n KARMA BAJKARBOARD \n==================\n"
     guild = client.get_guild(config.guild_id)
     for user in board:
         username = guild.get_member(int(user[0]))
         if username is None:
             continue
         username = str(username.name)
-        line = '{} - {} - {} pts\n'.format(i, username, user[1])
+        line = '{} - {}:  {} pts\n'.format(i, username, user[1])
         output = output + line
         i = i + 1
-    output = output + '\n Full leaderboard - TO BE ADDED (SOON*tm*) \n'
+    # '\n Full leaderboard - TO BE ADDED (SOON*tm*) \n'
     await message.channel.send(output)
 
 
