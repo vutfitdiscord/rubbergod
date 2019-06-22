@@ -42,7 +42,7 @@ async def update_web():
     db.close()
 
 
-async def send_hash(message):
+async def send_code(message):
     if len(str(message.content).split(" ")) != 2:
         await message.channel.send(
                 "Očekávám 1 argument (login)\n")
@@ -61,11 +61,11 @@ async def send_hash(message):
         if db_record:
             # get server permit role
 
-            hash = ''.join(random.choices(string.ascii_uppercase +
+            code = ''.join(random.choices(string.ascii_uppercase +
                                           string.digits, k=20))
 
             login = str(message.content).split(" ")[1]
-            email_message = "!verify " + login + " " + hash
+            email_message = "!verify " + login + " " + code
             password = "rubbergod7297"
             port = 465
             context = ssl.create_default_context()
@@ -79,13 +79,13 @@ async def send_hash(message):
                 server.login("toasterrubbergod@gmail.com", password)
                 server.sendmail(sender_email, receiver_email, mail_content)
 
-            user.save_mail(message, hash)
+            user.save_mail(message, code)
 
-            await message.channel.send(("Hash byl odoslán " +
+            await message.channel.send(("Kod byl odoslán " +
                                         "na tvůj mail " +
                                         "(@stud.fit.vutbr.cz)! {}\n" +
                                         "Pro verifikaci použij:\n" +
-                                        "!verify xlogin00 hash"
+                                        "!verify xlogin00 kod"
                                         ).format(utils.generate_mention(
                                                      message.author.id)))
         else:
@@ -111,8 +111,8 @@ async def verify(message):
     """"Verify if VUT login is from database"""
     if len(str(message.content).split(" ")) != 3:
         await message.channel.send(
-                "Ocekavam 2 argumenty (login a hash)\n" +
-                "Pro ziskani hashe pouzij `!get-hash xlogin00`")
+                "Ocekavam 2 argumenty (login a kod)\n" +
+                "Pro ziskani kodu pouzij `!getcode xlogin00`")
         return
 
     if not user.has_role(message, config.verification_role):
@@ -123,9 +123,9 @@ async def verify(message):
                                                utils.generate_mention(
                                                    message.author.id)))
             return
-        if str(message.content).split(" ")[2] == "hash":
+        if str(message.content).split(" ")[2] == "kod":
             fp = await message.channel.guild.fetch_emoji(585915845146968093)
-            await message.channel.send("Hash ktery ti prisel na mail {} {}"
+            await message.channel.send("Kod ktery ti prisel na mail {} {}"
                                        .format(str(fp),
                                                utils.generate_mention(
                                                    message.author.id)))
@@ -325,8 +325,8 @@ async def on_message(message):
     elif message.content.startswith("!verify"):
         await verify(message)
 
-    elif message.content.startswith("!get-hash"):
-        await send_hash(message)
+    elif message.content.startswith("!getcode"):
+        await send_code(message)
 
     elif message.content.startswith("!roll"):
         await message.channel.send(rng.generate_number(message))
