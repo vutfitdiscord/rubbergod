@@ -120,9 +120,9 @@ class Karma(BaseRepository):
 
         cursor.close()
         cursor = db.cursor()
-        result = cursor.execute('INSERT INTO bot_karma_emoji (emoji_id, value) '
-                       'VALUES ("{}", "{}")'
-                       .format(the_emote.id, vote_value))
+        result = cursor.execute('INSERT INTO bot_karma_emoji (emoji_id, value)'
+                                ' VALUES ("{}", "{}")'
+                                .format(the_emote.id, vote_value))
         print(result)
         db.commit()
         db.close()

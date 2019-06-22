@@ -100,16 +100,16 @@ async def send_code(message):
 
             user.save_mail(message, code)
 
-            await message.channel.send(("Kod byl odoslán " +
+            await message.channel.send(("Kód byl odeslán " +
                                         "na tvůj mail " +
                                         "(@stud.fit.vutbr.cz)! {}\n" +
                                         "Pro verifikaci použij:\n" +
-                                        "!verify xlogin00 kod"
+                                        "!verify xlogin00 kód"
                                         ).format(utils.generate_mention(
                                                      message.author.id)))
         else:
-            await message.channel.send(("Login nenalezen nebo jsi jiz " +
-                                        "prosel timhle krokem {} {}"
+            await message.channel.send(("Login nenalezen nebo jsi již " +
+                                        "prošel tímhle krokem {} {}"
                                         ).format(utils.generate_mention(
                                                      message.author.id),
                                                  utils.generate_mention(
@@ -130,23 +130,23 @@ async def verify(message):
     """"Verify if VUT login is from database"""
     if len(str(message.content).split(" ")) != 3:
         await message.channel.send(
-                "Ocekavam 2 argumenty (login a kod)\n" +
-                "Pro ziskani kodu pouzij `!getcode xlogin00`")
+                "Očekávám 2 argumenty (login a kód)\n" +
+                "Pro získaní kódu použij `!getcode xlogin00`")
         return
 
     if not user.has_role(message, config.verification_role):
         if str(message.content).split(" ")[1] == "xlogin00":
             guild = client.get_guild(config.guild_id)
             fp = await guild.fetch_emoji(585915845146968093)
-            await message.channel.send("Tvuj login {} {}"
+            await message.channel.send("Tvůj login {} {}"
                                        .format(str(fp),
                                                utils.generate_mention(
                                                    message.author.id)))
             return
-        if str(message.content).split(" ")[2] == "kod":
+        if str(message.content).split(" ")[2] == "kód":
             guild = client.get_guild(config.guild_id)
             fp = await guild.fetch_emoji(585915845146968093)
-            await message.channel.send("Kod ktery ti prisel na mail {} {}"
+            await message.channel.send("Kód který ti přišel na mail {} {}"
                                        .format(str(fp),
                                                utils.generate_mention(
                                                    message.author.id)))
@@ -366,6 +366,9 @@ async def on_message(message):
     elif message.content.startswith("!pick"):
         await pick(message)
         await botroom_check(message)
+
+    elif message.content.startswith("!karma get"):
+        await karma.get(message)
 
     elif message.content.startswith("!karma revote"):
         if not await guild_check(message):
