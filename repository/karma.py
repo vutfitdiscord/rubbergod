@@ -71,7 +71,7 @@ class Karma(BaseRepository):
                  ).format(str(emote), str(delay // 60)))
         await message.add_reaction("✅")
         await message.add_reaction("❌")
-        await message.add_reaction("0️")
+        await message.add_reaction("0⃣")
         await asyncio.sleep(delay)
 
         for reaction in message.reactions:
@@ -79,7 +79,7 @@ class Karma(BaseRepository):
                 plus = reaction.count
             elif reaction.emoji == "❌":
                 minus = reaction.count
-            elif reaction.emoji == "0️":
+            elif reaction.emoji == "0⃣":
                 neutral = reaction.count
 
         if plus > minus + neutral:
