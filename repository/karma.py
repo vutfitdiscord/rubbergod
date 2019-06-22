@@ -75,11 +75,11 @@ class Karma(BaseRepository):
         await asyncio.sleep(delay)
 
         for reaction in message.reactions:
-            if reaction.emoji == "✅":
+            if reaction.emoji.name == "✅":
                 plus = reaction.count
-            elif reaction.emoji == "❌":
+            elif reaction.emoji.name == "❌":
                 minus = reaction.count
-            elif reaction.emoji == "0⃣":
+            elif reaction.emoji.name == "0⃣":
                 neutral = reaction.count
 
         if plus > minus + neutral:

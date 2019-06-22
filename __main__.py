@@ -56,7 +56,7 @@ async def botroom_check(message):
 
 
 async def guild_check(message):
-    guild = client.get_guild(config.guild_id)
+    guild = await client.get_guild(config.guild_id)
     return message.channel.guild == guild
 
 
@@ -368,14 +368,14 @@ async def on_message(message):
         await botroom_check(message)
 
     elif message.content.startswith("!karma revote"):
-        if not guild_check(message):
+        if not await guild_check(message):
             await message.channel.send(
                     "Tohle funguje jen na VUT FIT serveru")
         else:
             await karma.revote(message)
 
     elif message.content.startswith("!karma vote"):
-        if not guild_check(message):
+        if not await guild_check(message):
             await message.channel.send(
                     "Tohle funguje jen na VUT FIT serveru")
         else:
@@ -422,6 +422,11 @@ async def on_raw_reaction_add(payload):
                     await message.remove_reaction(payload.emoji, member)
                 else:
                     await message.remove_reaction(emoji, member)
+        if message.content.startswith("Hlasovani o karma ohodnoceni"):
+            if emoji is None:
+                await message.remove_reaction(payload.emoji, member)
+            elif emoji.name not in ["✅", "❌", "0⃣"]:
+                await message.remove_reaction(emoji, member)
         if type(emoji) is not str and member.id != message.author.id:
             karma.karma_emoji(message.author, payload.emoji.id)
 
