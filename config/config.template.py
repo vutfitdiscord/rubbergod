@@ -3,7 +3,9 @@ class Config:
     def __init__(self):
         self.key = ""
         self.verification_role = ""
-        self.admin_id = 98870222911455232  # for mention in case of false verification
+        self.admin_id = 0   # for mention in case of false verification
+        self.guild_id = 0
+        # So that you can verify in PMs this is the server you get the roles at
         self.connection = {
             'user': 'root',
             'password': '',
