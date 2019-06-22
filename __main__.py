@@ -85,7 +85,7 @@ async def send_code(message):
 
             login = str(message.content).split(" ")[1]
             email_message = "!verify " + login + " " + code
-            password = "rubbergod7297"
+            password = config.email_pass
             port = 465
             context = ssl.create_default_context()
             sender_email = "toasterrubbergod@gmail.com"

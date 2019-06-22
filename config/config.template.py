@@ -5,6 +5,7 @@ class Config:
         self.verification_role = ""
         self.admin_id = 0   # for mention in case of false verification
         self.guild_id = 0
+        self.email_pass = ""
         # So that you can verify in PMs this is the server you get the roles at
         self.connection = {
             'user': 'root',
