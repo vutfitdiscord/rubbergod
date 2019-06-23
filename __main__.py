@@ -55,6 +55,14 @@ async def botroom_check(message):
         # Jsme v PM
         return
 
+async def vote_room_check(message):
+    guild = client.get_guild(config.guild_id)
+    try:
+        if message.channel.guild == guild:
+            return message.channel.name == "vote-room"
+    except AttributeError:
+        # Jsme v PM
+        return False
 
 async def guild_check(message):
     guild = client.get_guild(config.guild_id)
@@ -376,22 +384,30 @@ async def on_message(message):
             await message.channel.send(
                     "Tohle funguje jen na VUT FIT serveru")
         else:
-            await karma.revote(message, config)
-            try:
-                await message.delete()
-            except discord.errors.Forbidden:
-                return
+            if await vote_room_check(message):
+                try:
+                    await message.delete()
+                    await karma.revote(message, config)
+                except discord.errors.Forbidden:
+                    return
+            else:
+                await message.channel.send(
+                        "Tohle funguje jen ve specialni roomce")
 
     elif message.content.startswith("!karma vote"):
         if not await guild_check(message):
             await message.channel.send(
                     "Tohle funguje jen na VUT FIT serveru")
         else:
-            await karma.vote(message, config)
-            try:
-                await message.delete()
-            except discord.errors.Forbidden:
-                return
+            if await vote_room_check(message):
+                try:
+                    await message.delete()
+                    await karma.vote(message, config)
+                except discord.errors.Forbidden:
+                    return
+            else:
+                await message.channel.send(
+                        "Tohle funguje jen ve specialni roomce")
             
     elif message.content.startswith("!karma"):
         await show_karma(message)

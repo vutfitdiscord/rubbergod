@@ -135,6 +135,10 @@ class Karma(BaseRepository):
                     "Hlasovani o emotu {} neprošlo\n"
                     "Aspoň {} hlasů potřeba"
                     .format(str(the_emote), str(config.vote_minimum)))
+
+            db.commit()
+            db.close()
+            return
         else:
             cursor.execute('UPDATE bot_karma_emoji SET value = "{}" '
                            'WHERE emoji_id = "{}"'
