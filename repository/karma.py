@@ -115,7 +115,7 @@ class Karma(BaseRepository):
                 if self.get_row("bot_karma_emoji", "emoji_id = {}".format(emote.id)) is None:
                     cursor.execute('INSERT INTO bot_karma_emoji (emoji_id, value)'
                                    ' VALUES ("{}", "{}")'
-                                   .format(the_emote.id, 0))
+                                   .format(emote.id, 0))
                     db.commit()
                     vote_value = await self.emote_vote(message.channel, emote, config)
                     the_emote = emote

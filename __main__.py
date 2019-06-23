@@ -377,6 +377,10 @@ async def on_message(message):
                     "Tohle funguje jen na VUT FIT serveru")
         else:
             await karma.revote(message, config)
+            try:
+                await message.delete()
+            except discord.errors.Forbidden:
+                return
 
     elif message.content.startswith("!karma vote"):
         if not await guild_check(message):
@@ -384,7 +388,11 @@ async def on_message(message):
                     "Tohle funguje jen na VUT FIT serveru")
         else:
             await karma.vote(message, config)
-
+            try:
+                await message.delete()
+            except discord.errors.Forbidden:
+                return
+            
     elif message.content.startswith("!karma"):
         await show_karma(message)
         await botroom_check(message)
