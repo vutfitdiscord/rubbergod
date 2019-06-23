@@ -23,6 +23,10 @@ class Config:
         self.max_dice_groups = 10
         self.max_dice_sides = 10000
 
+        # Voting
+        self.vote_minimum = 20
+        self.vote_minutes = 2
+
     @staticmethod
     def info():
         info = '```'\

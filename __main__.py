@@ -376,14 +376,14 @@ async def on_message(message):
             await message.channel.send(
                     "Tohle funguje jen na VUT FIT serveru")
         else:
-            await karma.revote(message)
+            await karma.revote(message, config)
 
     elif message.content.startswith("!karma vote"):
         if not await guild_check(message):
             await message.channel.send(
                     "Tohle funguje jen na VUT FIT serveru")
         else:
-            await karma.vote(message)
+            await karma.vote(message, config)
 
     elif message.content.startswith("!karma"):
         await show_karma(message)

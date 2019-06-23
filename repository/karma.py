@@ -63,8 +63,8 @@ class Karma(BaseRepository):
         db.close()
         return leaderboard
 
-    async def emote_vote(self, channel, emote):
-        delay = 5 * 60
+    async def emote_vote(self, channel, emote, config):
+        delay = config.vote_minutes * 60
         message = await channel.send(
                 ("Hlasovani o karma ohodnoceni emotu {}\n" +
                  "Hlasovani skonci za {} minut"
@@ -84,6 +84,9 @@ class Karma(BaseRepository):
             elif reaction.emoji == "0⃣":
                 neutral = reaction.count - 1
 
+        if plus + minus + neutral < config.vote_minimum:
+            return None
+
         if plus > minus + neutral:
             return 1
         elif minus > plus + neutral:
@@ -91,7 +94,7 @@ class Karma(BaseRepository):
         else:
             return 0
 
-    async def vote(self, message):
+    async def vote(self, message, config):
         if len(message.content.split()) != 2:
             await message.channel.send(
                     "Neocekavam argument")
@@ -114,7 +117,7 @@ class Karma(BaseRepository):
                                    ' VALUES ("{}", "{}")'
                                    .format(the_emote.id, 0))
                     db.commit()
-                    vote_value = await self.emote_vote(message.channel, emote)
+                    vote_value = await self.emote_vote(message.channel, emote, config)
                     the_emote = emote
                     break
         else:
@@ -123,9 +126,19 @@ class Karma(BaseRepository):
                     "Hlasovalo se jiz o kazdem emote")
             return
 
-        cursor.execute('UPDATE bot_karma_emoji SET value = "{}" '
-                       'WHERE emoji_id = "{}"'
-                       .format(vote_value, the_emote.id))
+        if vote_value is None:
+            cursor.execute('DELETE FROM bot_karma_emoji '
+                           'WHERE emoji_id = "{}"'
+                           .format(the_emote.id))
+
+            await message.channel.send(
+                    "Hlasovani o emotu {} neprošlo\n"
+                    "Aspoň {} hlasů potřeba"
+                    .format(str(the_emote), str(config.vote_minimum)))
+        else:
+            cursor.execute('UPDATE bot_karma_emoji SET value = "{}" '
+                           'WHERE emoji_id = "{}"'
+                           .format(vote_value, the_emote.id))
         db.commit()
         db.close()
         await message.channel.send(
@@ -133,7 +146,7 @@ class Karma(BaseRepository):
                 .format(str(the_emote), str(vote_value)))
         return
 
-    async def revote(self, message):
+    async def revote(self, message, config):
         content = message.content.split()
         if len(content) != 3:
             await message.channel.send(
@@ -160,20 +173,29 @@ class Karma(BaseRepository):
         cursor.execute('SELECT emoji_id FROM bot_karma_emoji')
         emotes = cursor.fetchall()
 
-        vote_value = await self.emote_vote(message.channel, emote)
+        vote_value = await self.emote_vote(message.channel, emote, config)
 
-        cursor.close()
-        cursor = db.cursor()
-        if emote.id not in emotes:
-            cursor.execute('INSERT INTO bot_karma_emoji (emoji_id, value) '
-                           'VALUES ("{}", "{}")'
-                           .format(emote.id, str(vote_value)))
+        if vote_value is not None:
+            cursor.close()
+            cursor = db.cursor()
+            if emote.id not in emotes:
+                cursor.execute('INSERT INTO bot_karma_emoji (emoji_id, value) '
+                               'VALUES ("{}", "{}")'
+                               .format(emote.id, str(vote_value)))
+            else:
+                cursor.execute('UPDATE bot_karma_emoji SET value = "{}" '
+                               'WHERE emoji_id = "{}"'
+                               .format(str(vote_value), emote.id))
+            db.commit()
+            db.close()
         else:
-            cursor.execute('UPDATE bot_karma_emoji SET value = "{}" '
-                           'WHERE emoji_id = "{}"'
-                           .format(str(vote_value), emote.id))
-        db.commit()
-        db.close()
+            await message.channel.send(
+                    "Hlasovani o emotu {} neprošlo\n"
+                    "Aspoň {} hlasů potřeba"
+                    .format(str(emote), str(config.vote_minimum)))
+            db.close()
+            return
+
         await message.channel.send(
                 "Vysledek hlasovani o emotu {} je {}"
                 .format(str(emote), str(vote_value)))
