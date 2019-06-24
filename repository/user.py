@@ -9,8 +9,8 @@ class User(BaseRepository):
         db = mysql.connector.connect(**self.config.connection)
         login = str(message.content).split(" ")[1]  # gets login from command
         cursor = db.cursor()
-        cursor.execute('UPDATE bot_valid_persons SET status="{}", code="{}"'
-                       'WHERE login="{}"'.format(2, code, login))
+        cursor.execute('UPDATE bot_valid_persons SET status=%s, code=%s'
+                       'WHERE login=%s', (2, code, login))
         db.commit()
         db.close()
         return
@@ -20,16 +20,16 @@ class User(BaseRepository):
         db = mysql.connector.connect(**self.config.connection)
         login = str(message.content).split(" ")[1]  # gets login from command
         cursor = db.cursor()
-        cursor.execute('SELECT * FROM bot_valid_persons WHERE login="{}"'
-                       .format(login))
-        row = cursor.fetchone()
+        cursor.execute('SELECT * FROM bot_valid_persons WHERE login=%s',
+                       (login,))
+        cursor.fetchone()
         insert = cursor.execute('INSERT INTO bot_permit '
                                 '(login, discord_name, discord_id) '
-                                'VALUES ("{}", "{}", {})'
-                                .format(login, str(message.author),
-                                        message.author.id))
-        cursor.execute('UPDATE bot_valid_persons SET status="{}" '
-                       'WHERE login="{}"'.format(0, login))
+                                'VALUES (%s, %s, %s)',
+                                (login, str(message.author),
+                                 message.author.id))
+        cursor.execute('UPDATE bot_valid_persons SET status=%s '
+                       'WHERE login=%s', (0, login))
         db.commit()
         db.close()
         return insert
@@ -47,8 +47,8 @@ class User(BaseRepository):
         db = mysql.connector.connect(**self.config.connection)
         login = str(message.content).split(" ")[1]  # gets login from command
         cursor = db.cursor()
-        cursor.execute('SELECT * FROM bot_valid_persons WHERE `login`="{}" '
-                       'AND status = 1'.format(login))
+        cursor.execute('SELECT * FROM bot_valid_persons WHERE `login`=%s '
+                       'AND status = 1', (login,))
         login = cursor.fetchone()
         db.close()
         return login
@@ -59,8 +59,8 @@ class User(BaseRepository):
         login = str(message.content).split(" ")[1]  # gets login from command
         code = str(message.content).split(" ")[2]  # gets key from command
         cursor = db.cursor()
-        cursor.execute('SELECT * FROM bot_valid_persons WHERE `login`="{}" '
-                       'AND `code`="{}" AND status = 2'.format(login, code))
+        cursor.execute('SELECT * FROM bot_valid_persons WHERE `login`=%s '
+                       'AND `code`=%s AND status = 2', (login, code))
         login = cursor.fetchone()
         db.close()
         return login

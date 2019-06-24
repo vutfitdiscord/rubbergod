@@ -32,11 +32,11 @@ async def update_web():
         user = await client.get_user_info(item[0])
         client.get_user_info(item[0])
         username = str(user.name).split('#')[0]
-        cursor.execute('UPDATE bot_karma SET nick="{}", '
-                       'avatar_url="{}" WHERE member_id="{}"'
-                       .format(username,
-                               user.avatar_url.replace(".webp", ".png"),
-                               item[0]))
+        cursor.execute('UPDATE bot_karma SET nick=%s, '
+                       'avatar_url=%s WHERE member_id=%s',
+                       (username,
+                        user.avatar_url.replace(".webp", ".png"),
+                        item[0]))
         print("{} - {}".format(username,
                                user.avatar_url.replace(".webp", ".png")))
     db.commit()
@@ -49,7 +49,8 @@ async def botroom_check(message):
         if message.channel.guild == guild:
             if message.channel.name != "bot-room":
                 await message.channel.send(
-                        "{} <:sadcat:576171980118687754> 👉 <#461549842896781312>\n"
+                        "{} <:sadcat:576171980118687754> 👉 "
+                        "<#461549842896781312>\n"
                         .format(utils.generate_mention(message.author.id)))
     except AttributeError:
         # Jsme v PM
@@ -248,9 +249,11 @@ async def karma_leaderboard(message, order):
     board = karma.get_leaderboard(order)
     i = 1
     if order == "DESC":
-        output = "==================\n KARMA LEADERBOARD \n==================\n"
+        output = "==================\n KARMA LEADERBOARD \n"
+        output += "==================\n"
     else:
-        output = "==================\n KARMA BAJKARBOARD \n==================\n"
+        output = "==================\n KARMA BAJKARBOARD \n"
+        output += "==================\n"
     guild = client.get_guild(config.guild_id)
     for user in board:
         username = guild.get_member(int(user[0]))
@@ -339,7 +342,8 @@ async def remove_role_on_reaction(role, member, message):
             if role < max_role:
                 await member.remove_roles(role)
             else:
-                await message.channel.send("{} na odobranie role {} nemáš práva"
+                await message.channel.send("{} na odobranie role {} "
+                                           "nemáš práva"
                                            .format(utils.generate_mention(
                                               member.id), role.name))
 

@@ -17,17 +17,17 @@ class Karma(BaseRepository):
         db = mysql.connector.connect(**self.config.connection)
         cursor = db.cursor()
         if self.get_karma_value(member.id) is not None:
-            cursor.execute('SELECT karma FROM bot_karma WHERE member_id = "{}"'
-                           .format(member.id))
+            cursor.execute('SELECT karma FROM bot_karma WHERE member_id = %s',
+                           (member.id,))
             updated = cursor.fetchone()
             update = int(updated[0]) + emoji_value
-            cursor.execute('UPDATE bot_karma SET karma = "{}" '
-                           'WHERE member_id = "{}"'
-                           .format(update, member.id))
+            cursor.execute('UPDATE bot_karma SET karma = %s '
+                           'WHERE member_id = %s',
+                           (update, member.id))
         else:
             cursor.execute('INSERT INTO bot_karma (member_id, karma) '
-                           'VALUES ("{}","{}")'
-                           .format(member.id, emoji_value))
+                           'VALUES (%s, %s)',
+                           (member.id, emoji_value))
 
         db.commit()
         db.close()
@@ -112,12 +112,16 @@ class Karma(BaseRepository):
             id_array.append(emote[0])
         for emote in guild.emojis:
             if not emote.animated:
-                if self.get_row("bot_karma_emoji", "emoji_id = {}".format(emote.id)) is None:
-                    cursor.execute('INSERT INTO bot_karma_emoji (emoji_id, value)'
-                                   ' VALUES ("{}", "{}")'
-                                   .format(emote.id, 0))
+                row = self.get_row("bot_karma_emoji", "emoji_id = {}"
+                                   .format(emote.id))
+                if row is None:
+                    cursor.execute('INSERT INTO bot_karma_emoji '
+                                   '(emoji_id, value) '
+                                   'VALUES (%s, %s)',
+                                   (emote.id, 0))
                     db.commit()
-                    vote_value = await self.emote_vote(message.channel, emote, config)
+                    vote_value = await self.emote_vote(message.channel,
+                                                       emote, config)
                     the_emote = emote
                     break
         else:
@@ -128,8 +132,8 @@ class Karma(BaseRepository):
 
         if vote_value is None:
             cursor.execute('DELETE FROM bot_karma_emoji '
-                           'WHERE emoji_id = "{}"'
-                           .format(the_emote.id))
+                           'WHERE emoji_id = %s',
+                           (the_emote.id))
 
             await message.channel.send(
                     "Hlasovani o emotu {} neprošlo\n"
@@ -140,9 +144,9 @@ class Karma(BaseRepository):
             db.close()
             return
         else:
-            cursor.execute('UPDATE bot_karma_emoji SET value = "{}" '
-                           'WHERE emoji_id = "{}"'
-                           .format(vote_value, the_emote.id))
+            cursor.execute('UPDATE bot_karma_emoji SET value = %s '
+                           'WHERE emoji_id = %s',
+                           (vote_value, the_emote.id))
         db.commit()
         db.close()
         await message.channel.send(
@@ -184,12 +188,12 @@ class Karma(BaseRepository):
             cursor = db.cursor()
             if emote.id not in emotes:
                 cursor.execute('INSERT INTO bot_karma_emoji (emoji_id, value) '
-                               'VALUES ("{}", "{}")'
-                               .format(emote.id, str(vote_value)))
+                               'VALUES (%s, %s)',
+                               (emote.id, str(vote_value)))
             else:
-                cursor.execute('UPDATE bot_karma_emoji SET value = "{}" '
-                               'WHERE emoji_id = "{}"'
-                               .format(str(vote_value), emote.id))
+                cursor.execute('UPDATE bot_karma_emoji SET value = %s '
+                               'WHERE emoji_id = %s',
+                               (str(vote_value), emote.id))
             db.commit()
             db.close()
         else:
