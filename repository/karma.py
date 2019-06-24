@@ -10,7 +10,7 @@ class Karma(BaseRepository):
     utils = utils.Utils()
 
     def valid_emoji(self, emoji_id):
-        row = self.get_row("bot_karma_emoji", "emoji_id = {}".format(emoji_id))
+        row = self.get_row("bot_karma_emoji", "emoji_id", emoji_id)
         return row[1] if row else 0
 
     def update_karma(self, member, emoji_value):
@@ -43,7 +43,7 @@ class Karma(BaseRepository):
             self.update_karma(member, emoji_value * (-1))
 
     def get_karma_value(self, member):
-        row = self.get_row("bot_karma", "member_id = {}".format(member))
+        row = self.get_row("bot_karma", "member_id", member)
         return row[1] if row else None
 
     def get_karma(self, member):
@@ -112,8 +112,8 @@ class Karma(BaseRepository):
             id_array.append(emote[0])
         for emote in guild.emojis:
             if not emote.animated:
-                row = self.get_row("bot_karma_emoji", "emoji_id = {}"
-                                   .format(emote.id))
+                row = self.get_row("bot_karma_emoji", "emoji_id",
+                                   emote.id)
                 if row is None:
                     cursor.execute('INSERT INTO bot_karma_emoji '
                                    '(emoji_id, value) '
@@ -231,6 +231,6 @@ class Karma(BaseRepository):
                     "Emote jsem na serveru nenasel")
             return
 
-        row = self.get_row("bot_karma_emoji", "emoji_id = {}".format(emote.id))
+        row = self.get_row("bot_karma_emoji", "emoji_id", emote.id)
         await message.channel.send(
                 "Hodnota {} : {}".format(str(emote), str(row[1] if row else None)))

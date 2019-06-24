@@ -66,8 +66,11 @@ async def vote_room_check(message):
         return False
 
 async def guild_check(message):
-    guild = client.get_guild(config.guild_id)
-    return message.channel.guild == guild
+    try:
+        guild = client.get_guild(config.guild_id)
+        return message.channel.guild == guild
+    except AttributeError:
+        return False
 
 
 async def send_code(message):
@@ -381,7 +384,14 @@ async def on_message(message):
         await botroom_check(message)
 
     elif message.content.startswith("!karma get"):
-        await karma.get(message)
+        if not await guild_check(message):
+            await message.channel.send(
+                    "Tohle funguje jen na VUT FIT serveru")
+        else:
+            try:
+                await karma.get(message)
+            except discord.errors.Forbidden:
+                return
 
     elif message.content.startswith("!karma revote"):
         if not await guild_check(message):
