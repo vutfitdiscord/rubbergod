@@ -212,7 +212,7 @@ class Karma(BaseRepository):
     async def get(self, message):
         content = message.content.split()
         if len(content) != 3:
-            return await get_all(message.channel)
+            return await self.get_all(message.channel)
 
         emote = content[2]
         try:
@@ -236,7 +236,12 @@ class Karma(BaseRepository):
 
     async def get_all(self, channel):
         for value in ["1", "-1"]:
-            row = self.get_row("bot_karma_emoji", "value", value)
+            db = mysql.connector.connect(**self.config.connection)
+            cursor = db.cursor()
+            cursor.execute("SELECT * FROM bot_karma_emoji "
+                           "WHERE value = %s", (value,))
+            row = cursor.fetchall()
+            db.close()
             await channel.send(
                     "Hodnota {}:".format(str(value)))
 
