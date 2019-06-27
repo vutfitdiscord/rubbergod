@@ -390,6 +390,7 @@ async def on_message(message):
         else:
             try:
                 await karma.get(message)
+                await botroom_check(message)
             except discord.errors.Forbidden:
                 return
 

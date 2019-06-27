@@ -30,7 +30,7 @@ CREATE TABLE IF NOT EXISTS `bot_karma` (
 
 -- Dumping structure for table rubbergod.bot_karma_emoji
 CREATE TABLE IF NOT EXISTS `bot_karma_emoji` (
-  `emoji_id` varchar(50) DEFAULT NULL,
+  `emoji_id` varchar(50) UNIQUE,
   `value` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 

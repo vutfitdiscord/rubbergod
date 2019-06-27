@@ -242,15 +242,17 @@ class Karma(BaseRepository):
                            "WHERE value = %s", (value,))
             row = cursor.fetchall()
             db.close()
-            await channel.send(
-                    "Hodnota {}:".format(str(value)))
+            await channel.send("Hodnota {}:".format(str(value)))
 
             message = ""
             for emote in row:
+                if len(message) > 220:
+                    await channel.send(message)
+                    message = ""
                 try:
                     emote = await channel.guild.fetch_emoji(emote[0])
                     message += str(emote)
                 except discord.NotFound:
                     continue
-
+                    
             await channel.send(message)
