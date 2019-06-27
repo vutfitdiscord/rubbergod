@@ -44,26 +44,22 @@ async def update_web():
 
 
 async def botroom_check(message):
-    guild = client.get_guild(config.guild_id)
-    try:
-        if message.channel.guild == guild:
-            if message.channel.name != "bot-room":
-                await message.channel.send(
-                        "{} <:sadcat:576171980118687754> 👉 "
-                        "<#461549842896781312>\n"
-                        .format(utils.generate_mention(message.author.id)))
-    except AttributeError:
-        # Jsme v PM
-        return
+    if get_room(message) != "bot-room":
+        await message.channel.send(
+                "{} <:sadcat:576171980118687754> 👉 "
+                "<#461549842896781312>\n"
+                .format(utils.generate_mention(message.author.id)))
 
-async def vote_room_check(message):
+
+async def get_room(message):
     guild = client.get_guild(config.guild_id)
     try:
         if message.channel.guild == guild:
-            return message.channel.name == "vote-room"
+            return message.channel.name
     except AttributeError:
         # Jsme v PM
         return False
+
 
 async def guild_check(message):
     try:
@@ -399,7 +395,7 @@ async def on_message(message):
             await message.channel.send(
                     "Tohle funguje jen na VUT FIT serveru")
         else:
-            if await vote_room_check(message):
+            if await get_room(message) == "general":
                 try:
                     await message.delete()
                     await karma.revote(message, config)
@@ -407,14 +403,14 @@ async def on_message(message):
                     return
             else:
                 await message.channel.send(
-                        "Tohle funguje jen ve specialni roomce")
+                        "Tohle funguje jen v #general")
 
     elif message.content.startswith("!karma vote"):
         if not await guild_check(message):
             await message.channel.send(
                     "Tohle funguje jen na VUT FIT serveru")
         else:
-            if await vote_room_check(message):
+            if await get_room(message) == "general":
                 try:
                     await message.delete()
                     await karma.vote(message, config)
@@ -422,8 +418,8 @@ async def on_message(message):
                     return
             else:
                 await message.channel.send(
-                        "Tohle funguje jen ve specialni roomce")
-            
+                        "Tohle funguje jen v #general")
+
     elif message.content.startswith("!karma"):
         await show_karma(message)
         await botroom_check(message)
