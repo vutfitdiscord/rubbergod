@@ -212,16 +212,14 @@ class Karma(BaseRepository):
     async def get(self, message):
         content = message.content.split()
         if len(content) != 3:
-            await message.channel.send(
-                    "Ocekavam pouze emote")
-            return
+            return await get_all(message.channel)
 
         emote = content[2]
         try:
             emote_id = int(emote.split(':')[2][:-1])
         except (AttributeError, IndexError):
             await message.channel.send(
-                    "Ocekavam pouze **emote**")
+                    "Ocekavam pouze emote nebo nic")
             return
 
         try:
@@ -233,4 +231,21 @@ class Karma(BaseRepository):
 
         row = self.get_row("bot_karma_emoji", "emoji_id", emote.id)
         await message.channel.send(
-                "Hodnota {} : {}".format(str(emote), str(row[1] if row else None)))
+                "Hodnota {} : {}".format(str(emote),
+                                         str(row[1] if row else None)))
+
+    async def get_all(self, channel):
+        for value in ["1", "-1"]:
+            row = self.get_row("bot_karma_emoji", "value", value)
+            await channel.send(
+                    "Hodnota {}:".format(str(value)))
+
+            message = ""
+            for emote in row:
+                try:
+                    emote = await channel.guild.fetch_emoji(emote[0])
+                    message += str(emote)
+                except discord.NotFound:
+                    continue
+
+            await channel.send(message)
