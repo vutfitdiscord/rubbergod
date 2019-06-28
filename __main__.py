@@ -44,7 +44,8 @@ async def update_web():
 
 
 async def botroom_check(message):
-    if get_room(message) != "bot-room":
+    room = await get_room(message)
+    if room != "bot-room" and room is not None:
         await message.channel.send(
                 "{} <:sadcat:576171980118687754> 👉 "
                 "<#461549842896781312>\n"
@@ -58,7 +59,7 @@ async def get_room(message):
             return message.channel.name
     except AttributeError:
         # Jsme v PM
-        return False
+        return None
 
 
 async def guild_check(message):
