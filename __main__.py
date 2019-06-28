@@ -470,7 +470,8 @@ async def on_raw_reaction_add(payload):
                 await message.remove_reaction(payload.emoji, member)
             elif emoji not in ["✅", "❌", "0⃣"]:
                 await message.remove_reaction(emoji, member)
-        if type(emoji) is not str and member.id != message.author.id:
+        if (type(emoji) is not str and member.id != message.author.id and
+                get_room(message) != "add-roles"):
             karma.karma_emoji(message.author, payload.emoji.id)
 
 
@@ -489,7 +490,8 @@ async def on_raw_reaction_remove(payload):
             if str(emoji) == line[1]:
                 await remove_role_on_reaction(line[0], member, message)
                 break
-    if type(emoji) is not str and member.id != message.author.id:
+    if (type(emoji) is not str and member.id != message.author.id and
+            get_room(message) != "add-roles"):
         karma.karma_emoji_remove(message.author, payload.emoji.id)
 
 
