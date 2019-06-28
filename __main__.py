@@ -185,6 +185,8 @@ async def verify(message):
                             year = "3MIT+"
                     elif db_record[1] == "DVI4":
                         year = "PhD+"
+                elif db_record[0] == "FEKT":
+                    year = "FEKT"
 
             if year is None:
                 await message.channel.send(
