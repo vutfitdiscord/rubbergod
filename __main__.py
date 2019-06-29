@@ -352,6 +352,28 @@ async def remove_role_on_reaction(role, member, message):
                                               member.id), role.name))
 
 
+async def karmagive(message):
+    input_string = message.content.split()
+    if len(input_string) != 3:
+        message.channel.send(
+            "Toaster pls formát je !karmagive USER NUMBER")
+    else:
+        member = discord.utils.get(message.guild.members,
+                                   name=input_string[1])
+        if member is None:
+            await message.channel.send("User {} neexistuje"
+                                       .format(input_string[1]))
+            return
+        try:
+            number = int(input_string[2])
+        except ValueError:
+            await message.channel.send("Čauec {} nie je číslo"
+                                       .format(input_string[2]))
+            return
+        karma.update_karma(member, number)
+
+
+
 #                                      #
 #              COMMANDS                #
 #                                      #
@@ -454,6 +476,14 @@ async def on_message(message):
     elif message.content.startswith("Role"):
         role_data = await get_join_role_data(message)
         await message_role_reactions(message, role_data)
+
+    elif message.content.startswith("!karmagive"):
+        if message.author.id = config.admin_id:
+            await karmagive(message)
+        else:
+            await message.channel.send(
+                "{} na použitie tohto príkazu nemáš práva"
+                .format(utils.generate_mention(message.author.id)))
 
 
 @client.event
