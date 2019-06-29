@@ -41,7 +41,13 @@ class Config:
                '!pick Is foo bar ? Yes No Maybe '\
                '- Picks one of words after questionmark \n'\
                '!karma - Returns your karma stats \n'\
+               '!karma get - Returns a list of all non-zero valued emotes \n'\
+               '!karma get *emote* - Returns the karma value of an emote \n'\
+               '!karma vote - Odstartuje hlasovani o hodnote zatim neohodnoceneho emotu \n'\
+               '!karma revote *emote* - Odstartuje hlasovani o nove hodnote emotu \n'\
                '!leaderboard - Karma leaderboard \n'\
+               '!bajkarboard - Karma leaderboard reversed \n'\
+               '!diceroll - all kinds of dice rolling \n'\
                '!god - commandlist \n'\
                '```'
         return info
