@@ -66,9 +66,9 @@ class Karma(BaseRepository):
     async def emote_vote(self, channel, emote, config):
         delay = config.vote_minutes * 60
         message = await channel.send(
-                ("Hlasovani o karma ohodnoceni emotu {}\n" +
+                ("{} {}\n" +
                  "Hlasovani skonci za {} minut"
-                 ).format(str(emote), str(delay // 60)))
+                 ).format(config.vote_message, str(emote), str(delay // 60)))
         await message.add_reaction("✅")
         await message.add_reaction("❌")
         await message.add_reaction("0⃣")

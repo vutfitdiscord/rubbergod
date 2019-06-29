@@ -30,6 +30,14 @@ class Config:
         # Logging to discord
         self.log_channel_id = 0
 
+        #String constants
+        self.role_string = "Role"
+        self.role_room = 591384273051975683
+        self.server_warning = "Tohle funguje jen na VUT FIT serveru"
+        self.vote_room = 461544375105749003
+        self.vote_message = "Hlasovani o karma ohodnoceni emotu"
+        self.bot_room = 461549842896781312
+
     @staticmethod
     def info():
         info = '```'\
@@ -50,4 +58,4 @@ class Config:
                '!diceroll - all kinds of dice rolling \n'\
                '!god - commandlist \n'\
                '```'
-        return info
+

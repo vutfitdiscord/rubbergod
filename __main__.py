@@ -396,7 +396,7 @@ async def on_message(message):
     elif message.content.startswith("!karma get"):
         if not await guild_check(message):
             await message.channel.send(
-                    "Tohle funguje jen na VUT FIT serveru")
+                    "{}".format(config.server_warning))
         else:
             try:
                 await karma.get(message)
@@ -407,9 +407,9 @@ async def on_message(message):
     elif message.content.startswith("!karma revote"):
         if not await guild_check(message):
             await message.channel.send(
-                    "Tohle funguje jen na VUT FIT serveru")
+                    "{}".format(config.server_warning))
         else:
-            if await get_room(message) == "general":
+            if message.channel.id == config.vote_room:
                 try:
                     await message.delete()
                     await karma.revote(message, config)
@@ -417,14 +417,16 @@ async def on_message(message):
                     return
             else:
                 await message.channel.send(
-                        "Tohle funguje jen v #general")
+                        "Tohle funguje jen v {}"
+                        .format(discord.utils.get(message.guild.channels,
+                                id=config.vote_room)))
 
     elif message.content.startswith("!karma vote"):
         if not await guild_check(message):
             await message.channel.send(
-                    "Tohle funguje jen na VUT FIT serveru")
+                    "{}".format(config.server_warning))
         else:
-            if await get_room(message) == "general":
+            if message.channel.id == config.vote_room:
                 try:
                     await message.delete()
                     await karma.vote(message, config)
@@ -432,7 +434,9 @@ async def on_message(message):
                     return
             else:
                 await message.channel.send(
-                        "Tohle funguje jen v #general")
+                        "Tohle funguje jen v {}"
+                        .format(discord.utils.get(message.guild.channels,
+                                id=config.vote_room)))
 
     elif message.content.startswith("!karma"):
         await show_karma(message)
@@ -452,7 +456,7 @@ async def on_message(message):
     elif message.content.startswith("!diceroll"):
         await message.channel.send(roll_dice.roll_dice(message, config))
 
-    elif message.content.startswith("Role"):
+    elif message.content.startswith(config.role_string):
         role_data = await get_join_role_data(message)
         await message_role_reactions(message, role_data)
 
@@ -475,7 +479,7 @@ async def on_raw_reaction_add(payload):
     else:
         emoji = payload.emoji.name
     if not(member.bot):
-        if message.content.startswith("Role"):
+        if message.content.startswith(config.role_string):
             role_data = await get_join_role_data(message)
             for line in role_data:
                 if str(emoji) == line[1]:
@@ -486,13 +490,13 @@ async def on_raw_reaction_add(payload):
                     await message.remove_reaction(payload.emoji, member)
                 else:
                     await message.remove_reaction(emoji, member)
-        if message.content.startswith("Hlasovani o karma ohodnoceni"):
+        if message.content.startswith(config.vote_message):
             if emoji is None:
                 await message.remove_reaction(payload.emoji, member)
             elif emoji not in ["✅", "❌", "0⃣"]:
                 await message.remove_reaction(emoji, member)
         if (type(emoji) is not str and member.id != message.author.id and
-                await get_room(message) != "add-roles"):
+                message.channel.id != config.role_room):
             karma.karma_emoji(message.author, payload.emoji.id)
 
 
@@ -505,14 +509,14 @@ async def on_raw_reaction_remove(payload):
         emoji = client.get_emoji(payload.emoji.id)
     else:
         emoji = payload.emoji.name
-    if message.content.startswith("Role"):
+    if message.content.startswith(config.role_string):
         role_data = await get_join_role_data(message)
         for line in role_data:
             if str(emoji) == line[1]:
                 await remove_role_on_reaction(line[0], member, message)
                 break
     if (type(emoji) is not str and member.id != message.author.id and
-            await get_room(message) != "add-roles"):
+            message.channel.id != config.role_room):
         karma.karma_emoji_remove(message.author, payload.emoji.id)
 
 
