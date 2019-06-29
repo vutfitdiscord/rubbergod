@@ -27,6 +27,9 @@ class Config:
         self.vote_minimum = 20
         self.vote_minutes = 2
 
+        # Logging to discord
+        self.log_channel_id = 0
+
     @staticmethod
     def info():
         info = '```'\

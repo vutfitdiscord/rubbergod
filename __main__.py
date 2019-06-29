@@ -6,6 +6,7 @@ import random
 import string
 import smtplib
 import ssl
+import sys
 
 
 client = discord.Client()
@@ -351,6 +352,13 @@ async def remove_role_on_reaction(role, member, message):
 #                                      #
 #              COMMANDS                #
 #                                      #
+
+@client.event
+async def on_error():
+    print(sys.exc_info())
+    channel = client.get_channel(config.log_channel_id)
+    if channel is not None:
+        channel.send("```\n" + str(sys.exc_info()) + "\n```")
 
 
 @client.event
