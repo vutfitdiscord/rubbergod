@@ -457,7 +457,7 @@ async def on_message(message):
         await message_role_reactions(message, role_data)
 
     elif message.content.startswith("!karma give"):
-        if message.author.id = config.admin_id:
+        if message.author.id == config.admin_id:
             await karma.karma_give(message)
         else:
             await message.channel.send(
