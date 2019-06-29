@@ -58,6 +58,19 @@ CREATE TABLE IF NOT EXISTS `bot_valid_persons` (
   `status` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+CREATE TABLE IF NOT EXISTS `bot_reminders` (
+  `reminderID` int NOT NULL,
+  `message` text DEFAULT NULL,
+  `remind_time` timedate DEFAULT NULL,
+  PRIMARY KEY (`reminderID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS `bot_people_to_remind` (
+  `userID` varchar(50) NOT NULL,
+  `reminderID` int NOT NULL,
+  FOREIGN KEY (`reminderID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
 -- Dumping data for table rubbergod.bot_valid_persons: ~0 rows (approximately)
 /*!40000 ALTER TABLE `bot_valid_persons` DISABLE KEYS */;
 /*!40000 ALTER TABLE `bot_valid_persons` ENABLE KEYS */;
