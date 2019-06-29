@@ -507,4 +507,13 @@ async def on_raw_reaction_remove(payload):
         karma.karma_emoji_remove(message.author, payload.emoji.id)
 
 
+@client.event
+async def on_typing(channel, user, when):
+    arcas = discord.utils.get(channel.guild.members, name="ArcasCZ")
+    if arcas.id == user.id:
+        gif = discord.Embed()
+        gif.set_image(url="https://imgur.com/v2ueHcl")
+        await channel.send(embed=gif)
+
+
 client.run(config.key)
