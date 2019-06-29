@@ -440,6 +440,14 @@ async def on_message(message):
                         .format(discord.utils.get(message.guild.channels,
                                 id=config.vote_room)))
 
+    elif message.content.startswith("!karma give"):
+        if message.author.id == config.admin_id:
+            await karma.karma_give(message)
+        else:
+            await message.channel.send(
+                "{} na použitie tohto príkazu nemáš práva"
+                .format(utils.generate_mention(message.author.id)))
+
     elif message.content.startswith("!karma"):
         await show_karma(message)
         await botroom_check(message)
@@ -461,14 +469,6 @@ async def on_message(message):
     elif message.content.startswith(config.role_string):
         role_data = await get_join_role_data(message)
         await message_role_reactions(message, role_data)
-
-    elif message.content.startswith("!karma give"):
-        if message.author.id == config.admin_id:
-            await karma.karma_give(message)
-        else:
-            await message.channel.send(
-                "{} na použitie tohto príkazu nemáš práva"
-                .format(utils.generate_mention(message.author.id)))
 
 
 @client.event

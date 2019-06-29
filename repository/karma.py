@@ -67,8 +67,9 @@ class Karma(BaseRepository):
         delay = config.vote_minutes * 60
         message = await channel.send(
                 ("{} {}\n" +
-                 "Hlasovani skonci za {} minut"
-                 ).format(config.vote_message, str(emote), str(delay // 60)))
+                    "Hlasovani skonci za {} minut a minimalni pocet hlasu je: {}"
+                 ).format(config.vote_message, str(emote),
+                          str(delay // 60), str(config.vote_minimum)))
         await message.add_reaction("✅")
         await message.add_reaction("❌")
         await message.add_reaction("0⃣")
@@ -176,24 +177,15 @@ class Karma(BaseRepository):
                     "Emote jsem na serveru nenasel")
             return
 
-        db = mysql.connector.connect(**self.config.connection)
-        cursor = db.cursor()
-        cursor.execute('SELECT emoji_id FROM bot_karma_emoji')
-        emotes = cursor.fetchall()
-
         vote_value = await self.emote_vote(message.channel, emote, config)
 
         if vote_value is not None:
-            cursor.close()
+            db = mysql.connector.connect(**self.config.connection)
             cursor = db.cursor()
-            if emote.id not in emotes:
-                cursor.execute('INSERT INTO bot_karma_emoji (emoji_id, value) '
-                               'VALUES (%s, %s)',
-                               (emote.id, str(vote_value)))
-            else:
-                cursor.execute('UPDATE bot_karma_emoji SET value = %s '
-                               'WHERE emoji_id = %s',
-                               (str(vote_value), emote.id))
+            cursor.execute('INSERT INTO bot_karma_emoji (emoji_id, value) '
+                           'VALUES (%s, %s) ON DUPLICATE KEY '
+                           'UPDATE value = %s',
+                           (emote.id, str(vote_value), str(vote_value)))
             db.commit()
             db.close()
         else:
@@ -258,27 +250,16 @@ class Karma(BaseRepository):
             await channel.send(message)
 
     async def karma_give(self, message):
-    input_string = message.content.split()
-    if len(input_string) < 4:
-        message.channel.send(
-            "Toaster pls formát je !karma give USER(s) NUMBER")
-    else:
-        member_list = []
-        for i in range(2, len(input_string) - 1):
-            member = input_string[i].replace("<@", "")
-            member = member.replace(">", "")
-            member = discord.utils.get(message.guild.members,
-                                        id=int(member))
-            if member is None:
-                await message.channel.send("User {} neexistuje"
-                                           .format(input_string[i]))
-            return
-            member_list.append(member)
-        try:
-            number = int(input_string[-1])
-        except ValueError:
-            await message.channel.send("Čauec {} nie je číslo"
-                                       .format(input_string[-1]))
-            return
-        for member in member_list:
-            self.update_karma(member, number)
+        input_string = message.content.split()
+        if len(input_string) < 4:
+            message.channel.send(
+                "Toaster pls formát je !karma give NUMBER USER(s)")
+        else:
+            try:
+                number = int(input_string[2])
+            except ValueError:
+                await message.channel.send("Čauec {} nie je číslo"
+                                           .format(input_string[-1]))
+                return
+            for member in message.mentions:
+                self.update_karma(member, number)
