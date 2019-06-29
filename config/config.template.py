@@ -32,7 +32,6 @@ class Config:
 
         #String constants
         self.role_string = "Role"
-        self.role_room = 591384273051975683
         self.server_warning = "Tohle funguje jen na VUT FIT serveru"
         self.vote_room = 461544375105749003
         self.vote_message = "Hlasovani o karma ohodnoceni emotu"
