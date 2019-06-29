@@ -256,3 +256,25 @@ class Karma(BaseRepository):
                     continue
                     
             await channel.send(message)
+
+    async def karma_give(self, message):
+    input_string = message.content.split()
+    if len(input_string) != 4:
+        message.channel.send(
+            "Toaster pls formát je !karma give USER NUMBER")
+    else:
+        member = input_string[2].replace("<@", "")
+        member = member.replace(">", "")
+        member = discord.utils.get(message.guild.members,
+                                    id=int(member))
+        if member is None:
+            await message.channel.send("User {} neexistuje"
+                                       .format(input_string[1]))
+            return
+        try:
+            number = int(input_string[3])
+        except ValueError:
+            await message.channel.send("Čauec {} nie je číslo"
+                                       .format(input_string[2]))
+            return
+        self.update_karma(member, number)
