@@ -8,6 +8,7 @@ import smtplib
 import ssl
 import sys
 import traceback
+import datetime
 
 
 client = discord.Client()
@@ -17,6 +18,7 @@ karma = karma.Karma()
 rng = rng.Rng()
 user = user.User()
 roll_dice = roll_dice.Roll()
+arcas_time = datetime.datetime.utcnow() - datetime.timedelta(hours=1)
 
 
 @client.event
@@ -522,10 +524,12 @@ async def on_raw_reaction_remove(payload):
 
 @client.event
 async def on_typing(channel, user, when):
+    global arcas_time
     arcas = discord.utils.get(channel.guild.members, name="ArcasCZ")
-    if arcas.id == user.id:
+    if arcas_time + datetime.timedelta(hours=1) < when and arcas and arcas.id == user.id: 
+        arcas_time = when
         gif = discord.Embed()
-        gif.set_image(url="https://imgur.com/v2ueHcl")
+        gif.set_image(url="https://i.imgur.com/v2ueHcl.gif")
         await channel.send(embed=gif)
 
 
