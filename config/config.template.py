@@ -51,3 +51,19 @@ class Config:
                '!god - commandlist \n'\
                '```'
         return info
+    def role_string():
+    	string = "Role"
+    	return string
+    def role_room():
+    	room = "add-roles"
+    	return room
+    def server_warning():
+    	string = "Tohle funguje jen na VUT FIT serveru"
+    	return string
+    def vote_room():
+    	room = "general"
+    	return room
+    def vote_message():
+    	string = "Hlasovani o karma ohodnoceni"
+    	return string
+
