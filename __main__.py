@@ -352,6 +352,7 @@ async def remove_role_on_reaction(role, member, message):
                                               member.id), role.name))
 
 
+
 #                                      #
 #              COMMANDS                #
 #                                      #
@@ -454,6 +455,14 @@ async def on_message(message):
     elif message.content.startswith("Role"):
         role_data = await get_join_role_data(message)
         await message_role_reactions(message, role_data)
+
+    elif message.content.startswith("!karma give"):
+        if message.author.id == config.admin_id:
+            await karma.karma_give(message)
+        else:
+            await message.channel.send(
+                "{} na použitie tohto príkazu nemáš práva"
+                .format(utils.generate_mention(message.author.id)))
 
 
 @client.event
