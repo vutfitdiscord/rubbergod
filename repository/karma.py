@@ -193,7 +193,6 @@ class Karma(BaseRepository):
                     "Hlasovani o emotu {} neprošlo\n"
                     "Aspoň {} hlasů potřeba"
                     .format(str(emote), str(config.vote_minimum)))
-            db.close()
             return
 
         await message.channel.send(
