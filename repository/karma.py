@@ -263,3 +263,7 @@ class Karma(BaseRepository):
                 return
             for member in message.mentions:
                 self.update_karma(member, number)
+            if number >= 0:
+                await message.channel.send("Karma bola úspešne pridaná")
+            else:
+                await message.channel.send("Karma bola úspešne odobraná")
