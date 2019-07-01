@@ -523,8 +523,7 @@ async def on_raw_reaction_remove(payload):
 @client.event
 async def on_typing(channel, user, when):
     global arcas_time
-    arcas = discord.utils.get(channel.guild.members, name="ArcasCZ")
-    if arcas_time + datetime.timedelta(hours=1) < when and arcas and arcas.id == user.id: 
+    if arcas_time + datetime.timedelta(hours=1) < when and config.arcas_id == user.id: 
         arcas_time = when
         gif = discord.Embed()
         gif.set_image(url="https://i.imgur.com/v2ueHcl.gif")
