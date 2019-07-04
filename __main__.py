@@ -476,29 +476,30 @@ async def on_raw_reaction_add(payload):
     channel = client.get_channel(payload.channel_id)
     member = channel.guild.get_member(payload.user_id)
     message = await channel.fetch_message(payload.message_id)
-    if payload.emoji.is_custom_emoji():
-        emoji = client.get_emoji(payload.emoji.id)
-    else:
-        emoji = payload.emoji.name
-    if not(member.bot):
-        if message.content.startswith(config.role_string):
-            role_data = await get_join_role_data(message)
-            for line in role_data:
-                if str(emoji) == line[1]:
-                    await add_role_on_reaction(line[0], member, message)
-                    break
-            else:
+    if member is not None:
+        if payload.emoji.is_custom_emoji():
+            emoji = client.get_emoji(payload.emoji.id)
+        else:
+            emoji = payload.emoji.name
+        if not(member.bot):
+            if message.content.startswith(config.role_string):
+                role_data = await get_join_role_data(message)
+                for line in role_data:
+                    if str(emoji) == line[1]:
+                        await add_role_on_reaction(line[0], member, message)
+                        break
+                else:
+                    if emoji is None:
+                        await message.remove_reaction(payload.emoji, member)
+                    else:
+                        await message.remove_reaction(emoji, member)
+            elif message.content.startswith(config.vote_message):
                 if emoji is None:
                     await message.remove_reaction(payload.emoji, member)
-                else:
+                elif emoji not in ["✅", "❌", "0⃣"]:
                     await message.remove_reaction(emoji, member)
-        elif message.content.startswith(config.vote_message):
-            if emoji is None:
-                await message.remove_reaction(payload.emoji, member)
-            elif emoji not in ["✅", "❌", "0⃣"]:
-                await message.remove_reaction(emoji, member)
-        elif type(emoji) is not str and member.id != message.author.id:
-            karma.karma_emoji(message.author, payload.emoji.id)
+            elif type(emoji) is not str and member.id != message.author.id:
+                karma.karma_emoji(message.author, payload.emoji.id)
 
 
 @client.event
@@ -506,18 +507,19 @@ async def on_raw_reaction_remove(payload):
     channel = client.get_channel(payload.channel_id)
     member = channel.guild.get_member(payload.user_id)
     message = await channel.fetch_message(payload.message_id)
-    if payload.emoji.is_custom_emoji():
-        emoji = client.get_emoji(payload.emoji.id)
-    else:
-        emoji = payload.emoji.name
-    if message.content.startswith(config.role_string):
-        role_data = await get_join_role_data(message)
-        for line in role_data:
-            if str(emoji) == line[1]:
-                await remove_role_on_reaction(line[0], member, message)
-                break
-    elif type(emoji) is not str and member.id != message.author.id:
-        karma.karma_emoji_remove(message.author, payload.emoji.id)
+    if member is not None:
+        if payload.emoji.is_custom_emoji():
+            emoji = client.get_emoji(payload.emoji.id)
+        else:
+            emoji = payload.emoji.name
+        if message.content.startswith(config.role_string):
+            role_data = await get_join_role_data(message)
+            for line in role_data:
+                if str(emoji) == line[1]:
+                    await remove_role_on_reaction(line[0], member, message)
+                    break
+        elif type(emoji) is not str and member.id != message.author.id:
+            karma.karma_emoji_remove(message.author, payload.emoji.id)
 
 
 @client.event
