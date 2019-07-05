@@ -306,6 +306,8 @@ async def get_join_role_data(message):
 
 # Adds reactions to message
 async def message_role_reactions(message, data):
+    if message.channel.type is not discord.ChannelType.text:
+        message.channel.guild = client.get_guild(config.guild_id)
     for line in data:
         if (discord.utils.get(message.guild.roles,
                               name=line[0]) is None):
@@ -474,8 +476,13 @@ async def on_message(message):
 @client.event
 async def on_raw_reaction_add(payload):
     channel = client.get_channel(payload.channel_id)
+    if channel.type is not discord.ChannelType.text:
+        message.channel.guild = client.get_guild(config.guild_id)
     member = channel.guild.get_member(payload.user_id)
-    message = await channel.fetch_message(payload.message_id)
+    try:
+        message = await channel.fetch_message(payload.message_id)
+    except discord.errors.NotFound:
+        return
     if member is not None:
         if payload.emoji.is_custom_emoji():
             emoji = client.get_emoji(payload.emoji.id)
@@ -505,8 +512,13 @@ async def on_raw_reaction_add(payload):
 @client.event
 async def on_raw_reaction_remove(payload):
     channel = client.get_channel(payload.channel_id)
+    if channel.type is not discord.ChannelType.text:
+        message.channel.guild = client.get_guild(config.guild_id)
     member = channel.guild.get_member(payload.user_id)
-    message = await channel.fetch_message(payload.message_id)
+    try:
+        message = await channel.fetch_message(payload.message_id)
+    except discord.errors.NotFound:
+        return
     if member is not None:
         if payload.emoji.is_custom_emoji():
             emoji = client.get_emoji(payload.emoji.id)
