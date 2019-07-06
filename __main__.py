@@ -6,7 +6,6 @@ import random
 import string
 import smtplib
 import ssl
-import sys
 import traceback
 import datetime
 
@@ -306,8 +305,14 @@ async def get_join_role_data(message):
 
 # Adds reactions to message
 async def message_role_reactions(message, data):
+    if message.channel.type is not discord.TextChannel:
+        await message.channel.send("Nepises na serveru takze predpokladam "
+                                   "ze myslis role VUT FIT serveru")
+        guild = client.get_guild(config.guild_id)
+    else:
+        guild = message.guild
     for line in data:
-        if (discord.utils.get(message.guild.roles,
+        if (discord.utils.get(guild.roles,
                               name=line[0]) is None):
             await message.channel.send("{} {} nie je rola"
                                        .format(utils.generate_mention(
@@ -323,10 +328,10 @@ async def message_role_reactions(message, data):
 
 
 # Adds a role for user based on reaction
-async def add_role_on_reaction(role, member, message):
-    role = discord.utils.get(message.guild.roles,
+async def add_role_on_reaction(role, member, message, guild):
+    role = discord.utils.get(guild.roles,
                              name=role)
-    max_role = discord.utils.get(message.guild.roles,
+    max_role = discord.utils.get(guild.roles,
                                  name="Rubbergod")
     if role is not None:
         if role < max_role:
@@ -338,10 +343,10 @@ async def add_role_on_reaction(role, member, message):
 
 
 # Removes a role for user based on reaction
-async def remove_role_on_reaction(role, member, message):
-    role = discord.utils.get(message.guild.roles,
+async def remove_role_on_reaction(role, member, message, guild):
+    role = discord.utils.get(guild.roles,
                              name=role)
-    max_role = discord.utils.get(message.guild.roles,
+    max_role = discord.utils.get(guild.roles,
                                  name="Rubbergod")
     if role is not None:
         if role in member.roles:
@@ -352,7 +357,6 @@ async def remove_role_on_reaction(role, member, message):
                                            "nemáš práva"
                                            .format(utils.generate_mention(
                                               member.id), role.name))
-
 
 
 #                                      #
@@ -474,7 +478,11 @@ async def on_message(message):
 @client.event
 async def on_raw_reaction_add(payload):
     channel = client.get_channel(payload.channel_id)
-    member = channel.guild.get_member(payload.user_id)
+    if channel.type is discord.ChannelType.text:
+        guild = channel.guild
+    else:
+        guild = client.get_guild(config.guild_id)
+    member = guild.get_member(payload.user_id)
     message = await channel.fetch_message(payload.message_id)
     if member is not None:
         if payload.emoji.is_custom_emoji():
@@ -486,7 +494,8 @@ async def on_raw_reaction_add(payload):
                 role_data = await get_join_role_data(message)
                 for line in role_data:
                     if str(emoji) == line[1]:
-                        await add_role_on_reaction(line[0], member, message)
+                        await add_role_on_reaction(line[0], member,
+                                                   message, guild)
                         break
                 else:
                     if emoji is None:
@@ -505,7 +514,11 @@ async def on_raw_reaction_add(payload):
 @client.event
 async def on_raw_reaction_remove(payload):
     channel = client.get_channel(payload.channel_id)
-    member = channel.guild.get_member(payload.user_id)
+    if channel.type is discord.ChannelType.text:
+        guild = channel.guild
+    else:
+        guild = client.get_guild(config.guild_id)
+    member = guild.get_member(payload.user_id)
     message = await channel.fetch_message(payload.message_id)
     if member is not None:
         if payload.emoji.is_custom_emoji():
@@ -516,7 +529,8 @@ async def on_raw_reaction_remove(payload):
             role_data = await get_join_role_data(message)
             for line in role_data:
                 if str(emoji) == line[1]:
-                    await remove_role_on_reaction(line[0], member, message)
+                    await remove_role_on_reaction(line[0], member,
+                                                  message, guild)
                     break
         elif type(emoji) is not str and member.id != message.author.id:
             karma.karma_emoji_remove(message.author, payload.emoji.id)
@@ -525,7 +539,8 @@ async def on_raw_reaction_remove(payload):
 @client.event
 async def on_typing(channel, user, when):
     global arcas_time
-    if arcas_time + datetime.timedelta(hours=1) < when and config.arcas_id == user.id: 
+    if arcas_time + datetime.timedelta(hours=1) < when and\
+            config.arcas_id == user.id:
         arcas_time = when
         gif = discord.Embed()
         gif.set_image(url="https://i.imgur.com/v2ueHcl.gif")
