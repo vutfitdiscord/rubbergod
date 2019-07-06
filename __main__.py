@@ -496,6 +496,8 @@ async def run_command(message, command, args):
 @client.event
 async def on_raw_reaction_add(payload):
     channel = client.get_channel(payload.channel_id)
+    if channel == None:
+        return
     if channel.type is discord.ChannelType.text:
         guild = channel.guild
     else:
@@ -532,6 +534,8 @@ async def on_raw_reaction_add(payload):
 @client.event
 async def on_raw_reaction_remove(payload):
     channel = client.get_channel(payload.channel_id)
+    if channel == None:
+        return
     if channel.type is discord.ChannelType.text:
         guild = channel.guild
     else:
