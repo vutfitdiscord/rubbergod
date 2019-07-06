@@ -59,8 +59,9 @@ CREATE TABLE IF NOT EXISTS `bot_valid_persons` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE IF NOT EXISTS `bot_reminders` (
-  `reminderID` int NOT NULL,
+  `reminderID` int NOT NULL AUTO_INCREMENT,
   `message` text DEFAULT NULL,
+  `channelID` varchar(64) DEFAULT NULL,
   `remind_time` timedate DEFAULT NULL,
   PRIMARY KEY (`reminderID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
@@ -68,6 +69,7 @@ CREATE TABLE IF NOT EXISTS `bot_reminders` (
 CREATE TABLE IF NOT EXISTS `bot_people_to_remind` (
   `userID` varchar(50) NOT NULL,
   `reminderID` int NOT NULL,
+  `private` BOOLEAN,
   FOREIGN KEY (`reminderID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
