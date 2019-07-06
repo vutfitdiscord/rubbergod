@@ -148,9 +148,8 @@ class Roll:
         return RollResult(text[:-1] + ")", result)
 
     @staticmethod
-    def roll_dice(message, config):
-        roll_string = ' '.join(message.content.split(' ')[1:])
-
+    def roll_dice(roll_string, config):
+        
         if roll_string == "":
             return """Formát naleznete na https://wiki.roll20.net/Dice_Reference
 Implementovány featury podle obsahu:

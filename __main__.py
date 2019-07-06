@@ -378,101 +378,119 @@ async def on_message(message):
     if message.author == client.user:
         return
 
-    elif message.content.startswith("!verify"):
-        await verify(message)
+    if message.content.startswith(config.command_prefix):
+        separator_pos = message.content.find(' ')
+        if separator_pos < 0:
+            separator_pos = len(message.content) # args will be an empty string
 
-    elif message.content.startswith("!getcode"):
-        await send_code(message)
+        # strip prefix
+        command = message.content[len(config.command_prefix):separator_pos]
+        args = message.content[separator_pos+1:]
 
-    elif message.content.startswith("!roll"):
-        await message.channel.send(rng.generate_number(message))
-        await botroom_check(message)
-
-    elif message.content.startswith("!flip"):
-        await message.channel.send(rng.flip())
-        await botroom_check(message)
-
-    elif message.content.startswith("!week"):
-        await message.channel.send(rng.week())
-
-    elif message.content.startswith("!pick"):
-        await pick(message)
-        await botroom_check(message)
-
-    elif message.content.startswith("!karma get"):
-        if not await guild_check(message):
-            await message.channel.send(
-                    "{}".format(config.server_warning))
-        else:
-            try:
-                await karma.get(message)
-                await botroom_check(message)
-            except discord.errors.Forbidden:
-                return
-
-    elif message.content.startswith("!karma revote"):
-        if not await guild_check(message):
-            await message.channel.send(
-                    "{}".format(config.server_warning))
-        else:
-            if message.channel.id == config.vote_room:
-                try:
-                    await message.delete()
-                    await karma.revote(message, config)
-                except discord.errors.Forbidden:
-                    return
-            else:
-                await message.channel.send(
-                        "Tohle funguje jen v {}"
-                        .format(discord.utils.get(message.guild.channels,
-                                id=config.vote_room)))
-
-    elif message.content.startswith("!karma vote"):
-        if not await guild_check(message):
-            await message.channel.send(
-                    "{}".format(config.server_warning))
-        else:
-            if message.channel.id == config.vote_room:
-                try:
-                    await message.delete()
-                    await karma.vote(message, config)
-                except discord.errors.Forbidden:
-                    return
-            else:
-                await message.channel.send(
-                        "Tohle funguje jen v {}"
-                        .format(discord.utils.get(message.guild.channels,
-                                id=config.vote_room)))
-
-    elif message.content.startswith("!karma give"):
-        if message.author.id == config.admin_id:
-            await karma.karma_give(message)
-        else:
-            await message.channel.send(
-                "{} na použitie tohto príkazu nemáš práva"
-                .format(utils.generate_mention(message.author.id)))
-
-    elif message.content.startswith("!karma"):
-        await show_karma(message)
-        await botroom_check(message)
-
-    elif message.content.startswith("!leaderboard"):
-        await karma_leaderboard(message, 'DESC')
-        await botroom_check(message)
-
-    elif message.content.startswith("!bajkarboard"):
-        await karma_leaderboard(message, 'ASC')
-        await botroom_check(message)
-
-    elif message.content.startswith("!god"):
-        await message.channel.send(config.info())
-
-    elif message.content.startswith("!diceroll"):
-        await message.channel.send(roll_dice.roll_dice(message, config))
+        await run_command(message, command, args)
 
     elif message.content.startswith(config.role_string):
         role_data = await get_join_role_data(message)
         await message_role_reactions(message, role_data)
+
+
+async def run_command(message, command, args):
+
+    if command == "verify":
+        await verify(message)
+
+    elif command == "getcode":
+        await send_code(message)
+
+    elif command == "roll":
+        await message.channel.send(rng.generate_number(message))
+        await botroom_check(message)
+
+    elif command == "flip" or command == "flippz":
+        await message.channel.send(rng.flip())
+        await botroom_check(message)
+
+    elif command == "week":
+        await message.channel.send(rng.week())
+
+    elif command == "pick":
+        await pick(message)
+        await botroom_check(message)
+
+    elif command == "karma":
+        if args.startswith("get"):
+            if not await guild_check(message):
+                await message.channel.send(
+                        "{}".format(config.server_warning))
+            else:
+                try:
+                    await karma.get(message)
+                    await botroom_check(message)
+                except discord.errors.Forbidden:
+                    return
+
+        elif args.startswith("revote"):
+            if not await guild_check(message):
+                await message.channel.send(
+                        "{}".format(config.server_warning))
+            else:
+                if message.channel.id == config.vote_room:
+                    try:
+                        await message.delete()
+                        await karma.revote(message, config)
+                    except discord.errors.Forbidden:
+                        return
+                else:
+                    await message.channel.send(
+                            "Tohle funguje jen v {}"
+                            .format(discord.utils.get(message.guild.channels,
+                                    id=config.vote_room)))
+
+        elif args.startswith("vote"):
+            if not await guild_check(message):
+                await message.channel.send(
+                        "{}".format(config.server_warning))
+            else:
+                if message.channel.id == config.vote_room:
+                    try:
+                        await message.delete()
+                        await karma.vote(message, config)
+                    except discord.errors.Forbidden:
+                        return
+                else:
+                    await message.channel.send(
+                            "Tohle funguje jen v {}"
+                            .format(discord.utils.get(message.guild.channels,
+                                    id=config.vote_room)))
+
+        elif args.startswith("give"):
+            if message.author.id == config.admin_id:
+                await karma.karma_give(message)
+            else:
+                await message.channel.send(
+                    "{} na použitie tohto príkazu nemáš práva"
+                    .format(utils.generate_mention(message.author.id)))
+
+        else:
+            await show_karma(message)
+            await botroom_check(message)
+
+    # END KARMA COMMAND
+
+    elif command == "leaderboard":
+        await karma_leaderboard(message, 'DESC')
+        await botroom_check(message)
+
+    elif command == "bajkarboard":
+        await karma_leaderboard(message, 'ASC')
+        await botroom_check(message)
+
+    elif command == "god":
+        await message.channel.send(config.info())
+
+    elif command == "diceroll":
+        await message.channel.send(roll_dice.roll_dice(args, config))
+        await botroom_check(message)
 
 
 @client.event
