@@ -17,6 +17,9 @@ class Config:
             'use_pure': False,
         }
 
+        # Base bot behavior
+        self.command_prefix = '!'
+
         # Roll dice
         self.max_dice_at_once = 1000
         self.dice_before_collation = 20
@@ -30,14 +33,14 @@ class Config:
         # Logging to discord
         self.log_channel_id = 0
 
-        #String constants
+        # String constants
         self.role_string = "Role"
         self.server_warning = "Tohle funguje jen na VUT FIT serveru"
         self.vote_room = 461544375105749003
         self.vote_message = "Hlasovani o karma ohodnoceni emotu"
         self.bot_room = 461549842896781312
 
-        #Arcas
+        # Arcas
         self.arcas_id = 140547421733126145
 
     @staticmethod
