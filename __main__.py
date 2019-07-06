@@ -305,7 +305,7 @@ async def get_join_role_data(message):
 
 # Adds reactions to message
 async def message_role_reactions(message, data):
-    if message.channel.type is not discord.TextChannel:
+    if message.channel.type is not discord.ChannelType.text:
         await message.channel.send("Nepises na serveru takze predpokladam "
                                    "ze myslis role VUT FIT serveru")
         guild = client.get_guild(config.guild_id)
