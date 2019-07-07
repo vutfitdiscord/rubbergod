@@ -23,9 +23,9 @@ class Rng:
         """"Generate random number from interval"""
         string = message.content.split(" ")
         if len(string) != 3 and len(string) != 2:
-            return ("Použití: !roll x [y]\n" + 
-                    "Kde x, y je rozmezí čísel\n" + 
-                    "x, y jsou celá čísla\n" + 
+            return ("Použití: !roll x [y]\n" +
+                    "Kde x, y je rozmezí čísel\n" +
+                    "x, y jsou celá čísla\n" +
                     "Ak y není specifikováno, je považováno za 0")
         try:
             x = int(string[1])

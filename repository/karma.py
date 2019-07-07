@@ -1,5 +1,4 @@
 from repository.base_repository import BaseRepository
-from repository import utils
 import mysql.connector
 import asyncio
 import discord
@@ -7,7 +6,9 @@ import discord
 
 class Karma(BaseRepository):
 
-    utils = utils.Utils()
+    def __init__(self, client, utils):
+        self.client = client
+        self.utils = utils
 
     def valid_emoji(self, emoji_id):
         row = self.get_row("bot_karma_emoji", "emoji_id", emoji_id)
@@ -63,13 +64,13 @@ class Karma(BaseRepository):
         db.close()
         return leaderboard
 
-    async def emote_vote(self, channel, emote, config):
-        delay = config.vote_minutes * 60
+    async def emote_vote(self, channel, emote):
+        delay = self.config.vote_minutes * 60
         message = await channel.send(
-                ("{} {}\n" +
-                    "Hlasovani skonci za {} minut a minimalni pocet hlasu je: {}"
-                 ).format(config.vote_message, str(emote),
-                          str(delay // 60), str(config.vote_minimum)))
+                 "{} {}\n"
+                 "Hlasovani skonci za {} minut a minimalni pocet hlasu je: {}"
+                 .format(self.config.vote_message, str(emote),
+                         str(delay // 60), str(self.config.vote_minimum)))
         await message.add_reaction("✅")
         await message.add_reaction("❌")
         await message.add_reaction("0⃣")
@@ -85,7 +86,7 @@ class Karma(BaseRepository):
             elif reaction.emoji == "0⃣":
                 neutral = reaction.count - 1
 
-        if plus + minus + neutral < config.vote_minimum:
+        if plus + minus + neutral < self.config.vote_minimum:
             return None
 
         if plus > minus + neutral:
@@ -95,7 +96,7 @@ class Karma(BaseRepository):
         else:
             return 0
 
-    async def vote(self, message, config):
+    async def vote(self, message):
         if len(message.content.split()) != 2:
             await message.channel.send(
                     "Neocekavam argument")
@@ -122,7 +123,7 @@ class Karma(BaseRepository):
                                    (emote.id, 0))
                     db.commit()
                     vote_value = await self.emote_vote(message.channel,
-                                                       emote, config)
+                                                       emote)
                     the_emote = emote
                     break
         else:
@@ -139,7 +140,7 @@ class Karma(BaseRepository):
             await message.channel.send(
                     "Hlasovani o emotu {} neprošlo\n"
                     "Aspoň {} hlasů potřeba"
-                    .format(str(the_emote), str(config.vote_minimum)))
+                    .format(str(the_emote), str(self.config.vote_minimum)))
 
             db.commit()
             db.close()
@@ -155,7 +156,7 @@ class Karma(BaseRepository):
                 .format(str(the_emote), str(vote_value)))
         return
 
-    async def revote(self, message, config):
+    async def revote(self, message):
         content = message.content.split()
         if len(content) != 3:
             await message.channel.send(
@@ -177,7 +178,7 @@ class Karma(BaseRepository):
                     "Emote jsem na serveru nenasel")
             return
 
-        vote_value = await self.emote_vote(message.channel, emote, config)
+        vote_value = await self.emote_vote(message.channel, emote)
 
         if vote_value is not None:
             db = mysql.connector.connect(**self.config.connection)
@@ -192,7 +193,7 @@ class Karma(BaseRepository):
             await message.channel.send(
                     "Hlasovani o emotu {} neprošlo\n"
                     "Aspoň {} hlasů potřeba"
-                    .format(str(emote), str(config.vote_minimum)))
+                    .format(str(emote), str(self.config.vote_minimum)))
             return
 
         await message.channel.send(
@@ -245,7 +246,7 @@ class Karma(BaseRepository):
                     message += str(emote)
                 except discord.NotFound:
                     continue
-                    
+
             await channel.send(message)
 
     async def karma_give(self, message):
@@ -266,3 +267,24 @@ class Karma(BaseRepository):
                 await message.channel.send("Karma bola úspešne pridaná")
             else:
                 await message.channel.send("Karma bola úspešne odobraná")
+
+    async def leaderboard(self, channel, order):
+        board = self.get_leaderboard(order)
+        i = 1
+        if order == "DESC":
+            output = "==================\n KARMA LEADERBOARD \n"
+            output += "==================\n"
+        else:
+            output = "==================\n KARMA BAJKARBOARD \n"
+            output += "==================\n"
+        guild = self.client.get_guild(self.config.guild_id)
+        for user in board:
+            username = guild.get_member(int(user[0]))
+            if username is None:
+                continue
+            username = str(username.name)
+            line = '{} - {}:  {} pts\n'.format(i, username, user[1])
+            output = output + line
+            i = i + 1
+        # '\n Full leaderboard - TO BE ADDED (SOON*tm*) \n'
+        await channel.send(output)

@@ -10,7 +10,8 @@ class BaseRepository:
     def get_row(self, table, where, value):
         db = mysql.connector.connect(**self.config.connection)
         cursor = db.cursor()
-        cursor.execute("SELECT * FROM {} WHERE {} = %s".format(table, where), (value,))
+        cursor.execute("SELECT * FROM {} WHERE {} = %s"
+                       .format(table, where), (value,))
         row = cursor.fetchone()
         db.close()
         return row

@@ -43,24 +43,26 @@ class Config:
         # Arcas
         self.arcas_id = 140547421733126145
 
-    @staticmethod
-    def info():
-        info = '```'\
-               '====================\n'\
-               ' RUBBERGOD COMMANDS \n'\
-               '====================\n'\
-               '!roll x y - Generates random integer from interval <x, y> \n'\
-               '!flip - Flips a coin \n'\
-               '!pick Is foo bar ? Yes No Maybe '\
-               '- Picks one of words after questionmark \n'\
-               '!karma - Returns your karma stats \n'\
-               '!karma get - Returns a list of all non-zero valued emotes \n'\
-               '!karma get *emote* - Returns the karma value of an emote \n'\
-               '!karma vote - Odstartuje hlasovani o hodnote zatim neohodnoceneho emotu \n'\
-               '!karma revote *emote* - Odstartuje hlasovani o nove hodnote emotu \n'\
-               '!leaderboard - Karma leaderboard \n'\
-               '!bajkarboard - Karma leaderboard reversed \n'\
-               '!diceroll - all kinds of dice rolling \n'\
-               '!god - commandlist \n'\
-               '```'
-
+        self.info = '```'\
+                    '====================\n'\
+                    ' RUBBERGOD COMMANDS \n'\
+                    '====================\n'\
+                    '!roll x y - \
+                    Generates random integer from interval <x, y> \n'\
+                    '!flip - Flips a coin \n'\
+                    '!pick Is foo bar ? Yes No Maybe '\
+                    '- Picks one of words after questionmark \n'\
+                    '!karma - Returns your karma stats \n'\
+                    '!karma get - \
+                    Returns a list of all non-zero valued emotes \n'\
+                    '!karma get *emote* - \
+                    Returns the karma value of an emote \n'\
+                    '!karma vote - \
+                    Odstartuje hlasovani o hodnote zatim neohodnoceneho emotu \n'\
+                    '!karma revote *emote* - \
+                    Odstartuje hlasovani o nove hodnote emotu \n'\
+                    '!leaderboard - Karma leaderboard \n'\
+                    '!bajkarboard - Karma leaderboard reversed \n'\
+                    '!diceroll - all kinds of dice rolling \n'\
+                    '!god - commandlist \n'\
+                    '```'
