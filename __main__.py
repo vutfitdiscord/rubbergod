@@ -121,7 +121,7 @@ async def on_message(message):
 async def run_command(message, command, args):
 
     if command == "verify":
-        await verification.Verify(message)
+        await verification.verify(message)
 
     elif command == "getcode":
         await verification.send_code(message)
@@ -196,7 +196,8 @@ async def run_command(message, command, args):
                     .format(utils.generate_mention(message.author.id)))
 
         else:
-            await message.channel.send(str(karma.get_karma(message)))
+            await message.channel.send(
+                    str(karma.get_karma(message.author.id)))
             await botroom_check(message)
 
     # END KARMA COMMAND
@@ -219,12 +220,12 @@ async def run_command(message, command, args):
 
 @client.event
 async def on_raw_reaction_add(payload):
-    reaction.add(payload)
+    await reaction.add(payload)
 
 
 @client.event
 async def on_raw_reaction_remove(payload):
-    reaction.remove(payload)
+    await reaction.remove(payload)
 
 
 @client.event

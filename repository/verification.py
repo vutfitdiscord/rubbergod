@@ -9,6 +9,7 @@ import smtplib
 class Verification(BaseRepository):
 
     def __init__(self, client, utils, user):
+        super().__init__()
         self.client = client
         self.utils = utils
         self.user = user

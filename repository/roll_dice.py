@@ -180,7 +180,7 @@ Implementovány featury podle obsahu:
             result = match(Roll.DICE_REGEX, dice)
             if result:  # result found
                 try:
-                    results.append(Roll.single_roll_dice(result, self.config))
+                    results.append(self.single_roll_dice(result))
                 except SyntaxError as e:
                     return str(e)
             else:

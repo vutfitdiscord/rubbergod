@@ -7,6 +7,7 @@ import discord
 class Karma(BaseRepository):
 
     def __init__(self, client, utils):
+        super().__init__()
         self.client = client
         self.utils = utils
 

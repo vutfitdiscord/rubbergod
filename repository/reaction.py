@@ -5,6 +5,7 @@ import discord
 class Reaction(BaseRepository):
 
     def __init__(self, client, utils, karma):
+        super().__init__()
         self.client = client
         self.utils = utils
         self.karma = karma
@@ -59,7 +60,7 @@ class Reaction(BaseRepository):
                                         message.author.id),
                                     line[1], line[0]))
 
-    async def Add(self, payload):
+    async def add(self, payload):
         channel = self.client.get_channel(payload.channel_id)
         if channel is None:
             return
@@ -97,7 +98,7 @@ class Reaction(BaseRepository):
                 elif type(emoji) is not str and member.id != message.author.id:
                     self.karma.karma_emoji(message.author, payload.emoji.id)
 
-    async def Remove(self, payload):
+    async def remove(self, payload):
         channel = self.client.get_channel(payload.channel_id)
         if channel is None:
             return
