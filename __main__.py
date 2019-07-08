@@ -101,6 +101,9 @@ async def on_message(message):
     if message.author == client.user:
         return
 
+    if user.has_role(message, config.bot_role):
+        return
+
     if message.content.startswith(config.command_prefix):
         separator_pos = message.content.find(' ')
         if separator_pos < 0:

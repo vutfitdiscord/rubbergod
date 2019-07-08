@@ -38,7 +38,7 @@ class User(BaseRepository):
     def has_role(message, role):
         """"Checks if user has defined role"""
         try:
-            return True if role in message.autor.roles else False
+            return True if role in message.author.roles else False
         except AttributeError:
             return False
 
