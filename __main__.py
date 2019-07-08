@@ -101,7 +101,7 @@ async def on_message(message):
     if message.author == client.user:
         return
 
-    if user.has_role(message, config.bot_role):
+    if message.author.bot:
         return
 
     if message.content.startswith(config.command_prefix):

@@ -19,7 +19,6 @@ class Config:
 
         # Base bot behavior
         self.command_prefix = '!'
-        self.bot_role = 461556015251324939
 
         # Roll dice
         self.max_dice_at_once = 1000
