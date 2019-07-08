@@ -98,9 +98,6 @@ async def on_error(event, *args, **kwargs):
 @client.event
 async def on_message(message):
 
-    if message.author == client.user:
-        return
-
     if message.author.bot:
         return
 
