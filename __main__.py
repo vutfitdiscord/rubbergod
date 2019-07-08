@@ -98,7 +98,7 @@ async def on_error(event, *args, **kwargs):
 @client.event
 async def on_message(message):
 
-    if message.author == client.user:
+    if message.author.bot:
         return
 
     if message.content.startswith(config.command_prefix):
