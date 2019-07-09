@@ -117,7 +117,7 @@ class Karma(BaseRepository):
         for emote in guild.emojis:
             if not emote.animated:
                 row = self.get_row("bot_karma_emoji", "emoji_id",
-                                   emote.id)
+                                   str(emote.id))
                 if row is None:
                     cursor.execute('INSERT INTO bot_karma_emoji '
                                    '(emoji_id, value) '
@@ -223,7 +223,7 @@ class Karma(BaseRepository):
                     "Emote jsem na serveru nenasel")
             return
 
-        row = self.get_row("bot_karma_emoji", "emoji_id", emote.id)
+        row = self.get_row("bot_karma_emoji", "emoji_id", str(emote.id))
         await message.channel.send(
                 "Hodnota {} : {}".format(str(emote),
                                          str(row[1] if row else None)))
