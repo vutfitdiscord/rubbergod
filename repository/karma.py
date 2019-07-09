@@ -36,12 +36,12 @@ class Karma(BaseRepository):
         db.close()
 
     def karma_emoji(self, member, emoji_id):
-        emoji_value = int(self.emoji_value(emoji_id))
+        emoji_value = int(self.emoji_value(str(emoji_id)))
         if emoji_value:
             self.update_karma(member, emoji_value)
 
     def karma_emoji_remove(self, member, emoji_id):
-        emoji_value = int(self.emoji_value(emoji_id))
+        emoji_value = int(self.emoji_value(str(emoji_id)))
         if emoji_value:
             self.update_karma(member, emoji_value * (-1))
 

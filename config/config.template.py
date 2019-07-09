@@ -15,6 +15,7 @@ class Config:
             'port': '',
             'raise_on_warnings': True,
             'use_pure': False,
+            'charset': 'utf8mb4',
         }
 
         # Base bot behavior
