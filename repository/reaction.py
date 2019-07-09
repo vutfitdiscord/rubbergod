@@ -68,35 +68,38 @@ class Reaction(BaseRepository):
             guild = channel.guild
         else:
             guild = self.client.get_guild(self.config.guild_id)
+            if guild is None:
+                raise Exception("Nemuzu najit guildu podle config.guild_id")
         member = guild.get_member(payload.user_id)
         message = await channel.fetch_message(payload.message_id)
-        if member is not None:
-            if payload.emoji.is_custom_emoji():
-                emoji = self.client.get_emoji(payload.emoji.id)
+        if member is None or message is None or member.bot:
+            return
+
+        if payload.emoji.is_custom_emoji():
+            emoji = self.client.get_emoji(payload.emoji.id)
+            if emoji is None:
+                emoji = payload.emoji
+        else:
+            emoji = payload.emoji.name
+        if message.content.startswith(self.config.role_string):
+            role_data = await self.get_join_role_data(message)
+            for line in role_data:
+                if str(emoji) == line[1]:
+                    await self.add_role_on_reaction(line[0], member,
+                                                    message.channel,
+                                                    guild)
+                    break
             else:
-                emoji = payload.emoji.name
-            if not(member.bot):
-                if message.content.startswith(self.config.role_string):
-                    role_data = await self.get_join_role_data(message)
-                    for line in role_data:
-                        if str(emoji) == line[1]:
-                            await self.add_role_on_reaction(line[0], member,
-                                                            message.channel,
-                                                            guild)
-                            break
-                    else:
-                        if emoji is None:
-                            await message.remove_reaction(payload.emoji,
-                                                          member)
-                        else:
-                            await message.remove_reaction(emoji, member)
-                elif message.content.startswith(self.config.vote_message):
-                    if emoji is None:
-                        await message.remove_reaction(payload.emoji, member)
-                    elif emoji not in ["✅", "❌", "0⃣"]:
-                        await message.remove_reaction(emoji, member)
-                elif type(emoji) is not str and member.id != message.author.id:
-                    self.karma.karma_emoji(message.author, payload.emoji.id)
+                await message.remove_reaction(emoji, member)
+        elif message.content.startswith(self.config.vote_message):
+            if emoji not in ["✅", "❌", "0⃣"]:
+                await message.remove_reaction(emoji, member)
+        elif member.id != message.author.id and\
+                guild.id == self.config.guild_id:
+            if type(emoji) is str:
+                self.karma.karma_emoji(message.author, emoji)
+            else:
+                self.karma.karma_emoji(message.author, emoji.id)
 
     async def remove(self, payload):
         channel = self.client.get_channel(payload.channel_id)
@@ -106,23 +109,33 @@ class Reaction(BaseRepository):
             guild = channel.guild
         else:
             guild = self.client.get_guild(self.config.guild_id)
+            if guild is None:
+                raise Exception("Nemuzu najit guildu podle config.guild_id")
         member = guild.get_member(payload.user_id)
         message = await channel.fetch_message(payload.message_id)
-        if member is not None:
-            if payload.emoji.is_custom_emoji():
-                emoji = self.client.get_emoji(payload.emoji.id)
+        if member is None or message is None or member.bot:
+            return
+
+        if payload.emoji.is_custom_emoji():
+            emoji = self.client.get_emoji(payload.emoji.id)
+            if emoji is None:
+                emoji = payload.emoji
+        else:
+            emoji = payload.emoji.name
+        if message.content.startswith(self.config.role_string):
+            role_data = await self.get_join_role_data(message)
+            for line in role_data:
+                if str(emoji) == line[1]:
+                    await self.remove_role_on_reaction(line[0], member,
+                                                       message.channel,
+                                                       guild)
+                    break
+        elif member.id != message.author.id and\
+                guild.id == self.config.guild_id:
+            if type(emoji) is str:
+                self.karma.karma_emoji_remove(message.author, emoji)
             else:
-                emoji = payload.emoji.name
-            if message.content.startswith(self.config.role_string):
-                role_data = await self.get_join_role_data(message)
-                for line in role_data:
-                    if str(emoji) == line[1]:
-                        await self.remove_role_on_reaction(line[0], member,
-                                                           message.channel,
-                                                           guild)
-                        break
-            elif type(emoji) is not str and member.id != message.author.id:
-                self.karma.karma_emoji_remove(message.author, payload.emoji.id)
+                self.karma.karma_emoji_remove(message.author, emoji.id)
 
     # Adds a role for user based on reaction
     async def add_role_on_reaction(self, role, member, channel, guild):

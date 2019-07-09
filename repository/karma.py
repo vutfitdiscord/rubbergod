@@ -2,6 +2,7 @@ from repository.base_repository import BaseRepository
 import mysql.connector
 import asyncio
 import discord
+from emoji import UNICODE_EMOJI
 
 
 class Karma(BaseRepository):
@@ -11,7 +12,7 @@ class Karma(BaseRepository):
         self.client = client
         self.utils = utils
 
-    def valid_emoji(self, emoji_id):
+    def emoji_value(self, emoji_id):
         row = self.get_row("bot_karma_emoji", "emoji_id", emoji_id)
         return row[1] if row else 0
 
@@ -35,12 +36,12 @@ class Karma(BaseRepository):
         db.close()
 
     def karma_emoji(self, member, emoji_id):
-        emoji_value = self.valid_emoji(emoji_id)
+        emoji_value = int(self.emoji_value(emoji_id))
         if emoji_value:
             self.update_karma(member, emoji_value)
 
     def karma_emoji_remove(self, member, emoji_id):
-        emoji_value = int(self.valid_emoji(emoji_id))
+        emoji_value = int(self.emoji_value(emoji_id))
         if emoji_value:
             self.update_karma(member, emoji_value * (-1))
 
@@ -165,19 +166,18 @@ class Karma(BaseRepository):
             return
 
         emote = content[2]
-        try:
-            emote_id = int(emote.split(':')[2][:-1])
-        except (AttributeError, IndexError):
-            await message.channel.send(
-                    "Ocekavam pouze **emote**")
-            return
-
-        try:
-            emote = await message.channel.guild.fetch_emoji(emote_id)
-        except discord.NotFound:
-            await message.channel.send(
-                    "Emote jsem na serveru nenasel")
-            return
+        if len(emote) != 1 or emote[0] not in UNICODE_EMOJI:
+            try:
+                emote_id = int(emote.split(':')[2][:-1])
+                emote = await message.channel.guild.fetch_emoji(emote_id)
+            except (ValueError, IndexError):
+                await message.channel.send(
+                        "Ocekavam pouze **emote**")
+                return
+            except discord.NotFound:
+                await message.channel.send(
+                        "Emote jsem na serveru nenasel")
+                return
 
         vote_value = await self.emote_vote(message.channel, emote)
 
@@ -187,7 +187,8 @@ class Karma(BaseRepository):
             cursor.execute('INSERT INTO bot_karma_emoji (emoji_id, value) '
                            'VALUES (%s, %s) ON DUPLICATE KEY '
                            'UPDATE value = %s',
-                           (emote.id, str(vote_value), str(vote_value)))
+                           (emote if type(emote) is str else emote.id,
+                            str(vote_value), str(vote_value)))
             db.commit()
             db.close()
         else:
