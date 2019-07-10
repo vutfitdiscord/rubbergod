@@ -11,7 +11,7 @@ class BaseRepository:
         db = mysql.connector.connect(**self.config.connection)
         cursor = db.cursor()
         cursor.execute("SELECT * FROM {} WHERE {} = %s"
-                       .format(table, where), (value,))
+                       .format(table, where), (str(value),))
         row = cursor.fetchone()
         db.close()
         return row
