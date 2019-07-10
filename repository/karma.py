@@ -209,12 +209,18 @@ class Karma(BaseRepository):
             return await self.get_all(message.channel)
 
         emote = content[2]
-        try:
-            emote_id = int(emote.split(':')[2][:-1])
-        except (AttributeError, IndexError):
-            await message.channel.send(
-                    "Ocekavam pouze emote nebo nic")
-            return
+        if len(emote) != 1 or emote[0] not in UNICODE_EMOJI:
+            try:
+                emote_id = int(emote.split(':')[2][:-1])
+                emote = await message.channel.guild.fetch_emoji(emote_id)
+            except (ValueError, IndexError):
+                await message.channel.send(
+                        "Ocekavam pouze emote nebo nic")
+                return
+            except discord.NotFound:
+                await message.channel.send(
+                        "Emote jsem na serveru nenasel")
+                return
 
         try:
             emote = await message.channel.guild.fetch_emoji(emote_id)
