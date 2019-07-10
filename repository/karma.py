@@ -222,14 +222,8 @@ class Karma(BaseRepository):
                         "Emote jsem na serveru nenasel")
                 return
 
-        try:
-            emote = await message.channel.guild.fetch_emoji(emote_id)
-        except discord.NotFound:
-            await message.channel.send(
-                    "Emote jsem na serveru nenasel")
-            return
-
-        row = self.get_row("bot_karma_emoji", "emoji_id", emote.id)
+        row = self.get_row("bot_karma_emoji", "emoji_id",
+                           emote if type(emote) is str else emote.id)
         await message.channel.send(
                 "Hodnota {} : {}".format(str(emote),
                                          str(row[1] if row else None)))
