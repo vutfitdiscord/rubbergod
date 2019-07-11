@@ -16,6 +16,7 @@ class Config:
             'raise_on_warnings': True,
             'use_pure': False,
             'charset': 'utf8mb4',
+            'collation': 'utf8mb4_unicode_ci',
         }
 
         # Base bot behavior

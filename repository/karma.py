@@ -244,10 +244,13 @@ class Karma(BaseRepository):
                     await channel.send(message)
                     message = ""
                 try:
+                    int(emote[0])
                     emote = await channel.guild.fetch_emoji(emote[0])
                     message += str(emote)
                 except discord.NotFound:
                     continue
+                except ValueError:
+                    message += str(emote[0])
 
             await channel.send(message)
 
