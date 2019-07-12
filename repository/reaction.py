@@ -95,7 +95,8 @@ class Reaction(BaseRepository):
             if emoji not in ["✅", "❌", "0⃣"]:
                 await message.remove_reaction(emoji, member)
         elif member.id != message.author.id and\
-                guild.id == self.config.guild_id:
+                guild.id == self.config.guild_id and\
+                not member.roles.has(self.config.karma_ban_role_id):
             if type(emoji) is str:
                 self.karma.karma_emoji(message.author, emoji)
             else:
@@ -131,7 +132,8 @@ class Reaction(BaseRepository):
                                                        guild)
                     break
         elif member.id != message.author.id and\
-                guild.id == self.config.guild_id:
+                guild.id == self.config.guild_id and\
+                not member.roles.has(self.config.karma_ban_role_id):
             if type(emoji) is str:
                 self.karma.karma_emoji_remove(message.author, emoji)
             else:

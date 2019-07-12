@@ -28,6 +28,9 @@ class Config:
         self.max_dice_groups = 10
         self.max_dice_sides = 10000
 
+        # Karma
+        self.karma_ban_role_id = 0
+
         # Voting
         self.vote_minimum = 20
         self.vote_minutes = 2
