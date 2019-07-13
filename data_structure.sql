@@ -18,8 +18,16 @@ USE `rubbergod`;
 
 -- Dumping structure for table rubbergod.bot_karma
 CREATE TABLE IF NOT EXISTS `bot_karma` (
-  `member_id` varchar(30) NOT NULL DEFAULT 'a',
+  `member_id` varchar(30) NOT NULL,
   `karma` int(11) DEFAULT NULL,
+  `nick` text,
+  PRIMARY KEY (`member_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS `bot_karma_giving` (
+  `member_id` varchar(30) NOT NULL,
+  `positive` int(11) DEFAULT NULL,
+  `negative` int(11) DEFAULT NULL,
   `nick` text,
   PRIMARY KEY (`member_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

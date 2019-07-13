@@ -203,11 +203,19 @@ async def run_command(message, command, args):
     # END KARMA COMMAND
 
     elif command == "leaderboard":
-        await karma.leaderboard(message.channel, 'DESC')
+        await karma.leaderboard(message.channel, 'get', 'DESC')
         await botroom_check(message)
 
     elif command == "bajkarboard":
-        await karma.leaderboard(message.channel, 'ASC')
+        await karma.leaderboard(message.channel, 'get', 'ASC')
+        await botroom_check(message)
+
+    elif command == "givingboard":
+        await karma.givingboard(message.channel, 'give', 'DESC')
+        await botroom_check(message)
+
+    elif command == "ishaboard":
+        await karma.givingboard(message.channel, 'give', 'ASC')
         await botroom_check(message)
 
     elif command == "god":
