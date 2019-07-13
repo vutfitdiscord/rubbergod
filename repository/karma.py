@@ -16,10 +16,18 @@ class Karma(BaseRepository):
         row = self.get_row("bot_karma_emoji", "emoji_id", emoji_id)
         return row[1] if row else 0
 
-    def update_karma(self, member, emoji_value):
+    def update_karma(self, member, giver, emoji_value, remove=False):
         db = mysql.connector.connect(**self.config.connection)
         cursor = db.cursor()
-        if self.get_karma_value(member.id) is not None:
+
+        self.update_karma_get(cursor, member, emoji_value)
+        self.update_karma_give(cursor, giver, emoji_value, remove)
+
+        db.commit()
+        db.close()
+
+    def update_karma_get(self, cursor, member, emoji_value):
+        if self.get_karma_value('bot_karma', member.id) is not None:
             cursor.execute('SELECT karma FROM bot_karma WHERE member_id = %s',
                            (member.id,))
             updated = cursor.fetchone()
@@ -32,36 +40,87 @@ class Karma(BaseRepository):
                            'VALUES (%s, %s)',
                            (member.id, emoji_value))
 
-        db.commit()
-        db.close()
+    def update_karma_give(self, cursor, giver, emoji_value, remove):
+        if emoji_value > 0:
+            if remove:
+                column = 'negative'
+            else:
+                column = 'positive'
+        else:
+            if remove:
+                column = 'positive'
+            else:
+                column = 'negative'
 
-    def karma_emoji(self, member, emoji_id):
+        if column == 'negative':
+            emoji_value *= -1
+
+        if self.get_karma_value('bot_karma_giving', giver.id) is not None:
+            cursor.execute('SELECT {} FROM bot_karma_giving '
+                           'WHERE member_id = %s'.format(column),
+                           (giver.id,))
+            updated = cursor.fetchone()
+            update = int(updated[0]) + emoji_value
+            cursor.execute('UPDATE bot_karma_giving SET {} = %s '
+                           'WHERE member_id = %s'.format(column),
+                           (update, giver.id))
+        else:
+            if column == 'positive':
+                cursor.execute('INSERT INTO bot_karma_giving '
+                               '(member_id, positive, negative) '
+                               'VALUES (%s, %s, %s)',
+                               (giver.id, emoji_value, 0))
+            else:
+                cursor.execute('INSERT INTO bot_karma_giving '
+                               '(member_id, positive, negative) '
+                               'VALUES (%s, %s, %s)',
+                               (giver.id, 0, emoji_value))
+
+    def karma_emoji(self, member, giver, emoji_id):
         emoji_value = int(self.emoji_value(str(emoji_id)))
         if emoji_value:
-            self.update_karma(member, emoji_value)
+            self.update_karma(member, giver, emoji_value)
 
-    def karma_emoji_remove(self, member, emoji_id):
+    def karma_emoji_remove(self, member, giver, emoji_id):
         emoji_value = int(self.emoji_value(str(emoji_id)))
         if emoji_value:
-            self.update_karma(member, emoji_value * (-1))
+            self.update_karma(member, giver, emoji_value * (-1), True)
 
-    def get_karma_value(self, member):
-        row = self.get_row("bot_karma", "member_id", member)
-        return row[1] if row else None
+    def get_karma_value(self, database, member):
+        row = self.get_row(database, "member_id", member)
+        if database == 'bot_karma':
+            return row[1] if row else None
+        elif database == 'bot_karma_giving':
+            return (row[1], row[2]) if row else None
+        else:
+            raise Exception('Nespravna databaze v get_karma_value')
 
-    def get_karma(self, member):
-        karma = self.get_karma_value(member)
-        if karma is None:
-            karma = 0
-        return ("Hey {}, your karma is: {}."
-                .format(self.utils.generate_mention(member),
-                        str(karma)))
+    def get_karma(self, member, action):
+        if action == 'get':
+            database = 'bot_karma'
+        elif action == 'give':
+            database = 'bot_karma_giving'
+        else:
+            raise Exception('Action neni get/give')
+        karma = self.get_karma_value(database, member)
+        if action == 'get':
+            if karma is None:
+                karma = 0
+            return ("Hey {}, your karma is: {}."
+                    .format(self.utils.generate_mention(member),
+                            str(karma)))
+        elif action == 'give':
+            if karma is None:
+                karma = (0, 0)
+            return ("Hey {}, you gave {} positive karma and {} negative karma."
+                    .format(self.utils.generate_mention(member),
+                            str(karma[0]), str(karma[1])))
 
-    def get_leaderboard(self, order):
+    def get_leaderboard(self, database, column, order):
         db = mysql.connector.connect(**self.config.connection)
         cursor = db.cursor()
-        cursor.execute('SELECT * FROM bot_karma ORDER BY karma ' + order +
-                       ' LIMIT 10')
+        cursor.execute('SELECT * FROM {} ORDER BY {} {} LIMIT 10'
+                       .format(database, column, order))
         leaderboard = cursor.fetchall()
         db.close()
         return leaderboard
@@ -257,7 +316,7 @@ class Karma(BaseRepository):
     async def karma_give(self, message):
         input_string = message.content.split()
         if len(input_string) < 4:
-            message.channel.send(
+            await message.channel.send(
                 "Toaster pls formát je !karma give NUMBER USER(s)")
         else:
             try:
@@ -267,29 +326,46 @@ class Karma(BaseRepository):
                                            .format(input_string[-1]))
                 return
             for member in message.mentions:
-                self.update_karma(member, number)
+                self.update_karma(member, message.author, number)
             if number >= 0:
                 await message.channel.send("Karma bola úspešne pridaná")
             else:
                 await message.channel.send("Karma bola úspešne odobraná")
 
-    async def leaderboard(self, channel, order):
-        board = self.get_leaderboard(order)
-        i = 1
-        if order == "DESC":
-            output = "==================\n KARMA LEADERBOARD \n"
-            output += "==================\n"
+    async def leaderboard(self, channel, action, order):
+        output = "==================\n "
+        if action == 'give':
+            database = 'bot_karma_giving'
+            if order == "DESC":
+                database_index = 1
+                column = 'positive'
+                output += "KARMA GIVINGBOARD \n"
+            else:
+                database_index = 2
+                order = "DESC"
+                column = 'negative'
+                output += "KARMA ISHABOARD \n"
+        elif action == 'get':
+            database_index = 1
+            database = 'bot_karma'
+            column = 'karma'
+            if order == "DESC":
+                output += "KARMA LEADERBOARD \n"
+            else:
+                output += "KARMA BAJKARBOARD \n"
         else:
-            output = "==================\n KARMA BAJKARBOARD \n"
-            output += "==================\n"
+            raise Exception('Action neni get/give')
+        output += "==================\n"
+
+        board = self.get_leaderboard(database, column, order)
         guild = self.client.get_guild(self.config.guild_id)
-        for user in board:
+        for i, user in enumerate(board, 1):
             username = guild.get_member(int(user[0]))
             if username is None:
                 continue
             username = str(username.name)
-            line = '{} - {}:  {} pts\n'.format(i, username, user[1])
-            output = output + line
-            i = i + 1
+            line = '{} - {}:  {} pts\n'.format(i, username,
+                                               user[database_index])
+            output += line
         # '\n Full leaderboard - TO BE ADDED (SOON*tm*) \n'
         await channel.send(output)
