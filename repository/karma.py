@@ -103,13 +103,15 @@ class Karma(BaseRepository):
         else:
             raise Exception('Action neni get/give')
         karma = self.get_karma_value(database, member)
-        if karma is None:
-            karma = 0
         if action == 'get':
+            if karma is None:
+                karma = 0
             return ("Hey {}, your karma is: {}."
                     .format(self.utils.generate_mention(member),
                             str(karma)))
         elif action == 'give':
+            if karma is None:
+                karma = (0, 0)
             return ("Hey {}, you gave {} positive karma and {} negative karma."
                     .format(self.utils.generate_mention(member),
                             str(karma[0]), str(karma[1])))
@@ -317,7 +319,7 @@ class Karma(BaseRepository):
     async def karma_give(self, message):
         input_string = message.content.split()
         if len(input_string) < 4:
-            message.channel.send(
+            await message.channel.send(
                 "Toaster pls formát je !karma give NUMBER USER(s)")
         else:
             try:
@@ -327,7 +329,7 @@ class Karma(BaseRepository):
                                            .format(input_string[-1]))
                 return
             for member in message.mentions:
-                self.update_karma(member, message.author, number, number < 0)
+                self.update_karma(member, message.author, number)
             if number >= 0:
                 await message.channel.send("Karma bola úspešne pridaná")
             else:

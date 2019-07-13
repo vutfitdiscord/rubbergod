@@ -187,6 +187,11 @@ async def run_command(message, command, args):
                             .format(discord.utils.get(message.guild.channels,
                                     id=config.vote_room)))
 
+        elif args.startswith("given"):
+            await message.channel.send(
+                    str(karma.get_karma(message.author.id, 'give')))
+            await botroom_check(message)
+
         elif args.startswith("give"):
             if message.author.id == config.admin_id:
                 await karma.karma_give(message)
@@ -197,7 +202,7 @@ async def run_command(message, command, args):
 
         else:
             await message.channel.send(
-                    str(karma.get_karma(message.author.id)))
+                    str(karma.get_karma(message.author.id, 'get')))
             await botroom_check(message)
 
     # END KARMA COMMAND
@@ -211,11 +216,11 @@ async def run_command(message, command, args):
         await botroom_check(message)
 
     elif command == "givingboard":
-        await karma.givingboard(message.channel, 'give', 'DESC')
+        await karma.leaderboard(message.channel, 'give', 'DESC')
         await botroom_check(message)
 
     elif command == "ishaboard":
-        await karma.givingboard(message.channel, 'give', 'ASC')
+        await karma.leaderboard(message.channel, 'give', 'ASC')
         await botroom_check(message)
 
     elif command == "god":

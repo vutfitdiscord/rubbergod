@@ -97,9 +97,9 @@ class Reaction(BaseRepository):
         elif member.id != message.author.id and\
                 guild.id == self.config.guild_id:
             if type(emoji) is str:
-                self.karma.karma_emoji(message.author, emoji)
+                self.karma.karma_emoji(message.author, member, emoji)
             else:
-                self.karma.karma_emoji(message.author, emoji.id)
+                self.karma.karma_emoji(message.author, member, emoji.id)
 
     async def remove(self, payload):
         channel = self.client.get_channel(payload.channel_id)
@@ -133,9 +133,9 @@ class Reaction(BaseRepository):
         elif member.id != message.author.id and\
                 guild.id == self.config.guild_id:
             if type(emoji) is str:
-                self.karma.karma_emoji_remove(message.author, emoji)
+                self.karma.karma_emoji_remove(message.author, member, emoji)
             else:
-                self.karma.karma_emoji_remove(message.author, emoji.id)
+                self.karma.karma_emoji_remove(message.author, member, emoji.id)
 
     # Adds a role for user based on reaction
     async def add_role_on_reaction(self, role, member, channel, guild):
