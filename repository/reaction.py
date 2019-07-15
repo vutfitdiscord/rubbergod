@@ -96,7 +96,8 @@ class Reaction(BaseRepository):
                 await message.remove_reaction(emoji, member)
         elif member.id != message.author.id and\
                 guild.id == self.config.guild_id and\
-                not member.roles.has(self.config.karma_ban_role_id):
+                self.config.karma_ban_role_id not in map(lambda x: x.id,
+                                                         member.roles):
             if type(emoji) is str:
                 self.karma.karma_emoji(message.author, member, emoji)
             else:
@@ -133,7 +134,8 @@ class Reaction(BaseRepository):
                     break
         elif member.id != message.author.id and\
                 guild.id == self.config.guild_id and\
-                not member.roles.has(self.config.karma_ban_role_id):
+                self.config.karma_ban_role_id not in map(lambda x: x.id,
+                                                         member.roles):
             if type(emoji) is str:
                 self.karma.karma_emoji_remove(message.author, member, emoji)
             else:

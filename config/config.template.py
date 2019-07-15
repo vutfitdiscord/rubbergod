@@ -68,6 +68,8 @@ class Config:
                     Odstartuje hlasovani o nove hodnote emotu \n'\
                     '!leaderboard - Karma leaderboard \n'\
                     '!bajkarboard - Karma leaderboard reversed \n'\
+                    '!givingboard - Karma leaderboard of giving positive karma \n'\
+                    '!ishaboard - Karma leaderboard of giving negative karma \n'\
                     '!diceroll - all kinds of dice rolling \n'\
                     '!god - commandlist \n'\
                     '```'
