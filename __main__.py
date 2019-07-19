@@ -1,6 +1,6 @@
 import discord
 from repository import (rng, karma, user, utils, roll_dice,
-                        reaction, verification)
+                        reaction, verification, presence)
 from config import config
 import mysql.connector
 import traceback
@@ -17,12 +17,15 @@ karma = karma.Karma(client, utils)
 reaction = reaction.Reaction(client, utils, karma)
 verification = verification.Verification(client, utils, user)
 arcas_time = datetime.datetime.utcnow() - datetime.timedelta(hours=1)
+presence = presence.Presence(client, utils)
 
 
 @client.event
 async def on_ready():
     """If RGod is ready"""
     print("Ready")
+
+    await presence.set_presence()
 
 
 async def update_web():
@@ -47,18 +50,19 @@ async def update_web():
 
 async def botroom_check(message):
     room = await get_room(message)
-    if room != "bot-room" and room is not None:
+    if room is not None and room.id != config.bot_room:
         await message.channel.send(
                 "{} <:sadcat:576171980118687754> 👉 "
-                "<#461549842896781312>\n"
-                .format(utils.generate_mention(message.author.id)))
+                "<#{}>\n"
+                .format(utils.generate_mention(message.author.id),
+                        config.bot_room))
 
 
 async def get_room(message):
     guild = client.get_guild(config.guild_id)
     try:
         if message.channel.guild == guild:
-            return message.channel.name
+            return message.channel
     except AttributeError:
         # Jsme v PM
         return None

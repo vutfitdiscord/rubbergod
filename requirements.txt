@@ -2,3 +2,4 @@ discord
 mysql
 mysql-connector-python-rf
 emoji
+gitpython
