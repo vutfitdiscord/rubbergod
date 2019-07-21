@@ -213,7 +213,7 @@ class Karma(BaseRepository):
         if vote_value is None:
             cursor.execute('DELETE FROM bot_karma_emoji '
                            'WHERE emoji_id = %s',
-                           (the_emote.id))
+                           (str(the_emote.id),))
 
             await message.channel.send(
                     "Hlasovani o emotu {} neprošlo\n"
@@ -226,7 +226,7 @@ class Karma(BaseRepository):
         else:
             cursor.execute('UPDATE bot_karma_emoji SET value = %s '
                            'WHERE emoji_id = %s',
-                           (vote_value, the_emote.id))
+                           (vote_value, str(the_emote.id)))
         db.commit()
         db.close()
         await message.channel.send(
@@ -320,13 +320,15 @@ class Karma(BaseRepository):
                     await channel.send(message)
                     message = ""
                 try:
-                    int(emote[0])
-                    emote = await channel.guild.fetch_emoji(emote[0])
+                    emote = await channel.guild.fetch_emoji(int(emote[0]))
                     message += str(emote)
                 except discord.NotFound:
                     continue
                 except ValueError:
-                    message += str(emote[0])
+                    if type(emote[0]) == bytearray:
+                        message += emote[0].decode()
+                    else:
+                        message += str(emote[0])
 
             await channel.send(message)
 
