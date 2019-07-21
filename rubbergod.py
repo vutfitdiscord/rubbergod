@@ -1,4 +1,5 @@
 import discord
+from discord.ext import commands
 from repository import (rng, karma, user, utils, roll_dice,
                         reaction, verification, presence)
 from config import config
@@ -8,8 +9,8 @@ import datetime
 
 
 config = config.Config()
-bot = discord.Bot(config.command_prefix, config.help_command,
-                  config.bot_description, case_insensitive=True)
+bot = commands.Bot(command_prefix=config.command_prefix,
+                   help_command=None)
 utils = utils.Utils()
 rng = rng.Rng()
 user = user.User()
@@ -95,6 +96,8 @@ async def on_message(message):
     if message.content.startswith(config.role_string):
         role_data = await reaction.get_join_role_data(message)
         await reaction.message_role_reactions(message, role_data)
+    else:
+        await bot.process_commands(message)
 
 
 @bot.command()
@@ -135,7 +138,7 @@ async def pick(ctx):
         await ctx.send("{} {}"
                        .format(option,
                                utils.generate_mention(
-                                   ctx.author)))
+                                   ctx.author.id)))
     await botroom_check(ctx.message)
 
 
@@ -231,9 +234,30 @@ async def ishaboard(ctx):
     await karma.leaderboard(ctx.message.channel, 'give', 'ASC')
     await botroom_check(ctx.message)
 
+@bot.command()
+async def god(ctx):
+    embed = discord.Embed(title="Rubbergod",
+	 		  description="The nicest bot ever. List of commands are:",
+			  color=0xeee657)
+
+    prefix = config.command_prefix 
+
+    # give info about you here
+    embed.add_field(name="Author", value="Toaster#1111")
+
+    # Shows the number of servers the bot is member of.
+    embed.add_field(name="Server count", value=f"{len(bot.guilds)}")
+
+    for command in config.info:
+        embed.add_field(name=prefix+command[0],
+                        value=command[1],
+                        inline=False)
+
+    await ctx.send(embed=embed)
+
 
 @bot.command()
-async def diceroll(ctx, *, arg):
+async def diceroll(ctx, *, arg=""):
     await ctx.send(roll_dice.roll_dice(arg))
     await botroom_check(ctx.message)
 

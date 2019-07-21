@@ -21,7 +21,6 @@ class Config:
 
         # Base bot behavior
         self.command_prefix = '!'
-        self.bot_description = "Rubbergod commands:"
 
         # Roll dice
         self.max_dice_at_once = 1000
@@ -49,30 +48,26 @@ class Config:
         # Arcas
         self.arcas_id = 140547421733126145
 
-        self.info = '```'\
-                    '====================\n'\
-                    ' RUBBERGOD COMMANDS \n'\
-                    '====================\n'\
-                    '!roll x y - \
-                    Generates random integer from interval <x, y> \n'\
-                    '!flip - Flips a coin \n'\
-                    '!pick Is foo bar ? Yes No Maybe '\
-                    '- Picks one of words after questionmark \n'\
-                    '!karma - Returns your karma stats \n'\
-                    '!karma given - Returns your karma stats about how much you\'ve given \n'\
-                    '!karma get - \
-                    Returns a list of all non-zero valued emotes \n'\
-                    '!karma get *emote* - \
-                    Returns the karma value of an emote \n'\
-                    '!karma vote - \
-                    Odstartuje hlasovani o hodnote zatim neohodnoceneho emotu \n'\
-                    '!karma revote *emote* - \
-                    Odstartuje hlasovani o nove hodnote emotu \n'\
-                    '!leaderboard - Karma leaderboard \n'\
-                    '!bajkarboard - Karma leaderboard reversed \n'\
-                    '!givingboard - Karma leaderboard of giving positive karma \n'\
-                    '!ishaboard - Karma leaderboard of giving negative karma \n'\
-                    '!diceroll - all kinds of dice rolling \n'\
-                    '!week - Returns the current week (and if it\'s odd/even) \n'\
-                    '!god - commandlist \n'\
-                    '```'
+        self.info = [('roll X Y',
+                      'Generates random integer from interval <**X**, **Y**>'),
+                     ('flip', 'Flips a coin'),
+                     ('pick *Is foo bar ? Yes No Maybe*',
+                      'Picks one of words after questionmark'),
+                     ('karma', 'Returns your karma stats'),
+                     ('karma given',
+                      'Returns your karma stats about how much you\'ve given'),
+                     ('karma get',
+                      'Returns a list of all non-zero valued emotes'),
+                     ('karma get *emote*',
+                      'Returns the karma value of an emote'),
+                     ('karma vote',
+                      'Odstartuje hlasovani o hodnote zatim neohodnoceneho emotu'),
+                     ('karma revote *emote*',
+                      'Odstartuje hlasovani o nove hodnote emotu'),
+                     ('leaderboard',' Karma leaderboard'),
+                     ('bajkarboard', 'Karma leaderboard reversed'),
+                     ('givingboard', 'Karma leaderboard of giving positive karma'),
+                     ('ishaboard', 'Karma leaderboard of giving negative karma'),
+                     ('diceroll', 'all kinds of dice rolling'),
+                     ('week', 'Returns the current week (and if it\'s odd/even)'),
+                     ('god', 'Prints this message')]
