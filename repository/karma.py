@@ -127,8 +127,9 @@ class Karma(BaseRepository):
                 karma = (0, 0)
             order = (self.get_karma_position(database, "positive", karma[0]),
                      self.get_karma_position(database, "negative", karma[1]))
-            return ("Hey {}, you gave {} positive karma ({}.) "
-                    "and {} negative karma ({}.)."
+            return ("Hey {}, you have given:\n"
+                    "**{}** positive karma (**{}.** most generous giver)\n"
+                    "**{}** negative karma (**{}.** most generous giver)"
                     .format(self.utils.generate_mention(member),
                             str(karma[0]), str(order[0]),
                             str(karma[1]), str(order[1])))
