@@ -21,6 +21,7 @@ class Config:
 
         # Base bot behavior
         self.command_prefix = '!'
+        self.bot_description = "Rubbergod commands:"
 
         # Roll dice
         self.max_dice_at_once = 1000

@@ -7,20 +7,21 @@ import traceback
 import datetime
 
 
-client = discord.Client()
 config = config.Config()
+bot = discord.Bot(config.command_prefix, config.help_command,
+                  config.bot_description, case_insensitive=True)
 utils = utils.Utils()
 rng = rng.Rng()
 user = user.User()
 roll_dice = roll_dice.Roll()
-karma = karma.Karma(client, utils)
-reaction = reaction.Reaction(client, utils, karma)
-verification = verification.Verification(client, utils, user)
+karma = karma.Karma(bot, utils)
+reaction = reaction.Reaction(bot, utils, karma)
+verification = verification.Verification(bot, utils, user)
 arcas_time = datetime.datetime.utcnow() - datetime.timedelta(hours=1)
-presence = presence.Presence(client, utils)
+presence = presence.Presence(bot, utils)
 
 
-@client.event
+@bot.event
 async def on_ready():
     """If RGod is ready"""
     print("Ready")
@@ -34,8 +35,8 @@ async def update_web():
     cursor.execute('SELECT * FROM bot_karma')
     karma = cursor.fetchall()
     for item in karma:
-        user = await client.get_user_info(item[0])
-        client.get_user_info(item[0])
+        user = await bot.get_user_info(item[0])
+        bot.get_user_info(item[0])
         username = str(user.name).split('#')[0]
         cursor.execute('UPDATE bot_karma SET nick=%s, '
                        'avatar_url=%s WHERE member_id=%s',
@@ -59,7 +60,7 @@ async def botroom_check(message):
 
 
 async def get_room(message):
-    guild = client.get_guild(config.guild_id)
+    guild = bot.get_guild(config.guild_id)
     try:
         if message.channel.guild == guild:
             return message.channel
@@ -70,182 +71,184 @@ async def get_room(message):
 
 async def guild_check(message):
     try:
-        guild = client.get_guild(config.guild_id)
+        guild = bot.get_guild(config.guild_id)
         return message.channel.guild == guild
     except AttributeError:
         return False
-
-
-async def pick(message):
-    """"Pick an option"""
-    option = rng.pick_option(message)
-    if option:
-        await message.channel.send("{} {}"
-                                   .format(option,
-                                           utils.generate_mention(
-                                               message.author.id)))
 
 
 #                                      #
 #              COMMANDS                #
 #                                      #
 
-@client.event
+@bot.event
 async def on_error(event, *args, **kwargs):
     error = traceback.format_exc()
-    channel = client.get_channel(config.log_channel_id)
+    channel = bot.get_channel(config.log_channel_id)
     print(str(error))
     if channel is not None:
         await channel.send("```\n" + str(error) + "\n```")
 
 
-@client.event
+@bot.event
 async def on_message(message):
-
-    if message.author.bot:
-        return
-
-    if message.content.startswith(config.command_prefix):
-        separator_pos = message.content.find(' ')
-        if separator_pos < 0:
-            # args will be an empty string
-            separator_pos = len(message.content)
-
-        # strip prefix
-        command = message.content[len(config.command_prefix):separator_pos]
-        args = message.content[separator_pos+1:]
-
-        await run_command(message, command, args)
-
-    elif message.content.startswith(config.role_string):
+    if message.content.startswith(config.role_string):
         role_data = await reaction.get_join_role_data(message)
         await reaction.message_role_reactions(message, role_data)
 
 
-async def run_command(message, command, args):
+@bot.command()
+async def verify(ctx):
+    await verification.verify(ctx.message)
 
-    if command == "verify":
-        await verification.verify(message)
 
-    elif command == "getcode":
-        await verification.send_code(message)
+@bot.command()
+async def getcode(ctx):
+    await verification.send_code(ctx.message)
 
-    elif command == "roll":
-        await message.channel.send(rng.generate_number(message))
-        await botroom_check(message)
 
-    elif command == "flip" or command == "flippz":
-        await message.channel.send(rng.flip())
-        await botroom_check(message)
+@bot.command()
+async def roll(ctx):
+    # TODO: use
+    # https://discordpy.readthedocs.io/en/latest/ext/commands/commands.html#basic-converters
+    # and only pass integers to the function?
+    await ctx.send(rng.generate_number(ctx.message))
+    await botroom_check(ctx.message)
 
-    elif command == "week":
-        await message.channel.send(rng.week())
 
-    elif command == "pick":
-        await pick(message)
-        await botroom_check(message)
+@bot.command()
+async def flip(ctx):
+    await ctx.send(rng.flip())
+    await botroom_check(ctx.message)
 
-    elif command == "karma":
-        if args.startswith("get"):
-            if not await guild_check(message):
-                await message.channel.send(
-                        "{}".format(config.server_warning))
-            else:
+
+@bot.command()
+async def week(ctx):
+    await ctx.send(rng.week())
+
+
+@bot.command()
+async def pick(ctx):
+    """"Pick an option"""
+    option = rng.pick_option(ctx.message)
+    if option:
+        await ctx.send("{} {}"
+                       .format(option,
+                               utils.generate_mention(
+                                   ctx.author)))
+    await botroom_check(ctx.message)
+
+
+@bot.command(name="karma")
+async def pick_karma_command(ctx, *args):
+    if len(args) == 0:
+        await ctx.send(
+                str(karma.get_karma(ctx.author.id, 'get')))
+        await botroom_check(ctx.message)
+    elif args[0] == "get":
+        if not await guild_check(ctx.message):
+            await ctx.send(
+                    "{}".format(config.server_warning))
+        else:
+            try:
+                await karma.get(ctx.message)
+                await botroom_check(ctx.message)
+            except discord.errors.Forbidden:
+                return
+
+    elif args[0] == "revote":
+        if not await guild_check(ctx.message):
+            await ctx.send(
+                    "{}".format(config.server_warning))
+        else:
+            if ctx.message.channel.id == config.vote_room:
                 try:
-                    await karma.get(message)
-                    await botroom_check(message)
+                    await ctx.message.delete()
+                    await karma.revote(ctx.message)
                 except discord.errors.Forbidden:
                     return
-
-        elif args.startswith("revote"):
-            if not await guild_check(message):
-                await message.channel.send(
-                        "{}".format(config.server_warning))
             else:
-                if message.channel.id == config.vote_room:
-                    try:
-                        await message.delete()
-                        await karma.revote(message)
-                    except discord.errors.Forbidden:
-                        return
-                else:
-                    await message.channel.send(
-                            "Tohle funguje jen v {}"
-                            .format(discord.utils.get(message.guild.channels,
-                                    id=config.vote_room)))
+                await ctx.send(
+                        "Tohle funguje jen v {}"
+                        .format(discord.utils.get(ctx.guild.channels,
+                                id=config.vote_room)))
 
-        elif args.startswith("vote"):
-            if not await guild_check(message):
-                await message.channel.send(
-                        "{}".format(config.server_warning))
-            else:
-                if message.channel.id == config.vote_room:
-                    try:
-                        await message.delete()
-                        await karma.vote(message)
-                    except discord.errors.Forbidden:
-                        return
-                else:
-                    await message.channel.send(
-                            "Tohle funguje jen v {}"
-                            .format(discord.utils.get(message.guild.channels,
-                                    id=config.vote_room)))
-
-        elif args.startswith("given"):
-            await message.channel.send(
-                    str(karma.get_karma(message.author.id, 'give')))
-            await botroom_check(message)
-
-        elif args.startswith("give"):
-            if message.author.id == config.admin_id:
-                await karma.karma_give(message)
-            else:
-                await message.channel.send(
-                    "{} na použitie tohto príkazu nemáš práva"
-                    .format(utils.generate_mention(message.author.id)))
-
+    elif args[0] == "vote":
+        if not await guild_check(ctx.message):
+            await ctx.send(
+                    "{}".format(config.server_warning))
         else:
-            await message.channel.send(
-                    str(karma.get_karma(message.author.id, 'get')))
-            await botroom_check(message)
+            if ctx.message.channel.id == config.vote_room:
+                try:
+                    await ctx.message.delete()
+                    await karma.vote(ctx.message)
+                except discord.errors.Forbidden:
+                    return
+            else:
+                await ctx.send(
+                        "Tohle funguje jen v {}"
+                        .format(discord.utils.get(ctx.guild.channels,
+                                id=config.vote_room)))
 
-    # END KARMA COMMAND
+    elif args[0] == "given":
+        await ctx.send(
+                str(karma.get_karma(ctx.author.id, 'give')))
+        await botroom_check(ctx.message)
 
-    elif command == "leaderboard":
-        await karma.leaderboard(message.channel, 'get', 'DESC')
-        await botroom_check(message)
-
-    elif command == "bajkarboard":
-        await karma.leaderboard(message.channel, 'get', 'ASC')
-        await botroom_check(message)
-
-    elif command == "givingboard":
-        await karma.leaderboard(message.channel, 'give', 'DESC')
-        await botroom_check(message)
-
-    elif command == "ishaboard":
-        await karma.leaderboard(message.channel, 'give', 'ASC')
-        await botroom_check(message)
-
-    elif command == "god":
-        await message.channel.send(config.info)
-
-    elif command == "diceroll":
-        await message.channel.send(roll_dice.roll_dice(args))
-        await botroom_check(message)
+    elif args[0] == "give":
+        if ctx.author.id == config.admin_id:
+            await karma.karma_give(ctx.message)
+        else:
+            await ctx.send(
+                "{} na použitie tohto príkazu nemáš práva"
+                .format(utils.generate_mention(ctx.author.id)))
+    else:
+        await ctx.send(
+            "{} Neznamy karma command"
+            .format(utils.generate_mention(ctx.author.id)))
 
 
-@client.event
+@bot.command()
+async def leaderboard(ctx):
+    await karma.leaderboard(ctx.message.channel, 'get', 'DESC')
+    await botroom_check(ctx.message)
+
+
+@bot.command()
+async def bajkarboard(ctx):
+    await karma.leaderboard(ctx.message.channel, 'get', 'ASC')
+    await botroom_check(ctx.message)
+
+
+@bot.command()
+async def givingboard(ctx):
+    await karma.leaderboard(ctx.message.channel, 'give', 'DESC')
+    await botroom_check(ctx.message)
+
+
+@bot.command()
+async def ishaboard(ctx):
+    await karma.leaderboard(ctx.message.channel, 'give', 'ASC')
+    await botroom_check(ctx.message)
+
+
+@bot.command()
+async def diceroll(ctx, *, arg):
+    await ctx.send(roll_dice.roll_dice(arg))
+    await botroom_check(ctx.message)
+
+
+@bot.event
 async def on_raw_reaction_add(payload):
     await reaction.add(payload)
 
 
-@client.event
+@bot.event
 async def on_raw_reaction_remove(payload):
     await reaction.remove(payload)
 
 
-@client.event
+@bot.event
 async def on_typing(channel, user, when):
     global arcas_time
     if arcas_time + datetime.timedelta(hours=1) < when and\
@@ -256,4 +259,4 @@ async def on_typing(channel, user, when):
         await channel.send(embed=gif)
 
 
-client.run(config.key)
+bot.run(config.key)
