@@ -100,7 +100,7 @@ class Karma(BaseRepository):
         cursor = db.cursor()
         cursor.execute("SELECT count(*) "
                        "FROM {} "
-                       "WHERE {} < %s"
+                       "WHERE {} > %s"
                        .format(database, column),
                        (str(karma),))
         row = cursor.fetchone()
@@ -114,7 +114,7 @@ class Karma(BaseRepository):
             database = 'bot_karma_giving'
         else:
             raise Exception('Action neni get/give')
-        karma, order = self.get_karma_value(database, member)
+        karma = self.get_karma_value(database, member)
         if action == 'get':
             if karma is None:
                 karma = 0
@@ -130,8 +130,8 @@ class Karma(BaseRepository):
             return ("Hey {}, you gave {} positive karma ({}.) "
                     "and {} negative karma ({}.)."
                     .format(self.utils.generate_mention(member),
-                            str(karma[0]), str(karma[1]),
-                            str(order[0]), str(order[1])))
+                            str(karma[0]), str(order[0]),
+                            str(karma[1]), str(order[1])))
 
     def get_leaderboard(self, database, column, order):
         db = mysql.connector.connect(**self.config.connection)
