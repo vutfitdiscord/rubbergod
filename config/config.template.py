@@ -58,6 +58,7 @@ class Config:
                     '!pick Is foo bar ? Yes No Maybe '\
                     '- Picks one of words after questionmark \n'\
                     '!karma - Returns your karma stats \n'\
+                    '!karma given - Returns your karma stats about how much you\'ve given \n'\
                     '!karma get - \
                     Returns a list of all non-zero valued emotes \n'\
                     '!karma get *emote* - \
@@ -71,5 +72,6 @@ class Config:
                     '!givingboard - Karma leaderboard of giving positive karma \n'\
                     '!ishaboard - Karma leaderboard of giving negative karma \n'\
                     '!diceroll - all kinds of dice rolling \n'\
+                    '!week - Returns the current week (and if it\'s odd/even) \n'\
                     '!god - commandlist \n'\
                     '```'
