@@ -95,6 +95,18 @@ class Karma(BaseRepository):
         else:
             raise Exception('Nespravna databaze v get_karma_value')
 
+    def get_karma_position(self, database, column, karma):
+        db = mysql.connector.connect(**self.config.connection)
+        cursor = db.cursor()
+        cursor.execute("SELECT count(*) "
+                       "FROM {} "
+                       "WHERE {} < %s"
+                       .format(database, column),
+                       (str(karma),))
+        row = cursor.fetchone()
+        db.close()
+        return row[0] + 1
+
     def get_karma(self, member, action):
         if action == 'get':
             database = 'bot_karma'
@@ -102,19 +114,24 @@ class Karma(BaseRepository):
             database = 'bot_karma_giving'
         else:
             raise Exception('Action neni get/give')
-        karma = self.get_karma_value(database, member)
+        karma, order = self.get_karma_value(database, member)
         if action == 'get':
             if karma is None:
                 karma = 0
-            return ("Hey {}, your karma is: {}."
+            order = self.get_karma_position(database, "karma", karma)
+            return ("Hey {}, your karma is: {} ({}.)."
                     .format(self.utils.generate_mention(member),
-                            str(karma)))
+                            str(karma), str(order)))
         elif action == 'give':
             if karma is None:
                 karma = (0, 0)
-            return ("Hey {}, you gave {} positive karma and {} negative karma."
+            order = (self.get_karma_position(database, "positive", karma[0]),
+                     self.get_karma_position(database, "negative", karma[1]))
+            return ("Hey {}, you gave {} positive karma ({}.) "
+                    "and {} negative karma ({}.)."
                     .format(self.utils.generate_mention(member),
-                            str(karma[0]), str(karma[1])))
+                            str(karma[0]), str(karma[1]),
+                            str(order[0]), str(order[1])))
 
     def get_leaderboard(self, database, column, order):
         db = mysql.connector.connect(**self.config.connection)
