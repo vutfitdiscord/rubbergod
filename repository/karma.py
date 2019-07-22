@@ -119,7 +119,7 @@ class Karma(BaseRepository):
             if karma is None:
                 karma = 0
             order = self.get_karma_position(database, "karma", karma)
-            return ("Hey {}, your karma is: {} ({}.)."
+            return ("Hey {}, your karma is: **{} ({}.)**."
                     .format(self.utils.generate_mention(member),
                             str(karma), str(order)))
         elif action == 'give':
