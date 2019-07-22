@@ -316,10 +316,13 @@ class Karma(BaseRepository):
             await channel.send("Hodnota {}:".format(str(value)))
 
             message = ""
+            cnt = 0
             for emote in row:
-                if len(message) > 220:
+                cnt += 1
+                if cnt = 8:
                     await channel.send(message)
                     message = ""
+                    cnt = 0
                 try:
                     emote = await channel.guild.fetch_emoji(int(emote[0]))
                     message += str(emote)
