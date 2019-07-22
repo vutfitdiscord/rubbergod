@@ -29,7 +29,8 @@ class Config:
         self.max_dice_sides = 10000
 
         # Karma
-        self.karma_ban_role_id = 0
+        self.karma_ban_role_id = -1
+        self.karma_banned_channels = []
 
         # Voting
         self.vote_minimum = 20
