@@ -317,12 +317,10 @@ class Karma(BaseRepository):
 
             message = ""
             cnt = 0
-            for emote in row:
-                cnt += 1
-                if cnt = 8:
+            for cnt, emote in enumerate(row):
+                if cnt % 8 == 0:
                     await channel.send(message)
                     message = ""
-                    cnt = 0
                 try:
                     emote = await channel.guild.fetch_emoji(int(emote[0]))
                     message += str(emote)
