@@ -306,6 +306,7 @@ class Karma(BaseRepository):
                                          str(row[1] if row else None)))
 
     async def get_all(self, channel):
+        errors = ""
         for value in ["1", "-1"]:
             db = mysql.connector.connect(**self.config.connection)
             cursor = db.cursor()
@@ -317,21 +318,28 @@ class Karma(BaseRepository):
 
             message = ""
             for cnt, emote in enumerate(row):
-                if cnt % 8 == 7:
+                if cnt % 8 == 0 and cnt:
                     await channel.send(message)
                     message = ""
                 try:
                     emote = await channel.guild.fetch_emoji(int(emote[0]))
                     message += str(emote)
                 except discord.NotFound:
-                    continue
+                    errors += str(emote[0]) + ", "
                 except ValueError:
                     if type(emote[0]) == bytearray:
                         message += emote[0].decode()
                     else:
                         message += str(emote[0])
 
-            await channel.send(message)
+            try:
+                await channel.send(message)
+            except discord.errors.HTTPException:
+                continue
+
+        if errors != "":
+            await channel.send("Toaster pls mas v DB bordel "
+                               "(asi deleted emotes):\n" + errors)
 
     async def karma_give(self, message):
         input_string = message.content.split()
