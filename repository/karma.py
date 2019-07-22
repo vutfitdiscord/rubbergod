@@ -316,9 +316,8 @@ class Karma(BaseRepository):
             await channel.send("Hodnota {}:".format(str(value)))
 
             message = ""
-            cnt = 0
             for cnt, emote in enumerate(row):
-                if cnt % 8 == 0:
+                if cnt % 8 == 7:
                     await channel.send(message)
                     message = ""
                 try:
