@@ -345,7 +345,7 @@ class Karma(BaseRepository):
             try:
                 number = int(input_string[2])
             except ValueError:
-                await message.channel.send(self.messages.karma_give_format_number.format(input=input_string[-1]))
+                await message.channel.send(self.messages.karma_give_format_number.format(input=input_string[2]))
                 return
             for member in message.mentions:
                 self.update_karma(member, message.author, number)
