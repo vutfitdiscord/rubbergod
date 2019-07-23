@@ -45,12 +45,10 @@ async def update_web():
 
 async def botroom_check(message):
     room = await get_room(message)
-    if room is not None and room.id != config.bot_room:
-        await message.channel.send(
-            "{} <:sadcat:576171980118687754> 👉 "
-            "<#{}>\n"
-            .format(utils.generate_mention(message.author.id),
-                    config.bot_room))
+    if room is not None and room.id not in config.allowed_channels:
+        await message.channel.send(config.channel_redirect_message.format(
+            utils.generate_mention(message.author.id),
+            config.bot_room))
 
 
 async def get_room(message):
@@ -127,7 +125,7 @@ async def on_typing(channel, user, when):
         gif = discord.Embed()
         gif.set_image(url="https://i.imgur.com/v2ueHcl.gif")
         await channel.send(embed=gif)
-            
+
 
 #                                      #
 #              COMMANDS                #

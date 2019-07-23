@@ -52,6 +52,13 @@ class Config:
         self.vote_message = 'Hlasovani o karma ohodnoceni emotu'
         self.bot_room = 461549842896781312
 
+        # Allowed room check
+        self.allowed_channels = [
+            self.bot_room,
+            self.log_channel_id
+        ]
+        self.channel_redirect_message = "{} 👉 <#{}>"
+
         # Arcas
         self.arcas_id = 140547421733126145
 
