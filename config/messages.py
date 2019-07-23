@@ -1,6 +1,7 @@
 class Messages:
     server_warning = "Tohle funguje jen na VUT FIT serveru."
     toaster_pls = "Toaster pls, máš bordel v DB."
+    no_such_command = "Takovy prikaz neznám. <:sadcat:576171980118687754>"
 
     karma_own = "{user}, tvoje karma je: **{karma}** (**{pos}.**)."
     karma_given = "{user}, rozdal jsi:\n" \
@@ -101,25 +102,25 @@ class Messages:
                               "({toaster} pls)."
 
     info = [('roll X Y',
-             'Generates random integer from interval <**X**, **Y**>'),
-            ('flip', 'Flips a coin'),
-            ('pick *Is foo bar ? Yes No Maybe*',
-             'Picks one of words after questionmark'),
-            ('karma', 'Returns your karma stats'),
+             'Vygeneruje náhodné celé číslo z intervalu <**X**, **Y**>.'),
+            ('flip', 'Hodí mincí'),
+            ('pick *Is foo bar? Yes No Maybe*',
+             'Vybere jedno ze slov za otazníkem.'),
+            ('karma', 'Vypíše vaši karmu.'),
             ('karma given',
-             'Returns your karma stats about how much you\'ve given'),
+             'Vypíše, kolik pozitivní a negativní karmy jste rozdali.'),
             ('karma get',
-             'Returns a list of all non-zero valued emotes'),
-            ('karma get *emote*',
-             'Returns the karma value of an emote'),
+             'Vypíše, které emoty mají hodnotu 1 a -1.'),
+            ('karma get [emote]',
+             'Vrátí karma hodnotu emotu.'),
             ('karma vote',
-             'Odstartuje hlasovani o hodnote zatim neohodnoceneho emotu'),
-            ('karma revote *emote*',
-             'Odstartuje hlasovani o nove hodnote emotu'),
-            ('leaderboard', ' Karma leaderboard'),
+             'Odstartuje hlasování o hodnotě zatím neohodnoceného emotu.'),
+            ('karma revote [emote]',
+             'Odstartuje hlasování o nové hodnotě emotu.'),
+            ('leaderboard', 'Karma leaderboard'),
             ('bajkarboard', 'Karma leaderboard reversed'),
-            ('givingboard', 'Karma leaderboard of giving positive karma'),
-            ('ishaboard', 'Karma leaderboard of giving negative karma'),
-            ('diceroll', 'all kinds of dice rolling'),
-            ('week', 'Returns the current week (and if it\'s odd/even)'),
-            ('god', 'Prints this message')]
+            ('givingboard', 'Leaderboard rozdávání pozitivní karmy.'),
+            ('ishaboard', 'Leaderboard rozdávání negativní karmy.'),
+            ('diceroll', 'Všechno možné házení kostkami.'),
+            ('week', 'Vypíše, kolikátý je zrovna týden a jestli je sudý nebo lichý.'),
+            ('god', 'Vypíše tuto zprávu.')]
