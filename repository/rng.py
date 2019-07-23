@@ -21,8 +21,7 @@ class Rng:
                 return split[randint(1, len(split) - 1)]
         return False
 
-    @staticmethod
-    def generate_number(message):
+    def generate_number(self, message):
         """"Generate random number from interval"""
         m = messages.Messages()
         string = message.content.split(" ")
