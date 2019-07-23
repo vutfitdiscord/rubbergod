@@ -4,6 +4,8 @@ from datetime import date
 
 
 class Rng:
+    def __init__(self, utils):
+        self.utils = utils
 
     @staticmethod
     def pick_option(message):
@@ -33,7 +35,8 @@ class Rng:
             else:
                 y = 0
         except ValueError:
-            return m.rng_generator_format_number
+            return m.rng_generator_format_number.format(
+                    user=self.utils.generate_mention(message.author.id))
         if x > y:
             x, y = y, x  # variable values swap
         return randint(x, y)

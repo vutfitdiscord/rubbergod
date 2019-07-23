@@ -11,14 +11,15 @@ config = config.Config()
 bot = commands.Bot(command_prefix=config.command_prefix,
                    help_command=None)
 utils = utils.Utils()
-rng = rng.Rng()
 user = user.User()
 roll_dice = roll_dice.Roll()
+rng = rng.Rng(utils)
 karma = karma.Karma(bot, utils)
 reaction = reaction.Reaction(bot, utils, karma)
 verification = verification.Verification(bot, utils, user)
-arcas_time = datetime.datetime.utcnow() - datetime.timedelta(hours=1)
 presence = presence.Presence(bot, utils)
+
+arcas_time = datetime.datetime.utcnow() - datetime.timedelta(hours=1)
 
 
 @bot.event
