@@ -7,7 +7,6 @@ import mysql.connector
 import traceback
 import datetime
 
-
 config = config.Config()
 bot = commands.Bot(command_prefix=config.command_prefix,
                    help_command=None)
@@ -54,10 +53,10 @@ async def botroom_check(message):
     room = await get_room(message)
     if room is not None and room.id != config.bot_room:
         await message.channel.send(
-                "{} <:sadcat:576171980118687754> 👉 "
-                "<#{}>\n"
-                .format(utils.generate_mention(message.author.id),
-                        config.bot_room))
+            "{} <:sadcat:576171980118687754> 👉 "
+            "<#{}>\n"
+            .format(utils.generate_mention(message.author.id),
+                    config.bot_room))
 
 
 async def get_room(message):
@@ -146,12 +145,12 @@ async def pick(ctx):
 async def pick_karma_command(ctx, *args):
     if len(args) == 0:
         await ctx.send(
-                str(karma.get_karma(ctx.author.id, 'get')))
+            str(karma.get_karma(ctx.author.id, 'get')))
         await botroom_check(ctx.message)
     elif args[0] == "get":
         if not await guild_check(ctx.message):
             await ctx.send(
-                    "{}".format(config.server_warning))
+                "{}".format(config.server_warning))
         else:
             try:
                 await karma.get(ctx.message)
@@ -162,7 +161,7 @@ async def pick_karma_command(ctx, *args):
     elif args[0] == "revote":
         if not await guild_check(ctx.message):
             await ctx.send(
-                    "{}".format(config.server_warning))
+                "{}".format(config.server_warning))
         else:
             if ctx.message.channel.id == config.vote_room:
                 try:
@@ -172,14 +171,14 @@ async def pick_karma_command(ctx, *args):
                     return
             else:
                 await ctx.send(
-                        "Tohle funguje jen v {}"
-                        .format(discord.utils.get(ctx.guild.channels,
-                                id=config.vote_room)))
+                    "Tohle funguje jen v {}"
+                    .format(discord.utils.get(ctx.guild.channels,
+                                              id=config.vote_room)))
 
     elif args[0] == "vote":
         if not await guild_check(ctx.message):
             await ctx.send(
-                    "{}".format(config.server_warning))
+                "{}".format(config.server_warning))
         else:
             if ctx.message.channel.id == config.vote_room:
                 try:
@@ -189,13 +188,13 @@ async def pick_karma_command(ctx, *args):
                     return
             else:
                 await ctx.send(
-                        "Tohle funguje jen v {}"
-                        .format(discord.utils.get(ctx.guild.channels,
-                                id=config.vote_room)))
+                    "Tohle funguje jen v {}"
+                    .format(discord.utils.get(ctx.guild.channels,
+                                              id=config.vote_room)))
 
     elif args[0] == "given":
         await ctx.send(
-                str(karma.get_karma(ctx.author.id, 'give')))
+            str(karma.get_karma(ctx.author.id, 'give')))
         await botroom_check(ctx.message)
 
     elif args[0] == "give":
@@ -234,13 +233,14 @@ async def ishaboard(ctx):
     await karma.leaderboard(ctx.message.channel, 'give', 'ASC')
     await botroom_check(ctx.message)
 
+
 @bot.command()
 async def god(ctx):
     embed = discord.Embed(title="Rubbergod",
-	 		  description="The nicest bot ever. List of commands are:",
-			  color=0xeee657)
+                          description="The nicest bot ever. List of commands are:",
+                          color=0xeee657)
 
-    prefix = config.command_prefix 
+    prefix = config.command_prefix
 
     # give info about you here
     embed.add_field(name="Author", value="Toaster#1111")
@@ -249,7 +249,7 @@ async def god(ctx):
     embed.add_field(name="Server count", value=f"{len(bot.guilds)}")
 
     for command in config.info:
-        embed.add_field(name=prefix+command[0],
+        embed.add_field(name=prefix + command[0],
                         value=command[1],
                         inline=False)
 
@@ -275,7 +275,7 @@ async def on_raw_reaction_remove(payload):
 @bot.event
 async def on_typing(channel, user, when):
     global arcas_time
-    if arcas_time + datetime.timedelta(hours=1) < when and\
+    if arcas_time + datetime.timedelta(hours=1) < when and \
             config.arcas_id == user.id:
         arcas_time = when
         gif = discord.Embed()

@@ -21,8 +21,8 @@ class Reaction(BaseRepository):
             input_string = (input_string[input_string.index('\n')+1:]
                             .strip().split('\n'))
         except ValueError:
-            await message.channel.send("{} nesprávny formát. Použi !god"
-                                       .format(self.utils.generate_mention(
+            await message.channel.send(self.messages.role_format
+                                       .format(user=self.utils.generate_mention(
                                             message.author.id)))
             return output
         for line in input_string:
@@ -31,34 +31,33 @@ class Reaction(BaseRepository):
                 line = [line[0], line[1]]
                 output.append(line)
             else:
-                await message.channel.send("{} {} je neplatný riadok"
-                                           .format(self.utils.generate_mention(
-                                                message.author.id), line[0]))
+                await message.channel.send(self.messages.role_invalid_line
+                                           .format(user=self.utils.generate_mention(
+                                                message.author.id), line=line[0]))
         return output
 
     # Adds reactions to message
     async def message_role_reactions(self, message, data):
         if message.channel.type is not discord.ChannelType.text:
-            await message.channel.send("Nepises na serveru takze predpokladam "
-                                       "ze myslis role VUT FIT serveru")
+            await message.channel.send(self.messages.role_not_on_server)
             guild = self.client.get_guild(self.config.guild_id)
         else:
             guild = message.guild
         for line in data:
             if (discord.utils.get(guild.roles,
                                   name=line[0]) is None):
-                await message.channel.send("{} {} nie je rola"
-                                           .format(self.utils.generate_mention(
-                                               message.author.id), line[0]))
+                await message.channel.send(self.messages.role_not_role
+                                           .format(user=self.utils.generate_mention(
+                                               message.author.id), not_role=line[0]))
             else:
                 try:
                     await message.add_reaction(line[1])
                 except discord.errors.HTTPException:
                     await message.channel.send(
-                            "{} {} pre rolu {} nie je emote"
-                            .format(self.utils.generate_mention(
+                            self.messages.role_invalid_line
+                            .format(user=self.utils.generate_mention(
                                         message.author.id),
-                                    line[1], line[0]))
+                                    not_emote=line[1], role=line[0]))
 
     async def add(self, payload):
         channel = self.client.get_channel(payload.channel_id)
@@ -91,7 +90,7 @@ class Reaction(BaseRepository):
                     break
             else:
                 await message.remove_reaction(emoji, member)
-        elif message.content.startswith(self.config.vote_message):
+        elif message.content.startswith(self.messages.karma_vote_message_hack):
             if emoji not in ["✅", "❌", "0⃣"]:
                 await message.remove_reaction(emoji, member)
         elif member.id != message.author.id and\
@@ -153,9 +152,9 @@ class Reaction(BaseRepository):
             if role < max_role:
                 await member.add_roles(role)
             else:
-                await channel.send("{} na pridanie role {} nemáš práva"
-                                   .format(self.utils.generate_mention(
-                                           member.id), role.name))
+                await channel.send(self.messages.role_add_denied
+                                   .format(user=self.utils.generate_mention(
+                                           member.id), role=role.name))
 
     # Removes a role for user based on reaction
     async def remove_role_on_reaction(self, role, member, channel, guild):
@@ -168,7 +167,6 @@ class Reaction(BaseRepository):
                 if role < max_role:
                     await member.remove_roles(role)
                 else:
-                    await channel.send("{} na odobranie role {} "
-                                       "nemáš práva"
-                                       .format(self.utils.generate_mention(
-                                               member.id), role.name))
+                    await channel.send(self.messages.role_remove_denied
+                                       .format(user=self.utils.generate_mention(
+                                               member.id), role=role.name))

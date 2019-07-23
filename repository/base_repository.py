@@ -1,11 +1,12 @@
 import mysql.connector
-from config import config
+from config import config, messages
 
 
 class BaseRepository:
 
     def __init__(self):
         self.config = config.Config()
+        self.messages = messages.Messages()
 
     def get_row(self, table, where, value):
         db = mysql.connector.connect(**self.config.connection)
