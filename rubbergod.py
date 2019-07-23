@@ -238,7 +238,8 @@ async def ishaboard(ctx):
 async def god(ctx):
     embed = discord.Embed(title="Rubbergod",
                           description="The nicest bot ever. "
-                                      "List of commands are:",
+                                      "Author, server count and "
+                                      "list of commands are:",
                           color=0xeee657)
 
     prefix = config.command_prefix
@@ -247,7 +248,8 @@ async def god(ctx):
     embed.add_field(name="Author", value="Toaster#1111")
 
     # Shows the number of servers the bot is member of.
-    embed.add_field(name="Server count", value=f"{len(bot.guilds)}")
+    embed.add_field(name="Server count of this instance",
+                    value=f"{len(bot.guilds)}")
 
     for command in config.info:
         embed.add_field(name=prefix + command[0],

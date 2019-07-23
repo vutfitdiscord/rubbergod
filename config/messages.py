@@ -4,7 +4,7 @@ class Messages:
         self.server_warning = "Tohle funguje jen na VUT FIT serveru."
         self.toaster_pls = "Toaster pls, máš bordel v DB."
 
-        self.karma_own = "{user}, tvoje karma je: **{karma} ({pos}.)**."
+        self.karma_own = "{user}, tvoje karma je: **{karma}** (**{pos}.**)."
         self.karma_given = "{user}, rozdal jsi:\n" \
                            "**{karma_pos}** pozitivní karmy " \
                            "(**{karma_pos_pos}.**)\n" \
