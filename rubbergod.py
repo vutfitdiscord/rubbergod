@@ -2,12 +2,13 @@ import discord
 from discord.ext import commands
 from repository import (rng, karma, user, utils, roll_dice,
                         reaction, verification, presence)
-from config import config
+from config import config, messages
 import mysql.connector
 import traceback
 import datetime
 
 config = config.Config()
+messages = messages.Messages()
 bot = commands.Bot(command_prefix=config.command_prefix,
                    help_command=None,
                    case_insensitive=True)
@@ -46,7 +47,7 @@ async def update_web():
 async def botroom_check(message):
     room = await get_room(message)
     if room is not None and room.id not in config.allowed_channels:
-        await message.channel.send(config.channel_redirect_message.format(
+        await message.channel.send(messages.botroom_redirect.format(
             utils.generate_mention(message.author.id),
             config.bot_room))
 

@@ -57,7 +57,6 @@ class Config:
             self.bot_room,
             self.log_channel_id
         ]
-        self.channel_redirect_message = "{} 👉 <#{}>"
 
         # Arcas
         self.arcas_id = 140547421733126145
