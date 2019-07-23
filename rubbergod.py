@@ -7,7 +7,7 @@ import mysql.connector
 import traceback
 import datetime
 
-config = config.Config()
+config = config.Config
 bot = commands.Bot(command_prefix=config.command_prefix,
                    help_command=None,
                    case_insensitive=True)
