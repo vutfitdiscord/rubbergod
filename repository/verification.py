@@ -23,10 +23,13 @@ class Verification(BaseRepository):
             if str(message.content).split(" ")[1] == "xlogin00":
                 guild = self.client.get_guild(self.config.guild_id)
                 fp = await guild.fetch_emoji(585915845146968093)
-                await message.channel.send(self.messages.verify_send_dumbshit
-                                           .format(emote=str(fp),
-                                                   user=self.utils.generate_mention(
-                                                       message.author.id)))
+                await message.channel.send(
+                        self.messages.verify_send_dumbshit
+                        .format(emote=str(fp),
+                                user=self.utils.generate_mention(
+                                    message.author.id)
+                                )
+                        )
                 return
 
             db_record = self.user.find_login_to_mail(message)
@@ -66,11 +69,14 @@ class Verification(BaseRepository):
                                 toaster=self.utils.generate_mention(
                                     self.config.admin_id)))
         else:
-            await message.channel.send(self.messages.verify_already_verified
-                                       .format(user=self.utils.generate_mention(
-                                                   message.author.id),
-                                               toaster=self.utils.generate_mention(
-                                               self.config.admin_id)))
+            await message.channel.send(
+                    self.messages.verify_already_verified
+                    .format(user=self.utils.generate_mention(
+                                message.author.id),
+                            toaster=self.utils.generate_mention(
+                                self.config.admin_id)
+                            )
+                    )
         try:
             await message.delete()
         except discord.errors.Forbidden:
@@ -91,13 +97,17 @@ class Verification(BaseRepository):
                                                    self.utils.generate_mention(
                                                        message.author.id)))
                 return
-            if str(message.content).split(" ")[2] == "kód" or str(message.content).split(" ")[2] == "[kód]":
+            if str(message.content).split(" ")[2] == "kód" or \
+               str(message.content).split(" ")[2] == "[kód]":
                 guild = self.client.get_guild(self.config.guild_id)
                 fp = await guild.fetch_emoji(585915845146968093)
-                await message.channel.send(self.messages.verify_verify_dumbshit
-                                           .format(emote=str(fp),
-                                                   user=self.utils.generate_mention(
-                                                       message.author.id)))
+                await message.channel.send(
+                        self.messages.verify_verify_dumbshit
+                        .format(emote=str(fp),
+                                user=self.utils.generate_mention(
+                                    message.author.id)
+                                )
+                        )
                 return
 
             db_record = self.user.find_login(message)
@@ -155,9 +165,12 @@ class Verification(BaseRepository):
                 await member.add_roles(verify)
                 await member.add_roles(year)
                 self.user.save_record(message)
-                await message.channel.send(self.messages.verify_verify_success
-                                           .format(user=self.utils.generate_mention(
-                                                       message.author.id)))
+                await message.channel.send(
+                        self.messages.verify_verify_success
+                        .format(user=self.utils.generate_mention(
+                                    message.author.id)
+                                )
+                        )
             else:
                 await message.channel.send(
                         self.messages.verify_send_not_found
@@ -166,11 +179,14 @@ class Verification(BaseRepository):
                                 toaster=self.utils.generate_mention(
                                     self.config.admin_id)))
         else:
-            await message.channel.send(self.messages.verify_already_verified
-                                       .format(user=self.utils.generate_mention(
-                                                   message.author.id),
-                                               toaster=self.utils.generate_mention(
-                                               self.config.admin_id)))
+            await message.channel.send(
+                    self.messages.verify_already_verified
+                    .format(user=self.utils.generate_mention(
+                                message.author.id),
+                            toaster=self.utils.generate_mention(
+                                self.config.admin_id)
+                            )
+                    )
         try:
             await message.delete()
         except discord.errors.Forbidden:

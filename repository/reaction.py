@@ -21,9 +21,12 @@ class Reaction(BaseRepository):
             input_string = (input_string[input_string.index('\n')+1:]
                             .strip().split('\n'))
         except ValueError:
-            await message.channel.send(self.messages.role_format
-                                       .format(user=self.utils.generate_mention(
-                                            message.author.id)))
+            await message.channel.send(
+                    self.messages.role_format
+                    .format(user=self.utils.generate_mention(
+                                message.author.id)
+                            )
+                    )
             return output
         for line in input_string:
             line = line.split()
@@ -31,9 +34,13 @@ class Reaction(BaseRepository):
                 line = [line[0], line[1]]
                 output.append(line)
             else:
-                await message.channel.send(self.messages.role_invalid_line
-                                           .format(user=self.utils.generate_mention(
-                                                message.author.id), line=line[0]))
+                await message.channel.send(
+                        self.messages.role_invalid_line
+                        .format(user=self.utils.generate_mention(
+                                     message.author.id),
+                                line=line[0]
+                                )
+                        )
         return output
 
     # Adds reactions to message
@@ -46,9 +53,11 @@ class Reaction(BaseRepository):
         for line in data:
             if (discord.utils.get(guild.roles,
                                   name=line[0]) is None):
-                await message.channel.send(self.messages.role_not_role
-                                           .format(user=self.utils.generate_mention(
-                                               message.author.id), not_role=line[0]))
+                await message.channel.send(
+                        self.messages.role_not_role
+                        .format(user=self.utils.generate_mention(
+                                     message.author.id),
+                                not_role=line[0]))
             else:
                 try:
                     await message.add_reaction(line[1])
@@ -95,7 +104,8 @@ class Reaction(BaseRepository):
                 await message.remove_reaction(emoji, member)
         elif member.id != message.author.id and\
                 guild.id == self.config.guild_id and\
-                message.channel.id not in self.config.karma_banned_channels and\
+                message.channel.id not in \
+                self.config.karma_banned_channels and\
                 self.config.karma_ban_role_id not in map(lambda x: x.id,
                                                          member.roles):
             if type(emoji) is str:
@@ -134,7 +144,8 @@ class Reaction(BaseRepository):
                     break
         elif member.id != message.author.id and\
                 guild.id == self.config.guild_id and\
-                message.channel.id not in self.config.karma_banned_channels and\
+                message.channel.id not in \
+                self.config.karma_banned_channels and\
                 self.config.karma_ban_role_id not in map(lambda x: x.id,
                                                          member.roles):
             if type(emoji) is str:
@@ -167,6 +178,10 @@ class Reaction(BaseRepository):
                 if role < max_role:
                     await member.remove_roles(role)
                 else:
-                    await channel.send(self.messages.role_remove_denied
-                                       .format(user=self.utils.generate_mention(
-                                               member.id), role=role.name))
+                    await channel.send(
+                            self.messages.role_remove_denied
+                            .format(user=self.utils.generate_mention(
+                                         member.id),
+                                    role=role.name
+                                    )
+                            )

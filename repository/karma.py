@@ -130,8 +130,10 @@ class Karma(BaseRepository):
                      self.get_karma_position(database, "negative", karma[1]))
             return (self.messages.karma_given
                     .format(user=self.utils.generate_mention(member),
-                            karma_pos=str(karma[0]), karma_pos_pos=str(order[0]),
-                            karma_neg=str(karma[1]), karma_neg_pos=str(order[1])))
+                            karma_pos=str(karma[0]),
+                            karma_pos_pos=str(order[0]),
+                            karma_neg=str(karma[1]),
+                            karma_neg_pos=str(order[1])))
 
     def get_leaderboard(self, database, column, order):
         db = mysql.connector.connect(**self.config.connection)
@@ -146,9 +148,12 @@ class Karma(BaseRepository):
         delay = self.config.vote_minutes * 60
         message = await channel.send(
                  "{}\n{}"
-                 .format(self.messages.karma_vote_message.format(emote=str(emote)),
+                 .format(self.messages.karma_vote_message.format(
+                             emote=str(emote)
+                         ),
                          self.messages.karma_vote_info
-                         .format(delay=str(delay // 60), minimum=str(self.config.vote_minimum))))
+                         .format(delay=str(delay // 60),
+                         minimum=str(self.config.vote_minimum))))
         await message.add_reaction("✅")
         await message.add_reaction("❌")
         await message.add_reaction("0⃣")
@@ -216,7 +221,8 @@ class Karma(BaseRepository):
 
             await message.channel.send(
                     self.messages.karma_vote_notpassed
-                    .format(emote=str(the_emote), minimum=str(self.config.vote_minimum)))
+                    .format(emote=str(the_emote),
+                            minimum=str(self.config.vote_minimum)))
 
             db.commit()
             db.close()
@@ -266,7 +272,8 @@ class Karma(BaseRepository):
         else:
             await message.channel.send(
                 self.messages.karma_vote_notpassed
-                    .format(emote=str(emote), minimum=str(self.config.vote_minimum)))
+                    .format(emote=str(emote),
+                            minimum=str(self.config.vote_minimum)))
             return
 
         await message.channel.send(
@@ -335,7 +342,8 @@ class Karma(BaseRepository):
                 continue
 
         if errors != "":
-            await channel.send("{}\n{}".format(self.messages.toaster_pls, errors))
+            await channel.send("{}\n{}".format(self.messages.toaster_pls,
+                                               errors))
 
     async def karma_give(self, message):
         input_string = message.content.split()
@@ -345,14 +353,19 @@ class Karma(BaseRepository):
             try:
                 number = int(input_string[2])
             except ValueError:
-                await message.channel.send(self.messages.karma_give_format_number.format(input=input_string[2]))
+                await message.channel.send(
+                        self.messages.karma_give_format_number.format(
+                            input=input_string[2])
+                        )
                 return
             for member in message.mentions:
                 self.update_karma(member, message.author, number)
             if number >= 0:
                 await message.channel.send(self.messages.karma_give_success)
             else:
-                await message.channel.send(self.messages.karma_give_negative_success)
+                await message.channel.send(
+                        self.messages.karma_give_negative_success
+                        )
 
     async def leaderboard(self, channel, action, order):
         output = "\u200b\n==================\n "
@@ -387,7 +400,7 @@ class Karma(BaseRepository):
                 continue
             username = str(username.name)
             line = '{} – {}: {} pts\n'.format(i, username,
-                                               user[database_index])
+                                              user[database_index])
             output += line
         # '\n Full leaderboard - TO BE ADDED (SOON*tm*) \n'
         await channel.send(output)

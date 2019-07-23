@@ -237,7 +237,8 @@ async def ishaboard(ctx):
 @bot.command()
 async def god(ctx):
     embed = discord.Embed(title="Rubbergod",
-                          description="The nicest bot ever. List of commands are:",
+                          description="The nicest bot ever. "
+                                      "List of commands are:",
                           color=0xeee657)
 
     prefix = config.command_prefix
