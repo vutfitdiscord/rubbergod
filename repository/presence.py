@@ -1,11 +1,12 @@
 from repository.base_repository import BaseRepository
 import discord
 import datetime
+import utils
 
 
 class Presence(BaseRepository):
 
-    def __init__(self, client, utils):
+    def __init__(self, client):
         super().__init__()
 
         self.client = client

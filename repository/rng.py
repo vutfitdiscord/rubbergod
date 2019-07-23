@@ -1,12 +1,10 @@
 from config import messages
 from random import randint
 from datetime import date
+import utils
 
 
 class Rng:
-    def __init__(self, utils):
-        self.utils = utils
-
     @staticmethod
     def pick_option(message):
         """"Pick one option from message"""
@@ -34,7 +32,7 @@ class Rng:
                 y = 0
         except ValueError:
             return m.rng_generator_format_number.format(
-                user=self.utils.generate_mention(message.author.id))
+                user=utils.generate_mention(message.author.id))
         if x > y:
             x, y = y, x  # variable values swap
         return randint(x, y)

@@ -3,14 +3,14 @@ import mysql.connector
 import asyncio
 import discord
 from emoji import UNICODE_EMOJI
+import utils
 
 
 class Karma(BaseRepository):
 
-    def __init__(self, client, utils):
+    def __init__(self, client):
         super().__init__()
         self.client = client
-        self.utils = utils
 
     def emoji_value(self, emoji_id):
         row = self.get_row("bot_karma_emoji", "emoji_id", emoji_id)
@@ -121,7 +121,7 @@ class Karma(BaseRepository):
                 karma = 0
             order = self.get_karma_position(database, "karma", karma)
             return (self.messages.karma_own
-                    .format(user=self.utils.generate_mention(member),
+                    .format(user=utils.generate_mention(member),
                             karma=str(karma), pos=str(order)))
         elif action == 'give':
             if karma is None:
@@ -129,7 +129,7 @@ class Karma(BaseRepository):
             order = (self.get_karma_position(database, "positive", karma[0]),
                      self.get_karma_position(database, "negative", karma[1]))
             return (self.messages.karma_given
-                    .format(user=self.utils.generate_mention(member),
+                    .format(user=utils.generate_mention(member),
                             karma_pos=str(karma[0]),
                             karma_pos_pos=str(order[0]),
                             karma_neg=str(karma[1]),

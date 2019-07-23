@@ -1,13 +1,13 @@
 from repository.base_repository import BaseRepository
 import discord
+import utils
 
 
 class Reaction(BaseRepository):
 
-    def __init__(self, client, utils, karma):
+    def __init__(self, client, karma):
         super().__init__()
         self.client = client
-        self.utils = utils
         self.karma = karma
 
     # Returns list of role names and emotes that represent them
@@ -23,7 +23,7 @@ class Reaction(BaseRepository):
         except ValueError:
             await message.channel.send(
                     self.messages.role_format
-                    .format(user=self.utils.generate_mention(
+                    .format(user=utils.generate_mention(
                                 message.author.id)
                             )
                     )
@@ -36,7 +36,7 @@ class Reaction(BaseRepository):
             else:
                 await message.channel.send(
                         self.messages.role_invalid_line
-                        .format(user=self.utils.generate_mention(
+                        .format(user=utils.generate_mention(
                                      message.author.id),
                                 line=line[0]
                                 )
@@ -55,7 +55,7 @@ class Reaction(BaseRepository):
                                   name=line[0]) is None):
                 await message.channel.send(
                         self.messages.role_not_role
-                        .format(user=self.utils.generate_mention(
+                        .format(user=utils.generate_mention(
                                      message.author.id),
                                 not_role=line[0]))
             else:
@@ -64,7 +64,7 @@ class Reaction(BaseRepository):
                 except discord.errors.HTTPException:
                     await message.channel.send(
                             self.messages.role_invalid_line
-                            .format(user=self.utils.generate_mention(
+                            .format(user=utils.generate_mention(
                                         message.author.id),
                                     not_emote=line[1], role=line[0]))
 
@@ -164,7 +164,7 @@ class Reaction(BaseRepository):
                 await member.add_roles(role)
             else:
                 await channel.send(self.messages.role_add_denied
-                                   .format(user=self.utils.generate_mention(
+                                   .format(user=utils.generate_mention(
                                            member.id), role=role.name))
 
     # Removes a role for user based on reaction
@@ -180,7 +180,7 @@ class Reaction(BaseRepository):
                 else:
                     await channel.send(
                             self.messages.role_remove_denied
-                            .format(user=self.utils.generate_mention(
+                            .format(user=utils.generate_mention(
                                          member.id),
                                     role=role.name
                                     )

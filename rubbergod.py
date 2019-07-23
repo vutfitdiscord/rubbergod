@@ -1,9 +1,9 @@
 import discord
 from discord.ext import commands
-from repository import (rng, karma, user, utils, roll_dice,
+from repository import (rng, karma, user, roll_dice,
                         reaction, verification, presence)
+import utils
 from config import config, messages
-import mysql.connector
 import traceback
 import datetime
 
@@ -13,14 +13,14 @@ messages = messages.Messages
 bot = commands.Bot(command_prefix=config.command_prefix,
                    help_command=None,
                    case_insensitive=True)
-utils = utils.Utils()
+
 user = user.User()
 roll_dice = roll_dice.Roll()
-rng = rng.Rng(utils)
-karma = karma.Karma(bot, utils)
-reaction = reaction.Reaction(bot, utils, karma)
-verification = verification.Verification(bot, utils, user)
-presence = presence.Presence(bot, utils)
+rng = rng.Rng()
+karma = karma.Karma(bot)
+reaction = reaction.Reaction(bot, karma)
+verification = verification.Verification(bot, user)
+presence = presence.Presence(bot)
 
 arcas_time = datetime.datetime.utcnow() - datetime.timedelta(hours=1)
 
@@ -109,7 +109,7 @@ async def on_typing(channel, user, when):
         gif = discord.Embed()
         gif.set_image(url="https://i.imgur.com/v2ueHcl.gif")
         await channel.send(embed=gif)
-            
+
 
 #                                      #
 #              COMMANDS                #

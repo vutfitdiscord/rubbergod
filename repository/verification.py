@@ -4,14 +4,14 @@ import random
 import ssl
 import string
 import smtplib
+import utils
 
 
 class Verification(BaseRepository):
 
-    def __init__(self, client, utils, user):
+    def __init__(self, client, user):
         super().__init__()
         self.client = client
-        self.utils = utils
         self.user = user
 
     async def send_code(self, message):
@@ -26,7 +26,7 @@ class Verification(BaseRepository):
                 await message.channel.send(
                         self.messages.verify_send_dumbshit
                         .format(emote=str(fp),
-                                user=self.utils.generate_mention(
+                                user=utils.generate_mention(
                                     message.author.id)
                                 )
                         )
@@ -59,21 +59,21 @@ class Verification(BaseRepository):
 
                 await message.channel.send(
                         self.messages.verify_send_success
-                        .format(user=self.utils.generate_mention(
+                        .format(user=utils.generate_mention(
                                     message.author.id)))
             else:
                 await message.channel.send(
                         self.messages.verify_send_not_found
-                        .format(user=self.utils.generate_mention(
+                        .format(user=utils.generate_mention(
                                     message.author.id),
-                                toaster=self.utils.generate_mention(
+                                toaster=utils.generate_mention(
                                     self.config.admin_id)))
         else:
             await message.channel.send(
                     self.messages.verify_already_verified
-                    .format(user=self.utils.generate_mention(
+                    .format(user=utils.generate_mention(
                                 message.author.id),
-                            toaster=self.utils.generate_mention(
+                            toaster=utils.generate_mention(
                                 self.config.admin_id)
                             )
                     )
@@ -94,7 +94,7 @@ class Verification(BaseRepository):
                 fp = await guild.fetch_emoji(585915845146968093)
                 await message.channel.send("Tvůj login {} {}"
                                            .format(str(fp),
-                                                   self.utils.generate_mention(
+                                                   utils.generate_mention(
                                                        message.author.id)))
                 return
             if str(message.content).split(" ")[2] == "kód" or \
@@ -104,7 +104,7 @@ class Verification(BaseRepository):
                 await message.channel.send(
                         self.messages.verify_verify_dumbshit
                         .format(emote=str(fp),
-                                user=self.utils.generate_mention(
+                                user=utils.generate_mention(
                                     message.author.id)
                                 )
                         )
@@ -139,9 +139,9 @@ class Verification(BaseRepository):
                 if year is None:
                     await message.channel.send(
                         self.messages.verify_verify_manual
-                        .format(user=self.utils.generate_mention(
+                        .format(user=utils.generate_mention(
                                     message.author.id),
-                                toaster=self.utils.generate_mention(
+                                toaster=utils.generate_mention(
                                     self.config.admin_id),
                                 year=str(db_record)))
                     return
@@ -167,23 +167,23 @@ class Verification(BaseRepository):
                 self.user.save_record(message)
                 await message.channel.send(
                         self.messages.verify_verify_success
-                        .format(user=self.utils.generate_mention(
+                        .format(user=utils.generate_mention(
                                     message.author.id)
                                 )
                         )
             else:
                 await message.channel.send(
                         self.messages.verify_send_not_found
-                        .format(user=self.utils.generate_mention(
+                        .format(user=utils.generate_mention(
                                     message.author.id),
-                                toaster=self.utils.generate_mention(
+                                toaster=utils.generate_mention(
                                     self.config.admin_id)))
         else:
             await message.channel.send(
                     self.messages.verify_already_verified
-                    .format(user=self.utils.generate_mention(
+                    .format(user=utils.generate_mention(
                                 message.author.id),
-                            toaster=self.utils.generate_mention(
+                            toaster=utils.generate_mention(
                                 self.config.admin_id)
                             )
                     )
