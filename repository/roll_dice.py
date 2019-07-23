@@ -48,12 +48,12 @@ class Roll(BaseRepository):
             return RollResult("(**0**)", 0)
 
         if dice_count > self.config.max_dice_at_once:
-            raise SyntaxError("Příliš moc kostek v jedné skupině, "
-                              "maximum je %s" % self.config.max_dice_at_once)
+            raise SyntaxError(self.messages.rd_too_many_dice_in_group
+                              .format(maximum=self.config.max_dice_at_once))
 
         if dice_sides > self.config.max_dice_sides:
-            raise SyntaxError("Příliš moc stěn na kostkách, "
-                              "maximum je %s" % self.config.max_dice_sides)
+            raise SyntaxError(self.messages.rd_too_many_dice_sides
+                              .format(maximum=self.config.max_dice_sides))
 
         dice = [randint(1, dice_sides) for i in range(dice_count)]
 
@@ -165,16 +165,14 @@ class Roll(BaseRepository):
     def roll_dice(self, roll_string):
 
         if roll_string == "":
-            return """Formát naleznete na https://wiki.roll20.net/Dice_Reference
-Implementovány featury podle obsahu:
-8. Drop/Keep"""
+            return self.messages.rd_help
 
         results = []
         dice_groups = roll_string.split('+')
 
         if len(dice_groups) > self.config.max_dice_groups:
-            return ("Příliš moc skupin kostek, "
-                    "maximum je %s" % self.config.max_dice_groups)
+            return (self.messages.rd_too_many_dice_groups
+                    .format(maximum=self.config.max_dice_groups))
 
         for index, dice in enumerate(dice_groups):
             result = match(Roll.DICE_REGEX, dice)
@@ -184,7 +182,7 @@ Implementovány featury podle obsahu:
                 except SyntaxError as e:
                     return str(e)
             else:
-                return "Chybný syntax hodu ve skupině %s" % index
+                return self.messages.rd_format.format(group=index)
 
         returntext = ' + '.join(r.text for r in results)
         returntext += " = **" + str(sum(r.result for r in results)) + "**"
