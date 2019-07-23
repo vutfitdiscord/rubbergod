@@ -2,12 +2,14 @@ import discord
 from discord.ext import commands
 from repository import (rng, karma, user, utils, roll_dice,
                         reaction, verification, presence)
-from config import config
+from config import config, messages
 import mysql.connector
 import traceback
 import datetime
 
 config = config.Config
+messages = messages.Messages
+
 bot = commands.Bot(command_prefix=config.command_prefix,
                    help_command=None,
                    case_insensitive=True)
@@ -96,7 +98,7 @@ async def on_message(message):
 @bot.event
 async def on_command_error(ctx, error):
     if isinstance(error, commands.CommandNotFound):
-        await ctx.send("Takovy prikaz neznam <:sadcat:576171980118687754>")
+        await ctx.send(messages.no_such_command)
     else:
         output = 'Ignoring exception in command {}:\n'.format(ctx.command)
         output += ''.join(traceback.format_exception(type(error),
@@ -185,7 +187,7 @@ async def pick_karma_command(ctx, *args):
     elif args[0] == "get":
         if not await guild_check(ctx.message):
             await ctx.send(
-                "{}".format(config.server_warning))
+                "{}".format(messages.server_warning))
         else:
             try:
                 await karma.get(ctx.message)
@@ -196,7 +198,7 @@ async def pick_karma_command(ctx, *args):
     elif args[0] == "revote":
         if not await guild_check(ctx.message):
             await ctx.send(
-                "{}".format(config.server_warning))
+                "{}".format(messages.server_warning))
         else:
             if ctx.message.channel.id == config.vote_room:
                 try:
@@ -213,7 +215,7 @@ async def pick_karma_command(ctx, *args):
     elif args[0] == "vote":
         if not await guild_check(ctx.message):
             await ctx.send(
-                "{}".format(config.server_warning))
+                "{}".format(messages.server_warning))
         else:
             if ctx.message.channel.id == config.vote_room:
                 try:
@@ -286,7 +288,7 @@ async def god(ctx):
     embed.add_field(name="Server count of this instance",
                     value=f"{len(bot.guilds)}")
 
-    for command in config.info:
+    for command in messages.info:
         embed.add_field(name=prefix + command[0],
                         value=command[1],
                         inline=False)
