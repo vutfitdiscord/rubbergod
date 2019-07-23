@@ -25,26 +25,6 @@ presence = presence.Presence(bot, utils)
 arcas_time = datetime.datetime.utcnow() - datetime.timedelta(hours=1)
 
 
-async def update_web():
-    db = mysql.connector.connect(**config.connection)
-    cursor = db.cursor()
-    cursor.execute('SELECT * FROM bot_karma')
-    karma = cursor.fetchall()
-    for item in karma:
-        user = await bot.get_user_info(item[0])
-        bot.get_user_info(item[0])
-        username = str(user.name).split('#')[0]
-        cursor.execute('UPDATE bot_karma SET nick=%s, '
-                       'avatar_url=%s WHERE member_id=%s',
-                       (username,
-                        user.avatar_url.replace(".webp", ".png"),
-                        item[0]))
-        print("{} - {}".format(username,
-                               user.avatar_url.replace(".webp", ".png")))
-    db.commit()
-    db.close()
-
-
 async def botroom_check(message):
     room = await get_room(message)
     if room is not None and room.id != config.bot_room:
