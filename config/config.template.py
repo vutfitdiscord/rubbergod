@@ -1,12 +1,18 @@
 class Config:
 
     def __init__(self):
-        self.key = ""
-        self.verification_role = ""
+        self.key = ''
+        self.verification_role = ''
         self.admin_id = 0   # for mention in case of false verification
         self.guild_id = 0
-        self.email_pass = ""
-        # So that you can verify in PMs this is the server you get the roles at
+
+        # Verification email sender settings
+        self.email_name = 'toasterrubbergod@gmail.com'
+        self.email_addr = 'toasterrubbergod@gmail.com'
+        self.email_smtp_server = 'smtp.gmail.com'
+        self.email_smtp_port = 465
+        self.email_pass = ''
+
         self.connection = {
             'user': 'root',
             'password': '',
@@ -40,10 +46,10 @@ class Config:
         self.log_channel_id = 0
 
         # String constants
-        self.role_string = "Role"
-        self.server_warning = "Tohle funguje jen na VUT FIT serveru"
+        self.role_string = 'Role'
+        self.server_warning = 'Tohle funguje jen na VUT FIT serveru'
         self.vote_room = 461544375105749003
-        self.vote_message = "Hlasovani o karma ohodnoceni emotu"
+        self.vote_message = 'Hlasovani o karma ohodnoceni emotu'
         self.bot_room = 461549842896781312
 
         # Arcas

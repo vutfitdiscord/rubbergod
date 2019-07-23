@@ -40,17 +40,17 @@ class Verification(BaseRepository):
                 login = str(message.content).split(" ")[1]
                 email_message = "!verify " + login + " " + code
                 password = self.config.email_pass
-                port = 465
+                port = self.config.email_smtp_port
                 context = ssl.create_default_context()
-                sender_email = "toasterrubbergod@gmail.com"
+                sender_email = self.config.email_addr
                 receiver_email = login + "@stud.fit.vutbr.cz"
                 subject = "FIT Discord verifikace"
                 mail_content = 'Subject: {}\n\n{}'.format(subject,
                                                           email_message)
 
-                with smtplib.SMTP_SSL("smtp.gmail.com", port,
+                with smtplib.SMTP_SSL(self.config.email_smtp_server, port,
                                       context=context) as server:
-                    server.login("toasterrubbergod@gmail.com", password)
+                    server.login(self.config.email_name, password)
                     server.sendmail(sender_email, receiver_email, mail_content)
 
                 self.user.save_mail(message, code)
