@@ -1,7 +1,7 @@
 import discord
 from discord.ext import commands
 from repository import (rng, karma, user, utils, roll_dice,
-                        reaction, verification, presence)
+                        reaction, verification, presence, watchdog)
 from config import config
 import mysql.connector
 import traceback
@@ -19,6 +19,7 @@ karma = karma.Karma(bot, utils)
 reaction = reaction.Reaction(bot, utils, karma)
 verification = verification.Verification(bot, utils, user)
 presence = presence.Presence(bot, utils)
+watchdog = watchdog.Watchdog()
 
 arcas_time = datetime.datetime.utcnow() - datetime.timedelta(hours=1)
 

@@ -1,6 +1,11 @@
-class Config:
+from .config_base import ConfigBase
+
+
+class Config(ConfigBase):
 
     def __init__(self):
+        super().__init__()
+
         self.key = ''
         self.verification_role = ''
         self.admin_id = 0   # for mention in case of false verification
