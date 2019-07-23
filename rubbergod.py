@@ -9,7 +9,8 @@ import datetime
 
 config = config.Config()
 bot = commands.Bot(command_prefix=config.command_prefix,
-                   help_command=None)
+                   help_command=None,
+                   case_insensitive=True)
 utils = utils.Utils()
 user = user.User()
 roll_dice = roll_dice.Roll()
@@ -20,14 +21,6 @@ verification = verification.Verification(bot, utils, user)
 presence = presence.Presence(bot, utils)
 
 arcas_time = datetime.datetime.utcnow() - datetime.timedelta(hours=1)
-
-
-@bot.event
-async def on_ready():
-    """If RGod is ready"""
-    print("Ready")
-
-    await presence.set_presence()
 
 
 async def update_web():
@@ -78,17 +71,17 @@ async def guild_check(message):
         return False
 
 
-#                                      #
-#              COMMANDS                #
-#                                      #
+#                                    #
+#              EVENTS                #
+#                                    #
+
 
 @bot.event
-async def on_error(event, *args, **kwargs):
-    error = traceback.format_exc()
-    channel = bot.get_channel(config.log_channel_id)
-    print(str(error))
-    if channel is not None:
-        await channel.send("```\n" + str(error) + "\n```")
+async def on_ready():
+    """If RGod is ready"""
+    print("Ready")
+
+    await presence.set_presence()
 
 
 @bot.event
@@ -98,6 +91,47 @@ async def on_message(message):
         await reaction.message_role_reactions(message, role_data)
     else:
         await bot.process_commands(message)
+
+
+@bot.event
+async def on_command_error(ctx, error):
+    if isinstance(error, commands.CommandNotFound):
+        await ctx.send("Takovy prikaz neznam <:sadcat:576171980118687754>")
+    else:
+        output = 'Ignoring exception in command {}:\n'.format(ctx.command)
+        output += ''.join(traceback.format_exception(type(error),
+                                                     error,
+                                                     error.__traceback__))
+        channel = bot.get_channel(config.log_channel_id)
+        print(output)
+        if channel is not None:
+            await channel.send("```\n" + output + "\n```")
+
+
+@bot.event
+async def on_raw_reaction_add(payload):
+    await reaction.add(payload)
+
+
+@bot.event
+async def on_raw_reaction_remove(payload):
+    await reaction.remove(payload)
+
+
+@bot.event
+async def on_typing(channel, user, when):
+    global arcas_time
+    if arcas_time + datetime.timedelta(hours=1) < when and \
+            config.arcas_id == user.id:
+        arcas_time = when
+        gif = discord.Embed()
+        gif.set_image(url="https://i.imgur.com/v2ueHcl.gif")
+        await channel.send(embed=gif)
+            
+
+#                                      #
+#              COMMANDS                #
+#                                      #
 
 
 @bot.command()
@@ -264,27 +298,6 @@ async def god(ctx):
 async def diceroll(ctx, *, arg=""):
     await ctx.send(roll_dice.roll_dice(arg))
     await botroom_check(ctx.message)
-
-
-@bot.event
-async def on_raw_reaction_add(payload):
-    await reaction.add(payload)
-
-
-@bot.event
-async def on_raw_reaction_remove(payload):
-    await reaction.remove(payload)
-
-
-@bot.event
-async def on_typing(channel, user, when):
-    global arcas_time
-    if arcas_time + datetime.timedelta(hours=1) < when and \
-            config.arcas_id == user.id:
-        arcas_time = when
-        gif = discord.Embed()
-        gif.set_image(url="https://i.imgur.com/v2ueHcl.gif")
-        await channel.send(embed=gif)
 
 
 bot.run(config.key)
