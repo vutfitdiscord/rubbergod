@@ -103,6 +103,7 @@ class Messages:
     verify_verify_not_found = "{user} Login nenalezen nebo " \
                               "jsi už tímhle krokem prošel " \
                               "({toaster} pls)."
+    verify_verify_wrong_code = "{user} Špatný kód."
 
     info = [('roll X Y',
              'Vygeneruje náhodné celé číslo z intervalu <**X**, **Y**>.'),

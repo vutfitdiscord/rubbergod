@@ -15,7 +15,7 @@ bot = commands.Bot(command_prefix=config.command_prefix,
                    help_command=None,
                    case_insensitive=True)
 
-user = user.User()
+user = user.UserRepository()
 roll_dice = roll_dice.Roll()
 rng = rng.Rng()
 karma = karma.Karma(bot)

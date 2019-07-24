@@ -38,8 +38,12 @@ class BaseRepository:
         row = cursor.fetchone()
         return row
 
-    def get_count(self, table: str):
-        cursor = self.query(f"SELECT COUNT(*) FROM {table}")
+    def get_count(self, table: str, where: str = None, value: str = None):
+        if where:
+            cursor = self.query(f"SELECT COUNT(*) FROM {table} WHERE {where} = %s",
+                                (str(value),))
+        else:
+            cursor = self.query(f"SELECT COUNT(*) FROM {table}")
         row = cursor.fetchone()
         return row[0]
 

@@ -10,14 +10,14 @@ import utils
 from config.config import Config
 from config.messages import Messages
 from features.base_feature import BaseFeature
-from repository.user import User
+from repository.user import UserRepository
 
 
 class Verification(BaseFeature):
 
-    def __init__(self, bot: Bot, user: User):
+    def __init__(self, bot: Bot, user_repository: UserRepository):
         super().__init__(bot)
-        self.user = user
+        self.repo = user_repository
 
     def send_mail(self, receiver_email, contents):
         password = Config.email_pass
@@ -38,8 +38,13 @@ class Verification(BaseFeature):
             await message.channel.send(Messages.verify_send_format)
             return
 
-        if not self.user.has_role(message, Config.verification_role):
-            if str(message.content).split(" ")[1] == "xlogin00":
+        # Check if the user doesn't have the verify role
+        if Config.verification_role not in message.author.roles:
+            login = str(message.content).split(" ")[1]
+
+            # Some of them will use 'xlogin00' as stated in help,
+            # cuz they dumb
+            if login == "xlogin00":
                 guild = self.bot.get_guild(Config.guild_id)
                 fp = await guild.fetch_emoji(585915845146968093)
                 await message.channel.send(
@@ -51,18 +56,18 @@ class Verification(BaseFeature):
                 )
                 return
 
-            db_record = self.user.find_login_to_mail(message)
-            if db_record:
-                # get server permit role
-
+            # Check if the login we got is in the database
+            if self.repo.has_unverified_login(login):
+                # Generate a verification code
                 code = ''.join(random.choices(string.ascii_uppercase +
                                               string.digits, k=20))
 
-                login = str(message.content).split(" ")[1]
                 email_message = "!verify " + login + " " + code
 
                 self.send_mail(login + "@stud.fit.vutbr.cz", email_message)
-                self.user.save_mail(message, code)
+
+                # Save the newly generated code into the database
+                self.repo.save_sent_code(message, code)
 
                 await message.channel.send(
                         Messages.verify_send_success
@@ -89,23 +94,63 @@ class Verification(BaseFeature):
         except discord.errors.Forbidden:
             return
 
+    @staticmethod
+    def transform_year(raw_year: str):
+        """Parses year string originally from /etc/passwd into a role name"""
+        raw_year_parts = raw_year.split()
+        year = None
+
+        if len(raw_year_parts) == 3:
+            if raw_year_parts[0] == "FIT":
+                raw_year_parts[2] = int(raw_year_parts[2][:-1])  # rip types
+                if raw_year_parts[1] == "BIT":
+                    year = "BIT"
+                    if raw_year_parts[2] < 4:
+                        year = str(raw_year_parts[2]) + year
+                    else:
+                        year = "4BIT+"
+                elif raw_year_parts[1] in ["MBS", "MBI", "MIS", "MIN",
+                                     "MMI", "MMM", "MGM", "MGMe",
+                                     "MPV", "MSK"]:
+                    year = "MIT"
+                    if raw_year_parts[2] < 3:
+                        year = str(raw_year_parts[2]) + year
+                    else:
+                        year = "3MIT+"
+                elif raw_year_parts[1] == "DVI4":
+                    year = "PhD+"
+            elif raw_year_parts[0] == "FEKT":
+                year = "FEKT"
+
+        return year
+
     async def verify(self, message):
         """"Verify if VUT login is from database"""
         if len(str(message.content).split(" ")) != 3:
             await message.channel.send(Messages.verify_verify_format)
             return
 
-        if not self.user.has_role(message, Config.verification_role):
-            if str(message.content).split(" ")[1] == "xlogin00":
+        login = str(message.content).split(" ")[1]
+        code = str(message.content).split(" ")[2]
+
+        # Check if the user doesn't have the verify role
+        # otherwise they wouldn't need to verify, right?
+        if Config.verification_role not in message.author.roles:
+            # Some of them will use 'xlogin00' as stated in help
+            # yet again, cuz they dumb
+            if login == "xlogin00":
                 guild = self.bot.get_guild(Config.guild_id)
                 fp = await guild.fetch_emoji(585915845146968093)
-                await message.channel.send("Tvůj login {} {}"
-                                           .format(str(fp),
-                                                   utils.generate_mention(
-                                                           message.author.id)))
+                await message.channel.send(
+                        Messages.verify_send_dumbshit
+                            .format(emote=str(fp),
+                                    user=utils.generate_mention(
+                                            message.author.id)
+                                    )
+                )
                 return
-            if str(message.content).split(" ")[2] == "kód" or \
-                    str(message.content).split(" ")[2] == "[kód]":
+            # Same here
+            if code == "kód" or code == "[kód]":
                 guild = self.bot.get_guild(Config.guild_id)
                 fp = await guild.fetch_emoji(585915845146968093)
                 await message.channel.send(
@@ -117,31 +162,18 @@ class Verification(BaseFeature):
                 )
                 return
 
-            db_record = self.user.find_login(message)
-            if db_record:
-                db_record = db_record[2].split()
-                year = None
-                if len(db_record) == 3:
-                    if db_record[0] == "FIT":
-                        db_record[2] = int(db_record[2][:-1])
-                        if db_record[1] == "BIT":
-                            year = "BIT"
-                            if db_record[2] < 4:
-                                year = str(db_record[2]) + year
-                            else:
-                                year = "4BIT+"
-                        elif db_record[1] in ["MBS", "MBI", "MIS", "MIN",
-                                              "MMI", "MMM", "MGM", "MGMe",
-                                              "MPV", "MSK"]:
-                            year = "MIT"
-                            if db_record[2] < 3:
-                                year = str(db_record[2]) + year
-                            else:
-                                year = "3MIT+"
-                        elif db_record[1] == "DVI4":
-                            year = "PhD+"
-                    elif db_record[0] == "FEKT":
-                        year = "FEKT"
+            new_user = self.repo.get_user(login)
+            # Check the code
+            if code != new_user[2]:
+                await message.channel.send(
+                        Messages.verify_verify_wrong_code
+                            .format(user=utils.generate_mention(
+                                message.author.id)))
+                return
+
+            if new_user is not None:
+                # Try and transform the year into the role name
+                year = self.transform_year(new_user[1])
 
                 if year is None:
                     await message.channel.send(
@@ -150,11 +182,11 @@ class Verification(BaseFeature):
                                     message.author.id),
                                     toaster=utils.generate_mention(
                                             Config.admin_id),
-                                    year=str(db_record)))
+                                    year=str(new_user[1])))
                     return
 
                 try:
-                    # get server permit role
+                    # Get server verify role
                     verify = discord.utils.get(
                             message.guild.roles,
                             name=Config.verification_role)
@@ -171,7 +203,10 @@ class Verification(BaseFeature):
 
                 await member.add_roles(verify)
                 await member.add_roles(year)
-                self.user.save_record(message)
+
+                self.repo.save_verified(login, message.author.name,
+                                        message.author.id)
+
                 await message.channel.send(
                         Messages.verify_verify_success
                             .format(user=utils.generate_mention(
@@ -180,7 +215,7 @@ class Verification(BaseFeature):
                 )
             else:
                 await message.channel.send(
-                        Messages.verify_send_not_found
+                        Messages.verify_verify_not_found
                             .format(user=utils.generate_mention(
                                 message.author.id),
                                 toaster=utils.generate_mention(
