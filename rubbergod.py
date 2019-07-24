@@ -1,53 +1,43 @@
+import datetime
+import traceback
+
 import discord
 from discord.ext import commands
-from repository import (rng, karma, user, utils, roll_dice,
-                        reaction, verification, presence)
-from config import config, messages
-import mysql.connector
-import traceback
-import datetime
 
-config = config.Config()
-messages = messages.Messages()
+import utils
+from config import config, messages
+from features import (karma, presence, verification, reaction)
+from logic import roll_dice, rng
+from repository import (karma_repo, user_repo)
+
+config = config.Config
+messages = messages.Messages
+
 bot = commands.Bot(command_prefix=config.command_prefix,
                    help_command=None,
                    case_insensitive=True)
-utils = utils.Utils()
-user = user.User()
+
+# Repositories (data access layer)
+user_r = user_repo.UserRepository()
+karma_r = karma_repo.KarmaRepository()
+
+# Logic (functionality used by features or rubbergod directly)
 roll_dice = roll_dice.Roll()
-rng = rng.Rng(utils)
-karma = karma.Karma(bot, utils)
-reaction = reaction.Reaction(bot, utils, karma)
-verification = verification.Verification(bot, utils, user)
-presence = presence.Presence(bot, utils)
+rng = rng.Rng()
+
+# Features (layer talking to Discord)
+verification = verification.Verification(bot, user_r)
+karma = karma.Karma(bot, karma_r)
+presence = presence.Presence(bot)
+reaction = reaction.Reaction(bot, karma_r)
 
 arcas_time = datetime.datetime.utcnow() - datetime.timedelta(hours=1)
-
-
-async def update_web():
-    db = mysql.connector.connect(**config.connection)
-    cursor = db.cursor()
-    cursor.execute('SELECT * FROM bot_karma')
-    karma = cursor.fetchall()
-    for item in karma:
-        user = await bot.get_user_info(item[0])
-        bot.get_user_info(item[0])
-        username = str(user.name).split('#')[0]
-        cursor.execute('UPDATE bot_karma SET nick=%s, '
-                       'avatar_url=%s WHERE member_id=%s',
-                       (username,
-                        user.avatar_url.replace(".webp", ".png"),
-                        item[0]))
-        print("{} - {}".format(username,
-                               user.avatar_url.replace(".webp", ".png")))
-    db.commit()
-    db.close()
-
+uhoh_counter = 0
 
 async def botroom_check(message):
     room = await get_room(message)
     if room is not None and room.id not in config.allowed_channels:
-        await message.channel.send(messages.botroom_redirect.format(
+        await message.channel.send(messages.bot_room_redirect.format(
             utils.generate_mention(message.author.id),
             config.bot_room))
 
@@ -85,6 +75,8 @@ async def on_ready():
 
 @bot.event
 async def on_message(message):
+    global uhoh_counter
+
     if message.author.bot:
         return
 
@@ -93,6 +85,7 @@ async def on_message(message):
         await reaction.message_role_reactions(message, role_data)
     elif message.content.lower() == "uh oh":
         await message.channel.send("uh oh")
+        uhoh_counter += 1
     else:
         await bot.process_commands(message)
 
@@ -100,7 +93,7 @@ async def on_message(message):
 @bot.event
 async def on_command_error(ctx, error):
     if isinstance(error, commands.CommandNotFound):
-        await ctx.send("Takovy prikaz neznam <:sadcat:576171980118687754>")
+        await ctx.send(messages.no_such_command)
     else:
         output = 'Ignoring exception in command {}:\n'.format(ctx.command)
         output += ''.join(traceback.format_exception(type(error),
@@ -136,6 +129,10 @@ async def on_typing(channel, user, when):
 #                                      #
 #              COMMANDS                #
 #                                      #
+
+@bot.command()
+async def uhoh(ctx):
+    await ctx.send(messages.uhoh_counter.format(uhohs=uhoh_counter))
 
 
 @bot.command()
@@ -183,16 +180,16 @@ async def pick(ctx):
 @bot.command(name="karma")
 async def pick_karma_command(ctx, *args):
     if len(args) == 0:
-        await ctx.send(
-            str(karma.get_karma(ctx.author.id, 'get')))
+        await karma.karma_get(ctx.message)
         await botroom_check(ctx.message)
+
     elif args[0] == "get":
         if not await guild_check(ctx.message):
             await ctx.send(
-                "{}".format(config.server_warning))
+                "{}".format(messages.server_warning))
         else:
             try:
-                await karma.get(ctx.message)
+                await karma.emoji_get_value(ctx.message)
                 await botroom_check(ctx.message)
             except discord.errors.Forbidden:
                 return
@@ -200,42 +197,41 @@ async def pick_karma_command(ctx, *args):
     elif args[0] == "revote":
         if not await guild_check(ctx.message):
             await ctx.send(
-                "{}".format(config.server_warning))
+                "{}".format(messages.server_warning))
         else:
             if ctx.message.channel.id == config.vote_room or \
                ctx.author.id == config.admin_id:
                 try:
                     await ctx.message.delete()
-                    await karma.revote(ctx.message)
+                    await karma.emoji_revote_value(ctx.message)
                 except discord.errors.Forbidden:
                     return
             else:
                 await ctx.send(
-                    "Tohle funguje jen v {}"
-                    .format(discord.utils.get(ctx.guild.channels,
-                                              id=config.vote_room)))
+                    messages.vote_room_only
+                    .format(room=discord.utils.get(ctx.guild.channels,
+                                                   id=config.vote_room)))
 
     elif args[0] == "vote":
         if not await guild_check(ctx.message):
             await ctx.send(
-                "{}".format(config.server_warning))
+                "{}".format(messages.server_warning))
         else:
             if ctx.message.channel.id == config.vote_room or \
                ctx.author.id == config.admin_id:
                 try:
                     await ctx.message.delete()
-                    await karma.vote(ctx.message)
+                    await karma.emoji_vote_value(ctx.message)
                 except discord.errors.Forbidden:
                     return
             else:
                 await ctx.send(
-                    "Tohle funguje jen v {}"
-                    .format(discord.utils.get(ctx.guild.channels,
-                                              id=config.vote_room)))
+                    messages.vote_room_only
+                    .format(room=discord.utils.get(ctx.guild.channels,
+                                                   id=config.vote_room)))
 
     elif args[0] == "given":
-        await ctx.send(
-            str(karma.get_karma(ctx.author.id, 'give')))
+        await karma.karma_giving_get(ctx.message)
         await botroom_check(ctx.message)
 
     elif args[0] == "give":
@@ -243,11 +239,11 @@ async def pick_karma_command(ctx, *args):
             await karma.karma_give(ctx.message)
         else:
             await ctx.send(
-                "{} na použitie tohto príkazu nemáš práva"
-                .format(utils.generate_mention(ctx.author.id)))
+                messages.insufficient_rights
+                .format(user=utils.generate_mention(ctx.author.id)))
     else:
         await ctx.send(
-            "{} Neznamy karma command"
+            messages.karma_invalid_command
             .format(utils.generate_mention(ctx.author.id)))
 
 
@@ -278,24 +274,28 @@ async def ishaboard(ctx):
 @bot.command()
 async def god(ctx):
     embed = discord.Embed(title="Rubbergod",
-                          description="The nicest bot ever. "
-                                      "Author, server count and "
-                                      "list of commands are:",
+                          description="Nejlepší a nejúžasnější bot ever.",
                           color=0xeee657)
 
     prefix = config.command_prefix
 
-    # give info about you here
-    embed.add_field(name="Author", value="Toaster#1111")
+    embed.add_field(name="Autor", value="Toaster#1111")
 
     # Shows the number of servers the bot is member of.
-    embed.add_field(name="Server count of this instance",
+    embed.add_field(name="Počet serverů s touto instancí bota",
                     value=f"{len(bot.guilds)}")
 
-    for command in config.info:
+    embed.add_field(name="\u200b", value="Příkazy:", inline=False)
+
+    for command in messages.info:
         embed.add_field(name=prefix + command[0],
                         value=command[1],
                         inline=False)
+
+    embed.set_footer(text=f"Commit {utils.git_hash()}",
+                     icon_url="https://cdn.discordapp.com/avatars/"
+                              "560917571663298568/b93e8c1e93c2d18b"
+                              "fbd226a0b614cf57.png?size=32")
 
     await ctx.send(embed=embed)
 

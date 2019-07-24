@@ -1,32 +1,30 @@
-from config import messages
-from random import randint
 from datetime import date
+from random import randint
+
+import utils
+from config.messages import Messages
 
 
 class Rng:
-    def __init__(self, utils):
-        self.utils = utils
-
     @staticmethod
     def pick_option(message):
         """"Pick one option from message"""
-        split = message.content.split()
-        if len(split) > 2:
-            if "?" in split:
-                imdex = split.index("?")
-                if imdex:
-                    if ((len(split) - 1) - (imdex + 1)) > 0:
-                        return split[randint(imdex + 1, len(split) - 1)]
-            else:
-                return split[randint(1, len(split) - 1)]
-        return False
+        msg = str(message.content)
+        if "?" not in msg:
+            return False
 
-    def generate_number(self, message):
+        options = msg[(msg.index("?") + 1):].split()
+        if len(options) > 0:
+            return options[randint(0, len(options) - 1)]
+        else:
+            return False
+
+    @staticmethod
+    def generate_number(message):
         """"Generate random number from interval"""
-        m = messages.Messages()
         string = message.content.split(" ")
         if len(string) != 3 and len(string) != 2:
-            return m.rng_generator_format
+            return Messages.rng_generator_format
         try:
             x = int(string[1])
             if len(string) == 3:
@@ -34,8 +32,8 @@ class Rng:
             else:
                 y = 0
         except ValueError:
-            return m.rng_generator_format_number.format(
-                    user=self.utils.generate_mention(message.author.id))
+            return Messages.rng_generator_format_number.format(
+                user=utils.generate_mention(message.author.id))
         if x > y:
             x, y = y, x  # variable values swap
         return randint(x, y)

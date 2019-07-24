@@ -1,6 +1,8 @@
-from repository.base_repository import BaseRepository
 from random import randint
 from re import match
+
+from config.config import Config
+from config.messages import Messages
 
 """
 Syntax:
@@ -22,8 +24,8 @@ class RollResult:
         self.result = result
 
 
-class Roll(BaseRepository):
-    DICE_REGEX = r"^\s*(?:(\d*)[dD](\d+)(?:(d[hl]?)(\d+))?" +\
+class Roll():
+    DICE_REGEX = r"^\s*(?:(\d*)[dD](\d+)(?:(d[hl]?)(\d+))?" + \
                  r"(?:(k[hl]?)(\d+))?|(\d+))\s*$"
 
     def single_roll_dice(self, match_result):
@@ -47,13 +49,13 @@ class Roll(BaseRepository):
         if groups[4] and int(groups[5]) <= 0:  # Keep
             return RollResult("(**0**)", 0)
 
-        if dice_count > self.config.max_dice_at_once:
-            raise SyntaxError(self.messages.rd_too_many_dice_in_group
-                              .format(maximum=self.config.max_dice_at_once))
+        if dice_count > Config.max_dice_at_once:
+            raise SyntaxError(Messages.rd_too_many_dice_in_group
+                              .format(maximum=Config.max_dice_at_once))
 
-        if dice_sides > self.config.max_dice_sides:
-            raise SyntaxError(self.messages.rd_too_many_dice_sides
-                              .format(maximum=self.config.max_dice_sides))
+        if dice_sides > Config.max_dice_sides:
+            raise SyntaxError(Messages.rd_too_many_dice_sides
+                              .format(maximum=Config.max_dice_sides))
 
         dice = [randint(1, dice_sides) for i in range(dice_count)]
 
@@ -79,7 +81,7 @@ class Roll(BaseRepository):
             if groups[2] == "d" or groups[2] == "dl":
                 to_drop = int(groups[3])
                 crossed_low += to_drop
-                for i in range(1, dice_sides+1):
+                for i in range(1, dice_sides + 1):
                     length = len(lookup[i]) if i in lookup.keys() else 0
                     if length > 0:
                         dropping = min(length, to_drop)
@@ -105,17 +107,17 @@ class Roll(BaseRepository):
                 to_drop = dice_count - int(groups[5]) - (crossed_low +
                                                          crossed_high)
                 to_skip = crossed_low
-                for i in range(1, dice_sides+1):
+                for i in range(1, dice_sides + 1):
                     length = len(lookup[i]) if i in lookup.keys() else 0
                     if length > 0:
                         if 0 < to_skip < length:
-                            if to_drop < length-to_skip:
+                            if to_drop < length - to_skip:
                                 crossed_indexes += lookup[i][to_skip:
                                                              to_skip + to_drop]
                                 to_drop = 0
                             else:
                                 crossed_indexes += lookup[i][to_skip:]
-                                to_drop -= length-to_skip
+                                to_drop -= length - to_skip
                         elif to_skip <= 0:
                             dropping = min(length, to_drop)
                             to_drop -= dropping
@@ -125,20 +127,20 @@ class Roll(BaseRepository):
             # Keep lowest dice,
             # which is functionally the same as dropping highest dice
             if groups[4] == "kl":
-                to_drop = dice_count-int(groups[5]) - (crossed_low +
-                                                       crossed_high)
+                to_drop = dice_count - int(groups[5]) - (crossed_low +
+                                                         crossed_high)
                 to_skip = crossed_high
                 for i in range(dice_sides, 0, -1):
                     length = len(lookup[i]) if i in lookup.keys() else 0
                     if length > 0:
                         if 0 < to_skip < length:
-                            if to_drop < length-to_skip:
+                            if to_drop < length - to_skip:
                                 crossed_indexes += lookup[i][to_skip:
                                                              to_skip + to_drop]
                                 to_drop = 0
                             else:
                                 crossed_indexes += lookup[i][to_skip:]
-                                to_drop -= length-to_skip
+                                to_drop -= length - to_skip
                         elif to_skip <= 0:
                             dropping = min(length, to_drop)
                             to_drop -= dropping
@@ -156,7 +158,7 @@ class Roll(BaseRepository):
                 result += die
             text += " "
 
-        if dice_count > self.config.dice_before_collation:
+        if dice_count > Config.dice_before_collation:
             return RollResult("(***" + str(result) + "***)", result)
 
         # Remove last character since that is always a space
@@ -165,14 +167,14 @@ class Roll(BaseRepository):
     def roll_dice(self, roll_string):
 
         if roll_string == "":
-            return self.messages.rd_help
+            return Messages.rd_help
 
         results = []
         dice_groups = roll_string.split('+')
 
-        if len(dice_groups) > self.config.max_dice_groups:
-            return (self.messages.rd_too_many_dice_groups
-                    .format(maximum=self.config.max_dice_groups))
+        if len(dice_groups) > Config.max_dice_groups:
+            return (Messages.rd_too_many_dice_groups
+                    .format(maximum=Config.max_dice_groups))
 
         for index, dice in enumerate(dice_groups):
             result = match(Roll.DICE_REGEX, dice)
@@ -182,7 +184,7 @@ class Roll(BaseRepository):
                 except SyntaxError as e:
                     return str(e)
             else:
-                return self.messages.rd_format.format(group=index)
+                return Messages.rd_format.format(group=index)
 
         returntext = ' + '.join(r.text for r in results)
         returntext += " = **" + str(sum(r.result for r in results)) + "**"
