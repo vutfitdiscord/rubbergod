@@ -12,6 +12,8 @@ class Messages:
     bot_room_redirect = "{} <:sadcat:576171980118687754> 👉 " \
                         "<#{}>\n"
 
+    uhoh_counter = "{uhohs} uh ohs od spuštění."
+
     karma_own = "{user}, tvoje karma je: **{karma}** (**{pos}.**)."
     karma_given = "{user}, rozdal jsi:\n" \
                   "**{karma_pos}** pozitivní karmy " \
@@ -135,5 +137,6 @@ class Messages:
             ('diceroll', 'Všechno možné házení kostkami.'),
             ('week', 'Vypíše, kolikátý je zrovna týden '
                      'a jestli je sudý nebo lichý.'),
+            ('uhoh', 'Vypíše počet uh ohs od spuštění.'),
             ('god', 'Vypíše tuto zprávu.')]
 

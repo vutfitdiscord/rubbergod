@@ -32,7 +32,7 @@ presence = presence.Presence(bot)
 reaction = reaction.Reaction(bot, karma_r)
 
 arcas_time = datetime.datetime.utcnow() - datetime.timedelta(hours=1)
-
+uhoh_counter = 0
 
 async def botroom_check(message):
     room = await get_room(message)
@@ -75,6 +75,8 @@ async def on_ready():
 
 @bot.event
 async def on_message(message):
+    global uhoh_counter
+
     if message.author.bot:
         return
 
@@ -83,6 +85,7 @@ async def on_message(message):
         await reaction.message_role_reactions(message, role_data)
     elif message.content.lower() == "uh oh":
         await message.channel.send("uh oh")
+        uhoh_counter += 1
     else:
         await bot.process_commands(message)
 
@@ -126,6 +129,10 @@ async def on_typing(channel, user, when):
 #                                      #
 #              COMMANDS                #
 #                                      #
+
+@bot.command()
+async def uhoh(ctx):
+    await ctx.send(messages.uhoh_counter.format(uhohs=uhoh_counter))
 
 
 @bot.command()
