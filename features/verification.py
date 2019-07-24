@@ -67,7 +67,7 @@ class Verification(BaseFeature):
                 self.send_mail(login + "@stud.fit.vutbr.cz", email_message)
 
                 # Save the newly generated code into the database
-                self.repo.save_sent_code(message, code)
+                self.repo.save_sent_code(login, code)
 
                 await message.channel.send(
                     Messages.verify_send_success
