@@ -1,8 +1,8 @@
 import discord
 from discord.ext import commands
-from repository import (rng, karma, user, roll_dice,
-                        reaction, verification, presence)
-from features import (karma)
+from repository import (karma, user, reaction)
+from features import (karma, presence, verification)
+from logic import roll_dice, rng
 import utils
 from config import config, messages
 import traceback

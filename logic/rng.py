@@ -1,7 +1,7 @@
-from config import messages
 from random import randint
 from datetime import date
 import utils
+from config.messages import Messages
 
 
 class Rng:
@@ -18,12 +18,12 @@ class Rng:
         else:
             return False
 
-    def generate_number(self, message):
+    @staticmethod
+    def generate_number(message):
         """"Generate random number from interval"""
-        m = messages.Messages
         string = message.content.split(" ")
         if len(string) != 3 and len(string) != 2:
-            return m.rng_generator_format
+            return Messages.rng_generator_format
         try:
             x = int(string[1])
             if len(string) == 3:
@@ -31,7 +31,7 @@ class Rng:
             else:
                 y = 0
         except ValueError:
-            return m.rng_generator_format_number.format(
+            return Messages.rng_generator_format_number.format(
                 user=utils.generate_mention(message.author.id))
         if x > y:
             x, y = y, x  # variable values swap
