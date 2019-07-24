@@ -1,6 +1,7 @@
 import asyncio
 
 import discord
+from discord import Emoji
 from discord.ext.commands import Bot
 from emoji import UNICODE_EMOJI
 
@@ -11,6 +12,14 @@ from repository.karma_repo import KarmaRepository
 
 cfg = config.Config
 msg = messages.Messages
+
+
+def test_emoji(db_emoji: bytearray, server_emoji: Emoji):
+    try:
+        custom_emoji = int(db_emoji)
+        return custom_emoji == server_emoji.id
+    except ValueError:
+        return False
 
 
 class Karma(BaseFeature):
@@ -68,8 +77,7 @@ class Karma(BaseFeature):
             if not server_emoji.animated:
                 e = list(
                     filter(
-                        lambda x: x[0] == str(
-                            server_emoji.id),
+                        lambda x: test_emoji(x[0], server_emoji),
                         emojis))
 
                 if len(e) == 0:
@@ -185,10 +193,8 @@ class Karma(BaseFeature):
         errors += pos_msg[1] + neg_msg[1]
 
         try:
-            await channel.send("Hodnota 1:")
-            await channel.send(pos_msg[0])
-            await channel.send("Hodnota -1:")
-            await channel.send(neg_msg[0])
+            await channel.send("Hodnota 1:\n" + pos_msg[0])
+            await channel.send("Hodnota -1:\n" + neg_msg[0])
         except discord.errors.HTTPException:
             pass  # TODO: error handling?
 

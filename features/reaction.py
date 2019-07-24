@@ -153,9 +153,9 @@ class Reaction(BaseFeature):
                 Config.karma_ban_role_id not in map(lambda x: x.id,
                                                     member.roles):
             if isinstance(emoji, str):
-                self.bot.repo.karma_emoji_remove(message.author, member, emoji)
+                self.karma_repo.karma_emoji_remove(message.author, member, emoji)
             else:
-                self.bot.repo.karma_emoji_remove(
+                self.karma_repo.karma_emoji_remove(
                     message.author, member, emoji.id)
 
     # Adds a role for user based on reaction
