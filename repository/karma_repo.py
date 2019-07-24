@@ -1,6 +1,7 @@
-from repository.base_repository import BaseRepository
 import mysql.connector
+
 import utils
+from repository.base_repository import BaseRepository
 
 
 class KarmaRepository(BaseRepository):
@@ -172,7 +173,8 @@ class KarmaRepository(BaseRepository):
             order = (self.get_karma_position(database, "positive", karma[0]),
                      self.get_karma_position(database, "negative", karma[1]))
 
-            return karma[0], karma[1], order[0], order[1]  # karma pos, karma neg, order pos, order neg
+            # karma pos, karma neg, order pos, order neg
+            return karma[0], karma[1], order[0], order[1]
 
     def get_leaderboard(self, database, column, order):
         db = mysql.connector.connect(**self.config.connection)

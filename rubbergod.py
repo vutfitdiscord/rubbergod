@@ -1,12 +1,14 @@
+import datetime
+import traceback
+
 import discord
 from discord.ext import commands
-from repository import (karma_repo, user_repo)
-from features import (karma, presence, verification, reaction)
-from logic import roll_dice, rng
+
 import utils
 from config import config, messages
-import traceback
-import datetime
+from features import (karma, presence, verification, reaction)
+from logic import roll_dice, rng
+from repository import (karma_repo, user_repo)
 
 config = config.Config
 messages = messages.Messages

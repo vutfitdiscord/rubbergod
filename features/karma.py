@@ -5,10 +5,9 @@ from discord.ext.commands import Bot
 from emoji import UNICODE_EMOJI
 
 import utils
+from config import config, messages
 from features.base_feature import BaseFeature
 from repository.karma_repo import KarmaRepository
-
-from config import config, messages
 
 cfg = config.Config
 msg = messages.Messages
@@ -67,7 +66,11 @@ class Karma(BaseFeature):
 
         for server_emoji in message.guild.emojis:
             if not server_emoji.animated:
-                e = list(filter(lambda x: x[0] == str(server_emoji.id), emojis))
+                e = list(
+                    filter(
+                        lambda x: x[0] == str(
+                            server_emoji.id),
+                        emojis))
 
                 if len(e) == 0:
                     vote_value = await self.emoji_process_vote(message.channel,
@@ -81,15 +84,15 @@ class Karma(BaseFeature):
         if vote_value is None:
             await message.channel.send(
                 msg.karma_vote_notpassed
-                   .format(emote=str(emoji),
-                           minimum=str(cfg.vote_minimum)))
+                .format(emote=str(emoji),
+                        minimum=str(cfg.vote_minimum)))
 
         else:
             self.repo.set_emoji_value(emoji, vote_value)
             await message.channel.send(
                 msg.karma_vote_result
-                   .format(emote=str(emoji),
-                           result=str(vote_value)))
+                .format(emote=str(emoji),
+                        result=str(vote_value)))
 
     async def emoji_revote_value(self, message):
         content = message.content.split()
@@ -115,12 +118,12 @@ class Karma(BaseFeature):
             self.repo.set_emoji_value(emoji, vote_value)
             await message.channel.send(
                 msg.karma_vote_result
-                   .format(emote=str(emoji), result=str(vote_value)))
+                .format(emote=str(emoji), result=str(vote_value)))
         else:
             await message.channel.send(
                 msg.karma_vote_notpassed
-                   .format(emote=str(emoji),
-                           minimum=str(cfg.vote_minimum)))
+                .format(emote=str(emoji),
+                        minimum=str(cfg.vote_minimum)))
 
     async def emoji_get_value(self, message):
         content = message.content.split()
@@ -144,11 +147,11 @@ class Karma(BaseFeature):
         if val is not None:
             await message.channel.send(
                 msg.karma_get
-                   .format(emote=str(emoji), value=str(val)))
+                .format(emote=str(emoji), value=str(val)))
         else:
             await message.channel.send(
                 msg.karma_get_emote_not_voted
-                   .format(emote=str(emoji)))
+                .format(emote=str(emoji)))
 
     async def __make_emoji_list(self, guild, emojis):
         message = ""
@@ -164,7 +167,7 @@ class Karma(BaseFeature):
             except discord.NotFound:
                 errors += str(emoji) + ", "
             except ValueError:
-                if type(emoji) == bytearray:
+                if isinstance(emoji, bytearray):
                     message += emoji.decode()
                 else:
                     message += str(emoji)
@@ -219,18 +222,20 @@ class Karma(BaseFeature):
         k = self.repo.get_karma(message.author.id, "get")
 
         await message.channel.send(msg.karma_own
-                                      .format(user=utils.generate_mention(message.author.id),
-                                              karma=str(k[0]), pos=str(k[1])))
+                                   .format(user=utils.generate_mention(
+                                       message.author.id),
+                                       karma=str(k[0]), pos=str(k[1])))
 
     async def karma_giving_get(self, message):
         k = self.repo.get_karma(message.author.id, "give")
 
         await message.channel.send(msg.karma_given
-                                      .format(user=utils.generate_mention(message.author.id),
-                                              karma_pos=str(k[0]),
-                                              karma_pos_pos=str(k[2]),
-                                              karma_neg=str(k[1]),
-                                              karma_neg_pos=str(k[3])))
+                                   .format(user=utils.generate_mention(
+                                       message.author.id),
+                                       karma_pos=str(k[0]),
+                                       karma_pos_pos=str(k[2]),
+                                       karma_neg=str(k[1]),
+                                       karma_neg_pos=str(k[3])))
 
     async def leaderboard(self, channel, action, order):
         output = "\u200b\n==================\n "

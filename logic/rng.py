@@ -1,5 +1,6 @@
-from random import randint
 from datetime import date
+from random import randint
+
 import utils
 from config.messages import Messages
 

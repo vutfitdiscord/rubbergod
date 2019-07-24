@@ -48,11 +48,11 @@ class Verification(BaseFeature):
                 guild = self.bot.get_guild(Config.guild_id)
                 fp = await guild.fetch_emoji(585915845146968093)
                 await message.channel.send(
-                        Messages.verify_send_dumbshit
-                            .format(emote=str(fp),
-                                    user=utils.generate_mention(
-                                            message.author.id)
-                                    )
+                    Messages.verify_send_dumbshit
+                    .format(emote=str(fp),
+                            user=utils.generate_mention(
+                        message.author.id)
+                    )
                 )
                 return
 
@@ -70,24 +70,24 @@ class Verification(BaseFeature):
                 self.repo.save_sent_code(message, code)
 
                 await message.channel.send(
-                        Messages.verify_send_success
-                            .format(user=utils.generate_mention(
-                                message.author.id)))
+                    Messages.verify_send_success
+                    .format(user=utils.generate_mention(
+                        message.author.id)))
             else:
                 await message.channel.send(
-                        Messages.verify_send_not_found
-                            .format(user=utils.generate_mention(
-                                message.author.id),
-                                toaster=utils.generate_mention(
-                                        Config.admin_id)))
+                    Messages.verify_send_not_found
+                    .format(user=utils.generate_mention(
+                        message.author.id),
+                        toaster=utils.generate_mention(
+                        Config.admin_id)))
         else:
             await message.channel.send(
-                    Messages.verify_already_verified
-                        .format(user=utils.generate_mention(
-                            message.author.id),
-                            toaster=utils.generate_mention(
-                                    Config.admin_id)
-                    )
+                Messages.verify_already_verified
+                .format(user=utils.generate_mention(
+                    message.author.id),
+                    toaster=utils.generate_mention(
+                    Config.admin_id)
+                )
             )
         try:
             await message.delete()
@@ -110,8 +110,8 @@ class Verification(BaseFeature):
                     else:
                         year = "4BIT+"
                 elif raw_year_parts[1] in ["MBS", "MBI", "MIS", "MIN",
-                                     "MMI", "MMM", "MGM", "MGMe",
-                                     "MPV", "MSK"]:
+                                           "MMI", "MMM", "MGM", "MGMe",
+                                           "MPV", "MSK"]:
                     year = "MIT"
                     if raw_year_parts[2] < 3:
                         year = str(raw_year_parts[2]) + year
@@ -142,11 +142,11 @@ class Verification(BaseFeature):
                 guild = self.bot.get_guild(Config.guild_id)
                 fp = await guild.fetch_emoji(585915845146968093)
                 await message.channel.send(
-                        Messages.verify_send_dumbshit
-                            .format(emote=str(fp),
-                                    user=utils.generate_mention(
-                                            message.author.id)
-                                    )
+                    Messages.verify_send_dumbshit
+                    .format(emote=str(fp),
+                            user=utils.generate_mention(
+                        message.author.id)
+                    )
                 )
                 return
             # Same here
@@ -154,11 +154,11 @@ class Verification(BaseFeature):
                 guild = self.bot.get_guild(Config.guild_id)
                 fp = await guild.fetch_emoji(585915845146968093)
                 await message.channel.send(
-                        Messages.verify_verify_dumbshit
-                            .format(emote=str(fp),
-                                    user=utils.generate_mention(
-                                            message.author.id)
-                                    )
+                    Messages.verify_verify_dumbshit
+                    .format(emote=str(fp),
+                            user=utils.generate_mention(
+                        message.author.id)
+                    )
                 )
                 return
 
@@ -166,9 +166,9 @@ class Verification(BaseFeature):
             # Check the code
             if code != new_user[2]:
                 await message.channel.send(
-                        Messages.verify_verify_wrong_code
-                            .format(user=utils.generate_mention(
-                                message.author.id)))
+                    Messages.verify_verify_wrong_code
+                    .format(user=utils.generate_mention(
+                        message.author.id)))
                 return
 
             if new_user is not None:
@@ -177,27 +177,27 @@ class Verification(BaseFeature):
 
                 if year is None:
                     await message.channel.send(
-                            Messages.verify_verify_manual
-                                .format(user=utils.generate_mention(
-                                    message.author.id),
-                                    toaster=utils.generate_mention(
-                                            Config.admin_id),
-                                    year=str(new_user[1])))
+                        Messages.verify_verify_manual
+                        .format(user=utils.generate_mention(
+                            message.author.id),
+                            toaster=utils.generate_mention(
+                            Config.admin_id),
+                            year=str(new_user[1])))
                     return
 
                 try:
                     # Get server verify role
                     verify = discord.utils.get(
-                            message.guild.roles,
-                            name=Config.verification_role)
+                        message.guild.roles,
+                        name=Config.verification_role)
                     year = discord.utils.get(message.guild.roles, name=year)
                     member = message.author
                 except AttributeError:
                     # jsme v PM
                     guild = self.bot.get_guild(Config.guild_id)
                     verify = discord.utils.get(
-                            guild.roles,
-                            name=Config.verification_role)
+                        guild.roles,
+                        name=Config.verification_role)
                     year = discord.utils.get(guild.roles, name=year)
                     member = guild.get_member(message.author.id)
 
@@ -208,26 +208,26 @@ class Verification(BaseFeature):
                                         message.author.id)
 
                 await message.channel.send(
-                        Messages.verify_verify_success
-                            .format(user=utils.generate_mention(
-                                message.author.id)
-                        )
+                    Messages.verify_verify_success
+                    .format(user=utils.generate_mention(
+                        message.author.id)
+                    )
                 )
             else:
                 await message.channel.send(
-                        Messages.verify_verify_not_found
-                            .format(user=utils.generate_mention(
-                                message.author.id),
-                                toaster=utils.generate_mention(
-                                        Config.admin_id)))
+                    Messages.verify_verify_not_found
+                    .format(user=utils.generate_mention(
+                        message.author.id),
+                        toaster=utils.generate_mention(
+                        Config.admin_id)))
         else:
             await message.channel.send(
-                    Messages.verify_already_verified
-                        .format(user=utils.generate_mention(
-                            message.author.id),
-                            toaster=utils.generate_mention(
-                                    Config.admin_id)
-                    )
+                Messages.verify_already_verified
+                .format(user=utils.generate_mention(
+                    message.author.id),
+                    toaster=utils.generate_mention(
+                    Config.admin_id)
+                )
             )
         try:
             await message.delete()

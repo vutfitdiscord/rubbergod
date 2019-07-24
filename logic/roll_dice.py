@@ -1,7 +1,8 @@
-from config.config import Config
-from config.messages import Messages
 from random import randint
 from re import match
+
+from config.config import Config
+from config.messages import Messages
 
 """
 Syntax:
@@ -24,7 +25,7 @@ class RollResult:
 
 
 class Roll():
-    DICE_REGEX = r"^\s*(?:(\d*)[dD](\d+)(?:(d[hl]?)(\d+))?" +\
+    DICE_REGEX = r"^\s*(?:(\d*)[dD](\d+)(?:(d[hl]?)(\d+))?" + \
                  r"(?:(k[hl]?)(\d+))?|(\d+))\s*$"
 
     def single_roll_dice(self, match_result):
@@ -80,7 +81,7 @@ class Roll():
             if groups[2] == "d" or groups[2] == "dl":
                 to_drop = int(groups[3])
                 crossed_low += to_drop
-                for i in range(1, dice_sides+1):
+                for i in range(1, dice_sides + 1):
                     length = len(lookup[i]) if i in lookup.keys() else 0
                     if length > 0:
                         dropping = min(length, to_drop)
@@ -106,17 +107,17 @@ class Roll():
                 to_drop = dice_count - int(groups[5]) - (crossed_low +
                                                          crossed_high)
                 to_skip = crossed_low
-                for i in range(1, dice_sides+1):
+                for i in range(1, dice_sides + 1):
                     length = len(lookup[i]) if i in lookup.keys() else 0
                     if length > 0:
                         if 0 < to_skip < length:
-                            if to_drop < length-to_skip:
+                            if to_drop < length - to_skip:
                                 crossed_indexes += lookup[i][to_skip:
                                                              to_skip + to_drop]
                                 to_drop = 0
                             else:
                                 crossed_indexes += lookup[i][to_skip:]
-                                to_drop -= length-to_skip
+                                to_drop -= length - to_skip
                         elif to_skip <= 0:
                             dropping = min(length, to_drop)
                             to_drop -= dropping
@@ -126,20 +127,20 @@ class Roll():
             # Keep lowest dice,
             # which is functionally the same as dropping highest dice
             if groups[4] == "kl":
-                to_drop = dice_count-int(groups[5]) - (crossed_low +
-                                                       crossed_high)
+                to_drop = dice_count - int(groups[5]) - (crossed_low +
+                                                         crossed_high)
                 to_skip = crossed_high
                 for i in range(dice_sides, 0, -1):
                     length = len(lookup[i]) if i in lookup.keys() else 0
                     if length > 0:
                         if 0 < to_skip < length:
-                            if to_drop < length-to_skip:
+                            if to_drop < length - to_skip:
                                 crossed_indexes += lookup[i][to_skip:
                                                              to_skip + to_drop]
                                 to_drop = 0
                             else:
                                 crossed_indexes += lookup[i][to_skip:]
-                                to_drop -= length-to_skip
+                                to_drop -= length - to_skip
                         elif to_skip <= 0:
                             dropping = min(length, to_drop)
                             to_drop -= dropping

@@ -22,15 +22,15 @@ class Reaction(BaseFeature):
         input_string = input_string.replace("**", "")
         output = []
         try:
-            input_string = (input_string[input_string.index('\n')+1:]
+            input_string = (input_string[input_string.index('\n') + 1:]
                             .strip().split('\n'))
         except ValueError:
             await message.channel.send(
-                    Messages.role_format
-                    .format(user=utils.generate_mention(
-                                message.author.id)
-                            )
-                    )
+                Messages.role_format
+                .format(user=utils.generate_mention(
+                    message.author.id)
+                )
+            )
             return output
         for line in input_string:
             line = line.split()
@@ -39,12 +39,12 @@ class Reaction(BaseFeature):
                 output.append(line)
             else:
                 await message.channel.send(
-                        Messages.role_invalid_line
-                        .format(user=utils.generate_mention(
-                                     message.author.id),
-                                line=line[0]
-                                )
-                        )
+                    Messages.role_invalid_line
+                    .format(user=utils.generate_mention(
+                        message.author.id),
+                        line=line[0]
+                    )
+                )
         return output
 
     # Adds reactions to message
@@ -58,19 +58,19 @@ class Reaction(BaseFeature):
             if (discord.utils.get(guild.roles,
                                   name=line[0]) is None):
                 await message.channel.send(
-                        Messages.role_not_role
-                        .format(user=utils.generate_mention(
-                                     message.author.id),
-                                not_role=line[0]))
+                    Messages.role_not_role
+                    .format(user=utils.generate_mention(
+                        message.author.id),
+                        not_role=line[0]))
             else:
                 try:
                     await message.add_reaction(line[1])
                 except discord.errors.HTTPException:
                     await message.channel.send(
-                            Messages.role_invalid_line
-                            .format(user=utils.generate_mention(
-                                        message.author.id),
-                                    not_emote=line[1], role=line[0]))
+                        Messages.role_invalid_line
+                        .format(user=utils.generate_mention(
+                            message.author.id),
+                            not_emote=line[1], role=line[0]))
 
     async def add(self, payload):
         channel = self.bot.get_channel(payload.channel_id)
@@ -106,13 +106,13 @@ class Reaction(BaseFeature):
         elif message.content.startswith(Messages.karma_vote_message_hack):
             if emoji not in ["✅", "❌", "0⃣"]:
                 await message.remove_reaction(emoji, member)
-        elif member.id != message.author.id and\
-                guild.id == Config.guild_id and\
+        elif member.id != message.author.id and \
+                guild.id == Config.guild_id and \
                 message.channel.id not in \
-                Config.karma_banned_channels and\
+                Config.karma_banned_channels and \
                 Config.karma_ban_role_id not in map(lambda x: x.id,
-                                                         member.roles):
-            if type(emoji) is str:
+                                                    member.roles):
+            if isinstance(emoji, str):
                 self.karma_repo.karma_emoji(message.author, member, emoji)
             else:
                 self.karma_repo.karma_emoji(message.author, member, emoji.id)
@@ -146,16 +146,17 @@ class Reaction(BaseFeature):
                                                        message.channel,
                                                        guild)
                     break
-        elif member.id != message.author.id and\
-                guild.id == Config.guild_id and\
+        elif member.id != message.author.id and \
+                guild.id == Config.guild_id and \
                 message.channel.id not in \
-                Config.karma_banned_channels and\
+                Config.karma_banned_channels and \
                 Config.karma_ban_role_id not in map(lambda x: x.id,
-                                                         member.roles):
-            if type(emoji) is str:
+                                                    member.roles):
+            if isinstance(emoji, str):
                 self.bot.repo.karma_emoji_remove(message.author, member, emoji)
             else:
-                self.bot.repo.karma_emoji_remove(message.author, member, emoji.id)
+                self.bot.repo.karma_emoji_remove(
+                    message.author, member, emoji.id)
 
     # Adds a role for user based on reaction
     async def add_role_on_reaction(self, role, member, channel, guild):
@@ -169,7 +170,7 @@ class Reaction(BaseFeature):
             else:
                 await channel.send(Messages.role_add_denied
                                    .format(user=utils.generate_mention(
-                                           member.id), role=role.name))
+                                       member.id), role=role.name))
 
     # Removes a role for user based on reaction
     async def remove_role_on_reaction(self, role, member, channel, guild):
@@ -183,9 +184,9 @@ class Reaction(BaseFeature):
                     await member.remove_roles(role)
                 else:
                     await channel.send(
-                            Messages.role_remove_denied
-                            .format(user=utils.generate_mention(
-                                         member.id),
-                                    role=role.name
-                                    )
-                            )
+                        Messages.role_remove_denied
+                        .format(user=utils.generate_mention(
+                            member.id),
+                            role=role.name
+                        )
+                    )

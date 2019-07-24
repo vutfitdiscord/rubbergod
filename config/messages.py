@@ -126,5 +126,6 @@ class Messages:
             ('givingboard', 'Leaderboard rozdávání pozitivní karmy.'),
             ('ishaboard', 'Leaderboard rozdávání negativní karmy.'),
             ('diceroll', 'Všechno možné házení kostkami.'),
-            ('week', 'Vypíše, kolikátý je zrovna týden a jestli je sudý nebo lichý.'),
+            ('week', 'Vypíše, kolikátý je zrovna týden '
+                     'a jestli je sudý nebo lichý.'),
             ('god', 'Vypíše tuto zprávu.')]

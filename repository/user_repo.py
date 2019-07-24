@@ -42,8 +42,9 @@ class UserRepository(BaseRepository):
         """"Finds login from database"""
 
         cursor = self.cursor()
-        cursor.execute('SELECT login, year, code FROM bot_valid_persons WHERE `login`=%s '
-                       'AND status = %s', (login, status))
+        cursor.execute(
+            'SELECT login, year, code FROM bot_valid_persons WHERE `login`=%s '
+            'AND status = %s', (login, status))
         login = cursor.fetchone()
         cursor.close()
         return login

@@ -11,7 +11,7 @@ def git_hash():
 
 
 def str_emoji_id(emoji):
-    if type(emoji) is int:
+    if isinstance(emoji, int):
         return str(emoji)
 
-    return emoji if type(emoji) is str else emoji.id
+    return emoji if isinstance(emoji, str) else emoji.id
