@@ -91,7 +91,7 @@ async def on_message(message):
     if message.content.startswith(config.role_string):
         role_data = await reaction.get_join_role_data(message)
         await reaction.message_role_reactions(message, role_data)
-    elif message.content == "uh oh":
+    elif message.content.lower() == "uh oh":
         await message.channel.send("uh oh")
     else:
         await bot.process_commands(message)
@@ -202,7 +202,8 @@ async def pick_karma_command(ctx, *args):
             await ctx.send(
                 "{}".format(config.server_warning))
         else:
-            if ctx.message.channel.id == config.vote_room:
+            if ctx.message.channel.id == config.vote_room or \
+               ctx.author.id == config.admin_id:
                 try:
                     await ctx.message.delete()
                     await karma.revote(ctx.message)
@@ -219,7 +220,8 @@ async def pick_karma_command(ctx, *args):
             await ctx.send(
                 "{}".format(config.server_warning))
         else:
-            if ctx.message.channel.id == config.vote_room:
+            if ctx.message.channel.id == config.vote_room or \
+               ctx.author.id == config.admin_id:
                 try:
                     await ctx.message.delete()
                     await karma.vote(ctx.message)
