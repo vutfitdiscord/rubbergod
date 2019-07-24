@@ -2,6 +2,7 @@ import discord
 from discord.ext import commands
 from repository import (rng, karma, user, roll_dice,
                         reaction, verification, presence)
+from features import (karma)
 import utils
 from config import config, messages
 import traceback
@@ -161,16 +162,16 @@ async def pick(ctx):
 @bot.command(name="karma")
 async def pick_karma_command(ctx, *args):
     if len(args) == 0:
-        await ctx.send(
-            str(karma.get_karma(ctx.author.id, 'get')))
+        await karma.karma_get(ctx.message)
         await botroom_check(ctx.message)
+
     elif args[0] == "get":
         if not await guild_check(ctx.message):
             await ctx.send(
                 "{}".format(messages.server_warning))
         else:
             try:
-                await karma.get(ctx.message)
+                await karma.emoji_get_value(ctx.message)
                 await botroom_check(ctx.message)
             except discord.errors.Forbidden:
                 return
@@ -183,14 +184,14 @@ async def pick_karma_command(ctx, *args):
             if ctx.message.channel.id == config.vote_room:
                 try:
                     await ctx.message.delete()
-                    await karma.revote(ctx.message)
+                    await karma.emoji_revote_value(ctx.message)
                 except discord.errors.Forbidden:
                     return
             else:
                 await ctx.send(
-                    "Tohle funguje jen v {}"
-                    .format(discord.utils.get(ctx.guild.channels,
-                                              id=config.vote_room)))
+                    messages.vote_room_only
+                    .format(room=discord.utils.get(ctx.guild.channels,
+                                                   id=config.vote_room)))
 
     elif args[0] == "vote":
         if not await guild_check(ctx.message):
@@ -200,18 +201,17 @@ async def pick_karma_command(ctx, *args):
             if ctx.message.channel.id == config.vote_room:
                 try:
                     await ctx.message.delete()
-                    await karma.vote(ctx.message)
+                    await karma.emoji_vote_value(ctx.message)
                 except discord.errors.Forbidden:
                     return
             else:
                 await ctx.send(
-                    "Tohle funguje jen v {}"
-                    .format(discord.utils.get(ctx.guild.channels,
-                                              id=config.vote_room)))
+                    messages.vote_room_only
+                    .format(room=discord.utils.get(ctx.guild.channels,
+                                                   id=config.vote_room)))
 
     elif args[0] == "given":
-        await ctx.send(
-            str(karma.get_karma(ctx.author.id, 'give')))
+        await karma.karma_giving_get(ctx.message)
         await botroom_check(ctx.message)
 
     elif args[0] == "give":
@@ -219,11 +219,11 @@ async def pick_karma_command(ctx, *args):
             await karma.karma_give(ctx.message)
         else:
             await ctx.send(
-                "{} na použitie tohto príkazu nemáš práva"
-                .format(utils.generate_mention(ctx.author.id)))
+                messages.insufficient_rights
+                .format(user=utils.generate_mention(ctx.author.id)))
     else:
         await ctx.send(
-            "{} Neznamy karma command"
+            messages.karma_invalid_command
             .format(utils.generate_mention(ctx.author.id)))
 
 

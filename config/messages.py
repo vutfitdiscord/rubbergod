@@ -2,6 +2,8 @@ class Messages:
     server_warning = "Tohle funguje jen na VUT FIT serveru."
     toaster_pls = "Toaster pls, máš bordel v DB."
     no_such_command = "Takovy prikaz neznám. <:sadcat:576171980118687754>"
+    insufficient_rights = "{user}, na použití tohoto příkazu nemáš právo."
+    vote_room_only = "Tohle funguje jen v {room}."
 
     karma_own = "{user}, tvoje karma je: **{karma}** (**{pos}.**)."
     karma_given = "{user}, rozdal jsi:\n" \
@@ -10,6 +12,7 @@ class Messages:
                   "**{karma_neg}** negativní karmy " \
                   "(**{karma_neg_pos}.**)"
 
+    karma_invalid_command = "Neznámý karma příkaz."
     karma_vote_format = "Neočekávám argument. " \
                         "Správný formát: `!karma vote`"
     karma_vote_message_hack = "Hlasování o karma ohodnocení emotu"
