@@ -1,7 +1,7 @@
 class Config:
     key = ''
     verification_role = ''
-    admin_id = 0   # for mention in case of false verification
+    admin_id = 0  # for mention in case of false verification
     guild_id = 0
 
     # Verification email sender settings
@@ -11,6 +11,7 @@ class Config:
     email_smtp_port = 465
     email_pass = ''
 
+    # Database
     connection = {
         'user': 'root',
         'password': '',
@@ -40,15 +41,13 @@ class Config:
     vote_minimum = 20
     vote_minutes = 2
 
-    # Logging to discord
-    log_channel_id = 0
+    # Special channel IDs
+    log_channel_id = 597009137905303552
+    vote_room = 461544375105749003
+    bot_room = 461549842896781312
 
     # String constants
     role_string = 'Role'
-    server_warning = 'Tohle funguje jen na VUT FIT serveru'
-    vote_room = 461544375105749003
-    vote_message = 'Hlasovani o karma ohodnoceni emotu'
-    bot_room = 461549842896781312
 
     # Arcas
     arcas_id = 140547421733126145
