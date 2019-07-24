@@ -2,12 +2,13 @@ import discord
 from discord.ext import commands
 from repository import (rng, karma, user, utils, roll_dice,
                         reaction, verification, presence)
-from config import config
+from config import config, messages
 import mysql.connector
 import traceback
 import datetime
 
 config = config.Config()
+messages = messages.Messages()
 bot = commands.Bot(command_prefix=config.command_prefix,
                    help_command=None,
                    case_insensitive=True)
@@ -45,12 +46,10 @@ async def update_web():
 
 async def botroom_check(message):
     room = await get_room(message)
-    if room is not None and room.id != config.bot_room:
-        await message.channel.send(
-            "{} <:sadcat:576171980118687754> 👉 "
-            "<#{}>\n"
-            .format(utils.generate_mention(message.author.id),
-                    config.bot_room))
+    if room is not None and room.id not in config.allowed_channels:
+        await message.channel.send(messages.botroom_redirect.format(
+            utils.generate_mention(message.author.id),
+            config.bot_room))
 
 
 async def get_room(message):
@@ -127,7 +126,7 @@ async def on_typing(channel, user, when):
         gif = discord.Embed()
         gif.set_image(url="https://i.imgur.com/v2ueHcl.gif")
         await channel.send(embed=gif)
-            
+
 
 #                                      #
 #              COMMANDS                #
