@@ -39,7 +39,7 @@ class Verification(BaseFeature):
             return
 
         # Check if the user doesn't have the verify role
-        if Config.verification_role not in message.author.roles:
+        if not utils.has_role(message.author, Config.verification_role):
             login = str(message.content).split(" ")[1]
 
             # Some of them will use 'xlogin00' as stated in help,
@@ -135,7 +135,7 @@ class Verification(BaseFeature):
 
         # Check if the user doesn't have the verify role
         # otherwise they wouldn't need to verify, right?
-        if Config.verification_role not in message.author.roles:
+        if not utils.has_role(message.author, Config.verification_role):
             # Some of them will use 'xlogin00' as stated in help
             # yet again, cuz they dumb
             if login == "xlogin00":
@@ -163,15 +163,16 @@ class Verification(BaseFeature):
                 return
 
             new_user = self.repo.get_user(login)
-            # Check the code
-            if code != new_user[2]:
-                await message.channel.send(
-                    Messages.verify_verify_wrong_code
-                    .format(user=utils.generate_mention(
-                        message.author.id)))
-                return
 
             if new_user is not None:
+                # Check the code
+                if code != new_user[2]:
+                    await message.channel.send(
+                            Messages.verify_verify_wrong_code
+                                .format(user=utils.generate_mention(
+                                    message.author.id)))
+                    return
+
                 # Try and transform the year into the role name
                 year = self.transform_year(new_user[1])
 
