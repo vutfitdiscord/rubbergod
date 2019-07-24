@@ -46,6 +46,11 @@ class Config:
     vote_room = 461544375105749003
     bot_room = 461549842896781312
 
+    allowed_channels = [
+            bot_room,
+            log_channel_id
+    ]
+
     # String constants
     role_string = 'Role'
 

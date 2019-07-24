@@ -1,9 +1,16 @@
+from config import config
+
+
 class Messages:
+    prefix = config.Config.command_prefix
+
     server_warning = "Tohle funguje jen na VUT FIT serveru."
     toaster_pls = "Toaster pls, máš bordel v DB."
     no_such_command = "Takový příkaz neznám. <:sadcat:576171980118687754>"
     insufficient_rights = "{user}, na použití tohoto příkazu nemáš právo."
     vote_room_only = "Tohle funguje jen v {room}."
+    bot_room_redirect = "{} <:sadcat:576171980118687754> 👉 " \
+                        "<#{}>\n"
 
     karma_own = "{user}, tvoje karma je: **{karma}** (**{pos}.**)."
     karma_given = "{user}, rozdal jsi:\n" \
@@ -14,7 +21,7 @@ class Messages:
 
     karma_invalid_command = "Neznámý karma příkaz."
     karma_vote_format = "Neočekávám argument. " \
-                        "Správný formát: `!karma vote`"
+                        "Správný formát: `" + prefix + "karma vote`"
     karma_vote_message_hack = "Hlasování o karma ohodnocení emotu"
     karma_vote_message = karma_vote_message_hack + " {emote}"
     karma_vote_info = "Hlasování skončí za **{delay}** " \
@@ -26,19 +33,19 @@ class Messages:
                            "Aspoň {minimum} hlasů potřeba."
     karma_vote_allvoted = "Už se hlasovalo o všech emotech."
     karma_revote_format = "Očekávám pouze formát: " \
-                          "`!karma revote [emote]`"
+                          "`" + prefix + "karma revote [emote]`"
     karma_emote_not_found = "Emote jsem na serveru nenašel."
     karma_get_format = "Použití:\n" \
-                       "`!karma get`: " \
+                       "`" + prefix + "karma get`: " \
                        "vypíše všechny emoty s hodnotou.\n" \
-                       "`!karma get [emote]`: " \
+                       "`" + prefix + "karma get [emote]`: " \
                        "vrátí hodnotu daného emotu."
     karma_get = "Hodnota {emote} je {value}."
     karma_get_emote_not_voted = "{emote} není ohodnocen."
     karma_give_format = "Toaster pls, formát je " \
-                        "`!karma give [number] [user(s)]`"
+                        "`" + prefix + "karma give [number] [user(s)]`"
     karma_give_format_number = "Toaster pls, formát je " \
-                               "`!karma give " \
+                               "`" + prefix + "karma give " \
                                "[number, jakože číslo, " \
                                "ne {input}] [user(s)]` "
     karma_give_success = "Karma byla úspěšně přidaná."
@@ -56,7 +63,7 @@ class Messages:
     role_invalid_emote = "{user}, {not_emote} " \
                          "pro roli {role} není emote."
 
-    rng_generator_format = "Použití: `!roll x [y]`\n" \
+    rng_generator_format = "Použití: `" + prefix + "roll x [y]`\n" \
                            "x, y je rozmezí čísel,\n" \
                            "x, y jsou celá čísla,\n" \
                            "pokud y není specifikováno, " \
@@ -79,21 +86,21 @@ class Messages:
                               "({toaster} pls)."
     verify_send_format = "Očekávám jeden argument. " \
                          "Správný formát: " \
-                         "`!getcode [FIT login, " \
+                         "`" + prefix + "getcode [FIT login, " \
                          "ve tvaru xlogin00]`"
     verify_send_dumbshit = "{user} Tvůj login. {emote}"
     verify_send_success = "{user} Kód byl odeslán na tvůj mail " \
                           "(@stud.fit.vutbr.cz)!\n" \
                           "Pro verifikaci použij: " \
-                          "`!verify [login] [kód]`"
+                          "`" + prefix + "verify [login] [kód]`"
     verify_send_not_found = "{user} Login nenalezen " \
                             "nebo jsi už tímhle krokem " \
                             "prošel ({toaster} pls)."
     verify_verify_format = "Očekávám dva argumenty. " \
                            "Správný formát: " \
-                           "`!verify [FIT login] [kód]`\n" \
-                           "Pro získání kódu použij " \
-                           "!getcode [FIT login, ve tvaru xlogin00]`"
+                           "`" + prefix + "verify [FIT login] [kód]`\n" \
+                           "Pro získání kódu použij " +\
+                           prefix + "getcode [FIT login, ve tvaru xlogin00]`"
     verify_verify_dumbshit = "{user} Kód, " \
                              "který ti přišel na mail. {emote}"
     verify_verify_manual = "Čauec {user}, nechám {toaster}, " \
@@ -129,3 +136,4 @@ class Messages:
             ('week', 'Vypíše, kolikátý je zrovna týden '
                      'a jestli je sudý nebo lichý.'),
             ('god', 'Vypíše tuto zprávu.')]
+

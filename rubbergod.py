@@ -36,12 +36,10 @@ arcas_time = datetime.datetime.utcnow() - datetime.timedelta(hours=1)
 
 async def botroom_check(message):
     room = await get_room(message)
-    if room is not None and room.id != config.bot_room:
-        await message.channel.send(
-            "{} <:sadcat:576171980118687754> 👉 "
-            "<#{}>\n"
-            .format(utils.generate_mention(message.author.id),
-                    config.bot_room))
+    if room is not None and room.id not in config.allowed_channels:
+        await message.channel.send(messages.bot_room_redirect.format(
+            utils.generate_mention(message.author.id),
+            config.bot_room))
 
 
 async def get_room(message):
@@ -77,9 +75,14 @@ async def on_ready():
 
 @bot.event
 async def on_message(message):
+    if message.author.bot:
+        return
+
     if message.content.startswith(config.role_string):
         role_data = await reaction.get_join_role_data(message)
         await reaction.message_role_reactions(message, role_data)
+    elif message.content.lower() == "uh oh":
+        await message.channel.send("uh oh")
     else:
         await bot.process_commands(message)
 
@@ -189,7 +192,8 @@ async def pick_karma_command(ctx, *args):
             await ctx.send(
                 "{}".format(messages.server_warning))
         else:
-            if ctx.message.channel.id == config.vote_room:
+            if ctx.message.channel.id == config.vote_room or \
+               ctx.author.id == config.admin_id:
                 try:
                     await ctx.message.delete()
                     await karma.emoji_revote_value(ctx.message)
@@ -206,7 +210,8 @@ async def pick_karma_command(ctx, *args):
             await ctx.send(
                 "{}".format(messages.server_warning))
         else:
-            if ctx.message.channel.id == config.vote_room:
+            if ctx.message.channel.id == config.vote_room or \
+               ctx.author.id == config.admin_id:
                 try:
                     await ctx.message.delete()
                     await karma.emoji_vote_value(ctx.message)

@@ -106,8 +106,16 @@ class Reaction(BaseFeature):
         elif message.content.startswith(Messages.karma_vote_message_hack):
             if emoji not in ["✅", "❌", "0⃣"]:
                 await message.remove_reaction(emoji, member)
-        elif member.id != message.author.id and \
-                guild.id == Config.guild_id and \
+            else:
+                users = []
+                for reaction in message.reactions:
+                    users.append(await reaction.users().flatten())
+                # Flatten the final list
+                users = [x for y in users for x in y]
+                if users.count(member) > 1:
+                    await message.remove_reaction(emoji, member)
+        elif member.id != message.author.id and\
+                guild.id == Config.guild_id and\
                 message.channel.id not in \
                 Config.karma_banned_channels and \
                 Config.karma_ban_role_id not in map(lambda x: x.id,
