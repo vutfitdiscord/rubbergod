@@ -62,7 +62,7 @@ class Verification(BaseFeature):
                 code = ''.join(random.choices(string.ascii_uppercase +
                                               string.digits, k=20))
 
-                email_message = "!verify " + login + " " + code
+                email_message = Config.command_prefix + "verify " + login + " " + code
 
                 self.send_mail(login + "@stud.fit.vutbr.cz", email_message)
 

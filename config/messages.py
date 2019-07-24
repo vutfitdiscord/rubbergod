@@ -101,7 +101,7 @@ class Messages:
     verify_verify_format = "Očekávám dva argumenty. " \
                            "Správný formát: " \
                            "`" + prefix + "verify [FIT login] [kód]`\n" \
-                           "Pro získání kódu použij " +\
+                           "Pro získání kódu použij `" +\
                            prefix + "getcode [FIT login, ve tvaru xlogin00]`"
     verify_verify_dumbshit = "{user} Kód, " \
                              "který ti přišel na mail. {emote}"
