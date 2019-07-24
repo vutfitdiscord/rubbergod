@@ -34,6 +34,7 @@ class UserRepository(BaseRepository):
         cursor = self.cursor()
         cursor.execute('SELECT * FROM bot_valid_persons WHERE `login`=%s '
                        'AND status = 1', (login,))
+        cursor.fetchall()
         rc = cursor.rowcount
         cursor.close()
         return rc
