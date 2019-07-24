@@ -1,6 +1,11 @@
+from config import config
+
+
 class Messages:
 
     def __init__(self):
+        prefix = config.Config().command_prefix
+
         self.server_warning = "Tohle funguje jen na VUT FIT serveru."
         self.toaster_pls = "Toaster pls, máš bordel v DB."
 
@@ -15,7 +20,7 @@ class Messages:
                            "(**{karma_neg_pos}.**)"
 
         self.karma_vote_format = "Neočekávám argument. " \
-                                 "Správný formát: `!karma vote`"
+                                 "Správný formát: `" + prefix + "karma vote`"
         self.karma_vote_message_hack = "Hlasování o karma ohodnocení emotu"
         self.karma_vote_message = self.karma_vote_message_hack + " {emote}"
         self.karma_vote_info = "Hlasování skončí za **{delay}** " \
@@ -27,19 +32,20 @@ class Messages:
                                     "Aspoň {minimum} hlasů potřeba."
         self.karma_vote_allvoted = "Už se hlasovalo o všech emotech."
         self.karma_revote_format = "Očekávám pouze formát: " \
-                                   "`!karma revote [emote]`"
+                                   "`" + prefix + "karma revote [emote]`"
         self.karma_emote_not_found = "Emote jsem na serveru nenašel."
         self.karma_get_format = "Použití:\n" \
-                                "`!karma get`: " \
+                                "`" + prefix + "karma get`: " \
                                 "vypíše všechny emoty s hodnotou.\n" \
-                                "`!karma get [emote]`: " \
+                                "`" + prefix + "karma get [emote]`: " \
                                 "vrátí hodnotu daného emotu."
         self.karma_get = "Hodnota {emote} je {value}."
         self.karma_get_emote_not_voted = "{emote} není ohodnocen."
         self.karma_give_format = "Toaster pls, formát je " \
-                                 "`!karma give [number] [user(s)]`"
+                                 "`" + prefix + "karma give [number] " \
+                                 "[user(s)]`"
         self.karma_give_format_number = "Toaster pls, formát je " \
-                                        "`!karma give " \
+                                        "`" + prefix + "karma give " \
                                         "[number, jakože číslo, " \
                                         "ne {input}] [user(s)]` "
         self.karma_give_success = "Karma byla úspěšně přidaná."
@@ -49,7 +55,7 @@ class Messages:
         self.role_remove_denied = "{user}, " \
                                   "na odebrání role {role} nemáš právo."
         self.role_invalid_line = "{user}, řádek `{line}` je neplatný."
-        self.role_format = "{user}, použij `!god`."
+        self.role_format = "{user}, použij `" + prefix + "god`."
         self.role_not_on_server = "Nepíšeš na serveru, " \
                                   "takže předpokládám, " \
                                   "že myslíš role VUT FIT serveru."
@@ -57,7 +63,7 @@ class Messages:
         self.role_invalid_emote = "{user}, {not_emote} " \
                                   "pro roli {role} není emote."
 
-        self.rng_generator_format = "Použití: `!roll x [y]`\n" \
+        self.rng_generator_format = "Použití: `" + prefix + "roll x [y]`\n" \
                                     "x, y je rozmezí čísel,\n" \
                                     "x, y jsou celá čísla,\n" \
                                     "pokud y není specifikováno, " \
@@ -80,21 +86,23 @@ class Messages:
                                        "({toaster} pls)."
         self.verify_send_format = "Očekávám jeden argument. " \
                                   "Správný formát: " \
-                                  "`!getcode [FIT login, " \
+                                  "`" + prefix + "getcode [FIT login, " \
                                   "ve tvaru xlogin00]`"
         self.verify_send_dumbshit = "{user} Tvůj login. {emote}"
         self.verify_send_success = "{user} Kód byl odeslán na tvůj mail " \
                                    "(@stud.fit.vutbr.cz)!\n" \
                                    "Pro verifikaci použij: " \
-                                   "`!verify [login] [kód]`"
+                                   "`" + prefix + "verify [login] [kód]`"
         self.verify_send_not_found = "{user} Login nenalezen " \
                                      "nebo jsi už tímhle krokem " \
                                      "prošel ({toaster} pls)."
         self.verify_verify_format = "Očekávám dva argumenty. " \
                                     "Správný formát: " \
-                                    "`!verify [FIT login] [kód]`\n" \
+                                    "`" + prefix + "verify [FIT login] " \
+                                    "[kód]`\n" \
                                     "Pro získání kódu použij " \
-                                    "!getcode [FIT login, ve tvaru xlogin00]`"
+                                    + prefix + "getcode [FIT login, " \
+                                    "ve tvaru xlogin00]`"
         self.verify_verify_dumbshit = "{user} Kód, " \
                                       "který ti přišel na mail. {emote}"
         self.verify_verify_manual = "Čauec {user}, nechám {toaster}, " \
