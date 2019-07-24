@@ -1,8 +1,8 @@
-from importlib import reload
-from config import config
+from mixins import AutoReload
 from repository.base_repository import BaseRepository
 from watchdog.observers import Observer
 from watchdog.events import RegexMatchingEventHandler
+import os.path
 
 """
     Watches the config directory for any changes to python files
@@ -14,10 +14,11 @@ class Watchdog(BaseRepository, RegexMatchingEventHandler):
 
     def __init__(self):
         super().__init__()
-        RegexMatchingEventHandler.__init__(self, regexes=[r'.*/config[.]py$'],
+        RegexMatchingEventHandler.__init__(self, regexes=[r'.*[.]py$'],
                                            ignore_directories=True)
+
         self.observer = Observer()
-        self.observer.schedule(self, './config', recursive=True)
+        self.observer.schedule(self, '.', recursive=True)
         self.observer.start()
 
     def __del__(self):
@@ -25,12 +26,5 @@ class Watchdog(BaseRepository, RegexMatchingEventHandler):
         self.observer.join()
 
     def on_modified(self, event):
-        """
-            Move the instance list from old config to new reloaded config,
-            so we can reload all instances with new data
-        """
-        config_instances = config.Config.get_instances()
-        print("Reloading {} config instances".format(len(config_instances)))
-        reload(config)
-        config.Config.set_instances(config_instances)
-        config.Config.update_all(config.Config())
+        print("Reloading {}".format(event.src_path))
+        AutoReload.reload(os.path.abspath(event.src_path))

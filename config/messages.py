@@ -1,6 +1,11 @@
-class Messages:
+from mixins import AutoReload
+
+
+class Messages(AutoReload):
 
     def __init__(self):
+        AutoReload.__init__(self, 'config.messages')
+
         self.server_warning = "Tohle funguje jen na VUT FIT serveru."
         self.toaster_pls = "Toaster pls, máš bordel v DB."
 
@@ -54,7 +59,7 @@ class Messages:
         self.role_invalid_emote = "{user}, {not_emote} " \
                                   "pro roli {role} není emote."
 
-        self.rng_generator_format = "Použití: `!roll x [y]`\n" \
+        self.rng_generator_format = "Použití: `!roll x [y]`\n" \    
                                     "x, y je rozmezí čísel,\n" \
                                     "x, y jsou celá čísla,\n" \
                                     "pokud y není specifikováno, " \

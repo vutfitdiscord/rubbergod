@@ -1,10 +1,10 @@
-from .config_base import ConfigBase
+from mixins import AutoReload
 
 
-class Config(ConfigBase):
+class Config(AutoReload):
 
     def __init__(self):
-        super().__init__()
+        AutoReload.__init__(self, 'config.config')
 
         self.key = ''
         self.verification_role = ''
