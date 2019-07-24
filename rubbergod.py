@@ -267,24 +267,29 @@ async def ishaboard(ctx):
 @bot.command()
 async def god(ctx):
     embed = discord.Embed(title="Rubbergod",
-                          description="Nejlepší a nejúžasnější bot ever. "
-                                      "Autor, počet serverů "
-                                      "a dostupné příkazy jsou:",
+                          description="Nejlepší a nejúžasnější bot ever.",
                           color=0xeee657)
 
     prefix = config.command_prefix
 
     # give info about you here
-    embed.add_field(name="Author", value="Toaster#1111")
+    embed.add_field(name="Autor", value="Toaster#1111")
 
     # Shows the number of servers the bot is member of.
     embed.add_field(name="Počet serverů s touto instancí bota",
                     value=f"{len(bot.guilds)}")
 
+    embed.add_field(name="\u200b", value="Příkazy:")
+
     for command in messages.info:
         embed.add_field(name=prefix + command[0],
                         value=command[1],
                         inline=False)
+
+    embed.set_footer(text=f"Commit {utils.git_hash()}“",
+                     icon_url="https://cdn.discordapp.com/avatars/"
+                              "560917571663298568/b93e8c1e93c2d18b"
+                              "fbd226a0b614cf57.png?size=32")
 
     await ctx.send(embed=embed)
 
