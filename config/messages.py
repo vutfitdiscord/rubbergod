@@ -1,7 +1,7 @@
 class Messages:
     server_warning = "Tohle funguje jen na VUT FIT serveru."
     toaster_pls = "Toaster pls, máš bordel v DB."
-    no_such_command = "Takovy prikaz neznám. <:sadcat:576171980118687754>"
+    no_such_command = "Takový příkaz neznám. <:sadcat:576171980118687754>"
     insufficient_rights = "{user}, na použití tohoto příkazu nemáš právo."
     vote_room_only = "Tohle funguje jen v {room}."
 
