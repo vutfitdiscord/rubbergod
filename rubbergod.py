@@ -1,7 +1,7 @@
 import discord
 from discord.ext import commands
-from repository import (karma, user, reaction)
-from features import (karma, presence, verification)
+from repository import (karma_repo, user_repo)
+from features import (karma, presence, verification, reaction)
 from logic import roll_dice, rng
 import utils
 from config import config, messages
@@ -15,13 +15,19 @@ bot = commands.Bot(command_prefix=config.command_prefix,
                    help_command=None,
                    case_insensitive=True)
 
-user = user.UserRepository()
+# Repositories (data access layer)
+user_r = user_repo.UserRepository()
+karma_r = karma_repo.KarmaRepository()
+
+# Logic (functionality used by features or rubbergod directly)
 roll_dice = roll_dice.Roll()
 rng = rng.Rng()
-karma = karma.Karma(bot)
-reaction = reaction.Reaction(bot, karma)
-verification = verification.Verification(bot, user)
+
+# Features (layer talking to Discord)
+verification = verification.Verification(bot, user_r)
+karma = karma.Karma(bot, karma_r)
 presence = presence.Presence(bot)
+reaction = reaction.Reaction(bot, karma_r)
 
 arcas_time = datetime.datetime.utcnow() - datetime.timedelta(hours=1)
 

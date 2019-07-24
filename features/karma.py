@@ -6,7 +6,7 @@ from emoji import UNICODE_EMOJI
 
 import utils
 from features.base_feature import BaseFeature
-from repository.karma import KarmaRepository
+from repository.karma_repo import KarmaRepository
 
 from config import config, messages
 
@@ -15,9 +15,9 @@ msg = messages.Messages
 
 
 class Karma(BaseFeature):
-    def __init__(self, bot: Bot):
+    def __init__(self, bot: Bot, karma_repository: KarmaRepository):
         super().__init__(bot)
-        self.repo = KarmaRepository()
+        self.repo = karma_repository
 
     async def emoji_process_vote(self, channel, emoji):
         delay = cfg.vote_minutes * 60

@@ -10,7 +10,7 @@ import utils
 from config.config import Config
 from config.messages import Messages
 from features.base_feature import BaseFeature
-from repository.user import UserRepository
+from repository.user_repo import UserRepository
 
 
 class Verification(BaseFeature):
