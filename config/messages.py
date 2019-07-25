@@ -89,10 +89,10 @@ class Messages:
     verify_send_format = "Očekávám jeden argument. " \
                          "Správný formát: " \
                          "`" + prefix + "getcode [FIT login, " \
-                         "ve tvaru xlogin00]`"
+                         "ve tvaru xlogin00, nebo MUNI UCO]`"
     verify_send_dumbshit = "{user} Tvůj login. {emote}"
     verify_send_success = "{user} Kód byl odeslán na tvůj mail " \
-                          "(@stud.fit.vutbr.cz)!\n" \
+                          "({mail})!\n" \
                           "Pro verifikaci použij: " \
                           "`" + prefix + "verify [login] [kód]`"
     verify_send_not_found = "{user} Login nenalezen " \
@@ -100,9 +100,9 @@ class Messages:
                             "prošel ({toaster} pls)."
     verify_verify_format = "Očekávám dva argumenty. " \
                            "Správný formát: " \
-                           "`" + prefix + "verify [FIT login] [kód]`\n" \
+                           "`" + prefix + "verify [FIT login nebo MUNI UCO] [kód]`\n" \
                            "Pro získání kódu použij `" +\
-                           prefix + "getcode [FIT login, ve tvaru xlogin00]`"
+                           prefix + "getcode [FIT login, ve tvaru xlogin00, nebo MUNI UCO]`"
     verify_verify_dumbshit = "{user} Kód, " \
                              "který ti přišel na mail. {emote}"
     verify_verify_manual = "Čauec {user}, nechám {toaster}, " \

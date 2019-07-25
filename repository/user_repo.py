@@ -50,7 +50,7 @@ class UserRepository(BaseRepository):
         cursor.close()
         return login
 
-    def new_user(self, login: str, year: str, status: int = 1):
+    def add_user(self, login: str, year: str, status: int = 1):
         """"Finds login from database"""
 
         cursor = self.cursor()

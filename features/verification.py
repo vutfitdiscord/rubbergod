@@ -75,7 +75,8 @@ class Verification(BaseFeature):
                     email_message = Config.command_prefix + "verify "
                     email_message += login + " " + code
 
-                    self.send_mail(login + "@stud.fit.vutbr.cz", email_message)
+                    mail_postfix = "@stud.fit.vutbr.cz"
+                    self.send_mail(login + mail_postfix, email_message)
 
                     # Save the newly generated code into the database
                     self.repo.save_sent_code(login, code)
@@ -83,7 +84,8 @@ class Verification(BaseFeature):
                     await message.channel.send(
                         Messages.verify_send_success
                         .format(user=utils.generate_mention(
-                            message.author.id)))
+                            message.author.id),
+                                mail=mail_postfix))
                 else:
                     await message.channel.send(
                         Messages.verify_send_not_found
@@ -118,10 +120,17 @@ class Verification(BaseFeature):
                     email_message = Config.command_prefix + "verify "
                     email_message += login + " " + code
 
-                    self.send_mail(login + "@mail.muni.cz", email_message)
+                    mail_postfix = "@mail.muni.cz"
+                    self.send_mail(login + mail_postfix, email_message)
 
                     # Save the newly generated code into the database
                     self.repo.save_sent_code(login, code)
+
+                    await message.channel.send(
+                        Messages.verify_send_success
+                        .format(user=utils.generate_mention(
+                            message.author.id),
+                                mail=mail_postfix))
                 else:
                     await message.channel.send(
                         Messages.verify_send_not_found
