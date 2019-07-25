@@ -1,4 +1,5 @@
 import git
+from discord import Member
 
 
 def generate_mention(user_id):
@@ -23,4 +24,7 @@ def str_emoji_id(emoji):
 
 
 def has_role(user, role_name: str):
+    if type(user) != Member:
+        return None
+
     return role_name.lower() in [x.name.lower() for x in user.roles]

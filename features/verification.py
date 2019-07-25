@@ -4,6 +4,7 @@ import ssl
 import string
 
 import discord
+from discord import Member
 from discord.ext.commands import Bot
 
 import utils
@@ -33,13 +34,21 @@ class Verification(BaseFeature):
             server.login(Config.email_name, password)
             server.sendmail(sender_email, receiver_email, mail_content)
 
+    async def has_role(self, user, role_name):
+        if type(user) == Member:
+            return utils.has_role(user, role_name)
+        else:
+            guild = await self.bot.fetch_guild(Config.guild_id)
+            member = await guild.fetch_member(user.id)
+            return utils.has_role(member, role_name)
+
     async def send_code(self, message):
         if len(str(message.content).split(" ")) != 2:
             await message.channel.send(Messages.verify_send_format)
             return
 
         # Check if the user doesn't have the verify role
-        if not utils.has_role(message.author, Config.verification_role):
+        if not await self.has_role(message.author, Config.verification_role):
             login = str(message.content).split(" ")[1]
 
             # Some of them will use 'xlogin00' as stated in help,
@@ -135,7 +144,7 @@ class Verification(BaseFeature):
 
         # Check if the user doesn't have the verify role
         # otherwise they wouldn't need to verify, right?
-        if not utils.has_role(message.author, Config.verification_role):
+        if not await self.has_role(message.author, Config.verification_role):
             # Some of them will use 'xlogin00' as stated in help
             # yet again, cuz they dumb
             if login == "xlogin00":
