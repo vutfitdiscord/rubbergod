@@ -49,3 +49,14 @@ class UserRepository(BaseRepository):
         login = cursor.fetchone()
         cursor.close()
         return login
+
+    def new_user(self, login: str, year: str, status: int = 1):
+        """"Finds login from database"""
+
+        cursor = self.cursor()
+        cursor.execute(
+            'INSERT INTO bot_valid_persons(login, year, status) VALUES'
+            '(%s, %s, %s)', (login, year, status))
+        cursor.fetchone()
+        cursor.close()
+        return

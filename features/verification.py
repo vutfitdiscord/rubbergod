@@ -64,31 +64,71 @@ class Verification(BaseFeature):
                     )
                 )
                 return
+            if login[0] == 'x':
+                # VUT
+                # Check if the login we got is in the database
+                if self.repo.has_unverified_login(login):
+                    # Generate a verification code
+                    code = ''.join(random.choices(string.ascii_uppercase +
+                                                  string.digits, k=20))
 
-            # Check if the login we got is in the database
-            if self.repo.has_unverified_login(login):
-                # Generate a verification code
-                code = ''.join(random.choices(string.ascii_uppercase +
-                                              string.digits, k=20))
+                    email_message = Config.command_prefix + "verify "
+                    email_message += login + " " + code
 
-                email_message = Config.command_prefix + "verify " + login + " " + code
+                    self.send_mail(login + "@stud.fit.vutbr.cz", email_message)
 
-                self.send_mail(login + "@stud.fit.vutbr.cz", email_message)
+                    # Save the newly generated code into the database
+                    self.repo.save_sent_code(login, code)
 
-                # Save the newly generated code into the database
-                self.repo.save_sent_code(login, code)
-
-                await message.channel.send(
-                    Messages.verify_send_success
-                    .format(user=utils.generate_mention(
-                        message.author.id)))
+                    await message.channel.send(
+                        Messages.verify_send_success
+                        .format(user=utils.generate_mention(
+                            message.author.id)))
+                else:
+                    await message.channel.send(
+                        Messages.verify_send_not_found
+                        .format(user=utils.generate_mention(
+                            message.author.id),
+                            toaster=utils.generate_mention(
+                            Config.admin_id)))
             else:
-                await message.channel.send(
-                    Messages.verify_send_not_found
-                    .format(user=utils.generate_mention(
-                        message.author.id),
-                        toaster=utils.generate_mention(
-                        Config.admin_id)))
+                # MUNI
+                try:
+                    int(login)
+                except ValueError:
+                    await message.channel.send(
+                        Messages.verify_send_not_found
+                        .format(user=utils.generate_mention(
+                            message.author.id),
+                            toaster=utils.generate_mention(
+                            Config.admin_id)))
+                    try:
+                        await message.delete()
+                        return
+                    except discord.errors.Forbidden:
+                        return
+                if self.repo.get_user(login, status=2) is None and\
+                   self.repo.get_user(login, status=0) is None:
+
+                    self.repo.add_user(login, "MUNI", status=1)
+                    # Generate a verification code
+                    code = ''.join(random.choices(string.ascii_uppercase +
+                                                  string.digits, k=20))
+
+                    email_message = Config.command_prefix + "verify "
+                    email_message += login + " " + code
+
+                    self.send_mail(login + "@mail.muni.cz", email_message)
+
+                    # Save the newly generated code into the database
+                    self.repo.save_sent_code(login, code)
+                else:
+                    await message.channel.send(
+                        Messages.verify_send_not_found
+                        .format(user=utils.generate_mention(
+                            message.author.id),
+                            toaster=utils.generate_mention(
+                            Config.admin_id)))
         else:
             await message.channel.send(
                 Messages.verify_already_verified
@@ -130,6 +170,9 @@ class Verification(BaseFeature):
                     year = "PhD+"
             elif raw_year_parts[0] == "FEKT":
                 year = "FEKT"
+        elif len(raw_year_parts) == 1:
+            if raw_year_parts[0] == "MUNI":
+                year = "MUNI"
 
         return year
 
@@ -178,7 +221,7 @@ class Verification(BaseFeature):
                 if code != new_user[2]:
                     await message.channel.send(
                             Messages.verify_verify_wrong_code
-                                .format(user=utils.generate_mention(
+                            .format(user=utils.generate_mention(
                                     message.author.id)))
                     return
 
