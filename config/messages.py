@@ -7,6 +7,7 @@ class Messages:
     server_warning = "Tohle funguje jen na VUT FIT serveru."
     toaster_pls = "Toaster pls, máš bordel v DB."
     no_such_command = "Takový příkaz neznám. <:sadcat:576171980118687754>"
+    spamming = "{user} Nespamuj tolik <:sadcat:576171980118687754>"
     insufficient_rights = "{user}, na použití tohoto příkazu nemáš právo."
     vote_room_only = "Tohle funguje jen v {room}."
     bot_room_redirect = "{} <:sadcat:576171980118687754> 👉 " \

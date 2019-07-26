@@ -97,6 +97,10 @@ async def on_command_error(ctx, error):
     if isinstance(error, commands.CommandNotFound) and \
        not ctx.message.startswith('!'):
         await ctx.send(messages.no_such_command)
+    elif isinstance(error, commands.CommandOnCooldown):
+        await ctx.send(messages.spamming.format(
+            user=utils.generate_mention(ctx.author.id)
+            ))
     else:
         output = 'Ignoring exception in command {}:\n'.format(ctx.command)
         output += ''.join(traceback.format_exception(type(error),
@@ -133,21 +137,25 @@ async def on_typing(channel, user, when):
 #              COMMANDS                #
 #                                      #
 
+@commands.cooldown(rate=2, per=20.0, type=commands.BucketType.user)
 @bot.command()
 async def uhoh(ctx):
     await ctx.send(messages.uhoh_counter.format(uhohs=uhoh_counter))
 
 
+@commands.cooldown(rate=2, per=60.0, type=commands.BucketType.user)
 @bot.command()
 async def verify(ctx):
     await verification.verify(ctx.message)
 
 
+@commands.cooldown(rate=2, per=60.0, type=commands.BucketType.user)
 @bot.command()
 async def getcode(ctx):
     await verification.send_code(ctx.message)
 
 
+@commands.cooldown(rate=5, per=20.0, type=commands.BucketType.user)
 @bot.command()
 async def roll(ctx):
     # TODO: use
@@ -157,17 +165,20 @@ async def roll(ctx):
     await botroom_check(ctx.message)
 
 
+@commands.cooldown(rate=5, per=20.0, type=commands.BucketType.user)
 @bot.command()
 async def flip(ctx):
     await ctx.send(rng.flip())
     await botroom_check(ctx.message)
 
 
+@commands.cooldown(rate=2, per=20.0, type=commands.BucketType.user)
 @bot.command()
 async def week(ctx):
     await ctx.send(rng.week())
 
 
+@commands.cooldown(rate=5, per=20.0, type=commands.BucketType.user)
 @bot.command()
 async def pick(ctx):
     """"Pick an option"""
@@ -180,6 +191,8 @@ async def pick(ctx):
     await botroom_check(ctx.message)
 
 
+# TODO: split the karma commands so that we can cooldown them separately?
+@commands.cooldown(rate=5, per=30.0, type=commands.BucketType.user)
 @bot.command(name="karma")
 async def pick_karma_command(ctx, *args):
     if len(args) == 0:
@@ -250,30 +263,35 @@ async def pick_karma_command(ctx, *args):
             .format(utils.generate_mention(ctx.author.id)))
 
 
+@commands.cooldown(rate=2, per=30.0, type=commands.BucketType.user)
 @bot.command()
 async def leaderboard(ctx):
     await karma.leaderboard(ctx.message.channel, 'get', 'DESC')
     await botroom_check(ctx.message)
 
 
+@commands.cooldown(rate=2, per=30.0, type=commands.BucketType.user)
 @bot.command()
 async def bajkarboard(ctx):
     await karma.leaderboard(ctx.message.channel, 'get', 'ASC')
     await botroom_check(ctx.message)
 
 
+@commands.cooldown(rate=2, per=30.0, type=commands.BucketType.user)
 @bot.command()
 async def givingboard(ctx):
     await karma.leaderboard(ctx.message.channel, 'give', 'DESC')
     await botroom_check(ctx.message)
 
 
+@commands.cooldown(rate=2, per=30.0, type=commands.BucketType.user)
 @bot.command()
 async def ishaboard(ctx):
     await karma.leaderboard(ctx.message.channel, 'give', 'ASC')
     await botroom_check(ctx.message)
 
 
+@commands.cooldown(rate=2, per=60.0, type=commands.BucketType.user)
 @bot.command()
 async def god(ctx):
     embed = discord.Embed(title="Rubbergod",
@@ -303,6 +321,7 @@ async def god(ctx):
     await ctx.send(embed=embed)
 
 
+@commands.cooldown(rate=5, per=20.0, type=commands.BucketType.user)
 @bot.command()
 async def diceroll(ctx, *, arg=""):
     await ctx.send(roll_dice.roll_dice(arg))
