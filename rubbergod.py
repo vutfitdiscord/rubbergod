@@ -13,7 +13,8 @@ from repository import (karma_repo, user_repo)
 config = config.Config
 messages = messages.Messages
 
-bot = commands.Bot(command_prefix=config.command_prefix,
+bot = commands.Bot(command_prefix=commands.when_mentioned_or(
+                                      config.command_prefix),
                    help_command=None,
                    case_insensitive=True)
 
@@ -33,6 +34,7 @@ reaction = reaction.Reaction(bot, karma_r)
 
 arcas_time = datetime.datetime.utcnow() - datetime.timedelta(hours=1)
 uhoh_counter = 0
+
 
 async def botroom_check(message):
     room = await get_room(message)
