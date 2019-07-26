@@ -94,7 +94,8 @@ async def on_message(message):
 
 @bot.event
 async def on_command_error(ctx, error):
-    if isinstance(error, commands.CommandNotFound):
+    if isinstance(error, commands.CommandNotFound) and \
+       not ctx.message.startswith('!'):
         await ctx.send(messages.no_such_command)
     else:
         output = 'Ignoring exception in command {}:\n'.format(ctx.command)
