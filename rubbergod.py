@@ -14,7 +14,7 @@ config = config.Config
 messages = messages.Messages
 
 bot = commands.Bot(command_prefix=commands.when_mentioned_or(
-                                      config.command_prefix),
+                                      config.command_prefix, '!'),
                    help_command=None,
                    case_insensitive=True)
 
@@ -94,9 +94,10 @@ async def on_message(message):
 
 @bot.event
 async def on_command_error(ctx, error):
-    if isinstance(error, commands.CommandNotFound) and \
-       not ctx.message.startswith('!'):
-        await ctx.send(messages.no_such_command)
+    if isinstance(error, commands.CommandNotFound):
+        if not ctx.message.content.startswith('!'):
+            await ctx.send(messages.no_such_command)
+        return
     elif isinstance(error, commands.CommandOnCooldown):
         await ctx.send(messages.spamming.format(
             user=utils.generate_mention(ctx.author.id)
