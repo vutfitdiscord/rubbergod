@@ -319,7 +319,11 @@ async def god(ctx):
                               "560917571663298568/b93e8c1e93c2d18b"
                               "fbd226a0b614cf57.png?size=32")
 
-    await ctx.send(embed=embed)
+    channel = get_room(ctx.message)
+    if channel is not None and channel.id != config.bot_room:
+        await ctx.author.send(embed=embed)
+    else:
+        await ctx.send(embed=embed)
 
 
 @commands.cooldown(rate=5, per=20.0, type=commands.BucketType.user)
