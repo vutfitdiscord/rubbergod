@@ -87,8 +87,8 @@ class Verification(BaseFeature):
                 # VUT
                 # Check if the login we got is in the database
                 if self.repo.has_unverified_login(login):
-                    self.gen_code_and_send_mail(message, login,
-                                                "@stud.fit.vutbr.cz")
+                    await self.gen_code_and_send_mail(message, login,
+                                                      "@stud.fit.vutbr.cz")
                 else:
                     await message.channel.send(
                         Messages.verify_send_not_found
@@ -116,8 +116,8 @@ class Verification(BaseFeature):
                    self.repo.get_user(login, status=0) is None:
 
                     self.repo.add_user(login, "MUNI", status=1)
-                    self.gen_code_and_send_mail(message, login,
-                                                "@mail.muni.cz")
+                    await self.gen_code_and_send_mail(message, login,
+                                                      "@mail.muni.cz")
                 else:
                     await message.channel.send(
                         Messages.verify_send_not_found
