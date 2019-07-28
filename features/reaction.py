@@ -128,7 +128,7 @@ class Reaction(BaseFeature):
         # if the message has X or more 'pin' emojis pin the message
         if emoji == '📌':
             for reaction in message.reactions:
-                if reaction == '📌' and reaction.count >= Config.pin_count:
+                if reaction.emoji == '📌' and reaction.count >= Config.pin_count:
                     try:
                         await message.pin()
                     except discord.HTTPException:
