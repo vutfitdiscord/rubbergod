@@ -42,6 +42,25 @@ class Verification(BaseFeature):
             member = await guild.fetch_member(user.id)
             return utils.has_role(member, role_name)
 
+    async def gen_code_and_send_mail(self, message, login, mail_postfix):
+        # Generate a verification code
+        code = ''.join(random.choices(string.ascii_uppercase +
+                                      string.digits, k=20))
+
+        email_message = Config.command_prefix + "verify "
+        email_message += login + " " + code
+
+        self.send_mail(login + mail_postfix, email_message)
+
+        # Save the newly generated code into the database
+        self.repo.save_sent_code(login, code)
+
+        await message.channel.send(
+            Messages.verify_send_success
+            .format(user=utils.generate_mention(
+                message.author.id),
+                    mail=mail_postfix))
+
     async def send_code(self, message):
         if len(str(message.content).split(" ")) != 2:
             await message.channel.send(Messages.verify_send_format)
@@ -68,24 +87,8 @@ class Verification(BaseFeature):
                 # VUT
                 # Check if the login we got is in the database
                 if self.repo.has_unverified_login(login):
-                    # Generate a verification code
-                    code = ''.join(random.choices(string.ascii_uppercase +
-                                                  string.digits, k=20))
-
-                    email_message = Config.command_prefix + "verify "
-                    email_message += login + " " + code
-
-                    mail_postfix = "@stud.fit.vutbr.cz"
-                    self.send_mail(login + mail_postfix, email_message)
-
-                    # Save the newly generated code into the database
-                    self.repo.save_sent_code(login, code)
-
-                    await message.channel.send(
-                        Messages.verify_send_success
-                        .format(user=utils.generate_mention(
-                            message.author.id),
-                                mail=mail_postfix))
+                    self.gen_code_and_send_mail(message, login,
+                                                "@stud.fit.vutbr.cz")
                 else:
                     await message.channel.send(
                         Messages.verify_send_not_found
@@ -113,24 +116,8 @@ class Verification(BaseFeature):
                    self.repo.get_user(login, status=0) is None:
 
                     self.repo.add_user(login, "MUNI", status=1)
-                    # Generate a verification code
-                    code = ''.join(random.choices(string.ascii_uppercase +
-                                                  string.digits, k=20))
-
-                    email_message = Config.command_prefix + "verify "
-                    email_message += login + " " + code
-
-                    mail_postfix = "@mail.muni.cz"
-                    self.send_mail(login + mail_postfix, email_message)
-
-                    # Save the newly generated code into the database
-                    self.repo.save_sent_code(login, code)
-
-                    await message.channel.send(
-                        Messages.verify_send_success
-                        .format(user=utils.generate_mention(
-                            message.author.id),
-                                mail=mail_postfix))
+                    self.gen_code_and_send_mail(message, login,
+                                                "@mail.muni.cz")
                 else:
                     await message.channel.send(
                         Messages.verify_send_not_found
