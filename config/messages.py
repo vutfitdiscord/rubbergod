@@ -101,15 +101,22 @@ class Messages:
                             "prošel ({toaster} pls)."
     verify_verify_format = "Očekávám dva argumenty. " \
                            "Správný formát: " \
-                           "`" + prefix + "verify [FIT login nebo MUNI UCO] [kód]`\n" \
+                           "`" + prefix + "verify [FIT login nebo " \
+                           "MUNI UCO] [kód]`\n" \
                            "Pro získání kódu použij `" +\
-                           prefix + "getcode [FIT login, ve tvaru xlogin00, nebo MUNI UCO]`"
+                           prefix + "getcode [FIT login, ve tvaru " \
+                           "xlogin00, nebo MUNI UCO]`"
     verify_verify_dumbshit = "{user} Kód, " \
                              "který ti přišel na mail. {emote}"
     verify_verify_manual = "Čauec {user}, nechám {toaster}, " \
                            "aby to udělal manuálně, " \
                            "jsi shady (Year: {year})"
     verify_verify_success = "{user} Gratuluji, byl jsi verifikován!"
+    verify_post_verify_info = "Channely dobre navstivit po verifikaci:\n" \
+                              "<#591384273051975683> Pro pridani roli\n" \
+                              "<#489461089432633346> Pro pravidla " \
+                              "a dalsi info"
+
     verify_verify_not_found = "{user} Login nenalezen nebo " \
                               "jsi už tímhle krokem prošel " \
                               "({toaster} pls)."
@@ -140,4 +147,3 @@ class Messages:
                      'a jestli je sudý nebo lichý.'),
             ('uhoh', 'Vypíše počet uh ohs od spuštění.'),
             ('god', 'Vypíše tuto zprávu.')]
-

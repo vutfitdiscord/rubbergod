@@ -262,6 +262,9 @@ class Verification(BaseFeature):
                         message.author.id)
                     )
                 )
+                await member.send(
+                    Messages.verify_post_verify_info
+                )
             else:
                 await message.channel.send(
                     Messages.verify_verify_not_found
