@@ -41,6 +41,9 @@ class Config:
     vote_minimum = 20
     vote_minutes = 2
 
+    # Pin emoji count to pin
+    pin_count = 20
+
     # Special channel IDs
     log_channel_id = 597009137905303552
     vote_room = 461544375105749003
