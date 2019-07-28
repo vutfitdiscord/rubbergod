@@ -144,13 +144,13 @@ async def uhoh(ctx):
     await ctx.send(messages.uhoh_counter.format(uhohs=uhoh_counter))
 
 
-@commands.cooldown(rate=2, per=60.0, type=commands.BucketType.user)
+@commands.cooldown(rate=5, per=30.0, type=commands.BucketType.user)
 @bot.command()
 async def verify(ctx):
     await verification.verify(ctx.message)
 
 
-@commands.cooldown(rate=2, per=60.0, type=commands.BucketType.user)
+@commands.cooldown(rate=5, per=30.0, type=commands.BucketType.user)
 @bot.command()
 async def getcode(ctx):
     await verification.send_code(ctx.message)
