@@ -256,7 +256,7 @@ class Verification(BaseFeature):
                 self.repo.save_verified(login, message.author.name,
                                         message.author.id)
 
-                await message.channel.send(
+                await member.send(
                     Messages.verify_verify_success
                     .format(user=utils.generate_mention(
                         message.author.id)
@@ -265,6 +265,13 @@ class Verification(BaseFeature):
                 await member.send(
                     Messages.verify_post_verify_info
                 )
+                if message.channel.type is not discord.ChannelType.private:
+                    await message.channel.send(
+                        Messages.verify_verify_success
+                        .format(user=utils.generate_mention(
+                            message.author.id)
+                        )
+                    )
             else:
                 await message.channel.send(
                     Messages.verify_verify_not_found
