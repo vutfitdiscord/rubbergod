@@ -321,7 +321,11 @@ async def god(ctx):
 
     channel = await get_room(ctx.message)
     if channel is not None and channel.id != config.bot_room:
-        await ctx.author.send(embed=embed)
+        try:
+            await ctx.author.send(embed=embed)
+            await ctx.message.delete()
+        except discord.errors.Forbidden:
+            return
     else:
         await ctx.send(embed=embed)
 
