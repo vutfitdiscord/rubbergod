@@ -224,24 +224,22 @@ class Karma(BaseFeature):
                     msg.karma_give_negative_success
                 )
 
-    async def karma_get(self, message):
-        k = self.repo.get_karma(message.author.id, "get")
+    def karma_get(self, author):
+        k = self.repo.get_karma(author.id, "get")
 
-        await message.channel.send(msg.karma_own
-                                   .format(user=utils.generate_mention(
-                                       message.author.id),
-                                       karma=str(k[0]), pos=str(k[1])))
+        return msg.karma_own.format(user=utils.generate_mention(
+                                    author.id),
+                                    karma=str(k[0]), pos=str(k[1]))
 
-    async def karma_giving_get(self, message):
-        k = self.repo.get_karma(message.author.id, "give")
+    def karma_giving_get(self, author):
+        k = self.repo.get_karma(author.id, "give")
 
-        await message.channel.send(msg.karma_given
-                                   .format(user=utils.generate_mention(
-                                       message.author.id),
-                                       karma_pos=str(k[0]),
-                                       karma_pos_pos=str(k[2]),
-                                       karma_neg=str(k[1]),
-                                       karma_neg_pos=str(k[3])))
+        return msg.karma_given.format(user=utils.generate_mention(
+                                      author.id),
+                                      karma_pos=str(k[0]),
+                                      karma_pos_pos=str(k[2]),
+                                      karma_neg=str(k[1]),
+                                      karma_neg_pos=str(k[3]))
 
     async def leaderboard(self, channel, action, order):
         output = "\u200b\n==================\n "
