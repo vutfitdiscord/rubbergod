@@ -136,15 +136,13 @@ class KarmaRepository(BaseRepository):
             raise Exception('Nespravna databaze v get_karma_value')
 
     def get_karma_position(self, database, column, karma):
-        db = self.db
-        cursor = db.cursor()
+        cursor = self.cursor()
         cursor.execute("SELECT count(*) "
                        "FROM {} "
                        "WHERE {} > %s"
                        .format(database, column),
                        (str(karma),))
         row = cursor.fetchone()
-        db.close()
         return row[0] + 1
 
     def get_karma(self, member_id, action):
@@ -175,10 +173,8 @@ class KarmaRepository(BaseRepository):
             return karma[0], karma[1], order[0], order[1]
 
     def get_leaderboard(self, database, column, order):
-        db = self.db
-        cursor = db.cursor()
+        cursor = self.cursor()
         cursor.execute("SELECT * FROM {} ORDER BY {} {} LIMIT 10"
                        .format(database, column, order))
         leaderboard = cursor.fetchall()
-        db.close()
         return leaderboard
