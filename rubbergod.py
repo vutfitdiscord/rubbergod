@@ -202,22 +202,25 @@ async def pick_karma_command(ctx, *args):
 
     elif args[0] == "stalk":
         try:
-            target_member = await commands.MemberConverter.convert(
-                    ctx, ' '.join(args[1:]))
-        except commands.ConversionError:
+            converter = commands.MemberConverter()
+            target_member = await converter.convert(
+                    ctx=ctx, argument=' '.join(args[1:]))
+        except commands.errors.BadArgument:
             await ctx.send(
-                messages.karma_invalid_command
-                .format(utils.generate_mention(ctx.author.id)))
+                messages.karma_stalk_invalid_person
+                .format(user=utils.generate_mention(ctx.author.id)))
             return
-            output = utils.generate_mention(ctx.author.id)
-            output += "Karma of " + target_member.nick + " is:"
-            output += '\n'.join(karma.karma_get(target_member
-                                                ).split(':')[1:])
-            output += '\n'.join(karma.karma_giving_get(target_member
-                                                       ).split('\n')[1:])
 
-            ctx.send(output)
-            await botroom_check(ctx.message)
+        output = utils.generate_mention(ctx.author.id)
+        output += " Karma uzivatele `" + target_member.display_name + "` je:"
+        output += ''.join(karma.karma_get(target_member
+                                            ).split(':')[1:])
+        output += '\n'
+        output += '\n'.join(karma.karma_giving_get(target_member
+                                                   ).split('\n')[1:])
+
+        await ctx.send(output)
+        await botroom_check(ctx.message)
 
     elif args[0] == "get":
         if not await guild_check(ctx.message):
