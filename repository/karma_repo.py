@@ -1,5 +1,3 @@
-import mysql.connector
-
 import utils
 from repository.base_repository import BaseRepository
 
@@ -138,7 +136,7 @@ class KarmaRepository(BaseRepository):
             raise Exception('Nespravna databaze v get_karma_value')
 
     def get_karma_position(self, database, column, karma):
-        db = mysql.connector.connect(**self.config.connection)
+        db = self.db
         cursor = db.cursor()
         cursor.execute("SELECT count(*) "
                        "FROM {} "
@@ -177,7 +175,7 @@ class KarmaRepository(BaseRepository):
             return karma[0], karma[1], order[0], order[1]
 
     def get_leaderboard(self, database, column, order):
-        db = mysql.connector.connect(**self.config.connection)
+        db = self.db
         cursor = db.cursor()
         cursor.execute("SELECT * FROM {} ORDER BY {} {} LIMIT 10"
                        .format(database, column, order))
