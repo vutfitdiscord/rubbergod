@@ -165,20 +165,35 @@ class Karma(BaseFeature):
         message = ""
         errors = ""
 
-        for cnt, emoji in enumerate(emojis):
+        # Fetch all custom server emoji
+        # They will be saved in the guild.emojis list
+        await guild.fetch_emojis()
+
+        for cnt, emoji_id in enumerate(emojis):
             if cnt % 8 == 0 and cnt:
                 message += "\n"
 
             try:
-                emoji = await guild.fetch_emoji(int(emoji))
+                # Try and find the emoji in the server custom emoji list (match by id)
+                # if the current emoji_id is not an int, it's a unicode emoji,
+                # we'll handle that in the except ValueError part.
+                # If it is an int and it's not found in the emoji list, it will try to fetch
+                # it once again and as that will probably fail anyway, it'll jump to
+                # the discord.NotFound handler which will add it to the error message
+                emoji = next((x for x in guild.emojis if x.id == int(emoji_id)), None)
+                if emoji is None:
+                    emoji = await guild.fetch_emoji(int(emoji_id))
+
                 message += str(emoji)
-            except discord.NotFound:
-                errors += str(emoji) + ", "
+
             except ValueError:
-                if isinstance(emoji, bytearray):
-                    message += emoji.decode()
+                if isinstance(emoji_id, bytearray):
+                    message += emoji_id.decode()
                 else:
-                    message += str(emoji)
+                    message += str(emoji_id)
+
+            except discord.NotFound:
+                errors += str(emoji_id) + ", "
 
         return message, errors
 
