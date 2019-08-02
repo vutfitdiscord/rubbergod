@@ -220,15 +220,18 @@ async def pick_karma_command(ctx, *args):
                 .format(user=utils.generate_mention(ctx.author.id)))
             return
 
-        output = utils.generate_mention(ctx.author.id)
-        output += " Karma uzivatele `" + target_member.display_name + "` je:"
-        output += ''.join(karma.karma_get(target_member
-                                            ).split(':')[1:])
-        output += '\n'
-        output += '\n'.join(karma.karma_giving_get(target_member
-                                                   ).split('\n')[1:])
 
-        await ctx.send(output)
+        await ctx.send(
+            messages.karma_stalk.format(
+                user=utils.generate_mention(ctx.author.id),
+                target=target_member.display_name,
+                karma=''.join(karma.karma_get(target_member
+                                              ).split(':')[1:]),
+                karma_given='\n'.join(
+                    karma.karma_giving_get(target_member
+                                           ).split('\n')[1:])
+                )
+            )
         await botroom_check(ctx.message)
 
     elif args[0] == "get":

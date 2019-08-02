@@ -54,6 +54,8 @@ class Messages:
                                "ne {input}] [user(s)]` "
     karma_give_success = "Karma byla úspěšně přidaná."
     karma_give_negative_success = "Karma byla úspěšně odebraná."
+    karma_stalk = "{user} Karma uzivatele `{target}` je: {karma}\n" \
+                  "A rozdal:\n{karma_given}"
     karma_stalk_invalid_person = "{user} Nikoho takového jsem nenašel."
 
     role_add_denied = "{user}, na přidání role {role} nemáš právo."
