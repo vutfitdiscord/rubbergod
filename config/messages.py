@@ -14,6 +14,7 @@ class Messages:
                         "<#{}>\n"
 
     uhoh_counter = "{uhohs} uh ohs od spuštění."
+    uptime_message = "Uptime: {uptime}."
 
     karma_own = "{user}, tvoje karma je: **{karma}** (**{pos}.**)."
     karma_given = "{user}, rozdal jsi:\n" \
@@ -147,4 +148,5 @@ class Messages:
             ('week', 'Vypíše, kolikátý je zrovna týden '
                      'a jestli je sudý nebo lichý.'),
             ('uhoh', 'Vypíše počet uh ohs od spuštění.'),
+            ('uptime', 'Vypíše uplynulý čas od spuštění.'),
             ('god', 'Vypíše tuto zprávu.')]

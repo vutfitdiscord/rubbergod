@@ -33,6 +33,7 @@ presence = presence.Presence(bot)
 reaction = reaction.Reaction(bot, karma_r)
 
 arcas_time = datetime.datetime.utcnow() - datetime.timedelta(hours=1)
+boottime = datetime.datetime.utcnow()
 uhoh_counter = 0
 
 
@@ -142,6 +143,14 @@ async def on_typing(channel, user, when):
 @bot.command()
 async def uhoh(ctx):
     await ctx.send(messages.uhoh_counter.format(uhohs=uhoh_counter))
+
+
+@commands.cooldown(rate=2, per=20.0, type=commands.BucketType.user)
+@bot.command()
+async def uptime(ctx):
+    now = datetime.datetime.utcnow()
+    uptime = now - boottime
+    await ctx.send(messages.uptime_message.format(uptime=str(uptime)))
 
 
 @commands.cooldown(rate=5, per=30.0, type=commands.BucketType.user)
