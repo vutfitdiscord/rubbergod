@@ -25,7 +25,8 @@ class Config:
     }
 
     # Base bot behavior
-    command_prefix = '?'
+    command_prefix = ('?', '!')
+    default_prefix = '?'
 
     # Roll dice
     max_dice_at_once = 1000

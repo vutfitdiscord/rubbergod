@@ -14,7 +14,7 @@ config = config.Config
 messages = messages.Messages
 
 bot = commands.Bot(command_prefix=commands.when_mentioned_or(
-                                      config.command_prefix, '!'),
+                                      *config.command_prefix),
                    help_command=None,
                    case_insensitive=True)
 
@@ -330,7 +330,7 @@ async def god(ctx):
                           description="Nejlepší a nejúžasnější bot ever.",
                           color=0xeee657)
 
-    prefix = config.command_prefix
+    prefix = config.default_prefix
 
     embed.add_field(name="Autor", value="Toaster#1111")
 

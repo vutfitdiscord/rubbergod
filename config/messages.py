@@ -2,7 +2,7 @@ from config import config
 
 
 class Messages:
-    prefix = config.Config.command_prefix
+    prefix = config.Config.default_prefix
 
     server_warning = "Tohle funguje jen na VUT FIT serveru."
     toaster_pls = "Toaster pls, máš bordel v DB."
