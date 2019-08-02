@@ -181,9 +181,9 @@ async def week(ctx):
 
 @commands.cooldown(rate=5, per=20.0, type=commands.BucketType.user)
 @bot.command()
-async def pick(ctx):
+async def pick(ctx, *args):
     """"Pick an option"""
-    option = rng.pick_option(ctx.message)
+    option = rng.pick_option(' '.join(args))
     if option:
         await ctx.send("{} {}"
                        .format(option,

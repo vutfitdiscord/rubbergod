@@ -9,11 +9,10 @@ class Rng:
     @staticmethod
     def pick_option(message):
         """"Pick one option from message"""
-        msg = str(message.content)
-        if "?" not in msg:
-            return False
+        if "?" in message:
+            message = message.split('?', 1)[1]
 
-        options = msg[(msg.index("?") + 1):].split()
+        options = message.split()
         if len(options) > 0:
             return options[randint(0, len(options) - 1)]
         else:
