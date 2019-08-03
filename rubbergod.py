@@ -33,7 +33,7 @@ presence = presence.Presence(bot)
 reaction = reaction.Reaction(bot, karma_r)
 
 arcas_time = datetime.datetime.utcnow() - datetime.timedelta(hours=1)
-boottime = datetime.datetime.utcnow()
+boottime = datetime.datetime.now().replace(microsecond=0)
 uhoh_counter = 0
 
 
@@ -148,9 +148,9 @@ async def uhoh(ctx):
 @commands.cooldown(rate=2, per=20.0, type=commands.BucketType.user)
 @bot.command()
 async def uptime(ctx):
-    now = datetime.datetime.utcnow()
-    uptime = now - boottime
-    await ctx.send(messages.uptime_message.format(uptime=str(uptime)))
+    now = datetime.datetime.now().replace(microsecond=0)
+    delta = now - boottime
+    await ctx.send(messages.uptime_message.format(boottime=str(boottime),uptime=str(delta)))
 
 
 @commands.cooldown(rate=5, per=30.0, type=commands.BucketType.user)
