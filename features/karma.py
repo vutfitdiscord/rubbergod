@@ -257,29 +257,29 @@ class Karma(BaseFeature):
                                       karma_neg_pos=str(k[3]))
 
     async def leaderboard(self, channel, action, order):
-        output = "\u200b\n==================\n "
+        output = "> "
         if action == 'give':
             database = 'bot_karma_giving'
             if order == "DESC":
                 database_index = 1
                 column = 'positive'
-                output += "KARMA GIVINGBOARD \n"
+                output += "<:peepolove:562305740132450359> KARMA GIVINGBOARD <:peepolove:562305740132450359>\n"
             else:
                 database_index = 2
                 order = "DESC"
                 column = 'negative'
-                output += "KARMA ISHABOARD \n"
+                output += "<:ishaGrin:607293381646745621> KARMA ISHABOARD <:ishaGrin:607293381646745621>\n"
         elif action == 'get':
             database_index = 1
             database = 'bot_karma'
             column = 'karma'
             if order == "DESC":
-                output += "KARMA LEADERBOARD \n"
+                output += ":trophy: KARMA LEADERBOARD :trophy:\n"
             else:
-                output += "KARMA BAJKARBOARD \n"
+                output += "<:coolStoryArcasCZ:607292649501884456> KARMA BAJKARBOARD <:coolStoryArcasCZ:607292649501884456>\n"
         else:
             raise Exception('Action neni get/give')
-        output += "==================\n"
+        output += "> =======================\n"
 
         board = self.repo.get_leaderboard(database, column, order)
         guild = self.bot.get_guild(cfg.guild_id)
@@ -289,7 +289,7 @@ class Karma(BaseFeature):
             if username is None:
                 continue
             username = str(username.name)
-            line = '{} – {}: {} pts\n'.format(i, username,
+            line = '> {} – **{}**: {} pts\n'.format(i, username,
                                               user[database_index])
             output += line
 
