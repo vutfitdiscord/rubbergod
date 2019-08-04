@@ -174,13 +174,18 @@ class Karma(BaseFeature):
                 message += "\n"
 
             try:
-                # Try and find the emoji in the server custom emoji list (match by id)
-                # if the current emoji_id is not an int, it's a unicode emoji,
-                # we'll handle that in the except ValueError part.
-                # If it is an int and it's not found in the emoji list, it will try to fetch
-                # it once again and as that will probably fail anyway, it'll jump to
-                # the discord.NotFound handler which will add it to the error message
-                emoji = next((x for x in guild.emojis if x.id == int(emoji_id)), None)
+                # Try and find the emoji in the server custom emoji list
+                # (match by id) if the current emoji_id is not an int,
+                # it's a unicode emoji, we'll handle that in the except
+                # ValueError part. If it is an int and it's not found
+                # in the emoji list, it will try to fetch it once again
+                # and as that will probably fail anyway, it'll jump to
+                # the discord.NotFound handler which will add it to
+                # the error message
+                emoji = next(
+                        (x for x in guild.emojis if x.id == int(emoji_id)),
+                        None
+                        )
                 if emoji is None:
                     emoji = await guild.fetch_emoji(int(emoji_id))
 
@@ -263,20 +268,24 @@ class Karma(BaseFeature):
             if order == "DESC":
                 database_index = 1
                 column = 'positive'
-                output += "<:peepolove:562305740132450359> KARMA GIVINGBOARD <:peepolove:562305740132450359>\n"
+                emote = "<:peepolove:562305740132450359>"
+                output += emote + "KARMA GIVINGBOARD " + emote + "\n"
             else:
                 database_index = 2
                 order = "DESC"
                 column = 'negative'
-                output += "<:ishaGrin:607293381646745621> KARMA ISHABOARD <:ishaGrin:607293381646745621>\n"
+                emote = "<:ishaGrin:607293381646745621>"
+                output += emote + " KARMA ISHABOARD " + emote + "\n"
         elif action == 'get':
             database_index = 1
             database = 'bot_karma'
             column = 'karma'
             if order == "DESC":
-                output += ":trophy: KARMA LEADERBOARD :trophy:\n"
+                emote = ":trophy:"
+                output += emote + " KARMA LEADERBOARD " + emote + "\n"
             else:
-                output += "<:coolStoryArcasCZ:607292649501884456> KARMA BAJKARBOARD <:coolStoryArcasCZ:607292649501884456>\n"
+                emote = "<:coolStoryArcasCZ:607292649501884456>"
+                output += emote + " KARMA BAJKARBOARD " + emote + "\n"
         else:
             raise Exception('Action neni get/give')
         output += "> =======================\n"
@@ -290,7 +299,7 @@ class Karma(BaseFeature):
                 continue
             username = str(username.name)
             line = '> {} – **{}**: {} pts\n'.format(i, username,
-                                              user[database_index])
+                                                    user[database_index])
             output += line
 
         await channel.send(output)

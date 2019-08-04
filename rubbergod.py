@@ -152,7 +152,10 @@ async def uhoh(ctx):
 async def uptime(ctx):
     now = datetime.datetime.now().replace(microsecond=0)
     delta = now - boottime
-    await ctx.send(messages.uptime_message.format(boottime=str(boottime),uptime=str(delta)))
+    await ctx.send(
+            messages.uptime_message
+            .format(boottime=str(boottime), uptime=str(delta))
+            )
 
 
 @commands.cooldown(rate=5, per=30.0, type=commands.BucketType.user)
@@ -221,7 +224,6 @@ async def pick_karma_command(ctx, *args):
                 messages.karma_stalk_invalid_person
                 .format(user=utils.generate_mention(ctx.author.id)))
             return
-
 
         await ctx.send(
             messages.karma_stalk.format(

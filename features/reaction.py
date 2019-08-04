@@ -128,7 +128,8 @@ class Reaction(BaseFeature):
         # if the message has X or more 'pin' emojis pin the message
         if emoji == '📌':
             for reaction in message.reactions:
-                if reaction.emoji == '📌' and reaction.count >= Config.pin_count:
+                if reaction.emoji == '📌' and \
+                   reaction.count >= Config.pin_count:
                     try:
                         await message.pin()
                     except discord.HTTPException:
@@ -170,7 +171,8 @@ class Reaction(BaseFeature):
                 Config.karma_ban_role_id not in map(lambda x: x.id,
                                                     member.roles):
             if isinstance(emoji, str):
-                self.karma_repo.karma_emoji_remove(message.author, member, emoji)
+                self.karma_repo.karma_emoji_remove(message.author,
+                                                   member, emoji)
             else:
                 self.karma_repo.karma_emoji_remove(
                     message.author, member, emoji.id)
