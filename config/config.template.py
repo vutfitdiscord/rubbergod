@@ -79,3 +79,4 @@ class Config:
 
     # Arcas
     arcas_id = 140547421733126145
+    arcas_delay = 24

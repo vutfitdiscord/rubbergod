@@ -33,7 +33,8 @@ karma = karma.Karma(bot, karma_r)
 presence = presence.Presence(bot)
 reaction = reaction.Reaction(bot, karma_r)
 
-arcas_time = datetime.datetime.utcnow() - datetime.timedelta(hours=1)
+arcas_time = (datetime.datetime.utcnow() -
+              datetime.timedelta(hours=config.arcas_delay))
 boottime = datetime.datetime.now().replace(microsecond=0)
 uhoh_counter = 0
 
@@ -128,7 +129,7 @@ async def on_raw_reaction_remove(payload):
 @bot.event
 async def on_typing(channel, user, when):
     global arcas_time
-    if arcas_time + datetime.timedelta(hours=1) < when and \
+    if arcas_time + datetime.timedelta(hours=config.arcas_delay) < when and \
             config.arcas_id == user.id:
         arcas_time = when
         gif = discord.Embed()
