@@ -97,6 +97,9 @@ async def on_message(message):
 
 @bot.event
 async def on_command_error(ctx, error):
+    if isinstance(error, commands.BadArgument) and ctx.command.name == 'hug':
+        return
+
     if isinstance(error, commands.CommandNotFound):
         if not ctx.message.content.startswith('!'):
             await ctx.send(messages.no_such_command)
@@ -221,7 +224,7 @@ async def pick_karma_command(ctx, *args):
                     ctx=ctx, argument=' '.join(args[1:]))
         except commands.errors.BadArgument:
             await ctx.send(
-                messages.karma_stalk_invalid_person
+                messages.member_not_found
                 .format(user=utils.generate_mention(ctx.author.id)))
             return
 
@@ -377,15 +380,29 @@ async def diceroll(ctx, *, arg=""):
 
 @commands.cooldown(rate=5, per=20.0, type=commands.BucketType.user)
 @bot.command()
-async def hug(self, ctx, user: discord.Member, intensity: int = 0):
+async def hug(ctx, user: discord.Member = None, intensity: int = 0):
     """Because everyone likes hugs"""
+    if user is None:
+        user = ctx.author
+    elif user == bot.user:
+        await ctx.send("<:huggers:602823825880514561>")
+        return
 
     emojis = config.hug_emojis
 
+    user = discord.utils.escape_markdown(user.display_name)
     if 0 <= intensity < len(emojis):
-        await ctx.send(emojis[intensity] + f" **{user.display_name}**")
+        await ctx.send(emojis[intensity] + f" **{user}**")
     else:
-        await ctx.send(choice(emojis) + f" **{user.display_name}**")
+        await ctx.send(choice(emojis) + f" **{user}**")
+
+
+@hug.error
+async def hug_error(ctx, error):
+    if isinstance(error, commands.BadArgument):
+        await ctx.send(
+            messages.member_not_found
+            .format(user=utils.generate_mention(ctx.author.id)))
 
 
 bot.run(config.key)
