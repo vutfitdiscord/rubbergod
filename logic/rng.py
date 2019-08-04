@@ -1,5 +1,5 @@
 from datetime import date
-from random import randint
+from random import randint, choice
 
 import utils
 from config.messages import Messages
@@ -14,7 +14,7 @@ class Rng:
 
         options = message.split()
         if len(options) > 0:
-            return options[randint(0, len(options) - 1)]
+            return choice(options)
         else:
             return False
 
@@ -39,7 +39,7 @@ class Rng:
 
     @staticmethod
     def flip():
-        return "True" if randint(0, 1) else "False"
+        return choice(["True", "False"])
 
     @staticmethod
     def week():
