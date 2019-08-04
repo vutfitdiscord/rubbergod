@@ -1,5 +1,6 @@
 import datetime
 import traceback
+from random import choice
 
 import discord
 from discord.ext import commands
@@ -369,6 +370,19 @@ async def god(ctx):
 async def diceroll(ctx, *, arg=""):
     await ctx.send(roll_dice.roll_dice(arg))
     await botroom_check(ctx.message)
+
+
+@commands.cooldown(rate=5, per=20.0, type=commands.BucketType.user)
+@bot.command()
+async def hug(self, ctx, user: discord.Member, intensity: int = 0):
+    """Because everyone likes hugs"""
+
+    emojis = config.hug_emojis
+
+    if 0 <= intensity < len(emojis):
+        await ctx.send(emojis[intensity] + f" **{user.display_name}**")
+    else:
+        await ctx.send(choice(emojis) + f" **{user.display_name}**")
 
 
 bot.run(config.key)
