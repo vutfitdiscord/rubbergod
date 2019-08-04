@@ -274,7 +274,7 @@ class Karma(BaseFeature):
                 database_index = 2
                 order = "DESC"
                 column = 'negative'
-                emote = "<:ishaGrin:607293381646745621>"
+                emote = "<:ishaGrin:587959772301623297>"
                 output += emote + " KARMA ISHABOARD " + emote + "\n"
         elif action == 'get':
             database_index = 1
@@ -284,7 +284,7 @@ class Karma(BaseFeature):
                 emote = ":trophy:"
                 output += emote + " KARMA LEADERBOARD " + emote + "\n"
             else:
-                emote = "<:coolStoryArcasCZ:607292649501884456>"
+                emote = "<:coolStoryArcasCZ:489539455271829514>"
                 output += emote + " KARMA BAJKARBOARD " + emote + "\n"
         else:
             raise Exception('Action neni get/give')
