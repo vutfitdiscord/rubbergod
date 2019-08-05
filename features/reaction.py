@@ -6,6 +6,7 @@ from config.config import Config
 from config.messages import Messages
 from features.base_feature import BaseFeature
 from repository.karma_repo import KarmaRepository
+from emoji import UNICODE_EMOJI
 
 
 class Reaction(BaseFeature):
@@ -23,7 +24,7 @@ class Reaction(BaseFeature):
         output = []
         try:
             input_string = (input_string[input_string.index('\n') + 1:]
-                            .strip().split('\n'))
+                            .rstrip().split('\n'))
         except ValueError:
             await message.channel.send(
                 Messages.role_format
@@ -33,9 +34,9 @@ class Reaction(BaseFeature):
             )
             return output
         for line in input_string:
-            line = line.split()
-            if len(line) > 1:
-                line = [line[0], line[1]]
+            emojis = list(filter(lamda x: x in UNICODE_EMOJI or x[0] == '<', line.split()))
+            if len(emojis) > 1:
+                line = [line[:line.index(emojis[0])], emojis[0]]
                 output.append(line)
             else:
                 await message.channel.send(
