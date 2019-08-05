@@ -34,7 +34,7 @@ class Reaction(BaseFeature):
             )
             return output
         for line in input_string:
-            emojis = list(filter(lamda x: x in UNICODE_EMOJI or x[0] == '<', line.split()))
+            emojis = list(filter(lamda x: x[0] in UNICODE_EMOJI or x[0] == '<', line.split()))
             if len(emojis) > 1:
                 line = [line[:line.index(emojis[0])], emojis[0]]
                 output.append(line)
