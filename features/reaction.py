@@ -34,11 +34,11 @@ class Reaction(BaseFeature):
             )
             return output
         for line in input_string:
-            emojis = list(filter(lamda x: x[0] in UNICODE_EMOJI or x[0] == '<', line.split()))
-            if len(emojis) > 1:
-                line = [line[:line.index(emojis[0])], emojis[0]]
+            try:
+                emoji = next(filter(lamda x: x[0] in UNICODE_EMOJI or x[0] == '<', line.split()))
+                line = [line[:line.index(emojis)], emoji]
                 output.append(line)
-            else:
+            except:
                 await message.channel.send(
                     Messages.role_invalid_line
                     .format(user=utils.generate_mention(
