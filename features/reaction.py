@@ -35,8 +35,8 @@ class Reaction(BaseFeature):
             return output
         for line in input_string:
             try:
-                emoji = next(filter(lamda x: x[0] in UNICODE_EMOJI or x[0] == '<', line.split()))
-                line = [line[:line.index(emoji)], emoji]
+                emoji = next(filter(lambda x: x[0] in UNICODE_EMOJI or x[0] == '<', line.split()))
+                line = [line[:line.index(emoji) - 1], emoji]
                 output.append(line)
             except:
                 await message.channel.send(
