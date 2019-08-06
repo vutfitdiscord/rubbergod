@@ -14,6 +14,35 @@ class Reaction(BaseFeature):
         super().__init__(bot)
         self.karma_repo = karma_repository
 
+    def make_embed(self, page):
+        embed = discord.Embed(title="Rubbergod",
+                        description="Nejlepší a nejúžasnější bot ever.",
+                        color=0xeee657)
+
+        prefix = Config.default_prefix
+
+        embed.add_field(name="Autor", value="Toaster#1111") 
+
+        # Shows the number of servers the bot is member of.
+        embed.add_field(name="Počet serverů s touto instancí bota",
+                        value=f"{len(self.bot.guilds)}")
+
+        embed.add_field(name="\u200b", value="Příkazy:", inline=False)
+
+        info = Messages.info[page - 1]
+            
+        for command in info:
+            embed.add_field(name=prefix + command[0],
+                            value=command[1],
+                            inline=False)
+
+        embed.set_footer(text=f"Page {page} | Commit {utils.git_hash()}",
+                        icon_url="https://cdn.discordapp.com/avatars/"
+                                "560917571663298568/b93e8c1e93c2d18b"
+                                "fbd226a0b614cf57.png?size=32")
+        return embed
+
+
     # Returns list of role names and emotes that represent them
     async def get_join_role_data(self, message):
         input_string = message.content
@@ -114,6 +143,29 @@ class Reaction(BaseFeature):
                 users = [x for y in users for x in y]
                 if users.count(member) > 1:
                     await message.remove_reaction(emoji, member)
+        elif message.embeds and message.author == self.bot.user:
+            if emoji in ["⏪", "⏩"]:
+                page = int(message.embeds[0].footer.text[5])
+                info_len = len(Messages.info)
+                if emoji == "⏩":
+                    next_page = page + 1
+                    if next_page == info_len:
+                        await message.remove_reaction("⏩", self.bot.user)
+                    if next_page == 2:
+                        await message.add_reaction("⏪")                            
+                elif emoji == "⏪":
+                    next_page = page - 1
+                    if next_page == 1:
+                        await message.remove_reaction("⏪", self.bot.user)
+                    if next_page == info_len - 1:
+                        await message.add_reaction("⏩")
+                if next_page in range(1,info_len):
+                    embed = self.make_embed(next_page)
+                    await message.edit(embed=embed)
+            try:
+                await message.remove_reaction(emoji, member)
+            except:
+                pass 
         elif member.id != message.author.id and\
                 guild.id == Config.guild_id and\
                 message.channel.id not in \
