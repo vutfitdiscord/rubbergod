@@ -336,39 +336,18 @@ async def ishaboard(ctx):
 @commands.cooldown(rate=2, per=60.0, type=commands.BucketType.user)
 @bot.command()
 async def god(ctx):
-    embed = discord.Embed(title="Rubbergod",
-                          description="Nejlepší a nejúžasnější bot ever.",
-                          color=0xeee657)
-
-    prefix = config.default_prefix
-
-    embed.add_field(name="Autor", value="Toaster#1111")
-
-    # Shows the number of servers the bot is member of.
-    embed.add_field(name="Počet serverů s touto instancí bota",
-                    value=f"{len(bot.guilds)}")
-
-    embed.add_field(name="\u200b", value="Příkazy:", inline=False)
-
-    for command in messages.info:
-        embed.add_field(name=prefix + command[0],
-                        value=command[1],
-                        inline=False)
-
-    embed.set_footer(text=f"Commit {utils.git_hash()}",
-                     icon_url="https://cdn.discordapp.com/avatars/"
-                              "560917571663298568/b93e8c1e93c2d18b"
-                              "fbd226a0b614cf57.png?size=32")
+    embed = reaction.make_embed(1)
 
     channel = await get_room(ctx.message)
     if channel is not None and channel.id != config.bot_room:
         try:
-            await ctx.author.send(embed=embed)
+            msg = await ctx.author.send(embed=embed)
             await ctx.message.delete()
         except discord.errors.Forbidden:
             return
     else:
-        await ctx.send(embed=embed)
+        msg = await ctx.send(embed=embed)
+    await msg.add_reaction("⏩")
 
 
 @commands.cooldown(rate=5, per=20.0, type=commands.BucketType.user)
