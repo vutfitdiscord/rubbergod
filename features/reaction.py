@@ -160,7 +160,7 @@ class Reaction(BaseFeature):
                         await message.remove_reaction("⏪", self.bot.user)
                     if next_page == info_len - 1:
                         await message.add_reaction("⏩")
-                if next_page in range(1,info_len):
+                if 1 <= next_page <= info_len:
                     embed = self.make_embed(next_page)
                     await message.edit(embed=embed)
             try:
