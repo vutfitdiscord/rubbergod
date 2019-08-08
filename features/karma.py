@@ -81,15 +81,17 @@ class Karma(BaseFeature):
                         emojis))
 
                 if len(e) == 0:
+                    self.repo.set_emoji_value(server_emoji, 0)
                     vote_value = await self.emoji_process_vote(message.channel,
                                                                server_emoji)
-                    emoji = server_emoji
+                    emoji = server_emoji  # Save for use outside loop
                     break
         else:
             await message.channel.send(msg.karma_vote_allvoted)
             return
 
         if vote_value is None:
+            self.repo.remove_emoji(emoji)
             await message.channel.send(
                 msg.karma_vote_notpassed
                 .format(emote=str(emoji),
