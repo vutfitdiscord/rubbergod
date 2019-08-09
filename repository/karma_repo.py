@@ -1,6 +1,16 @@
 import utils
 from repository.base_repository import BaseRepository
 
+class Karma_row_data():
+    def __init__(self, value, position):
+        self.value = value
+        self.position = position
+
+class Karma_data():
+    def __init__(self, karma, positive, negative):
+        self.karma = karma
+        self.positive = positive
+        self.negative = negative
 
 class KarmaRepository(BaseRepository):
 
@@ -135,32 +145,34 @@ class KarmaRepository(BaseRepository):
         row = cursor.fetchone()
         return row[0] + 1
 
-    def get_karma(self, member_id, action):
-        if action == "get":
-            database = "bot_karma"
-        elif action == "give":
-            database = "bot_karma_giving"
+    def get_karma(self, member_id):
+        database = "bot_karma"
+        giving_database = "bot_karma_giving"
+
+        karma_value = self.get_karma_value(database, member_id)
+        giving = self.get_karma_value(giving_database, member_id)        
+
+        if karma_value is None:
+            karma_value = 0
+
+        order = self.get_karma_position(database, "karma", karma_value)
+
+        if giving is None:
+            pos_value = 0
+            neg_value = 0
         else:
-            raise Exception("Action není get/give")
+            pos_value = giving[0]
+            neg_value = giving[1]
 
-        karma = self.get_karma_value(database, member_id)
+        pos_order = self.get_karma_position(giving_database, "positive", pos_value)
+        neg_order = self.get_karma_position(giving_database, "negative", neg_value)
 
-        if action == "get":
-            if karma is None:
-                karma = 0
+        karma = Karma_row_data(karma_value,order)
+        positive = Karma_row_data(pos_value,pos_order)
+        negative = Karma_row_data(neg_value,neg_order)
 
-            order = self.get_karma_position(database, "karma", karma)
-            return karma, order
-
-        elif action == "give":
-            if karma is None:
-                karma = (0, 0)
-
-            order = (self.get_karma_position(database, "positive", karma[0]),
-                     self.get_karma_position(database, "negative", karma[1]))
-
-            # karma pos, karma neg, order pos, order neg
-            return karma[0], karma[1], order[0], order[1]
+        result = Karma_data(karma,positive,negative)
+        return result
 
     def get_leaderboard(self, database, column, order):
         cursor = self.cursor()
