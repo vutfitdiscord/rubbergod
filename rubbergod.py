@@ -347,7 +347,7 @@ async def god(ctx):
             return
     else:
         msg = await ctx.send(embed=embed)
-    await msg.add_reaction("⏩")
+    await msg.add_reaction("▶")
 
 
 @commands.cooldown(rate=5, per=20.0, type=commands.BucketType.user)
