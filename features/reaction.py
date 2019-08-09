@@ -144,7 +144,7 @@ class Reaction(BaseFeature):
                 users = [x for y in users for x in y]
                 if users.count(member) > 1:
                     await message.remove_reaction(emoji, member)
-        elif message.embeds and message.author == self.bot.user:
+        elif message.embeds and message.embeds[0].title == "Rubbergod":
             if emoji in ["⏪", "⏩"]:
                 page = int(message.embeds[0].footer.text[5])
                 info_len = len(Messages.info)
