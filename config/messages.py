@@ -16,12 +16,12 @@ class Messages:
     uhoh_counter = "{uhohs} uh ohs od spuštění."
     uptime_message = "Up since:  `{boottime}`\nUptime:\t`{uptime}`"
 
-    karma_own = "{user}, tvoje karma je: **{karma}** (**{pos}.**)."
-    karma_given = "{user}, rozdal jsi:\n" \
-                  "**{karma_pos}** pozitivní karmy " \
-                  "(**{karma_pos_pos}.**)\n" \
-                  "**{karma_neg}** negativní karmy " \
-                  "(**{karma_neg_pos}.**)"
+    karma = "{user} Karma uzivatele `{target}` je: **{karma}** " \
+            "(**{order}.**)\nA rozdal:\n" \
+            "**{karma_pos}** pozitivní karmy " \
+            "(**{karma_pos_order}.**)\n" \
+            "**{karma_neg}** negativní karmy " \
+            "(**{karma_neg_order}.**)"
 
     karma_invalid_command = "Neznámý karma příkaz."
     karma_vote_format = "Neočekávám argument. " \
@@ -54,8 +54,6 @@ class Messages:
                                "ne {input}] [user(s)]` "
     karma_give_success = "Karma byla úspěšně přidaná."
     karma_give_negative_success = "Karma byla úspěšně odebraná."
-    karma_stalk = "{user} Karma uzivatele `{target}` je: {karma}\n" \
-                  "A rozdal:\n{karma_given}"
     member_not_found = "{user} Nikoho takového jsem nenašel."
 
     role_add_denied = "{user}, na přidání role {role} nemáš právo."
@@ -126,9 +124,10 @@ class Messages:
                               "({toaster} pls)."
     verify_verify_wrong_code = "{user} Špatný kód."
 
-    info = [[('karma', 'Vypíše vaši karmu.'),
-             ('karma given',
-              'Vypíše, kolik pozitivní a negativní karmy jste rozdali.'),
+    info = [[('karma', 'Vypíše vaši karmu, kolik pozitivní a negativní karmy'
+                       ' jste rozdali.'),
+             ('karma stalk [user]', 'Vypíše karmu uživatele, kolik pozitivní '
+                                    'a negativní karmy rozdal.'),
              ('karma get',
               'Vypíše, které emoty mají hodnotu 1 a -1.'),
              ('karma get [emote]',

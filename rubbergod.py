@@ -228,17 +228,7 @@ async def pick_karma_command(ctx, *args):
                 .format(user=utils.generate_mention(ctx.author.id)))
             return
 
-        await ctx.send(
-            messages.karma_stalk.format(
-                user=utils.generate_mention(ctx.author.id),
-                target=target_member.display_name,
-                karma=''.join(karma.karma_get(target_member
-                                              ).split(':')[1:]),
-                karma_given='\n'.join(
-                    karma.karma_giving_get(target_member
-                                           ).split('\n')[1:])
-                )
-            )
+        await ctx.send(karma.karma_get(ctx.author, target_member))
         await botroom_check(ctx.message)
 
     elif args[0] == "get":
@@ -287,10 +277,6 @@ async def pick_karma_command(ctx, *args):
                     messages.vote_room_only
                     .format(room=discord.utils.get(ctx.guild.channels,
                                                    id=config.vote_room)))
-
-    elif args[0] == "given":
-        await ctx.send(karma.karma_giving_get(ctx.author))
-        await botroom_check(ctx.message)
 
     elif args[0] == "give":
         if ctx.author.id == config.admin_id:
