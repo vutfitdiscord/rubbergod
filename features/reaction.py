@@ -145,21 +145,21 @@ class Reaction(BaseFeature):
                 if users.count(member) > 1:
                     await message.remove_reaction(emoji, member)
         elif message.embeds and message.embeds[0].title == "Rubbergod":
-            if emoji in ["⏪", "⏩"]:
+            if emoji in ["◀", "▶"]:
                 page = int(message.embeds[0].footer.text[5])
                 info_len = len(Messages.info)
-                if emoji == "⏩":
+                if emoji == "▶":
                     next_page = page + 1
                     if next_page == info_len:
-                        await message.remove_reaction("⏩", self.bot.user)
+                        await message.remove_reaction("▶", self.bot.user)
                     if next_page == 2:
-                        await message.add_reaction("⏪")                            
-                elif emoji == "⏪":
+                        await message.add_reaction("◀")                            
+                elif emoji == "◀":
                     next_page = page - 1
                     if next_page == 1:
-                        await message.remove_reaction("⏪", self.bot.user)
+                        await message.remove_reaction("◀", self.bot.user)
                     if next_page == info_len - 1:
-                        await message.add_reaction("⏩")
+                        await message.add_reaction("▶")
                 if 1 <= next_page <= info_len:
                     embed = self.make_embed(next_page)
                     await message.edit(embed=embed)
