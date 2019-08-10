@@ -165,7 +165,7 @@ class Karma(BaseFeature):
 
     async def __make_emoji_list(self, guild, emojis):
         message = ""
-        errors = ""
+        broken_emoji = []
 
         # Fetch all custom server emoji
         # They will be saved in the guild.emojis list
@@ -200,29 +200,30 @@ class Karma(BaseFeature):
                     message += str(emoji_id)
 
             except discord.NotFound:
-                errors += str(emoji_id) + ", "
+                if isinstance(emoji_id, bytearray):
+                    broken_emoji.append(emoji_id.decode())
+                else:
+                    broken_emoji.append(str(emoji_id))
 
-        return message, errors
+        return message, ', '.join(broken_emoji)
 
     async def emoji_list_all_values(self, channel):
         errors = ""
-
-        pos_msg = await self.__make_emoji_list(channel.guild,
-                                               self.repo.get_positive_emojis())
-        neg_msg = await self.__make_emoji_list(channel.guild,
-                                               self.repo.get_negative_emojis())
-
-        errors += pos_msg[1] + neg_msg[1]
-
-        try:
-            await channel.send("Hodnota 1:\n" + pos_msg[0])
-            await channel.send("Hodnota -1:\n" + neg_msg[0])
-        except discord.errors.HTTPException:
-            pass  # TODO: error handling?
+        for value in ['1', '-1']:
+            emojis, error = await self.__make_emoji_list(
+                    channel.guild,
+                    self.repo.get_emojis_valued(value)
+                    )
+            errors += error
+            try:
+                await channel.send("Hodnota " + value + ":\n" + emojis)
+            except discord.errors.HTTPException:
+                pass  # TODO: error handling?
 
         if errors != "":
-            await self.log_channel.send("{}\n{}".format(msg.toaster_pls,
-                                                        errors))
+            channel = await self.bot.fetch_channel(cfg.log_channel_id)
+            await channel.send("{}\n{}".format(msg.toaster_pls,
+                                               errors))
 
     async def karma_give(self, message):
         input_string = message.content.split()

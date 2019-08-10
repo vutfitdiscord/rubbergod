@@ -7,20 +7,10 @@ class KarmaRepository(BaseRepository):
     def __init__(self):
         super().__init__()
 
-    def __get_emojis_val(self, val):
+    def get_emojis_valued(self, val):
         """Returns a list of ids of emojis with specified value"""
-        if val == "1" or val == "-1":
-            all_rows = self.get_all("bot_karma_emoji", "value", val)
-            return [row[0] for row in all_rows]
-        return []
-
-    def get_positive_emojis(self):
-        """Returns a list of all positive emojis' ids"""
-        return self.__get_emojis_val("1")
-
-    def get_negative_emojis(self):
-        """Returns a list of all negative emojis' ids"""
-        return self.__get_emojis_val("-1")
+        all_rows = self.get_all("bot_karma_emoji", "value", val)
+        return [row[0] for row in all_rows]
 
     def get_all_emojis(self):
         """Returns a list of (emoji_id, value) tuples."""
