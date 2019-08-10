@@ -299,7 +299,7 @@ class Karma(BaseFeature):
             username = guild.get_member(int(user[0]))
             if username is None:
                 continue
-            username = str(username.name)
+            username = discord.utils.escape_markdown(username.display_name)
             line = '> {} – **{}**: {} pts\n'.format(i, username,
                                                     user[database_index])
             output += line
