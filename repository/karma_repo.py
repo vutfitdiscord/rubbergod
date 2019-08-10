@@ -51,7 +51,7 @@ class KarmaRepository(BaseRepository):
     def remove_emoji(self, emoji_id):
         cursor = self.cursor()
         cursor.execute('DELETE FROM bot_karma_emoji '
-                       'WHERE emoji_id = %s',
+                       'WHERE emoji_id = \'%s\'',
                        (utils.str_emoji_id(emoji_id),))
         self.db.commit()
 
