@@ -124,6 +124,9 @@ class Messages:
                               "({toaster} pls)."
     verify_verify_wrong_code = "{user} Špatný kód."
 
+    vote_format = "Použití vote:\n`" + prefix + "vote [otázka]\n[emoji] [odpověď 1]\n[emoji] [odpověď 2]\na tak dále`"
+    vote_not_emoji = "{not_emoji} není emoji. <:sadcat:576171980118687754>"
+
     info = [[('karma', 'Vypíše vaši karmu, kolik pozitivní a negativní karmy'
                        ' jste rozdali.'),
              ('karma stalk [user]', 'Vypíše karmu uživatele, kolik pozitivní '

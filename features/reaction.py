@@ -5,15 +5,17 @@ import utils
 from config.config import Config
 from config.messages import Messages
 from features.base_feature import BaseFeature
+from features.vote import Vote
 from repository.karma_repo import KarmaRepository
 from emoji import UNICODE_EMOJI
 
 
 class Reaction(BaseFeature):
 
-    def __init__(self, bot: Bot, karma_repository: KarmaRepository):
+    def __init__(self, bot: Bot, karma_repository: KarmaRepository, voter: Vote):
         super().__init__(bot)
         self.karma_repo = karma_repository
+        self.voter = voter
 
     def make_embed(self, page):
         embed = discord.Embed(title="Rubbergod",
@@ -42,7 +44,6 @@ class Reaction(BaseFeature):
                                 "560917571663298568/b93e8c1e93c2d18b"
                                 "fbd226a0b614cf57.png?size=32")
         return embed
-
 
     # Returns list of role names and emotes that represent them
     async def get_join_role_data(self, message):
@@ -144,6 +145,8 @@ class Reaction(BaseFeature):
                 users = [x for y in users for x in y]
                 if users.count(member) > 1:
                     await message.remove_reaction(emoji, member)
+        elif message.content[1:].startswith("vote") and message.content[0] in Config.command_prefix:
+            await self.voter.handle_reaction(message)
         elif message.embeds and message.embeds[0].title == "Rubbergod":
             if emoji in ["◀", "▶"]:
                 page = int(message.embeds[0].footer.text[5])

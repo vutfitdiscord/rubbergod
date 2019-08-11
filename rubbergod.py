@@ -7,7 +7,7 @@ from discord.ext import commands
 
 import utils
 from config import config, messages
-from features import (karma, presence, verification, reaction)
+from features import (karma, presence, verification, reaction, vote)
 from logic import roll_dice, rng
 from repository import (karma_repo, user_repo)
 
@@ -31,7 +31,8 @@ rng = rng.Rng()
 verification = verification.Verification(bot, user_r)
 karma = karma.Karma(bot, karma_r)
 presence = presence.Presence(bot)
-reaction = reaction.Reaction(bot, karma_r)
+voter = vote.Vote(bot)
+reaction = reaction.Reaction(bot, karma_r, voter)
 
 arcas_time = (datetime.datetime.utcnow() -
               datetime.timedelta(hours=config.arcas_delay))
@@ -368,6 +369,12 @@ async def hug_error(ctx, error):
         await ctx.send(
             messages.member_not_found
             .format(user=utils.generate_mention(ctx.author.id)))
+
+
+@commands.cooldown(rate=5, per=20.0, type=commands.BucketType.user)
+@bot.command()
+async def vote(ctx):
+    await voter.handle_vote(ctx)
 
 
 bot.run(config.key)
