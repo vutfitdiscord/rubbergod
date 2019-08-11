@@ -118,6 +118,9 @@ class Reaction(BaseFeature):
         if member is None or message is None or member.bot:
             return
 
+        if message.content[1:].startswith("vote") and message.content[0] in Config.command_prefix:
+            await self.voter.handle_reaction(message)
+
         if payload.emoji.is_custom_emoji():
             emoji = self.bot.get_emoji(payload.emoji.id)
             if emoji is None:
@@ -145,8 +148,6 @@ class Reaction(BaseFeature):
                 users = [x for y in users for x in y]
                 if users.count(member) > 1:
                     await message.remove_reaction(emoji, member)
-        elif message.content[1:].startswith("vote") and message.content[0] in Config.command_prefix:
-            await self.voter.handle_reaction(message)
         elif message.embeds and message.embeds[0].title == "Rubbergod":
             if emoji in ["◀", "▶"]:
                 page = int(message.embeds[0].footer.text[5])
@@ -205,6 +206,9 @@ class Reaction(BaseFeature):
         message = await channel.fetch_message(payload.message_id)
         if member is None or message is None or member.bot:
             return
+
+        if message.content[1:].startswith("vote") and message.content[0] in Config.command_prefix:
+            await self.voter.handle_reaction(message)
 
         if payload.emoji.is_custom_emoji():
             emoji = self.bot.get_emoji(payload.emoji.id)

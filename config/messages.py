@@ -127,6 +127,10 @@ class Messages:
     vote_format = "Použití vote:\n`" + prefix + "vote [otázka]\n[emoji] [odpověď 1]\n[emoji] [odpověď 2]\na tak dále`"
     vote_not_emoji = "{not_emoji} není emoji. <:sadcat:576171980118687754>"
 
+    vote_winning = "Vyhrává možnost {winning_emoji} „{winning_option}“ s {votes} hlasy."
+    vote_winning_multiple = "Vyhrávají možnosti {winning_emojis} s {votes} hlasy."
+    vote_none = "Čekám na hlasy."
+
     info = [[('karma', 'Vypíše vaši karmu, kolik pozitivní a negativní karmy'
                        ' jste rozdali.'),
              ('karma stalk [user]', 'Vypíše karmu uživatele, kolik pozitivní '
