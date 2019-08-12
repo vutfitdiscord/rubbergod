@@ -124,6 +124,8 @@ class Messages:
                               "({toaster} pls)."
     verify_verify_wrong_code = "{user} Špatný kód."
 
+    pr_meme = "https://github.com/Toaster192/rubbergod/pulls"
+
     info = [[('karma', 'Vypíše vaši karmu, kolik pozitivní a negativní karmy'
                        ' jste rozdali.'),
              ('karma stalk [user]', 'Vypíše karmu uživatele, kolik pozitivní '

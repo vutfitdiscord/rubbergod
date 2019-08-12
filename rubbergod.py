@@ -88,6 +88,8 @@ async def on_message(message):
     if message.content.startswith(config.role_string):
         role_data = await reaction.get_join_role_data(message)
         await reaction.message_role_reactions(message, role_data)
+    elif message.content == "PR":
+        await message.channel.send(messages.pr_meme)
     elif message.content.lower() == "uh oh":
         await message.channel.send("uh oh")
         uhoh_counter += 1
