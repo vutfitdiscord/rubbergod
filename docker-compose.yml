@@ -1,0 +1,15 @@
+version: '3.7'
+
+services:
+    db:
+        image: postgres:12-alpine
+        volumes:
+            - postgres_data:/var/lib/postgresql/data/
+    bot:
+        build: .
+        command: python rubbergod.py
+        depends_on:
+            - db
+
+volumes:
+    postgres_data:
