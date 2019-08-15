@@ -1,7 +1,5 @@
-import mysql.connector
-from mysql.connector.cursor import MySQLCursor
-
 from config import config, messages
+from sqlalchemy import create_engine
 
 
 class BaseRepository:
@@ -9,18 +7,18 @@ class BaseRepository:
     def __init__(self):
         self.config = config.Config
         self.messages = messages.Messages
-        self.db = mysql.connector.connect(**self.config.connection)
+        self.db = create_engine(config.Config.db_string)
 
     def cursor(self):
-        if not self.db.is_connected():
-            self.db = mysql.connector.connect(**self.config.connection)
+        # if not self.db.is_connected():
+            # self.db = mysql.connector.connect(**self.config.connection)
 
         return self.db.cursor()
 
-    def query(self, sql: str, *args, **kwargs) -> MySQLCursor:
-        cursor = self.cursor()
-        cursor.execute(sql, *args, **kwargs)
-        return cursor
+    # def query(self, sql: str, *args, **kwargs) -> MySQLCursor:
+    #     cursor = self.cursor()
+    #     cursor.execute(sql, *args, **kwargs)
+    #     return cursor
 
     def get_all(self, table: str, where: str = None, value: str = None):
         if where:
