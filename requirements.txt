@@ -2,3 +2,4 @@ discord
 emoji
 gitpython
 sqlalchemy
+psycopg2

@@ -12,17 +12,7 @@ class Config:
     email_pass = ''
 
     # Database
-    connection = {
-        'user': 'root',
-        'password': '',
-        'host': '127.0.0.1',
-        'database': 'rubbergod',
-        'port': '',
-        'raise_on_warnings': True,
-        'use_pure': False,
-        'charset': 'utf8mb4',
-        'collation': 'utf8mb4_unicode_ci',
-    }
+    db_string = "postgres://admin:admin@0.0.0.0:15813/rubbergod"
 
     # Base bot behavior
     command_prefix = ('?', '!')
