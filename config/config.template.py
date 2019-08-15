@@ -12,7 +12,7 @@ class Config:
     email_pass = ''
 
     # Database
-    db_string = "postgres://admin:admin@0.0.0.0:15813/rubbergod"
+    db_string = "postgres://postgres:postgres@db:5432/postgres"
 
     # Base bot behavior
     command_prefix = ('?', '!')

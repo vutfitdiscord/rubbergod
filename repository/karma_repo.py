@@ -1,16 +1,19 @@
 import utils
 from repository.base_repository import BaseRepository
 
+
 class Karma_row_data():
     def __init__(self, value, position):
         self.value = value
         self.position = position
+
 
 class Karma_data():
     def __init__(self, karma, positive, negative):
         self.karma = karma
         self.positive = positive
         self.negative = negative
+
 
 class KarmaRepository(BaseRepository):
 
