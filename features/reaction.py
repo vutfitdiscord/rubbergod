@@ -1,3 +1,4 @@
+import datetime
 import discord
 from discord.ext.commands import Bot
 
@@ -182,7 +183,25 @@ class Reaction(BaseFeature):
         if emoji == '📌':
             for reaction in message.reactions:
                 if reaction.emoji == '📌' and \
-                   reaction.count >= Config.pin_count:
+                   reaction.count >= Config.pin_count and \
+                   message.pinned == False:
+                    embed = discord.Embed(title="📌 Auto pin message log",
+                        color=0xeee657)
+                    users = await reaction.users().flatten()
+                    users_name = ''
+                    for user in users:
+                        users_name += user.name + ', '
+                    users_name = users_name[:-2]
+                    message_link = Messages.message_link_prefix \
+                                 + str(message.channel.id) + '/'\
+                                 + str(message.id)
+                    embed.add_field(name="Users", value=users_name)
+                    embed.add_field(name="In channel",value=message.channel)
+                    embed.add_field(name="Message",
+                                    value=message_link, inline=False)
+                    embed.set_footer(text=datetime.datetime.now().replace(microsecond=0))
+                    channel = self.bot.get_channel(log_channel_id)
+                    await channel.send(embed=embed)
                     try:
                         await message.pin()
                     except discord.HTTPException:
