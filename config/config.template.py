@@ -46,13 +46,14 @@ class Config:
     pin_count = 20
 
     # Special channel IDs
-    log_channel_id = 597009137905303552
+    log_channel = 531058805233156096
+    bot_dev_channel = 597009137905303552
     vote_room = 461544375105749003
     bot_room = 461549842896781312
 
     allowed_channels = [
             bot_room,
-            log_channel_id
+            bot_dev_channel
     ]
 
     # String constants

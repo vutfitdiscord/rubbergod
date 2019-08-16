@@ -221,7 +221,7 @@ class Karma(BaseFeature):
                 pass  # TODO: error handling?
 
         if errors != "":
-            channel = await self.bot.fetch_channel(cfg.log_channel_id)
+            channel = await self.bot.fetch_channel(cfg.bot_dev_channel)
             await channel.send("{}\n{}".format(msg.toaster_pls,
                                                errors))
 

@@ -188,19 +188,16 @@ class Reaction(BaseFeature):
                     embed = discord.Embed(title="📌 Auto pin message log",
                         color=0xeee657)
                     users = await reaction.users().flatten()
-                    users_name = ''
-                    for user in users:
-                        users_name += user.name + ', '
-                    users_name = users_name[:-2]
+                    user_names = ', '.join([user.name for user in users])
                     message_link = Messages.message_link_prefix \
                                  + str(message.channel.id) + '/'\
                                  + str(message.id)
-                    embed.add_field(name="Users", value=users_name)
+                    embed.add_field(name="Users", value=user_names)
                     embed.add_field(name="In channel",value=message.channel)
                     embed.add_field(name="Message",
                                     value=message_link, inline=False)
                     embed.set_footer(text=datetime.datetime.now().replace(microsecond=0))
-                    channel = self.bot.get_channel(log_channel_id)
+                    channel = self.bot.get_channel(Config.log_channel)
                     await channel.send(embed=embed)
                     try:
                         await message.pin()

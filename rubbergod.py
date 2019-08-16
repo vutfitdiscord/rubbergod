@@ -115,7 +115,7 @@ async def on_command_error(ctx, error):
         output += ''.join(traceback.format_exception(type(error),
                                                      error,
                                                      error.__traceback__))
-        channel = bot.get_channel(config.log_channel_id)
+        channel = bot.get_channel(config.bot_dev_channel)
         print(output)
         if channel is not None:
             await channel.send("```\n" + output + "\n```")
