@@ -64,7 +64,8 @@ class Reaction(BaseFeature):
             return output
         for line in input_string:
             try:
-                emoji = next(filter(lambda x: x[0] in UNICODE_EMOJI or x[0] == '<', line.split()))
+                emoji = next(filter(lambda x: x[0] in UNICODE_EMOJI or \
+                        (x[0] == '<' and x[1]== ':'), line.split()))
                 line = [line[:line.index(emoji) - 1], emoji]
                 output.append(line)
             except:
@@ -75,6 +76,20 @@ class Reaction(BaseFeature):
                         line=line[0]
                     )
                 )
+        for line in output:
+            if "<#" in line[0]:
+                line[0] = line[0].replace("<#", "")
+                line[0] = line[0].replace(">", "")
+                try:
+                    line[0] = int(line[0])
+                except:
+                    await message.channel.send(
+                        Messages.role_invalid_line
+                        .format(user=utils.generate_mention(
+                            message.author.id),
+                            line=line[0]
+                        )
+                    )
         return output
 
     # Adds reactions to message
@@ -85,8 +100,8 @@ class Reaction(BaseFeature):
         else:
             guild = message.guild
         for line in data:
-            if (discord.utils.get(guild.roles,
-                                  name=line[0]) is None):
+            if ((discord.utils.get(guild.roles,name=line[0]) is None) and
+                (discord.utils.get(guild.channels,id=line[0]) is None)):
                 await message.channel.send(
                     Messages.role_not_role
                     .format(user=utils.generate_mention(
@@ -231,9 +246,9 @@ class Reaction(BaseFeature):
                     message.author, member, emoji.id)
 
     # Adds a role for user based on reaction
-    async def add_role_on_reaction(self, role, member, channel, guild):
+    async def add_role_on_reaction(self, target, member, channel, guild):
         role = discord.utils.get(guild.roles,
-                                 name=role)
+                                 name=target)
         max_role = discord.utils.get(guild.roles,
                                      name="Rubbergod")
         if role is not None:
@@ -243,11 +258,15 @@ class Reaction(BaseFeature):
                 await channel.send(Messages.role_add_denied
                                    .format(user=utils.generate_mention(
                                        member.id), role=role.name))
+        else:
+            channel = discord.utils.get(guild.channels,id=target)
+            await channel.set_permissions(member,read_messages=True, 
+                                                 send_messages=True)
 
     # Removes a role for user based on reaction
-    async def remove_role_on_reaction(self, role, member, channel, guild):
+    async def remove_role_on_reaction(self, target, member, channel, guild):
         role = discord.utils.get(guild.roles,
-                                 name=role)
+                                 name=target)
         max_role = discord.utils.get(guild.roles,
                                      name="Rubbergod")
         if role is not None:
@@ -262,3 +281,7 @@ class Reaction(BaseFeature):
                             role=role.name
                         )
                     )
+        else:
+            channel = discord.utils.get(guild.channels,id=target)
+            await channel.set_permissions(member,read_messages=None, 
+                                                 send_messages=None)
