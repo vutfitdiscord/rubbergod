@@ -51,18 +51,9 @@ def load_dump():
             values = values.replace('(', '').replace(')', '')
             values = values.split(',')
             for i in range(0, len(values), 4):
-                found = [karma for karma in karma_values
-                         if karma.member_ID == values[i]]
-                if found == []:
-                    karma_values.append(Karma(member_ID=values[i],
-                                              karma=0,
-                                              positive=values[i + 1],
-                                              negative=values[i + 2]))
-                elif len(found) == 1:
-                    found[0].positive = values[i + 1]
-                    found[0].negative = values[i + 2]
-                else:
-                    raise Exception("what the fuck is going on here")
+                karma_values.append(Karma(member_ID=values[i],
+                                          positive=values[i + 1],
+                                          negative=values[i + 2]))
         elif insert.startswith("INSERT INTO `bot_karma_emoji`"):
             values = values[1:-2].replace('\'', '')
             values = values.replace('(', '').replace(')', '')
@@ -91,7 +82,7 @@ def load_dump():
                                          status=values[i + 4]))
 
     for karma in karma_values:
-        session.add(karma)
+        session.merge(karma)
 
     session.commit()
 

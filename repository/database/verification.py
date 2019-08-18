@@ -16,4 +16,4 @@ class Valid_person(database.base):
     name = Column(String)
     year = Column(String)
     code = Column(String)
-    status = Column(Integer)
+    status = Column(Integer, default=1)

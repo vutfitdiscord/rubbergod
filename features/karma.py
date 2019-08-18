@@ -9,6 +9,7 @@ import utils
 from config import config, messages
 from features.base_feature import BaseFeature
 from repository.karma_repo import KarmaRepository
+from repository.database.karma import Karma as Database_karma
 
 cfg = config.Config
 msg = messages.Messages
@@ -261,37 +262,34 @@ class Karma(BaseFeature):
                                 karma_neg=k.negative.value,
                                 karma_neg_order=k.negative.position)
 
-
     async def leaderboard(self, channel, action, order):
         output = "> "
         if action == 'give':
-            database = 'bot_karma_giving'
             if order == "DESC":
-                database_index = 1
                 column = 'positive'
+                attribute = Database_karma.positive
                 emote = "<:peepolove:562305740132450359>"
                 output += emote + "KARMA GIVINGBOARD " + emote + "\n"
             else:
-                database_index = 2
-                order = "DESC"
                 column = 'negative'
+                attribute = Database_karma.negative
                 emote = "<:ishaGrin:587959772301623297>"
                 output += emote + " KARMA ISHABOARD " + emote + "\n"
         elif action == 'get':
-            database_index = 1
-            database = 'bot_karma'
             column = 'karma'
             if order == "DESC":
+                attribute = Database_karma.karma.desc()
                 emote = ":trophy:"
                 output += emote + " KARMA LEADERBOARD " + emote + "\n"
             else:
+                attribute = Database_karma.karma
                 emote = "<:coolStoryArcasCZ:489539455271829514>"
                 output += emote + " KARMA BAJKARBOARD " + emote + "\n"
         else:
             raise Exception('Action neni get/give')
         output += "> =======================\n"
 
-        board = self.repo.get_leaderboard(database, column, order)
+        board = self.repo.get_leaderboard(attribute)
         guild = self.bot.get_guild(cfg.guild_id)
 
         for i, user in enumerate(board, 1):
@@ -300,7 +298,7 @@ class Karma(BaseFeature):
                 continue
             username = discord.utils.escape_markdown(username.display_name)
             line = '> {} – **{}**: {} pts\n'.format(i, username,
-                                                    user[database_index])
+                                                    getattr(user, column))
             output += line
 
         await channel.send(output)

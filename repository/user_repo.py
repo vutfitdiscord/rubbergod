@@ -1,62 +1,48 @@
 from repository.base_repository import BaseRepository
+from repository.database import session
+from repository.database.verification import Permit, Valid_person
 
 
 class UserRepository(BaseRepository):
     # Status 0 = verified
     # Status 1 = unverified
-    # Status 2 = in process of verification
+    # Status 2 = in process of verification (code sent)
 
     def save_sent_code(self, login: str, code: str):
         """Updates a specified login with a new verification code"""
-
-        cursor = self.cursor()
-        cursor.execute('UPDATE bot_valid_persons SET status=%s, code=%s '
-                       'WHERE login=%s', (2, code, login))
-        self.db.commit()
-        cursor.close()
+        person = session.query(Valid_person).\
+            filter(Valid_person.login == login).one_or_none()
+        person.code = code
+        person.status = 2
+        session.commit()
 
     def save_verified(self, login: str, discord_name: str, discord_id: str):
         """"Inserts login with discord name into database"""
-        cursor = self.cursor()
+        session.add(Permit(login=login, discord_name=discord_name,
+                           discord_id=discord_id))
 
-        cursor.execute('INSERT INTO bot_permit '
-                       '(login, discord_name, discord_id) '
-                       'VALUES (%s, %s, %s)',
-                       (login, discord_name, discord_id))
+        person = session.query(Valid_person).\
+            filter(Valid_person.login == login).one_or_none()
+        person.status = 0
 
-        cursor.execute('UPDATE bot_valid_persons SET status=0 '
-                       'WHERE login=%s', (login,))
-        self.db.commit()
-        cursor.close()
+        session.commit()
 
     def has_unverified_login(self, login: str):
         """"Checks if there's a login """
-        cursor = self.cursor()
-        cursor.execute('SELECT * FROM bot_valid_persons WHERE `login`=%s '
-                       'AND status = 1', (login,))
-        cursor.fetchall()
-        rc = cursor.rowcount
-        cursor.close()
-        return rc
+        query = session.query(Valid_person).\
+            filter(Valid_person.login == login and Valid_person.status == 1).\
+            one_or_none()
+        return True if query is not None else False
 
     def get_user(self, login: str, status: int = 2):
         """"Finds login from database"""
-
-        cursor = self.cursor()
-        cursor.execute(
-            'SELECT login, year, code FROM bot_valid_persons WHERE `login`=%s '
-            'AND status = %s', (login, status))
-        login = cursor.fetchone()
-        cursor.close()
-        return login
+        user = session.query(Valid_person).\
+            filter(Valid_person.login == login and
+                   Valid_person.status == status).\
+            one_or_none()
+        return user
 
     def add_user(self, login: str, year: str, status: int = 1):
         """"Finds login from database"""
-
-        cursor = self.cursor()
-        cursor.execute(
-            'INSERT INTO bot_valid_persons(login, year, status) VALUES'
-            '(%s, %s, %s)', (login, year, status))
-        cursor.fetchone()
-        cursor.close()
-        return
+        session.add(Valid_person(login=login, year=year, status=status))
+        session.commit()
