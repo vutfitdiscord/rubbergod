@@ -9,7 +9,7 @@ wouldn't recommend using it for different servers.
 ## Installing and running the bot
 
 Prerequisites:
-* Mysql #TODO
+* Postgresql
 * Python3.6+
 
 Start by cloning the repo:
@@ -33,17 +33,25 @@ python3 rubbergod.py
 #### Required/recommended packages (apt)
 
 ```
+git
 python3.7
 python3.7-dev
 python3-pip
-mysql-server #TODO
-libmysqlclient-dev
+postgresql
+postgresql-contrib
+libpq-dev
 ```
 
 ## Docker compose setup
 
-Install `docker-compose` for your system (will vary from system to system)
+Install `docker` and `docker-compose` for your system (will vary from system to system)
 and run `docker` (`systemctl start docker.service`)
+
+```
+docker build .
+```
+
+and then everytime you want to run the app
 
 ```
 docker-compose down && docker-compose up --build
