@@ -42,7 +42,8 @@ class KarmaRepository(BaseRepository):
         """Returns the value of an emoji.
         If the emoji has not been voted for, returns None."""
         emoji = session.query(Karma_emoji).\
-            filter(Karma_emoji.emoji_ID == utils.str_emoji_id(emoji_id))
+            filter(Karma_emoji.emoji_ID == utils.str_emoji_id(emoji_id)).\
+            one_or_none()
         return emoji.value if emoji else None
 
     def set_emoji_value(self, emoji_id, value: int):

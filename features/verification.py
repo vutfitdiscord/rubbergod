@@ -214,7 +214,7 @@ class Verification(BaseFeature):
 
             if new_user is not None:
                 # Check the code
-                if code != new_user[2]:
+                if code != new_user.code:
                     await message.channel.send(
                             Messages.verify_verify_wrong_code
                             .format(user=utils.generate_mention(
@@ -222,7 +222,7 @@ class Verification(BaseFeature):
                     return
 
                 # Try and transform the year into the role name
-                year = self.transform_year(new_user[1])
+                year = self.transform_year(new_user.year)
 
                 if year is None:
                     await message.channel.send(
@@ -231,7 +231,7 @@ class Verification(BaseFeature):
                             message.author.id),
                             toaster=utils.generate_mention(
                             Config.admin_id),
-                            year=str(new_user[1])))
+                            year=str(new_user.year)))
                     return
 
                 try:
@@ -253,8 +253,7 @@ class Verification(BaseFeature):
                 await member.add_roles(verify)
                 await member.add_roles(year)
 
-                self.repo.save_verified(login, message.author.name,
-                                        message.author.id)
+                self.repo.save_verified(login, message.author.id)
 
                 await member.send(
                     Messages.verify_verify_success

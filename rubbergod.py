@@ -87,7 +87,7 @@ def load_dump():
     session.commit()
 
 
-load_dump()
+#load_dump()
 
 config = config.Config
 messages = messages.Messages
