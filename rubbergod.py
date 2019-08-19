@@ -159,6 +159,7 @@ async def on_ready():
 @bot.event
 async def on_message(message):
     global uhoh_counter
+    
 
     if message.author.bot:
         return
@@ -168,8 +169,8 @@ async def on_message(message):
         await reaction.message_role_reactions(message, role_data)
     elif message.content == "PR":
         await message.channel.send(messages.pr_meme)
-    elif message.content.lower() == "uh oh":
-        await message.channel.send("uh oh")
+    elif config.uhoh_regex.search(message.content) is not None:
+        await message.channel.send(messages.uhoh)
         uhoh_counter += 1
     else:
         await bot.process_commands(message)

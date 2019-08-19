@@ -71,3 +71,7 @@ class Config:
     # Arcas
     arcas_id = 140547421733126145
     arcas_delay = 24
+
+
+    # uh oh
+    uhoh_regex = re.compile('uh oh', re.IGNORECASE) 

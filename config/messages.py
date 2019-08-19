@@ -127,6 +127,7 @@ class Messages:
     verify_verify_wrong_code = "{user} Špatný kód."
 
     pr_meme = "https://github.com/Toaster192/rubbergod/pulls"
+    uhoh = "uh oh"
 
     info = [[('karma', 'Vypíše vaši karmu, kolik pozitivní a negativní karmy'
                        ' jste rozdali.'),
