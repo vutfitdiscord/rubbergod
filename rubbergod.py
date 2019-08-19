@@ -78,6 +78,7 @@ def load_dump():
 
     session.commit()
 
+
 # load_dump()
 
 config = config.Config
@@ -134,5 +135,6 @@ async def unload(ctx, extension):
             print("unloading error")
     else:
         await ctx.send(messages.insufficient_rights)
+
 
 bot.run(config.key)
