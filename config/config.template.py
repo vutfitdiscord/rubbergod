@@ -18,6 +18,9 @@ class Config:
     command_prefix = ('?', '!')
     default_prefix = '?'
 
+    # Extensions loaded on bot start
+    extensions = ['base', 'karma', 'meme', 'random', 'verify']
+
     # Roll dice
     max_dice_at_once = 1000
     dice_before_collation = 20
@@ -71,3 +74,6 @@ class Config:
     # Arcas
     arcas_id = 140547421733126145
     arcas_delay = 24
+
+    # uh oh
+    uhoh_string = 'uh oh'
