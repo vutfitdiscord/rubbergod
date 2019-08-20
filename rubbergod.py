@@ -169,7 +169,7 @@ async def on_message(message):
         await reaction.message_role_reactions(message, role_data)
     elif message.content == "PR":
         await message.channel.send(messages.pr_meme)
-    elif config.uhoh_regex.search(message.content) is not None:
+    elif config.uhoh_string in message.content.lower():
         await message.channel.send(messages.uhoh)
         uhoh_counter += 1
     else:
