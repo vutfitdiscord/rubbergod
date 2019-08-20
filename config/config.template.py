@@ -74,4 +74,4 @@ class Config:
 
 
     # uh oh
-    uhoh_regex = re.compile('uh oh', re.IGNORECASE) 
+    uhoh_string = 'uh oh'
