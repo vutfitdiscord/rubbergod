@@ -80,7 +80,6 @@ def load_dump():
 
 # load_dump()
 
-
 config = config.Config
 messages = messages.Messages
 
@@ -106,6 +105,7 @@ async def on_ready():
 for extension in config.extensions:
     bot.load_extension(f'cogs.{extension}')
     print(f'{extension} loaded')
+
 
 #                                      #
 #              COMMANDS                #

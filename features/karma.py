@@ -78,7 +78,7 @@ class Karma(BaseFeature):
             if not server_emoji.animated:
                 e = list(
                     filter(
-                        lambda x: test_emoji(x[0], server_emoji),
+                        lambda x: test_emoji(x.emoji_ID, server_emoji),
                         emojis))
 
                 if len(e) == 0:
@@ -213,7 +213,7 @@ class Karma(BaseFeature):
         for value in ['1', '-1']:
             emojis, error = await self.__make_emoji_list(
                     channel.guild,
-                    self.repo.get_emojis_valued(value)
+                    self.repo.get_ids_of_emojis_valued(value)
                     )
             errors += error
             try:
@@ -267,12 +267,12 @@ class Karma(BaseFeature):
         if action == 'give':
             if order == "DESC":
                 column = 'positive'
-                attribute = Database_karma.positive
+                attribute = Database_karma.positive.desc()
                 emote = "<:peepolove:562305740132450359>"
                 output += emote + "KARMA GIVINGBOARD " + emote + "\n"
             else:
                 column = 'negative'
-                attribute = Database_karma.negative
+                attribute = Database_karma.negative.desc()
                 emote = "<:ishaGrin:587959772301623297>"
                 output += emote + " KARMA ISHABOARD " + emote + "\n"
         elif action == 'get':
@@ -293,7 +293,7 @@ class Karma(BaseFeature):
         guild = self.bot.get_guild(cfg.guild_id)
 
         for i, user in enumerate(board, 1):
-            username = guild.get_member(int(user[0]))
+            username = guild.get_member(int(user.member_ID))
             if username is None:
                 continue
             username = discord.utils.escape_markdown(username.display_name)

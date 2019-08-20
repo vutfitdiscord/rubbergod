@@ -16,10 +16,9 @@ class UserRepository(BaseRepository):
         person.status = 2
         session.commit()
 
-    def save_verified(self, login: str, discord_name: str, discord_id: str):
+    def save_verified(self, login: str, discord_id: str):
         """"Inserts login with discord name into database"""
-        session.add(Permit(login=login, discord_name=discord_name,
-                           discord_id=discord_id))
+        session.add(Permit(login=login, discord_ID=discord_id))
 
         person = session.query(Valid_person).\
             filter(Valid_person.login == login).one_or_none()

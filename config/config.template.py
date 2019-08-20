@@ -75,5 +75,6 @@ class Config:
     arcas_id = 140547421733126145
     arcas_delay = 24
 
+
     # uh oh
     uhoh_string = 'uh oh'
