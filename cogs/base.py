@@ -12,6 +12,7 @@ from repository import karma_repo
 from cogs import room_check
 
 from repository.database import database, session
+from repository.database.verification import Valid_person
 from repository.database.year_increment import User_backup
 
 rng = rng.Rng()
@@ -237,6 +238,42 @@ class Base(commands.Cog):
 
     # TODO: the opposite of increment_roles (for rollback and testing)
     # and role_check to check if peoples roles match the database
+
+    @commands.cooldown(rate=2, per=20.0, type=commands.BucketType.user)
+    @commands.command()
+    async def update_db(self, ctx):
+        if ctx.author.id != config.admin_id:
+            await ctx.send(
+                    messages.insufficient_rights
+                    .format(user=utils.generate_mention(ctx.author.id)))
+            return
+
+        with open("merlin-latest", "r") as f:
+            data = f.readlines()
+
+        new_people = []
+        new_logins = []
+
+        for line in data:
+            line = line.split(":")
+            login = line[0]
+            name = line[4].split(",", 1)[0]
+            try:
+                year = line[4].split(",")[1]
+            except IndexError:
+                continue
+            new_people.append(Valid_person(login=login, year=year,
+                                           name=name))
+            new_logins.append(login)
+
+        for person in new_people:
+            session.merge(person)
+
+        for person in session.query(Valid_person):
+            if person.login not in new_logins:
+                person.year = "dropout"
+
+        session.commit()
 
 
 def setup(bot):
