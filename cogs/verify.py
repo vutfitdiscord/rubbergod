@@ -30,8 +30,9 @@ class Verify(commands.Cog):
 
     @commands.cooldown(rate=2, per=20.0, type=commands.BucketType.user)
     @commands.command()
-    async def role_check(self, ctx, p_verified: bool=True, p_move: bool=True,
-                         p_status: bool=True, p_role: bool=True):
+    async def role_check(self, ctx, p_verified: bool=True,
+                         p_move: bool=True, p_status: bool=True,
+                         p_role: bool=True, p_muni: bool=True):
         if ctx.author.id != config.admin_id:
             await ctx.send(
                     messages.insufficient_rights
@@ -46,6 +47,7 @@ class Verify(commands.Cog):
         bot = discord.utils.get(guild.roles, name="Bot")
         poradce = discord.utils.get(guild.roles, name="Poradce")
         dropout = discord.utils.get(guild.roles, name="Dropout")
+        muni = discord.utils.get(guild.roles, name="MUNI")
 
         verified = [member for member in members
                     if verify in member.roles and
@@ -53,6 +55,10 @@ class Verify(commands.Cog):
                     bot not in member.roles and 
                     dropout not in member.roles and 
                     poradce not in member.roles]
+
+        if not p_muni:
+            verified = [member for member in verified
+                        if muni not in member.roles]
 
         permited = session.query(Permit)
         permited_ids = [int(person.discord_ID) for person in permited]
