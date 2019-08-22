@@ -11,6 +11,7 @@ from repository.database.verification import Valid_person, Permit
 user_r = user_repo.UserRepository()
 
 config = config.Config
+messages = messages.Messages
 
 
 class Verify(commands.Cog):
