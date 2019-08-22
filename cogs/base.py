@@ -271,9 +271,17 @@ class Base(commands.Cog):
 
         for person in session.query(Valid_person):
             if person.login not in new_logins:
-                person.year = "dropout"
+                try:
+                    # check for muni
+                    int(person.login)
+                    print("Muni pls")
+                    person.year = "MUNI"
+                except ValueError:
+                    person.year = "dropout"
 
         session.commit()
+        
+        await ctx.send("Update databaze probehl uspesne")
 
 
 def setup(bot):
