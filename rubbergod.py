@@ -2,6 +2,7 @@ import re
 
 from discord.ext import commands
 
+import utils
 from config import config, messages
 from features import presence
 from repository.database import database, session
@@ -114,15 +115,31 @@ for extension in config.extensions:
 
 
 @bot.command()
+async def pull(ctx):
+    if ctx.author.id == config.admin_id:
+        try:
+            utils.git_pull()
+            await ctx.send("Git pulled")
+        except:
+            await ctx.send("Git pull error")
+    else:
+        await ctx.send(
+            messages.insufficient_rights
+            .format(user=utils.generate_mention(ctx.author.id)))
+
+
+@bot.command()
 async def load(ctx, extension):
     if ctx.author.id == config.admin_id:
         try:
             bot.load_extension(f'cogs.{extension}')
-            print(f'{extension} loaded')
+            await ctx.send(f'{extension} loaded')
         except:
-            print("loading error")
+            await ctx.send("loading error")
     else:
-        await ctx.send(messages.insufficient_rights)
+        await ctx.send(
+            messages.insufficient_rights
+            .format(user=utils.generate_mention(ctx.author.id)))
 
 
 @bot.command()
@@ -130,11 +147,27 @@ async def unload(ctx, extension):
     if ctx.author.id == config.admin_id:
         try:
             bot.unload_extension(f'cogs.{extension}')
-            print(f'{extension} unloaded')
+            await ctx.send(f'{extension} unloaded')
         except:
-            print("unloading error")
+            await ctx.send("unloading error")
     else:
-        await ctx.send(messages.insufficient_rights)
+        await ctx.send(
+            messages.insufficient_rights
+            .format(user=utils.generate_mention(ctx.author.id)))
+
+
+@bot.command()
+async def reload(ctx, extension):
+    if ctx.author.id == config.admin_id:
+        try:
+            bot.reload_extension(f'cogs.{extension}')
+            await ctx.send(f'{extension} reloaded')
+        except:
+            await ctx.send("reloading error")
+    else:
+        await ctx.send(
+            messages.insufficient_rights
+            .format(user=utils.generate_mention(ctx.author.id)))
 
 
 bot.run(config.key)
