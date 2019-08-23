@@ -46,6 +46,7 @@ class Meme(commands.Cog):
     @commands.command()
     async def uhoh(self, ctx):
         await ctx.send(messages.uhoh_counter.format(uhohs=uhoh_counter))
+        await ctx.send("Testing reload and pull")
 
     @commands.cooldown(rate=5, per=20.0, type=commands.BucketType.user)
     @commands.command()
