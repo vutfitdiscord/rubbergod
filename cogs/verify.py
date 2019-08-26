@@ -64,6 +64,13 @@ class Verify(commands.Cog):
         permited = session.query(Permit)
         permited_ids = [int(person.discord_ID) for person in permited]
 
+        bit0 = discord.utils.get(guild.roles, name="0BIT")
+        bit1 = discord.utils.get(guild.roles, name="1BIT")
+        bit2 = discord.utils.get(guild.roles, name="2BIT")
+        bit3 = discord.utils.get(guild.roles, name="3BIT")
+        bit4 = discord.utils.get(guild.roles, name="4BIT+")
+        mit1 = discord.utils.get(guild.roles, name="1MIT")
+
         for member in verified:
             if member.id not in permited_ids:
                 if p_verified:
@@ -87,15 +94,32 @@ class Verify(commands.Cog):
 
                 role = discord.utils.get(guild.roles, name=year)
 
-                bit4 = discord.utils.get(guild.roles, name="4BIT+")
-                mit1 = discord.utils.get(guild.roles, name="1MIT")
-
                 if role not in member.roles:
                     if year == "1MIT" and bit4 in member.roles and p_move:
                         await member.add_roles(mit1)
                         await member.remove_roles(bit4)
                         await ctx.send("Presouvam: " + member.display_name +
-                                       "na magisterske studium")
+                                       " do 1MIT")
+                    elif year == "4BIT+" and bit3 in member.roles and p_move:
+                        await member.add_roles(bit4)
+                        await member.remove_roles(bit3)
+                        await ctx.send("Presouvam: " + member.display_name +
+                                       " do 4BIT+")
+                    elif year == "3BIT" and bit2 in member.roles and p_move:
+                        await member.add_roles(bit3)
+                        await member.remove_roles(bit2)
+                        await ctx.send("Presouvam: " + member.display_name +
+                                       " do 3BIT")
+                    elif year == "2BIT" and bit1 in member.roles and p_move:
+                        await member.add_roles(bit2)
+                        await member.remove_roles(bit1)
+                        await ctx.send("Presouvam: " + member.display_name +
+                                       " do 2BIT")
+                    elif year == "1BIT" and bit0 in member.roles and p_move:
+                        await member.add_roles(bit1)
+                        await member.remove_roles(bit0)
+                        await ctx.send("Presouvam: " + member.display_name +
+                                       " do 1BIT")
                     elif not p_role:
                         continue
                     elif year is None:
