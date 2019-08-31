@@ -1,4 +1,3 @@
-import datetime
 from random import choice
 
 import discord
@@ -11,8 +10,6 @@ config = config.Config
 messages = messages.Messages
 
 uhoh_counter = 0
-arcas_time = (datetime.datetime.utcnow() -
-              datetime.timedelta(hours=config.arcas_delay))
 
 
 class Meme(commands.Cog):
@@ -32,16 +29,6 @@ class Meme(commands.Cog):
             uhoh_counter += 1
         elif message.content == "PR":
             await message.channel.send(messages.pr_meme)
-
-    @commands.Cog.listener()
-    async def on_typing(self, channel, user, when):
-        global arcas_time
-        if arcas_time + datetime.timedelta(hours=config.arcas_delay) <\
-           when and config.arcas_id == user.id:
-            arcas_time = when
-            gif = discord.Embed()
-            gif.set_image(url="https://i.imgur.com/v2ueHcl.gif")
-            await channel.send(embed=gif)
 
     @commands.command()
     async def uhoh(self, ctx):
