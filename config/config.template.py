@@ -19,7 +19,7 @@ class Config:
     default_prefix = '?'
 
     # Extensions loaded on bot start
-    extensions = ['base', 'karma', 'meme', 'random', 'verify']
+    extensions = ['base', 'karma', 'meme', 'random', 'verify', 'fitwide']
 
     # Roll dice
     max_dice_at_once = 1000
