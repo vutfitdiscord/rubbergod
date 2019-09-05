@@ -50,7 +50,7 @@ class Config:
     ]
 
     # String constants
-    role_string = 'Role'
+    role_string = 'Role\n'
     hug_emojis = ["<:peepoHug:600435649786544151>",
                   "<:peepoHugger:602052621007585280>",
                   "<:huggers:602823825880514561>", "(っ˘̩╭╮˘̩)っ", "(っ´▽｀)っ",
