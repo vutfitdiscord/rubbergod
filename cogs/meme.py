@@ -22,6 +22,10 @@ class Meme(commands.Cog):
         global uhoh_counter
 
         if message.author.bot:
+            if message.author.id == config.grillbot_id and \
+               message.content.startswith("<:") and \
+               message.content.endswith(">"):
+                await message.channel.send(message.content)
             return
 
         elif config.uhoh_string in message.content.lower():
