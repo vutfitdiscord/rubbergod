@@ -78,3 +78,6 @@ class Config:
 
     # uh oh
     uhoh_string = 'uh oh'
+
+    # grillbot
+    grillbot_id = 0
