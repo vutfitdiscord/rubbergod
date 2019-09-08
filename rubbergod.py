@@ -170,4 +170,6 @@ async def reload(ctx, extension):
             .format(user=utils.generate_mention(ctx.author.id)))
 
 
+database.base.metadata.create_all(database.db)
+session.commit()  # Making sure
 bot.run(config.key)
