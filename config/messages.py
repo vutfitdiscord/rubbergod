@@ -6,6 +6,25 @@ class Messages:
 
     server_warning = "Tohle funguje jen na VUT FIT serveru."
     toaster_pls = "Toaster pls, máš bordel v DB."
+    missing_perms = "Na tohle nemas prava. {user}"
+    acl_help = "{user}, Pouziti:\n`!acl {{action}} {{table}} [args]`\n"\
+               "action: add, edit, del nebo list\n"\
+               "table: group, rule, role nebo user\n"\
+               "args zalezi na zvolene akci a tabulce, napriklad kdyz chcete"\
+               "pridat groupu, musite zadat nazev groupy a nepovinne take "\
+               "ID rodice jako argumnet"  # TODO: Correct to proper czech
+    acl_add_group = "Group vytvorena."
+    acl_edit_group = "Group zmenena."
+    acl_del_group = "Group smazana."
+    acl_add_rule = "Pravidlo vytvoreno."
+    acl_edit_rule = "Pravidlo zmeneno."
+    acl_del_rule = "Pravidlo smazano."
+    acl_add_role = "Vyjimka pro roli pridana."
+    acl_edit_role = "Vyjimka pro roli upravena."
+    acl_del_role = "Vyjimka pro roli smazana."
+    acl_add_user = "Vyjimka pro uzivatele pridana."
+    acl_edit_user = "Vyjimka pro uzivatele upravena."
+    acl_del_user = "Vyjimka pro uzivatele smazana."
     no_such_command = "Takový příkaz neznám. <:sadcat:576171980118687754>"
     spamming = "{user} Nespamuj tolik <:sadcat:576171980118687754>"
     insufficient_rights = "{user}, na použití tohoto příkazu nemáš právo."
@@ -13,7 +32,7 @@ class Messages:
     bot_room_redirect = "{} <:sadcat:576171980118687754> 👉 " \
                         "<#{}>\n"
     message_link_prefix = 'https://discordapp.com/channels/' \
-                        + str(config.Config.guild_id) + '/'
+                          + str(config.Config.guild_id) + '/'
 
     uhoh_counter = "{uhohs} uh ohs od spuštění."
     uptime_message = "Up since:  `{boottime}`\nUptime:\t`{uptime}`"

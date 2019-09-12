@@ -6,8 +6,13 @@ import utils
 from config.config import Config
 from config.messages import Messages
 from features.base_feature import BaseFeature
+from features.acl import Acl
 from repository.karma_repo import KarmaRepository
+from repository.acl_repo import AclRepository
 from emoji import UNICODE_EMOJI
+
+acl_repo = AclRepository()
+acl = Acl(acl_repo)
 
 
 class Reaction(BaseFeature):
@@ -102,7 +107,10 @@ class Reaction(BaseFeature):
             guild = message.guild
         for line in data:
             if ((discord.utils.get(guild.roles, name=line[0]) is None) and
-               (discord.utils.get(guild.channels, id=line[0]) is None)):
+               (discord.utils.get(guild.channels,
+                                  id=int(line[0])) is None) and
+               (discord.utils.get(guild.channels,
+                                  name=line[0].lower()) is None)):
                 await message.channel.send(
                     Messages.role_not_role
                     .format(user=utils.generate_mention(
@@ -267,29 +275,38 @@ class Reaction(BaseFeature):
     async def add_role_on_reaction(self, target, member, channel, guild):
         role = discord.utils.get(guild.roles,
                                  name=target)
-        max_role = discord.utils.get(guild.roles,
-                                     name="Rubbergod")
         if role is not None:
-            if role < max_role:
+            if acl.get_perms(member.id, member.top_role,
+                             role.id, guild.roles):
                 await member.add_roles(role)
             else:
                 await channel.send(Messages.role_add_denied
                                    .format(user=utils.generate_mention(
                                        member.id), role=role.name))
         else:
-            channel = discord.utils.get(guild.channels, id=target)
-            await channel.set_permissions(member, read_messages=True,
-                                          send_messages=True)
+            channel = discord.utils.get(guild.channels, id=int(target))
+            if channel is None:
+                channel = discord.utils.get(guild.channels,
+                                            name=target.lower())
+            perms = acl.get_perms(member.id, member.top_role,
+                                  channel.id, guild.roles)
+            # TODO give perms based on the int (like read-only)
+            if perms:
+                await channel.set_permissions(member, read_messages=True,
+                                              send_messages=True)
+            else:
+                await channel.send(Messages.role_add_denied
+                                   .format(user=utils.generate_mention(
+                                       member.id), role=role.name))
 
     # Removes a role for user based on reaction
     async def remove_role_on_reaction(self, target, member, channel, guild):
         role = discord.utils.get(guild.roles,
                                  name=target)
-        max_role = discord.utils.get(guild.roles,
-                                     name="Rubbergod")
         if role is not None:
             if role in member.roles:
-                if role < max_role:
+                if acl.get_perms(member.id, member.top_role,
+                                 role.id, guild.roles):
                     await member.remove_roles(role)
                 else:
                     await channel.send(
@@ -300,6 +317,16 @@ class Reaction(BaseFeature):
                         )
                     )
         else:
-            channel = discord.utils.get(guild.channels, id=target)
-            await channel.set_permissions(member, read_messages=None,
-                                          send_messages=None)
+            channel = discord.utils.get(guild.channels, id=int(target))
+            if channel is None:
+                channel = discord.utils.get(guild.channels,
+                                            name=target.lower())
+            perms = acl.get_perms(member.id, member.top_role,
+                                  channel.id, guild.roles)
+            if perms:
+                await channel.set_permissions(member, read_messages=None,
+                                              send_messages=None)
+            else:
+                await channel.send(Messages.role_remove_denied
+                                   .format(user=utils.generate_mention(
+                                       member.id), role=channel.name))
