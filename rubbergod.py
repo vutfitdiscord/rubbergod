@@ -5,9 +5,11 @@ from discord.ext import commands
 import utils
 from config import config, messages
 from features import presence
+from repository.review_repo import ReviewRepository
 from repository.database import database, session
 from repository.database.karma import Karma, Karma_emoji
 from repository.database.verification import Permit, Valid_person
+from repository.database.review import Review, ReviewRelevance, Subject
 
 
 # TODO move this ANYWHERE else
@@ -92,6 +94,14 @@ bot = commands.Bot(command_prefix=commands.when_mentioned_or(
 
 presence = presence.Presence(bot)
 
+
+# fill DB with subjects shortcut, needed for reviews
+def load_subjects():
+    review_repo = ReviewRepository()
+    for subject in config.subjects:
+        review_repo.add_subject(subject)
+
+
 #                                    #
 #              EVENTS                #
 #                                    #
@@ -169,5 +179,10 @@ async def reload(ctx, extension):
             messages.insufficient_rights
             .format(user=utils.generate_mention(ctx.author.id)))
 
+
+database.base.metadata.create_all(database.db)
+session.commit()  # Making sure
+
+# load_subjects()
 
 bot.run(config.key)

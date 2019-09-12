@@ -1,10 +1,12 @@
-import discord
 from discord.ext import commands
 
 from config import config, messages
 from features import review
+import utils
 
 config = config.Config
+messages = messages.Messages
+
 
 class Review(commands.Cog):
 
@@ -14,31 +16,78 @@ class Review(commands.Cog):
 
     @commands.cooldown(rate=5, per=20.0, type=commands.BucketType.user)
     @commands.command()
-    async def review(self, ctx, subject=None, tier=None, *args):
+    async def review(self, ctx, subject=None, tier: int = None, *args):
         if subject is None or tier is None:
-            await ctx.send("?review nazov_predmetu tier \nrecenzia")
+            await ctx.send(messages.review_format)
         else:
             author = ctx.message.author.id
             anonym = False
-            print(args)
-            if args is not None:
+            if tier < 0 or tier > 3:
+                await ctx.send(messages.review_tier)
+                return
+            if args:
                 if args[0] == "anonym":
                     anonym = True
                     args = args[1:]
                 args = ' '.join(args)
-            if len(args) == 0:
+            args_len = len(args)
+            if args_len == 0:
                 args = None
-            self.rev.add_review(author_id=author, subject=subject, tier=tier, anonym=anonym, text=args)
-            await ctx.send("Hodnotenie predmetu bolo pridane")
+            elif args_len > 1024:
+                await ctx.send(messages.review_text_len)
+                return
+            try:
+                self.rev.add_review(author, subject, tier, anonym, args)
+            except:
+                await ctx.send(messages.review_wrong_subject)
+                return
+            await ctx.send(messages.review_added)
 
     @commands.cooldown(rate=5, per=20.0, type=commands.BucketType.user)
     @commands.command()
     async def get_reviews(self, ctx, subject=None):
         if subject is None:
-            await ctx.send("Pls napis aky predmet")
+            await ctx.send(messages.review_get_format)
         else:
             embed = self.rev.list_reviews(subject)
-            await ctx.send(embed=embed)
+            if not embed:
+                await ctx.send(messages.review_wrong_subject)
+                return
+            msg = await ctx.send(embed=embed)
+            if msg.embeds[0].description[-1].isnumeric():
+                await msg.add_reaction("◀")
+                await msg.add_reaction("▶")
+                await msg.add_reaction("👍")
+                await msg.add_reaction("👎")
+
+    @commands.cooldown(rate=5, per=20.0, type=commands.BucketType.user)
+    @commands.command()
+    async def add_subject(self, ctx, subject=None):
+        if ctx.author.id == config.admin_id:
+            if not subject:
+                await ctx.send(messages.review_wrong_subject)
+                return
+            self.rev.add_subject(subject)
+            await ctx.send(f'Zkratka {subject} byla přidána')
+        else:
+            await ctx.send(
+                messages.insufficient_rights
+                .format(user=utils.generate_mention(ctx.author.id)))
+
+    @commands.cooldown(rate=5, per=20.0, type=commands.BucketType.user)
+    @commands.command()
+    async def remove_subject(self, ctx, subject=None):
+        if ctx.author.id == config.admin_id:
+            if not subject:
+                await ctx.send(messages.review_wrong_subject)
+                return
+            self.rev.remove_subject(subject)
+            await ctx.send(f'Zkratka {subject} byla odebrána')
+        else:
+            await ctx.send(
+                messages.insufficient_rights
+                .format(user=utils.generate_mention(ctx.author.id)))
+
 
 def setup(bot):
     bot.add_cog(Review(bot))

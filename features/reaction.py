@@ -1,13 +1,22 @@
 import datetime
 import discord
 from discord.ext.commands import Bot
+import re
 
 import utils
 from config.config import Config
 from config.messages import Messages
 from features.base_feature import BaseFeature
+from features.acl import Acl
+from features.review import Review
 from repository.karma_repo import KarmaRepository
+from repository.acl_repo import AclRepository
+from repository.review_repo import ReviewRepository
 from emoji import UNICODE_EMOJI
+
+acl_repo = AclRepository()
+acl = Acl(acl_repo)
+review_r = ReviewRepository()
 
 
 class Reaction(BaseFeature):
@@ -15,15 +24,16 @@ class Reaction(BaseFeature):
     def __init__(self, bot: Bot, karma_repository: KarmaRepository):
         super().__init__(bot)
         self.karma_repo = karma_repository
+        self.review = Review(bot)
 
     def make_embed(self, page):
         embed = discord.Embed(title="Rubbergod",
-                        description="Nejlepší a nejúžasnější bot ever.",
-                        color=0xeee657)
+                              description="Nejlepší a nejúžasnější bot ever.",
+                              color=0xeee657)
 
         prefix = Config.default_prefix
 
-        embed.add_field(name="Autor", value="Toaster#1111") 
+        embed.add_field(name="Autor", value="Toaster#1111")
 
         # Shows the number of servers the bot is member of.
         embed.add_field(name="Počet serverů s touto instancí bota",
@@ -32,18 +42,17 @@ class Reaction(BaseFeature):
         embed.add_field(name="\u200b", value="Příkazy:", inline=False)
 
         info = Messages.info[page - 1]
-            
+
         for command in info:
             embed.add_field(name=prefix + command[0],
                             value=command[1],
                             inline=False)
 
         embed.set_footer(text=f"Page {page} | Commit {utils.git_hash()}",
-                        icon_url="https://cdn.discordapp.com/avatars/"
-                                "560917571663298568/b93e8c1e93c2d18b"
-                                "fbd226a0b614cf57.png?size=32")
+                         icon_url="https://cdn.discordapp.com/avatars/"
+                                  "560917571663298568/b93e8c1e93c2d18b"
+                                  "fbd226a0b614cf57.png?size=32")
         return embed
-
 
     # Returns list of role names and emotes that represent them
     async def get_join_role_data(self, message):
@@ -65,7 +74,9 @@ class Reaction(BaseFeature):
             return output
         for line in input_string:
             try:
-                emoji = next(filter(lambda x: x[0] in UNICODE_EMOJI or x[0] == '<', line.split()))
+                emoji = next(filter(lambda x: x[0] in UNICODE_EMOJI or
+                                    (x[0] == '<' and x[1] == ':'),
+                                    line.split()))
                 line = [line[:line.index(emoji) - 1], emoji]
                 output.append(line)
             except:
@@ -76,6 +87,20 @@ class Reaction(BaseFeature):
                         line=line[0]
                     )
                 )
+        for line in output:
+            if "<#" in line[0]:
+                line[0] = line[0].replace("<#", "")
+                line[0] = line[0].replace(">", "")
+                try:
+                    line[0] = int(line[0])
+                except:
+                    await message.channel.send(
+                        Messages.role_invalid_line
+                        .format(user=utils.generate_mention(
+                            message.author.id),
+                            line=line[0]
+                        )
+                    )
         return output
 
     # Adds reactions to message
@@ -86,8 +111,11 @@ class Reaction(BaseFeature):
         else:
             guild = message.guild
         for line in data:
-            if (discord.utils.get(guild.roles,
-                                  name=line[0]) is None):
+            if ((discord.utils.get(guild.roles, name=line[0]) is None) and
+               (discord.utils.get(guild.channels,
+                                  id=int(line[0])) is None) and
+               (discord.utils.get(guild.channels,
+                                  name=line[0].lower()) is None)):
                 await message.channel.send(
                     Messages.role_not_role
                     .format(user=utils.generate_mention(
@@ -154,7 +182,7 @@ class Reaction(BaseFeature):
                     if next_page == info_len:
                         await message.remove_reaction("▶", self.bot.user)
                     if next_page == 2:
-                        await message.add_reaction("◀")                            
+                        await message.add_reaction("◀")
                 elif emoji == "◀":
                     next_page = page - 1
                     if next_page == 1:
@@ -167,7 +195,46 @@ class Reaction(BaseFeature):
             try:
                 await message.remove_reaction(emoji, member)
             except:
-                pass 
+                pass
+        elif message.embeds and re.match(
+             ".* reviews", message.embeds[0].title):
+            subject = message.embeds[0].title.split(' ', 1)[0]
+            if message.embeds[0].footer.text[7] != '/':
+                page = int(message.embeds[0].footer.text[6:7])
+                max_page = int(message.embeds[0].footer.text[9])
+            else:
+                page = int(message.embeds[0].footer.text[6])
+                max_page = int(message.embeds[0].footer.text[8])
+            tier_average = message.embeds[0].description[-1]
+            if emoji in ["◀", "▶"]:
+                if emoji == "▶":
+                    next_page = page + 1
+                elif emoji == "◀":
+                    next_page = page - 1
+                if 1 <= next_page <= max_page:
+                    review = review_r.get_subject_reviews(subject)
+                    if review.count() >= next_page:
+                        review = review[next_page - 1].Review
+                        next_page = str(next_page) + "/" + str(max_page)
+                        embed = self.review.make_embed(
+                            review, subject, tier_average, next_page)
+                        await message.edit(embed=embed)
+            elif emoji in ["👍", "👎"]:
+                review = review_r.get_subject_reviews(subject)[page - 1].Review
+                if str(member.id) != review.member_ID:
+                    review_id = review.id
+                    if emoji == "👍":
+                        self.review.add_vote(review_id, True, str(member.id))
+                    elif emoji == "👎":
+                        self.review.add_vote(review_id, False, str(member.id))
+                    page = str(page) + "/" + str(max_page)
+                    embed = self.review.make_embed(
+                        review, subject, tier_average, page)
+                    await message.edit(embed=embed)
+            try:
+                await message.remove_reaction(emoji, member)
+            except:
+                pass
         elif member.id != message.author.id and\
                 guild.id == Config.guild_id and\
                 message.channel.id not in \
@@ -184,19 +251,21 @@ class Reaction(BaseFeature):
             for reaction in message.reactions:
                 if reaction.emoji == '📌' and \
                    reaction.count >= Config.pin_count and \
-                   message.pinned == False:
+                   not message.pinned:
                     embed = discord.Embed(title="📌 Auto pin message log",
-                        color=0xeee657)
+                                          color=0xeee657)
                     users = await reaction.users().flatten()
                     user_names = ', '.join([user.name for user in users])
-                    message_link = Messages.message_link_prefix \
-                                 + str(message.channel.id) + '/'\
-                                 + str(message.id)
+                    message_link = Messages.message_link_prefix +\
+                        str(message.channel.id) + '/' +\
+                        str(message.id)
                     embed.add_field(name="Users", value=user_names)
-                    embed.add_field(name="In channel",value=message.channel)
+                    embed.add_field(name="In channel", value=message.channel)
                     embed.add_field(name="Message",
                                     value=message_link, inline=False)
-                    embed.set_footer(text=datetime.datetime.now().replace(microsecond=0))
+                    embed.set_footer(
+                        text=datetime.datetime.now().replace(microsecond=0)
+                    )
                     channel = self.bot.get_channel(Config.log_channel)
                     await channel.send(embed=embed)
                     try:
@@ -247,28 +316,41 @@ class Reaction(BaseFeature):
                     message.author, member, emoji.id)
 
     # Adds a role for user based on reaction
-    async def add_role_on_reaction(self, role, member, channel, guild):
+    async def add_role_on_reaction(self, target, member, channel, guild):
         role = discord.utils.get(guild.roles,
-                                 name=role)
-        max_role = discord.utils.get(guild.roles,
-                                     name="Rubbergod")
+                                 name=target)
         if role is not None:
-            if role < max_role:
+            if acl.get_perms(member.id, member.top_role,
+                             role.id, guild.roles):
                 await member.add_roles(role)
+            else:
+                await channel.send(Messages.role_add_denied
+                                   .format(user=utils.generate_mention(
+                                       member.id), role=role.name))
+        else:
+            channel = discord.utils.get(guild.channels, id=int(target))
+            if channel is None:
+                channel = discord.utils.get(guild.channels,
+                                            name=target.lower())
+            perms = acl.get_perms(member.id, member.top_role,
+                                  channel.id, guild.roles)
+            # TODO give perms based on the int (like read-only)
+            if perms:
+                await channel.set_permissions(member, read_messages=True,
+                                              send_messages=True)
             else:
                 await channel.send(Messages.role_add_denied
                                    .format(user=utils.generate_mention(
                                        member.id), role=role.name))
 
     # Removes a role for user based on reaction
-    async def remove_role_on_reaction(self, role, member, channel, guild):
+    async def remove_role_on_reaction(self, target, member, channel, guild):
         role = discord.utils.get(guild.roles,
-                                 name=role)
-        max_role = discord.utils.get(guild.roles,
-                                     name="Rubbergod")
+                                 name=target)
         if role is not None:
             if role in member.roles:
-                if role < max_role:
+                if acl.get_perms(member.id, member.top_role,
+                                 role.id, guild.roles):
                     await member.remove_roles(role)
                 else:
                     await channel.send(
@@ -278,3 +360,17 @@ class Reaction(BaseFeature):
                             role=role.name
                         )
                     )
+        else:
+            channel = discord.utils.get(guild.channels, id=int(target))
+            if channel is None:
+                channel = discord.utils.get(guild.channels,
+                                            name=target.lower())
+            perms = acl.get_perms(member.id, member.top_role,
+                                  channel.id, guild.roles)
+            if perms:
+                await channel.set_permissions(member, read_messages=None,
+                                              send_messages=None)
+            else:
+                await channel.send(Messages.role_remove_denied
+                                   .format(user=utils.generate_mention(
+                                       member.id), role=channel.name))

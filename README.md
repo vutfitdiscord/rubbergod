@@ -62,7 +62,7 @@ docker-compose down && docker-compose up --build
 * [Matthew](https://github.com/matejsoroka)
 * [Toaster](https://github.com/toaster192)
 * [Fpmk](https://github.com/TheGreatfpmK)
-* [Radluy](https://github.com/Radluy)
+* [_peter](https://github.com/xdragu01)
 * [Urumasi](https://github.com/Urumasi)
 * [Leo](https://github.com/ondryaso)
 
