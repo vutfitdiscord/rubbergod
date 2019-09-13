@@ -122,7 +122,7 @@ class Reaction(BaseFeature):
                     await message.add_reaction(line[1])
                 except discord.errors.HTTPException:
                     await message.channel.send(
-                        Messages.role_invalid_line
+                        Messages.role_invalid_emote
                         .format(user=utils.generate_mention(
                             message.author.id),
                             not_emote=line[1], role=line[0]))
@@ -285,7 +285,10 @@ class Reaction(BaseFeature):
                                    .format(user=utils.generate_mention(
                                        member.id), role=role.name))
         else:
-            channel = discord.utils.get(guild.channels, id=int(target))
+            try:
+                channel = discord.utils.get(guild.channels, id=int(target))
+            except ValueError:
+                channel = None
             if channel is None:
                 channel = discord.utils.get(guild.channels,
                                             name=target.lower())
@@ -318,7 +321,10 @@ class Reaction(BaseFeature):
                         )
                     )
         else:
-            channel = discord.utils.get(guild.channels, id=int(target))
+            try:
+                channel = discord.utils.get(guild.channels, id=int(target))
+            except ValueError:
+                channel = None
             if channel is None:
                 channel = discord.utils.get(guild.channels,
                                             name=target.lower())

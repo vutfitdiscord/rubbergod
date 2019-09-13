@@ -1,4 +1,5 @@
 import re
+import traceback
 
 from discord.ext import commands
 
@@ -103,6 +104,14 @@ async def on_ready():
     print("Ready")
 
     await presence.set_presence()
+
+@bot.event
+async def on_error(event, *args, **kweags):
+    channel = bot.get_channel(config.bot_dev_channel)
+    output = traceback.format_exc()
+    print(output)
+    if channel is not None:
+        await channel.send("```\n" + output + "\n```")
 
 for extension in config.extensions:
     bot.load_extension(f'cogs.{extension}')
