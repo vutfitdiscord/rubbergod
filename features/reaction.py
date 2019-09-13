@@ -107,10 +107,11 @@ class Reaction(BaseFeature):
             guild = message.guild
         for line in data:
             if ((discord.utils.get(guild.roles, name=line[0]) is None) and
-               (discord.utils.get(guild.channels,
-                                  id=int(line[0])) is None) and
-               (discord.utils.get(guild.channels,
-                                  name=line[0].lower()) is None)):
+                (discord.utils.get(guild.channels,
+                                   name=line[0].lower()) is None) and
+                line[0].isdigit() and
+                (discord.utils.get(guild.channels,
+                                   id=int(line[0])) is None)):
                 await message.channel.send(
                     Messages.role_not_role
                     .format(user=utils.generate_mention(
