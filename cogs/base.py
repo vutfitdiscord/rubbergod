@@ -27,9 +27,16 @@ class Base(commands.Cog):
         self.check = room_check.RoomCheck(bot)
 
     @commands.Cog.listener()
+    async def on_error(event, *args, **kwargs):
+        channel = self.bot.get_channel(config.bot_dev_channel)
+        output = traceback.format_exc()
+        print(output)
+        if channel is not None:
+            await channel.send("```\n" + output + "\n```")
+
+    @commands.Cog.listener()
     async def on_command_error(self, ctx, error):
-        if isinstance(error, commands.BadArgument) and \
-           ctx.command.name == 'hug':
+        if hasattr(ctx.command, 'on_error'):
             return
 
         if isinstance(error, commands.CommandNotFound):
