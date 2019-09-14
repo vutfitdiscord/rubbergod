@@ -203,18 +203,17 @@ class Reaction(BaseFeature):
         elif message.embeds and re.match(
              ".* reviews", message.embeds[0].title):
             subject = message.embeds[0].title.split(' ', 1)[0]
-            if message.embeds[0].footer.text[7] != '/':
-                page = int(message.embeds[0].footer.text[6:7])
-                max_page = int(message.embeds[0].footer.text[9])
-            else:
-                page = int(message.embeds[0].footer.text[6])
-                max_page = int(message.embeds[0].footer.text[8])
+            pos = message.embeds[0].footer.text.find('/')
+            page = int(message.embeds[0].footer.text[6:(pos - 1)])
+            max_page = int(message.embeds[0].footer.text[(pos + 1):])
             tier_average = message.embeds[0].description[-1]
-            if emoji in ["◀", "▶"]:
+            if emoji in ["◀", "▶", "⏪"]:
                 if emoji == "▶":
                     next_page = page + 1
                 elif emoji == "◀":
                     next_page = page - 1
+                elif emoji == "⏪":
+                    next_page = 1
                 if 1 <= next_page <= max_page:
                     review = review_r.get_subject_reviews(subject)
                     if review.count() >= next_page:

@@ -60,6 +60,7 @@ class Review(commands.Cog):
                 return
             msg = await ctx.send(embed=embed)
             if msg.embeds[0].description[-1].isnumeric():
+                await msg.add_reaction("⏪")
                 await msg.add_reaction("◀")
                 await msg.add_reaction("▶")
                 await msg.add_reaction("👍")
