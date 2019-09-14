@@ -63,8 +63,8 @@ class Reaction(BaseFeature):
         output = []
         try:
             if input_string.startswith(Config.role_string):
-                input_string = (input_string[input_string.index('\n') + 1:]
-                                .rstrip().split('\n'))
+                input_string = input_string[input_string.index('\n') + 1:]
+            input_string = input_string.rstrip().split('\n')
         except ValueError:
             await message.channel.send(
                 Messages.role_format
@@ -85,7 +85,7 @@ class Reaction(BaseFeature):
                     Messages.role_invalid_line
                     .format(user=utils.generate_mention(
                         message.author.id),
-                        line=line[0]
+                        line=line
                     )
                 )
         for line in output:
