@@ -17,7 +17,7 @@ class Review(BaseFeature):
     def make_embed(self, review, subject, tier_average, page):
         embed = discord.Embed(
             title=subject.lower() + " reviews",
-            description="Avarage tier: " + tier_average
+            description="Average tier: " + tier_average
         )
         colour = 0x6d6a69
         if review is not None:

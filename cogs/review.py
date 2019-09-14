@@ -43,6 +43,11 @@ class Review(commands.Cog):
                 return
             await ctx.send(messages.review_added)
 
+    @review.error
+    async def review_error(self, ctx, error):
+        if isinstance(error, commands.BadArgument):
+            await ctx.send(messages.review_format)
+
     @commands.cooldown(rate=5, per=20.0, type=commands.BucketType.user)
     @commands.command()
     async def get_reviews(self, ctx, subject=None):

@@ -28,7 +28,10 @@ class Base(commands.Cog):
 
     @commands.Cog.listener()
     async def on_command_error(self, ctx, error):
-        if hasattr(ctx.command, 'on_error'):
+        # The local handlers so far only catch bad arguments so we still
+        # want to print the rest
+        if isinstance(error, commands.BadArgument) and\
+           hasattr(ctx.command, 'on_error'):
             return
 
         if isinstance(error, commands.CommandNotFound):
