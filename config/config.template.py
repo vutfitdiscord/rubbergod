@@ -30,7 +30,8 @@ class Config:
 
     # Karma
     karma_ban_role_id = -1
-    karma_banned_channels = []
+    #                        add-roles         back-to-school
+    karma_banned_channels = [591384273051975683, 622202824377237504]
 
     # Voting
     vote_minimum = 20
@@ -52,6 +53,8 @@ class Config:
 
     # String constants
     role_string = 'Role\n'
+    #                add-roles         back-to-school
+    role_channels = [591384273051975683, 622202824377237504]
     hug_emojis = ["<:peepoHug:600435649786544151>",
                   "<:peepoHugger:602052621007585280>",
                   "<:huggers:602823825880514561>", "(っ˘̩╭╮˘̩)っ", "(っ´▽｀)っ",

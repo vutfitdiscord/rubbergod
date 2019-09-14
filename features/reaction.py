@@ -62,8 +62,9 @@ class Reaction(BaseFeature):
         input_string = input_string.replace("**", "")
         output = []
         try:
-            input_string = (input_string[input_string.index('\n') + 1:]
-                            .rstrip().split('\n'))
+            if input_string.startswith(Config.role_string):
+                input_string = (input_string[input_string.index('\n') + 1:]
+                                .rstrip().split('\n'))
         except ValueError:
             await message.channel.send(
                 Messages.role_format
@@ -156,7 +157,8 @@ class Reaction(BaseFeature):
                 emoji = payload.emoji
         else:
             emoji = payload.emoji.name
-        if message.content.startswith(Config.role_string):
+        if message.content.startswith(Config.role_string) or\
+           channel.id in Config.role_channels:
             role_data = await self.get_join_role_data(message)
             for line in role_data:
                 if str(emoji) == line[1]:
@@ -297,7 +299,8 @@ class Reaction(BaseFeature):
                 emoji = payload.emoji
         else:
             emoji = payload.emoji.name
-        if message.content.startswith(Config.role_string):
+        if message.content.startswith(Config.role_string) or\
+           channel.id in Config.role_channels:
             role_data = await self.get_join_role_data(message)
             for line in role_data:
                 if str(emoji) == line[1]:
