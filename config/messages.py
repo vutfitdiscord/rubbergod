@@ -145,6 +145,13 @@ class Messages:
                               "({toaster} pls)."
     verify_verify_wrong_code = "{user} Špatný kód."
 
+    review_format = "?review [zkratka předmětu] [tier] (anonym) (text)"
+    review_wrong_subject = "Nesprávná zkratka předmětu"
+    review_tier = "Tier je z rozsahu 0-3"
+    review_text_len = "Maximální počet znaků v části 'text' je 1024"
+    review_added = "Hodnocení předmětu bylo přidáno"
+    review_get_format = "?get_reviews [zkratka předmětu]"
+
     pr_meme = "https://github.com/Toaster192/rubbergod/pulls"
     uhoh = "uh oh"
 
@@ -164,7 +171,9 @@ class Messages:
              ('bajkarboard', 'Karma leaderboard reversed'),
              ('givingboard', 'Leaderboard rozdávání pozitivní karmy.'),
              ('ishaboard', 'Leaderboard rozdávání negativní karmy.')],
-            [('roll X Y',
+            [(review_format[1:], 'Přidá recenzi na předmět.'),
+             (review_get_format[1:], 'Vypíše recenze na vybraný předmět.'),
+             ('roll X Y',
               'Vygeneruje náhodné celé číslo z intervalu <**X**, **Y**>.'),
              ('flip', 'Hodí mincí'),
              ('pick *Is foo bar? Yes No Maybe*',

@@ -1,18 +1,22 @@
 import datetime
 import discord
 from discord.ext.commands import Bot
+import re
 
 import utils
 from config.config import Config
 from config.messages import Messages
 from features.base_feature import BaseFeature
 from features.acl import Acl
+from features.review import Review
 from repository.karma_repo import KarmaRepository
 from repository.acl_repo import AclRepository
+from repository.review_repo import ReviewRepository
 from emoji import UNICODE_EMOJI
 
 acl_repo = AclRepository()
 acl = Acl(acl_repo)
+review_r = ReviewRepository()
 
 
 class Reaction(BaseFeature):
@@ -20,6 +24,7 @@ class Reaction(BaseFeature):
     def __init__(self, bot: Bot, karma_repository: KarmaRepository):
         super().__init__(bot)
         self.karma_repo = karma_repository
+        self.review = Review(bot)
 
     def make_embed(self, page):
         embed = discord.Embed(title="Rubbergod",
@@ -190,6 +195,45 @@ class Reaction(BaseFeature):
                         await message.add_reaction("▶")
                 if 1 <= next_page <= info_len:
                     embed = self.make_embed(next_page)
+                    await message.edit(embed=embed)
+            try:
+                await message.remove_reaction(emoji, member)
+            except:
+                pass
+        elif message.embeds and re.match(
+             ".* reviews", message.embeds[0].title):
+            subject = message.embeds[0].title.split(' ', 1)[0]
+            if message.embeds[0].footer.text[7] != '/':
+                page = int(message.embeds[0].footer.text[6:7])
+                max_page = int(message.embeds[0].footer.text[9])
+            else:
+                page = int(message.embeds[0].footer.text[6])
+                max_page = int(message.embeds[0].footer.text[8])
+            tier_average = message.embeds[0].description[-1]
+            if emoji in ["◀", "▶"]:
+                if emoji == "▶":
+                    next_page = page + 1
+                elif emoji == "◀":
+                    next_page = page - 1
+                if 1 <= next_page <= max_page:
+                    review = review_r.get_subject_reviews(subject)
+                    if review.count() >= next_page:
+                        review = review[next_page - 1].Review
+                        next_page = str(next_page) + "/" + str(max_page)
+                        embed = self.review.make_embed(
+                            review, subject, tier_average, next_page)
+                        await message.edit(embed=embed)
+            elif emoji in ["👍", "👎"]:
+                review = review_r.get_subject_reviews(subject)[page - 1].Review
+                if str(member.id) != review.member_ID:
+                    review_id = review.id
+                    if emoji == "👍":
+                        self.review.add_vote(review_id, True, str(member.id))
+                    elif emoji == "👎":
+                        self.review.add_vote(review_id, False, str(member.id))
+                    page = str(page) + "/" + str(max_page)
+                    embed = self.review.make_embed(
+                        review, subject, tier_average, page)
                     await message.edit(embed=embed)
             try:
                 await message.remove_reaction(emoji, member)
