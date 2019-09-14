@@ -200,8 +200,8 @@ class Reaction(BaseFeature):
                 await message.remove_reaction(emoji, member)
             except:
                 pass
-        elif message.embeds and re.match(
-             ".* reviews", message.embeds[0].title):
+        elif message.embeds and message.embeds[0].title is not None and\
+                re.match(".* reviews", message.embeds[0].title):
             subject = message.embeds[0].title.split(' ', 1)[0]
             pos = message.embeds[0].footer.text.find('/')
             page = int(message.embeds[0].footer.text[6:pos])
@@ -217,7 +217,7 @@ class Reaction(BaseFeature):
                 if 1 <= next_page <= max_page:
                     review = review_r.get_subject_reviews(subject)
                     if review.count() >= next_page:
-                        review = review[next_page - 1].Review
+                        review = review.all()[next_page - 1].Review
                         next_page = str(next_page) + "/" + str(max_page)
                         embed = self.review.make_embed(
                             review, subject, tier_average, next_page)
