@@ -50,11 +50,11 @@ class Review(commands.Cog):
 
     @commands.cooldown(rate=5, per=20.0, type=commands.BucketType.user)
     @commands.command()
-    async def get_reviews(self, ctx, subject=None):
+    async def get_reviews(self, ctx, subject: str = None):
         if subject is None:
             await ctx.send(messages.review_get_format)
         else:
-            embed = self.rev.list_reviews(subject)
+            embed = self.rev.list_reviews(subject.lower())
             if not embed:
                 await ctx.send(messages.review_wrong_subject)
                 return

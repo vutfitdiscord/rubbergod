@@ -204,7 +204,7 @@ class Reaction(BaseFeature):
              ".* reviews", message.embeds[0].title):
             subject = message.embeds[0].title.split(' ', 1)[0]
             pos = message.embeds[0].footer.text.find('/')
-            page = int(message.embeds[0].footer.text[6:(pos - 1)])
+            page = int(message.embeds[0].footer.text[6:pos])
             max_page = int(message.embeds[0].footer.text[(pos + 1):])
             tier_average = message.embeds[0].description[-1]
             if emoji in ["◀", "▶", "⏪"]:
