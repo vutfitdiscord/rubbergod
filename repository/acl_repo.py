@@ -31,7 +31,7 @@ class AclRepository(BaseRepository):
                     filter(Acl_groups.parent_id == group_id).all()
                 for group in groups:
                     stack.append(group.id)
-                if stack is []:
+                if stack == []:
                     return None
             else:
                 return result

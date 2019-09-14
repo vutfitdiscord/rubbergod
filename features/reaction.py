@@ -106,12 +106,15 @@ class Reaction(BaseFeature):
         else:
             guild = message.guild
         for line in data:
-            if ((discord.utils.get(guild.roles, name=line[0]) is None) and
-                (discord.utils.get(guild.channels,
-                                   name=line[0].lower()) is None) and
-                line[0].isdigit() and
-                (discord.utils.get(guild.channels,
-                                   id=int(line[0])) is None)):
+            not_role = discord.utils.get(guild.roles, name=line[0]) is None
+            if isinstance(line[0], int) or line[0].isdigit():
+                not_channel = discord.utils.get(guild.channels,
+                                                id=int(line[0])) is None
+            else:
+                not_channel = line[0][0] != "#" or\
+                    discord.utils.get(guild.channels,
+                                      name=line[0][1:].lower()) is None
+            if not_role and not_channel:
                 await message.channel.send(
                     Messages.role_not_role
                     .format(user=utils.generate_mention(
@@ -291,7 +294,9 @@ class Reaction(BaseFeature):
                 channel = None
             if channel is None:
                 channel = discord.utils.get(guild.channels,
-                                            name=target.lower())
+                                            name=target[1:].lower())
+            if channel is None:
+                return
             perms = acl.get_perms(member.id, member.top_role,
                                   channel.id, guild.roles)
             # TODO give perms based on the int (like read-only)
@@ -299,9 +304,10 @@ class Reaction(BaseFeature):
                 await channel.set_permissions(member, read_messages=True,
                                               send_messages=True)
             else:
-                await channel.send(Messages.role_add_denied
-                                   .format(user=utils.generate_mention(
-                                       member.id), role=role.name))
+                bot_room = self.bot.get_channel(Config.bot_room)
+                await bot_room.send(Messages.role_add_denied
+                                    .format(user=utils.generate_mention(
+                                        member.id), role=channel.name))
 
     # Removes a role for user based on reaction
     async def remove_role_on_reaction(self, target, member, channel, guild):
@@ -327,13 +333,16 @@ class Reaction(BaseFeature):
                 channel = None
             if channel is None:
                 channel = discord.utils.get(guild.channels,
-                                            name=target.lower())
+                                            name=target[1:].lower())
+            if channel is None:
+                return
             perms = acl.get_perms(member.id, member.top_role,
                                   channel.id, guild.roles)
             if perms:
                 await channel.set_permissions(member, read_messages=None,
                                               send_messages=None)
             else:
-                await channel.send(Messages.role_remove_denied
-                                   .format(user=utils.generate_mention(
-                                       member.id), role=channel.name))
+                bot_room = self.bot.get_channel(Config.bot_room)
+                await bot_room.send(Messages.role_remove_denied
+                                    .format(user=utils.generate_mention(
+                                        member.id), role=channel.name))
