@@ -39,16 +39,20 @@ class ReviewRepository(BaseRepository):
         session.commit()
 
     def add_review(self, author, subject, tier, anonym: bool, text):
-        review = Review(
-            member_ID=str(author),
-            subject=subject,
-            tier=tier,
-            anonym=anonym,
-            text_review=text,
-            date=datetime.date.today()
-        )
-        session.add(review)
-        session.commit()
+        try:
+            review = Review(
+                member_ID=str(author),
+                subject=subject,
+                tier=tier,
+                anonym=anonym,
+                text_review=text,
+                date=datetime.date.today()
+            )
+            session.add(review)
+            session.commit()
+        except:
+            session.rollback()
+            raise
 
     def get_votes_count(self, review_id, vote: bool):
         return session.query(ReviewRelevance).filter(

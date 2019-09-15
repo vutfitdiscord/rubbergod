@@ -49,7 +49,7 @@ class Base(commands.Cog):
                                                          error.__traceback__))
             channel = self.bot.get_channel(config.bot_dev_channel)
             print(output)
-            output = (output[0 + i: 1900 + i] for i in range(0,len(output), 1900))
+            output = list(output[0 + i: 1900 + i] for i in range(0, len(output), 1900))
             if channel is not None:
                 for message in output:
                     await channel.send("```\n" + message + "\n```")
