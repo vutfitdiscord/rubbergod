@@ -202,7 +202,8 @@ class Reaction(BaseFeature):
                 await message.remove_reaction(emoji, member)
             except:
                 pass
-        elif message.embeds and message.embeds[0].title is not None and\
+        elif message.embeds and\
+                message.embeds[0].title is not discord.Embed.Empty and\
                 re.match(".* reviews", message.embeds[0].title):
             subject = message.embeds[0].title.split(' ', 1)[0]
             pos = message.embeds[0].footer.text.find('/')

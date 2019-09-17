@@ -113,8 +113,8 @@ class Acl(BaseFeature):
         self.acl_repo.edit_group(*args)
         await ctx.send(messages.acl_edit_group)
 
-    async def del_group(self, ctx, args):
-        self.acl_repo.del_group(*args)
+    async def del_group(self, ctx, id):
+        self.acl_repo.del_group(id)
         await ctx.send(messages.acl_del_group)
 
     async def list_group(self, ctx, args):
@@ -138,8 +138,8 @@ class Acl(BaseFeature):
         self.acl_repo.edit_rule(*args)
         await ctx.send(messages.acl_edit_rule)
 
-    async def del_rule(self, ctx, args):
-        self.acl_repo.del_rule(*args)
+    async def del_rule(self, ctx, id):
+        self.acl_repo.del_rule(id)
         await ctx.send(messages.acl_del_rule)
 
     async def list_rule(self, ctx, args):
@@ -163,8 +163,8 @@ class Acl(BaseFeature):
         self.acl_repo.edit_role(*args)
         await ctx.send(messages.acl_edit_role)
 
-    async def del_role(self, ctx, args):
-        self.acl_repo.del_role(*args)
+    async def del_role(self, ctx, id):
+        self.acl_repo.del_role(id)
         await ctx.send(messages.acl_del_role)
 
     async def list_role(self, ctx, args):
@@ -191,8 +191,8 @@ class Acl(BaseFeature):
         self.acl_repo.edit_user(*args)
         await ctx.send(messages.acl_edit_user)
 
-    async def del_user(self, ctx, args):
-        self.acl_repo.del_user(*args)
+    async def del_user(self, ctx, id):
+        self.acl_repo.del_user(id)
         await ctx.send(messages.acl_del_user)
 
     async def list_user(self, ctx, args):
