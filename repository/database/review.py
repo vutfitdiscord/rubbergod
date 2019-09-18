@@ -18,7 +18,7 @@ class Review(database.base):
     member_ID = Column(String)
     anonym = Column(Boolean, default=True)
     subject = Column(String, ForeignKey("bot_subjects.shortcut",
-        ondelete="CASCADE"))
+                     ondelete="CASCADE"))
     tier = Column(Integer, default=0)
     text_review = Column(String, default=None)
     date = Column(Date)
@@ -34,6 +34,7 @@ class ReviewRelevance(database.base):
     member_ID = Column(String)
     vote = Column(Boolean, default=False)
     review = Column(Integer, ForeignKey('bot_review.id', ondelete="CASCADE"))
+
 
 class Subject(database.base):
     __tablename__ = 'bot_subjects'

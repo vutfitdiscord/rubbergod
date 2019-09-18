@@ -145,12 +145,20 @@ class Messages:
                               "({toaster} pls)."
     verify_verify_wrong_code = "{user} Špatný kód."
 
-    review_format = "?review [zkratka předmětu] [tier] (anonym) (text)"
+    review_format = "?reviews [add, remove, zkratka předmětu]"
+    review_add_format = "?reviews add [zkratka předmětu] [tier (0-4, kde 0" \
+                        " je nejlepší)] (anonym) (text)"
     review_wrong_subject = "Nesprávná zkratka předmětu"
-    review_tier = "Tier je z rozsahu 0-3"
+    review_tier = "Tier je z rozsahu 0-4"
     review_text_len = "Maximální počet znaků v části 'text' je 1024"
     review_added = "Hodnocení předmětu bylo přidáno"
-    review_get_format = "?get_reviews [zkratka předmětu]"
+    review_get_format = "?reviews [zkratka předmětu]"
+    review_remove_format = "?reviews remove [zkratka předmětu]"
+    review_remove_id_format = "?reviews remove id [id]"
+    review_remove_success = "Hodnocení předmětu bylo odebráno"
+    review_remove_error = "Hodnocení předmětu nebylo nalezeno"
+    review_add_denied = "{user}, na přidání hodnocení předmětu nemáš právo."
+    subject_format = "?subject [add, remove] [zkratka předmětu]"
 
     pr_meme = "https://github.com/Toaster192/rubbergod/pulls"
     uhoh = "uh oh"
@@ -173,6 +181,7 @@ class Messages:
              ('ishaboard', 'Leaderboard rozdávání negativní karmy.')],
             [(review_format[1:], 'Přidá recenzi na předmět.'),
              (review_get_format[1:], 'Vypíše recenze na vybraný předmět.'),
+             (review_remove_format[1:], 'Odstráni hodnocení'),
              ('roll X Y',
               'Vygeneruje náhodné celé číslo z intervalu <**X**, **Y**>.'),
              ('flip', 'Hodí mincí'),
