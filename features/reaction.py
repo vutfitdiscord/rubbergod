@@ -57,10 +57,7 @@ class Reaction(BaseFeature):
     # Returns list of role names and emotes that represent them
     async def get_join_role_data(self, message):
         input_string = message.content
-        input_string = input_string.replace(" - ", " ")
-        input_string = input_string.replace(": ", " ")
         input_string = input_string.replace("**", "")
-        output = []
         try:
             if input_string.startswith(Config.role_string):
                 input_string = input_string[input_string.index('\n') + 1:]
@@ -73,13 +70,12 @@ class Reaction(BaseFeature):
                 )
             )
             return output
+        output = []
         for line in input_string:
             try:
-                emoji = next(filter(lambda x: x[0] in UNICODE_EMOJI or
-                                    (x[0] == '<' and x[1] == ':'),
-                                    line.split()))
-                line = [line[:line.index(emoji) - 1], emoji]
-                output.append(line)
+                out = line.split(" - ", 1)[0].split()
+                out = [out[1], out[0]]
+                output.append(out)
             except:
                 await message.channel.send(
                     Messages.role_invalid_line
@@ -331,7 +327,8 @@ class Reaction(BaseFeature):
                              role.id, guild.roles):
                 await member.add_roles(role)
             else:
-                await channel.send(Messages.role_add_denied
+                bot_room = self.bot.get_channel(Config.bot_room)
+                await bot_room.send(Messages.role_add_denied
                                    .format(user=utils.generate_mention(
                                        member.id), role=role.name))
         else:
@@ -348,8 +345,7 @@ class Reaction(BaseFeature):
                                   channel.id, guild.roles)
             # TODO give perms based on the int (like read-only)
             if perms:
-                await channel.set_permissions(member, read_messages=True,
-                                              send_messages=True)
+                await channel.set_permissions(member, read_messages=True)
             else:
                 bot_room = self.bot.get_channel(Config.bot_room)
                 await bot_room.send(Messages.role_add_denied
@@ -366,7 +362,8 @@ class Reaction(BaseFeature):
                                  role.id, guild.roles):
                     await member.remove_roles(role)
                 else:
-                    await channel.send(
+                    bot_room = self.bot.get_channel(Config.bot_room)
+                    await bot_room.send(
                         Messages.role_remove_denied
                         .format(user=utils.generate_mention(
                             member.id),

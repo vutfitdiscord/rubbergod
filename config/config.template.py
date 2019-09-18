@@ -53,8 +53,8 @@ class Config:
 
     # String constants
     role_string = 'Role\n'
-    #                add-roles         back-to-school
-    role_channels = [591384273051975683, 622202824377237504]
+    #                add-roles         back-to-school        summertime-madness
+    role_channels = [591384273051975683, 622202824377237504, 623290691774316574]
     hug_emojis = ["<:peepoHug:600435649786544151>",
                   "<:peepoHugger:602052621007585280>",
                   "<:huggers:602823825880514561>", "(っ˘̩╭╮˘̩)っ", "(っ´▽｀)っ",
