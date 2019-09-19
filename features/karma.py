@@ -9,6 +9,7 @@ import utils
 from config import config, messages
 from features.base_feature import BaseFeature
 from repository.karma_repo import KarmaRepository
+from repository.database.karma import Karma as Database_karma
 
 cfg = config.Config
 msg = messages.Messages
@@ -77,7 +78,7 @@ class Karma(BaseFeature):
             if not server_emoji.animated:
                 e = list(
                     filter(
-                        lambda x: test_emoji(x[0], server_emoji),
+                        lambda x: test_emoji(x.emoji_ID, server_emoji),
                         emojis))
 
                 if len(e) == 0:
@@ -212,7 +213,7 @@ class Karma(BaseFeature):
         for value in ['1', '-1']:
             emojis, error = await self.__make_emoji_list(
                     channel.guild,
-                    self.repo.get_emojis_valued(value)
+                    self.repo.get_ids_of_emojis_valued(value)
                     )
             errors += error
             try:
@@ -221,7 +222,7 @@ class Karma(BaseFeature):
                 pass  # TODO: error handling?
 
         if errors != "":
-            channel = await self.bot.fetch_channel(cfg.log_channel_id)
+            channel = await self.bot.fetch_channel(cfg.bot_dev_channel)
             await channel.send("{}\n{}".format(msg.toaster_pls,
                                                errors))
 
@@ -261,46 +262,43 @@ class Karma(BaseFeature):
                                 karma_neg=k.negative.value,
                                 karma_neg_order=k.negative.position)
 
-
     async def leaderboard(self, channel, action, order):
         output = "> "
         if action == 'give':
-            database = 'bot_karma_giving'
             if order == "DESC":
-                database_index = 1
                 column = 'positive'
+                attribute = Database_karma.positive.desc()
                 emote = "<:peepolove:562305740132450359>"
                 output += emote + "KARMA GIVINGBOARD " + emote + "\n"
             else:
-                database_index = 2
-                order = "DESC"
                 column = 'negative'
+                attribute = Database_karma.negative.desc()
                 emote = "<:ishaGrin:587959772301623297>"
                 output += emote + " KARMA ISHABOARD " + emote + "\n"
         elif action == 'get':
-            database_index = 1
-            database = 'bot_karma'
             column = 'karma'
             if order == "DESC":
+                attribute = Database_karma.karma.desc()
                 emote = ":trophy:"
                 output += emote + " KARMA LEADERBOARD " + emote + "\n"
             else:
+                attribute = Database_karma.karma
                 emote = "<:coolStoryArcasCZ:489539455271829514>"
                 output += emote + " KARMA BAJKARBOARD " + emote + "\n"
         else:
             raise Exception('Action neni get/give')
         output += "> =======================\n"
 
-        board = self.repo.get_leaderboard(database, column, order)
+        board = self.repo.get_leaderboard(attribute)
         guild = self.bot.get_guild(cfg.guild_id)
 
         for i, user in enumerate(board, 1):
-            username = guild.get_member(int(user[0]))
+            username = guild.get_member(int(user.member_ID))
             if username is None:
                 continue
             username = discord.utils.escape_markdown(username.display_name)
             line = '> {} – **{}**: {} pts\n'.format(i, username,
-                                                    user[database_index])
+                                                    getattr(user, column))
             output += line
 
         await channel.send(output)

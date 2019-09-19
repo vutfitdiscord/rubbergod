@@ -1,3 +1,4 @@
+import datetime
 import discord
 from discord.ext.commands import Bot
 
@@ -12,9 +13,12 @@ from emoji import UNICODE_EMOJI
 
 class Reaction(BaseFeature):
 
-    def __init__(self, bot: Bot, karma_repository: KarmaRepository, voter: Vote):
+    def __init__(self, bot: Bot, karma_repository: KarmaRepository):
         super().__init__(bot)
         self.karma_repo = karma_repository
+        self.voter = None
+
+    def use_voter(self, voter: Vote):
         self.voter = voter
 
     def make_embed(self, page):
@@ -65,7 +69,8 @@ class Reaction(BaseFeature):
             return output
         for line in input_string:
             try:
-                emoji = next(filter(lambda x: x[0] in UNICODE_EMOJI or x[0] == '<', line.split()))
+                emoji = next(filter(lambda x: x[0] in UNICODE_EMOJI or \
+                        (x[0] == '<' and x[1]== ':'), line.split()))
                 line = [line[:line.index(emoji) - 1], emoji]
                 output.append(line)
             except:
@@ -76,6 +81,20 @@ class Reaction(BaseFeature):
                         line=line[0]
                     )
                 )
+        for line in output:
+            if "<#" in line[0]:
+                line[0] = line[0].replace("<#", "")
+                line[0] = line[0].replace(">", "")
+                try:
+                    line[0] = int(line[0])
+                except:
+                    await message.channel.send(
+                        Messages.role_invalid_line
+                        .format(user=utils.generate_mention(
+                            message.author.id),
+                            line=line[0]
+                        )
+                    )
         return output
 
     # Adds reactions to message
@@ -86,8 +105,8 @@ class Reaction(BaseFeature):
         else:
             guild = message.guild
         for line in data:
-            if (discord.utils.get(guild.roles,
-                                  name=line[0]) is None):
+            if ((discord.utils.get(guild.roles,name=line[0]) is None) and
+                (discord.utils.get(guild.channels,id=line[0]) is None)):
                 await message.channel.send(
                     Messages.role_not_role
                     .format(user=utils.generate_mention(
@@ -118,7 +137,8 @@ class Reaction(BaseFeature):
         if member is None or message is None or member.bot:
             return
 
-        if message.content[1:].startswith("vote") and message.content[0] in Config.command_prefix:
+        if message.content[1:].startswith("vote") and message.content[0] in Config.command_prefix\
+                and self.voter is not None:
             await self.voter.handle_reaction(message)
 
         if payload.emoji.is_custom_emoji():
@@ -186,7 +206,22 @@ class Reaction(BaseFeature):
         if emoji == '📌':
             for reaction in message.reactions:
                 if reaction.emoji == '📌' and \
-                   reaction.count >= Config.pin_count:
+                   reaction.count >= Config.pin_count and \
+                   message.pinned == False:
+                    embed = discord.Embed(title="📌 Auto pin message log",
+                        color=0xeee657)
+                    users = await reaction.users().flatten()
+                    user_names = ', '.join([user.name for user in users])
+                    message_link = Messages.message_link_prefix \
+                                 + str(message.channel.id) + '/'\
+                                 + str(message.id)
+                    embed.add_field(name="Users", value=user_names)
+                    embed.add_field(name="In channel",value=message.channel)
+                    embed.add_field(name="Message",
+                                    value=message_link, inline=False)
+                    embed.set_footer(text=datetime.datetime.now().replace(microsecond=0))
+                    channel = self.bot.get_channel(Config.log_channel)
+                    await channel.send(embed=embed)
                     try:
                         await message.pin()
                     except discord.HTTPException:
@@ -207,7 +242,8 @@ class Reaction(BaseFeature):
         if member is None or message is None or member.bot:
             return
 
-        if message.content[1:].startswith("vote") and message.content[0] in Config.command_prefix:
+        if message.content[1:].startswith("vote") and message.content[0] in Config.command_prefix\
+                and self.voter is not None:
             await self.voter.handle_reaction(message)
 
         if payload.emoji.is_custom_emoji():
@@ -238,9 +274,9 @@ class Reaction(BaseFeature):
                     message.author, member, emoji.id)
 
     # Adds a role for user based on reaction
-    async def add_role_on_reaction(self, role, member, channel, guild):
+    async def add_role_on_reaction(self, target, member, channel, guild):
         role = discord.utils.get(guild.roles,
-                                 name=role)
+                                 name=target)
         max_role = discord.utils.get(guild.roles,
                                      name="Rubbergod")
         if role is not None:
@@ -250,11 +286,15 @@ class Reaction(BaseFeature):
                 await channel.send(Messages.role_add_denied
                                    .format(user=utils.generate_mention(
                                        member.id), role=role.name))
+        else:
+            channel = discord.utils.get(guild.channels,id=target)
+            await channel.set_permissions(member,read_messages=True, 
+                                                 send_messages=True)
 
     # Removes a role for user based on reaction
-    async def remove_role_on_reaction(self, role, member, channel, guild):
+    async def remove_role_on_reaction(self, target, member, channel, guild):
         role = discord.utils.get(guild.roles,
-                                 name=role)
+                                 name=target)
         max_role = discord.utils.get(guild.roles,
                                      name="Rubbergod")
         if role is not None:
@@ -269,3 +309,7 @@ class Reaction(BaseFeature):
                             role=role.name
                         )
                     )
+        else:
+            channel = discord.utils.get(guild.channels,id=target)
+            await channel.set_permissions(member,read_messages=None, 
+                                                 send_messages=None)

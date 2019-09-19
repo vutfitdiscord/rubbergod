@@ -12,6 +12,8 @@ class Messages:
     vote_room_only = "Tohle funguje jen v {room}."
     bot_room_redirect = "{} <:sadcat:576171980118687754> 👉 " \
                         "<#{}>\n"
+    message_link_prefix = 'https://discordapp.com/channels/' \
+                        + str(config.Config.guild_id) + '/'
 
     uhoh_counter = "{uhohs} uh ohs od spuštění."
     uptime_message = "Up since:  `{boottime}`\nUptime:\t`{uptime}`"
@@ -130,6 +132,9 @@ class Messages:
     vote_winning = "Vyhrává možnost {winning_emoji} „{winning_option}“ s {votes} hlasy."
     vote_winning_multiple = "Vyhrávají možnosti {winning_emojis} s {votes} hlasy."
     vote_none = "Čekám na hlasy."
+
+    pr_meme = "https://github.com/Toaster192/rubbergod/pulls"
+    uhoh = "uh oh"
 
     info = [[('karma', 'Vypíše vaši karmu, kolik pozitivní a negativní karmy'
                        ' jste rozdali.'),

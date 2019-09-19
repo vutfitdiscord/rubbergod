@@ -12,21 +12,14 @@ class Config:
     email_pass = ''
 
     # Database
-    connection = {
-        'user': 'root',
-        'password': '',
-        'host': '127.0.0.1',
-        'database': 'rubbergod',
-        'port': '',
-        'raise_on_warnings': True,
-        'use_pure': False,
-        'charset': 'utf8mb4',
-        'collation': 'utf8mb4_unicode_ci',
-    }
+    db_string = "postgres://postgres:postgres@db:5432/postgres"
 
     # Base bot behavior
     command_prefix = ('?', '!')
     default_prefix = '?'
+
+    # Extensions loaded on bot start
+    extensions = ['base', 'karma', 'meme', 'random', 'verify', 'fitwide']
 
     # Roll dice
     max_dice_at_once = 1000
@@ -46,17 +39,18 @@ class Config:
     pin_count = 20
 
     # Special channel IDs
-    log_channel_id = 597009137905303552
+    log_channel = 531058805233156096
+    bot_dev_channel = 597009137905303552
     vote_room = 461544375105749003
     bot_room = 461549842896781312
 
     allowed_channels = [
             bot_room,
-            log_channel_id
+            bot_dev_channel
     ]
 
     # String constants
-    role_string = 'Role'
+    role_string = 'Role\n'
     hug_emojis = ["<:peepoHug:600435649786544151>",
                   "<:peepoHugger:602052621007585280>",
                   "<:huggers:602823825880514561>", "(っ˘̩╭╮˘̩)っ", "(っ´▽｀)っ",
@@ -80,3 +74,10 @@ class Config:
     # Arcas
     arcas_id = 140547421733126145
     arcas_delay = 24
+
+
+    # uh oh
+    uhoh_string = 'uh oh'
+
+    # grillbot
+    grillbot_id = 0

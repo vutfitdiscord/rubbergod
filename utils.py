@@ -16,11 +16,17 @@ def git_commit_msg():
     return repo.head.commit.message
 
 
+def git_pull():
+    repo = git.Repo(search_parent_directories=True)
+    cmd = repo.git
+    return cmd.pull()
+
+
 def str_emoji_id(emoji):
     if isinstance(emoji, int):
         return str(emoji)
 
-    return emoji if isinstance(emoji, str) else emoji.id
+    return emoji if isinstance(emoji, str) else str(emoji.id)
 
 
 def has_role(user, role_name: str):

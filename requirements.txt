@@ -1,5 +1,5 @@
 discord
-mysql
-mysql-connector-python-rf
 emoji
 gitpython
+sqlalchemy
+psycopg2
