@@ -93,8 +93,7 @@ class KarmaRepository(BaseRepository):
                     getattr(givers_karma, column) + emoji_value)
         else:
             new_giver = Karma(member_ID=giver.id)
-            setattr(new_giver, column,
-                    getattr(new_giver, column) + emoji_value)
+            setattr(new_giver, column, emoji_value)
             session.add(new_giver)
 
     def karma_emoji(self, member_id, giver, emoji_id):

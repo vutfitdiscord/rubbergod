@@ -1,4 +1,5 @@
 import re
+import traceback
 
 from discord.ext import commands
 
@@ -6,9 +7,11 @@ import utils
 from config import config, messages
 
 from features import presence
+from repository.review_repo import ReviewRepository
 from repository.database import database, session
 from repository.database.karma import Karma, Karma_emoji
 from repository.database.verification import Permit, Valid_person
+from repository.database.review import Review, ReviewRelevance, Subject
 
 
 # TODO move this ANYWHERE else
@@ -91,6 +94,14 @@ bot = commands.Bot(command_prefix=commands.when_mentioned_or(
 
 presence = presence.Presence(bot)
 
+
+# fill DB with subjects shortcut, needed for reviews
+def load_subjects():
+    review_repo = ReviewRepository()
+    for subject in config.subjects:
+        review_repo.add_subject(subject)
+
+
 @bot.event
 async def on_ready():
     """If RGod is ready"""
@@ -99,6 +110,13 @@ async def on_ready():
     await presence.set_presence()
 
 
+@bot.event
+async def on_error(event, *args, **kwargs):
+    channel = bot.get_channel(config.bot_dev_channel)
+    output = traceback.format_exc()
+    print(output)
+    if channel is not None:
+        await channel.send("```\n" + output + "\n```")
 
 
 @bot.command()
@@ -156,6 +174,10 @@ async def reload(ctx, extension):
             messages.insufficient_rights
             .format(user=utils.generate_mention(ctx.author.id)))
 
+database.base.metadata.create_all(database.db)
+session.commit()  # Making sure
+
+#load_subjects()
 
 for extension in config.extensions:
     bot.load_extension(f'cogs.{extension}')

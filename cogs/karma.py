@@ -27,7 +27,8 @@ class Karma(commands.Cog):
         if message.author.bot:
             return
 
-        if message.content.startswith(config.role_string):
+        if message.content.startswith(config.role_string) or\
+           message.channel.id in config.role_channels:
             role_data = await self.reaction.get_join_role_data(message)
             await self.reaction.message_role_reactions(message, role_data)
 

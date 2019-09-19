@@ -148,7 +148,7 @@ class Verification(BaseFeature):
         if len(raw_year_parts) == 3:
             if raw_year_parts[0] == "FIT":
                 raw_year_parts[2] = int(raw_year_parts[2][:-1])  # rip types
-                if raw_year_parts[1] == "BIT":
+                if raw_year_parts[1] == "BIT" or raw_year_parts[1] == "BITP":
                     year = "BIT"
                     if raw_year_parts[2] < 4:
                         year = str(raw_year_parts[2]) + year

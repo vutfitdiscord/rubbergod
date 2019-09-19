@@ -28,8 +28,10 @@ class Base(commands.Cog):
 
     @commands.Cog.listener()
     async def on_command_error(self, ctx, error):
-        if isinstance(error, commands.BadArgument) and \
-           ctx.command.name == 'hug':
+        # The local handlers so far only catch bad arguments so we still
+        # want to print the rest
+        if isinstance(error, commands.BadArgument) and\
+           hasattr(ctx.command, 'on_error'):
             return
 
         if isinstance(error, commands.CommandNotFound):
@@ -47,8 +49,10 @@ class Base(commands.Cog):
                                                          error.__traceback__))
             channel = self.bot.get_channel(config.bot_dev_channel)
             print(output)
+            output = list(output[0 + i: 1900 + i] for i in range(0, len(output), 1900))
             if channel is not None:
-                await channel.send("```\n" + output + "\n```")
+                for message in output:
+                    await channel.send("```\n" + message + "\n```")
 
     @commands.cooldown(rate=2, per=20.0, type=commands.BucketType.user)
     @commands.command()
