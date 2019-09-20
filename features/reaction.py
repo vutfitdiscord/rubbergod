@@ -243,7 +243,11 @@ class Reaction(BaseFeature):
             elif emoji in ["🔼", "🔽"]:
                 if message.embeds[0].fields[3].name == "Text page":
                     review = review_r.get_subject_reviews(
-                        subject)[page - 1].Review
+                        subject)
+                    if review:
+                        await message.remove_reaction(emoji, member)
+                        return
+                    review = review[page - 1].Review
                     text_page = message.embeds[0].fields[3].value
                     pos = message.embeds[0].fields[3].value.find('/')
                     max_text_page = int(text_page[(pos + 1):])

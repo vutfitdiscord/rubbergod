@@ -31,6 +31,7 @@ class Review(commands.Cog):
             if subcommand == 'add':
                 if subject is None or tier is None:
                     await ctx.send(messages.review_add_format)
+                    return
                 author = ctx.message.author.id
                 anonym = False
                 if tier < 0 or tier > 4:
@@ -89,7 +90,7 @@ class Review(commands.Cog):
     @reviews.error
     async def review_error(self, ctx, error):
         if isinstance(error, commands.BadArgument):
-            await ctx.send(messages.review_format)
+            await ctx.send(messages.review_add_format)
 
     @commands.cooldown(rate=5, per=20.0, type=commands.BucketType.user)
     @commands.command()

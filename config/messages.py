@@ -149,7 +149,7 @@ class Messages:
     review_add_format = "?reviews add [zkratka předmětu] [tier (0-4, kde 0" \
                         " je nejlepší)] (anonym) (text)"
     review_wrong_subject = "Nesprávná zkratka předmětu"
-    review_tier = "Tier je z rozsahu 0-4"
+    review_tier = "Tier je z rozsahu 0-4, kde 0 je nejlepší"
     review_text_len = "Maximální počet znaků v části 'text' je 1024"
     review_added = "Hodnocení předmětu bylo přidáno"
     review_get_format = "?reviews [zkratka předmětu]"
@@ -179,7 +179,7 @@ class Messages:
              ('bajkarboard', 'Karma leaderboard reversed'),
              ('givingboard', 'Leaderboard rozdávání pozitivní karmy.'),
              ('ishaboard', 'Leaderboard rozdávání negativní karmy.')],
-            [(review_format[1:], 'Přidá recenzi na předmět.'),
+            [(review_add_format[1:], 'Přidá recenzi na předmět.'),
              (review_get_format[1:], 'Vypíše recenze na vybraný předmět.'),
              (review_remove_format[1:], 'Odstráni hodnocení'),
              ('roll X Y',
