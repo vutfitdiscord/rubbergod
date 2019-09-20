@@ -156,7 +156,11 @@ class Verification(BaseFeature):
                         year = "4BIT+"
                 elif raw_year_parts[1] in ["MBS", "MBI", "MIS", "MIN",
                                            "MMI", "MMM", "MGM", "MGMe",
-                                           "MPV", "MSK"]:
+                                           "MPV", "MSK", "NADE", "NBIO",
+                                           "NGRI", "NNET", "NVIZ", "NCPS",
+                                           "NSEC", "NEMB", "NHPC", "NISD",
+                                           "NIDE", "NISY", "NMAL", "NMAT",
+                                           "NSEN", "NVER", "NSPE"]:
                     year = "MIT"
                     if raw_year_parts[2] < 3:
                         year = str(raw_year_parts[2]) + year
