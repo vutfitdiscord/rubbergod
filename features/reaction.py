@@ -152,6 +152,9 @@ class Reaction(BaseFeature):
                 emoji = payload.emoji
         else:
             emoji = payload.emoji.name
+        if emoji == "⏹️":
+            return
+            # grillbot emoji for removing message causes errors
         if message.content.startswith(Config.role_string) or\
            channel.id in Config.role_channels:
             role_data = await self.get_join_role_data(message)
@@ -201,9 +204,10 @@ class Reaction(BaseFeature):
                 message.embeds[0].title is not discord.Embed.Empty and\
                 re.match(".* reviews", message.embeds[0].title):
             subject = message.embeds[0].title.split(' ', 1)[0]
-            pos = message.embeds[0].footer.text.find('/')
-            page = int(message.embeds[0].footer.text[6:pos])
-            max_page = int(message.embeds[0].footer.text[(pos + 1):])
+            footer = message.embeds[0].footer.text.split('|')[0]
+            pos = footer.find('/')
+            page = int(footer[8:pos])
+            max_page = int(footer[(pos + 1):])
             tier_average = message.embeds[0].description[-1]
             if emoji in ["◀", "▶", "⏪"]:
                 if emoji == "▶":
@@ -220,7 +224,7 @@ class Reaction(BaseFeature):
                         embed = self.review.make_embed(
                             review, subject, tier_average, next_page)
                         await message.edit(embed=embed)
-            elif emoji in ["👍", "👎"]:
+            elif emoji in ["👍", "👎", "🛑"]:
                 review = review_r.get_subject_reviews(subject)[page - 1].Review
                 if str(member.id) != review.member_ID:
                     review_id = review.id
@@ -228,10 +232,36 @@ class Reaction(BaseFeature):
                         self.review.add_vote(review_id, True, str(member.id))
                     elif emoji == "👎":
                         self.review.add_vote(review_id, False, str(member.id))
+                    elif emoji == "🛑":
+                        review_r.remove_vote(
+                            review_id, str(member.id))
                     page = str(page) + "/" + str(max_page)
                     embed = self.review.make_embed(
                         review, subject, tier_average, page)
                     await message.edit(embed=embed)
+            elif emoji in ["🔼", "🔽"]:
+                if message.embeds[0].fields[3].name == "Text page":
+                    review = review_r.get_subject_reviews(
+                        subject)
+                    if review:
+                        await message.remove_reaction(emoji, member)
+                        return
+                    review = review[page - 1].Review
+                    text_page = message.embeds[0].fields[3].value
+                    pos = message.embeds[0].fields[3].value.find('/')
+                    max_text_page = int(text_page[(pos + 1):])
+                    text_page = int(text_page[:pos])
+                    if emoji == "🔼":
+                        next_text_page = text_page - 1
+                    if emoji == "🔽":
+                        next_text_page = text_page + 1
+                    if next_text_page > 0 and next_text_page <= max_text_page:
+                        page = str(page) + "/" + str(max_page)
+                        embed = self.review.make_embed(
+                            review, subject, tier_average, page)
+                        embed = self.review.change_text_page(
+                            review, embed, next_text_page, max_text_page)
+                        await message.edit(embed=embed)
             try:
                 await message.remove_reaction(emoji, member)
             except:

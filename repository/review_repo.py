@@ -54,6 +54,9 @@ class ReviewRepository(BaseRepository):
             session.rollback()
             raise
 
+    def remove(self, id):
+        session.query(Review).filter(Review.id == id).delete()
+
     def get_votes_count(self, review_id, vote: bool):
         return session.query(ReviewRelevance).filter(
             ReviewRelevance.review == review_id,
@@ -74,6 +77,12 @@ class ReviewRepository(BaseRepository):
         )
         session.merge(relevance)
         session.commit()
+
+    def remove_vote(self, review_id, author):
+        session.query(ReviewRelevance).filter(
+            ReviewRelevance.review == review_id,
+            ReviewRelevance.member_ID == author
+        ).delete()
 
     def get_subject(self, shortcut):
         return session.query(Subject).filter(Subject.shortcut == shortcut)
