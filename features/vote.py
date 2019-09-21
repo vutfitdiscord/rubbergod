@@ -132,7 +132,7 @@ class Vote(BaseFeature):
 
     # The lookups in this method are so ineffective that they make me sick a bit.
     # We could definitely get rid of all the iterations.
-    async def handle_reaction(self, reaction: Reaction, user: User):
+    async def handle_reaction(self, reaction: Reaction, user: User, added: bool):
         target_msg = reaction.message
         data = await self.get_message_data_raw(target_msg.content)
 
@@ -140,6 +140,12 @@ class Vote(BaseFeature):
             return
 
         if data.date is not None and data.date < datetime.now():
+            if added:
+                await reaction.message.remove_reaction(reaction.emoji, user)
+            return
+
+        if added and not any(str(reaction.emoji) == a[0] for a in data.options):
+            await reaction.message.remove_reaction(reaction.emoji, user)
             return
 
         bot_msg = await target_msg.channel.history(limit=3, after=target_msg.created_at) \

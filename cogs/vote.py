@@ -40,14 +40,14 @@ class Vote(commands.Cog):
             self.handled.append(t)
         return False
 
-    async def handle_raw_reaction(self, payload: RawReactionActionEvent):
+    async def handle_raw_reaction(self, payload: RawReactionActionEvent, added: bool):
         chan = await self.bot.fetch_channel(payload.channel_id)
         msg = await chan.fetch_message(payload.message_id)
         usr = await self.bot.fetch_user(payload.user_id)
 
         for r in msg.reactions:
             if str(r.emoji) == str(payload.emoji):
-                await self.voter.handle_reaction(r, usr)
+                await self.voter.handle_reaction(r, usr, added)
                 return True
 
         return False
@@ -59,7 +59,7 @@ class Vote(commands.Cog):
             return
 
         # print("Handling")
-        await self.voter.handle_reaction(reaction, user)
+        await self.voter.handle_reaction(reaction, user, True)
 
     @commands.Cog.listener()
     async def on_raw_reaction_add(self, payload: RawReactionActionEvent):
@@ -68,7 +68,7 @@ class Vote(commands.Cog):
             return
 
         # print("Handling RAW")
-        if not await self.handle_raw_reaction(payload):
+        if not await self.handle_raw_reaction(payload, True):
             print("Couldn't find reaction, that is rather weird.")
 
     @commands.Cog.listener()
@@ -78,7 +78,7 @@ class Vote(commands.Cog):
             return
 
         # print("Handling")
-        await self.voter.handle_reaction(reaction, user)
+        await self.voter.handle_reaction(reaction, user, False)
 
     @commands.Cog.listener()
     async def on_raw_reaction_remove(self, payload: RawReactionActionEvent):
@@ -87,7 +87,7 @@ class Vote(commands.Cog):
             return
 
         # print("Handling RAW")
-        if not await self.handle_raw_reaction(payload):
+        if not await self.handle_raw_reaction(payload, False):
             print("Couldn't find reaction, that is rather weird.")
 
 
