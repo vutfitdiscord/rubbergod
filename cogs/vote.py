@@ -25,7 +25,7 @@ class Vote(commands.Cog):
         self.handled = []
 
     @commands.cooldown(rate=5, per=20.0, type=commands.BucketType.user)
-    @commands.command()
+    @commands.command(rest_is_raw=True)
     async def vote(self, ctx, date: typing.Optional[DateTimeConverter], *, message):
         await self.voter.handle_vote(ctx, date, message)
 

@@ -51,6 +51,8 @@ class Vote(BaseFeature):
         d = self.parse_vote_date(f"{msg_split[vote_par + 1][1:]} {msg_split[vote_par + 2][:-1]}")
 
         lines = msg.splitlines()
+        if len(lines) < 2:
+            return None
 
         if d is None:
             question = lines[0][(lines[0].index("vote ") + 5):]
@@ -63,6 +65,9 @@ class Vote(BaseFeature):
 
     async def get_message_data(self, msg: str):
         lines = msg.splitlines()
+        if len(lines) < 2:
+            return None
+
         question = lines[0]
         options_raw = [(x[:x.index(" ")].strip(), x[x.index(" "):].strip()) for x in lines[1:]]
 
@@ -70,14 +75,15 @@ class Vote(BaseFeature):
 
     async def handle_vote(self, context: Context, date: datetime, message: str):
         data = await self.get_message_data(message)
+
+        if data is None or not data.is_valid():
+            await context.message.channel.send(messages.Messages.vote_format)
+            return
+
         data.date = date
 
         if data.date is not None and data.date < datetime.now():
             await context.message.channel.send(messages.Messages.vote_bad_date)
-            return
-
-        if not data.is_valid():
-            await context.message.channel.send(messages.Messages.vote_format)
             return
 
         for o in data.options:
