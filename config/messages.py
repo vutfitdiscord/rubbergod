@@ -145,17 +145,25 @@ class Messages:
                               "({toaster} pls)."
     verify_verify_wrong_code = "{user} Špatný kód."
 
-    vote_format = "Použití vote:\n`" + prefix + "vote \"[datum a čas]\" [otázka]\n[emoji]" \
+    vote_format = "Použití vote:\n`" + prefix + "vote [datum a čas] [otázka]\n[emoji]" \
                                                 " [odpověď 1]\n[emoji] [odpověď 2]\na tak dále`\n" \
-                                                "Datum a čas jsou ve formátu `dd.MM. hh:mm` " \
-                                                "(v takovém případě musí být celý tento řetězec v uvozovkách) " \
-                                                "nebo pouze `hh:mm` pro použití dnešního dne. Datum a čas jsou " \
-                                                "nepovinné, hlasování tak bude funknčí neustále."
+                                                "Datum a čas jsou ve formátu `\"dd.MM. hh:mm\"` " \
+                                                "(včetně uvozovek!). Je to nepovinný argument, " \
+                                                "hlasování bez něj bude funknčí neustále. " \
+                                                "Pokud je vyplněno, bot pošle po uplynutí zprávu o výsledku," \
+                                                "když ho mezitím nikdo nevypne. " \
+                                                "Indikace výherné možnosti přežije i vypnutí."
     vote_not_emoji = "{not_emoji} není emoji. <:sadcat:576171980118687754>"
+    vote_bad_date = "Hlasování může skončit jen v budoucnosti. <:objection:490989324125470720>"
 
     vote_winning = "Vyhrává možnost {winning_emoji} „{winning_option}“ s {votes} hlasy."
     vote_winning_multiple = "Vyhrávají možnosti {winning_emojis} s {votes} hlasy."
+
     vote_none = "Čekám na hlasy."
+
+    vote_result = "V hlasování „{question}“ vyhrála možnost {winning_emoji} „{winning_option}“ s {votes} hlasy."
+    vote_result_multiple = "V hlasování „{question}“ vyhrály možnosti {winning_emojis} s {votes} hlasy."
+    vote_result_none = "V hlasování „{question}“ nikdo nehlasoval. <:sadcat:576171980118687754>"
 
     review_format = prefix + "review [zkratka předmětu] [tier] (anonym) (text)"
     review_wrong_subject = "Nesprávná zkratka předmětu"

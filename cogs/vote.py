@@ -55,40 +55,40 @@ class Vote(commands.Cog):
     @commands.Cog.listener()
     async def on_reaction_add(self, reaction: Reaction, user):
         if self.__handle(reaction.message.id, user.id, reaction.emoji, True, False):
-            print("Already handled")
+            # print("Already handled")
             return
 
-        print("Handling")
+        # print("Handling")
         await self.voter.handle_reaction(reaction, user)
 
     @commands.Cog.listener()
     async def on_raw_reaction_add(self, payload: RawReactionActionEvent):
         if self.__handle(payload.message_id, payload.user_id, payload.emoji, True, True):
-            print("Already handled (in RAW)")
+            # print("Already handled (in RAW)")
             return
 
-        print("Handling RAW")
+        # print("Handling RAW")
         if not await self.handle_raw_reaction(payload):
-            print("Couldn't find reaction")
+            print("Couldn't find reaction, that is rather weird.")
 
     @commands.Cog.listener()
     async def on_reaction_remove(self, reaction: Reaction, user):
         if self.__handle(reaction.message.id, user.id, reaction.emoji, False, False):
-            print("Already handled")
+            # print("Already handled")
             return
 
-        print("Handling")
+        # print("Handling")
         await self.voter.handle_reaction(reaction, user)
 
     @commands.Cog.listener()
     async def on_raw_reaction_remove(self, payload: RawReactionActionEvent):
         if self.__handle(payload.message_id, payload.user_id, payload.emoji, False, True):
-            print("Already handled (in RAW)")
+            # print("Already handled (in RAW)")
             return
 
-        print("Handling RAW")
+        # print("Handling RAW")
         if not await self.handle_raw_reaction(payload):
-            print("Couldn't find reaction")
+            print("Couldn't find reaction, that is rather weird.")
 
 
 def setup(bot):
