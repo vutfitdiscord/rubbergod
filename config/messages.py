@@ -145,7 +145,12 @@ class Messages:
                               "({toaster} pls)."
     verify_verify_wrong_code = "{user} Špatný kód."
 
-    vote_format = "Použití vote:\n`" + prefix + "vote [otázka]\n[emoji] [odpověď 1]\n[emoji] [odpověď 2]\na tak dále`"
+    vote_format = "Použití vote:\n`" + prefix + "vote \"[datum a čas]\" [otázka]\n[emoji]" \
+                                                " [odpověď 1]\n[emoji] [odpověď 2]\na tak dále`\n" \
+                                                "Datum a čas jsou ve formátu `dd.MM. hh:mm` " \
+                                                "(v takovém případě musí být celý tento řetězec v uvozovkách) " \
+                                                "nebo pouze `hh:mm` pro použití dnešního dne. Datum a čas jsou " \
+                                                "nepovinné, hlasování tak bude funknčí neustále."
     vote_not_emoji = "{not_emoji} není emoji. <:sadcat:576171980118687754>"
 
     vote_winning = "Vyhrává možnost {winning_emoji} „{winning_option}“ s {votes} hlasy."

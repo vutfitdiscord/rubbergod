@@ -7,13 +7,11 @@ import utils
 from config.config import Config
 from config.messages import Messages
 from features.base_feature import BaseFeature
-from features.vote import Vote
 from features.acl import Acl
 from features.review import Review
 from repository.karma_repo import KarmaRepository
 from repository.acl_repo import AclRepository
 from repository.review_repo import ReviewRepository
-from emoji import UNICODE_EMOJI
 
 acl_repo = AclRepository()
 acl = Acl(acl_repo)
@@ -26,10 +24,6 @@ class Reaction(BaseFeature):
         super().__init__(bot)
         self.karma_repo = karma_repository
         self.review = Review(bot)
-        self.voter = None
-
-    def use_voter(self, voter: Vote):
-        self.voter = voter
 
     def make_embed(self, page):
         embed = discord.Embed(title="Rubbergod",
@@ -151,10 +145,6 @@ class Reaction(BaseFeature):
         message = await channel.fetch_message(payload.message_id)
         if member is None or message is None or member.bot:
             return
-
-        if message.content[1:].startswith("vote") and message.content[0] in Config.command_prefix\
-                and self.voter is not None:
-            await self.voter.handle_reaction(message)
 
         if payload.emoji.is_custom_emoji():
             emoji = self.bot.get_emoji(payload.emoji.id)
@@ -298,10 +288,6 @@ class Reaction(BaseFeature):
         message = await channel.fetch_message(payload.message_id)
         if member is None or message is None or member.bot:
             return
-
-        if message.content[1:].startswith("vote") and message.content[0] in Config.command_prefix\
-                and self.voter is not None:
-            await self.voter.handle_reaction(message)
 
         if payload.emoji.is_custom_emoji():
             emoji = self.bot.get_emoji(payload.emoji.id)

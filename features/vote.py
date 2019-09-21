@@ -1,4 +1,6 @@
-from discord import Message, HTTPException, PartialEmoji
+from datetime import datetime
+
+from discord import HTTPException, Reaction, User
 from discord.ext.commands import Bot, Context
 
 from config import config, messages
@@ -6,37 +8,70 @@ from features.base_feature import BaseFeature
 
 
 class MessageData:
-    def __init__(self, question, options):
+    def __init__(self, question, options, date: datetime = None):
         self.question = question
         self.options = options
+        self.date = date
+
+    def is_valid(self):
+        return self.question is not None and self.options is not None \
+               and len(self.question) != 0 and len(self.options) != 0
 
 
 class Vote(BaseFeature):
     def __init__(self, bot: Bot):
         super().__init__(bot)
 
-    async def get_message_data(self, message: Message):
-        msg = message.content
+    @staticmethod
+    def parse_vote_date(arg):
+        try:
+            dt = datetime.strptime(arg, "%H:%M")
+            now = datetime.now()
+            dt = dt.replace(year=now.year, month=now.month, day=now.day)
+            return dt
+        except ValueError:
+            try:
+                dt = datetime.strptime(arg, "%d.%m %H:%M")
+                dt = dt.replace(year=datetime.now().year)
+                return dt
+            except ValueError:
+                return None
 
-        if len(msg.split()) < 2:
+    async def get_message_data_raw(self, msg: str):
+        msg_split = msg.split()
+
+        if len(msg_split) < 2:
             return None
 
-        if msg[1:].startswith("vote") and msg[0] in config.Config.command_prefix:
-            lines = msg.splitlines()
-            question = lines[0][(lines[0].index("vote ") + 5):]
-            options_raw = [(x[:x.index(" ")].strip(), x[x.index(" "):].strip()) for x in lines[1:]]
-
-            return MessageData(question, options_raw)
+        vote_par = 0
+        if msg_split[0][1:] == "vote":
+            vote_par = 0
+        elif msg_split[1] == "vote":
+            vote_par = 1
         else:
             return None
 
-    async def handle_vote(self, context: Context):
-        data = await self.get_message_data(context.message)
-        if data is None:
-            await context.message.channel.send(messages.Messages.vote_format)
-            return
+        d = self.parse_vote_date(msg_split[vote_par + 1])
 
-        if len(data.options) == 0:
+        lines = msg.splitlines()
+        question = lines[0][(lines[0].index("vote ") + 5):]
+        options_raw = [(x[:x.index(" ")].strip(), x[x.index(" "):].strip()) for x in lines[1:]]
+
+        return MessageData(question, options_raw, d)
+
+    async def get_message_data(self, msg: str):
+        lines = msg.splitlines()
+        question = lines[0]
+        options_raw = [(x[:x.index(" ")].strip(), x[x.index(" "):].strip()) for x in lines[1:]]
+
+        return MessageData(question, options_raw)
+
+    async def handle_vote(self, context: Context, date: datetime, message: str):
+        data = await self.get_message_data(message)
+        data.date = date
+
+        if not data.is_valid():
+            await context.message.channel.send(messages.Messages.vote_format)
             return
 
         for o in data.options:
@@ -52,10 +87,14 @@ class Vote(BaseFeature):
 
     # The lookups in this method are so ineffective that they make me sick a bit.
     # We could definitely get rid of all the iterations.
-    async def handle_reaction(self, target_msg: Message):
-        data = await self.get_message_data(target_msg)
+    async def handle_reaction(self, reaction: Reaction, user: User):
+        target_msg = reaction.message
+        data = await self.get_message_data_raw(target_msg.content)
 
-        bot_msg = await target_msg.channel.history(limit=3, after=target_msg.created_at)\
+        if data is None or not data.is_valid():
+            return
+
+        bot_msg = await target_msg.channel.history(limit=3, after=target_msg.created_at) \
             .get(author__id=self.bot.user.id)
 
         if bot_msg is None:
