@@ -165,8 +165,8 @@ class Messages:
     vote_result_multiple = "V hlasování „{question}“ vyhrály možnosti {winning_emojis} s {votes} hlasy."
     vote_result_none = "V hlasování „{question}“ nikdo nehlasoval. <:sadcat:576171980118687754>"
 
-    review_format = "?reviews [add, remove, zkratka předmětu]"
-    review_add_format = "?reviews add [zkratka předmětu] [tier (0-4, kde 0" \
+    review_format = prefix + "reviews [add, remove, zkratka předmětu]"
+    review_add_format = prefix + "reviews add [zkratka předmětu] [tier (0-4, kde 0" \
                         " je nejlepší)] (anonym) (text)"
 
     review_wrong_subject = "Nesprávná zkratka předmětu"
@@ -174,13 +174,13 @@ class Messages:
     review_text_len = "Maximální počet znaků v části 'text' je 1024"
     review_added = "Hodnocení předmětu bylo přidáno"
 
-    review_get_format = "?reviews [zkratka předmětu]"
-    review_remove_format = "?reviews remove [zkratka předmětu]"
-    review_remove_id_format = "?reviews remove id [id]"
+    review_get_format = prefix + "reviews [zkratka předmětu]"
+    review_remove_format = prefix + "reviews remove [zkratka předmětu]"
+    review_remove_id_format = "reviews remove id [id]"
     review_remove_success = "Hodnocení předmětu bylo odebráno"
     review_remove_error = "Hodnocení předmětu nebylo nalezeno"
     review_add_denied = "{user}, na přidání hodnocení předmětu nemáš právo."
-    subject_format = "?subject [add, remove] [zkratka předmětu]"
+    subject_format = prefix + "subject [add, remove] [zkratka předmětu]"
 
     pr_meme = "https://github.com/Toaster192/rubbergod/pulls"
     uhoh = "uh oh"
