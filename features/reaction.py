@@ -142,7 +142,12 @@ class Reaction(BaseFeature):
             if guild is None:
                 raise Exception("Nemuzu najit guildu podle config.guild_id")
         member = guild.get_member(payload.user_id)
-        message = await channel.fetch_message(payload.message_id)
+
+        try:
+            message = await channel.fetch_message(payload.message_id)
+        except discord.errors.NotFound:
+            return
+
         if member is None or message is None or member.bot:
             return
 
@@ -315,7 +320,12 @@ class Reaction(BaseFeature):
             if guild is None:
                 raise Exception("Nemuzu najit guildu podle config.guild_id")
         member = guild.get_member(payload.user_id)
-        message = await channel.fetch_message(payload.message_id)
+
+        try:
+            message = await channel.fetch_message(payload.message_id)
+        except discord.errors.NotFound:
+            return
+
         if member is None or message is None or member.bot:
             return
 
