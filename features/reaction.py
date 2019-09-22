@@ -288,26 +288,29 @@ class Reaction(BaseFeature):
                 if reaction.emoji == '📌' and \
                    reaction.count >= Config.pin_count and \
                    not message.pinned:
-                    embed = discord.Embed(title="📌 Auto pin message log",
-                                          color=0xeee657)
-                    users = await reaction.users().flatten()
-                    user_names = ', '.join([user.name for user in users])
-                    message_link = Messages.message_link_prefix +\
-                        str(message.channel.id) + '/' +\
-                        str(message.id)
-                    embed.add_field(name="Users", value=user_names)
-                    embed.add_field(name="In channel", value=message.channel)
-                    embed.add_field(name="Message",
-                                    value=message_link, inline=False)
-                    embed.set_footer(
-                        text=datetime.datetime.now().replace(microsecond=0)
-                    )
-                    channel = self.bot.get_channel(Config.log_channel)
-                    await channel.send(embed=embed)
-                    try:
-                        await message.pin()
-                    except discord.HTTPException:
-                        break
+                    if message.type == discord.MessageType.default:
+                        embed = discord.Embed(title="📌 Auto pin message log",
+                                            color=0xeee657)
+                        users = await reaction.users().flatten()
+                        user_names = ', '.join([user.name for user in users])
+                        message_link = Messages.message_link_prefix +\
+                            str(message.channel.id) + '/' +\
+                            str(message.id)
+                        embed.add_field(name="Users", value=user_names)
+                        embed.add_field(name="In channel", value=message.channel)
+                        embed.add_field(name="Message",
+                                        value=message_link, inline=False)
+                        embed.set_footer(
+                            text=datetime.datetime.now().replace(microsecond=0)
+                        )
+                        channel = self.bot.get_channel(Config.log_channel)
+                        await channel.send(embed=embed)
+                        try:
+                            await message.pin()
+                        except discord.HTTPException:
+                            break
+                    else:
+                        await message.channel.send('Kua hoši, neserte!')
 
     async def remove(self, payload):
         channel = self.bot.get_channel(payload.channel_id)
