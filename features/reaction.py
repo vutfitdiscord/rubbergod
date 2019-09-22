@@ -12,7 +12,6 @@ from features.review import Review
 from repository.karma_repo import KarmaRepository
 from repository.acl_repo import AclRepository
 from repository.review_repo import ReviewRepository
-from emoji import UNICODE_EMOJI
 
 acl_repo = AclRepository()
 acl = Acl(acl_repo)
@@ -69,7 +68,7 @@ class Reaction(BaseFeature):
                     message.author.id)
                 )
             )
-            return output
+            return None
         output = []
         for line in input_string:
             try:

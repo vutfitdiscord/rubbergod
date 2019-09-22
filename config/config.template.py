@@ -20,7 +20,7 @@ class Config:
 
     # Extensions loaded on bot start
     extensions = ['base', 'karma', 'meme', 'random', 'verify', 'fitwide',
-                  'acl', 'review']
+                  'acl', 'review', 'vote']
 
     # Roll dice
     max_dice_at_once = 1000

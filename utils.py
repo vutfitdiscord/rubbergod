@@ -15,6 +15,7 @@ def git_commit_msg():
     repo = git.Repo(search_parent_directories=True)
     return repo.head.commit.message
 
+
 def git_pull():
     repo = git.Repo(search_parent_directories=True)
     cmd = repo.git

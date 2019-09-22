@@ -145,20 +145,42 @@ class Messages:
                               "({toaster} pls)."
     verify_verify_wrong_code = "{user} Špatný kód."
 
-    review_format = "?reviews [add, remove, zkratka předmětu]"
-    review_add_format = "?reviews add [zkratka předmětu] [tier (0-4, kde 0" \
+    vote_format = "Použití vote:\n`" + prefix + "vote [datum a čas] [otázka]\n[emoji]" \
+                                                " [odpověď 1]\n[emoji] [odpověď 2]\na tak dále`\n" \
+                                                "Datum a čas jsou ve formátu `\"dd.MM. hh:mm\"` " \
+                                                "(včetně uvozovek!). Je to nepovinný argument, " \
+                                                "hlasování bez něj bude funknčí neustále. " \
+                                                "Pokud je vyplněno, bot pošle po uplynutí zprávu o výsledku," \
+                                                "když ho mezitím nikdo nevypne. " \
+                                                "Indikace výherné možnosti přežije i vypnutí."
+    vote_not_emoji = "{not_emoji} není emoji. <:sadcat:576171980118687754>"
+    vote_bad_date = "Hlasování může skončit jen v budoucnosti. <:objection:490989324125470720>"
+
+    vote_winning = "Vyhrává možnost {winning_emoji} „{winning_option}“ s {votes} hlasy."
+    vote_winning_multiple = "Vyhrávají možnosti {winning_emojis} s {votes} hlasy."
+
+    vote_none = "Čekám na hlasy."
+
+    vote_result = "V hlasování „{question}“ vyhrála možnost {winning_emoji} „{winning_option}“ s {votes} hlasy."
+    vote_result_multiple = "V hlasování „{question}“ vyhrály možnosti {winning_emojis} s {votes} hlasy."
+    vote_result_none = "V hlasování „{question}“ nikdo nehlasoval. <:sadcat:576171980118687754>"
+
+    review_format = prefix + "reviews [add, remove, zkratka předmětu]"
+    review_add_format = prefix + "reviews add [zkratka předmětu] [tier (0-4, kde 0" \
                         " je nejlepší)] (anonym) (text)"
+
     review_wrong_subject = "Nesprávná zkratka předmětu"
     review_tier = "Tier je z rozsahu 0-4, kde 0 je nejlepší"
     review_text_len = "Maximální počet znaků v části 'text' je 1024"
     review_added = "Hodnocení předmětu bylo přidáno"
-    review_get_format = "?reviews [zkratka předmětu]"
-    review_remove_format = "?reviews remove [zkratka předmětu]"
-    review_remove_id_format = "?reviews remove id [id]"
+
+    review_get_format = prefix + "reviews [zkratka předmětu]"
+    review_remove_format = prefix + "reviews remove [zkratka předmětu]"
+    review_remove_id_format = "reviews remove id [id]"
     review_remove_success = "Hodnocení předmětu bylo odebráno"
     review_remove_error = "Hodnocení předmětu nebylo nalezeno"
     review_add_denied = "{user}, na přidání hodnocení předmětu nemáš právo."
-    subject_format = "?subject [add, remove] [zkratka předmětu]"
+    subject_format = prefix + "subject [add, remove] [zkratka předmětu]"
 
     pr_meme = "https://github.com/Toaster192/rubbergod/pulls"
     uhoh = "uh oh"
@@ -181,7 +203,8 @@ class Messages:
              ('ishaboard', 'Leaderboard rozdávání negativní karmy.')],
             [(review_add_format[1:], 'Přidá recenzi na předmět.'),
              (review_get_format[1:], 'Vypíše recenze na vybraný předmět.'),
-             (review_remove_format[1:], 'Odstráni hodnocení'),
+             (review_remove_format[1:], 'Odstraní hodnocení.'),
+             ('vote', 'Zahájí hlasování.'),
              ('roll X Y',
               'Vygeneruje náhodné celé číslo z intervalu <**X**, **Y**>.'),
              ('flip', 'Hodí mincí'),

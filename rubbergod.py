@@ -5,6 +5,7 @@ from discord.ext import commands
 
 import utils
 from config import config, messages
+
 from features import presence
 from repository.review_repo import ReviewRepository
 from repository.database import database, session
@@ -83,8 +84,6 @@ def load_dump():
     session.commit()
 
 
-# load_dump()
-
 config = config.Config
 messages = messages.Messages
 
@@ -103,11 +102,6 @@ def load_subjects():
         review_repo.add_subject(subject)
 
 
-#                                    #
-#              EVENTS                #
-#                                    #
-
-
 @bot.event
 async def on_ready():
     """If RGod is ready"""
@@ -115,22 +109,14 @@ async def on_ready():
 
     await presence.set_presence()
 
+
 @bot.event
-async def on_error(event, *args, **kweags):
+async def on_error(event, *args, **kwargs):
     channel = bot.get_channel(config.bot_dev_channel)
     output = traceback.format_exc()
     print(output)
     if channel is not None:
         await channel.send("```\n" + output + "\n```")
-
-for extension in config.extensions:
-    bot.load_extension(f'cogs.{extension}')
-    print(f'{extension} loaded')
-
-
-#                                      #
-#              COMMANDS                #
-#                                      #
 
 
 @bot.command()
@@ -188,10 +174,13 @@ async def reload(ctx, extension):
             messages.insufficient_rights
             .format(user=utils.generate_mention(ctx.author.id)))
 
-
 database.base.metadata.create_all(database.db)
 session.commit()  # Making sure
 
-# load_subjects()
+#load_subjects()
+
+for extension in config.extensions:
+    bot.load_extension(f'cogs.{extension}')
+    print(f'{extension} loaded')
 
 bot.run(config.key)
