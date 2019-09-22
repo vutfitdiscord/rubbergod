@@ -149,7 +149,7 @@ class Messages:
                                                 " [odpověď 1]\n[emoji] [odpověď 2]\na tak dále`\n" \
                                                 "Datum a čas jsou ve formátu `\"dd.MM. hh:mm\"` " \
                                                 "(včetně uvozovek!). Je to nepovinný argument, " \
-                                                "hlasování bez něj bude funknčí neustále. " \
+                                                "hlasování bez něj bude funkční neustále. " \
                                                 "Pokud je vyplněno, bot pošle po uplynutí zprávu o výsledku," \
                                                 "když ho mezitím nikdo nevypne. " \
                                                 "Indikace výherné možnosti přežije i vypnutí."
