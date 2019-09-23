@@ -287,8 +287,8 @@ class Reaction(BaseFeature):
             for reaction in message.reactions:
                 if reaction.emoji == '📌' and \
                    reaction.count >= Config.pin_count and \
+                   not message.is_system() and \
                    not message.pinned:
-                    if message.type == discord.MessageType.default:
                         embed = discord.Embed(title="📌 Auto pin message log",
                                             color=0xeee657)
                         users = await reaction.users().flatten()
@@ -309,8 +309,6 @@ class Reaction(BaseFeature):
                             await message.pin()
                         except discord.HTTPException:
                             break
-                    else:
-                        await message.channel.send('Kua hoši, neserte!')
 
     async def remove(self, payload):
         channel = self.bot.get_channel(payload.channel_id)
