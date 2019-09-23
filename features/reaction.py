@@ -290,7 +290,7 @@ class Reaction(BaseFeature):
                    not message.is_system() and \
                    not message.pinned:
                     embed = discord.Embed(title="📌 Auto pin message log",
-                                        color=0xeee657)
+                                          color=0xeee657)
                     users = await reaction.users().flatten()
                     user_names = ', '.join([user.name for user in users])
                     message_link = Messages.message_link_prefix +\
