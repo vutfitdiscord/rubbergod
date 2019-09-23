@@ -41,7 +41,7 @@ class Meme(commands.Cog):
     @commands.command()
     async def godhelp(self, ctx):
         """Directs the user to a psychologist"""
-        await ctx.send("https://www.lli.vutbr.cz/psychologicke-poradenstvi")
+        await ctx.send(messages.poradenstvi_link)
 
     @commands.cooldown(rate=5, per=20.0, type=commands.BucketType.user)
     @commands.command()

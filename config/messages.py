@@ -184,6 +184,7 @@ class Messages:
 
     pr_meme = "https://github.com/Toaster192/rubbergod/pulls"
     uhoh = "uh oh"
+    poradenstvi_link = "https://www.lli.vutbr.cz/psychologicke-poradenstvi"
 
     info = [[('karma', 'Vypíše vaši karmu, kolik pozitivní a negativní karmy'
                        ' jste rozdali.'),
