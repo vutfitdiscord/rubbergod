@@ -38,6 +38,11 @@ class Meme(commands.Cog):
     async def uhoh(self, ctx):
         await ctx.send(messages.uhoh_counter.format(uhohs=uhoh_counter))
 
+    @commands.command()
+    async def godhelp(self, ctx):
+        """Directs the user to a psychologist"""
+        await ctx.send("https://www.lli.vutbr.cz/psychologicke-poradenstvi")
+
     @commands.cooldown(rate=5, per=20.0, type=commands.BucketType.user)
     @commands.command()
     async def hug(self, ctx, user: discord.Member = None, intensity: int = 0):
