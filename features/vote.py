@@ -187,7 +187,9 @@ class Vote(BaseFeature):
                 await reaction.message.remove_reaction(reaction.emoji, user)
             return
         else:
-            if added and not any(a.me for a in target_msg.reactions):
+            print(reaction)
+            print(target_msg.reactions)
+            if added and not any(a.me and a.emoji == reaction.emoji for a in target_msg.reactions):
                 await target_msg.add_reaction(reaction.emoji)
 
         bot_msg = await target_msg.channel.history(limit=3, after=target_msg.created_at) \
