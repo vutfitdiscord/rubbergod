@@ -127,6 +127,10 @@ class Vote(BaseFeature):
             sec = (data.date - datetime.now()).total_seconds()
             asyncio.ensure_future(self.send_winning_msg(context.channel.id, context.message.id, sec))
 
+    @staticmethod
+    def _(msg: str):
+        return msg.replace("1 hlasy.", "1 hlasem.")
+
     async def send_winning_msg(self, channel_id, vote_msg_id, timeout):
         await asyncio.sleep(timeout)
         chan = await self.bot.fetch_channel(channel_id)
@@ -149,20 +153,20 @@ class Vote(BaseFeature):
         if len(all_most_voted) == 1:
             option = [a[1] for a in data.options if str(most_voted.emoji) == a[0]][0]
 
-            await chan.send(content=messages.Messages.vote_result
+            await chan.send(content=self._(messages.Messages.vote_result
                             .format(question=data.question,
                                     winning_emoji=most_voted.emoji,
                                     winning_option=option,
-                                    votes=most_voted.count))
+                                    votes=(most_voted.count - 1))))
         else:
             emoji_str = ""
             for e in all_most_voted:
                 emoji_str += str(e.emoji) + ", "
             emoji_str = emoji_str[:-2]
-            await chan.send(content=messages.Messages.vote_result_multiple
+            await chan.send(content=self._(messages.Messages.vote_result_multiple
                             .format(question=data.question,
                                     winning_emojis=emoji_str,
-                                    votes=most_voted.count))
+                                    votes=(most_voted.count - 1))))
 
     # The lookups in this method are so ineffective that they make me sick a bit.
     # We could definitely get rid of all the iterations.
@@ -200,15 +204,15 @@ class Vote(BaseFeature):
         if len(all_most_voted) == 1:
             option = [a[1] for a in data.options if str(most_voted.emoji) == a[0]][0]
 
-            await bot_msg.edit(content=messages.Messages.vote_winning
+            await bot_msg.edit(content=self._(messages.Messages.vote_winning
                                .format(winning_emoji=most_voted.emoji,
                                        winning_option=option,
-                                       votes=most_voted.count))
+                                       votes=(most_voted.count - 1))))
         else:
             emoji_str = ""
             for e in all_most_voted:
                 emoji_str += str(e.emoji) + ", "
             emoji_str = emoji_str[:-2]
-            await bot_msg.edit(content=messages.Messages.vote_winning_multiple
+            await bot_msg.edit(content=self._(messages.Messages.vote_winning_multiple
                                .format(winning_emojis=emoji_str,
-                                       votes=most_voted.count))
+                                       votes=(most_voted.count - 1))))
