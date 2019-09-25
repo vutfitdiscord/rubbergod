@@ -78,7 +78,8 @@ class Vote(BaseFeature):
         if d is None:
             question = lines[0][(lines[0].index("vote ") + 5):]
         else:
-            question = lines[0][(lines[0].index("vote ") + 5):].split()[d[1]]
+            # Eww
+            question = " ".join(lines[0][(lines[0].index("vote ") + 5):].split()[d[1]:])
 
         options_raw = [(x[:x.index(" ")].strip(), x[x.index(" "):].strip()) for x in lines[1:]]
 
