@@ -1,7 +1,7 @@
 import asyncio
 from datetime import datetime
 
-from discord import HTTPException, Reaction, User
+from discord import HTTPException, Reaction, User, Message
 from discord.ext.commands import Bot, Context
 
 from config import config, messages
@@ -23,17 +23,39 @@ class Vote(BaseFeature):
     def __init__(self, bot: Bot):
         super().__init__(bot)
 
+    # Eww
     @staticmethod
-    def parse_vote_date(arg):
-        try:
-            dt = datetime.strptime(arg, "%d.%m. %H:%M")
-            now = datetime.now()
-            dt = dt.replace(year=now.year)
-            return dt
-        except ValueError:
-            return None
+    def parse_vote_date(arg1, arg2, def_date: datetime):
+        def parse_date(a):
+            try:
+                dt = datetime.strptime(a, "%d.%m.")
+                dt = dt.replace(year=def_date.year)
+                return dt
+            except ValueError:
+                return None
 
-    async def get_message_data_raw(self, msg: str):
+        def parse_time(a):
+            try:
+                dt = datetime.strptime(a, "%H:%M")
+                dt = dt.replace(year=def_date.year, month=def_date.month, day=def_date.day)
+                return dt
+            except ValueError:
+                return None
+
+        date = parse_date(arg1)
+        if date is None:
+            time = parse_time(arg1)
+            if time is None:
+                return None
+            return time, 1
+        else:
+            time = parse_time(arg2)
+            if time is None:
+                return date, 1
+            return datetime.combine(date.date(), time.time()), 2
+
+    async def get_message_data_raw(self, target_msg: Message):
+        msg = target_msg.content
         msg_split = msg.split()
 
         if len(msg_split) < 2:
@@ -47,8 +69,7 @@ class Vote(BaseFeature):
         else:
             return None
 
-        # There's a space between date and time, we have to join the strings back and get rid of the " chars
-        d = self.parse_vote_date(f"{msg_split[vote_par + 1][1:]} {msg_split[vote_par + 2][:-1]}")
+        d = self.parse_vote_date(msg_split[vote_par + 1], msg_split[vote_par + 2], target_msg.created_at)
 
         lines = msg.splitlines()
         if len(lines) < 2:
@@ -57,11 +78,11 @@ class Vote(BaseFeature):
         if d is None:
             question = lines[0][(lines[0].index("vote ") + 5):]
         else:
-            question = lines[0][(lines[0].index("vote ") + 5):].split()[2]
+            question = lines[0][(lines[0].index("vote ") + 5):].split()[d[1]]
 
         options_raw = [(x[:x.index(" ")].strip(), x[x.index(" "):].strip()) for x in lines[1:]]
 
-        return MessageData(question, options_raw, d)
+        return MessageData(question, options_raw, None if d is None else d[0])
 
     async def get_message_data(self, msg: str):
         lines = msg.splitlines()
@@ -73,14 +94,20 @@ class Vote(BaseFeature):
 
         return MessageData(question, options_raw)
 
-    async def handle_vote(self, context: Context, date: datetime, message: str):
+    async def handle_vote(self, context: Context, date: datetime, time: datetime, message: str):
         data = await self.get_message_data(message)
 
         if data is None or not data.is_valid():
             await context.message.channel.send(messages.Messages.vote_format)
             return
 
-        data.date = date
+        if date is None:
+            data.date = time
+        else:
+            if time is None:
+                data.date = date
+            else:
+                data.date = datetime.combine(date.date(), time.time())
 
         if data.date is not None and data.date < datetime.now():
             await context.message.channel.send(messages.Messages.vote_bad_date)
@@ -103,7 +130,7 @@ class Vote(BaseFeature):
         await asyncio.sleep(timeout)
         chan = await self.bot.fetch_channel(channel_id)
         target_msg = await chan.fetch_message(vote_msg_id)
-        data = await self.get_message_data_raw(target_msg.content)
+        data = await self.get_message_data_raw(target_msg)
 
         if data is None:
             return
@@ -140,7 +167,7 @@ class Vote(BaseFeature):
     # We could definitely get rid of all the iterations.
     async def handle_reaction(self, reaction: Reaction, user: User, added: bool):
         target_msg = reaction.message
-        data = await self.get_message_data_raw(target_msg.content)
+        data = await self.get_message_data_raw(target_msg)
 
         if data is None or not data.is_valid():
             return

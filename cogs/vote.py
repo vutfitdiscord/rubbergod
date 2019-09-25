@@ -10,12 +10,25 @@ from config.config import Config
 from features import vote
 
 
-class DateTimeConverter(commands.Converter):
+class DateConverter(commands.Converter):
     async def convert(self, ctx, argument):
-        ret = vote.Vote.parse_vote_date(argument)
-        if ret is None:
+        try:
+            dt = datetime.strptime(argument, "%d.%m.")
+            dt = dt.replace(year=ctx.message.created_at.year)
+            return dt
+        except ValueError:
             raise BadArgument()
-        return ret
+
+
+class TimeConverter(commands.Converter):
+    async def convert(self, ctx, argument):
+        try:
+            dt = datetime.strptime(argument, "%H:%M")
+            d = ctx.message.created_at
+            dt = dt.replace(year=d.year, month=d.month, day=d.day)
+            return dt
+        except ValueError:
+            raise BadArgument()
 
 
 class Vote(commands.Cog):
@@ -26,8 +39,8 @@ class Vote(commands.Cog):
 
     @commands.cooldown(rate=5, per=20.0, type=commands.BucketType.user)
     @commands.command(rest_is_raw=True)
-    async def vote(self, ctx, date: typing.Optional[DateTimeConverter], *, message):
-        await self.voter.handle_vote(ctx, date, message)
+    async def vote(self, ctx, date: typing.Optional[DateConverter], time: typing.Optional[TimeConverter], *, message):
+        await self.voter.handle_vote(ctx, date, time, message)
 
     def __handle(self, msg_id, user_id, emoji, add, raw):
         t = (msg_id, user_id,)

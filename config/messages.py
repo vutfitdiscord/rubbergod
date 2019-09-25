@@ -145,12 +145,12 @@ class Messages:
                               "({toaster} pls)."
     verify_verify_wrong_code = "{user} Špatný kód."
 
-    vote_format = "Použití vote:\n`" + prefix + "vote [datum a čas] [otázka]\n[emoji]" \
+    vote_format = "Použití vote:\n`" + prefix + "vote [datum] [čas] [otázka]\n[emoji]" \
                                                 " [odpověď 1]\n[emoji] [odpověď 2]\na tak dále`\n" \
-                                                "Datum a čas jsou ve formátu `\"dd.MM. hh:mm\"` " \
-                                                "(včetně uvozovek!). Je to nepovinný argument, " \
-                                                "hlasování bez něj bude funkční neustále. " \
-                                                "Pokud je vyplněno, bot pošle po uplynutí zprávu o výsledku," \
+                                                "Datum je ve formátu `dd.MM.`. Čas je ve formátu `hh:mm`." \
+                                                "Datum a čas jsou nepovinné argumenty, " \
+                                                "hlasování bez jejich uvedení funkční neustále. " \
+                                                "Pokud jsou vyplněny, bot pošle po uplynutí zprávu o výsledku," \
                                                 "když ho mezitím nikdo nevypne. " \
                                                 "Indikace výherné možnosti přežije i vypnutí."
     vote_not_emoji = "{not_emoji} není emoji. <:sadcat:576171980118687754>"
