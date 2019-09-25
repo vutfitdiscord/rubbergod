@@ -147,7 +147,7 @@ class Messages:
 
     vote_format = "Použití vote:\n`" + prefix + "vote [datum] [čas] [otázka]\n[emoji]" \
                                                 " [odpověď 1]\n[emoji] [odpověď 2]\na tak dále`\n" \
-                                                "Datum je ve formátu `dd.MM.`. Čas je ve formátu `hh:mm`. " \
+                                                "Datum je ve formátu `dd.MM.(yy)`. Čas je ve formátu `hh:mm`. " \
                                                 "Pouze vyplněný čas použije den odeslání zprávy, " \
                                                 "pouze vyplněné datum použije čas 00:00. " \
                                                 "Datum a čas jsou nepovinné argumenty, " \
