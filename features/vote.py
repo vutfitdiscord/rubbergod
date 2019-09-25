@@ -154,19 +154,19 @@ class Vote(BaseFeature):
             option = [a[1] for a in data.options if str(most_voted.emoji) == a[0]][0]
 
             await chan.send(content=self._(messages.Messages.vote_result
-                            .format(question=data.question,
-                                    winning_emoji=most_voted.emoji,
-                                    winning_option=option,
-                                    votes=(most_voted.count - 1))))
+                                           .format(question=data.question,
+                                                   winning_emoji=most_voted.emoji,
+                                                   winning_option=option,
+                                                   votes=(most_voted.count - 1))))
         else:
             emoji_str = ""
             for e in all_most_voted:
                 emoji_str += str(e.emoji) + ", "
             emoji_str = emoji_str[:-2]
             await chan.send(content=self._(messages.Messages.vote_result_multiple
-                            .format(question=data.question,
-                                    winning_emojis=emoji_str,
-                                    votes=(most_voted.count - 1))))
+                                           .format(question=data.question,
+                                                   winning_emojis=emoji_str,
+                                                   votes=(most_voted.count - 1))))
 
     # The lookups in this method are so ineffective that they make me sick a bit.
     # We could definitely get rid of all the iterations.
@@ -182,9 +182,13 @@ class Vote(BaseFeature):
                 await reaction.message.remove_reaction(reaction.emoji, user)
             return
 
-        if added and not any(str(reaction.emoji) == a[0] for a in data.options):
-            await reaction.message.remove_reaction(reaction.emoji, user)
+        if not any(str(reaction.emoji) == a[0] for a in data.options):
+            if added:
+                await reaction.message.remove_reaction(reaction.emoji, user)
             return
+        else:
+            if added and not any(a.me for a in target_msg.reactions):
+                await target_msg.add_reaction(reaction.emoji)
 
         bot_msg = await target_msg.channel.history(limit=3, after=target_msg.created_at) \
             .get(author__id=self.bot.user.id)
@@ -205,14 +209,14 @@ class Vote(BaseFeature):
             option = [a[1] for a in data.options if str(most_voted.emoji) == a[0]][0]
 
             await bot_msg.edit(content=self._(messages.Messages.vote_winning
-                               .format(winning_emoji=most_voted.emoji,
-                                       winning_option=option,
-                                       votes=(most_voted.count - 1))))
+                                              .format(winning_emoji=most_voted.emoji,
+                                                      winning_option=option,
+                                                      votes=(most_voted.count - 1))))
         else:
             emoji_str = ""
             for e in all_most_voted:
                 emoji_str += str(e.emoji) + ", "
             emoji_str = emoji_str[:-2]
             await bot_msg.edit(content=self._(messages.Messages.vote_winning_multiple
-                               .format(winning_emojis=emoji_str,
-                                       votes=(most_voted.count - 1))))
+                                              .format(winning_emojis=emoji_str,
+                                                      votes=(most_voted.count - 1))))

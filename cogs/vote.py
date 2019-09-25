@@ -2,7 +2,7 @@ from datetime import datetime
 
 import typing
 
-from discord import Reaction, Member, User, RawReactionActionEvent
+from discord import Reaction, Member, User, RawReactionActionEvent, NotFound
 from discord.ext import commands
 from discord.ext.commands import BadArgument
 
@@ -55,8 +55,11 @@ class Vote(commands.Cog):
 
     async def handle_raw_reaction(self, payload: RawReactionActionEvent, added: bool):
         chan = await self.bot.fetch_channel(payload.channel_id)
-        msg = await chan.fetch_message(payload.message_id)
-        usr = await self.bot.fetch_user(payload.user_id)
+        try:
+            msg = await chan.fetch_message(payload.message_id)
+            usr = await self.bot.fetch_user(payload.user_id)
+        except NotFound:
+            return False
 
         for r in msg.reactions:
             if str(r.emoji) == str(payload.emoji):
