@@ -158,8 +158,8 @@ class Messages:
     vote_not_emoji = "{not_emoji} není emoji. <:sadcat:576171980118687754>"
     vote_bad_date = "Hlasování může skončit jen v budoucnosti. <:objection:490989324125470720>"
 
-    vote_winning = "Vyhrává možnost {winning_emoji} „{winning_option}“ s {votes} hlasy."
-    vote_winning_multiple = "Vyhrávají možnosti {winning_emojis} s {votes} hlasy."
+    vote_winning = "Prozatím vyhrává možnost {winning_emoji} „{winning_option}“ s {votes} hlasy."
+    vote_winning_multiple = "Prozatím vyhrávají možnosti {winning_emojis} s {votes} hlasy."
 
     vote_none = "Čekám na hlasy."
 
