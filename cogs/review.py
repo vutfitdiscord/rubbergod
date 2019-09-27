@@ -1,3 +1,4 @@
+import discord
 from discord.ext import commands
 
 from config import config, messages
@@ -23,8 +24,13 @@ class Review(commands.Cog):
         if subcommand is None:
             await ctx.send(messages.review_format)
         else:
-            for role in ctx.message.author.roles:
-                if "MUNI" == role.name or "Host" == role.name:
+            if isinstance(ctx.message.channel, discord.DMChannel):
+                guild = self.bot.get_guild(config.guild_id)
+                roles = guild.get_member(ctx.message.author.id).roles
+            else:
+                roles = ctx.message.author.roles
+            for role in roles:
+                if role.name in config.reviews_forbidden_roles:
                     await ctx.send(messages.review_add_denied.format(
                                    user=ctx.message.author.mention))
                     return

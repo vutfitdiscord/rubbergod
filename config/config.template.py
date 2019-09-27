@@ -111,6 +111,7 @@ class Config:
         "zzn", "jad", "jad", "izsl", "zpo", "zpoe", "zpd", "zpja", "asd",
         "zre", "zree"
     ]
+    reviews_forbidden_roles = ["MUNI","Host"]
 
     # Arcas
     arcas_id = 140547421733126145
