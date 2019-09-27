@@ -287,7 +287,6 @@ class Reaction(BaseFeature):
             for reaction in message.reactions:
                 if reaction.emoji == '📌' and \
                    reaction.count >= Config.pin_count and \
-                   not message.is_system() and \
                    not message.pinned:
                     embed = discord.Embed(title="📌 Auto pin message log",
                                           color=0xeee657)
