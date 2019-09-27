@@ -82,10 +82,12 @@ class Review(commands.Cog):
                     await ctx.send(messages.review_wrong_subject)
                     return
                 msg = await ctx.send(embed=embed)
+                footer = msg.embeds[0].footer.text.split('|')[0]
                 if msg.embeds[0].description[-1].isnumeric():
-                    await msg.add_reaction("⏪")
-                    await msg.add_reaction("◀")
-                    await msg.add_reaction("▶")
+                    if footer != "Review: 1/1 ":
+                        await msg.add_reaction("⏪")
+                        await msg.add_reaction("◀")
+                        await msg.add_reaction("▶")
                     await msg.add_reaction("👍")
                     await msg.add_reaction("🛑")
                     await msg.add_reaction("👎")
