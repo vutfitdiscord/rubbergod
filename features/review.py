@@ -1,4 +1,5 @@
 import discord
+from datetime import datetime
 from discord.ext.commands import Bot
 
 from features.base_feature import BaseFeature
@@ -49,7 +50,9 @@ class Review(BaseFeature):
             elif diff < 0:
                 colour = 0xcb410b
             id = review.id
-        embed.set_footer(text="Review: " + page + ' | ID: ' + str(id))
+        embed.set_footer(text="Review: " + page + ' | ID: ' + str(id) +
+                         " | Last edited at: " +
+                         str(datetime.now().replace(microsecond=0)))
         embed.colour = colour
         return embed
 

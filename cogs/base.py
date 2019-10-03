@@ -83,6 +83,7 @@ class Base(commands.Cog):
                 return
         else:
             msg = await ctx.send(embed=embed)
+        await msg.add_reaction("◀")
         await msg.add_reaction("▶")
 
 
