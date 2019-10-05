@@ -29,12 +29,12 @@ class Review(commands.Cog):
                 roles = guild.get_member(ctx.message.author.id).roles
             else:
                 roles = ctx.message.author.roles
-            for role in roles:
-                if role.name in config.reviews_forbidden_roles:
-                    await ctx.send(messages.review_add_denied.format(
-                                   user=ctx.message.author.mention))
-                    return
             if subcommand == 'add':
+                for role in roles:
+                    if role.name in config.reviews_forbidden_roles:
+                        await ctx.send(messages.review_add_denied.format(
+                                    user=ctx.message.author.mention))
+                        return
                 if subject is None or tier is None:
                     await ctx.send(messages.review_add_format)
                     return

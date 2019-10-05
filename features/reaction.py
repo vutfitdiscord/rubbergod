@@ -185,20 +185,9 @@ class Reaction(BaseFeature):
         elif message.embeds and message.embeds[0].title == "Rubbergod":
             if emoji in ["◀", "▶"]:
                 page = int(message.embeds[0].footer.text[5])
-                info_len = len(Messages.info)
-                if emoji == "▶":
-                    next_page = page + 1
-                    if next_page == info_len:
-                        await message.remove_reaction("▶", self.bot.user)
-                    if next_page == 2:
-                        await message.add_reaction("◀")
-                elif emoji == "◀":
-                    next_page = page - 1
-                    if next_page == 1:
-                        await message.remove_reaction("◀", self.bot.user)
-                    if next_page == info_len - 1:
-                        await message.add_reaction("▶")
-                if 1 <= next_page <= info_len:
+                next_page = self.pagination_next(emoji, page,
+                                                 len(Messages.info))
+                if next_page:
                     embed = self.make_embed(next_page)
                     await message.edit(embed=embed)
             try:
@@ -215,13 +204,8 @@ class Reaction(BaseFeature):
             max_page = int(footer[(pos + 1):])
             tier_average = message.embeds[0].description[-1]
             if emoji in ["◀", "▶", "⏪"]:
-                if emoji == "▶":
-                    next_page = page + 1
-                elif emoji == "◀":
-                    next_page = page - 1
-                elif emoji == "⏪":
-                    next_page = 1
-                if 1 <= next_page <= max_page:
+                next_page = self.pagination_next(emoji, page, max_page)
+                if next_page:
                     review = review_r.get_subject_reviews(subject)
                     if review.count() >= next_page:
                         review = review.all()[next_page - 1].Review
@@ -256,11 +240,9 @@ class Reaction(BaseFeature):
                     pos = message.embeds[0].fields[3].value.find('/')
                     max_text_page = int(text_page[(pos + 1):])
                     text_page = int(text_page[:pos])
-                    if emoji == "🔼":
-                        next_text_page = text_page - 1
-                    if emoji == "🔽":
-                        next_text_page = text_page + 1
-                    if next_text_page > 0 and next_text_page <= max_text_page:
+                    next_text_page = self.pagination_next(emoji, page,
+                                                          max_text_page)
+                    if next_text_page:
                         page = str(page) + "/" + str(max_page)
                         embed = self.review.make_embed(
                             review, subject, tier_average, page)
@@ -368,7 +350,7 @@ class Reaction(BaseFeature):
             else:
                 bot_room = self.bot.get_channel(Config.bot_room)
                 await bot_room.send(Messages.role_add_denied
-                                   .format(user=utils.generate_mention(
+                                    .format(user=utils.generate_mention(
                                        member.id), role=role.name))
         else:
             try:
@@ -429,3 +411,15 @@ class Reaction(BaseFeature):
                 await bot_room.send(Messages.role_remove_denied
                                     .format(user=utils.generate_mention(
                                         member.id), role=channel.name))
+
+    def pagination_next(self, emoji, page, max_page):
+        if emoji in ["▶", "🔽"]:
+            next_page = page + 1
+        elif emoji in ["◀", "🔼"]:
+            next_page = page - 1
+        elif emoji == "⏪":
+            next_page = 1
+        if 1 <= next_page <= max_page:
+            return next_page
+        else:
+            return 0
