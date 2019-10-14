@@ -63,6 +63,13 @@ class Base(commands.Cog):
                 messages.uptime_message
                 .format(boottime=str(boottime), uptime=str(delta))
                 )
+    @commands.command()
+    async def kachna(self, ctx):
+        now = datetime.datetime.now().replace(microsecond=0)
+        opentime = datetime.datetime(2019, 10, 21, 16)
+        delta = opentime - now
+        message = messages.kachna_remaining.format(zustava=str(delta)) if opentime > now else messages.kachna_opened
+        await ctx.send(message)
 
     @commands.cooldown(rate=2, per=20.0, type=commands.BucketType.user)
     @commands.command()
