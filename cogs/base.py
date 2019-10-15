@@ -65,10 +65,21 @@ class Base(commands.Cog):
                 )
     @commands.command()
     async def kachna(self, ctx):
+        kachna_open_hour = 16
+        kachna_close_hour = 22
+        kachna_open_day = 0 # 0 = Monday, 1=Tuesday, 2=Wednesday...
+        def next_weekday(d, weekday):
+            days_ahead = weekday - d.weekday()
+            if days_ahead < 0:
+                days_ahead += 7
+            return d + datetime.timedelta(days_ahead)
         now = datetime.datetime.now().replace(microsecond=0)
-        opentime = datetime.datetime(2019, 10, 21, 16)
+        opentime = next_weekday(now, kachna_open_day).replace(hour=kachna_open_hour, minute=0, second=0)
+        isClosed = (now < opentime) or (opentime.replace(hour=kachna_close_hour) < now)
         delta = opentime - now
-        message = messages.kachna_remaining.format(zustava=str(delta)) if opentime > now else messages.kachna_opened
+        if(delta < datetime.timedelta(0)): 
+            delta += datetime.timedelta(days=7)
+        message = messages.kachna_remaining.format(zustava=str(delta)) if isClosed else messages.kachna_opened
         await ctx.send(message)
 
     @commands.cooldown(rate=2, per=20.0, type=commands.BucketType.user)
