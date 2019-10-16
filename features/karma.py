@@ -203,8 +203,10 @@ class Karma(BaseFeature):
             except discord.NotFound:
                 if isinstance(emoji_id, bytearray):
                     broken_emoji.append(emoji_id.decode())
+                    self.repo.remove_emoji(emoji_id.decode())
                 else:
                     broken_emoji.append(str(emoji_id))
+                    self.repo.remove_emoji(str(emoji_id))
 
         return message, ', '.join(broken_emoji)
 
