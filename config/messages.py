@@ -36,7 +36,8 @@ class Messages:
 
     uhoh_counter = "{uhohs} uh ohs od spuštění."
     uptime_message = "Up since:  `{boottime}`\nUptime:\t`{uptime}`"
-
+    kachna_remaining = "Do kachny zustava:  `{zustava}`"
+    kachna_opened = "Kachna otevrena !"
     karma = "{user} Karma uzivatele `{target}` je: **{karma}** " \
             "(**{order}.**)\nA rozdal:\n" \
             "**{karma_pos}** pozitivní karmy " \
@@ -217,4 +218,5 @@ class Messages:
                       'a jestli je sudý nebo lichý.'),
              ('uhoh', 'Vypíše počet uh ohs od spuštění.'),
              ('uptime', 'Vypíše čas spuštění a čas uplynulý od spuštění.'),
+             ('kachna', 'Vypíše čas do otvorení kachny.'),
              ('god', 'Vypíše tuto zprávu.')]]
