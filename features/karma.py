@@ -166,7 +166,7 @@ class Karma(BaseFeature):
 
     async def __make_emoji_list(self, guild, emojis):
         message = ""
-        broken_emoji = []
+        is_error = False
 
         # Fetch all custom server emoji
         # They will be saved in the guild.emojis list
@@ -201,30 +201,30 @@ class Karma(BaseFeature):
                     message += str(emoji_id)
 
             except discord.NotFound:
+                is_error = True
                 if isinstance(emoji_id, bytearray):
-                    broken_emoji.append(emoji_id.decode())
+                    self.repo.remove_emoji(emoji_id.decode())
                 else:
-                    broken_emoji.append(str(emoji_id))
+                    self.repo.remove_emoji(str(emoji_id))
 
-        return message, ', '.join(broken_emoji)
+        return message, is_error
 
     async def emoji_list_all_values(self, channel):
-        errors = ""
+        error = False
         for value in ['1', '-1']:
-            emojis, error = await self.__make_emoji_list(
+            emojis, is_error = await self.__make_emoji_list(
                     channel.guild,
                     self.repo.get_ids_of_emojis_valued(value)
                     )
-            errors += error
+            error |= is_error
             try:
                 await channel.send("Hodnota " + value + ":\n" + emojis)
             except discord.errors.HTTPException:
                 pass  # TODO: error handling?
 
-        if errors != "":
+        if error:
             channel = await self.bot.fetch_channel(cfg.bot_dev_channel)
-            await channel.send("{}\n{}".format(msg.toaster_pls,
-                                               errors))
+            await channel.send(msg.karma_get_missing)
 
     async def karma_give(self, message):
         input_string = message.content.split()

@@ -5,7 +5,7 @@ class Messages:
     prefix = config.Config.default_prefix
 
     server_warning = "Tohle funguje jen na VUT FIT serveru."
-    toaster_pls = "Toaster pls, máš bordel v DB."
+    karma_get_missing = "Toaster pls, měls bordel v DB. Musel jsem za tebe uklidit."
     missing_perms = "Na tohle nemas prava. {user}"
     acl_help = "{user}, Pouziti:\n`!acl {{action}} {{table}} [args]`\n"\
                "action: add, edit, del nebo list\n"\
