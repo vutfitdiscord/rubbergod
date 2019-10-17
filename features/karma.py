@@ -216,7 +216,7 @@ class Karma(BaseFeature):
                     channel.guild,
                     self.repo.get_ids_of_emojis_valued(value)
                     )
-            error = is_error
+            error |= is_error
             try:
                 await channel.send("Hodnota " + value + ":\n" + emojis)
             except discord.errors.HTTPException:
