@@ -106,7 +106,7 @@ class FitWide(commands.Cog):
                                 await member.add_roles(correct_role)
                                 await member.remove_roles(role)
                                 await ctx.send("Presouvam: " + member.display_name +
-                                               "z " + role_name + " do "+ year)
+                                               " z " + role_name + " do "+ year)
                                 break
                     elif p_role:
                         await ctx.send("Nesedi mi role u: " +
@@ -119,7 +119,7 @@ class FitWide(commands.Cog):
                                 await member.add_roles(dropout)
                                 await member.remove_roles(role)
                                 await ctx.send("Presouvam: " + member.display_name +
-                                               "z " + role_name + " do dropout")
+                                               " z " + role_name + " do dropout")
                                 break
                     elif p_role:
                         await ctx.send("Nesedi mi role u: " +
