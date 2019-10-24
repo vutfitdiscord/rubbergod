@@ -43,7 +43,7 @@ class Rng:
 
     @staticmethod
     def week():
-        starting_week = 5  # School started at 5th week (winter in 37)
+        starting_week = 38  # School started at 5th week (winter in 37)
         week = date.today().isocalendar()[1]  # get actual week number
         stud_week = week - starting_week
         odd = "Lichý"

@@ -145,19 +145,21 @@ class Messages:
                               "({toaster} pls)."
     verify_verify_wrong_code = "{user} Špatný kód."
 
-    vote_format = "Použití vote:\n`" + prefix + "vote [datum a čas] [otázka]\n[emoji]" \
+    vote_format = "Použití vote:\n`" + prefix + "vote [datum] [čas] [otázka]\n[emoji]" \
                                                 " [odpověď 1]\n[emoji] [odpověď 2]\na tak dále`\n" \
-                                                "Datum a čas jsou ve formátu `\"dd.MM. hh:mm\"` " \
-                                                "(včetně uvozovek!). Je to nepovinný argument, " \
-                                                "hlasování bez něj bude funkční neustále. " \
-                                                "Pokud je vyplněno, bot pošle po uplynutí zprávu o výsledku," \
+                                                "Datum je ve formátu `dd.MM.(yy)`. Čas je ve formátu `hh:mm`. " \
+                                                "Pouze vyplněný čas použije den odeslání zprávy, " \
+                                                "pouze vyplněné datum použije čas 00:00. " \
+                                                "Datum a čas jsou nepovinné argumenty, " \
+                                                "hlasování bude bez jejich uvedení funkční neustále. " \
+                                                "Pokud jsou vyplněny, bot pošle po uplynutí zprávu o výsledku," \
                                                 "když ho mezitím nikdo nevypne. " \
                                                 "Indikace výherné možnosti přežije i vypnutí."
     vote_not_emoji = "{not_emoji} není emoji. <:sadcat:576171980118687754>"
     vote_bad_date = "Hlasování může skončit jen v budoucnosti. <:objection:490989324125470720>"
 
-    vote_winning = "Vyhrává možnost {winning_emoji} „{winning_option}“ s {votes} hlasy."
-    vote_winning_multiple = "Vyhrávají možnosti {winning_emojis} s {votes} hlasy."
+    vote_winning = "Prozatím vyhrává možnost {winning_emoji} „{winning_option}“ s {votes} hlasy."
+    vote_winning_multiple = "Prozatím vyhrávají možnosti {winning_emojis} s {votes} hlasy."
 
     vote_none = "Čekám na hlasy."
 
