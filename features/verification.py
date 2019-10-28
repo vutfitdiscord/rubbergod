@@ -166,12 +166,12 @@ class Verification(BaseFeature):
                         year = str(raw_year_parts[2]) + year
                     else:
                         year = "3MIT+"
-                elif raw_year_parts[1] == "DVI4":
+                elif raw_year_parts[1] in ["DVI4", "DRH"]:
                     year = "PhD+"
                 elif raw_year_parts[1] == "BCH":
                     year = "Erasmus"
-            elif raw_year_parts[0] == "FEKT":
-                year = "FEKT"
+        elif raw_year_parts[0] == "FEKT":
+            year = "FEKT"
         elif len(raw_year_parts) == 1:
             if raw_year_parts[0] == "MUNI":
                 year = "MUNI"

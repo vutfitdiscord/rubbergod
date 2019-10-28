@@ -71,12 +71,10 @@ class FitWide(commands.Cog):
         permited = session.query(Permit)
         permited_ids = [int(person.discord_ID) for person in permited]
 
-        bit0 = discord.utils.get(guild.roles, name="0BIT")
-        bit1 = discord.utils.get(guild.roles, name="1BIT")
-        bit2 = discord.utils.get(guild.roles, name="2BIT")
-        bit3 = discord.utils.get(guild.roles, name="3BIT")
-        bit4 = discord.utils.get(guild.roles, name="4BIT+")
-        mit1 = discord.utils.get(guild.roles, name="1MIT")
+        years = ["0BIT", "1BIT", "2BIT", "3BIT", "4BIT+",
+                 "0MIT", "1MIT", "2MIT", "3MIT+"]
+
+        year_roles = {year: discord.utils.get(guild.roles, name=year) for year in years}
 
         for member in verified:
             if member.id not in permited_ids:
@@ -99,44 +97,34 @@ class FitWide(commands.Cog):
 
                 year = self.verification.transform_year(person.year)
 
-                role = discord.utils.get(guild.roles, name=year)
+                correct_role = discord.utils.get(guild.roles, name=year)
 
-                if role not in member.roles:
-                    if year == "1MIT" and bit4 in member.roles and p_move:
-                        await member.add_roles(mit1)
-                        await member.remove_roles(bit4)
-                        await ctx.send("Presouvam: " + member.display_name +
-                                       " do 1MIT")
-                    elif year == "4BIT+" and bit3 in member.roles and p_move:
-                        await member.add_roles(bit4)
-                        await member.remove_roles(bit3)
-                        await ctx.send("Presouvam: " + member.display_name +
-                                       " do 4BIT+")
-                    elif year == "3BIT" and bit2 in member.roles and p_move:
-                        await member.add_roles(bit3)
-                        await member.remove_roles(bit2)
-                        await ctx.send("Presouvam: " + member.display_name +
-                                       " do 3BIT")
-                    elif year == "2BIT" and bit1 in member.roles and p_move:
-                        await member.add_roles(bit2)
-                        await member.remove_roles(bit1)
-                        await ctx.send("Presouvam: " + member.display_name +
-                                       " do 2BIT")
-                    elif year == "1BIT" and bit0 in member.roles and p_move:
-                        await member.add_roles(bit1)
-                        await member.remove_roles(bit0)
-                        await ctx.send("Presouvam: " + member.display_name +
-                                       " do 1BIT")
-                    elif not p_role:
-                        continue
-                    elif year is None:
-                        await ctx.send("Nesedi mi role u: " +
-                                       utils.generate_mention(member.id) +
-                                       ", ma ted rocnik: " + person.year)
-                    else:
+                if year is not None and correct_role not in member.roles:
+                    if p_move:
+                        for role_name, role in year_roles.items():
+                            if role in member.roles:
+                                await member.add_roles(correct_role)
+                                await member.remove_roles(role)
+                                await ctx.send("Presouvam: " + member.display_name +
+                                               " z " + role_name + " do "+ year)
+                                break
+                    elif p_role:
                         await ctx.send("Nesedi mi role u: " +
                                        utils.generate_mention(member.id) +
                                        ", mel by mit roli: " + year)
+                elif year is None:
+                    if p_move:
+                        for role_name, role in year_roles.items():
+                            if role in member.roles:
+                                await member.add_roles(dropout)
+                                await member.remove_roles(role)
+                                await ctx.send("Presouvam: " + member.display_name +
+                                               " z " + role_name + " do dropout")
+                                break
+                    elif p_role:
+                        await ctx.send("Nesedi mi role u: " +
+                                       utils.generate_mention(member.id) +
+                                       ", ma ted rocnik: " + person.year)
 
         await ctx.send("Done")
 

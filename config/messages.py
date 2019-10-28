@@ -5,7 +5,7 @@ class Messages:
     prefix = config.Config.default_prefix
 
     server_warning = "Tohle funguje jen na VUT FIT serveru."
-    toaster_pls = "Toaster pls, máš bordel v DB."
+    karma_get_missing = "Toaster pls, měls bordel v DB. Musel jsem za tebe uklidit."
     missing_perms = "Na tohle nemas prava. {user}"
     acl_help = "{user}, Pouziti:\n`!acl {{action}} {{table}} [args]`\n"\
                "action: add, edit, del nebo list\n"\
@@ -36,7 +36,8 @@ class Messages:
 
     uhoh_counter = "{uhohs} uh ohs od spuštění."
     uptime_message = "Up since:  `{boottime}`\nUptime:\t`{uptime}`"
-
+    kachna_remaining = "Do kachny zustava:  `{zustava}`"
+    kachna_opened = "Kachna otevrena !"
     karma = "{user} Karma uzivatele `{target}` je: **{karma}** " \
             "(**{order}.**)\nA rozdal:\n" \
             "**{karma_pos}** pozitivní karmy " \
@@ -198,16 +199,16 @@ class Messages:
              ('karma vote',
               'Odstartuje hlasování o hodnotě zatím neohodnoceného emotu.'),
              ('karma revote [emote]',
-              'Odstartuje hlasování o nové hodnotě emotu.'),
-             ('leaderboard', 'Karma leaderboard'),
+              'Odstartuje hlasování o nové hodnotě emotu.')],
+            [('leaderboard', 'Karma leaderboard'),
              ('bajkarboard', 'Karma leaderboard reversed'),
              ('givingboard', 'Leaderboard rozdávání pozitivní karmy.'),
-             ('ishaboard', 'Leaderboard rozdávání negativní karmy.')],
-            [(review_add_format[1:], 'Přidá recenzi na předmět.'),
+             ('ishaboard', 'Leaderboard rozdávání negativní karmy.'),
+             (review_add_format[1:], 'Přidá recenzi na předmět.'),
              (review_get_format[1:], 'Vypíše recenze na vybraný předmět.'),
              (review_remove_format[1:], 'Odstraní hodnocení.'),
-             ('vote', 'Zahájí hlasování.'),
-             ('roll X Y',
+             ('vote', 'Zahájí hlasování.')],
+            [('roll X Y',
               'Vygeneruje náhodné celé číslo z intervalu <**X**, **Y**>.'),
              ('flip', 'Hodí mincí'),
              ('pick *Is foo bar? Yes No Maybe*',
@@ -217,4 +218,5 @@ class Messages:
                       'a jestli je sudý nebo lichý.'),
              ('uhoh', 'Vypíše počet uh ohs od spuštění.'),
              ('uptime', 'Vypíše čas spuštění a čas uplynulý od spuštění.'),
+             ('kachna', 'Vypíše čas do otvorení kachny.'),
              ('god', 'Vypíše tuto zprávu.')]]
