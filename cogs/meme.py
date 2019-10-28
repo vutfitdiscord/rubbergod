@@ -39,6 +39,11 @@ class Meme(commands.Cog):
         await ctx.send(messages.uhoh_counter.format(uhohs=uhoh_counter))
 
     @commands.cooldown(rate=5, per=20.0, type=commands.BucketType.user)
+    @commands.command(name='??')
+    async def question(self, ctx):
+        await ctx.send(choice(messages.question))
+
+    @commands.cooldown(rate=5, per=20.0, type=commands.BucketType.user)
     @commands.command()
     async def hug(self, ctx, user: discord.Member = None, intensity: int = 0):
         """Because everyone likes hugs"""

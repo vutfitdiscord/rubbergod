@@ -176,6 +176,7 @@ class Messages:
     review_tier = "Tier je z rozsahu 0-4, kde 0 je nejlepší"
     review_text_len = "Maximální počet znaků v části 'text' je 1024"
     review_added = "Hodnocení předmětu bylo přidáno"
+    reviews_page_e = "Zavolej znova reviews pro aktualizaci"
 
     review_get_format = prefix + "reviews [zkratka předmětu]"
     review_remove_format = prefix + "reviews remove [zkratka předmětu]"
@@ -187,6 +188,9 @@ class Messages:
 
     pr_meme = "https://github.com/Toaster192/rubbergod/pulls"
     uhoh = "uh oh"
+    question = ["<:what:638277508541710337>",
+                "<:wuuut:484470874003472394>",
+                "nech mě <:sadcat:576171980118687754>"]
 
     info = [[('karma', 'Vypíše vaši karmu, kolik pozitivní a negativní karmy'
                        ' jste rozdali.'),

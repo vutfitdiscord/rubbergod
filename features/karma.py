@@ -273,7 +273,7 @@ class Karma(BaseFeature):
             else:
                 column = 'negative'
                 attribute = Database_karma.negative.desc()
-                emote = "<:ishaGrin:587959772301623297>"
+                emote = "<:ishagrin:638277508651024394>"
                 output += emote + " KARMA ISHABOARD " + emote + "\n"
         elif action == 'get':
             column = 'karma'
