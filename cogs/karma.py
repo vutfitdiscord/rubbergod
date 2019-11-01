@@ -124,7 +124,7 @@ class Karma(commands.Cog):
     @commands.cooldown(rate=2, per=30.0, type=commands.BucketType.user)
     @commands.command()
     async def leaderboard(self, ctx, start=1):
-        if (not 1 < start < 100000000): # Any value larger than the server
+        if (not 0 < start < 100000000): # Any value larger than the server
                                         # user cnt and lower than 32bit
                                         # int max will do
             await ctx.send(
@@ -137,7 +137,7 @@ class Karma(commands.Cog):
     @commands.cooldown(rate=2, per=30.0, type=commands.BucketType.user)
     @commands.command()
     async def bajkarboard(self, ctx, start=1):
-        if (not 1 < start < 100000000): # Any value larger than the server
+        if (not 0 < start < 100000000): # Any value larger than the server
                                         # user cnt and lower than 32bit
                                         # int max will do
             await ctx.send(
@@ -150,7 +150,7 @@ class Karma(commands.Cog):
     @commands.cooldown(rate=2, per=30.0, type=commands.BucketType.user)
     @commands.command()
     async def givingboard(self, ctx, start=1):
-        if (not 1 < start < 100000000): # Any value larger than the server
+        if (not 0 < start < 100000000): # Any value larger than the server
                                         # user cnt and lower than 32bit
                                         # int max will do
             await ctx.send(
@@ -163,7 +163,7 @@ class Karma(commands.Cog):
     @commands.cooldown(rate=2, per=30.0, type=commands.BucketType.user)
     @commands.command()
     async def ishaboard(self, ctx, start=1):
-        if (not 1 < start < 100000000): # Any value larger than the server
+        if (not 0 < start < 100000000): # Any value larger than the server
                                         # user cnt and lower than 32bit
                                         # int max will do
             await ctx.send(
