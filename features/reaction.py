@@ -204,7 +204,7 @@ class Reaction(BaseFeature):
                 page = int(footer[8:pos])
                 max_page = int(footer[(pos + 1):])
             except ValueError:
-                await message.edit(content=message.reviews_page_e, embed=None)
+                await message.edit(content=Messages.reviews_page_e, embed=None)
                 return
             tier_average = message.embeds[0].description[-1]
             if emoji in ["◀", "▶", "⏪"]:
