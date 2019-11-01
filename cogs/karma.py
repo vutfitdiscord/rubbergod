@@ -123,27 +123,57 @@ class Karma(commands.Cog):
 
     @commands.cooldown(rate=2, per=30.0, type=commands.BucketType.user)
     @commands.command()
-    async def leaderboard(self, ctx):
-        await self.karma.leaderboard(ctx.message.channel, 'get', 'DESC')
+    async def leaderboard(self, ctx, start=1):
+        if (start < 1):
+            await ctx.send(
+                messages.karma_lederboard_offser_error
+                .format(user=utils.generate_mention(ctx.author.id)))
+            return
+        await self.karma.leaderboard(ctx.message.channel, 'get', 'DESC', start)
         await self.check.botroom_check(ctx.message)
 
     @commands.cooldown(rate=2, per=30.0, type=commands.BucketType.user)
     @commands.command()
-    async def bajkarboard(self, ctx):
-        await self.karma.leaderboard(ctx.message.channel, 'get', 'ASC')
+    async def bajkarboard(self, ctx, start=1):
+        if (start < 1):
+            await ctx.send(
+                messages.karma_lederboard_offser_error
+                .format(user=utils.generate_mention(ctx.author.id)))
+            return
+        await self.karma.leaderboard(ctx.message.channel, 'get', 'ASC', start)
         await self.check.botroom_check(ctx.message)
 
     @commands.cooldown(rate=2, per=30.0, type=commands.BucketType.user)
     @commands.command()
-    async def givingboard(self, ctx):
-        await self.karma.leaderboard(ctx.message.channel, 'give', 'DESC')
+    async def givingboard(self, ctx, start=1):
+        if (start < 1):
+            await ctx.send(
+                messages.karma_lederboard_offser_error
+                .format(user=utils.generate_mention(ctx.author.id)))
+            return
+        await self.karma.leaderboard(ctx.message.channel, 'give', 'DESC', start)
         await self.check.botroom_check(ctx.message)
 
     @commands.cooldown(rate=2, per=30.0, type=commands.BucketType.user)
     @commands.command()
-    async def ishaboard(self, ctx):
-        await self.karma.leaderboard(ctx.message.channel, 'give', 'ASC')
+    async def ishaboard(self, ctx, start=1):
+        if (start < 1):
+            await ctx.send(
+                messages.karma_lederboard_offser_error
+                .format(user=utils.generate_mention(ctx.author.id)))
+            return
+        await self.karma.leaderboard(ctx.message.channel, 'give', 'ASC', start)
         await self.check.botroom_check(ctx.message)
+
+    @leaderboard.error
+    @bajkarboard.error
+    @givingboard.error
+    @ishaboard.error
+    async def leaderboard_error(self, ctx, error):
+        if isinstance(error, commands.BadArgument):
+            await ctx.send(
+                messages.karma_lederboard_offser_error
+                .format(user=utils.generate_mention(ctx.author.id)))
 
 
 def setup(bot):

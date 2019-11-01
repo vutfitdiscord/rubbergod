@@ -262,7 +262,7 @@ class Karma(BaseFeature):
                                 karma_neg=k.negative.value,
                                 karma_neg_order=k.negative.position)
 
-    async def leaderboard(self, channel, action, order):
+    async def leaderboard(self, channel, action, order, start=1):
         output = "> "
         if action == 'give':
             if order == "DESC":
@@ -289,10 +289,10 @@ class Karma(BaseFeature):
             raise Exception('Action neni get/give')
         output += "> =======================\n"
 
-        board = self.repo.get_leaderboard(attribute)
+        board = self.repo.get_leaderboard(attribute, start-1)
         guild = self.bot.get_guild(cfg.guild_id)
 
-        for i, user in enumerate(board, 1):
+        for i, user in enumerate(board, start):
             username = guild.get_member(int(user.member_ID))
             if username is None:
                 continue

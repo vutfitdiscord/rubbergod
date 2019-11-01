@@ -77,6 +77,7 @@ class Messages:
     karma_give_success = "Karma byla úspěšně přidaná."
     karma_give_negative_success = "Karma byla úspěšně odebraná."
     member_not_found = "{user} Nikoho takového jsem nenašel."
+    karma_lederboard_offser_error = "{user} Špatný offset, zadej kladné číslo"
 
     role_add_denied = "{user}, na přidání role {role} nemáš právo."
     role_remove_denied = "{user}, " \
@@ -204,10 +205,10 @@ class Messages:
               'Odstartuje hlasování o hodnotě zatím neohodnoceného emotu.'),
              ('karma revote [emote]',
               'Odstartuje hlasování o nové hodnotě emotu.')],
-            [('leaderboard', 'Karma leaderboard'),
-             ('bajkarboard', 'Karma leaderboard reversed'),
-             ('givingboard', 'Leaderboard rozdávání pozitivní karmy.'),
-             ('ishaboard', 'Leaderboard rozdávání negativní karmy.'),
+            [('leaderboard [offset]', 'Karma leaderboard'),
+             ('bajkarboard [offset]', 'Karma leaderboard reversed'),
+             ('givingboard [offset]', 'Leaderboard rozdávání pozitivní karmy.'),
+             ('ishaboard [offset]', 'Leaderboard rozdávání negativní karmy.'),
              (review_add_format[1:], 'Přidá recenzi na předmět.'),
              (review_get_format[1:], 'Vypíše recenze na vybraný předmět.'),
              (review_remove_format[1:], 'Odstraní hodnocení.'),
