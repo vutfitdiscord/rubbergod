@@ -71,5 +71,3 @@ docker-compose down && docker-compose up --build
 ## License
 
 This project is licensed under the GNU GPL v.3 License.
-
-funguje mi webhoook?

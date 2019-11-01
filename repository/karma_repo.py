@@ -132,7 +132,7 @@ class KarmaRepository(BaseRepository):
         result = Karma_data(karma, positive, negative)
         return result
 
-    def get_leaderboard(self, atribute):
+    def get_leaderboard(self, atribute, offset=0):
         leaderboard = session.query(Karma).\
-                order_by(atribute).limit(10)
+                order_by(atribute).offset(offset).limit(10)
         return leaderboard
