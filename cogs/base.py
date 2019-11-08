@@ -30,7 +30,8 @@ class Base(commands.Cog):
     async def on_command_error(self, ctx, error):
         # The local handlers so far only catch bad arguments so we still
         # want to print the rest
-        if isinstance(error, commands.BadArgument) and\
+        if (isinstance(error, commands.BadArgument) or
+            isinstance(error, commands.errors.CheckFailure)) and\
            hasattr(ctx.command, 'on_error'):
             return
 

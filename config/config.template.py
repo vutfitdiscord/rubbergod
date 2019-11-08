@@ -45,6 +45,7 @@ class Config:
     bot_dev_channel = 597009137905303552
     vote_room = 461544375105749003
     bot_room = 461549842896781312
+    mod_room = 505679727936143361
 
     allowed_channels = [
             bot_room,

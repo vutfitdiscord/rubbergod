@@ -26,6 +26,13 @@ class FitWide(commands.Cog):
         self.bot = bot
         self.verification = verification.Verification(bot, user_r)
 
+    async def is_admin(ctx):
+        return ctx.author.id == config.admin_id
+
+    async def is_in_modroom(ctx):
+        return ctx.message.channel.id == config.mod_room
+
+
     @commands.Cog.listener()
     async def on_typing(self, channel, user, when):
         global arcas_time
@@ -37,16 +44,11 @@ class FitWide(commands.Cog):
             await channel.send(embed=gif)
 
     @commands.cooldown(rate=2, per=20.0, type=commands.BucketType.user)
+    @commands.check(is_admin)
     @commands.command()
     async def role_check(self, ctx, p_verified: bool = True,
                          p_move: bool = True, p_status: bool = True,
                          p_role: bool = True, p_muni: bool = True):
-        if ctx.author.id != config.admin_id:
-            await ctx.send(
-                    messages.insufficient_rights
-                    .format(user=utils.generate_mention(ctx.author.id)))
-            return
-
         guild = self.bot.get_guild(config.guild_id)
         members = guild.members
 
@@ -129,14 +131,9 @@ class FitWide(commands.Cog):
         await ctx.send("Done")
 
     @commands.cooldown(rate=2, per=20.0, type=commands.BucketType.user)
+    @commands.check(is_admin)
     @commands.command()
     async def increment_roles(self, ctx):
-        if ctx.author.id != config.admin_id:
-            await ctx.send(
-                    messages.insufficient_rights
-                    .format(user=utils.generate_mention(ctx.author.id)))
-            return
-
         database.base.metadata.create_all(database.db)
 
         guild = self.bot.get_guild(config.guild_id)
@@ -283,14 +280,9 @@ class FitWide(commands.Cog):
     # and role_check to check if peoples roles match the database
 
     @commands.cooldown(rate=2, per=20.0, type=commands.BucketType.user)
+    @commands.check(is_in_modroom)
     @commands.command()
     async def update_db(self, ctx):
-        if ctx.author.id != config.admin_id:
-            await ctx.send(
-                    messages.insufficient_rights
-                    .format(user=utils.generate_mention(ctx.author.id)))
-            return
-
         with open("merlin-latest", "r") as f:
             data = f.readlines()
 
@@ -317,7 +309,6 @@ class FitWide(commands.Cog):
                 try:
                     # check for muni
                     int(person.login)
-                    print("Muni pls")
                     person.year = "MUNI"
                 except ValueError:
                     person.year = "dropout"
@@ -326,6 +317,42 @@ class FitWide(commands.Cog):
 
         await ctx.send("Update databaze probehl uspesne")
 
+
+    @commands.cooldown(rate=2, per=20.0, type=commands.BucketType.user)
+    @commands.check(is_in_modroom)
+    @commands.command()
+    async def get_users_login(self, ctx, member: discord.Member):
+        result = session.query(Permit).\
+            filter(Permit.discord_ID == str(member.id)).one_or_none()
+
+        if result is None:
+            await ctx.send("Neni v DB prej")
+        else:
+            await ctx.send(result.login)
+        
+
+    @commands.cooldown(rate=2, per=20.0, type=commands.BucketType.user)
+    @commands.check(is_in_modroom)
+    @commands.command()
+    async def get_logins_user(self, ctx, login):
+        result = session.query(Permit).\
+            filter(Permit.login == login).one_or_none()
+
+        if result is None:
+            await ctx.send("Neni na serveru prej")
+        else:
+            await ctx.send(utils.generate_mention(result.discord_ID))
+
+
+    @get_users_login.error
+    @get_logins_user.error
+    @role_check.error
+    @increment_roles.error
+    @update_db.error
+    async def fitwide_checks_error(self, ctx, error):
+        if isinstance(error, commands.CheckFailure):
+            await ctx.send('Nothing to see here comrade. ' + 
+                           '<:KKomrade:484470873001164817>')
 
 def setup(bot):
     bot.add_cog(FitWide(bot))
