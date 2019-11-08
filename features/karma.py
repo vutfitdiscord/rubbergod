@@ -165,7 +165,8 @@ class Karma(BaseFeature):
                 .format(emote=str(emoji)))
 
     async def __make_emoji_list(self, guild, emojis):
-        message = ""
+        message = []
+        line = ""
         is_error = False
 
         # Fetch all custom server emoji
@@ -174,7 +175,8 @@ class Karma(BaseFeature):
 
         for cnt, emoji_id in enumerate(emojis):
             if cnt % 8 == 0 and cnt:
-                message += "\n"
+                message.append(line)
+                line = ""
 
             try:
                 # Try and find the emoji in the server custom emoji list
@@ -192,13 +194,13 @@ class Karma(BaseFeature):
                 if emoji is None:
                     emoji = await guild.fetch_emoji(int(emoji_id))
 
-                message += str(emoji)
+                line += str(emoji)
 
             except ValueError:
                 if isinstance(emoji_id, bytearray):
-                    message += emoji_id.decode()
+                    line += emoji_id.decode()
                 else:
-                    message += str(emoji_id)
+                    line += str(emoji_id)
 
             except discord.NotFound:
                 is_error = True
@@ -207,6 +209,8 @@ class Karma(BaseFeature):
                 else:
                     self.repo.remove_emoji(str(emoji_id))
 
+        message.append(line)
+        message = [line for line in message if line != ""]
         return message, is_error
 
     async def emoji_list_all_values(self, channel):
@@ -218,7 +222,9 @@ class Karma(BaseFeature):
                     )
             error |= is_error
             try:
-                await channel.send("Hodnota " + value + ":\n" + emojis)
+                await channel.send("Hodnota " + value + ":")
+                for line in emojis:
+                    await channel.send(line)
             except discord.errors.HTTPException:
                 pass  # TODO: error handling?
 
