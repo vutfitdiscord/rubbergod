@@ -343,8 +343,39 @@ class FitWide(commands.Cog):
         else:
             await ctx.send(utils.generate_mention(result.discord_ID))
 
+    @commands.cooldown(rate=2, per=20.0, type=commands.BucketType.user)
+    @commands.check(is_in_modroom)
+    @commands.command()
+    async def reset_login(self, ctx, login):
+
+        result = session.query(Valid_person).\
+            filter(Valid_person.login == login).one_or_none()
+        if result is None:
+            await ctx.send("Neni validni login pre")
+        else:
+            session.query(Permit).\
+                filter(Permit.login == login).delete()
+            result.status = 1
+            session.commit()
+            await ctx.send("Done")
+
+    @commands.cooldown(rate=2, per=20.0, type=commands.BucketType.user)
+    @commands.check(is_in_modroom)
+    @commands.command()
+    async def connect_login_to_user(self, ctx, login, member: discord.Member):
+
+        result = session.query(Valid_person).\
+            filter(Valid_person.login == login).one_or_none()
+        if result is None:
+            await ctx.send("Neni validni login prej")
+        else:
+            session.add(Permit(login=login, discord_ID=str(member.id)))
+            result.status = 0
+            session.commit()
+            await ctx.send("Done")
 
     @get_users_login.error
+    @reset_login.error
     @get_logins_user.error
     @role_check.error
     @increment_roles.error
