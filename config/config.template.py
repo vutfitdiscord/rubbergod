@@ -128,3 +128,4 @@ class Config:
     kachna_open_hour = 16
     kachna_close_hour = 22
     kachna_open_days = [0, 2] # 0 = Monday, 1=Tuesday, 2=Wednesday...
+    kachna_temp_closed = False
