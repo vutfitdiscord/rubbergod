@@ -69,6 +69,7 @@ class Base(commands.Cog):
         open_days = config.kachna_open_days
         open_hour = config.kachna_open_hour
         close_hour = config.kachna_close_hour
+        temp_closed = config.kachna_temp_closed
         def next_weekday(d, weekday):
             days_ahead = weekday - d.weekday()
             if days_ahead < 0:
@@ -85,7 +86,9 @@ class Base(commands.Cog):
         opentime = open_date.replace(hour=open_hour, minute=0, second=0)
         isClosed = (now < opentime) or (opentime.replace(hour=close_hour) < now)
         delta = opentime - now
-        message = messages.kachna_remaining.format(zustava=str(delta)) if isClosed else messages.kachna_opened
+        message = messages.kachna_remaining.format(zbyva=str(delta)) if isClosed else messages.kachna_opened
+        if temp_closed:
+            message = messages.kachna_temp_closed
         await ctx.send(message)
 
     @commands.cooldown(rate=2, per=20.0, type=commands.BucketType.user)
