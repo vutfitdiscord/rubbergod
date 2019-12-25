@@ -39,6 +39,7 @@ class Messages:
     kachna_remaining = "Do kachny zbývá:  `{zbyva}`"
     kachna_opened = "Kachna otevřená ! <:hypers:493154327318233088>"
     kachna_temp_closed = "Kachna je bohužel zavřena <:sadcat:576171980118687754>"
+    kachna_switched = "Kachna byla nastavena na: {open_closed}"
     karma = "{user} Karma uzivatele `{target}` je: **{karma}** " \
             "(**{order}.**)\nA rozdal:\n" \
             "**{karma_pos}** pozitivní karmy " \
@@ -224,5 +225,5 @@ class Messages:
                       'a jestli je sudý nebo lichý.'),
              ('uhoh', 'Vypíše počet uh ohs od spuštění.'),
              ('uptime', 'Vypíše čas spuštění a čas uplynulý od spuštění.'),
-             ('kachna', 'Vypíše čas do otvorení kachny.'),
+             ('kachna', 'Vypíše čas do otevření kachny.'),
              ('god', 'Vypíše tuto zprávu.')]]

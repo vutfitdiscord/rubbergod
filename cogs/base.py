@@ -91,6 +91,18 @@ class Base(commands.Cog):
             message = messages.kachna_temp_closed
         await ctx.send(message)
 
+    @commands.command()
+    async def kachna_switch(self, ctx):   
+        message = messages.insufficient_rights.format(user=utils.generate_mention(ctx.author.id))
+        if ctx.author.id == config.admin_id:
+            if config.kachna_temp_closed == False:
+                config.kachna_temp_closed = True
+                message = messages.kachna_switched.format(open_closed = "zavřená dlouhodobě")
+            else:
+                config.kachna_temp_closed = False
+                message = messages.kachna_switched.format(open_closed = "otevřená pravidelně")
+        await ctx.send(message)
+
     @commands.cooldown(rate=2, per=20.0, type=commands.BucketType.user)
     @commands.command()
     async def week(self, ctx):
