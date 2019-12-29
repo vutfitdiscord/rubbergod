@@ -3,7 +3,7 @@ import asyncio
 import discord
 from discord import Emoji
 from discord.ext.commands import Bot
-from emoji import UNICODE_EMOJI
+from emoji import demojize
 
 import utils
 from config import config, messages
@@ -21,6 +21,15 @@ def test_emoji(db_emoji: bytearray, server_emoji: Emoji):
         return custom_emoji == server_emoji.id
     except ValueError:
         return False
+
+
+def is_unicode(text):
+    demojized = demojize(text)
+    if demojized.count(':') != 2:
+        return False
+    if demojized.split(':')[2] != '':
+        return False
+    return demojized != text
 
 
 class Karma(BaseFeature):
@@ -112,7 +121,7 @@ class Karma(BaseFeature):
             return
 
         emoji = content[2]
-        if len(emoji) != 1 or emoji[0] not in UNICODE_EMOJI:
+        if not is_unicode(emoji):
             try:
                 emoji_id = int(emoji.split(':')[2][:-1])
                 emoji = await message.channel.guild.fetch_emoji(emoji_id)
@@ -142,7 +151,7 @@ class Karma(BaseFeature):
             return await self.emoji_list_all_values(message.channel)
 
         emoji = content[2]
-        if len(emoji) != 1 or emoji[0] not in UNICODE_EMOJI:
+        if not is_unicode(emoji):
             try:
                 emoji_id = int(emoji.split(':')[2][:-1])
                 emoji = await message.channel.guild.fetch_emoji(emoji_id)
