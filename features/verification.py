@@ -96,6 +96,13 @@ class Verification(BaseFeature):
                             message.author.id),
                             toaster=utils.generate_mention(
                             Config.admin_id)))
+                    embed = discord.Embed(title="Neuspesny pokus o verify",
+                                          color=0xeee657)
+                    embed.add_field(name="User", value=utils.generate_mention(message.author.id))
+                    embed.add_field(name="Message",
+                                    value=message.content, inline=False)
+                    channel = self.bot.get_channel(Config.log_channel)
+                    await channel.send(embed=embed)
             else:
                 # MUNI
                 try:
@@ -107,6 +114,13 @@ class Verification(BaseFeature):
                             message.author.id),
                             toaster=utils.generate_mention(
                             Config.admin_id)))
+                    embed = discord.Embed(title="Neuspesny pokus o verify",
+                                          color=0xeee657)
+                    embed.add_field(name="User", value=utils.generate_mention(message.author.id))
+                    embed.add_field(name="Message",
+                                    value=message.content, inline=False)
+                    channel = self.bot.get_channel(Config.log_channel)
+                    await channel.send(embed=embed)
                     try:
                         await message.delete()
                         return
@@ -125,6 +139,13 @@ class Verification(BaseFeature):
                             message.author.id),
                             toaster=utils.generate_mention(
                             Config.admin_id)))
+                    embed = discord.Embed(title="Neuspesny pokus o verify",
+                                          color=0xeee657)
+                    embed.add_field(name="User", value=utils.generate_mention(message.author.id))
+                    embed.add_field(name="Message",
+                                    value=message.content, inline=False)
+                    channel = self.bot.get_channel(Config.log_channel)
+                    await channel.send(embed=embed)
         else:
             await message.channel.send(
                 Messages.verify_already_verified
@@ -225,6 +246,13 @@ class Verification(BaseFeature):
                             Messages.verify_verify_wrong_code
                             .format(user=utils.generate_mention(
                                     message.author.id)))
+                    embed = discord.Embed(title="Neuspesny pokus o verify(kod)",
+                                          color=0xeee657)
+                    embed.add_field(name="User", value=utils.generate_mention(message.author.id))
+                    embed.add_field(name="Message",
+                                    value=message.content, inline=False)
+                    channel = self.bot.get_channel(Config.log_channel)
+                    await channel.send(embed=embed)
                     return
 
                 # Try and transform the year into the role name
@@ -238,6 +266,13 @@ class Verification(BaseFeature):
                             toaster=utils.generate_mention(
                             Config.admin_id),
                             year=str(new_user.year)))
+                    embed = discord.Embed(title="Neuspesny pokus o verify(manual)",
+                                          color=0xeee657)
+                    embed.add_field(name="User", value=utils.generate_mention(message.author.id))
+                    embed.add_field(name="Message",
+                                    value=message.content, inline=False)
+                    channel = self.bot.get_channel(Config.log_channel)
+                    await channel.send(embed=embed)
                     return
 
                 try:
@@ -284,6 +319,13 @@ class Verification(BaseFeature):
                         message.author.id),
                         toaster=utils.generate_mention(
                         Config.admin_id)))
+                embed = discord.Embed(title="Neuspesny pokus o verify",
+                                      color=0xeee657)
+                embed.add_field(name="User", value=utils.generate_mention(message.author.id))
+                embed.add_field(name="Message",
+                                value=message.content, inline=False)
+                channel = self.bot.get_channel(Config.log_channel)
+                await channel.send(embed=embed)
         else:
             await message.channel.send(
                 Messages.verify_already_verified
