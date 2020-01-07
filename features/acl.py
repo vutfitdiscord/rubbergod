@@ -1,4 +1,5 @@
 import utils
+from utils import fill_message
 from config import messages
 from features.base_feature import BaseFeature
 from repository.acl_repo import AclRepository
@@ -23,9 +24,7 @@ class Acl(BaseFeature):
 
     async def handle_add(self, ctx, args):
         if not len(args):
-            await ctx.send(
-                messages.acl_help
-                .format(user=utils.generate_mention(ctx.author.id)))
+            await ctx.send(fill_message("acl_help", user=ctx.author.id))
             return
 
         if args[0] == "group" and 2 <= len(args) <= 3:
@@ -37,16 +36,12 @@ class Acl(BaseFeature):
         elif args[0] == "user" and len(args) == 4:
             await self.add_user(ctx, args[1:])
         else:
-            await ctx.send(
-                messages.acl_help
-                .format(user=utils.generate_mention(ctx.author.id)))
+            await ctx.send(fill_message("acl_help", user=ctx.author.id))
             return
 
     async def handle_edit(self, ctx, args):
         if not len(args):
-            await ctx.send(
-                messages.acl_help
-                .format(user=utils.generate_mention(ctx.author.id)))
+            await ctx.send(fill_message("acl_help", user=ctx.author.id))
             return
 
         if args[0] == "group" and 3 <= len(args) <= 4:
@@ -58,16 +53,12 @@ class Acl(BaseFeature):
         elif args[0] == "user" and len(args) == 4:
             await self.edit_user(ctx, args[1:])
         else:
-            await ctx.send(
-                messages.acl_help
-                .format(user=utils.generate_mention(ctx.author.id)))
+            await ctx.send(fill_message("acl_help", user=ctx.author.id))
             return
 
     async def handle_del(self, ctx, args):
         if not len(args):
-            await ctx.send(
-                messages.acl_help
-                .format(user=utils.generate_mention(ctx.author.id)))
+            await ctx.send(fill_message("acl_help", user=ctx.author.id))
             return
 
         if args[0] == "group" and len(args) == 2:
@@ -79,16 +70,12 @@ class Acl(BaseFeature):
         elif args[0] == "user" and len(args) == 2:
             await self.del_user(ctx, args[1])
         else:
-            await ctx.send(
-                messages.acl_help
-                .format(user=utils.generate_mention(ctx.author.id)))
+            await ctx.send(fill_message("acl_help", user=ctx.author.id))
             return
 
     async def handle_list(self, ctx, args):
         if not len(args) or len(args) > 2:
-            await ctx.send(
-                messages.acl_help
-                .format(user=utils.generate_mention(ctx.author.id)))
+            await ctx.send(fill_message("acl_help", user=ctx.author.id))
             return
 
         if args[0] == "group":
@@ -100,9 +87,7 @@ class Acl(BaseFeature):
         elif args[0] == "user":
             await self.list_user(ctx, args[1:])
         else:
-            await ctx.send(
-                messages.acl_help
-                .format(user=utils.generate_mention(ctx.author.id)))
+            await ctx.send(fill_message("acl_help", user=ctx.author.id))
             return
 
     async def add_group(self, ctx, args):

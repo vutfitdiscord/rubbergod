@@ -2,6 +2,7 @@ from datetime import date
 from random import randint, choice
 
 import utils
+from utils import fill_message
 from config.messages import Messages
 
 
@@ -31,8 +32,7 @@ class Rng:
             else:
                 y = 0
         except ValueError:
-            return Messages.rng_generator_format_number.format(
-                user=utils.generate_mention(message.author.id))
+            return fill_message("rng_generator_format_number", user=message.author.id)
         if x > y:
             x, y = y, x  # variable values swap
         return randint(x, y)

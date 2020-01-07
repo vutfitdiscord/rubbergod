@@ -2,6 +2,7 @@ import discord
 from discord.ext import commands
 
 import utils
+from utils import fill_message
 from config import messages, config
 from features import karma, reaction
 from repository import karma_repo
@@ -54,9 +55,7 @@ class Karma(commands.Cog):
                 target_member = await converter.convert(
                         ctx=ctx, argument=' '.join(args[1:]))
             except commands.errors.BadArgument:
-                await ctx.send(
-                    messages.member_not_found
-                    .format(user=utils.generate_mention(ctx.author.id)))
+                await ctx.send(fill_message("member_not_found", user=ctx.author.id))
                 return
 
             await ctx.send(karma.karma_get(ctx.author, target_member))
@@ -64,8 +63,7 @@ class Karma(commands.Cog):
 
         elif args[0] == "get":
             if not await self.check.guild_check(ctx.message):
-                await ctx.send(
-                    "{}".format(messages.server_warning))
+                await ctx.send(messages.server_warning)
             else:
                 try:
                     await karma.emoji_get_value(ctx.message)
@@ -113,13 +111,9 @@ class Karma(commands.Cog):
             if ctx.author.id == config.admin_id:
                 await karma.karma_give(ctx.message)
             else:
-                await ctx.send(
-                    messages.insufficient_rights
-                    .format(user=utils.generate_mention(ctx.author.id)))
+                await ctx.send(fill_message("insufficient_rights", user=ctx.author.id))
         else:
-            await ctx.send(
-                messages.karma_invalid_command
-                .format(utils.generate_mention(ctx.author.id)))
+            await ctx.send(fill_message("karma_invalid_command", user=ctx.author.id))
 
     @commands.cooldown(rate=2, per=30.0, type=commands.BucketType.user)
     @commands.command()
@@ -127,9 +121,7 @@ class Karma(commands.Cog):
         if (not 0 < start < 100000000): # Any value larger than the server
                                         # user cnt and lower than 32bit
                                         # int max will do
-            await ctx.send(
-                messages.karma_lederboard_offser_error
-                .format(user=utils.generate_mention(ctx.author.id)))
+            await ctx.send(fill_message("karma_lederboard_offser_error", user=ctx.author.id))
             return
         await self.karma.leaderboard(ctx.message.channel, 'get', 'DESC', start)
         await self.check.botroom_check(ctx.message)
@@ -140,9 +132,7 @@ class Karma(commands.Cog):
         if (not 0 < start < 100000000): # Any value larger than the server
                                         # user cnt and lower than 32bit
                                         # int max will do
-            await ctx.send(
-                messages.karma_lederboard_offser_error
-                .format(user=utils.generate_mention(ctx.author.id)))
+            await ctx.send(fill_message("karma_lederboard_offser_error", user=ctx.author.id))
             return
         await self.karma.leaderboard(ctx.message.channel, 'get', 'ASC', start)
         await self.check.botroom_check(ctx.message)
@@ -153,9 +143,7 @@ class Karma(commands.Cog):
         if (not 0 < start < 100000000): # Any value larger than the server
                                         # user cnt and lower than 32bit
                                         # int max will do
-            await ctx.send(
-                messages.karma_lederboard_offser_error
-                .format(user=utils.generate_mention(ctx.author.id)))
+            await ctx.send(fill_message("karma_lederboard_offser_error", user=ctx.author.id))
             return
         await self.karma.leaderboard(ctx.message.channel, 'give', 'DESC', start)
         await self.check.botroom_check(ctx.message)
@@ -166,9 +154,7 @@ class Karma(commands.Cog):
         if (not 0 < start < 100000000): # Any value larger than the server
                                         # user cnt and lower than 32bit
                                         # int max will do
-            await ctx.send(
-                messages.karma_lederboard_offser_error
-                .format(user=utils.generate_mention(ctx.author.id)))
+            await ctx.send(fill_message("karma_lederboard_offser_error", user=ctx.author.id))
             return
         await self.karma.leaderboard(ctx.message.channel, 'give', 'ASC', start)
         await self.check.botroom_check(ctx.message)
@@ -179,9 +165,7 @@ class Karma(commands.Cog):
     @ishaboard.error
     async def leaderboard_error(self, ctx, error):
         if isinstance(error, commands.BadArgument):
-            await ctx.send(
-                messages.karma_lederboard_offser_error
-                .format(user=utils.generate_mention(ctx.author.id)))
+            await ctx.send(fill_message("karma_lederboard_offser_error", user=ctx.author.id))
 
 
 def setup(bot):

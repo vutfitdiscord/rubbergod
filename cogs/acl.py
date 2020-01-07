@@ -2,6 +2,7 @@ import discord
 from discord.ext import commands
 
 import utils
+from utils import fill_message
 from cogs import room_check
 from features import acl
 from config import config, messages
@@ -29,9 +30,7 @@ class Acl(commands.Cog):
                                          name="Mod")
         if self.mod in ctx.author.roles:
             if not len(args):
-                await ctx.send(
-                    messages.acl_help
-                    .format(user=utils.generate_mention(ctx.author.id)))
+                await ctx.send(fill_message("acl_help", user=ctx.author.id))
                 return
             if args[0] == 'add':
                 await acl.handle_add(ctx, args[1:])
@@ -42,14 +41,11 @@ class Acl(commands.Cog):
             elif args[0] == 'list':
                 await acl.handle_list(ctx, args[1:])
             else:
-                await ctx.send(
-                    messages.acl_help
-                    .format(user=utils.generate_mention(ctx.author.id)))
+                await ctx.send(fill_message("acl_help", user=ctx.author.id))
                 return
         else:
             await ctx.send(
-                messages.missing_perms
-                .format(user=utils.generate_mention(ctx.author.id)))
+                await ctx.send(fill_message("missing_perms", user=ctx.author.id))
             return
 
     # TODO: this is only to help init the acl database

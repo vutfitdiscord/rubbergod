@@ -4,6 +4,7 @@ import discord
 from discord.ext import commands
 
 import utils
+from utils import fill_message
 from config import config, messages
 
 config = config.Config
@@ -64,9 +65,7 @@ class Meme(commands.Cog):
     @hug.error
     async def hug_error(self, ctx, error):
         if isinstance(error, commands.BadArgument):
-            await ctx.send(
-                messages.member_not_found
-                .format(user=utils.generate_mention(ctx.author.id)))
+            await ctx.send(fill_message("member_not_found", user=ctx.author.id))
 
 
 def setup(bot):

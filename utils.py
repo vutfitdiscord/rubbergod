@@ -1,5 +1,6 @@
 import git
 from discord import Member
+from config.messages import Messages
 
 
 def generate_mention(user_id):
@@ -34,3 +35,25 @@ def has_role(user, role_name: str):
         return None
 
     return role_name.lower() in [x.name.lower() for x in user.roles]
+
+
+def fill_message(message_name, **kwargs):
+    """Fills message template from messages by attempting to get the attr.
+    :param message_name: {str} message template name
+    :kwargs: {dict} data for formatting the template
+    :return: filled template
+    """
+
+    # Convert username/toaster to a mention
+    if 'user' in kwargs:
+        kwargs['user'] = generate_mention(kwargs['user'])
+
+    if 'toaster' in kwargs:
+        kwargs['toaster'] = generate_mention(kwargs['toaster'])
+    
+    # Attempt to get message template and fill
+    try:
+        template = getattr(Messages, message_name)
+        return template.format(**kwargs)
+    except Exception:
+        return ""
