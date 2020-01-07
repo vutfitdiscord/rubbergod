@@ -5,7 +5,7 @@ class Messages:
     prefix = config.Config.default_prefix
 
     server_warning = "Tohle funguje jen na VUT FIT serveru."
-    toaster_pls = "Toaster pls, máš bordel v DB."
+    karma_get_missing = "Toaster pls, měls bordel v DB. Musel jsem za tebe uklidit."
     missing_perms = "Na tohle nemas prava. {user}"
     acl_help = "{user}, Pouziti:\n`!acl {{action}} {{table}} [args]`\n"\
                "action: add, edit, del nebo list\n"\
@@ -36,7 +36,10 @@ class Messages:
 
     uhoh_counter = "{uhohs} uh ohs od spuštění."
     uptime_message = "Up since:  `{boottime}`\nUptime:\t`{uptime}`"
-
+    kachna_remaining = "Do kachny zbývá:  `{zbyva}`"
+    kachna_opened = "Kachna otevřená ! <:hypers:493154327318233088>"
+    kachna_temp_closed = "Kachna je bohužel zavřena <:sadcat:576171980118687754>"
+    kachna_switched = "Kachna byla nastavena na: {open_closed}"
     karma = "{user} Karma uzivatele `{target}` je: **{karma}** " \
             "(**{order}.**)\nA rozdal:\n" \
             "**{karma_pos}** pozitivní karmy " \
@@ -76,6 +79,7 @@ class Messages:
     karma_give_success = "Karma byla úspěšně přidaná."
     karma_give_negative_success = "Karma byla úspěšně odebraná."
     member_not_found = "{user} Nikoho takového jsem nenašel."
+    karma_lederboard_offser_error = "{user} Špatný offset, zadej kladné číslo"
 
     role_add_denied = "{user}, na přidání role {role} nemáš právo."
     role_remove_denied = "{user}, " \
@@ -175,6 +179,7 @@ class Messages:
     review_tier = "Tier je z rozsahu 0-4, kde 0 je nejlepší"
     review_text_len = "Maximální počet znaků v části 'text' je 1024"
     review_added = "Hodnocení předmětu bylo přidáno"
+    reviews_page_e = "Zavolej znova reviews pro aktualizaci"
 
     review_get_format = prefix + "reviews [zkratka předmětu]"
     review_remove_format = prefix + "reviews remove [zkratka předmětu]"
@@ -186,6 +191,9 @@ class Messages:
 
     pr_meme = "https://github.com/Toaster192/rubbergod/pulls"
     uhoh = "uh oh"
+    question = ["<:what:638277508541710337>",
+                "<:wuuut:484470874003472394>",
+                "nech mě <:sadcat:576171980118687754>"]
 
     info = [[('karma', 'Vypíše vaši karmu, kolik pozitivní a negativní karmy'
                        ' jste rozdali.'),
@@ -199,10 +207,10 @@ class Messages:
               'Odstartuje hlasování o hodnotě zatím neohodnoceného emotu.'),
              ('karma revote [emote]',
               'Odstartuje hlasování o nové hodnotě emotu.')],
-            [('leaderboard', 'Karma leaderboard'),
-             ('bajkarboard', 'Karma leaderboard reversed'),
-             ('givingboard', 'Leaderboard rozdávání pozitivní karmy.'),
-             ('ishaboard', 'Leaderboard rozdávání negativní karmy.'),
+            [('leaderboard [offset]', 'Karma leaderboard'),
+             ('bajkarboard [offset]', 'Karma leaderboard reversed'),
+             ('givingboard [offset]', 'Leaderboard rozdávání pozitivní karmy.'),
+             ('ishaboard [offset]', 'Leaderboard rozdávání negativní karmy.'),
              (review_add_format[1:], 'Přidá recenzi na předmět.'),
              (review_get_format[1:], 'Vypíše recenze na vybraný předmět.'),
              (review_remove_format[1:], 'Odstraní hodnocení.'),
@@ -217,4 +225,5 @@ class Messages:
                       'a jestli je sudý nebo lichý.'),
              ('uhoh', 'Vypíše počet uh ohs od spuštění.'),
              ('uptime', 'Vypíše čas spuštění a čas uplynulý od spuštění.'),
+             ('kachna', 'Vypíše čas do otevření kachny.'),
              ('god', 'Vypíše tuto zprávu.')]]

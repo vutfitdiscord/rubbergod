@@ -200,8 +200,12 @@ class Reaction(BaseFeature):
             subject = message.embeds[0].title.split(' ', 1)[0]
             footer = message.embeds[0].footer.text.split('|')[0]
             pos = footer.find('/')
-            page = int(footer[8:pos])
-            max_page = int(footer[(pos + 1):])
+            try:
+                page = int(footer[8:pos])
+                max_page = int(footer[(pos + 1):])
+            except ValueError:
+                await message.edit(content=Messages.reviews_page_e, embed=None)
+                return
             tier_average = message.embeds[0].description[-1]
             if emoji in ["◀", "▶", "⏪"]:
                 next_page = self.pagination_next(emoji, page, max_page)

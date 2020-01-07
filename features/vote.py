@@ -1,7 +1,7 @@
 import asyncio
 from datetime import datetime
 
-from discord import HTTPException, Reaction, User, Message
+from discord import HTTPException, Reaction, User, Message, utils
 from discord.ext.commands import Bot, Context
 
 from config import messages
@@ -171,9 +171,9 @@ class Vote(BaseFeature):
 
             await chan.send(
                 content=self.singularise(messages.Messages.vote_result
-                                         .format(question=data.question,
+                                         .format(question=utils.escape_mentions(data.question),
                                                  winning_emoji=most_voted.emoji,
-                                                 winning_option=option,
+                                                 winning_option=utils.escape_mentions(option),
                                                  votes=(most_voted.count - 1))))
         else:
             emoji_str = ""
@@ -182,7 +182,7 @@ class Vote(BaseFeature):
             emoji_str = emoji_str[:-2]
             await chan.send(
                 content=self.singularise(messages.Messages.vote_result_multiple
-                                         .format(question=data.question,
+                                         .format(question=utils.escape_mentions(data.question),
                                                  winning_emojis=emoji_str,
                                                  votes=(most_voted.count - 1))))
 

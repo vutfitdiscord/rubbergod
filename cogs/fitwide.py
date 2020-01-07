@@ -26,6 +26,13 @@ class FitWide(commands.Cog):
         self.bot = bot
         self.verification = verification.Verification(bot, user_r)
 
+    async def is_admin(ctx):
+        return ctx.author.id == config.admin_id
+
+    async def is_in_modroom(ctx):
+        return ctx.message.channel.id == config.mod_room
+
+
     @commands.Cog.listener()
     async def on_typing(self, channel, user, when):
         global arcas_time
@@ -37,16 +44,11 @@ class FitWide(commands.Cog):
             await channel.send(embed=gif)
 
     @commands.cooldown(rate=2, per=20.0, type=commands.BucketType.user)
+    @commands.check(is_admin)
     @commands.command()
     async def role_check(self, ctx, p_verified: bool = True,
                          p_move: bool = True, p_status: bool = True,
                          p_role: bool = True, p_muni: bool = True):
-        if ctx.author.id != config.admin_id:
-            await ctx.send(
-                    messages.insufficient_rights
-                    .format(user=utils.generate_mention(ctx.author.id)))
-            return
-
         guild = self.bot.get_guild(config.guild_id)
         members = guild.members
 
@@ -71,12 +73,10 @@ class FitWide(commands.Cog):
         permited = session.query(Permit)
         permited_ids = [int(person.discord_ID) for person in permited]
 
-        bit0 = discord.utils.get(guild.roles, name="0BIT")
-        bit1 = discord.utils.get(guild.roles, name="1BIT")
-        bit2 = discord.utils.get(guild.roles, name="2BIT")
-        bit3 = discord.utils.get(guild.roles, name="3BIT")
-        bit4 = discord.utils.get(guild.roles, name="4BIT+")
-        mit1 = discord.utils.get(guild.roles, name="1MIT")
+        years = ["0BIT", "1BIT", "2BIT", "3BIT", "4BIT+",
+                 "0MIT", "1MIT", "2MIT", "3MIT+"]
+
+        year_roles = {year: discord.utils.get(guild.roles, name=year) for year in years}
 
         for member in verified:
             if member.id not in permited_ids:
@@ -99,56 +99,41 @@ class FitWide(commands.Cog):
 
                 year = self.verification.transform_year(person.year)
 
-                role = discord.utils.get(guild.roles, name=year)
+                correct_role = discord.utils.get(guild.roles, name=year)
 
-                if role not in member.roles:
-                    if year == "1MIT" and bit4 in member.roles and p_move:
-                        await member.add_roles(mit1)
-                        await member.remove_roles(bit4)
-                        await ctx.send("Presouvam: " + member.display_name +
-                                       " do 1MIT")
-                    elif year == "4BIT+" and bit3 in member.roles and p_move:
-                        await member.add_roles(bit4)
-                        await member.remove_roles(bit3)
-                        await ctx.send("Presouvam: " + member.display_name +
-                                       " do 4BIT+")
-                    elif year == "3BIT" and bit2 in member.roles and p_move:
-                        await member.add_roles(bit3)
-                        await member.remove_roles(bit2)
-                        await ctx.send("Presouvam: " + member.display_name +
-                                       " do 3BIT")
-                    elif year == "2BIT" and bit1 in member.roles and p_move:
-                        await member.add_roles(bit2)
-                        await member.remove_roles(bit1)
-                        await ctx.send("Presouvam: " + member.display_name +
-                                       " do 2BIT")
-                    elif year == "1BIT" and bit0 in member.roles and p_move:
-                        await member.add_roles(bit1)
-                        await member.remove_roles(bit0)
-                        await ctx.send("Presouvam: " + member.display_name +
-                                       " do 1BIT")
-                    elif not p_role:
-                        continue
-                    elif year is None:
-                        await ctx.send("Nesedi mi role u: " +
-                                       utils.generate_mention(member.id) +
-                                       ", ma ted rocnik: " + person.year)
-                    else:
+                if year is not None and correct_role not in member.roles:
+                    if p_move:
+                        for role_name, role in year_roles.items():
+                            if role in member.roles:
+                                await member.add_roles(correct_role)
+                                await member.remove_roles(role)
+                                await ctx.send("Presouvam: " + member.display_name +
+                                               " z " + role_name + " do "+ year)
+                                break
+                    elif p_role:
                         await ctx.send("Nesedi mi role u: " +
                                        utils.generate_mention(member.id) +
                                        ", mel by mit roli: " + year)
+                elif year is None:
+                    if p_move:
+                        for role_name, role in year_roles.items():
+                            if role in member.roles:
+                                await member.add_roles(dropout)
+                                await member.remove_roles(role)
+                                await ctx.send("Presouvam: " + member.display_name +
+                                               " z " + role_name + " do dropout")
+                                break
+                    elif p_role:
+                        await ctx.send("Nesedi mi role u: " +
+                                       utils.generate_mention(member.id) +
+                                       ", ma ted rocnik: " + person.year)
 
         await ctx.send("Done")
 
     @commands.cooldown(rate=2, per=20.0, type=commands.BucketType.user)
+    @commands.check(is_admin)
     @commands.command()
     async def increment_roles(self, ctx):
-        if ctx.author.id != config.admin_id:
-            await ctx.send(
-                    messages.insufficient_rights
-                    .format(user=utils.generate_mention(ctx.author.id)))
-            return
-
         database.base.metadata.create_all(database.db)
 
         guild = self.bot.get_guild(config.guild_id)
@@ -295,14 +280,9 @@ class FitWide(commands.Cog):
     # and role_check to check if peoples roles match the database
 
     @commands.cooldown(rate=2, per=20.0, type=commands.BucketType.user)
+    @commands.check(is_in_modroom)
     @commands.command()
     async def update_db(self, ctx):
-        if ctx.author.id != config.admin_id:
-            await ctx.send(
-                    messages.insufficient_rights
-                    .format(user=utils.generate_mention(ctx.author.id)))
-            return
-
         with open("merlin-latest", "r") as f:
             data = f.readlines()
 
@@ -329,7 +309,6 @@ class FitWide(commands.Cog):
                 try:
                     # check for muni
                     int(person.login)
-                    print("Muni pls")
                     person.year = "MUNI"
                 except ValueError:
                     person.year = "dropout"
@@ -338,6 +317,73 @@ class FitWide(commands.Cog):
 
         await ctx.send("Update databaze probehl uspesne")
 
+
+    @commands.cooldown(rate=2, per=20.0, type=commands.BucketType.user)
+    @commands.check(is_in_modroom)
+    @commands.command()
+    async def get_users_login(self, ctx, member: discord.Member):
+        result = session.query(Permit).\
+            filter(Permit.discord_ID == str(member.id)).one_or_none()
+
+        if result is None:
+            await ctx.send("Neni v DB prej")
+        else:
+            await ctx.send(result.login)
+        
+
+    @commands.cooldown(rate=2, per=20.0, type=commands.BucketType.user)
+    @commands.check(is_in_modroom)
+    @commands.command()
+    async def get_logins_user(self, ctx, login):
+        result = session.query(Permit).\
+            filter(Permit.login == login).one_or_none()
+
+        if result is None:
+            await ctx.send("Neni na serveru prej")
+        else:
+            await ctx.send(utils.generate_mention(result.discord_ID))
+
+    @commands.cooldown(rate=2, per=20.0, type=commands.BucketType.user)
+    @commands.check(is_in_modroom)
+    @commands.command()
+    async def reset_login(self, ctx, login):
+
+        result = session.query(Valid_person).\
+            filter(Valid_person.login == login).one_or_none()
+        if result is None:
+            await ctx.send("Neni validni login pre")
+        else:
+            session.query(Permit).\
+                filter(Permit.login == login).delete()
+            result.status = 1
+            session.commit()
+            await ctx.send("Done")
+
+    @commands.cooldown(rate=2, per=20.0, type=commands.BucketType.user)
+    @commands.check(is_in_modroom)
+    @commands.command()
+    async def connect_login_to_user(self, ctx, login, member: discord.Member):
+
+        result = session.query(Valid_person).\
+            filter(Valid_person.login == login).one_or_none()
+        if result is None:
+            await ctx.send("Neni validni login prej")
+        else:
+            session.add(Permit(login=login, discord_ID=str(member.id)))
+            result.status = 0
+            session.commit()
+            await ctx.send("Done")
+
+    @get_users_login.error
+    @reset_login.error
+    @get_logins_user.error
+    @role_check.error
+    @increment_roles.error
+    @update_db.error
+    async def fitwide_checks_error(self, ctx, error):
+        if isinstance(error, commands.CheckFailure):
+            await ctx.send('Nothing to see here comrade. ' + 
+                           '<:KKomrade:484470873001164817>')
 
 def setup(bot):
     bot.add_cog(FitWide(bot))

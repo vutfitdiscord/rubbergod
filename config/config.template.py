@@ -45,6 +45,7 @@ class Config:
     bot_dev_channel = 597009137905303552
     vote_room = 461544375105749003
     bot_room = 461549842896781312
+    mod_room = 505679727936143361
 
     allowed_channels = [
             bot_room,
@@ -122,3 +123,9 @@ class Config:
 
     # grillbot
     grillbot_id = 0
+
+    # kachna countdown
+    kachna_open_hour = 16
+    kachna_close_hour = 22
+    kachna_open_days = [0, 2] # 0 = Monday, 1=Tuesday, 2=Wednesday...
+    kachna_temp_closed = False

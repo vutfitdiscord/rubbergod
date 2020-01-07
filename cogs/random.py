@@ -1,3 +1,4 @@
+import discord
 from discord.ext import commands
 
 import utils
@@ -25,7 +26,7 @@ class Random(commands.Cog):
     @commands.command()
     async def pick(self, ctx, *args):
         """"Pick an option"""
-        option = rng.pick_option(' '.join(args))
+        option = rng.pick_option(discord.utils.escape_mentions(' '.join(args)))
         if option:
             await ctx.send("{} {}".format(option,
                            utils.generate_mention(ctx.author.id)))

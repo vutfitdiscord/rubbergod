@@ -3,6 +3,7 @@ from config import config, messages
 from features import verification
 from repository import user_repo
 
+
 user_r = user_repo.UserRepository()
 
 config = config.Config
