@@ -127,10 +127,10 @@ class Messages:
                             "nebo jsi už tímhle krokem " \
                             "prošel ({toaster} pls)."
     verify_verify_format = "Očekávám dva argumenty. " \
-                           "Správný formát: " \
+                           "Správný formát:\n" \
                            "`" + prefix + "verify [FIT login nebo " \
                            "MUNI UCO] [kód]`\n" \
-                           "Pro získání kódu použij `" +\
+                           "Pro získání kódu použij\n`" +\
                            prefix + "getcode [FIT login, ve tvaru " \
                            "xlogin00, nebo MUNI UCO]`"
     verify_verify_dumbshit = "{user} Kód, " \
