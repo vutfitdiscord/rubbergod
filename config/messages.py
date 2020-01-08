@@ -29,8 +29,8 @@ class Messages:
     spamming = "{user} Nespamuj tolik <:sadcat:576171980118687754>"
     insufficient_rights = "{user}, na použití tohoto příkazu nemáš právo."
     vote_room_only = "Tohle funguje jen v {room}."
-    bot_room_redirect = "{} <:sadcat:576171980118687754> 👉 " \
-                        "<#{}>\n"
+    bot_room_redirect = "{user} <:sadcat:576171980118687754> 👉 " \
+                        "<#{bot_room}>\n"
     message_link_prefix = 'https://discordapp.com/channels/' \
                           + str(config.Config.guild_id) + '/'
 

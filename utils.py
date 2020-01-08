@@ -45,7 +45,7 @@ def fill_message(message_name, *args, **kwargs):
     :return: filled template
     """
 
-    # Convert username/toaster to a mention
+    # Convert username/admin to a mention
     if 'user' in kwargs:
         kwargs['user'] = generate_mention(kwargs['user'])
 
