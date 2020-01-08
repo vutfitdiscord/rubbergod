@@ -4,13 +4,12 @@ from discord.ext import commands
 import utils
 from cogs import room_check
 from features import acl
-from config import config, messages
+from config import config
 from repository import acl_repo
 
 acl_repo = acl_repo.AclRepository()
 acl = acl.Acl(acl_repo)
 config = config.Config
-messages = messages.Messages
 
 
 class Acl(commands.Cog):
