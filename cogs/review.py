@@ -5,7 +5,6 @@ from config import config, messages
 from features import review
 from repository import review_repo
 import utils
-from utils import fill_message
 
 config = config.Config
 messages = messages.Messages
@@ -69,7 +68,7 @@ class Review(commands.Cog):
                             review_repo.remove(tier)
                             await ctx.send(messages.review_remove_success)
                     else:
-                        await ctx.send(fill_message("insufficient_rights", user=ctx.author.id))
+                        await ctx.send(utils.fill_message("insufficient_rights", user=ctx.author.id))
                 else:
                     if self.rev.remove(str(ctx.message.author.id), subject):
                         await ctx.send(messages.review_remove_success)

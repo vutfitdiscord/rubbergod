@@ -4,7 +4,6 @@ from discord.ext.commands import Bot
 import re
 
 import utils
-from utils import fill_message
 from config.config import Config
 from config.messages import Messages
 from features.base_feature import BaseFeature
@@ -63,7 +62,7 @@ class Reaction(BaseFeature):
                 input_string = input_string[input_string.index('\n') + 1:]
             input_string = input_string.rstrip().split('\n')
         except ValueError:
-            await message.channel.send(fill_message("role_format", user=message.author.id))
+            await message.channel.send(utils.fill_message("role_format", user=message.author.id))
             return None
         output = []
         for line in input_string:
@@ -72,7 +71,7 @@ class Reaction(BaseFeature):
                 out = [out[1], out[0]]
                 output.append(out)
             except:
-                await message.channel.send(fill_message("role_invalid_line",
+                await message.channel.send(utils.fill_message("role_invalid_line",
                                            user=message.author.id, line=line))
         for line in output:
             if "<#" in line[0]:
@@ -81,7 +80,7 @@ class Reaction(BaseFeature):
                 try:
                     line[0] = int(line[0])
                 except:
-                    await message.channel.send(fill_message("role_invalid_line",
+                    await message.channel.send(utils.fill_message("role_invalid_line",
                                             user=message.author.id, line=line[0]))
         return output
 
@@ -102,13 +101,13 @@ class Reaction(BaseFeature):
                     discord.utils.get(guild.channels,
                                       name=line[0][1:].lower()) is None
             if not_role and not_channel:
-                await message.channel.send(fill_message("role_not_role",
+                await message.channel.send(utils.fill_message("role_not_role",
                                         user=message.author.id, not_role=line[0]))
             else:
                 try:
                     await message.add_reaction(line[1])
                 except discord.errors.HTTPException:
-                    await message.channel.send(fill_message("role_invalid_emote",
+                    await message.channel.send(utils.fill_message("role_invalid_emote",
                                             user=message.author.id, not_role=line[1], role=line[0]))
 
     async def add(self, payload):
@@ -333,7 +332,7 @@ class Reaction(BaseFeature):
                 await member.add_roles(role)
             else:
                 bot_room = self.bot.get_channel(Config.bot_room)
-                await bot_room.send(fill_message("role_add_denied",
+                await bot_room.send(utils.fill_message("role_add_denied",
                                         user=member.id, role=role.name))
         else:
             try:
@@ -352,7 +351,7 @@ class Reaction(BaseFeature):
                 await channel.set_permissions(member, read_messages=True)
             else:
                 bot_room = self.bot.get_channel(Config.bot_room)
-                await bot_room.send(fill_message("role_add_denied",
+                await bot_room.send(utils.fill_message("role_add_denied",
                                         user=member.id, role=channel.name))
 
     # Removes a role for user based on reaction
@@ -366,7 +365,7 @@ class Reaction(BaseFeature):
                     await member.remove_roles(role)
                 else:
                     bot_room = self.bot.get_channel(Config.bot_room)
-                    await bot_room.send(fill_message("role_remove_denied",
+                    await bot_room.send(utils.fill_message("role_remove_denied",
                                             user=member.id, role=role.name))
         else:
             try:
@@ -385,7 +384,7 @@ class Reaction(BaseFeature):
                                               send_messages=None)
             else:
                 bot_room = self.bot.get_channel(Config.bot_room)
-                await bot_room.send(fill_message("role_remove_denied",
+                await bot_room.send(utils.fill_message("role_remove_denied",
                                         user=member.id, role=channel.name))
 
     def pagination_next(self, emoji, page, max_page):
