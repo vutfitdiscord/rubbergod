@@ -58,10 +58,8 @@ class Base(commands.Cog):
     async def uptime(self, ctx):
         now = datetime.datetime.now().replace(microsecond=0)
         delta = now - boottime
-        await ctx.send(
-                messages.uptime_message
-                .format(boottime=str(boottime), uptime=str(delta))
-                )
+        await ctx.send(utils.fill_message("uptime_message", boottime=str(boottime), uptime=str(delta)))
+
     @commands.command()
     async def kachna(self, ctx):
         open_days = config.kachna_open_days
@@ -84,7 +82,8 @@ class Base(commands.Cog):
         opentime = open_date.replace(hour=open_hour, minute=0, second=0)
         isClosed = (now < opentime) or (opentime.replace(hour=close_hour) < now)
         delta = opentime - now
-        message = messages.kachna_remaining.format(zbyva=str(delta)) if isClosed else messages.kachna_opened
+        message = utils.fill_message("kachna_remaining", zbyva=str(delta) if \
+                                     isClosed else messages.kachna_opened)
         if temp_closed:
             message = messages.kachna_temp_closed
         await ctx.send(message)
@@ -96,10 +95,10 @@ class Base(commands.Cog):
         if ctx.author.id == config.admin_id:
             if config.kachna_temp_closed == False:
                 config.kachna_temp_closed = True
-                message = messages.kachna_switched.format(open_closed = "zavřená dlouhodobě")
+                message = utils.fill_message("kachan_switched", open_closed="zavřená dlouhodobě")
             else:
                 config.kachna_temp_closed = False
-                message = messages.kachna_switched.format(open_closed = "otevřená pravidelně")
+                message = utils.fill_message("kachna_switched", open_closed="otevřená pravidelně")
         await ctx.send(message)
 
     @commands.cooldown(rate=2, per=20.0, type=commands.BucketType.user)

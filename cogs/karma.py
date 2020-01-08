@@ -72,8 +72,7 @@ class Karma(commands.Cog):
 
         elif args[0] == "revote":
             if not await self.check.guild_check(ctx.message):
-                await ctx.send(
-                    "{}".format(messages.server_warning))
+                await ctx.send(messages.server_warning)
             else:
                 if ctx.message.channel.id == config.vote_room or \
                    ctx.author.id == config.admin_id:
@@ -83,15 +82,12 @@ class Karma(commands.Cog):
                     except discord.errors.Forbidden:
                         return
                 else:
-                    await ctx.send(
-                        messages.vote_room_only
-                        .format(room=discord.utils.get(ctx.guild.channels,
-                                                       id=config.vote_room)))
+                    await ctx.send(utils.fill_message("vote_room_only", 
+                                   room=discord.utils.get(ctx.guild.channels, id=config.vote_room)))
 
         elif args[0] == "vote":
             if not await self.check.guild_check(ctx.message):
-                await ctx.send(
-                    "{}".format(messages.server_warning))
+                await ctx.send(messages.server_warning)
             else:
                 if ctx.message.channel.id == config.vote_room or \
                    ctx.author.id == config.admin_id:
@@ -101,10 +97,8 @@ class Karma(commands.Cog):
                     except discord.errors.Forbidden:
                         return
                 else:
-                    await ctx.send(
-                        messages.vote_room_only
-                        .format(room=discord.utils.get(ctx.guild.channels,
-                                                       id=config.vote_room)))
+                    await ctx.send(utils.fill_message("vote_room_only", 
+                                   room=discord.utils.get(ctx.guild.channels, id=config.vote_room)))
 
         elif args[0] == "give":
             if ctx.author.id == config.admin_id:

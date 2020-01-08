@@ -1,8 +1,7 @@
 import utils
-from config import messages, config
+from config import config
 
 config = config.Config
-messages = messages.Messages
 
 
 class RoomCheck():
@@ -13,7 +12,8 @@ class RoomCheck():
     async def botroom_check(self, message):
         room = await self.get_room(message)
         if room is not None and room.id not in config.allowed_channels:
-            await message.channel.send(utils.fill_message("bot_room_redirect", config.bot_room, user=message.author.id))
+            await message.channel.send(utils.fill_message("bot_room_redirect",
+                                       config.bot_room, user=message.author.id))
 
     async def get_room(self, message):
         guild = self.bot.get_guild(config.guild_id)

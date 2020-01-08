@@ -32,8 +32,8 @@ class Review(commands.Cog):
             if subcommand == 'add':
                 for role in roles:
                     if role.name in config.reviews_forbidden_roles:
-                        await ctx.send(messages.review_add_denied.format(
-                                    user=ctx.message.author.mention))
+                        await ctx.send(utils.fill_message("review_add_denied",
+                                       user=ctx.message.author.mention))
                         return
                 if subject is None or tier is None:
                     await ctx.send(messages.review_add_format)
@@ -115,9 +115,7 @@ class Review(commands.Cog):
             else:
                 await ctx.send(messages.review_wrong_subject)
         else:
-            await ctx.send(
-                messages.insufficient_rights
-                .format(user=utils.generate_mention(ctx.author.id)))
+            await ctx.send(utils.fill_message("insufficient_rights", user=ctx.author.id))
 
 
 def setup(bot):

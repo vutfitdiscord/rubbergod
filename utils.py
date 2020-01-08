@@ -1,5 +1,6 @@
 import git
 from discord import Member
+
 from config.messages import Messages
 
 
@@ -37,7 +38,7 @@ def has_role(user, role_name: str):
     return role_name.lower() in [x.name.lower() for x in user.roles]
 
 
-def fill_message(message_name, **kwargs):
+def fill_message(message_name, *args, **kwargs):
     """Fills message template from messages by attempting to get the attr.
     :param message_name: {str} message template name
     :kwargs: {dict} data for formatting the template
@@ -54,6 +55,6 @@ def fill_message(message_name, **kwargs):
     # Attempt to get message template and fill
     try:
         template = getattr(Messages, message_name)
-        return template.format(**kwargs)
+        return template.format(*args, **kwargs)
     except AttributeError:
         raise ValueError("Invalid template {}".format(message_name))

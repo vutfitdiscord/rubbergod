@@ -6,7 +6,7 @@ from discord.ext import commands
 
 
 import utils
-from config import config, messages
+from config import config
 from features import verification
 from repository import user_repo
 from repository.database import database, session
@@ -16,7 +16,6 @@ from repository.database.year_increment import User_backup
 user_r = user_repo.UserRepository()
 
 config = config.Config
-messages = messages.Messages
 arcas_time = (datetime.datetime.utcnow() -
               datetime.timedelta(hours=config.arcas_delay))
 
