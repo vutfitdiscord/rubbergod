@@ -5,7 +5,6 @@ import discord
 from discord.ext import commands
 
 import utils
-from utils import fill_message
 from config import config, messages
 from logic import rng
 from features import reaction
@@ -41,7 +40,7 @@ class Base(commands.Cog):
                 await ctx.send(messages.no_such_command)
             return
         elif isinstance(error, commands.CommandOnCooldown):
-            await ctx.send(fill_message("spamming", user=ctx.author.id))
+            await ctx.send(utils.fill_message("spamming", user=ctx.author.id))
         else:
             output = 'Ignoring exception in command {}:\n'.format(ctx.command)
             output += ''.join(traceback.format_exception(type(error),
@@ -92,7 +91,7 @@ class Base(commands.Cog):
 
     @commands.command()
     async def kachna_switch(self, ctx):   
-        message = fill_message("insufficient_rights", user=ctx.author.id)
+        message = utils.fill_message("insufficient_rights", user=ctx.author.id)
 
         if ctx.author.id == config.admin_id:
             if config.kachna_temp_closed == False:

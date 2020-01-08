@@ -113,7 +113,7 @@ class Messages:
               "Implementovány featury podle obsahu: **8. Drop/Keep**"
 
     verify_already_verified = "{user} Už jsi byl verifikován " \
-                              "({toaster} pls)."
+                              "({admin} pls)."
     verify_send_format = "Očekávám jeden argument. " \
                          "Správný formát: " \
                          "`" + prefix + "getcode [FIT login, " \
@@ -125,7 +125,7 @@ class Messages:
                           "`" + prefix + "verify [login] [kód]`"
     verify_send_not_found = "{user} Login nenalezen " \
                             "nebo jsi už tímhle krokem " \
-                            "prošel ({toaster} pls)."
+                            "prošel ({admin} pls)."
     verify_verify_format = "Očekávám dva argumenty. " \
                            "Správný formát:\n" \
                            "`" + prefix + "verify [FIT login nebo " \
@@ -135,7 +135,7 @@ class Messages:
                            "xlogin00, nebo MUNI UCO]`"
     verify_verify_dumbshit = "{user} Kód, " \
                              "který ti přišel na mail. {emote}"
-    verify_verify_manual = "Čauec {user}, nechám {toaster}, " \
+    verify_verify_manual = "Čauec {user}, nechám {admin}, " \
                            "aby to udělal manuálně, " \
                            "jsi shady (Year: {year})"
     verify_verify_success = "{user} Gratuluji, byl jsi verifikován!"
@@ -146,7 +146,7 @@ class Messages:
 
     verify_verify_not_found = "{user} Login nenalezen nebo " \
                               "jsi už tímhle krokem prošel " \
-                              "({toaster} pls)."
+                              "({admin} pls)."
     verify_verify_wrong_code = "{user} Špatný kód."
 
     vote_format = "Použití vote:\n`" + prefix + "vote [datum] [čas] [otázka]\n[emoji]" \

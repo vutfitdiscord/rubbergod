@@ -48,12 +48,12 @@ def fill_message(message_name, **kwargs):
     if 'user' in kwargs:
         kwargs['user'] = generate_mention(kwargs['user'])
 
-    if 'toaster' in kwargs:
-        kwargs['toaster'] = generate_mention(kwargs['toaster'])
+    if 'admin' in kwargs:
+        kwargs['admin'] = generate_mention(kwargs['admin'])
     
     # Attempt to get message template and fill
     try:
         template = getattr(Messages, message_name)
         return template.format(**kwargs)
-    except Exception:
-        return ""
+    except AttributeError:
+        raise ValueError("Invalid template {}".format(message_name))

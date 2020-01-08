@@ -8,7 +8,6 @@ from discord import Member
 from discord.ext.commands import Bot
 
 import utils
-from utils import fill_message
 from config.config import Config
 from config.messages import Messages
 from features.base_feature import BaseFeature
@@ -56,7 +55,7 @@ class Verification(BaseFeature):
         # Save the newly generated code into the database
         self.repo.save_sent_code(login, code)
 
-        await message.channel.send(fill_message("verify_send_success", 
+        await message.channel.send(utils.fill_message("verify_send_success", 
                                     user=message.author.id, mail=mail_postfix))
 
     async def send_code(self, message):
@@ -73,7 +72,7 @@ class Verification(BaseFeature):
             if login == "xlogin00":
                 guild = self.bot.get_guild(Config.guild_id)
                 fp = await guild.fetch_emoji(585915845146968093)
-                await message.channel.send(fill_message("verify_send_dumbshit", 
+                await message.channel.send(utils.fill_message("verify_send_dumbshit", 
                                            user=message.author.id, emote=str(fp)))
                 return
             if login[0] == 'x':
@@ -83,8 +82,8 @@ class Verification(BaseFeature):
                     await self.gen_code_and_send_mail(message, login,
                                                       "@stud.fit.vutbr.cz")
                 else:
-                    await message.channel.send(fill_message("verify_send_not_found",
-                                   user=message.author.id, toaster=Config.admin_id))
+                    await message.channel.send(utils.fill_message("verify_send_not_found",
+                                   user=message.author.id, admin=Config.admin_id))
 
                     embed = discord.Embed(title="Neuspesny pokus o verify",
                                           color=0xeee657)
@@ -98,8 +97,8 @@ class Verification(BaseFeature):
                 try:
                     int(login)
                 except ValueError:
-                    await message.channel.send(fill_message("verify_send_not_found",
-                                   user=message.author.id, toaster=Config.admin_id))
+                    await message.channel.send(utils.fill_message("verify_send_not_found",
+                                   user=message.author.id, admin=Config.admin_id))
 
                     embed = discord.Embed(title="Neuspesny pokus o verify",
                                           color=0xeee657)
@@ -120,8 +119,8 @@ class Verification(BaseFeature):
                     await self.gen_code_and_send_mail(message, login,
                                                       "@mail.muni.cz")
                 else:
-                    await message.channel.send(fill_message("verify_send_not_found",
-                                   user=message.author.id, toaster=Config.admin_id))
+                    await message.channel.send(utils.fill_message("verify_send_not_found",
+                                   user=message.author.id, admin=Config.admin_id))
 
                     embed = discord.Embed(title="Neuspesny pokus o verify",
                                           color=0xeee657)
@@ -131,8 +130,8 @@ class Verification(BaseFeature):
                     channel = self.bot.get_channel(Config.log_channel)
                     await channel.send(embed=embed)
         else:
-            await message.channel.send(fill_message("verify_already_verified",
-                            user=message.author.id, toaster=Config.admin_id))
+            await message.channel.send(utils.fill_message("verify_already_verified",
+                            user=message.author.id, admin=Config.admin_id))
         try:
             await message.delete()
         except discord.errors.Forbidden:
@@ -194,14 +193,14 @@ class Verification(BaseFeature):
             if login == "xlogin00":
                 guild = self.bot.get_guild(Config.guild_id)
                 fp = await guild.fetch_emoji(585915845146968093)
-                await message.channel.send(fill_message("verify_send_dumbshit",
+                await message.channel.send(utils.fill_message("verify_send_dumbshit",
                                 user=message.author.id, emote=str(fp)))
                 return
             # Same here
             if code == "kód" or code == "[kód]":
                 guild = self.bot.get_guild(Config.guild_id)
                 fp = await guild.fetch_emoji(585915845146968093)
-                await message.channel.send(fill_message("verify_verify_dumbshit",
+                await message.channel.send(utils.fill_message("verify_verify_dumbshit",
                                 user=message.author.id, emote=str(fp)))
                 return
 
@@ -210,7 +209,7 @@ class Verification(BaseFeature):
             if new_user is not None:
                 # Check the code
                 if code != new_user.code:
-                    await message.channel.send(fill_message("verify_verify_wrong_code",
+                    await message.channel.send(utils.fill_message("verify_verify_wrong_code",
                                     user=message.author.id))
                     embed = discord.Embed(title="Neuspesny pokus o verify(kod)",
                                           color=0xeee657)
@@ -225,9 +224,9 @@ class Verification(BaseFeature):
                 year = self.transform_year(new_user.year)
 
                 if year is None:
-                    await message.channel.send(fill_message("verify_verify_manual",
+                    await message.channel.send(utils.fill_message("verify_verify_manual",
                                                             user=message.author.id,
-                                                            toaster=Config.admin_id,
+                                                            admin=Config.admin_id,
                                                             year=str(new_user.year))
                     )
 
@@ -261,17 +260,17 @@ class Verification(BaseFeature):
 
                 self.repo.save_verified(login, message.author.id)
 
-                await message.channel.send(fill_message("verify_verify_success",
+                await message.channel.send(utils.fill_message("verify_verify_success",
                                 user=message.author.id))
 
                 await member.send(Messages.verify_post_verify_info)
 
                 if message.channel.type is not discord.ChannelType.private:
-                    await message.channel.send(fill_message("verify_verify_success",
+                    await message.channel.send(utils.fill_message("verify_verify_success",
                                     user=message.author.id))
             else:
-                await message.channel.send(fill_message("verify_verify_not_found",
-                                user=message.author.id, toaster=Config.admin_id))
+                await message.channel.send(utils.fill_message("verify_verify_not_found",
+                                user=message.author.id, admin=Config.admin_id))
 
                 embed = discord.Embed(title="Neuspesny pokus o verify",
                                       color=0xeee657)
@@ -281,8 +280,8 @@ class Verification(BaseFeature):
                 channel = self.bot.get_channel(Config.log_channel)
                 await channel.send(embed=embed)
         else:
-            await message.channel.send(fill_message("verify_verify_already_verified",
-                            user=message.author.id, toaster=Config.admin_id))
+            await message.channel.send(utils.fill_message("verify_verify_already_verified",
+                            user=message.author.id, admin=Config.admin_id))
 
         try:
             await message.delete()
