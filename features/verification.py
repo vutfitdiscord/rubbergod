@@ -129,7 +129,9 @@ class Verification(BaseFeature):
                 if self.repo.get_user(login, status=2) is None and\
                    self.repo.get_user(login, status=0) is None:
 
-                    self.repo.add_user(login, "MUNI", status=1)
+                    if self.repo.get_user(login, status=1) is None:
+                        self.repo.add_user(login, "MUNI", status=1)
+                        
                     await self.gen_code_and_send_mail(message, login,
                                                       "@mail.muni.cz")
                 else:
