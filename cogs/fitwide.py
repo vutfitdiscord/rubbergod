@@ -327,8 +327,17 @@ class FitWide(commands.Cog):
 
         if result is None:
             await ctx.send("Neni v DB prej")
-        else:
+            return
+        
+        person = session.query(Valid_person).\
+            filter(Valid_person.login == result.login).one_or_none()
+
+        if person is None:
             await ctx.send(result.login)
+            return
+
+        await ctx.send(("Login: `{p.login}`\nJmeno: `{p.name}`\n"
+                        "Rocnik: `{p.year}`").format(p=person))
         
 
     @commands.cooldown(rate=2, per=20.0, type=commands.BucketType.user)
