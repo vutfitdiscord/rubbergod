@@ -74,6 +74,7 @@ class Review(commands.Cog):
                         await ctx.send(messages.insufficient_rights.format(
                                 user=utils.generate_mention(ctx.author.id)))
                 else:
+                    subject = subject.lower()
                     if self.rev.remove(str(ctx.message.author.id), subject):
                         await ctx.send(messages.review_remove_success)
                     else:
@@ -110,6 +111,7 @@ class Review(commands.Cog):
             if not subcommand or not subject:
                 await ctx.send(messages.subject_format)
                 return
+            subject = subject.lower()
             if subcommand == "add":
                 self.rev.add_subject(subject)
                 await ctx.send(f'Zkratka {subject} byla přidána')
