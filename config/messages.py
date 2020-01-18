@@ -194,6 +194,9 @@ class Messages:
     question = ["<:what:638277508541710337>",
                 "<:wuuut:484470874003472394>",
                 "nech mě <:sadcat:576171980118687754>"]
+    
+    name_day_cz = "Dnes má svátek {name}"
+    name_day_sk = "Dnes má meniny {name}"
 
     info = [[('karma', 'Vypíše vaši karmu, kolik pozitivní a negativní karmy'
                        ' jste rozdali.'),
