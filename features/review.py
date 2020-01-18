@@ -64,7 +64,7 @@ class Review(BaseFeature):
             text = review.text_review[text_index:1024*new_page]
         embed.set_field_at(
             3, name="Text page", value=str(new_page) + "/" + str(max_page))
-        embed.set_field_at(4, name="Text", value=text)
+        embed.set_field_at(4, name="Text", value=text, inline=False)
         return embed
 
     def add_review(self, author_id, subject, tier, anonym, text):

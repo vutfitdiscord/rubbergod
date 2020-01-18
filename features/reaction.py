@@ -234,29 +234,26 @@ class Reaction(BaseFeature):
                     await message.edit(embed=embed)
             elif emoji in ["🔼", "🔽"]:
                 if message.embeds[0].fields[3].name == "Text page":
-                    review = review_r.get_subject_reviews(
-                        subject)
+                    review = review_r.get_subject_reviews(subject)
                     if review:
-                        await message.remove_reaction(emoji, member)
-                        return
-                    review = review[page - 1].Review
-                    text_page = message.embeds[0].fields[3].value
-                    pos = message.embeds[0].fields[3].value.find('/')
-                    max_text_page = int(text_page[(pos + 1):])
-                    text_page = int(text_page[:pos])
-                    next_text_page = self.pagination_next(emoji, page,
-                                                          max_text_page)
-                    if next_text_page:
-                        page = str(page) + "/" + str(max_page)
-                        embed = self.review.make_embed(
-                            review, subject, tier_average, page)
-                        embed = self.review.change_text_page(
-                            review, embed, next_text_page, max_text_page)
-                        await message.edit(embed=embed)
+                        review = review[page - 1].Review
+                        text_page = message.embeds[0].fields[3].value
+                        pos = message.embeds[0].fields[3].value.find('/')
+                        max_text_page = int(text_page[(pos + 1):])
+                        text_page = int(text_page[:pos])
+                        next_text_page = self.pagination_next(emoji, text_page,
+                                                              max_text_page)
+                        if next_text_page:
+                            page = str(page) + "/" + str(max_page)
+                            embed = self.review.make_embed(
+                                review, subject, tier_average, page)
+                            embed = self.review.change_text_page(
+                                review, embed, next_text_page, max_text_page)
+                            await message.edit(embed=embed)
             try:
                 await message.remove_reaction(emoji, member)
             except:
-                pass
+                pass # in DM
         elif member.id != message.author.id and\
                 guild.id == Config.guild_id and\
                 message.channel.id not in \

@@ -183,6 +183,7 @@ class Messages:
 
     review_get_format = prefix + "reviews [zkratka předmětu]"
     review_remove_format = prefix + "reviews remove [zkratka předmětu]"
+    review_remove_format_admin = prefix + "reviews remove [zkratka předmětu, id + číslo]"
     review_remove_id_format = "reviews remove id [id]"
     review_remove_success = "Hodnocení předmětu bylo odebráno"
     review_remove_error = "Hodnocení předmětu nebylo nalezeno"
