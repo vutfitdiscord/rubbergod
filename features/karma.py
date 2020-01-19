@@ -251,7 +251,8 @@ class Karma(BaseFeature):
         if target is None:
             target = author
         k = self.repo.get_karma(target.id)
-        return utils.fill_message("karma",
+        return utils.fill_message(
+            "karma",
             user=author.id,
             karma=k.karma.value,
             order=k.karma.position,

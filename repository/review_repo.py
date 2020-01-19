@@ -12,7 +12,8 @@ class ReviewRepository(BaseRepository):
         super().__init__()
 
     def get_subject_reviews(self, subject):
-        return session.query(Review, func.count(Review.relevance)
+        return session.query(Review,
+            func.count(Review.relevance)
             .filter(ReviewRelevance.vote == True)
             .label('total')).filter(Review.subject == subject)\
             .outerjoin(Review.relevance).group_by(Review)\
