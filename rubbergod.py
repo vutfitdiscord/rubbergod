@@ -85,8 +85,8 @@ def load_dump():
 
 config = config.Config
 
-bot = commands.Bot(command_prefix=commands.when_mentioned_or(
-                                      *config.command_prefix),
+bot = commands.Bot(
+    command_prefix=commands.when_mentioned_or(*config.command_prefix),
                    help_command=None,
                    case_insensitive=True)
 
@@ -123,7 +123,7 @@ async def pull(ctx):
         try:
             utils.git_pull()
             await ctx.send("Git pulled")
-        except:
+        except Exception:
             await ctx.send("Git pull error")
     else:
         await ctx.send(utils.fill_message("insufficient_rights", user=ctx.author.id))
@@ -135,7 +135,7 @@ async def load(ctx, extension):
         try:
             bot.load_extension(f'cogs.{extension}')
             await ctx.send(f'{extension} loaded')
-        except:
+        except Exception:
             await ctx.send("loading error")
     else:
         await ctx.send(utils.fill_message("insufficient_rights", user=ctx.author.id))
@@ -147,7 +147,7 @@ async def unload(ctx, extension):
         try:
             bot.unload_extension(f'cogs.{extension}')
             await ctx.send(f'{extension} unloaded')
-        except:
+        except Exception:
             await ctx.send("unloading error")
     else:
         await ctx.send(utils.fill_message("insufficient_rights", user=ctx.author.id))
@@ -159,7 +159,7 @@ async def reload(ctx, extension):
         try:
             bot.reload_extension(f'cogs.{extension}')
             await ctx.send(f'{extension} reloaded')
-        except:
+        except Exception:
             await ctx.send("reloading error")
     else:
         await ctx.send(utils.fill_message("insufficient_rights", user=ctx.author.id))
@@ -167,7 +167,7 @@ async def reload(ctx, extension):
 database.base.metadata.create_all(database.db)
 session.commit()  # Making sure
 
-#load_subjects()
+# load_subjects()
 
 for extension in config.extensions:
     bot.load_extension(f'cogs.{extension}')

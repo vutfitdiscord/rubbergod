@@ -77,19 +77,19 @@ class Base(commands.Cog):
         open_date = next_weekday(now, open_days[0])
         for open_day in open_days:
             current_open_date = next_weekday(now, open_day)
-            if current_open_date <= open_date: 
+            if current_open_date <= open_date:
                 open_date = current_open_date
         opentime = open_date.replace(hour=open_hour, minute=0, second=0)
         isClosed = (now < opentime) or (opentime.replace(hour=close_hour) < now)
         delta = opentime - now
-        message = utils.fill_message("kachna_remaining", zbyva=str(delta) if \
+        message = utils.fill_message("kachna_remaining", zbyva=str(delta) if
                                      isClosed else messages.kachna_opened)
         if temp_closed:
             message = messages.kachna_temp_closed
         await ctx.send(message)
 
     @commands.command()
-    async def kachna_switch(self, ctx):   
+    async def kachna_switch(self, ctx):
         message = utils.fill_message("insufficient_rights", user=ctx.author.id)
 
         if ctx.author.id == config.admin_id:

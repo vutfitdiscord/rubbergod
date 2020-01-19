@@ -182,10 +182,8 @@ class Karma(BaseFeature):
                 # and as that will probably fail anyway, it'll jump to
                 # the discord.NotFound handler which will add it to
                 # the error message
-                emoji = next(
-                        (x for x in guild.emojis if x.id == int(emoji_id)),
-                        None
-                        )
+                emoji = next((x for x in guild.emojis if x.id == int(emoji_id)), None)
+
                 if emoji is None:
                     emoji = await guild.fetch_emoji(int(emoji_id))
 
@@ -213,8 +211,7 @@ class Karma(BaseFeature):
         for value in ['1', '-1']:
             emojis, is_error = await self.__make_emoji_list(
                     channel.guild,
-                    self.repo.get_ids_of_emojis_valued(value)
-                    )
+                    self.repo.get_ids_of_emojis_valued(value))
             error |= is_error
             try:
                 await channel.send("Hodnota " + value + ":")

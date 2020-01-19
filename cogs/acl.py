@@ -63,7 +63,7 @@ class Acl(commands.Cog):
             for role in guild.roles:
                 if str(role.id) not in rules and role < rubbergod:
                     output += str(role.name) + "  -  " + str(role.id) + "\n"
-                    
+
             await ctx.send(output + "\n```")
 
 

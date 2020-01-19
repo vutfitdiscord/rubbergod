@@ -55,7 +55,7 @@ class Verification(BaseFeature):
         # Save the newly generated code into the database
         self.repo.save_sent_code(login, code)
 
-        await message.channel.send(utils.fill_message("verify_send_success", 
+        await message.channel.send(utils.fill_message("verify_send_success",
                                    user=message.author.id, mail=mail_postfix))
 
     async def send_code(self, message):
@@ -72,7 +72,7 @@ class Verification(BaseFeature):
             if login == "xlogin00":
                 guild = self.bot.get_guild(Config.guild_id)
                 fp = await guild.fetch_emoji(585915845146968093)
-                await message.channel.send(utils.fill_message("verify_send_dumbshit", 
+                await message.channel.send(utils.fill_message("verify_send_dumbshit",
                                            user=message.author.id, emote=str(fp)))
                 return
             if login[0] == 'x':

@@ -107,7 +107,7 @@ class FitWide(commands.Cog):
                                 await member.add_roles(correct_role)
                                 await member.remove_roles(role)
                                 await ctx.send("Presouvam: " + member.display_name +
-                                               " z " + role_name + " do "+ year)
+                                               " z " + role_name + " do " + year)
                                 break
                     elif p_role:
                         await ctx.send("Nesedi mi role u: " +
@@ -338,7 +338,6 @@ class FitWide(commands.Cog):
         await ctx.send(("Login: `{p.login}`\nJmeno: `{p.name}`\n"
                         "Rocnik: `{p.year}`").format(p=person))
         
-
     @commands.cooldown(rate=2, per=20.0, type=commands.BucketType.user)
     @commands.check(is_in_modroom)
     @commands.command()
@@ -390,7 +389,7 @@ class FitWide(commands.Cog):
     @update_db.error
     async def fitwide_checks_error(self, ctx, error):
         if isinstance(error, commands.CheckFailure):
-            await ctx.send('Nothing to see here comrade. ' + 
+            await ctx.send('Nothing to see here comrade. ' +
                            '<:KKomrade:484470873001164817>')
 
 def setup(bot):

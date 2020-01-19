@@ -53,7 +53,7 @@ class Review(commands.Cog):
                     args = None
                 try:
                     self.rev.add_review(author, subject, tier, anonym, args)
-                except:
+                except Exception:
                     await ctx.send(messages.review_wrong_subject)
                     return
                 await ctx.send(messages.review_added)
