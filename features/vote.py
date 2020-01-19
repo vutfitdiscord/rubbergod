@@ -170,23 +170,29 @@ class Vote(BaseFeature):
                     0]
 
             await chan.send(
-                content=self.singularise(utils.fill_message("vote_result",
+                content=self.singularise(utils.fill_message(
+                    "vote_result",
                     question=utils.escape_mentions(data.question),
                     winning_emoji=most_voted.emoji,
                     winning_option=utils.escape_mentions(option),
                     votes=(most_voted.count - 1)
-            )))
+                ))
+            )
         else:
             emoji_str = ""
             for e in all_most_voted:
                 emoji_str += str(e.emoji) + ", "
             emoji_str = emoji_str[:-2]
             await chan.send(
-                content=self.singularise(utils.fill_message("vote_result_multiple",
-                    question=utils.escape_mentions(data.question),
-                    winning_emojis=emoji_str,
-                    votes=(most_voted.count - 1)
-            )))
+                content=self.singularise(
+                    utils.fill_message(
+                        "vote_result_multiple",
+                        question=utils.escape_mentions(data.question),
+                        winning_emojis=emoji_str,
+                        votes=(most_voted.count - 1)
+                    )
+                )
+            )
 
     # The lookups in this method are ineffective.
     # We could definitely get rid of all the iterations.
@@ -212,9 +218,11 @@ class Vote(BaseFeature):
                                  target_msg.reactions):
                 await target_msg.add_reaction(reaction.emoji)
 
-        bot_msg = await target_msg.channel.history(limit=3,
-                                                   after=target_msg.created_at) \
-                                                   .get(author__id=self.bot.user.id)
+        bot_msg = await target_msg.channel.history(
+            limit=3,
+            after=target_msg.created_at) \
+            .get(author__id=self.bot.user.id
+        )
 
         if bot_msg is None:
             return
@@ -235,10 +243,11 @@ class Vote(BaseFeature):
                     0]
 
             await bot_msg.edit(
-                content=self.singularise(utils.fill_message("vote_winning",
-                        winning_emoji=most_voted.emoji,
-                        winning_option=option,
-                        votes=(most_voted.count - 1)
+                content=self.singularise(utils.fill_message(
+                    "vote_winning",
+                    winning_emoji=most_voted.emoji,
+                    winning_option=option,
+                    votes=(most_voted.count - 1)
                 )))
         else:
             emoji_str = ""
@@ -246,7 +255,11 @@ class Vote(BaseFeature):
                 emoji_str += str(e.emoji) + ", "
             emoji_str = emoji_str[:-2]
             await bot_msg.edit(
-                content=self.singularise(utils.fill_message("vote_winning_multiple",
-                    winning_emojis=emoji_str,
-                    votes=(most_voted.count - 1)
-            )))
+                content=self.singularise(
+                    utils.fill_message(
+                        "vote_winning_multiple",
+                        winning_emojis=emoji_str,
+                        votes=(most_voted.count - 1)
+                    )
+                )
+            )
