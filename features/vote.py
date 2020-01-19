@@ -222,9 +222,8 @@ class Vote(BaseFeature):
 
         bot_msg = await target_msg.channel.history(
             limit=3,
-            after=target_msg.created_at) \
-            .get(author__id=self.bot.user.id
-        )
+            after=target_msg.created_at
+        ).get(author__id=self.bot.user.id)
 
         if bot_msg is None:
             return

@@ -51,7 +51,7 @@ def fill_message(message_name, *args, **kwargs):
 
     if 'admin' in kwargs:
         kwargs['admin'] = generate_mention(kwargs['admin'])
-    
+
     # Attempt to get message template and fill
     try:
         template = getattr(Messages, message_name)

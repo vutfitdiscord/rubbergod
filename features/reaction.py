@@ -70,7 +70,7 @@ class Reaction(BaseFeature):
                 out = line.split(" - ", 1)[0].split()
                 out = [out[1], out[0]]
                 output.append(out)
-            except:
+            except Exception:
                 await message.channel.send(utils.fill_message("role_invalid_line",
                                            user=message.author.id, line=line))
         for line in output:
@@ -79,7 +79,7 @@ class Reaction(BaseFeature):
                 line[0] = line[0].replace(">", "")
                 try:
                     line[0] = int(line[0])
-                except:
+                except Exception:
                     await message.channel.send(utils.fill_message("role_invalid_line",
                                                user=message.author.id, line=line[0]))
         return output
@@ -171,7 +171,7 @@ class Reaction(BaseFeature):
                     await message.edit(embed=embed)
             try:
                 await message.remove_reaction(emoji, member)
-            except:
+            except Exception:
                 pass
         elif message.embeds and\
                 message.embeds[0].title is not discord.Embed.Empty and\
@@ -234,7 +234,7 @@ class Reaction(BaseFeature):
                         await message.edit(embed=embed)
             try:
                 await message.remove_reaction(emoji, member)
-            except:
+            except Exception:
                 pass
         elif member.id != message.author.id and\
                 guild.id == Config.guild_id and\

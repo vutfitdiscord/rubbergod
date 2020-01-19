@@ -82,7 +82,7 @@ class Karma(commands.Cog):
                     except discord.errors.Forbidden:
                         return
                 else:
-                    await ctx.send(utils.fill_message("vote_room_only", 
+                    await ctx.send(utils.fill_message("vote_room_only",
                                    room=discord.utils.get(ctx.guild.channels, id=config.vote_room)))
 
         elif args[0] == "vote":
