@@ -78,6 +78,7 @@ class Messages:
                                "ne {input}] [user(s)]` "
     karma_give_success = "Karma byla úspěšně přidaná."
     karma_give_negative_success = "Karma byla úspěšně odebraná."
+    karma_message_format = "?karma message [url, id]"
     member_not_found = "{user} Nikoho takového jsem nenašel."
     karma_lederboard_offser_error = "{user} Špatný offset, zadej kladné číslo"
 
@@ -209,7 +210,9 @@ class Messages:
              ('karma vote',
               'Odstartuje hlasování o hodnotě zatím neohodnoceného emotu.'),
              ('karma revote [emote]',
-              'Odstartuje hlasování o nové hodnotě emotu.')],
+              'Odstartuje hlasování o nové hodnotě emotu.'),
+             ('karma message [url, id]',
+              'Zobrazí karmu získanou za zprávu')],
             [('leaderboard [offset]', 'Karma leaderboard'),
              ('bajkarboard [offset]', 'Karma leaderboard reversed'),
              ('givingboard [offset]', 'Leaderboard rozdávání pozitivní karmy.'),

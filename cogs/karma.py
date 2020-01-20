@@ -105,6 +105,16 @@ class Karma(commands.Cog):
                 await karma.karma_give(ctx.message)
             else:
                 await ctx.send(utils.fill_message("insufficient_rights", user=ctx.author.id))
+
+        elif args[0] == "message":
+            try:
+                converter = commands.MessageConverter()
+                target_message = await converter.convert(
+                        ctx=ctx, argument=' '.join(args[1:]))
+            except commands.errors.BadArgument:
+                await ctx.send(utils.fill_message("karma_message_format", user=ctx.author.id))
+                return
+            await karma.message_karma(ctx, target_message)
         else:
             await ctx.send(utils.fill_message("karma_invalid_command", user=ctx.author.id))
 
