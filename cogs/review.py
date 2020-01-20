@@ -59,7 +59,10 @@ class Review(commands.Cog):
                 await ctx.send(messages.review_added)
             elif subcommand == 'remove':
                 if subject is None:
-                    await ctx.send(messages.review_remove_format)
+                    if ctx.author.id == config.admin_id:
+                        await ctx.send(messages.review_remove_format_admin)
+                    else:
+                        await ctx.send(messages.review_remove_format)
                 elif subject == 'id':
                     if ctx.author.id == config.admin_id:
                         if tier is None:
@@ -70,6 +73,7 @@ class Review(commands.Cog):
                     else:
                         await ctx.send(utils.fill_message("insufficient_rights", user=ctx.author.id))
                 else:
+                    subject = subject.lower()
                     if self.rev.remove(str(ctx.message.author.id), subject):
                         await ctx.send(messages.review_remove_success)
                     else:
@@ -106,6 +110,7 @@ class Review(commands.Cog):
             if not subcommand or not subject:
                 await ctx.send(messages.subject_format)
                 return
+            subject = subject.lower()
             if subcommand == "add":
                 self.rev.add_subject(subject)
                 await ctx.send(f'Zkratka {subject} byla přidána')
