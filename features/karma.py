@@ -265,23 +265,33 @@ class Karma(BaseFeature):
         reactions = msg.reactions
         colour = 0x6d6a69
         output = {'-1': [], '1': [], '0': []}
+        karma = 0
         for react in reactions:
             emoji = react.emoji
             val = self.repo.emoji_value_raw(emoji)
             if val == 1:
                 output['1'].append(emoji)
+                karma += react.count
+                async for user in react.users():
+                    if user.id == msg.author.id:
+                        karma -= 1
+                        break
             elif val == -1:
                 output['-1'].append(emoji)
+                karma -= react.count
+                async for user in react.users():
+                    if user.id == msg.author.id:
+                        karma += 1
+                        break
             else:
                 output['0'].append(emoji)
-        karma = len(output['1']) - len(output['-1'])
         embed = discord.Embed(title='Karma zprávy')
         embed.add_field(name="Zpráva", value=msg.jump_url, inline=False)
         for key in ['1', '-1', '0']:
             if output[key]:
                 message = ""
                 for emoji in output[key]:
-                    message += str(emoji)
+                    message += str(emoji) + ' '
                 if key == '1':
                     name = 'Pozitivní'
                 elif key == '0':
