@@ -33,7 +33,7 @@ class Review(commands.Cog):
                 for role in roles:
                     if role.name in config.reviews_forbidden_roles:
                         await ctx.send(utils.fill_message("review_add_denied",
-                                       user=ctx.message.author.mention))
+                                       user=ctx.message.author.id))
                         return
                 if subject is None or tier is None:
                     await ctx.send(messages.review_add_format)

@@ -1,12 +1,14 @@
 import asyncio
 from datetime import datetime
 
-from discord import HTTPException, Reaction, User, Message, utils
+import discord
+from discord import HTTPException, Reaction, User, Message
 from discord.ext.commands import Bot, Context
 
 from config import messages
 from features.base_feature import BaseFeature
 
+import utils
 
 class MessageData:
     def __init__(self, question, options, date: datetime = None):
@@ -172,9 +174,9 @@ class Vote(BaseFeature):
             await chan.send(
                 content=self.singularise(utils.fill_message(
                     "vote_result",
-                    question=utils.escape_mentions(data.question),
+                    question=discord.utils.escape_mentions(data.question),
                     winning_emoji=most_voted.emoji,
-                    winning_option=utils.escape_mentions(option),
+                    winning_option=discord.utils.escape_mentions(option),
                     votes=(most_voted.count - 1)
                 ))
             )
@@ -187,7 +189,7 @@ class Vote(BaseFeature):
                 content=self.singularise(
                     utils.fill_message(
                         "vote_result_multiple",
-                        question=utils.escape_mentions(data.question),
+                        question=discord.utils.escape_mentions(data.question),
                         winning_emojis=emoji_str,
                         votes=(most_voted.count - 1)
                     )
