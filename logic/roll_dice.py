@@ -1,5 +1,6 @@
 from random import randint
 from re import match
+import utils
 
 from config.config import Config
 from config.messages import Messages
@@ -50,12 +51,12 @@ class Roll():
             return RollResult("(**0**)", 0)
 
         if dice_count > Config.max_dice_at_once:
-            raise SyntaxError(Messages.rd_too_many_dice_in_group
-                              .format(maximum=Config.max_dice_at_once))
+            raise SyntaxError(utils.fill_message("rd_too_many_dice_in_group",
+                              maximum=Config.max_dice_at_once))
 
         if dice_sides > Config.max_dice_sides:
-            raise SyntaxError(Messages.rd_too_many_dice_sides
-                              .format(maximum=Config.max_dice_sides))
+            raise SyntaxError(utils.fill_message("rd_too_many_dice_sides",
+                              maximum=Config.max_dice_sides))
 
         dice = [randint(1, dice_sides) for i in range(dice_count)]
 
@@ -173,8 +174,7 @@ class Roll():
         dice_groups = roll_string.split('+')
 
         if len(dice_groups) > Config.max_dice_groups:
-            return (Messages.rd_too_many_dice_groups
-                    .format(maximum=Config.max_dice_groups))
+            return utils.fill_message("rd_too_many_dice_groups", maximum=Config.max_dice_groups)
 
         for index, dice in enumerate(dice_groups):
             result = match(Roll.DICE_REGEX, dice)
@@ -184,7 +184,7 @@ class Roll():
                 except SyntaxError as e:
                     return str(e)
             else:
-                return Messages.rd_format.format(group=index)
+                return utils.fill_message("rd_format", group=index)
 
         returntext = ' + '.join(r.text for r in results)
         returntext += " = **" + str(sum(r.result for r in results)) + "**"

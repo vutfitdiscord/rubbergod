@@ -36,7 +36,7 @@ class Meme(commands.Cog):
 
     @commands.command()
     async def uhoh(self, ctx):
-        await ctx.send(messages.uhoh_counter.format(uhohs=uhoh_counter))
+        await ctx.send(utils.fill_message("uhoh_counter", uhohs=uhoh_counter))
 
     @commands.cooldown(rate=5, per=20.0, type=commands.BucketType.user)
     @commands.command(name='??')
@@ -64,9 +64,7 @@ class Meme(commands.Cog):
     @hug.error
     async def hug_error(self, ctx, error):
         if isinstance(error, commands.BadArgument):
-            await ctx.send(
-                messages.member_not_found
-                .format(user=utils.generate_mention(ctx.author.id)))
+            await ctx.send(utils.fill_message("member_not_found", user=ctx.author.id))
 
 
 def setup(bot):

@@ -112,7 +112,7 @@ class Config:
         "zzn", "jad", "jad", "izsl", "zpo", "zpoe", "zpd", "zpja", "asd",
         "zre", "zree"
     ]
-    reviews_forbidden_roles = ["MUNI","Host"]
+    reviews_forbidden_roles = ["MUNI", "Host"]
 
     # Arcas
     arcas_id = 140547421733126145
@@ -129,3 +129,7 @@ class Config:
     kachna_close_hour = 22
     kachna_open_days = [0, 2] # 0 = Monday, 1=Tuesday, 2=Wednesday...
     kachna_temp_closed = False
+
+    # name day source url
+    name_day_url_cz = "http://svatky.adresa.info/json"
+    name_day_url_sk = "http://svatky.adresa.info/json?lang=sk"

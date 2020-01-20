@@ -4,13 +4,12 @@ from discord.ext import commands
 import utils
 from cogs import room_check
 from features import acl
-from config import config, messages
+from config import config
 from repository import acl_repo
 
 acl_repo = acl_repo.AclRepository()
 acl = acl.Acl(acl_repo)
 config = config.Config
-messages = messages.Messages
 
 
 class Acl(commands.Cog):
@@ -29,9 +28,7 @@ class Acl(commands.Cog):
                                          name="Mod")
         if self.mod in ctx.author.roles:
             if not len(args):
-                await ctx.send(
-                    messages.acl_help
-                    .format(user=utils.generate_mention(ctx.author.id)))
+                await ctx.send(utils.fill_message("acl_help", user=ctx.author.id))
                 return
             if args[0] == 'add':
                 await acl.handle_add(ctx, args[1:])
@@ -42,14 +39,10 @@ class Acl(commands.Cog):
             elif args[0] == 'list':
                 await acl.handle_list(ctx, args[1:])
             else:
-                await ctx.send(
-                    messages.acl_help
-                    .format(user=utils.generate_mention(ctx.author.id)))
+                await ctx.send(utils.fill_message("acl_help", user=ctx.author.id))
                 return
         else:
-            await ctx.send(
-                messages.missing_perms
-                .format(user=utils.generate_mention(ctx.author.id)))
+            await ctx.send(utils.fill_message("missing_perms", user=ctx.author.id))
             return
 
     # TODO: this is only to help init the acl database
@@ -70,7 +63,7 @@ class Acl(commands.Cog):
             for role in guild.roles:
                 if str(role.id) not in rules and role < rubbergod:
                     output += str(role.name) + "  -  " + str(role.id) + "\n"
-                    
+
             await ctx.send(output + "\n```")
 
 

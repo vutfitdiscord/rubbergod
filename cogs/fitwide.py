@@ -6,7 +6,7 @@ from discord.ext import commands
 
 
 import utils
-from config import config, messages
+from config import config
 from features import verification
 from repository import user_repo
 from repository.database import database, session
@@ -16,7 +16,6 @@ from repository.database.year_increment import User_backup
 user_r = user_repo.UserRepository()
 
 config = config.Config
-messages = messages.Messages
 arcas_time = (datetime.datetime.utcnow() -
               datetime.timedelta(hours=config.arcas_delay))
 
@@ -108,7 +107,7 @@ class FitWide(commands.Cog):
                                 await member.add_roles(correct_role)
                                 await member.remove_roles(role)
                                 await ctx.send("Presouvam: " + member.display_name +
-                                               " z " + role_name + " do "+ year)
+                                               " z " + role_name + " do " + year)
                                 break
                     elif p_role:
                         await ctx.send("Nesedi mi role u: " +
@@ -339,7 +338,6 @@ class FitWide(commands.Cog):
         await ctx.send(("Login: `{p.login}`\nJmeno: `{p.name}`\n"
                         "Rocnik: `{p.year}`").format(p=person))
         
-
     @commands.cooldown(rate=2, per=20.0, type=commands.BucketType.user)
     @commands.check(is_in_modroom)
     @commands.command()
@@ -391,7 +389,7 @@ class FitWide(commands.Cog):
     @update_db.error
     async def fitwide_checks_error(self, ctx, error):
         if isinstance(error, commands.CheckFailure):
-            await ctx.send('Nothing to see here comrade. ' + 
+            await ctx.send('Nothing to see here comrade. ' +
                            '<:KKomrade:484470873001164817>')
 
 def setup(bot):
