@@ -260,6 +260,44 @@ class Karma(BaseFeature):
             karma_neg_order=k.negative.position
         )
 
+    async def message_karma(self, channel_out, msg):
+        author = channel_out.author
+        reactions = msg.reactions
+        colour = 0x6d6a69
+        output = {'-1': [], '1': [], '0': []}
+        for react in reactions:
+            emoji = react.emoji
+            val = self.repo.emoji_value_raw(emoji)
+            if val == 1:
+                output['1'].append(emoji)
+            elif val == -1:
+                output['-1'].append(emoji)
+            else:
+                output['0'].append(emoji)
+        karma = len(output['1']) - len(output['-1'])
+        embed = discord.Embed(title='Karma zprávy')
+        embed.add_field(name="Zpráva", value=msg.jump_url, inline=False)
+        for key in ['1', '-1', '0']:
+            if output[key]:
+                message = ""
+                for emoji in output[key]:
+                    message += str(emoji)
+                if key == '1':
+                    name = 'Pozitivní'
+                elif key == '0':
+                    name = 'Neutrální'
+                else:
+                    name = 'Negativní'
+                embed.add_field(name=name, value=message, inline=False)
+        if karma > 0:
+            colour = 0x34cb0b
+        elif karma < 0:
+            colour = 0xcb410b
+        embed.colour = colour
+        embed.set_footer(text=author, icon_url=author.avatar_url)
+        embed.add_field(name='Celková karma za zprávu:', value=karma, inline=False)
+        await channel_out.send(embed=embed)
+
     async def leaderboard(self, channel, action, order, start=1):
         output = "> "
         if action == 'give':
