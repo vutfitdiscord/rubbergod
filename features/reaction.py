@@ -71,9 +71,10 @@ class Reaction(BaseFeature):
                 out = [out[1], out[0]]
                 output.append(out)
             except Exception:
-                await message.channel.send(utils.fill_message("role_invalid_line",
-                                           user=message.author.id,
-                                           line=discord.utils.escape_mentions(line)))
+                if message.channel.id not in Config.role_channels:
+                    await message.channel.send(utils.fill_message("role_invalid_line",
+                                               user=message.author.id,
+                                               line=discord.utils.escape_mentions(line)))
         for line in output:
             if "<#" in line[0]:
                 line[0] = line[0].replace("<#", "")
@@ -81,9 +82,10 @@ class Reaction(BaseFeature):
                 try:
                     line[0] = int(line[0])
                 except Exception:
-                    await message.channel.send(utils.fill_message("role_invalid_line",
-                                               user=message.author.id,
-                                               line=discord.utils.escape_mentions(line[0])))
+                    if message.channel.id not in Config.role_channels:
+                        await message.channel.send(utils.fill_message("role_invalid_line",
+                                                   user=message.author.id,
+                                                   line=discord.utils.escape_mentions(line[0])))
         return output
 
     # Adds reactions to message
@@ -112,7 +114,7 @@ class Reaction(BaseFeature):
                 except discord.errors.HTTPException:
                     await message.channel.send(utils.fill_message("role_invalid_emote",
                                                user=message.author.id,
-                                               not_role=discord.utils.escape_mentions(line[1]),
+                                               not_emote=discord.utils.escape_mentions(line[1]),
                                                role=discord.utils.escape_mentions(line[0])))
 
     async def add(self, payload):
