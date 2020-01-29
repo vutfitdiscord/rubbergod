@@ -264,8 +264,8 @@ class Verification(BaseFeature):
 
                 self.repo.save_verified(login, message.author.id)
 
-                await message.channel.send(utils.fill_message("verify_verify_success",
-                                           user=message.author.id))
+                await member.send(utils.fill_message("verify_verify_success",
+                                                     user=message.author.id))
 
                 await member.send(Messages.verify_post_verify_info)
 
@@ -284,7 +284,7 @@ class Verification(BaseFeature):
                 channel = self.bot.get_channel(Config.log_channel)
                 await channel.send(embed=embed)
         else:
-            await message.channel.send(utils.fill_message("verify_verify_already_verified",
+            await message.channel.send(utils.fill_message("verify_already_verified",
                                        user=message.author.id, admin=Config.admin_id))
 
         try:
