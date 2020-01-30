@@ -202,6 +202,15 @@ class Reaction(BaseFeature):
                         next_page = str(next_page) + "/" + str(max_page)
                         embed = self.review.make_embed(
                             review, subject, tier_average, next_page)
+                        if embed.fields[3].name == "Text page":
+                            await message.add_reaction("🔼")
+                            await message.add_reaction("🔽")
+                        else:
+                            for emote in message.reactions:
+                                if emote.emoji == "🔼":
+                                    await message.remove_reaction("🔼", self.bot.user)
+                                    await message.remove_reaction("🔽", self.bot.user)
+                                    break
                         await message.edit(embed=embed)
             elif emoji in ["👍", "👎", "🛑"]:
                 review = review_r.get_subject_reviews(subject)[page - 1].Review
@@ -239,7 +248,7 @@ class Reaction(BaseFeature):
             try:
                 await message.remove_reaction(emoji, member)
             except Exception:
-                pass  # in D
+                pass  # in DM
         elif member.id != message.author.id and\
                 guild.id == Config.guild_id and\
                 message.channel.id not in \

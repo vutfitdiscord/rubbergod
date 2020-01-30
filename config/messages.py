@@ -78,7 +78,7 @@ class Messages:
                                "ne {input}] [user(s)]` "
     karma_give_success = "Karma byla úspěšně přidaná."
     karma_give_negative_success = "Karma byla úspěšně odebraná."
-    karma_message_format = "?karma message [url, id]"
+    karma_message_format = prefix + "karma message [url, id]"
     member_not_found = "{user} Nikoho takového jsem nenašel."
     karma_lederboard_offser_error = "{user} Špatný offset, zadej kladné číslo"
 
@@ -173,8 +173,9 @@ class Messages:
     vote_result_none = "V hlasování „{question}“ nikdo nehlasoval. <:sadcat:576171980118687754>"
 
     review_format = prefix + "reviews [add, remove, zkratka předmětu]"
-    review_add_format = prefix + "reviews add [zkratka předmětu] [tier (0-4, kde 0" \
-                        " je nejlepší)] (anonym) (text)"
+    review_add_format = prefix + "reviews add {ZkratkaPredmetu} {Tier (0-4, 0 je TOP)} (anonym - Pokud si přejete anonymní příspěvek) (VolitelnyText)\n" \
+                        "Například:\nPro anonymní příspěvek: `" + prefix +"reviews add ITU 0 anonym text recenze`\n" \
+                        "Jinak: `" + prefix +"reviews add IZP 2 text recenze`"
 
     review_wrong_subject = "Nesprávná zkratka předmětu"
     review_tier = "Tier je z rozsahu 0-4, kde 0 je nejlepší"

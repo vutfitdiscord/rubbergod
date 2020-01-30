@@ -52,7 +52,7 @@ class Review(commands.Cog):
                 if args_len == 0:
                     args = None
                 try:
-                    self.rev.add_review(author, subject, tier, anonym, args)
+                    self.rev.add_review(author, subject.lower(), tier, anonym, args)
                 except Exception:
                     await ctx.send(messages.review_wrong_subject)
                     return
@@ -68,7 +68,7 @@ class Review(commands.Cog):
                         if tier is None:
                             await ctx.send(messages.review_remove_id_format)
                         else:
-                            review_repo.remove(tier)
+                            review_repo.remove(tier) # tier => ID of review
                             await ctx.send(messages.review_remove_success)
                     else:
                         await ctx.send(utils.fill_message("insufficient_rights", user=ctx.author.id))

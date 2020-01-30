@@ -72,7 +72,7 @@ class Review(BaseFeature):
         if update:
             review_r.update_review(update.id, tier, anonym, text)
         else:
-            review_r.add_review(author_id, subject.lower(), tier, anonym, text)
+            review_r.add_review(author_id, subject, tier, anonym, text)
 
     def list_reviews(self, subject):
         result = review_r.get_subject(subject).first()
