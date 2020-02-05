@@ -84,14 +84,17 @@ class Vote(BaseFeature):
         if len(lines) < 2:
             return None
 
-        if d is None:
-            question = lines[0][(lines[0].index("vote ") + 5):]
-        else:
-            question = " ".join(
-                lines[0][(lines[0].index("vote ") + 5):].split()[d[1]:])
+        try:
+            if d is None:
+                question = lines[0][(lines[0].index("vote ") + 5):]
+            else:
+                question = " ".join(
+                    lines[0][(lines[0].index("vote ") + 5):].split()[d[1]:])
 
-        options_raw = [(x[:x.index(" ")].strip(), x[x.index(" "):].strip()) for
-                       x in lines[1:]]
+            options_raw = [(x[:x.index(" ")].strip(), x[x.index(" "):].strip()) for
+                           x in lines[1:]]
+        except ValueError:
+            return None
 
         return MessageData(question, options_raw, None if d is None else d[0])
 
