@@ -171,7 +171,7 @@ class Verification(BaseFeature):
                 elif raw_year_parts[1] == "BCH":
                     year = "Erasmus"
         elif raw_year_parts[0] == "FEKT":
-            year = "FEKT"
+            year = "VUT"
         elif len(raw_year_parts) == 1:
             if raw_year_parts[0] == "MUNI":
                 year = "MUNI"
