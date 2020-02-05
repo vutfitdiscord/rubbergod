@@ -164,6 +164,14 @@ async def reload(ctx, extension):
     else:
         await ctx.send(utils.fill_message("insufficient_rights", user=ctx.author.id))
 
+
+@reload.error
+@load.error
+@unload.error
+async def missing_arg_error(ctx, error):
+    if isinstance(error, commands.errors.MissingRequiredArgument):
+        await ctx.send('Missing argument.')
+
 database.base.metadata.create_all(database.db)
 session.commit()  # Making sure
 
