@@ -25,7 +25,7 @@ class weather(commands.Cog):
         res = requests.get(url).json()
         
         if(str(res["cod"]) == "200"):
-            description = "Aktuální počasí v městě " + res["name"]
+            description = "Aktuální počasí v městě " + res["name"] + ", " + res["sys"]["country"]
             embed=discord.Embed(title="Počasí", description=description)
             image = "http://openweathermap.org/img/w/" + res["weather"][0]["icon"] + ".png"
             embed.set_thumbnail(url=image)
@@ -46,8 +46,10 @@ class weather(commands.Cog):
             await ctx.send(embed=embed)
         elif(str(res["cod"]) == "404"):
             await ctx.send("Město nenalezeno")
+        elif(str(res["cod"]) == "401"):
+            await ctx.send("Rip token -> Rebel pls fix")
         else:
-            await ctx.send("Asi rip token -> Rebel pls fix")
+            await ctx.send("Město nenalezeno! <:pepeGun:484470874246742018> (" + res["message"] + ")")
 
 def setup(bot):
     bot.add_cog(weather(bot))
