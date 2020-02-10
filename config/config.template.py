@@ -133,3 +133,6 @@ class Config:
     # name day source url
     name_day_url_cz = "http://svatky.adresa.info/json"
     name_day_url_sk = "http://svatky.adresa.info/json?lang=sk"
+
+    # weather token to openweather API
+    weather_token = "678a5932f6dd92ac668b20e9f89c0318"
