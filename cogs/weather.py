@@ -19,8 +19,8 @@ class weather(commands.Cog):
     async def weather(self, ctx, *args):
         token = config.weather_token
         city = "Brno"
-        if(len(args) == 1):
-            city = args[0]
+        if(len(args) != 0):
+            city = ' '.join(map(str, args))
         url = "http://api.openweathermap.org/data/2.5/weather?q=" + city + "&units=metric&lang=cz&appid=" + token
         res = requests.get(url).json()
         
