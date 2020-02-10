@@ -15,7 +15,7 @@ class weather(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command()
+    @commands.command(aliases=['pocasi', 'pocasie'])
     async def weather(self, ctx, *args):
         token = config.weather_token
         city = "Brno"
