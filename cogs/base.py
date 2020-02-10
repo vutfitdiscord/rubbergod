@@ -36,6 +36,10 @@ class Base(commands.Cog):
            hasattr(ctx.command, 'on_error'):
             return
 
+        if isinstance(error, commands.UserInputError):
+            await ctx.send("Chyba v inputu")
+            return
+
         if isinstance(error, commands.CommandNotFound):
             if not ctx.message.content.startswith('!'):
                 await ctx.send(messages.no_such_command)
