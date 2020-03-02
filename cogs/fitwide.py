@@ -45,7 +45,7 @@ class FitWide(commands.Cog):
     @commands.cooldown(rate=2, per=20.0, type=commands.BucketType.user)
     @commands.check(is_in_modroom)
     @commands.command()
-    async def find_rolewhores(self, ctx):
+    async def find_rolehoarders(self, ctx):
         guild = self.bot.get_guild(config.guild_id)
         members = guild.members
 
@@ -56,7 +56,7 @@ class FitWide(commands.Cog):
             for role in member.roles:
                 if role.name in config.subjects:
                     role_count += 1
-            if role_count > config.rolewhore_treshold:
+            if role_count > config.rolehoarder_treshold:
                 found_members.append((member, role_count))
 
         msg = ""

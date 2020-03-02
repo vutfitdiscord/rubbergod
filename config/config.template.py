@@ -115,7 +115,7 @@ class Config:
     reviews_forbidden_roles = ["MUNI", "Host"]
 
     # How many subject roles you can have until it's suspicious
-    rolewhore_treshold = 10
+    rolehoarder_treshold = 10
 
     # Arcas
     arcas_id = 140547421733126145
