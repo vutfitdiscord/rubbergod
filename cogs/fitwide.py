@@ -45,7 +45,7 @@ class FitWide(commands.Cog):
     @commands.cooldown(rate=2, per=20.0, type=commands.BucketType.user)
     @commands.check(is_in_modroom)
     @commands.command()
-    async def find_rolehoarders(self, ctx):
+    async def find_rolehoarders(self, ctx, limit=config.rolehoarder_default_limit):
         guild = self.bot.get_guild(config.guild_id)
         members = guild.members
 
@@ -56,20 +56,22 @@ class FitWide(commands.Cog):
             for role in member.roles:
                 if role.name.lower() in config.subjects:
                     role_count += 1
-            if role_count > config.rolehoarder_treshold:
+            if role_count > 0:
                 found_members.append((member, role_count))
 
         msg = ""
-        for member, role_count in found_members:
-            line = "{id} - {name} ({num} roli)\n".format(id=member.id, name=member.name, num=role_count)
-            if len(line) + len(msg) >= 2000:
-                await ctx.send(msg)
-                msg = line
-            else:
-                msg += line
 
-        if msg == "":
+        if len(found_members) == 0:
             msg = "Zadne jsem nenasel :slight_smile:"
+        else:
+            found_members.sort(key=lambda x: x[1], reverse=True)
+            for member, role_count in found_members[:limit]:
+                line = "{id} - {name} ({num} roli)\n".format(id=member.id, name=member.name, num=role_count)
+                if len(line) + len(msg) >= 2000:
+                    await ctx.send(msg)
+                    msg = line
+                else:
+                    msg += line
 
         await ctx.send(msg)
 
