@@ -1,0 +1,10 @@
+[Unit]
+Description=Rubbergod, a FIT Discord bot
+After=multi-user.target
+
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/python3 /var/fitdiscord/rubbergod/rubbergod.py
+
+[Install]
+WantedBy=multi-user.target
