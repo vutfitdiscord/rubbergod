@@ -54,7 +54,7 @@ class FitWide(commands.Cog):
         for member in members:
             role_count = 0
             for role in member.roles:
-                if role.name in config.subjects:
+                if role.name.lower() in config.subjects:
                     role_count += 1
             if role_count > config.rolehoarder_treshold:
                 found_members.append((member, role_count))
