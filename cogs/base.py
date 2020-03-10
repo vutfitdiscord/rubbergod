@@ -44,19 +44,21 @@ class Base(commands.Cog):
             if not ctx.message.content.startswith('!'):
                 await ctx.send(messages.no_such_command)
             return
-        elif isinstance(error, commands.CommandOnCooldown):
+
+        if isinstance(error, commands.CommandOnCooldown):
             await ctx.send(utils.fill_message("spamming", user=ctx.author.id))
-        else:
-            output = 'Ignoring exception in command {}:\n'.format(ctx.command)
-            output += ''.join(traceback.format_exception(type(error),
-                                                         error,
-                                                         error.__traceback__))
-            channel = self.bot.get_channel(config.bot_dev_channel)
-            print(output)
-            output = list(output[0 + i: 1900 + i] for i in range(0, len(output), 1900))
-            if channel is not None:
-                for message in output:
-                    await channel.send("```\n" + message + "\n```")
+            return
+
+        output = 'Ignoring exception in command {}:\n'.format(ctx.command)
+        output += ''.join(traceback.format_exception(type(error),
+                                                     error,
+                                                     error.__traceback__))
+        channel = self.bot.get_channel(config.bot_dev_channel)
+        print(output)
+        output = list(output[0 + i: 1900 + i] for i in range(0, len(output), 1900))
+        if channel is not None:
+            for message in output:
+                await channel.send("```\n" + message + "\n```")
 
     @commands.cooldown(rate=2, per=20.0, type=commands.BucketType.user)
     @commands.command()
