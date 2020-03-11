@@ -34,11 +34,19 @@ class Karma(commands.Cog):
 
     @commands.Cog.listener()
     async def on_raw_reaction_add(self, payload):
-        await self.reaction.add(payload)
+        try:
+            await self.reaction.add(payload)
+        except HTTPException:
+            # ignore HTTP Exceptions
+            return
 
     @commands.Cog.listener()
     async def on_raw_reaction_remove(self, payload):
-        await self.reaction.remove(payload)
+        try:
+            await self.reaction.remove(payload)
+        except HTTPException:
+            # ignore HTTP Exceptions
+            return
 
     @commands.cooldown(rate=5, per=30.0, type=commands.BucketType.user)
     @commands.command(name="karma")
