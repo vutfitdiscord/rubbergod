@@ -36,7 +36,7 @@ class Karma(commands.Cog):
     async def on_raw_reaction_add(self, payload):
         try:
             await self.reaction.add(payload)
-        except HTTPException:
+        except discord.HTTPException:
             # ignore HTTP Exceptions
             return
 
@@ -44,7 +44,7 @@ class Karma(commands.Cog):
     async def on_raw_reaction_remove(self, payload):
         try:
             await self.reaction.remove(payload)
-        except HTTPException:
+        except discord.HTTPException:
             # ignore HTTP Exceptions
             return
 
