@@ -36,10 +36,10 @@ class Messages:
 
     uhoh_counter = "{uhohs} uh ohs od spuštění."
     uptime_message = "Up since:  `{boottime}`\nUptime:\t`{uptime}`"
-    kachna_remaining = "Do kachny zbývá:  `{zbyva}`"
-    kachna_opened = "Kachna otevřená ! <:hypers:493154327318233088>"
-    kachna_temp_closed = "Kachna je bohužel zavřena <:sadcat:576171980118687754>"
-    kachna_switched = "Kachna byla nastavena na: {open_closed}"
+
+    kachna_grillbot = "O Kachnu se teď stará Grillbot " \
+                      "<:feelsWowMan:493152294712377354> Použij $kachna."
+
     karma = "{user} Karma uzivatele `{target}` je: **{karma}** " \
             "(**{order}.**)\nA rozdal:\n" \
             "**{karma_pos}** pozitivní karmy " \
