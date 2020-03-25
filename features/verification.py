@@ -145,6 +145,9 @@ class Verification(BaseFeature):
         raw_year_parts = raw_year.split()
         year = None
 
+        if raw_year.lower() == "dropout":
+            return "Dropout"
+
         if len(raw_year_parts) == 3:
             if raw_year_parts[0] == "FIT":
                 raw_year_parts[2] = int(raw_year_parts[2][:-1])  # rip types
@@ -160,16 +163,16 @@ class Verification(BaseFeature):
                                            "NGRI", "NNET", "NVIZ", "NCPS",
                                            "NSEC", "NEMB", "NHPC", "NISD",
                                            "NIDE", "NISY", "NMAL", "NMAT",
-                                           "NSEN", "NVER", "NSPE"]:
-                    year = "MIT"
+                                           "NSEN", "NVER", "NSPE", "MGH"]:
+                    year = "MIT" # MGH is also Erasmus
                     if raw_year_parts[2] < 3:
                         year = str(raw_year_parts[2]) + year
                     else:
                         year = "3MIT+"
                 elif raw_year_parts[1] in ["DVI4", "DRH"]:
                     year = "PhD+"
-                elif raw_year_parts[1] == "BCH":
-                    year = "Erasmus"
+                elif raw_year_parts[1] in ["BCH", "CZV"]:
+                    year = "1BIT" # TODO: fix erasmus students (BCH)
         elif raw_year_parts[0] == "FEKT":
             year = "VUT"
         elif len(raw_year_parts) == 1:

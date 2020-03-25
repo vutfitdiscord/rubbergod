@@ -95,7 +95,6 @@ class FitWide(commands.Cog):
                     if verify in member.roles and
                     host not in member.roles and
                     bot not in member.roles and
-                    dropout not in member.roles and
                     poradce not in member.roles]
 
         if not p_muni:
@@ -106,7 +105,7 @@ class FitWide(commands.Cog):
         permited_ids = [int(person.discord_ID) for person in permited]
 
         years = ["0BIT", "1BIT", "2BIT", "3BIT", "4BIT+",
-                 "0MIT", "1MIT", "2MIT", "3MIT+"]
+                 "0MIT", "1MIT", "2MIT", "3MIT+", "Dropout"]
 
         year_roles = {year: discord.utils.get(guild.roles, name=year) for year in years}
 
@@ -142,6 +141,10 @@ class FitWide(commands.Cog):
                                 await ctx.send("Presouvam: " + member.display_name +
                                                " z " + role_name + " do " + year)
                                 break
+                        else:
+                            await member.add_roles(dropout)
+                            await ctx.send("Presouvam: " + member.display_name +
+                                           " z " + role_name + " do dropout")
                     elif p_role:
                         await ctx.send("Nesedi mi role u: " +
                                        utils.generate_mention(member.id) +
@@ -155,6 +158,10 @@ class FitWide(commands.Cog):
                                 await ctx.send("Presouvam: " + member.display_name +
                                                " z " + role_name + " do dropout")
                                 break
+                        else:
+                            await member.add_roles(dropout)
+                            await ctx.send("Presouvam: " + member.display_name +
+                                           " z " + role_name + " do dropout")
                     elif p_role:
                         await ctx.send("Nesedi mi role u: " +
                                        utils.generate_mention(member.id) +
