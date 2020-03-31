@@ -15,7 +15,7 @@ class Warphole(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message(self, message):
-        if message.channel == self.warp_channel:
+        if message.channel == self.warp_channel and not message.author.bot:
             self.sibling.send(discord.utils.escape_mentions(message.content))
         elif (isinstance(message.channel, discord.DMChannel) and
               message.channel.recipient == self.sibling):
