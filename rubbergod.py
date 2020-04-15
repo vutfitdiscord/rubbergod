@@ -95,8 +95,12 @@ bot = commands.Bot(command_prefix=commands.when_mentioned_or(
 presence = presence.Presence(bot)
 
 
-# fill DB with subjects shortcut, needed for reviews
 def load_subjects():
+    """
+    Fills DB with subject shorcut from config file.
+    This is needed for reviews feature.
+    Run this just when you want to create DB fo reviews.
+    """
     review_repo = ReviewRepository()
     for subject in config.subjects:
         review_repo.add_subject(subject)
@@ -177,7 +181,7 @@ async def reload(ctx, extension):
 database.base.metadata.create_all(database.db)
 session.commit()  # Making sure
 
-#load_subjects()
+# load_subjects()
 
 for extension in config.extensions:
     bot.load_extension(f'cogs.{extension}')

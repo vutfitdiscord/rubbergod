@@ -173,7 +173,7 @@ class Messages:
 
     review_format = prefix + "reviews [add, remove, zkratka předmětu]"
     review_add_format = prefix + "reviews add [zkratka předmětu] [tier (0-4, kde 0" \
-                        " je nejlepší)] (anonym) (text)"
+                        " je nejlepší)] (text)"
 
     review_wrong_subject = "Nesprávná zkratka předmětu"
     review_tier = "Tier je z rozsahu 0-4, kde 0 je nejlepší"
@@ -187,6 +187,7 @@ class Messages:
     review_remove_success = "Hodnocení předmětu bylo odebráno"
     review_remove_error = "Hodnocení předmětu nebylo nalezeno"
     review_add_denied = "{user}, na přidání hodnocení předmětu nemáš právo."
+    review_not_on_server = "{user}, na použití tohto příkazu musíš být na Fitwide serveri."
     subject_format = prefix + "subject [add, remove] [zkratka předmětu]"
 
     pr_meme = "https://github.com/Toaster192/rubbergod/pulls"
@@ -211,7 +212,7 @@ class Messages:
              ('bajkarboard [offset]', 'Karma leaderboard reversed'),
              ('givingboard [offset]', 'Leaderboard rozdávání pozitivní karmy.'),
              ('ishaboard [offset]', 'Leaderboard rozdávání negativní karmy.'),
-             (review_add_format[1:], 'Přidá recenzi na předmět.'),
+             (review_add_format[1:], 'Přidá recenzi na předmět. Pro anonymní recenzi použijte DM.'),
              (review_get_format[1:], 'Vypíše recenze na vybraný předmět.'),
              (review_remove_format[1:], 'Odstraní hodnocení.'),
              ('vote', 'Zahájí hlasování.')],

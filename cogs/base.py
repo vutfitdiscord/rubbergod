@@ -109,7 +109,7 @@ class Base(commands.Cog):
         await ctx.send(rng.week())
 
     @commands.cooldown(rate=2, per=60.0, type=commands.BucketType.user)
-    @commands.command()
+    @commands.command(aliases=['help'])
     async def god(self, ctx):
         embed = self.reaction.make_embed(1)
 
