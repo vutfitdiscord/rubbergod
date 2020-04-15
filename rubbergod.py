@@ -4,14 +4,13 @@ import traceback
 from discord.ext import commands
 
 import utils
-from config import config, messages
-
+from config import config
 from features import presence
-from repository.review_repo import ReviewRepository
 from repository.database import database, session
 from repository.database.karma import Karma, Karma_emoji
-from repository.database.verification import Permit, Valid_person
 from repository.database.review import Review, ReviewRelevance, Subject
+from repository.database.verification import Permit, Valid_person
+from repository.review_repo import ReviewRepository
 
 
 # TODO move this ANYWHERE else
@@ -85,10 +84,9 @@ def load_dump():
 
 
 config = config.Config
-messages = messages.Messages
 
-bot = commands.Bot(command_prefix=commands.when_mentioned_or(
-                                      *config.command_prefix),
+bot = commands.Bot(
+    command_prefix=commands.when_mentioned_or(*config.command_prefix),
                    help_command=None,
                    case_insensitive=True)
 
@@ -119,8 +117,10 @@ async def on_error(event, *args, **kwargs):
     channel = bot.get_channel(config.bot_dev_channel)
     output = traceback.format_exc()
     print(output)
+    output = list(output[0+i:1900+i] for i in range(0, len(output), 1900))
     if channel is not None:
-        await channel.send("```\n" + output + "\n```")
+        for message in output:
+            await channel.send("```\n{}```".format(message))
 
 
 @bot.command()
@@ -129,12 +129,10 @@ async def pull(ctx):
         try:
             utils.git_pull()
             await ctx.send("Git pulled")
-        except:
+        except Exception:
             await ctx.send("Git pull error")
     else:
-        await ctx.send(
-            messages.insufficient_rights
-            .format(user=utils.generate_mention(ctx.author.id)))
+        await ctx.send(utils.fill_message("insufficient_rights", user=ctx.author.id))
 
 
 @bot.command()
@@ -143,12 +141,10 @@ async def load(ctx, extension):
         try:
             bot.load_extension(f'cogs.{extension}')
             await ctx.send(f'{extension} loaded')
-        except:
+        except Exception:
             await ctx.send("loading error")
     else:
-        await ctx.send(
-            messages.insufficient_rights
-            .format(user=utils.generate_mention(ctx.author.id)))
+        await ctx.send(utils.fill_message("insufficient_rights", user=ctx.author.id))
 
 
 @bot.command()
@@ -157,12 +153,10 @@ async def unload(ctx, extension):
         try:
             bot.unload_extension(f'cogs.{extension}')
             await ctx.send(f'{extension} unloaded')
-        except:
+        except Exception:
             await ctx.send("unloading error")
     else:
-        await ctx.send(
-            messages.insufficient_rights
-            .format(user=utils.generate_mention(ctx.author.id)))
+        await ctx.send(utils.fill_message("insufficient_rights", user=ctx.author.id))
 
 
 @bot.command()
@@ -171,12 +165,18 @@ async def reload(ctx, extension):
         try:
             bot.reload_extension(f'cogs.{extension}')
             await ctx.send(f'{extension} reloaded')
-        except:
+        except Exception:
             await ctx.send("reloading error")
     else:
-        await ctx.send(
-            messages.insufficient_rights
-            .format(user=utils.generate_mention(ctx.author.id)))
+        await ctx.send(utils.fill_message("insufficient_rights", user=ctx.author.id))
+
+
+@reload.error
+@load.error
+@unload.error
+async def missing_arg_error(ctx, error):
+    if isinstance(error, commands.errors.MissingRequiredArgument):
+        await ctx.send('Missing argument.')
 
 database.base.metadata.create_all(database.db)
 session.commit()  # Making sure

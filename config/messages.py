@@ -29,17 +29,17 @@ class Messages:
     spamming = "{user} Nespamuj tolik <:sadcat:576171980118687754>"
     insufficient_rights = "{user}, na použití tohoto příkazu nemáš právo."
     vote_room_only = "Tohle funguje jen v {room}."
-    bot_room_redirect = "{} <:sadcat:576171980118687754> 👉 " \
-                        "<#{}>\n"
+    bot_room_redirect = "{user} <:sadcat:576171980118687754> 👉 " \
+                        "<#{bot_room}>\n"
     message_link_prefix = 'https://discordapp.com/channels/' \
                           + str(config.Config.guild_id) + '/'
 
     uhoh_counter = "{uhohs} uh ohs od spuštění."
     uptime_message = "Up since:  `{boottime}`\nUptime:\t`{uptime}`"
-    kachna_remaining = "Do kachny zbývá:  `{zbyva}`"
-    kachna_opened = "Kachna otevřená ! <:hypers:493154327318233088>"
-    kachna_temp_closed = "Kachna je bohužel zavřena <:sadcat:576171980118687754>"
-    kachna_switched = "Kachna byla nastavena na: {open_closed}"
+
+    kachna_grillbot = "O Kachnu se teď stará Grillbot " \
+                      "<:feelsWowMan:493152294712377354> Použij $kachna."
+
     karma = "{user} Karma uzivatele `{target}` je: **{karma}** " \
             "(**{order}.**)\nA rozdal:\n" \
             "**{karma_pos}** pozitivní karmy " \
@@ -78,6 +78,7 @@ class Messages:
                                "ne {input}] [user(s)]` "
     karma_give_success = "Karma byla úspěšně přidaná."
     karma_give_negative_success = "Karma byla úspěšně odebraná."
+    karma_message_format = prefix + "karma message [url, id]"
     member_not_found = "{user} Nikoho takového jsem nenašel."
     karma_lederboard_offser_error = "{user} Špatný offset, zadej kladné číslo"
 
@@ -113,7 +114,7 @@ class Messages:
               "Implementovány featury podle obsahu: **8. Drop/Keep**"
 
     verify_already_verified = "{user} Už jsi byl verifikován " \
-                              "({toaster} pls)."
+                              "({admin} pls)."
     verify_send_format = "Očekávám jeden argument. " \
                          "Správný formát: " \
                          "`" + prefix + "getcode [FIT login, " \
@@ -125,7 +126,7 @@ class Messages:
                           "`" + prefix + "verify [login] [kód]`"
     verify_send_not_found = "{user} Login nenalezen " \
                             "nebo jsi už tímhle krokem " \
-                            "prošel ({toaster} pls)."
+                            "prošel ({admin} pls)."
     verify_verify_format = "Očekávám dva argumenty. " \
                            "Správný formát:\n" \
                            "`" + prefix + "verify [FIT login nebo " \
@@ -135,7 +136,7 @@ class Messages:
                            "xlogin00, nebo MUNI UCO]`"
     verify_verify_dumbshit = "{user} Kód, " \
                              "který ti přišel na mail. {emote}"
-    verify_verify_manual = "Čauec {user}, nechám {toaster}, " \
+    verify_verify_manual = "Čauec {user}, nechám {admin}, " \
                            "aby to udělal manuálně, " \
                            "jsi shady (Year: {year})"
     verify_verify_success = "{user} Gratuluji, byl jsi verifikován!"
@@ -146,7 +147,7 @@ class Messages:
 
     verify_verify_not_found = "{user} Login nenalezen nebo " \
                               "jsi už tímhle krokem prošel " \
-                              "({toaster} pls)."
+                              "({admin} pls)."
     verify_verify_wrong_code = "{user} Špatný kód."
 
     vote_format = "Použití vote:\n`" + prefix + "vote [datum] [čas] [otázka]\n[emoji]" \
@@ -172,9 +173,8 @@ class Messages:
     vote_result_none = "V hlasování „{question}“ nikdo nehlasoval. <:sadcat:576171980118687754>"
 
     review_format = prefix + "reviews [add, remove, zkratka předmětu]"
-    review_add_format = prefix + "reviews add [zkratka předmětu] [tier (0-4, kde 0" \
-                        " je nejlepší)] (text)"
-
+    review_add_format = prefix + "reviews add {ZkratkaPredmetu} {Tier (0-4, 0 je TOP)} (VolitelnyText)\n" \
+                        "Pro anonymní příspěvek použijte DM.\nNapříklad:\n`" + prefix +"reviews add IZP 2 text recenze`"
     review_wrong_subject = "Nesprávná zkratka předmětu"
     review_tier = "Tier je z rozsahu 0-4, kde 0 je nejlepší"
     review_text_len = "Maximální počet znaků v části 'text' je 1024"
@@ -183,6 +183,7 @@ class Messages:
 
     review_get_format = prefix + "reviews [zkratka předmětu]"
     review_remove_format = prefix + "reviews remove [zkratka předmětu]"
+    review_remove_format_admin = prefix + "reviews remove [zkratka předmětu, id + číslo]"
     review_remove_id_format = "reviews remove id [id]"
     review_remove_success = "Hodnocení předmětu bylo odebráno"
     review_remove_error = "Hodnocení předmětu nebylo nalezeno"
@@ -195,6 +196,9 @@ class Messages:
     question = ["<:what:638277508541710337>",
                 "<:wuuut:484470874003472394>",
                 "nech mě <:sadcat:576171980118687754>"]
+    
+    name_day_cz = "Dnes má svátek {name}"
+    name_day_sk = "Dnes má meniny {name}"
 
     info = [[('karma', 'Vypíše vaši karmu, kolik pozitivní a negativní karmy'
                        ' jste rozdali.'),
@@ -207,12 +211,14 @@ class Messages:
              ('karma vote',
               'Odstartuje hlasování o hodnotě zatím neohodnoceného emotu.'),
              ('karma revote [emote]',
-              'Odstartuje hlasování o nové hodnotě emotu.')],
+              'Odstartuje hlasování o nové hodnotě emotu.'),
+             ('karma message [url, id]',
+              'Zobrazí karmu získanou za zprávu')],
             [('leaderboard [offset]', 'Karma leaderboard'),
              ('bajkarboard [offset]', 'Karma leaderboard reversed'),
              ('givingboard [offset]', 'Leaderboard rozdávání pozitivní karmy.'),
              ('ishaboard [offset]', 'Leaderboard rozdávání negativní karmy.'),
-             (review_add_format[1:], 'Přidá recenzi na předmět. Pro anonymní recenzi použijte DM.'),
+             (review_add_format[1:], 'Přidá recenzi na předmět.'),
              (review_get_format[1:], 'Vypíše recenze na vybraný předmět.'),
              (review_remove_format[1:], 'Odstraní hodnocení.'),
              ('vote', 'Zahájí hlasování.')],

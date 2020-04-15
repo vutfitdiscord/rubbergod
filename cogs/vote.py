@@ -1,7 +1,7 @@
 import typing
 from datetime import datetime
 
-from discord import Reaction, RawReactionActionEvent, NotFound
+from discord import Reaction, RawReactionActionEvent, NotFound, HTTPException
 from discord.ext import commands
 from discord.ext.commands import BadArgument
 
@@ -86,8 +86,13 @@ class Vote(commands.Cog):
             return
 
         # print("Handling RAW")
-        if not await self.handle_raw_reaction(payload, True):
-            print("Couldn't find reaction, that is rather weird.")
+        try:
+            if not await self.handle_raw_reaction(payload, True):
+                print("Couldn't find reaction, that is rather weird.")
+        except HTTPException:
+            # ignore HTTP Exceptions
+            return
+
 
     @commands.Cog.listener()
     async def on_reaction_remove(self, reaction: Reaction, user):

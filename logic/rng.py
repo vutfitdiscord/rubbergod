@@ -31,8 +31,7 @@ class Rng:
             else:
                 y = 0
         except ValueError:
-            return Messages.rng_generator_format_number.format(
-                user=utils.generate_mention(message.author.id))
+            return utils.fill_message("rng_generator_format_number", user=message.author.id)
         if x > y:
             x, y = y, x  # variable values swap
         return randint(x, y)
@@ -43,7 +42,7 @@ class Rng:
 
     @staticmethod
     def week():
-        starting_week = 38  # School started at 5th week (winter in 37)
+        starting_week = 5  # School started at 5th week (winter in 37)
         week = date.today().isocalendar()[1]  # get actual week number
         stud_week = week - starting_week
         odd = "Lichý"

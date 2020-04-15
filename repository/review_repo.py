@@ -12,8 +12,10 @@ class ReviewRepository(BaseRepository):
         super().__init__()
 
     def get_subject_reviews(self, subject):
-        return session.query(Review, func.count(Review.relevance)
-            .filter(ReviewRelevance.vote == True)
+        return session.query(
+            Review,
+            func.count(Review.relevance)
+            .filter(ReviewRelevance.vote)
             .label('total')).filter(Review.subject == subject)\
             .outerjoin(Review.relevance).group_by(Review)\
             .order_by(desc('total'))
@@ -50,7 +52,7 @@ class ReviewRepository(BaseRepository):
             )
             session.add(review)
             session.commit()
-        except:
+        except Exception:
             session.rollback()
             raise
 

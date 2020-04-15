@@ -26,14 +26,14 @@ class Review(commands.Cog):
             guild = self.bot.get_guild(config.guild_id)
             member = guild.get_member(ctx.message.author.id)
             if member == None:
-                await ctx.send(messages.review_not_on_server.fromat(user=ctx.message.author.mention))
+                await ctx.send(utils.fill_message("review_not_on_server", user=ctx.message.author.mention))
                 return
             roles = member.roles
             if subcommand == 'add':
                 for role in roles:
                     if role.id in config.reviews_forbidden_roles:
-                        await ctx.send(messages.review_add_denied.format(
-                                    user=ctx.message.author.mention))
+                        await ctx.send(utils.fill_message("review_add_denied",
+                                       user=ctx.message.author.id))
                         return
                 if subject is None or tier is None:
                     await ctx.send(messages.review_add_format)
@@ -51,25 +51,28 @@ class Review(commands.Cog):
                 if args_len == 0:
                     args = None
                 try:
-                    self.rev.add_review(author, subject, tier, anonym, args)
-                except:
+                    self.rev.add_review(author, subject.lower(), tier, anonym, args)
+                except Exception:
                     await ctx.send(messages.review_wrong_subject)
                     return
                 await ctx.send(messages.review_added)
             elif subcommand == 'remove':
                 if subject is None:
-                    await ctx.send(messages.review_remove_format)
+                    if ctx.author.id == config.admin_id:
+                        await ctx.send(messages.review_remove_format_admin)
+                    else:
+                        await ctx.send(messages.review_remove_format)
                 elif subject == 'id':
                     if ctx.author.id == config.admin_id:
                         if tier is None:
                             await ctx.send(messages.review_remove_id_format)
                         else:
-                            review_repo.remove(tier)
+                            review_repo.remove(tier) # tier => ID of review
                             await ctx.send(messages.review_remove_success)
                     else:
-                        await ctx.send(messages.insufficient_rights.format(
-                                user=utils.generate_mention(ctx.author.id)))
+                        await ctx.send(utils.fill_message("insufficient_rights", user=ctx.author.id))
                 else:
+                    subject = subject.lower()
                     if self.rev.remove(str(ctx.message.author.id), subject):
                         await ctx.send(messages.review_remove_success)
                     else:
@@ -108,18 +111,18 @@ class Review(commands.Cog):
                 return
             if subcommand == "add":
                 for subject in subjects:
+                    subject = subject.lower()
                     self.rev.add_subject(subject)
                 await ctx.send(f'Zkratky `{subjects}` byli přidány')
             elif subcommand == "remove":
                 for subject in subjects:
+                    subject = subject.lower()
                     self.rev.remove_subject(subject)
                 await ctx.send(f'Zkratky `{subjects}` byli odebrány')
             else:
                 await ctx.send(messages.review_wrong_subject)
         else:
-            await ctx.send(
-                messages.insufficient_rights
-                .format(user=utils.generate_mention(ctx.author.id)))
+            await ctx.send(utils.fill_message("insufficient_rights", user=ctx.author.id))
 
 class Review_helper():
 
@@ -183,7 +186,7 @@ class Review_helper():
         if update:
             review_repo.update_review(update.id, tier, anonym, text)
         else:
-            review_repo.add_review(author_id, subject.lower(), tier, anonym, text)
+            review_repo.add_review(author_id, subject, tier, anonym, text)
 
     def list_reviews(self, subject):
         result = review_repo.get_subject(subject).first()

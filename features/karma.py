@@ -39,13 +39,10 @@ class Karma(BaseFeature):
 
     async def emoji_process_vote(self, channel, emoji):
         delay = cfg.vote_minutes * 60
-        message = await channel.send(
-            "{}\n{}".format(msg.karma_vote_message
-                            .format(emote=str(emoji)),
-                            msg.karma_vote_info
-                            .format(delay=str(delay // 60),
-                                    minimum=str(cfg.vote_minimum))))
-
+        message = utils.fill_message("karma_vote_message", emote=str(emoji))
+        message += '\n'
+        message += utils.fill_message("karma_vote_info", delay=str(delay//60), minimum=str(cfg.vote_minimum))
+        message = await channel.send(message)
         await message.add_reaction("✅")
         await message.add_reaction("❌")
         await message.add_reaction("0⃣")
@@ -102,17 +99,13 @@ class Karma(BaseFeature):
 
         if vote_value is None:
             self.repo.remove_emoji(emoji)
-            await message.channel.send(
-                msg.karma_vote_notpassed
-                .format(emote=str(emoji),
-                        minimum=str(cfg.vote_minimum)))
+            await message.channel.send(utils.fill_message("karma_vote_notpassed", 
+                                       emote=str(emoji), minimum=str(cfg.vote_minimum)))
 
         else:
             self.repo.set_emoji_value(emoji, vote_value)
-            await message.channel.send(
-                msg.karma_vote_result
-                .format(emote=str(emoji),
-                        result=str(vote_value)))
+            await message.channel.send(utils.fill_message("karma_vote_result",
+                                       emote=str(emoji), result=str(vote_value)))
 
     async def emoji_revote_value(self, message):
         content = message.content.split()
@@ -136,14 +129,11 @@ class Karma(BaseFeature):
 
         if vote_value is not None:
             self.repo.set_emoji_value(emoji, vote_value)
-            await message.channel.send(
-                msg.karma_vote_result
-                .format(emote=str(emoji), result=str(vote_value)))
+            await message.channel.send(utils.fill_message("karma_vote_result",
+                                       emote=str(emoji), result=str(vote_value)))
         else:
-            await message.channel.send(
-                msg.karma_vote_notpassed
-                .format(emote=str(emoji),
-                        minimum=str(cfg.vote_minimum)))
+            await message.channel.send(utils.fill_message("karma_vote_notpassed",
+                                       emote=str(emoji), minimum=str(cfg.vote_minimum)))
 
     async def emoji_get_value(self, message):
         content = message.content.split()
@@ -165,13 +155,9 @@ class Karma(BaseFeature):
         val = self.repo.emoji_value_raw(emoji)
 
         if val is not None:
-            await message.channel.send(
-                msg.karma_get
-                .format(emote=str(emoji), value=str(val)))
+            await message.channel.send(utils.fill_message("karma_get", emote=str(emoji), value=str(val)))
         else:
-            await message.channel.send(
-                msg.karma_get_emote_not_voted
-                .format(emote=str(emoji)))
+            await message.channel.send(utils.fill_message("karma_get_emote_not_voted", emote=str(emoji)))
 
     async def __make_emoji_list(self, guild, emojis):
         message = []
@@ -196,10 +182,8 @@ class Karma(BaseFeature):
                 # and as that will probably fail anyway, it'll jump to
                 # the discord.NotFound handler which will add it to
                 # the error message
-                emoji = next(
-                        (x for x in guild.emojis if x.id == int(emoji_id)),
-                        None
-                        )
+                emoji = next((x for x in guild.emojis if x.id == int(emoji_id)), None)
+
                 if emoji is None:
                     emoji = await guild.fetch_emoji(int(emoji_id))
 
@@ -227,8 +211,7 @@ class Karma(BaseFeature):
         for value in ['1', '-1']:
             emojis, is_error = await self.__make_emoji_list(
                     channel.guild,
-                    self.repo.get_ids_of_emojis_valued(value)
-                    )
+                    self.repo.get_ids_of_emojis_valued(value))
             error |= is_error
             try:
                 await channel.send("Hodnota " + value + ":")
@@ -249,10 +232,8 @@ class Karma(BaseFeature):
             try:
                 number = int(input_string[2])
             except ValueError:
-                await message.channel.send(
-                    msg.karma_give_format_number.format(
-                        input=input_string[2])
-                )
+                await message.channel.send(utils.fill_message("karma_give_format_number",
+                                                              input=input_string[2]))
                 return
             for member in message.mentions:
                 self.repo.update_karma(member, message.author, number)
@@ -267,15 +248,65 @@ class Karma(BaseFeature):
         if target is None:
             target = author
         k = self.repo.get_karma(target.id)
-        return msg.karma.format(user=utils.generate_mention(
-                                author.id),
-                                karma=k.karma.value,
-                                order=k.karma.position,
-                                target=target.display_name,
-                                karma_pos=k.positive.value,
-                                karma_pos_order=k.positive.position,
-                                karma_neg=k.negative.value,
-                                karma_neg_order=k.negative.position)
+        return utils.fill_message(
+            "karma",
+            user=author.id,
+            karma=k.karma.value,
+            order=k.karma.position,
+            target=target.display_name,
+            karma_pos=k.positive.value,
+            karma_pos_order=k.positive.position,
+            karma_neg=k.negative.value,
+            karma_neg_order=k.negative.position
+        )
+
+    async def message_karma(self, channel_out, msg):
+        author = channel_out.author
+        reactions = msg.reactions
+        colour = 0x6d6a69
+        output = {'-1': [], '1': [], '0': []}
+        karma = 0
+        for react in reactions:
+            emoji = react.emoji
+            val = self.repo.emoji_value_raw(emoji)
+            if val == 1:
+                output['1'].append(emoji)
+                karma += react.count
+                async for user in react.users():
+                    if user.id == msg.author.id:
+                        karma -= 1
+                        break
+            elif val == -1:
+                output['-1'].append(emoji)
+                karma -= react.count
+                async for user in react.users():
+                    if user.id == msg.author.id:
+                        karma += 1
+                        break
+            else:
+                output['0'].append(emoji)
+        embed = discord.Embed(title='Karma zprávy')
+        embed.add_field(name="Zpráva", value=msg.jump_url, inline=False)
+        for key in ['1', '-1', '0']:
+            if output[key]:
+                message = ""
+                for emoji in output[key]:
+                    message += str(emoji) + ' '
+                if key == '1':
+                    name = 'Pozitivní'
+                elif key == '0':
+                    name = 'Neutrální'
+                else:
+                    name = 'Negativní'
+                embed.add_field(name=name, value=message, inline=False)
+        if karma > 0:
+            colour = 0x34cb0b
+        elif karma < 0:
+            colour = 0xcb410b
+        embed.colour = colour
+        embed.set_footer(text=author, icon_url=author.avatar_url)
+        embed.add_field(name='Celková karma za zprávu:', value=karma, inline=False)
+        await channel_out.send(embed=embed)
 
     async def leaderboard(self, channel, action, order, start=1):
         output = "> "
