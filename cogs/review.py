@@ -1,6 +1,7 @@
 import discord
 from datetime import datetime
 from discord.ext import commands
+import re
 
 from config import config, messages
 from repository import review_repo
@@ -123,6 +124,101 @@ class Review(commands.Cog):
                 await ctx.send(messages.review_wrong_subject)
         else:
             await ctx.send(utils.fill_message("insufficient_rights", user=ctx.author.id))
+
+    @commands.Cog.listener()
+    async def on_raw_reaction_add(self, payload):
+        channel = self.bot.get_channel(payload.channel_id)
+        if channel is None:
+            return
+        if channel.type is discord.ChannelType.text:
+            guild = channel.guild
+        else:
+            guild = self.bot.get_guild(config.guild_id)
+            if guild is None:
+                raise Exception("Nemuzu najit guildu podle config.guild_id")
+        member = guild.get_member(payload.user_id)
+        try:
+            message = await channel.fetch_message(payload.message_id)
+        except discord.errors.NotFound:
+            return
+
+        if member is None or message is None or member.bot:
+            return
+
+        if payload.emoji.is_custom_emoji():
+            emoji = self.bot.get_emoji(payload.emoji.id)
+            if emoji is None:
+                emoji = payload.emoji
+        else:
+            emoji = payload.emoji.name
+
+        if message.embeds and message.embeds[0].title is not discord.Embed.Empty and\
+                re.match(".* reviews", message.embeds[0].title):
+            subject = message.embeds[0].title.split(' ', 1)[0]
+            footer = message.embeds[0].footer.text.split('|')[0]
+            pos = footer.find('/')
+            try:
+                page = int(footer[8:pos])
+                max_page = int(footer[(pos + 1):])
+            except ValueError:
+                await message.edit(content=messages.reviews_page_e, embed=None)
+                return
+            tier_average = message.embeds[0].description[-1]
+            if emoji in ["◀", "▶", "⏪"]:
+                next_page = utils.pagination_next(emoji, page, max_page)
+                if next_page:
+                    review = review_repo.get_subject_reviews(subject)
+                    if review.count() >= next_page:
+                        review = review.all()[next_page - 1].Review
+                        next_page = str(next_page) + "/" + str(max_page)
+                        embed = self.rev.make_embed(
+                            review, subject, tier_average, next_page)
+                        if embed.fields[3].name == "Text page":
+                            await message.add_reaction("🔼")
+                            await message.add_reaction("🔽")
+                        else:
+                            for emote in message.reactions:
+                                if emote.emoji == "🔼":
+                                    await message.remove_reaction("🔼", self.bot.user)
+                                    await message.remove_reaction("🔽", self.bot.user)
+                                    break
+                        await message.edit(embed=embed)
+            elif emoji in ["👍", "👎", "🛑"]:
+                review = review_repo.get_subject_reviews(subject)[page - 1].Review
+                if str(member.id) != review.member_ID:
+                    review_id = review.id
+                    if emoji == "👍":
+                        self.rev.add_vote(review_id, True, str(member.id))
+                    elif emoji == "👎":
+                        self.rev.add_vote(review_id, False, str(member.id))
+                    elif emoji == "🛑":
+                        review_repo.remove_vote(
+                            review_id, str(member.id))
+                    page = str(page) + "/" + str(max_page)
+                    embed = self.rev.make_embed(
+                        review, subject, tier_average, page)
+                    await message.edit(embed=embed)
+            elif emoji in ["🔼", "🔽"]:
+                if message.embeds[0].fields[3].name == "Text page":
+                    review = review_repo.get_subject_reviews(subject)
+                    if review:
+                        review = review[page - 1].Review
+                        text_page = message.embeds[0].fields[3].value
+                        pos = message.embeds[0].fields[3].value.find('/')
+                        max_text_page = int(text_page[(pos + 1):])
+                        text_page = int(text_page[:pos])
+                        next_text_page = utils.pagination_next(emoji, text_page,
+                                                              max_text_page)
+                        if next_text_page:
+                            page = str(page) + "/" + str(max_page)
+                            embed = self.rev.make_embed(
+                                review, subject, tier_average, page)
+                            embed = self.rev.change_text_page(
+                                review, embed, next_text_page, max_text_page)
+                            await message.edit(embed=embed)
+            if message.guild: # cannot remove reaction in DM
+                await message.remove_reaction(emoji, member)
+
 
 class Review_helper():
 

@@ -1,21 +1,17 @@
 import datetime
 import discord
 from discord.ext.commands import Bot
-import re
 
 import utils
 from config.config import Config
 from config.messages import Messages
 from features.base_feature import BaseFeature
 from features.acl import Acl
-from features.review import Review
 from repository.karma_repo import KarmaRepository
 from repository.acl_repo import AclRepository
-from repository.review_repo import ReviewRepository
 
 acl_repo = AclRepository()
 acl = Acl(acl_repo)
-review_r = ReviewRepository()
 
 
 class Reaction(BaseFeature):
@@ -23,7 +19,6 @@ class Reaction(BaseFeature):
     def __init__(self, bot: Bot, karma_repository: KarmaRepository):
         super().__init__(bot)
         self.karma_repo = karma_repository
-        self.review = Review(bot)
 
     def make_embed(self, page):
         embed = discord.Embed(title="Rubbergod",
@@ -171,7 +166,7 @@ class Reaction(BaseFeature):
         elif message.embeds and message.embeds[0].title == "Rubbergod":
             if emoji in ["◀", "▶"]:
                 page = int(message.embeds[0].footer.text[5])
-                next_page = self.pagination_next(emoji, page,
+                next_page = utils.pagination_next(emoji, page,
                                                  len(Messages.info))
                 if next_page:
                     embed = self.make_embed(next_page)
@@ -180,75 +175,6 @@ class Reaction(BaseFeature):
                 await message.remove_reaction(emoji, member)
             except Exception:
                 pass
-        elif message.embeds and\
-                message.embeds[0].title is not discord.Embed.Empty and\
-                re.match(".* reviews", message.embeds[0].title):
-            subject = message.embeds[0].title.split(' ', 1)[0]
-            footer = message.embeds[0].footer.text.split('|')[0]
-            pos = footer.find('/')
-            try:
-                page = int(footer[8:pos])
-                max_page = int(footer[(pos + 1):])
-            except ValueError:
-                await message.edit(content=Messages.reviews_page_e, embed=None)
-                return
-            tier_average = message.embeds[0].description[-1]
-            if emoji in ["◀", "▶", "⏪"]:
-                next_page = self.pagination_next(emoji, page, max_page)
-                if next_page:
-                    review = review_r.get_subject_reviews(subject)
-                    if review.count() >= next_page:
-                        review = review.all()[next_page - 1].Review
-                        next_page = str(next_page) + "/" + str(max_page)
-                        embed = self.review.make_embed(
-                            review, subject, tier_average, next_page)
-                        if embed.fields[3].name == "Text page":
-                            await message.add_reaction("🔼")
-                            await message.add_reaction("🔽")
-                        else:
-                            for emote in message.reactions:
-                                if emote.emoji == "🔼":
-                                    await message.remove_reaction("🔼", self.bot.user)
-                                    await message.remove_reaction("🔽", self.bot.user)
-                                    break
-                        await message.edit(embed=embed)
-            elif emoji in ["👍", "👎", "🛑"]:
-                review = review_r.get_subject_reviews(subject)[page - 1].Review
-                if str(member.id) != review.member_ID:
-                    review_id = review.id
-                    if emoji == "👍":
-                        self.review.add_vote(review_id, True, str(member.id))
-                    elif emoji == "👎":
-                        self.review.add_vote(review_id, False, str(member.id))
-                    elif emoji == "🛑":
-                        review_r.remove_vote(
-                            review_id, str(member.id))
-                    page = str(page) + "/" + str(max_page)
-                    embed = self.review.make_embed(
-                        review, subject, tier_average, page)
-                    await message.edit(embed=embed)
-            elif emoji in ["🔼", "🔽"]:
-                if message.embeds[0].fields[3].name == "Text page":
-                    review = review_r.get_subject_reviews(subject)
-                    if review:
-                        review = review[page - 1].Review
-                        text_page = message.embeds[0].fields[3].value
-                        pos = message.embeds[0].fields[3].value.find('/')
-                        max_text_page = int(text_page[(pos + 1):])
-                        text_page = int(text_page[:pos])
-                        next_text_page = self.pagination_next(emoji, text_page,
-                                                              max_text_page)
-                        if next_text_page:
-                            page = str(page) + "/" + str(max_page)
-                            embed = self.review.make_embed(
-                                review, subject, tier_average, page)
-                            embed = self.review.change_text_page(
-                                review, embed, next_text_page, max_text_page)
-                            await message.edit(embed=embed)
-            try:
-                await message.remove_reaction(emoji, member)
-            except Exception:
-                pass  # in DM
         elif member.id != message.author.id and\
                 guild.id == Config.guild_id and\
                 message.channel.id not in \
@@ -399,15 +325,3 @@ class Reaction(BaseFeature):
                 bot_room = self.bot.get_channel(Config.bot_room)
                 await bot_room.send(utils.fill_message("role_remove_denied",
                                     user=member.id, role=channel.name))
-
-    def pagination_next(self, emoji, page, max_page):
-        if emoji in ["▶", "🔽"]:
-            next_page = page + 1
-        elif emoji in ["◀", "🔼"]:
-            next_page = page - 1
-        elif emoji == "⏪":
-            next_page = 1
-        if 1 <= next_page <= max_page:
-            return next_page
-        else:
-            return 0
