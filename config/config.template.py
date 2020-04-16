@@ -1,6 +1,7 @@
 class Config:
     key = ''
     verification_role = ''
+    verification_role_id = 591349196267716608
     admin_id = 0  # for mention in case of false verification
     guild_id = 0
 
@@ -112,7 +113,8 @@ class Config:
         "zzn", "jad", "jad", "izsl", "zpo", "zpoe", "zpd", "zpja", "asd",
         "zre", "zree"
     ]
-    reviews_forbidden_roles = ["MUNI", "Host"]
+    #                            MUNI                Host
+    reviews_forbidden_roles = [600047283509264384, 603673568051462144]
 
     # How many people to print if the limit argument is not specified
     rolehoarder_default_limit = 10

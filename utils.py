@@ -58,3 +58,15 @@ def fill_message(message_name, *args, **kwargs):
         return template.format(*args, **kwargs)
     except AttributeError:
         raise ValueError("Invalid template {}".format(message_name))
+
+def pagination_next(emoji, page, max_page):
+    if emoji in ["▶", "🔽"]:
+        next_page = page + 1
+    elif emoji in ["◀", "🔼"]:
+        next_page = page - 1
+    elif emoji == "⏪":
+        next_page = 1
+    if 1 <= next_page <= max_page:
+        return next_page
+    else:
+        return 0
