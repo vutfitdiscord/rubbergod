@@ -27,15 +27,23 @@ class Review(commands.Cog):
             guild = self.bot.get_guild(config.guild_id)
             member = guild.get_member(ctx.message.author.id)
             if member == None:
-                await ctx.send(utils.fill_message("review_not_on_server", user=ctx.message.author.mention))
+                await ctx.send(utils.fill_message("review_not_on_server",
+                                                  user=ctx.message.author.mention))
                 return
             roles = member.roles
             if subcommand == 'add':
+                verify = False
                 for role in roles:
+                    if config.verification_role_id == role.id:
+                        verify = True
                     if role.id in config.reviews_forbidden_roles:
                         await ctx.send(utils.fill_message("review_add_denied",
                                        user=ctx.message.author.id))
                         return
+                if not verify:
+                    await ctx.send(utils.fill_message("review_add_denied", 
+                                   user=ctx.message.author.id))
+                    return
                 if subject is None or tier is None:
                     await ctx.send(messages.review_add_format)
                     return
@@ -71,7 +79,8 @@ class Review(commands.Cog):
                             review_repo.remove(tier) # tier => ID of review
                             await ctx.send(messages.review_remove_success)
                     else:
-                        await ctx.send(utils.fill_message("insufficient_rights", user=ctx.author.id))
+                        await ctx.send(utils.fill_message("insufficient_rights",
+                                                          user=ctx.author.id))
                 else:
                     subject = subject.lower()
                     if self.rev.remove(str(ctx.message.author.id), subject):

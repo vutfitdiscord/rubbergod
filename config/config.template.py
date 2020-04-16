@@ -1,6 +1,7 @@
 class Config:
     key = ''
     verification_role = ''
+    verification_role_id = 591349196267716608
     admin_id = 0  # for mention in case of false verification
     guild_id = 0
 
