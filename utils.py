@@ -1,4 +1,5 @@
 import git
+import discord
 from discord import Member
 
 from config.messages import Messages
@@ -51,6 +52,12 @@ def fill_message(message_name, *args, **kwargs):
 
     if 'admin' in kwargs:
         kwargs['admin'] = generate_mention(kwargs['admin'])
+
+    to_escape = ['role', 'not_role', 'line']
+
+    for arg in to_escape:
+        if arg in kwargs:
+            kwargs[arg] = discord.utils.escape_mentions(kwargs[arg])
 
     # Attempt to get message template and fill
     try:
