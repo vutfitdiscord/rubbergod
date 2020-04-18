@@ -173,10 +173,8 @@ class Messages:
     vote_result_none = "V hlasování „{question}“ nikdo nehlasoval. <:sadcat:576171980118687754>"
 
     review_format = prefix + "reviews [add, remove, zkratka předmětu]"
-    review_add_format = prefix + "reviews add {ZkratkaPredmetu} {Tier (0-4, 0 je TOP)} (anonym - Pokud si přejete anonymní příspěvek) (VolitelnyText)\n" \
-                        "Například:\nPro anonymní příspěvek: `" + prefix +"reviews add ITU 0 anonym text recenze`\n" \
-                        "Jinak: `" + prefix +"reviews add IZP 2 text recenze`"
-
+    review_add_format = prefix + "reviews add {ZkratkaPredmetu} {Tier (0-4, 0 je TOP)} (VolitelnyText)\n" \
+                        "Pro anonymní příspěvek použijte DM.\nNapříklad:\n`" + prefix +"reviews add IZP 2 text recenze`"
     review_wrong_subject = "Nesprávná zkratka předmětu"
     review_tier = "Tier je z rozsahu 0-4, kde 0 je nejlepší"
     review_text_len = "Maximální počet znaků v části 'text' je 1024"
@@ -190,6 +188,7 @@ class Messages:
     review_remove_success = "Hodnocení předmětu bylo odebráno"
     review_remove_error = "Hodnocení předmětu nebylo nalezeno"
     review_add_denied = "{user}, na přidání hodnocení předmětu nemáš právo."
+    review_not_on_server = "{user}, na použití tohto příkazu musíš být na Fitwide serveri."
     subject_format = prefix + "subject [add, remove] [zkratka předmětu]"
 
     pr_meme = "https://github.com/Toaster192/rubbergod/pulls"
