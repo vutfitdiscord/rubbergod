@@ -141,5 +141,5 @@ class Config:
     weather_token = "678a5932f6dd92ac668b20e9f89c0318"
 
     # Warphole config
-    warphole_sibling_id = 0
-    warphole_channel_id = 0
+    warphole_blue = 0
+    warphole_orange = 0

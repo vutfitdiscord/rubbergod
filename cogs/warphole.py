@@ -10,16 +10,20 @@ class Warphole(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
-        self.sibling = self.bot.get_user(config.warphole_sibling_id)
-        self.warp_channel = self.bot.get_channel(config.warphole_channel_id)
+        self.warp_channel_blue = self.bot.get_channel(config.warphole_blue)
+        self.warp_channel_orange = self.bot.get_channel(config.warphole_orange)
 
     @commands.Cog.listener()
     async def on_message(self, message):
-        if message.channel == self.warp_channel and not message.author.bot:
-            self.sibling.send(discord.utils.escape_mentions(message.content))
-        elif (isinstance(message.channel, discord.DMChannel) and
-              message.channel.recipient == self.sibling):
-            self.warp_channel.send(message.content)
+        if message.author == self.bot.user:
+            return
+
+        if message.channel == self.warp_channel_blue:
+            await self.warp_channel_orange.send(
+                    discord.utils.escape_mentions(message.content))
+        elif message.channel == self.warp_channel_orange:
+            await self.warp_channel_blue.send(
+                    discord.utils.escape_mentions(message.content))
 
 
 def setup(bot):
