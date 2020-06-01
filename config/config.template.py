@@ -145,3 +145,6 @@ class Config:
     # Warphole config
     warphole_blue = 0
     warphole_orange = 0
+
+    # warden
+    duplicate_limit = 0

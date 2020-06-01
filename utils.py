@@ -1,8 +1,10 @@
 import git
 import discord
 from discord import Member
+from discord.ext import commands
 
 from config.messages import Messages
+from config.config import Config
 
 
 def generate_mention(user_id):
@@ -77,3 +79,11 @@ def pagination_next(emoji, page, max_page):
         return next_page
     else:
         return 0
+
+def is_bot_owner(ctx: commands.Context):
+    return ctx.author.id == Config.admin_id
+
+# def is_mod(ctx: commands.Context):
+#     if Config.role_mod in ctx.bot.get_guild(Config.guild_id).get_member(ctx.author.id).roles:
+#         return True
+#     return False

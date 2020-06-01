@@ -200,6 +200,10 @@ class Messages:
     name_day_cz = "Dnes má svátek {name}"
     name_day_sk = "Dnes má meniny {name}"
 
+    repost_title = "Nápověda"
+    repost_description = "{user}, shoda **{value}**!"
+    repost_content = "Pokud obrázek je repost, dej mu ♻️.\nJestli není, klikni tady na ❎ a při {limit} takových reakcích se toho upozornění smaže."
+
     info = [[('karma', 'Vypíše vaši karmu, kolik pozitivní a negativní karmy'
                        ' jste rozdali.'),
              ('karma stalk [user]', 'Vypíše karmu uživatele, kolik pozitivní '
