@@ -1,4 +1,4 @@
-# stolem from rubbergoddess
+# stolen from rubbergoddess
 import datetime
 
 import psycopg2
@@ -32,7 +32,7 @@ class ImageRepository(BaseRepository):
         return session.query(Image).filter(Image.dhash == dhash).all()
 
     def getByMessage(self, message_id: int):
-        return session.query(Image).filter(Image.message_id == message_id).all()
+        return session.query(Image).filter(Image.message_id == message_id).one_or_none()
 
     def getAll(self):
         return session.query(Image)

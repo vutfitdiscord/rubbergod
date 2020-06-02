@@ -1,4 +1,4 @@
-# stolem from rubbergoddess
+# stolen from rubbergoddess
 import asyncio
 import time
 from io import BytesIO
@@ -10,7 +10,6 @@ from PIL import Image
 
 import utils
 from config import config, messages
-from core.text import text
 from repository import image_repo
 
 dhash.force_pil()
@@ -25,7 +24,7 @@ class Warden(commands.Cog):
     # TODO Implement ?deepscan to test against all database hashes
 
     def __init__(self, bot):
-        super().__init__(bot)
+        self.bot = bot
 
         self.limit_full = 3
         self.limit_hard = 7
@@ -35,7 +34,7 @@ class Warden(commands.Cog):
 
     def doCheckRepost(self, message: discord.Message):
         return (
-            message.channel.id in config.get("warden cog", "deduplication channels")
+            message.channel.id in config.deduplication_channels
             and message.attachments is not None
             and len(message.attachments) > 0
             and not message.author.bot
@@ -50,49 +49,48 @@ class Warden(commands.Cog):
     @commands.Cog.listener()
     async def on_message_delete(self, message: discord.Message):
         if self.doCheckRepost(message):
-            i = repo_i.deleteByMessage(message.id)
-            self.console.debug("Warden:on_message_delete", f"Removed {i} dhash(es) from database")
+            repo_i.deleteByMessage(message.id)
 
             # try to detect repost embed
             messages = await message.channel.history(
                 after=message, limit=10, oldest_first=True
             ).flatten()
-            for m in messages:
-                if not m.author.bot:
+            for mess in messages:
+                if not mess.author.bot:
                     continue
                 try:
-                    if str(message.id) == m.embeds[0].footer.text:
-                        await m.delete()
+                    if str(message.id) == mess.embeds[0].footer.text:
+                        await mess.delete()
                 except:
                     continue
 
     @commands.Cog.listener()
     async def on_raw_reaction_add(self, payload: discord.RawReactionActionEvent):
         """Delete duplicate embed if original is not a duplicate"""
-        if payload.channel_id not in config.get("warden cog", "deduplication channels"):
+        if payload.channel_id not in config.deduplication_channels:
             return
         if payload.member.bot:
             return
         try:
             message = (
-                await self.getGuild()
+                await self.bot.get_guild(config.guild_id)
                 .get_channel(payload.channel_id)
                 .fetch_message(payload.message_id)
             )
         except Exception as e:
-            self.console.debug("Warden:on_raw_reaction_add", "Message not found", e)
+            print("Warden:on_raw_reaction_add", "Message not found", e)
             return
         if not message or not message.author.bot:
             return
 
-        for r in message.reactions:
-            if r.emoji == "❎" and r.count > config.get("warden cog", "not duplicate limit"):
+        for react in message.reactions:
+            if react.emoji == "❎" and react.count > config.duplicate_limit:
                 try:
                     orig = message.embeds[0].footer.text
                     orig = await message.channel.fetch_message(int(orig))
                     await orig.remove_reaction("♻️", self.bot.user)
                 except Exception as e:
-                    self.console.debug("Warden:on_raw_reaction_add", "Could not remove ♻️", e)
+                    print("Warden:on_raw_reaction_add", "Could not remove ♻️", e)
                     return
                 await message.delete()
 
@@ -101,20 +99,20 @@ class Warden(commands.Cog):
             fp = BytesIO()
             await f.save(fp)
             try:
-                i = Image.open(fp)
+                image = Image.open(fp)
             except OSError as e:
                 # not an image
                 print(e)
                 continue
-            h = dhash.dhash_int(i)
+            img_hash = dhash.dhash_int(image)
 
             repo_i.add_image(
                 channel_id=message.channel.id,
                 message_id=message.id,
                 attachment_id=f.id,
-                dhash=str(hex(h)),
+                dhash=str(hex(img_hash)),
             )
-            yield h
+            yield img_hash
 
     @commands.group()
     @commands.check(utils.is_bot_owner)
@@ -193,7 +191,7 @@ class Warden(commands.Cog):
 
         duplicates = {}
         posts = repo_i.getLast(1000)
-        for h in hashes:
+        for img_hash in hashes:
             hamming_min = 128
             duplicate = None
             for post in posts:
@@ -202,23 +200,16 @@ class Warden(commands.Cog):
                     continue
                 # do the comparison
                 post_hash = int(post.dhash, 16)
-                hamming = dhash.get_num_bits_different(h, post_hash)
+                hamming = dhash.get_num_bits_different(img_hash, post_hash)
                 if hamming < hamming_min:
                     duplicate = post
                     hamming_min = hamming
 
             duplicates[duplicate] = hamming_min
 
-            await self.output.debug(
-                message.channel, f"Closest Hamming distance: {hamming_min}/128 bits"
-            )
-            self.console.debug(
-                "Warden:checkDuplicate", f"Closest Hamming distance: {hamming_min}/128 bits"
-            )
-
-        for d, h in duplicates.items():
-            if h <= self.limit_soft:
-                await self._announceDuplicate(message, d, h)
+        for duplicate, hamming_min in duplicates.items():
+            if hamming_min <= self.limit_soft:
+                await self._announceDuplicate(message, duplicate, hamming_min)
 
     async def _announceDuplicate(self, message: discord.Message, original: object, hamming: int):
         """Send message that a post is a original
@@ -226,18 +217,18 @@ class Warden(commands.Cog):
         hamming: Hamming distance between the image and closest database entry
         """
         if hamming <= self.limit_full:
-            t = "**♻️ To je repost!**"
+            title = "**♻️ To je repost!**"
             await message.add_reaction("♻️")
         elif hamming <= self.limit_hard:
-            t = "**♻️ To je asi repost**"
+            title = "**♻️ To je asi repost**"
             await message.add_reaction("🤔")
         else:
-            t = "To je možná repost"
+            title = "To je možná repost"
             await message.add_reaction("🤷🏻")
         prob = "{:.1f} %".format((1 - hamming / 128) * 100)
         timestamp = original.timestamp.strftime("%Y-%m-%d %H:%M:%S")
 
-        src_chan = self.getGuild().get_channel(original.channel_id)
+        src_chan = self.bot.get_guild(config.guild_id).get_channel(original.channel_id)
         try:
             src_post = await src_chan.fetch_message(original.message_id)
             link = src_post.jump_url
@@ -246,21 +237,21 @@ class Warden(commands.Cog):
             link = "404 <:sadcat:576171980118687754>"
             author = "_??? (404)_"
 
-        d = utils.fill_message(
+        desc = utils.fill_message(
             "repost_description",
             user=discord.utils.escape_markdown(message.author.display_name),
             value=prob,
         )
-        embed = discord.Embed(title=t, color=config.color, description=d, url=message.jump_url)
+        embed = discord.Embed(title=title, color=0xcb410b, description=desc, url=message.jump_url)
         embed.add_field(name=f"**{author}**, {timestamp}", value=link, inline=False)
 
         embed.add_field(
-            name=messages.repost_title,
+            name=messages.Messages.repost_title,
             value="_" + utils.fill_message("repost_content", limit=config.duplicate_limit) + "_",
         )
         embed.set_footer(text=message.id)
-        m = await message.channel.send(embed=embed)
-        await m.add_reaction("❎")
+        send = await message.channel.send(embed=embed)
+        await send.add_reaction("❎")
 
 
 def setup(bot):

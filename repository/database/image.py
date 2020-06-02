@@ -1,4 +1,4 @@
-# stolem from rubbergoddess
+# stolen from rubbergoddess
 from sqlalchemy import Column, String, BigInteger, DateTime
 from repository.database import database
 
@@ -6,7 +6,6 @@ from repository.database import database
 class Image(database.base):
     __tablename__ = "images"
 
-    # fmt: off
     attachment_id = Column(BigInteger, primary_key=True)
     message_id    = Column(BigInteger)
     channel_id    = Column(BigInteger)
