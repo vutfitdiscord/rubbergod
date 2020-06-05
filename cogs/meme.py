@@ -56,6 +56,8 @@ class Meme(commands.Cog):
         emojis = config.hug_emojis
 
         user = discord.utils.escape_markdown(user.display_name)
+        user = user.replace("@", "@ ")
+
         if 0 <= intensity < len(emojis):
             await ctx.send(emojis[intensity] + f" **{user}**")
         else:
