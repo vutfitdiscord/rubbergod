@@ -157,7 +157,7 @@ class Warden(commands.Cog):
         now = time.time()
         for i, message in enumerate(messages):
             # update info on every 10th message
-            if i % 10 == 0:
+            if i % 50 == 0:
                 await msg.edit(content=template.format(
                     i, len(messages), (i / len(messages) * 100),
                     ctr_hashes
@@ -190,7 +190,7 @@ class Warden(commands.Cog):
             return
 
         duplicates = {}
-        posts = repo_i.getLast(1000)
+        posts = repo_i.getAll()
         for img_hash in hashes:
             hamming_min = 128
             duplicate = None
