@@ -10,6 +10,7 @@ from repository.database import database, session
 from repository.database.karma import Karma, Karma_emoji
 from repository.database.review import Review, ReviewRelevance, Subject
 from repository.database.verification import Permit, Valid_person
+from repository.database.image import Image
 from repository.review_repo import ReviewRepository
 
 
