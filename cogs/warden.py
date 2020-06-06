@@ -186,7 +186,6 @@ class Warden(commands.Cog):
         hashes = [x async for x in self.saveMessageHashes(message)]
 
         if len(message.attachments) > 0 and len(hashes) == 0:
-            await message.add_reaction("▶")
             return
 
         duplicates = {}
