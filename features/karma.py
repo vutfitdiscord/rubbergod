@@ -334,6 +334,8 @@ class Karma(BaseFeature):
         else:
             raise Exception('Action neni get/give')
         output += "> =======================\n"
+        if action == 'get' and order == "DESC":
+            output += msg.karma_web
 
         board = self.repo.get_leaderboard(attribute, start-1)
         guild = self.bot.get_guild(cfg.guild_id)
