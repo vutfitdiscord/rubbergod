@@ -81,6 +81,7 @@ class Messages:
     karma_message_format = prefix + "karma message [url, id]"
     member_not_found = "{user} Nikoho takového jsem nenašel."
     karma_lederboard_offser_error = "{user} Špatný offset, zadej kladné číslo"
+    karma_web = "Celý leaderboard je dostupný na https://karma.grillbot.cloud/"
 
     role_add_denied = "{user}, na přidání role {role} nemáš právo."
     role_remove_denied = "{user}, " \
