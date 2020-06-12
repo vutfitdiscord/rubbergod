@@ -125,59 +125,51 @@ async def on_error(event, *args, **kwargs):
 
 
 @bot.command()
+@commands.check(utils.is_bot_owner)
 async def pull(ctx):
-    if ctx.author.id == config.admin_id:
-        try:
-            utils.git_pull()
-            await ctx.send("Git pulled")
-        except Exception:
-            await ctx.send("Git pull error")
-    else:
-        await ctx.send(utils.fill_message("insufficient_rights", user=ctx.author.id))
+    try:
+        utils.git_pull()
+        await ctx.send("Git pulled")
+    except Exception:
+        await ctx.send("Git pull error")
 
 
 @bot.command()
+@commands.check(utils.is_bot_owner)
 async def load(ctx, extension):
-    if ctx.author.id == config.admin_id:
-        try:
-            bot.load_extension(f'cogs.{extension}')
-            await ctx.send(f'{extension} loaded')
-        except Exception:
-            await ctx.send("loading error")
-    else:
-        await ctx.send(utils.fill_message("insufficient_rights", user=ctx.author.id))
-
+    try:
+        bot.load_extension(f'cogs.{extension}')
+        await ctx.send(f'{extension} loaded')
+    except Exception as e:
+        await ctx.send(f"loading error\n```\n{e}```")
 
 @bot.command()
+@commands.check(utils.is_bot_owner)
 async def unload(ctx, extension):
-    if ctx.author.id == config.admin_id:
-        try:
-            bot.unload_extension(f'cogs.{extension}')
-            await ctx.send(f'{extension} unloaded')
-        except Exception:
-            await ctx.send("unloading error")
-    else:
-        await ctx.send(utils.fill_message("insufficient_rights", user=ctx.author.id))
-
+    try:
+        bot.unload_extension(f'cogs.{extension}')
+        await ctx.send(f'{extension} unloaded')
+    except Exception as e:
+        await ctx.send(f"unloading error\n```\n{e}```")
 
 @bot.command()
+@commands.check(utils.is_bot_owner)
 async def reload(ctx, extension):
-    if ctx.author.id == config.admin_id:
-        try:
-            bot.reload_extension(f'cogs.{extension}')
-            await ctx.send(f'{extension} reloaded')
-        except Exception:
-            await ctx.send("reloading error")
-    else:
-        await ctx.send(utils.fill_message("insufficient_rights", user=ctx.author.id))
-
+    try:
+        bot.reload_extension(f'cogs.{extension}')
+        await ctx.send(f'{extension} reloaded')
+    except Exception as e:
+        await ctx.send(f"reloading error\n```\n{e}```")
 
 @reload.error
 @load.error
 @unload.error
+@pull.error
 async def missing_arg_error(ctx, error):
     if isinstance(error, commands.errors.MissingRequiredArgument):
         await ctx.send('Missing argument.')
+    if isinstance(error, commands.errors.CheckFailure):
+        await ctx.send(utils.fill_message("insufficient_rights", user=ctx.author.id))
 
 database.base.metadata.create_all(database.db)
 session.commit()  # Making sure
