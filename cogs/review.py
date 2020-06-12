@@ -269,9 +269,8 @@ class Review_helper():
             elif diff < 0:
                 colour = 0xcb410b
             id = review.id
-        embed.set_footer(text="Review: " + page + ' | ID: ' + str(id) +
-                         " | Last edited at: " +
-                         str(datetime.now().replace(microsecond=0)))
+        embed.set_footer(text="Review: " + page + ' | ID: ' + str(id))
+        embed.timestamp = datetime.now()
         embed.colour = colour
         return embed
 

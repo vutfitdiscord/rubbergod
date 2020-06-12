@@ -203,9 +203,7 @@ class Reaction(BaseFeature):
                     embed.add_field(name="In channel", value=message.channel)
                     embed.add_field(name="Message",
                                     value=message_link, inline=False)
-                    embed.set_footer(
-                        text=datetime.datetime.now().replace(microsecond=0)
-                    )
+                    embed.timestamp = datetime.datetime.now()
                     channel = self.bot.get_channel(Config.log_channel)
                     await channel.send(embed=embed)
                     try:
