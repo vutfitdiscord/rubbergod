@@ -89,6 +89,8 @@ class Warden(commands.Cog):
                     orig = message.embeds[0].footer.text
                     orig = await message.channel.fetch_message(int(orig))
                     await orig.remove_reaction("♻️", self.bot.user)
+                    await orig.remove_reaction("🤷🏻", self.bot.user)
+                    await orig.remove_reaction("🤔", self.bot.user)
                 except Exception as e:
                     print("Warden:on_raw_reaction_add", "Could not remove ♻️", e)
                     return
@@ -236,11 +238,7 @@ class Warden(commands.Cog):
             link = "404 <:sadcat:576171980118687754>"
             author = "_??? (404)_"
 
-        desc = utils.fill_message(
-            "repost_description",
-            user=discord.utils.escape_markdown(message.author.display_name),
-            value=prob,
-        )
+        desc = utils.fill_message("repost_description", user=message.author.id, value=prob)
         embed = discord.Embed(title=title, color=0xcb410b, description=desc, url=message.jump_url)
         embed.add_field(name=f"**{author}**, {timestamp}", value=link, inline=False)
 
