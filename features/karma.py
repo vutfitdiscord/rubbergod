@@ -1,4 +1,5 @@
 import asyncio
+import datetime
 
 import discord
 from discord import Emoji
@@ -309,44 +310,47 @@ class Karma(BaseFeature):
         await channel_out.send(embed=embed)
 
     async def leaderboard(self, channel, action, order, start=1):
-        output = "> "
         if action == 'give':
             if order == "DESC":
                 column = 'positive'
                 attribute = Database_karma.positive.desc()
                 emote = "<:peepolove:562305740132450359>"
-                output += emote + "KARMA GIVINGBOARD " + emote + "\n"
+                title = emote + "KARMA GIVINGBOARD " + emote
             else:
                 column = 'negative'
                 attribute = Database_karma.negative.desc()
                 emote = "<:ishagrin:638277508651024394>"
-                output += emote + " KARMA ISHABOARD " + emote + "\n"
+                title = emote + " KARMA ISHABOARD " + emote
         elif action == 'get':
             column = 'karma'
             if order == "DESC":
                 attribute = Database_karma.karma.desc()
                 emote = ":trophy:"
-                output += emote + " KARMA LEADERBOARD " + emote + "\n"
+                title = emote + " KARMA LEADERBOARD " + emote
             else:
                 attribute = Database_karma.karma
                 emote = "<:coolStoryArcasCZ:489539455271829514>"
-                output += emote + " KARMA BAJKARBOARD " + emote + "\n"
+                title = emote + " KARMA BAJKARBOARD " + emote
         else:
             raise Exception('Action neni get/give')
-        output += "> =======================\n"
-        if action == 'get' and order == "DESC":
-            output += msg.karma_web
 
         board = self.repo.get_leaderboard(attribute, start-1)
         guild = self.bot.get_guild(cfg.guild_id)
 
+        output = ""
         for i, user in enumerate(board, start):
             username = guild.get_member(int(user.member_ID))
             if username is None:
-                continue
-            username = discord.utils.escape_markdown(username.display_name)
-            line = '> {} – **{}**: {} pts\n'.format(i, username,
-                                                    getattr(user, column))
+                line = '{} – *User left*: {} pts\n'.format(i, getattr(user, column))
+            else:
+                username = discord.utils.escape_markdown(username.display_name)
+                line = '{} – **{}**: {} pts\n'.format(i, username, getattr(user, column))
             output += line
 
-        await channel.send(output)
+        embed = discord.Embed(title=title, description=output)
+        embed.timestamp = datetime.datetime.now()
+
+        if action == 'get' and order == "DESC":
+            embed.add_field(name=msg.karma_web_title, value=msg.karma_web)
+
+        await channel.send(embed=embed)
