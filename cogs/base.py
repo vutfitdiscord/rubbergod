@@ -68,10 +68,7 @@ class Base(commands.Cog):
         delta = now - boottime
         await ctx.send(utils.fill_message("uptime_message", boottime=str(boottime), uptime=str(delta)))
 
-    @commands.cooldown(rate=2, per=20.0, type=commands.BucketType.user)
-    @commands.command()
-    async def week(self, ctx):
-        await ctx.send(rng.week())
+    
 
     @commands.cooldown(rate=2, per=60.0, type=commands.BucketType.user)
     @commands.command(aliases=['help'])
