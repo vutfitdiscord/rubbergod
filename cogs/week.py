@@ -14,7 +14,7 @@ class week(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    #@commands.cooldown(rate=2, per=20.0, type=commands.BucketType.user)
+    @commands.cooldown(rate=2, per=20.0, type=commands.BucketType.user)
     @commands.command()
     async def week(self, ctx, *args):
         if args and args[0] == "set":
