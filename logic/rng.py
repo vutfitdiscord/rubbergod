@@ -1,4 +1,3 @@
-from datetime import date
 from random import randint, choice
 
 import utils
@@ -39,15 +38,3 @@ class Rng:
     @staticmethod
     def flip():
         return choice(["True", "False"])
-
-    @staticmethod
-    def week():
-        starting_week = 5  # School started at 5th week (winter in 37)
-        week = date.today().isocalendar()[1]  # get actual week number
-        stud_week = week - starting_week
-        odd = "Lichý"
-        even = "Sudý"
-        cal_type = even if week % 2 == 0 else odd
-        stud_type = even if stud_week % 2 == 0 else odd
-        return "Cal\t{}\t{}\nStd\t{}\t{}".format(cal_type, week,
-                                                 stud_type, stud_week)

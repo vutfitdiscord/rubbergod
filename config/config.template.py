@@ -21,7 +21,7 @@ class Config:
 
     # Extensions loaded on bot start
     extensions = ['base', 'karma', 'meme', 'random', 'verify', 'fitwide',
-                  'acl', 'review', 'vote', 'kachna', 'name_day']
+                  'acl', 'review', 'vote', 'kachna', 'name_day', "week", "weather"]
 
     # Roll dice
     max_dice_at_once = 1000
@@ -150,3 +150,6 @@ class Config:
     duplicate_limit = 5
     #                           #memes              #aww
     deduplication_channels = [461548323116154880, 543083844736253964]
+
+    # week command
+    starting_week = 5
