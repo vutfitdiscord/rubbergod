@@ -40,6 +40,8 @@ class Config:
 
     # Pin emoji count to pin
     pin_count = 20
+    #                       skolni-info          server-info
+    pin_banned_channels = [491277786489683979, 489461089432633346]
 
     # Special channel IDs
     log_channel = 531058805233156096

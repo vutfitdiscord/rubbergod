@@ -191,7 +191,8 @@ class Reaction(BaseFeature):
             for reaction in message.reactions:
                 if reaction.emoji == '📌' and \
                    reaction.count >= Config.pin_count and \
-                   not message.pinned:
+                   not message.pinned and \
+                   message.channel.id not in Config.pin_banned_channels:
                     embed = discord.Embed(title="📌 Auto pin message log",
                                           color=0xeee657)
                     users = await reaction.users().flatten()
