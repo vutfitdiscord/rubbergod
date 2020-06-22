@@ -208,6 +208,7 @@ class Reaction(BaseFeature):
                     await channel.send(embed=embed)
                     try:
                         await message.pin()
+                        await message.clear_reaction('📌')
                     except discord.HTTPException:
                         break
 
