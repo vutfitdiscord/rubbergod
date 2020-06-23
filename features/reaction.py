@@ -207,12 +207,10 @@ class Reaction(BaseFeature):
                     embed.timestamp = datetime.datetime.now()
                     channel = self.bot.get_channel(Config.log_channel)
                     await channel.send(embed=embed)
-                    try:
-                        await message.pin()
-                        await message.clear_reaction('📌')
-                    except discord.HTTPException:
-                        break
-
+                    await message.pin()
+                    await message.clear_reaction('📌')
+                    break
+                        
     async def remove(self, payload):
         channel = self.bot.get_channel(payload.channel_id)
         if channel is None:
