@@ -42,7 +42,8 @@ class Base(commands.Cog):
             return
 
         if isinstance(error, commands.CommandNotFound):
-            if not ctx.message.content.startswith('!'):
+            prefix = ctx.message.content[:1]
+            if prefix not in config.ignored_prefixes:
                 await ctx.send(messages.no_such_command)
             return
 
