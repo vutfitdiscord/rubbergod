@@ -6,12 +6,6 @@ from discord.ext import commands
 import utils
 from config import config
 from features import presence
-from repository.database import database, session
-from repository.database.karma import Karma, Karma_emoji
-from repository.database.review import Review, ReviewRelevance, Subject
-from repository.database.verification import Permit, Valid_person
-from repository.database.image import Image
-from repository.review_repo import ReviewRepository
 
 import repository.db_migrations as migrations
 
@@ -40,8 +34,8 @@ config = config.Config
 
 bot = commands.Bot(
     command_prefix=commands.when_mentioned_or(*config.command_prefix),
-                   help_command=None,
-                   case_insensitive=True)
+    help_command=None,
+    case_insensitive=True)
 
 presence = presence.Presence(bot)
 
@@ -84,6 +78,7 @@ async def load(ctx, extension):
     except Exception as e:
         await ctx.send(f"loading error\n```\n{e}```")
 
+
 @bot.command()
 @commands.check(utils.is_bot_owner)
 async def unload(ctx, extension):
@@ -92,6 +87,7 @@ async def unload(ctx, extension):
         await ctx.send(f'{extension} unloaded')
     except Exception as e:
         await ctx.send(f"unloading error\n```\n{e}```")
+
 
 @bot.command()
 @commands.check(utils.is_bot_owner)
@@ -102,6 +98,7 @@ async def reload(ctx, extension):
     except Exception as e:
         await ctx.send(f"reloading error\n```\n{e}```")
 
+
 @reload.error
 @load.error
 @unload.error
@@ -110,7 +107,8 @@ async def missing_arg_error(ctx, error):
     if isinstance(error, commands.errors.MissingRequiredArgument):
         await ctx.send('Missing argument.')
     if isinstance(error, commands.errors.CheckFailure):
-        await ctx.send(utils.fill_message("insufficient_rights", user=ctx.author.id))
+        await ctx.send(
+            utils.fill_message("insufficient_rights", user=ctx.author.id))
 
 # Create missing tables at start
 migrations.init_db()
