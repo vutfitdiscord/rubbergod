@@ -18,6 +18,7 @@ class Config:
     # Base bot behavior
     command_prefix = ('?', '!')
     default_prefix = '?'
+    ignored_prefixes = ('!')
 
     # Extensions loaded on bot start
     extensions = ['base', 'karma', 'meme', 'random', 'verify', 'fitwide',
