@@ -22,7 +22,7 @@ parser.add_argument('--load_dump', type=str,
 parser.add_argument('--load_subjects', action='store_true',
                     help='Fills DB with subjects.')
 parser.add_argument('--init_db', action='store_true',
-                    help='Creates missing DB tables.')
+                    help='Creates missing DB tables without start bot.')
 args = parser.parse_args()
 
 if args.load_dump is not None:
@@ -111,6 +111,9 @@ async def missing_arg_error(ctx, error):
         await ctx.send('Missing argument.')
     if isinstance(error, commands.errors.CheckFailure):
         await ctx.send(utils.fill_message("insufficient_rights", user=ctx.author.id))
+
+# Create missing tables at start
+migrations.init_db()
 
 for extension in config.extensions:
     bot.load_extension(f'cogs.{extension}')
