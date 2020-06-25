@@ -69,7 +69,6 @@ class Base(commands.Cog):
         delta = now - boottime
         await ctx.send(utils.fill_message("uptime_message", boottime=str(boottime), uptime=str(delta)))
 
-    
 
     @commands.cooldown(rate=2, per=60.0, type=commands.BucketType.user)
     @commands.command(aliases=['help'])
@@ -85,8 +84,10 @@ class Base(commands.Cog):
                 return
         else:
             msg = await ctx.send(embed=embed)
-        await msg.add_reaction("◀")
-        await msg.add_reaction("▶")
+
+        if len(messages.info) > 1:
+            await msg.add_reaction("◀")
+            await msg.add_reaction("▶")
 
 
 def setup(bot):
