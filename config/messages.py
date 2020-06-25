@@ -121,8 +121,8 @@ class Messages:
                               "({admin} pls)."
     verify_send_format = "Očekávám jeden argument. " \
                          "Správný formát: " \
-                         "`" + prefix + "getcode [FIT login, " \
-                         "ve tvaru xlogin00, nebo MUNI UCO]`"
+                         "`" + prefix + "getcode FIT login, " \
+                         "ve tvaru xlogin00, nebo MUNI UCO`"
     verify_send_dumbshit = "{user} Tvůj login. {emote}"
     verify_send_success = "{user} Kód byl odeslán na tvůj mail " \
                           "({mail})!\n" \
