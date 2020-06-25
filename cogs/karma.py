@@ -1,3 +1,4 @@
+from cogs.base_cog import BaseCog
 import discord
 from discord.ext import commands
 
@@ -12,7 +13,6 @@ karma_r = karma_repo.KarmaRepository()
 config = config.Config
 messages = messages.Messages
 
-from cogs.base_cog import BaseCog
 
 class Karma(BaseCog):
 
@@ -91,8 +91,8 @@ class Karma(BaseCog):
                     except discord.errors.Forbidden:
                         return
                 else:
-                    await ctx.send(utils.fill_message("vote_room_only",
-                                                      room=discord.utils.get(ctx.guild.channels, id=config.vote_room)))
+                    dc_vote_room = discord.utils.get(ctx.guild.channels, id=config.vote_room)
+                    await ctx.send(utils.fill_message("vote_room_only", room=dc_vote_room))
 
         elif args[0] == "vote":
             if not await self.check.guild_check(ctx.message):
@@ -106,14 +106,14 @@ class Karma(BaseCog):
                     except discord.errors.Forbidden:
                         return
                 else:
-                    await ctx.send(utils.fill_message("vote_room_only",
-                                                      room=discord.utils.get(ctx.guild.channels, id=config.vote_room)))
+                    dc_vote_room = discord.utils.get(ctx.guild.channels, id=config.vote_room)
+                    await ctx.send(utils.fill_message("vote_room_only", room=dc_vote_room))
 
         elif args[0] == "give":
-            if ctx.author.id == config.admin_id:
-                await karma.karma_give(ctx.message)
-            else:
-                await ctx.send(utils.fill_message("insufficient_rights", user=ctx.author.id))
+            if not self.validate_admin_rights(ctx):
+                return
+
+            await karma.karma_give(ctx.message)
 
         elif args[0] == "message":
             try:
@@ -135,44 +135,36 @@ class Karma(BaseCog):
     @commands.cooldown(rate=2, per=30.0, type=commands.BucketType.user)
     @commands.command()
     async def leaderboard(self, ctx, start=1):
-        if (not 0 < start < 100000000): # Any value larger than the server
-                                        # user cnt and lower than 32bit
-                                        # int max will do
-            await ctx.send(utils.fill_message("karma_lederboard_offser_error", user=ctx.author.id))
+        if not self.validate_leaderboard_offset(start):
             return
+
         await self.karma.leaderboard(ctx.message.channel, 'get', 'DESC', start)
         await self.check.botroom_check(ctx.message)
 
     @commands.cooldown(rate=2, per=30.0, type=commands.BucketType.user)
     @commands.command()
     async def bajkarboard(self, ctx, start=1):
-        if (not 0 < start < 100000000): # Any value larger than the server
-                                        # user cnt and lower than 32bit
-                                        # int max will do
-            await ctx.send(utils.fill_message("karma_lederboard_offser_error", user=ctx.author.id))
+        if not self.validate_leaderboard_offset(start):
             return
+
         await self.karma.leaderboard(ctx.message.channel, 'get', 'ASC', start)
         await self.check.botroom_check(ctx.message)
 
     @commands.cooldown(rate=2, per=30.0, type=commands.BucketType.user)
     @commands.command()
     async def givingboard(self, ctx, start=1):
-        if (not 0 < start < 100000000): # Any value larger than the server
-                                        # user cnt and lower than 32bit
-                                        # int max will do
-            await ctx.send(utils.fill_message("karma_lederboard_offser_error", user=ctx.author.id))
+        if not self.validate_leaderboard_offset(start):
             return
+
         await self.karma.leaderboard(ctx.message.channel, 'give', 'DESC', start)
         await self.check.botroom_check(ctx.message)
 
     @commands.cooldown(rate=2, per=30.0, type=commands.BucketType.user)
     @commands.command()
     async def ishaboard(self, ctx, start=1):
-        if (not 0 < start < 100000000): # Any value larger than the server
-                                        # user cnt and lower than 32bit
-                                        # int max will do
-            await ctx.send(utils.fill_message("karma_lederboard_offser_error", user=ctx.author.id))
+        if not self.validate_leaderboard_offset(start):
             return
+
         await self.karma.leaderboard(ctx.message.channel, 'give', 'ASC', start)
         await self.check.botroom_check(ctx.message)
 
@@ -183,6 +175,15 @@ class Karma(BaseCog):
     async def leaderboard_error(self, ctx, error):
         if isinstance(error, commands.BadArgument):
             await ctx.send(utils.fill_message("karma_lederboard_offser_error", user=ctx.author.id))
+
+    async def validate_leaderboard_offset(self, offset: int, ctx: commands.Context) -> bool:
+        if (not 0 < offset < 100000000):  # Any value larger than the server
+            # user cnt and lower than 32bit
+            # int max will do
+            await ctx.send(utils.fill_message("karma_lederboard_offser_error", user=ctx.author.id))
+            return False
+
+        return True
 
 
 def setup(bot):
