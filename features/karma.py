@@ -2,7 +2,7 @@ import asyncio
 import datetime
 
 import discord
-from discord import Emoji
+from discord import Emoji, TextChannel, Member
 from discord.ext.commands import Bot
 from emoji import demojize
 
@@ -244,6 +244,22 @@ class Karma(BaseFeature):
                 await message.channel.send(
                     msg.karma_give_negative_success
                 )
+
+    async def karma_transfer(self, message: TextChannel):
+        input_string = message.content.split()
+        if len(input_string) < 4 or len(message.mentions) < 2:
+            await message.channel.send(msg.karma_transfer_format)
+            return
+
+        try:
+            from_user: Member = message.mentions[0]
+            to_user: Member = message.mentions[1]
+
+            self.repo.transfer_karma(from_user, to_user)
+            await self.reply_to_channel(message.channel, msg.karma_transfer_complete)
+        except ValueError:
+            await self.reply_to_channel(message.channel, msg.karma_transfer_format)
+            return
 
     def karma_get(self, author, target=None):
         if target is None:

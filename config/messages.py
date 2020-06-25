@@ -83,6 +83,8 @@ class Messages:
     karma_lederboard_offser_error = "{user} Špatný offset, zadej kladné číslo"
     karma_web_title = "Celý leaderboard"
     karma_web = "https://karma.grillbot.cloud/"
+    karma_transfer_format = "Formát je `" + prefix + "karma transfer [od koho] [komu]`"
+    karma_transfer_complete = "Karma byla úspěšně převedena."
 
     role_add_denied = "{user}, na přidání role {role} nemáš právo."
     role_remove_denied = "{user}, " \
@@ -176,7 +178,8 @@ class Messages:
 
     review_format = prefix + "reviews [add, remove, zkratka předmětu]"
     review_add_format = prefix + "reviews add {ZkratkaPredmetu} {Tier (0-4, 0 je TOP)} (VolitelnyText)\n" \
-                        "Pro anonymní příspěvek použijte DM.\nNapříklad:\n`" + prefix +"reviews add IZP 2 text recenze`"
+        "Pro anonymní příspěvek použijte DM.\nNapříklad:\n`" + \
+        prefix + "reviews add IZP 2 text recenze`"
     review_wrong_subject = "Nesprávná zkratka předmětu"
     review_tier = "Tier je z rozsahu 0-4, kde 0 je nejlepší"
     review_text_len = "Maximální počet znaků v části 'text' je 1024"
@@ -185,7 +188,8 @@ class Messages:
 
     review_get_format = prefix + "reviews [zkratka předmětu]"
     review_remove_format = prefix + "reviews remove [zkratka předmětu]"
-    review_remove_format_admin = prefix + "reviews remove [zkratka předmětu, id + číslo]"
+    review_remove_format_admin = prefix + \
+        "reviews remove [zkratka předmětu, id + číslo]"
     review_remove_id_format = "reviews remove id [id]"
     review_remove_success = "Hodnocení předmětu bylo odebráno"
     review_remove_error = "Hodnocení předmětu nebylo nalezeno"
@@ -198,7 +202,7 @@ class Messages:
     question = ["<:what:638277508541710337>",
                 "<:wuuut:484470874003472394>",
                 "nech mě <:sadcat:576171980118687754>"]
-    
+
     name_day_cz = "Dnes má svátek {name}"
     name_day_sk = "Dnes má meniny {name}"
 
@@ -222,7 +226,8 @@ class Messages:
               'Zobrazí karmu získanou za zprávu')],
             [('leaderboard [offset]', 'Karma leaderboard'),
              ('bajkarboard [offset]', 'Karma leaderboard reversed'),
-             ('givingboard [offset]', 'Leaderboard rozdávání pozitivní karmy.'),
+             ('givingboard [offset]',
+              'Leaderboard rozdávání pozitivní karmy.'),
              ('ishaboard [offset]', 'Leaderboard rozdávání negativní karmy.'),
              (review_add_format[1:], 'Přidá recenzi na předmět.'),
              (review_get_format[1:], 'Vypíše recenze na vybraný předmět.'),

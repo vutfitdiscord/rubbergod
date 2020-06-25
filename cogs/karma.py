@@ -12,11 +12,12 @@ karma_r = karma_repo.KarmaRepository()
 config = config.Config
 messages = messages.Messages
 
+from cogs.base_cog import BaseCog
 
-class Karma(commands.Cog):
+class Karma(BaseCog):
 
     def __init__(self, bot):
-        self.bot = bot
+        super().__init__(bot)
         self.karma = karma.Karma(bot, karma_r)
         self.check = room_check.RoomCheck(bot)
         self.reaction = reaction.Reaction(bot, karma_r)
@@ -60,7 +61,7 @@ class Karma(commands.Cog):
             try:
                 converter = commands.MemberConverter()
                 target_member = await converter.convert(
-                        ctx=ctx, argument=' '.join(args[1:]))
+                    ctx=ctx, argument=' '.join(args[1:]))
             except commands.errors.BadArgument:
                 await ctx.send(utils.fill_message("member_not_found", user=ctx.author.id))
                 return
@@ -91,7 +92,7 @@ class Karma(commands.Cog):
                         return
                 else:
                     await ctx.send(utils.fill_message("vote_room_only",
-                                   room=discord.utils.get(ctx.guild.channels, id=config.vote_room)))
+                                                      room=discord.utils.get(ctx.guild.channels, id=config.vote_room)))
 
         elif args[0] == "vote":
             if not await self.check.guild_check(ctx.message):
@@ -105,8 +106,8 @@ class Karma(commands.Cog):
                     except discord.errors.Forbidden:
                         return
                 else:
-                    await ctx.send(utils.fill_message("vote_room_only", 
-                                   room=discord.utils.get(ctx.guild.channels, id=config.vote_room)))
+                    await ctx.send(utils.fill_message("vote_room_only",
+                                                      room=discord.utils.get(ctx.guild.channels, id=config.vote_room)))
 
         elif args[0] == "give":
             if ctx.author.id == config.admin_id:
@@ -118,11 +119,16 @@ class Karma(commands.Cog):
             try:
                 converter = commands.MessageConverter()
                 target_message = await converter.convert(
-                        ctx=ctx, argument=' '.join(args[1:]))
+                    ctx=ctx, argument=' '.join(args[1:]))
             except commands.errors.BadArgument:
                 await ctx.send(utils.fill_message("karma_message_format", user=ctx.author.id))
                 return
             await karma.message_karma(ctx, target_message)
+        elif args[0] == "transfer":
+            if not await self.validate_admin_rights(ctx):
+                return
+
+            await karma.karma_transfer(ctx.message)
         else:
             await ctx.send(utils.fill_message("karma_invalid_command", user=ctx.author.id))
 

@@ -136,3 +136,11 @@ class KarmaRepository(BaseRepository):
         leaderboard = session.query(Karma).\
                 order_by(atribute).offset(offset).limit(10)
         return leaderboard
+
+    def transfer_karma(self, from_user, to_user):
+        from_user_karma = self.get_karma_object(from_user.id)
+
+        self.update_karma_get(to_user, from_user_karma.karma)
+        self.update_karma_get(from_user, -from_user_karma.karma)
+
+        session.commit()
