@@ -210,6 +210,8 @@ class Messages:
     repost_description = "{user}, shoda **{value}**!"
     repost_content = "Pokud obrázek je repost, dej mu ♻️.\nJestli není, klikni tady na ❎ a při {limit} takových reakcích se toho upozornění smaže."
 
+    on_ready_message = "<:peepowave:693070888546861096>"
+
     info = [[('karma', 'Vypíše vaši karmu, kolik pozitivní a negativní karmy'
                        ' jste rozdali.'),
              ('karma stalk [user]', 'Vypíše karmu uživatele, kolik pozitivní '

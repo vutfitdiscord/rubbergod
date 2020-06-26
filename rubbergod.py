@@ -1,9 +1,11 @@
 import traceback
 import argparse
 
+from discord import TextChannel
 from discord.ext import commands
 
 import utils
+from config.messages import Messages
 from config.app_config import Config
 from features import presence
 
@@ -31,6 +33,7 @@ elif args.init_db:
     exit(0)
 
 config = Config
+is_initialized = False
 
 bot = commands.Bot(
     command_prefix=commands.when_mentioned_or(*config.command_prefix),
@@ -42,10 +45,19 @@ presence = presence.Presence(bot)
 
 @bot.event
 async def on_ready():
-    """If RGod is ready"""
-    print("Ready")
+    """If RubberGod is ready"""
+    # Inspirated from https://github.com/sinus-x/rubbergoddess/blob/master/rubbergoddess.py
+    global is_initialized
+    if is_initialized:
+        return
+    is_initialized = True
+
+    bot_room: TextChannel = bot.get_channel(config.bot_room)
+    if bot_room is not None:
+        await bot_room.send(Messages.on_ready_message)
 
     await presence.set_presence()
+    print("Ready")
 
 
 @bot.event
