@@ -132,12 +132,6 @@ class Config:
     # grillbot
     grillbot_id = 0
 
-    # kachna countdown
-    kachna_open_hour = 16
-    kachna_close_hour = 22
-    kachna_open_days = [0, 2] # 0 = Monday, 1=Tuesday, 2=Wednesday...
-    kachna_temp_closed = False
-
     # name day source url
     name_day_url_cz = "http://svatky.adresa.info/json"
     name_day_url_sk = "http://svatky.adresa.info/json?lang=sk"
