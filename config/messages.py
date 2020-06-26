@@ -1,8 +1,8 @@
-from config import config
+from config.app_config import Config
 
 
 class Messages:
-    prefix = config.Config.default_prefix
+    prefix = Config.default_prefix
 
     server_warning = "Tohle funguje jen na VUT FIT serveru."
     karma_get_missing = "Toaster pls, měls bordel v DB. Musel jsem za tebe uklidit."
@@ -32,7 +32,7 @@ class Messages:
     bot_room_redirect = "{user} <:sadcat:576171980118687754> 👉 " \
                         "<#{bot_room}>\n"
     message_link_prefix = 'https://discordapp.com/channels/' \
-                          + str(config.Config.guild_id) + '/'
+                          + str(Config.guild_id) + '/'
 
     uhoh_counter = "{uhohs} uh ohs od spuštění."
     uptime_message = "Up since:  `{boottime}`\nUptime:\t`{uptime}`"

@@ -4,7 +4,7 @@ import argparse
 from discord.ext import commands
 
 import utils
-from config import config
+from config.app_config import Config
 from features import presence
 
 import repository.db_migrations as migrations
@@ -30,7 +30,7 @@ elif args.init_db:
     print('Init complete')
     exit(0)
 
-config = config.Config
+config = Config
 
 bot = commands.Bot(
     command_prefix=commands.when_mentioned_or(*config.command_prefix),

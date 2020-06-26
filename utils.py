@@ -4,7 +4,7 @@ from discord import Member
 from discord.ext import commands
 
 from config.messages import Messages
-from config.config import Config
+from config.app_config import Config
 
 
 def generate_mention(user_id):

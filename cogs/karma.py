@@ -110,7 +110,7 @@ class Karma(BaseCog):
                     await ctx.send(utils.fill_message("vote_room_only", room=dc_vote_room))
 
         elif args[0] == "give":
-            if not self.validate_admin_rights(ctx):
+            if not await self.validate_admin_rights(ctx):
                 return
 
             await karma.karma_give(ctx.message)
