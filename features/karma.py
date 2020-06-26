@@ -7,7 +7,7 @@ from discord.ext.commands import Bot
 from emoji import demojize
 
 import utils
-from config import config, messages
+from config import app_config as config, messages
 from features.base_feature import BaseFeature
 from repository.karma_repo import KarmaRepository
 from repository.database.karma import Karma as Database_karma

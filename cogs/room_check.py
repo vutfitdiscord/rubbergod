@@ -1,5 +1,5 @@
 import utils
-from config import config
+from config import app_config as config
 
 config = config.Config
 

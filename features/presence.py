@@ -4,7 +4,7 @@ import discord
 from discord.ext.commands import Bot
 
 import utils
-from config.config import Config
+from config import app_config as config
 from features.base_feature import BaseFeature
 
 
@@ -14,7 +14,7 @@ class Presence(BaseFeature):
 
         self.activity = discord.Game(
             start=datetime.datetime.utcnow(),
-            name=Config.default_prefix + 'god'
+            name=config.Config.default_prefix + 'god'
             ' | Running hash ' + utils.git_hash()[:7])
 
     async def set_presence(self):

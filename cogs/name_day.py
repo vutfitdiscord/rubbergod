@@ -4,7 +4,7 @@ import discord
 from discord.ext import commands
 
 import utils
-from config import config, messages
+from config import app_config as config, messages
 
 config = config.Config
 messages = messages.Messages

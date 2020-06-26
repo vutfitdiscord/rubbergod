@@ -3,7 +3,7 @@ import discord
 from discord.ext import commands
 
 import utils
-from config import messages, config
+from config import app_config as config, messages
 from features import karma, reaction
 from repository import karma_repo
 from cogs import room_check

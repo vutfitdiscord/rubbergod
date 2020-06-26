@@ -2,7 +2,7 @@ from discord.ext.commands import Bot
 from discord.ext import commands
 
 import utils
-from config import config
+from config import app_config as config
 
 
 class BaseCog(commands.Cog):

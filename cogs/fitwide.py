@@ -6,7 +6,7 @@ from discord.ext import commands
 
 
 import utils
-from config import config
+from config import app_config as config
 from features import verification
 from repository import user_repo
 from repository.database import database, session

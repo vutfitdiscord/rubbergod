@@ -1,6 +1,6 @@
 from discord import Member
 from discord.ext import commands
-from config import config, messages
+from config import app_config as config, messages
 from repository.database import session
 from repository.database.verification import Permit, Valid_person
 import discord

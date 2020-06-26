@@ -5,7 +5,7 @@ import discord
 from discord.ext import commands
 
 import utils
-from config import config, messages
+from config import app_config as config, messages
 from logic import rng
 from features import reaction
 from repository import karma_repo
