@@ -71,59 +71,11 @@ async def on_error(event, *args, **kwargs):
             await channel.send("```\n{}```".format(message))
 
 
-@bot.command()
-@commands.check(utils.is_bot_owner)
-async def pull(ctx):
-    try:
-        utils.git_pull()
-        await ctx.send("Git pulled")
-    except Exception:
-        await ctx.send("Git pull error")
-
-
-@bot.command()
-@commands.check(utils.is_bot_owner)
-async def load(ctx, extension):
-    try:
-        bot.load_extension(f'cogs.{extension}')
-        await ctx.send(f'{extension} loaded')
-    except Exception as e:
-        await ctx.send(f"loading error\n```\n{e}```")
-
-
-@bot.command()
-@commands.check(utils.is_bot_owner)
-async def unload(ctx, extension):
-    try:
-        bot.unload_extension(f'cogs.{extension}')
-        await ctx.send(f'{extension} unloaded')
-    except Exception as e:
-        await ctx.send(f"unloading error\n```\n{e}```")
-
-
-@bot.command()
-@commands.check(utils.is_bot_owner)
-async def reload(ctx, extension):
-    try:
-        bot.reload_extension(f'cogs.{extension}')
-        await ctx.send(f'{extension} reloaded')
-    except Exception as e:
-        await ctx.send(f"reloading error\n```\n{e}```")
-
-
-@reload.error
-@load.error
-@unload.error
-@pull.error
-async def missing_arg_error(ctx, error):
-    if isinstance(error, commands.errors.MissingRequiredArgument):
-        await ctx.send('Missing argument.')
-    if isinstance(error, commands.errors.CheckFailure):
-        await ctx.send(
-            utils.fill_message("insufficient_rights", user=ctx.author.id))
-
 # Create missing tables at start
 migrations.init_db()
+
+bot.load_extension('cogs.system')
+print('System cog loaded')
 
 for extension in config.extensions:
     bot.load_extension(f'cogs.{extension}')

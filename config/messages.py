@@ -217,6 +217,13 @@ class Messages:
 
     on_ready_message = "<:peepowave:693070888546861096>"
 
+    cog_is_loaded = 'Toto rozšíření `{cog}` mám již v provozu.'
+    cog_unloaded = 'Rozšíření `{cog}` uvolněno.'
+    cog_loaded = 'Rozšíření `{cog}` načteno.'
+    cog_is_unloaded = 'Toto rozšíření `{cog}` není načteno'
+    cog_cannot_be_unloadable = 'Toto rozšíření `{cog}` je neodebratelné.'
+    cog_reloaded = 'Rozšíření `{cog}` bylo přenačteno.'
+
     info = [[('karma', 'Vypíše vaši karmu, kolik pozitivní a negativní karmy'
                        ' jste rozdali.'),
              ('karma stalk [user]', 'Vypíše karmu uživatele, kolik pozitivní '
