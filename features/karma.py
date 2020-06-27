@@ -100,7 +100,7 @@ class Karma(BaseFeature):
 
         if vote_value is None:
             self.repo.remove_emoji(emoji)
-            await message.channel.send(utils.fill_message("karma_vote_notpassed", 
+            await message.channel.send(utils.fill_message("karma_vote_notpassed",
                                        emote=str(emoji), minimum=str(cfg.vote_minimum)))
 
         else:
@@ -255,8 +255,12 @@ class Karma(BaseFeature):
             from_user: Member = message.mentions[0]
             to_user: Member = message.mentions[1]
 
-            self.repo.transfer_karma(from_user, to_user)
-            await self.reply_to_channel(message.channel, msg.karma_transfer_complete)
+            transfered = self.repo.transfer_karma(from_user, to_user)
+            formated_message = utils.fill_message("karma_transfer_complete", from_user=from_user.name,
+                                                  to_user=to_user.name, karma=transfered.karma,
+                                                  positive=transfered.positive, negative=transfered.negative)
+
+            await self.reply_to_channel(message.channel, formated_message)
         except ValueError:
             await self.reply_to_channel(message.channel, msg.karma_transfer_format)
             return

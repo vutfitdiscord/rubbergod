@@ -83,8 +83,13 @@ class Messages:
     karma_lederboard_offser_error = "{user} Špatný offset, zadej kladné číslo"
     karma_web_title = "Celý leaderboard"
     karma_web = "https://karma.grillbot.cloud/"
-    karma_transfer_format = "Formát je `" + prefix + "karma transfer [od koho] [komu]`"
-    karma_transfer_complete = "Karma byla úspěšně převedena."
+    karma_transfer_format = "Ten příkaz voláš špatně.\n" \
+                            "Formát je `" + prefix + "karma transfer [od koho] [komu]`"
+    karma_transfer_complete = "Karma byla úspěšně převedena.\n" \
+                              "Převedl jsem z uživatele `{from_user}` na `{to_user}`:\n" \
+                              "Množství karmy: **{karma}**\n" \
+                              "Množství pozitivně rozdané karmy: **{positive}** \n" \
+                              "Množství negativně rozdané karmy: **{negative}**"
 
     role_add_denied = "{user}, na přidání role {role} nemáš právo."
     role_remove_denied = "{user}, " \
