@@ -82,3 +82,7 @@ def pagination_next(emoji, page, max_page):
 
 def is_bot_owner(ctx: commands.Context):
     return ctx.author.id == Config.admin_id
+
+
+def cut_string(string: str, part_len: int):
+    return list(string[0+i:part_len+i] for i in range(0, len(string), part_len))
