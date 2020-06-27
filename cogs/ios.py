@@ -33,6 +33,7 @@ def unchanged_for(date, format_str):
     date = datetime.datetime.strptime(date, format_str)
     return (now - date.replace(year=now.year)).total_seconds() // 60
 
+
 def parse_memory(memory):
     parsed = dict()
     for line in memory.strip().splitlines():
@@ -47,6 +48,7 @@ def parse_memory(memory):
                 parsed[login] = list()
             parsed[login].append(since_last_change)
     return parsed
+
 
 def parse_semaphores(semaphores):
     parsed = dict()
@@ -85,6 +87,7 @@ def parse_semaphores(semaphores):
 
     return parsed, parsed_files
 
+
 def parse_processes(processes):
     parsed = dict()
     for line in processes.strip().splitlines():
@@ -99,6 +102,7 @@ def parse_processes(processes):
                 parsed[login] = list()
             parsed[login].append(uptime)
     return parsed
+
 
 def filter_processes(processes):
     out = []
@@ -185,8 +189,7 @@ async def print_output(ctx, system, parsed_memory, parsed_semaphores, parsed_fil
                                    str(avg_time) + " minut, ty prase")
                 if login_not_in_name:
                     await ctx.send("Nemas v nazvu tvuj login takze muzes" +
-                                    " mit kolize s ostatnima, ty prase")
-
+                                   " mit kolize s ostatnima, ty prase")
 
     if parsed_processes != dict():
         for login, array in parsed_processes.copy().items():
@@ -210,7 +213,7 @@ async def print_output(ctx, system, parsed_memory, parsed_semaphores, parsed_fil
                                " mas na " + system + " " + str(count) +
                                " procesu, bezicich prumerne " +
                                str(avg_time) + " minut, ty prase")
-    
+
     if (parsed_memory == dict() and parsed_semaphores == dict()
             and parsed_processes == dict() and parsed_files == dict()):
         await ctx.send("Na " + system + " uklizeno <:HYPERS:493154327318233088>")
@@ -256,7 +259,7 @@ class IOS(commands.Cog):
         # eva doesn't seem to have /dev/shm
         await print_output(ctx, "eve", parsed_memory, parsed_semaphores, dict(), parsed_processes)
         await ctx.send("Pokud nevite jak po sobe uklidit checknete: " +
-                       "https://discordapp.com/channels/" + 
+                       "https://discordapp.com/channels/" +
                        "461541385204400138/534431057001316362/" +
                        "698701631495340033")
 

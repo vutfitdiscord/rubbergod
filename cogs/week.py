@@ -29,7 +29,8 @@ class week(commands.Cog):
         cal_type = even if week % 2 == 0 else odd
         stud_type = even if stud_week % 2 == 0 else odd
         await ctx.send("Cal\t{}\t{}\nStd\t{}\t{}".format(cal_type, week,
-                                                stud_type, stud_week))
+                                                         stud_type, stud_week))
+
 
 def setup(bot):
     bot.add_cog(week(bot))

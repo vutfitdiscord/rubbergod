@@ -68,6 +68,7 @@ def fill_message(message_name, *args, **kwargs):
     except AttributeError:
         raise ValueError("Invalid template {}".format(message_name))
 
+
 def pagination_next(emoji, page, max_page):
     if emoji in ["▶", "🔽"]:
         next_page = page + 1
@@ -79,6 +80,7 @@ def pagination_next(emoji, page, max_page):
         return next_page
     else:
         return 0
+
 
 def is_bot_owner(ctx: commands.Context):
     return ctx.author.id == Config.admin_id

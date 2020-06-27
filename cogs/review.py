@@ -11,6 +11,7 @@ config = config.Config
 messages = messages.Messages
 review_repo = review_repo.ReviewRepository()
 
+
 class Review(commands.Cog):
 
     def __init__(self, bot):
@@ -38,11 +39,11 @@ class Review(commands.Cog):
                         verify = True
                     if role.id in config.reviews_forbidden_roles:
                         await ctx.send(utils.fill_message("review_add_denied",
-                                       user=ctx.message.author.id))
+                                                          user=ctx.message.author.id))
                         return
                 if not verify:
-                    await ctx.send(utils.fill_message("review_add_denied", 
-                                   user=ctx.message.author.id))
+                    await ctx.send(utils.fill_message("review_add_denied",
+                                                      user=ctx.message.author.id))
                     return
                 if subject is None or tier is None:
                     await ctx.send(messages.review_add_format)
@@ -52,7 +53,7 @@ class Review(commands.Cog):
                 if tier < 0 or tier > 4:
                     await ctx.send(messages.review_tier)
                     return
-                if not ctx.guild: # DM
+                if not ctx.guild:  # DM
                     anonym = True
                 if args:
                     args = ' '.join(args)
@@ -76,7 +77,7 @@ class Review(commands.Cog):
                         if tier is None:
                             await ctx.send(messages.review_remove_id_format)
                         else:
-                            review_repo.remove(tier) # tier => ID of review
+                            review_repo.remove(tier)  # tier => ID of review
                             await ctx.send(messages.review_remove_success)
                     else:
                         await ctx.send(utils.fill_message("insufficient_rights",
@@ -217,7 +218,7 @@ class Review(commands.Cog):
                         max_text_page = int(text_page[(pos + 1):])
                         text_page = int(text_page[:pos])
                         next_text_page = utils.pagination_next(emoji, text_page,
-                                                              max_text_page)
+                                                               max_text_page)
                         if next_text_page:
                             page = str(page) + "/" + str(max_page)
                             embed = self.rev.make_embed(
@@ -225,7 +226,7 @@ class Review(commands.Cog):
                             embed = self.rev.change_text_page(
                                 review, embed, next_text_page, max_text_page)
                             await message.edit(embed=embed)
-            if message.guild: # cannot remove reaction in DM
+            if message.guild:  # cannot remove reaction in DM
                 await message.remove_reaction(emoji, member)
 
 

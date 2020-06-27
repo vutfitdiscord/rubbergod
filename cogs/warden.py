@@ -172,11 +172,10 @@ class Warden(commands.Cog):
             hashes = [x async for x in self.saveMessageHashes(message)]
             ctr_hashes += len(hashes)
 
-        await msg.edit(content=
-            "**SCAN COMPLETE**\n\n"
-            f"Processed **{len(messages)}** messages.\n"
-            f"Computed **{ctr_hashes}** hashes in {(time.time() - now):.1f} seconds."
-        )
+        await msg.edit(content="**SCAN COMPLETE**\n\n"
+                       f"Processed **{len(messages)}** messages.\n"
+                       f"Computed **{ctr_hashes}** hashes in {(time.time() - now):.1f} seconds."
+                       )
 
     @scan.command(name="message")
     async def scan_message(self, ctx, link):
@@ -254,6 +253,7 @@ class Warden(commands.Cog):
     async def role_checks_error(self, ctx, error):
         if isinstance(error, commands.errors.CheckFailure):
             await ctx.send(utils.fill_message("insufficient_rights", user=ctx.author.id))
+
 
 def setup(bot):
     bot.add_cog(Warden(bot))
