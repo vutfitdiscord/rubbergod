@@ -1,4 +1,3 @@
-from cogs.base_cog import BaseCog
 import discord
 from discord.ext import commands
 
@@ -14,10 +13,10 @@ config = config.Config
 messages = messages.Messages
 
 
-class Karma(BaseCog):
+class Karma(commands.Cog):
 
     def __init__(self, bot):
-        super().__init__(bot)
+        self.bot = bot
         self.karma = karma.Karma(bot, karma_r)
         self.check = room_check.RoomCheck(bot)
         self.reaction = reaction.Reaction(bot, karma_r)
@@ -85,12 +84,12 @@ class Karma(BaseCog):
                 return
 
     @karma.command()
+    @commands.check(utils.is_bot_owner)
     async def revote(self, ctx, *args):
         if not await self.check.guild_check(ctx.message):
             await ctx.send(messages.server_warning)
         else:
-            if ctx.message.channel.id == config.vote_room or \
-                    ctx.author.id == config.admin_id:
+            if ctx.message.channel.id == config.vote_room:
                 try:
                     await ctx.message.delete()
                     await self.karma.emoji_revote_value(ctx.message)
@@ -101,12 +100,12 @@ class Karma(BaseCog):
                 await ctx.send(utils.fill_message("vote_room_only", room=dc_vote_room))
 
     @karma.command()
+    @commands.check(utils.is_bot_owner)
     async def vote(self, ctx, *args):
         if not await self.check.guild_check(ctx.message):
             await ctx.send(messages.server_warning)
         else:
-            if ctx.message.channel.id == config.vote_room or \
-                    ctx.author.id == config.admin_id:
+            if ctx.message.channel.id == config.vote_room:
                 try:
                     await ctx.message.delete()
                     await self.karma.emoji_vote_value(ctx.message)
@@ -117,10 +116,8 @@ class Karma(BaseCog):
                 await ctx.send(utils.fill_message("vote_room_only", room=dc_vote_room))
 
     @karma.command()
+    @commands.check(utils.is_bot_owner)
     async def give(self, ctx, *args):
-        if not await self.validate_admin_rights(ctx):
-            return
-
         await self.karma.karma_give(ctx.message)
 
     @karma.command()
@@ -134,10 +131,8 @@ class Karma(BaseCog):
         await self.karma.message_karma(ctx, target_message)
 
     @karma.command()
+    @commands.check(utils.is_bot_owner)
     async def transfer(self, ctx, *args):
-        if not await self.validate_admin_rights(ctx):
-            return
-
         await self.karma.karma_transfer(ctx.message)
 
     @commands.cooldown(rate=2, per=30.0, type=commands.BucketType.user)
@@ -183,6 +178,14 @@ class Karma(BaseCog):
     async def leaderboard_error(self, ctx, error):
         if isinstance(error, commands.BadArgument):
             await ctx.send(utils.fill_message("karma_lederboard_offser_error", user=ctx.author.id))
+
+    @revote.error
+    @vote.error
+    @give.error
+    @transfer.error
+    async def karma_error(self, ctx, error):
+        if isinstance(error, commands.CheckFailure):
+            await ctx.send(utils.fill_message("insufficient_rights", user=ctx.author.id))
 
     async def validate_leaderboard_offset(self, offset: int, ctx: commands.Context) -> bool:
         if (not 0 < offset < 100000000):  # Any value larger than the server

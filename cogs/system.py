@@ -1,13 +1,12 @@
-from cogs.base_cog import BaseCog
 from discord.ext import commands
 from features.git import Git
 from discord.message import Message
 import utils
 
 
-class System(BaseCog):
+class System(commands.Cog):
     def __init__(self, bot):
-        super().__init__(bot)
+        self.bot = bot
         self.git = Git()
 
         self.unloadable_cogs = [
