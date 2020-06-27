@@ -11,7 +11,7 @@ class BaseCog(commands.Cog):
         self.config = config.Config
 
     async def validate_admin_rights(self, ctx: commands.Context) -> bool:
-        if ctx.author.id != self.config.admin_id:
+        if not utils.is_bot_owner(ctx):
             await ctx.send(utils.fill_message("insufficient_rights", user=ctx.author.id))
             return False
 
