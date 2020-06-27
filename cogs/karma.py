@@ -135,7 +135,7 @@ class Karma(BaseCog):
     @commands.cooldown(rate=2, per=30.0, type=commands.BucketType.user)
     @commands.command()
     async def leaderboard(self, ctx, start=1):
-        if not self.validate_leaderboard_offset(start):
+        if not await self.validate_leaderboard_offset(start, ctx):
             return
 
         await self.karma.leaderboard(ctx.message.channel, 'get', 'DESC', start)
@@ -144,7 +144,7 @@ class Karma(BaseCog):
     @commands.cooldown(rate=2, per=30.0, type=commands.BucketType.user)
     @commands.command()
     async def bajkarboard(self, ctx, start=1):
-        if not self.validate_leaderboard_offset(start):
+        if not await self.validate_leaderboard_offset(start, ctx):
             return
 
         await self.karma.leaderboard(ctx.message.channel, 'get', 'ASC', start)
@@ -153,7 +153,7 @@ class Karma(BaseCog):
     @commands.cooldown(rate=2, per=30.0, type=commands.BucketType.user)
     @commands.command()
     async def givingboard(self, ctx, start=1):
-        if not self.validate_leaderboard_offset(start):
+        if not await self.validate_leaderboard_offset(start, ctx):
             return
 
         await self.karma.leaderboard(ctx.message.channel, 'give', 'DESC', start)
@@ -162,7 +162,7 @@ class Karma(BaseCog):
     @commands.cooldown(rate=2, per=30.0, type=commands.BucketType.user)
     @commands.command()
     async def ishaboard(self, ctx, start=1):
-        if not self.validate_leaderboard_offset(start):
+        if not await self.validate_leaderboard_offset(start, ctx):
             return
 
         await self.karma.leaderboard(ctx.message.channel, 'give', 'ASC', start)
