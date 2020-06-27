@@ -13,7 +13,7 @@ Prerequisites:
 * Python3.6+
 
 Start by cloning the repo:
-```
+```sh
 git clone https://github.com/toaster192/rubbergod.git
 cd rubbergod
 ```
