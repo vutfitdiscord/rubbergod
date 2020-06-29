@@ -1,4 +1,5 @@
 import requests
+from datetime import date
 
 import discord
 from discord.ext import commands
@@ -16,7 +17,7 @@ class Name_day(commands.Cog):
 
     @commands.command()
     async def svatek(self, ctx):
-        url = config.name_day_url_cz
+        url = config.name_day_url_cz + "?date=" + date.today().strftime("%d%m")
         res = requests.get(url).json()
         names = []
         for i in res:
@@ -25,7 +26,7 @@ class Name_day(commands.Cog):
 
     @commands.command()
     async def meniny(self, ctx):
-        url = config.name_day_url_sk
+        url = config.name_day_url_sk + "&date=" + date.today().strftime("%d%m")
         res = requests.get(url).json()
         names = []
         for i in res:
