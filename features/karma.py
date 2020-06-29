@@ -348,7 +348,7 @@ class Karma(BaseFeature):
             output += line
 
         embed = discord.Embed(title=title, description=output)
-        embed.timestamp = datetime.datetime.now()
+        embed.timestamp = datetime.datetime.now(tz=datetime.timezone.utc)
 
         if action == 'get' and order == "DESC":
             embed.add_field(name=msg.karma_web_title, value=msg.karma_web)

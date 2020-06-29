@@ -1,5 +1,5 @@
 import discord
-from datetime import datetime
+import datetime
 from discord.ext import commands
 import re
 
@@ -270,7 +270,7 @@ class Review_helper():
                 colour = 0xcb410b
             id = review.id
         embed.set_footer(text="Review: " + page + ' | ID: ' + str(id))
-        embed.timestamp = datetime.now()
+        embed.timestamp = datetime.datetime.now(tz=datetime.timezone.utc)
         embed.colour = colour
         return embed
 
