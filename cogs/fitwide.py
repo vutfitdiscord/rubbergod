@@ -6,7 +6,7 @@ from discord.ext import commands
 
 
 import utils
-from config import config
+from config import app_config as config
 from features import verification
 from repository import user_repo
 from repository.database import database, session
@@ -30,7 +30,6 @@ class FitWide(commands.Cog):
 
     async def is_in_modroom(ctx):
         return ctx.message.channel.id == config.mod_room
-
 
     @commands.Cog.listener()
     async def on_typing(self, channel, user, when):
@@ -245,9 +244,9 @@ class FitWide(commands.Cog):
                                             send_messages=True)
         }
         await guild.create_text_channel(
-                '0bit-general', overwrites=overwrites,
-                category=general_channels[0].category,
-                position=general_channels[0].position - 1
+            '0bit-general', overwrites=overwrites,
+            category=general_channels[0].category,
+            position=general_channels[0].position - 1
         )
 
         # delete 3bit-terminy
@@ -264,9 +263,9 @@ class FitWide(commands.Cog):
                                             send_messages=False)
         }
         await guild.create_text_channel(
-                '1bit-terminy', overwrites=overwrites,
-                category=terminy_channels[0].category,
-                position=terminy_channels[0].position - 1
+            '1bit-terminy', overwrites=overwrites,
+            category=terminy_channels[0].category,
+            position=terminy_channels[0].position - 1
         )
 
         # give 4bit perms to the new 3bit terminy
@@ -356,7 +355,6 @@ class FitWide(commands.Cog):
 
         await ctx.send("Update databaze probehl uspesne")
 
-
     @commands.cooldown(rate=2, per=20.0, type=commands.BucketType.user)
     @commands.check(is_in_modroom)
     @commands.command()
@@ -367,7 +365,7 @@ class FitWide(commands.Cog):
         if result is None:
             await ctx.send("Neni v DB prej")
             return
-        
+
         person = session.query(Valid_person).\
             filter(Valid_person.login == result.login).one_or_none()
 
@@ -377,7 +375,7 @@ class FitWide(commands.Cog):
 
         await ctx.send(("Login: `{p.login}`\nJmeno: `{p.name}`\n"
                         "Rocnik: `{p.year}`").format(p=person))
-        
+
     @commands.cooldown(rate=2, per=20.0, type=commands.BucketType.user)
     @commands.check(is_in_modroom)
     @commands.command()
@@ -431,6 +429,7 @@ class FitWide(commands.Cog):
         if isinstance(error, commands.CheckFailure):
             await ctx.send('Nothing to see here comrade. ' +
                            '<:KKomrade:484470873001164817>')
+
 
 def setup(bot):
     bot.add_cog(FitWide(bot))

@@ -7,7 +7,7 @@ from repository.database.verification import Permit, Valid_person
 from repository.database.image import Image
 from repository.review_repo import ReviewRepository
 
-from config.config import Config
+from config.app_config import Config
 
 
 def init_db(commit: bool = True):

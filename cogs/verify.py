@@ -1,5 +1,5 @@
 from discord.ext import commands
-from config import config
+from config import app_config as config
 from features import verification
 from repository import user_repo
 

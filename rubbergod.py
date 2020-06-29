@@ -1,10 +1,12 @@
 import traceback
 import argparse
 
+from discord import TextChannel
 from discord.ext import commands
 
 import utils
-from config import config
+from config.messages import Messages
+from config.app_config import Config
 from features import presence
 
 import repository.db_migrations as migrations
@@ -30,7 +32,8 @@ elif args.init_db:
     print('Init complete')
     exit(0)
 
-config = config.Config
+config = Config
+is_initialized = False
 
 bot = commands.Bot(
     command_prefix=commands.when_mentioned_or(*config.command_prefix),
@@ -42,10 +45,19 @@ presence = presence.Presence(bot)
 
 @bot.event
 async def on_ready():
-    """If RGod is ready"""
-    print("Ready")
+    """If RubberGod is ready"""
+    # Inspirated from https://github.com/sinus-x/rubbergoddess/blob/master/rubbergoddess.py
+    global is_initialized
+    if is_initialized:
+        return
+    is_initialized = True
+
+    bot_room: TextChannel = bot.get_channel(config.bot_room)
+    if bot_room is not None:
+        await bot_room.send(Messages.on_ready_message)
 
     await presence.set_presence()
+    print("Ready")
 
 
 @bot.event
@@ -53,65 +65,17 @@ async def on_error(event, *args, **kwargs):
     channel = bot.get_channel(config.bot_dev_channel)
     output = traceback.format_exc()
     print(output)
-    output = list(output[0+i:1900+i] for i in range(0, len(output), 1900))
     if channel is not None:
+        output = utils.cut_string(output, 1900)
         for message in output:
             await channel.send("```\n{}```".format(message))
 
 
-@bot.command()
-@commands.check(utils.is_bot_owner)
-async def pull(ctx):
-    try:
-        utils.git_pull()
-        await ctx.send("Git pulled")
-    except Exception:
-        await ctx.send("Git pull error")
-
-
-@bot.command()
-@commands.check(utils.is_bot_owner)
-async def load(ctx, extension):
-    try:
-        bot.load_extension(f'cogs.{extension}')
-        await ctx.send(f'{extension} loaded')
-    except Exception as e:
-        await ctx.send(f"loading error\n```\n{e}```")
-
-
-@bot.command()
-@commands.check(utils.is_bot_owner)
-async def unload(ctx, extension):
-    try:
-        bot.unload_extension(f'cogs.{extension}')
-        await ctx.send(f'{extension} unloaded')
-    except Exception as e:
-        await ctx.send(f"unloading error\n```\n{e}```")
-
-
-@bot.command()
-@commands.check(utils.is_bot_owner)
-async def reload(ctx, extension):
-    try:
-        bot.reload_extension(f'cogs.{extension}')
-        await ctx.send(f'{extension} reloaded')
-    except Exception as e:
-        await ctx.send(f"reloading error\n```\n{e}```")
-
-
-@reload.error
-@load.error
-@unload.error
-@pull.error
-async def missing_arg_error(ctx, error):
-    if isinstance(error, commands.errors.MissingRequiredArgument):
-        await ctx.send('Missing argument.')
-    if isinstance(error, commands.errors.CheckFailure):
-        await ctx.send(
-            utils.fill_message("insufficient_rights", user=ctx.author.id))
-
 # Create missing tables at start
 migrations.init_db()
+
+bot.load_extension('cogs.system')
+print('System cog loaded')
 
 for extension in config.extensions:
     bot.load_extension(f'cogs.{extension}')

@@ -2,7 +2,8 @@ from datetime import date
 
 from discord.ext import commands
 
-from config import config, messages
+import utils
+from config import app_config as config, messages
 
 config = config.Config
 messages = messages.Messages

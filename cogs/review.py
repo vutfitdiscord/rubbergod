@@ -3,7 +3,7 @@ import datetime
 from discord.ext import commands
 import re
 
-from config import config, messages
+from config import app_config as config, messages
 from repository import review_repo
 import utils
 

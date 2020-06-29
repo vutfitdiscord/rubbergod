@@ -5,7 +5,7 @@ import discord
 from discord.ext import commands
 
 import utils
-from config import config, messages
+from config import app_config as config, messages
 from logic import rng
 from features import reaction
 from repository import karma_repo
@@ -57,7 +57,7 @@ class Base(commands.Cog):
                                                      error.__traceback__))
         channel = self.bot.get_channel(config.bot_dev_channel)
         print(output)
-        output = list(output[0 + i: 1900 + i] for i in range(0, len(output), 1900))
+        output = utils.cut_string(output, 1900)
         if channel is not None:
             for message in output:
                 await channel.send("```\n" + message + "\n```")
@@ -68,8 +68,6 @@ class Base(commands.Cog):
         now = datetime.datetime.now().replace(microsecond=0)
         delta = now - boottime
         await ctx.send(utils.fill_message("uptime_message", boottime=str(boottime), uptime=str(delta)))
-
-    
 
     @commands.cooldown(rate=2, per=60.0, type=commands.BucketType.user)
     @commands.command(aliases=['help'])
@@ -85,8 +83,10 @@ class Base(commands.Cog):
                 return
         else:
             msg = await ctx.send(embed=embed)
-        await msg.add_reaction("◀")
-        await msg.add_reaction("▶")
+
+        if len(messages.info) > 1:
+            await msg.add_reaction("◀")
+            await msg.add_reaction("▶")
 
 
 def setup(bot):

@@ -2,12 +2,12 @@ import asyncio
 import datetime
 
 import discord
-from discord import Emoji
+from discord import Emoji, TextChannel, Member
 from discord.ext.commands import Bot
 from emoji import demojize
 
 import utils
-from config import config, messages
+from config import app_config as config, messages
 from features.base_feature import BaseFeature
 from repository.karma_repo import KarmaRepository
 from repository.database.karma import Karma as Database_karma
@@ -100,7 +100,7 @@ class Karma(BaseFeature):
 
         if vote_value is None:
             self.repo.remove_emoji(emoji)
-            await message.channel.send(utils.fill_message("karma_vote_notpassed", 
+            await message.channel.send(utils.fill_message("karma_vote_notpassed",
                                        emote=str(emoji), minimum=str(cfg.vote_minimum)))
 
         else:
@@ -244,6 +244,26 @@ class Karma(BaseFeature):
                 await message.channel.send(
                     msg.karma_give_negative_success
                 )
+
+    async def karma_transfer(self, message: TextChannel):
+        input_string = message.content.split()
+        if len(input_string) < 4 or len(message.mentions) < 2:
+            await message.channel.send(msg.karma_transfer_format)
+            return
+
+        try:
+            from_user: Member = message.mentions[0]
+            to_user: Member = message.mentions[1]
+
+            transfered = self.repo.transfer_karma(from_user, to_user)
+            formated_message = utils.fill_message("karma_transfer_complete", from_user=from_user.name,
+                                                  to_user=to_user.name, karma=transfered.karma,
+                                                  positive=transfered.positive, negative=transfered.negative)
+
+            await self.reply_to_channel(message.channel, formated_message)
+        except ValueError:
+            await self.reply_to_channel(message.channel, msg.karma_transfer_format)
+            return
 
     def karma_get(self, author, target=None):
         if target is None:

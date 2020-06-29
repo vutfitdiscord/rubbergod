@@ -4,7 +4,7 @@ from discord.ext import commands
 import utils
 from cogs import room_check
 from features import acl
-from config import config
+from config import app_config as config
 from repository import acl_repo
 
 acl_repo = acl_repo.AclRepository()

@@ -116,7 +116,7 @@ class Acl(BaseFeature):
 
     async def add_rule(self, ctx, args):
         self.acl_repo.add_rule(*args)
-        await ctx.send(messages.acl_add_group)
+        await ctx.send(messages.acl_add_rule)
 
     async def edit_rule(self, ctx, args):
         self.acl_repo.edit_rule(*args)

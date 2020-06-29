@@ -1,8 +1,8 @@
-from config import config
+from config.app_config import Config
 
 
 class Messages:
-    prefix = config.Config.default_prefix
+    prefix = Config.default_prefix
 
     server_warning = "Tohle funguje jen na VUT FIT serveru."
     karma_get_missing = "Toaster pls, měls bordel v DB. Musel jsem za tebe uklidit."
@@ -32,7 +32,7 @@ class Messages:
     bot_room_redirect = "{user} <:sadcat:576171980118687754> 👉 " \
                         "<#{bot_room}>\n"
     message_link_prefix = 'https://discordapp.com/channels/' \
-                          + str(config.Config.guild_id) + '/'
+                          + str(Config.guild_id) + '/'
 
     uhoh_counter = "{uhohs} uh ohs od spuštění."
     uptime_message = "Up since:  `{boottime}`\nUptime:\t`{uptime}`"
@@ -83,6 +83,13 @@ class Messages:
     karma_lederboard_offser_error = "{user} Špatný offset, zadej kladné číslo"
     karma_web_title = "Celý leaderboard"
     karma_web = "https://karma.grillbot.cloud/"
+    karma_transfer_format = "Ten příkaz voláš špatně.\n" \
+                            "Formát je `" + prefix + "karma transfer [od koho] [komu]`"
+    karma_transfer_complete = "Karma byla úspěšně převedena.\n" \
+                              "Převedl jsem z uživatele `{from_user}` na `{to_user}`:\n" \
+                              "Množství karmy: **{karma}**\n" \
+                              "Množství pozitivně rozdané karmy: **{positive}** \n" \
+                              "Množství negativně rozdané karmy: **{negative}**"
 
     role_add_denied = "{user}, na přidání role {role} nemáš právo."
     role_remove_denied = "{user}, " \
@@ -119,8 +126,8 @@ class Messages:
                               "({admin} pls)."
     verify_send_format = "Očekávám jeden argument. " \
                          "Správný formát: " \
-                         "`" + prefix + "getcode [FIT login, " \
-                         "ve tvaru xlogin00, nebo MUNI UCO]`"
+                         "`" + prefix + "getcode FIT login, " \
+                         "ve tvaru xlogin00, nebo MUNI UCO`"
     verify_send_dumbshit = "{user} Tvůj login. {emote}"
     verify_send_success = "{user} Kód byl odeslán na tvůj mail " \
                           "({mail})!\n" \
@@ -176,7 +183,8 @@ class Messages:
 
     review_format = prefix + "reviews [add, remove, zkratka předmětu]"
     review_add_format = prefix + "reviews add {ZkratkaPredmetu} {Tier (0-4, 0 je TOP)} (VolitelnyText)\n" \
-                        "Pro anonymní příspěvek použijte DM.\nNapříklad:\n`" + prefix +"reviews add IZP 2 text recenze`"
+        "Pro anonymní příspěvek použijte DM.\nNapříklad:\n`" + \
+        prefix + "reviews add IZP 2 text recenze`"
     review_wrong_subject = "Nesprávná zkratka předmětu"
     review_tier = "Tier je z rozsahu 0-4, kde 0 je nejlepší"
     review_text_len = "Maximální počet znaků v části 'text' je 1024"
@@ -185,7 +193,8 @@ class Messages:
 
     review_get_format = prefix + "reviews [zkratka předmětu]"
     review_remove_format = prefix + "reviews remove [zkratka předmětu]"
-    review_remove_format_admin = prefix + "reviews remove [zkratka předmětu, id + číslo]"
+    review_remove_format_admin = prefix + \
+        "reviews remove [zkratka předmětu, id + číslo]"
     review_remove_id_format = "reviews remove id [id]"
     review_remove_success = "Hodnocení předmětu bylo odebráno"
     review_remove_error = "Hodnocení předmětu nebylo nalezeno"
@@ -198,13 +207,22 @@ class Messages:
     question = ["<:what:638277508541710337>",
                 "<:wuuut:484470874003472394>",
                 "nech mě <:sadcat:576171980118687754>"]
-    
+
     name_day_cz = "Dnes má svátek {name}"
     name_day_sk = "Dnes má meniny {name}"
 
     repost_title = "Nápověda"
     repost_description = "{user}, shoda **{value}**!"
     repost_content = "Pokud obrázek je repost, dej mu ♻️.\nJestli není, klikni tady na ❎ a při {limit} takových reakcích se toho upozornění smaže."
+
+    on_ready_message = "<:peepowave:693070888546861096>"
+
+    cog_is_loaded = 'Toto rozšíření `{cog}` mám již v provozu.'
+    cog_unloaded = 'Rozšíření `{cog}` uvolněno.'
+    cog_loaded = 'Rozšíření `{cog}` načteno.'
+    cog_is_unloaded = 'Toto rozšíření `{cog}` není načteno'
+    cog_cannot_be_unloadable = 'Toto rozšíření `{cog}` je neodebratelné.'
+    cog_reloaded = 'Rozšíření `{cog}` bylo přenačteno.'
 
     info = [[('karma', 'Vypíše vaši karmu, kolik pozitivní a negativní karmy'
                        ' jste rozdali.'),
@@ -222,7 +240,8 @@ class Messages:
               'Zobrazí karmu získanou za zprávu')],
             [('leaderboard [offset]', 'Karma leaderboard'),
              ('bajkarboard [offset]', 'Karma leaderboard reversed'),
-             ('givingboard [offset]', 'Leaderboard rozdávání pozitivní karmy.'),
+             ('givingboard [offset]',
+              'Leaderboard rozdávání pozitivní karmy.'),
              ('ishaboard [offset]', 'Leaderboard rozdávání negativní karmy.'),
              (review_add_format[1:], 'Přidá recenzi na předmět.'),
              (review_get_format[1:], 'Vypíše recenze na vybraný předmět.'),

@@ -3,7 +3,7 @@ import discord
 from discord.ext.commands import Bot
 
 import utils
-from config.config import Config
+from config.app_config import Config
 from config.messages import Messages
 from features.base_feature import BaseFeature
 from features.acl import Acl
@@ -42,10 +42,15 @@ class Reaction(BaseFeature):
                             value=command[1],
                             inline=False)
 
-        embed.set_footer(text=f"Page {page} | Commit {utils.git_hash()}",
-                         icon_url="https://cdn.discordapp.com/avatars/"
-                                  "560917571663298568/b93e8c1e93c2d18b"
-                                  "fbd226a0b614cf57.png?size=32")
+        git_hash = utils.git_hash()
+        footer_text = f"Commit {git_hash}"
+
+        if len(Messages.info) > 1:
+            footer_text = f"Page {page} | {footer_text}"
+
+        embed.set_footer(text=footer_text, icon_url="https://cdn.discordapp.com/avatars/"
+                         "560917571663298568/b93e8c1e93c2d18b"
+                         "fbd226a0b614cf57.png?size=32")
         return embed
 
     # Returns list of role names and emotes that represent them
@@ -68,8 +73,8 @@ class Reaction(BaseFeature):
             except Exception:
                 if message.channel.id not in Config.role_channels:
                     await message.channel.send(utils.fill_message("role_invalid_line",
-                                               user=message.author.id,
-                                               line=discord.utils.escape_mentions(line)))
+                                                                  user=message.author.id,
+                                                                  line=discord.utils.escape_mentions(line)))
         for line in output:
             if "<#" in line[0]:
                 line[0] = line[0].replace("<#", "")
@@ -79,8 +84,8 @@ class Reaction(BaseFeature):
                 except Exception:
                     if message.channel.id not in Config.role_channels:
                         await message.channel.send(utils.fill_message("role_invalid_line",
-                                                   user=message.author.id,
-                                                   line=discord.utils.escape_mentions(line[0])))
+                                                                      user=message.author.id,
+                                                                      line=discord.utils.escape_mentions(line[0])))
         return output
 
     # Adds reactions to message
@@ -101,16 +106,17 @@ class Reaction(BaseFeature):
                                       name=line[0][1:].lower()) is None
             if not_role and not_channel:
                 await message.channel.send(utils.fill_message("role_not_role",
-                                           user=message.author.id, 
-                                           not_role=discord.utils.escape_mentions(line[0])))
+                                                              user=message.author.id,
+                                                              not_role=discord.utils.escape_mentions(line[0])))
             else:
                 try:
                     await message.add_reaction(line[1])
                 except discord.errors.HTTPException:
                     await message.channel.send(utils.fill_message("role_invalid_emote",
-                                               user=message.author.id,
-                                               not_emote=discord.utils.escape_mentions(line[1]),
-                                               role=discord.utils.escape_mentions(line[0])))
+                                                                  user=message.author.id,
+                                                                  not_emote=discord.utils.escape_mentions(
+                                                                      line[1]),
+                                                                  role=discord.utils.escape_mentions(line[0])))
 
     async def add(self, payload):
         channel = self.bot.get_channel(payload.channel_id)
@@ -167,7 +173,7 @@ class Reaction(BaseFeature):
             if emoji in ["◀", "▶"]:
                 page = int(message.embeds[0].footer.text[5])
                 next_page = utils.pagination_next(emoji, page,
-                                                 len(Messages.info))
+                                                  len(Messages.info))
                 if next_page:
                     embed = self.make_embed(next_page)
                     await message.edit(embed=embed)
@@ -210,7 +216,7 @@ class Reaction(BaseFeature):
                     await message.pin()
                     await message.clear_reaction('📌')
                     break
-                        
+
     async def remove(self, payload):
         channel = self.bot.get_channel(payload.channel_id)
         if channel is None:
@@ -270,7 +276,7 @@ class Reaction(BaseFeature):
             else:
                 bot_room = self.bot.get_channel(Config.bot_room)
                 await bot_room.send(utils.fill_message("role_add_denied",
-                                    user=member.id, role=role.name))
+                                                       user=member.id, role=role.name))
         else:
             try:
                 channel = discord.utils.get(guild.channels, id=int(target))
@@ -289,7 +295,7 @@ class Reaction(BaseFeature):
             else:
                 bot_room = self.bot.get_channel(Config.bot_room)
                 await bot_room.send(utils.fill_message("role_add_denied",
-                                    user=member.id, role=channel.name))
+                                                       user=member.id, role=channel.name))
 
     # Removes a role for user based on reaction
     async def remove_role_on_reaction(self, target, member, channel, guild):
@@ -303,7 +309,7 @@ class Reaction(BaseFeature):
                 else:
                     bot_room = self.bot.get_channel(Config.bot_room)
                     await bot_room.send(utils.fill_message("role_remove_denied",
-                                        user=member.id, role=role.name))
+                                                           user=member.id, role=role.name))
         else:
             try:
                 channel = discord.utils.get(guild.channels, id=int(target))
@@ -322,4 +328,4 @@ class Reaction(BaseFeature):
             else:
                 bot_room = self.bot.get_channel(Config.bot_room)
                 await bot_room.send(utils.fill_message("role_remove_denied",
-                                    user=member.id, role=channel.name))
+                                                       user=member.id, role=channel.name))

@@ -21,6 +21,23 @@ git clone https://github.com/toaster192/rubbergod.git
 cd rubbergod
 ```
 
+## Docker compose setup
+
+Install `docker` and `docker-compose` for your system (will vary from system to system)
+and run `docker` (`systemctl start docker.service`)
+
+To run docker user needs to be in `docker` group. (eg. `sudo usermod -aG docker $USER`).
+
+```
+docker build .
+```
+
+and then everytime you want to run the app
+
+```
+docker-compose down && docker-compose up --build
+```
+
 ## Local setup (not recommended)
 
 Install the required python modules (`venv` / `--user` flag recommended):
@@ -43,24 +60,6 @@ python3-pip
 postgresql
 postgresql-contrib
 libpq-dev
-```
-
-## Docker compose setup
-
-Install `docker` and `docker-compose` for your system (will vary from system to system)
-and run `docker` (`systemctl start docker.service`)
-
-Your user account must be in the `docker` group (eg. `sudo usermod -aG docker $USER`).
-This will take effect on next logon.
-
-```bash
-docker build .
-```
-
-and then everytime you want to run the app
-
-```bash
-docker-compose down && docker-compose up --build
 ```
 
 ## Authors

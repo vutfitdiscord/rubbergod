@@ -9,7 +9,7 @@ import dhash
 from PIL import Image
 
 import utils
-from config import config, messages
+from config import app_config as config, messages
 from repository import image_repo
 
 dhash.force_pil()

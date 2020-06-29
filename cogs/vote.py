@@ -93,7 +93,6 @@ class Vote(commands.Cog):
             # ignore HTTP Exceptions
             return
 
-
     @commands.Cog.listener()
     async def on_reaction_remove(self, reaction: Reaction, user):
         if self.__handle(reaction.message.id, user.id, reaction.emoji, False,

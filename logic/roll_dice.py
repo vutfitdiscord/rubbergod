@@ -2,7 +2,7 @@ from random import randint
 from re import match
 import utils
 
-from config.config import Config
+from config.app_config import Config
 from config.messages import Messages
 
 """

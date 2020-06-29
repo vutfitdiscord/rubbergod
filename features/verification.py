@@ -8,7 +8,7 @@ from discord import Member
 from discord.ext.commands import Bot
 
 import utils
-from config.config import Config
+from config.app_config import Config
 from config.messages import Messages
 from features.base_feature import BaseFeature
 from repository.user_repo import UserRepository

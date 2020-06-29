@@ -1,12 +1,6 @@
-import datetime
-
-import discord
 from discord.ext import commands
+from config import messages
 
-import utils
-from config import config, messages
-
-config = config.Config
 messages = messages.Messages
 
 
