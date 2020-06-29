@@ -103,16 +103,8 @@ class Config:
     # grillbot
     grillbot_id: int = get_attr('grillbot_id')
 
-    # name day source url
-    name_day_url_cz: str = get_attr('name_day_url_cz')
-    name_day_url_sk: str = get_attr('name_day_url_sk')
-
     # weather token to openweather API
     weather_token: str = get_attr('weather_token')
-
-    # Warphole config
-    warphole_blue: int = get_attr('warphole_blue')
-    warphole_orange: int = get_attr('warphole_orange')
 
     # warden
     duplicate_limit: int = get_attr('duplicate_limit')
