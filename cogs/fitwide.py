@@ -1,4 +1,5 @@
 import datetime
+import subprocess
 from sqlalchemy.orm.exc import NoResultFound
 
 import discord
@@ -320,12 +321,16 @@ class FitWide(commands.Cog):
     @commands.cooldown(rate=2, per=20.0, type=commands.BucketType.user)
     @commands.check(is_in_modroom)
     @commands.command()
-    async def update_db(self, ctx):
+    async def update_db(self, ctx, convert_0bit: bool = False):
         with open("merlin-latest", "r") as f:
             data = f.readlines()
 
-        new_people = []
+        found_people = []
+        found_logins = []
         new_logins = []
+        login_results = session.query(Valid_person.login).all()
+        # Use unpacking on results
+        old_logins = [value for value, in login_results]
 
         for line in data:
             line = line.split(":")
@@ -335,25 +340,64 @@ class FitWide(commands.Cog):
                 year = line[4].split(",")[1]
             except IndexError:
                 continue
-            new_people.append(Valid_person(login=login, year=year,
-                                           name=name))
-            new_logins.append(login)
 
-        for person in new_people:
+            if convert_0bit and year == "FIT BITP 1r":
+                person = session.query(Valid_person).\
+                    filter(Valid_person.login == login).\
+                    one_or_none()
+                if person is not None and person.year == "FIT BITP 0r":
+                    year = "FIT BITP 0r"
+                 
+            found_people.append(Valid_person(login=login, year=year,
+                                             name=name))
+            found_logins.append(login)
+
+        for login in found_logins:
+            if login not in old_logins:
+                new_logins.append(login)
+
+        await ctx.send(f"Nasel jsem {len(new_logins)} novych loginu")
+
+        for person in found_people:
             session.merge(person)
 
+        counter = 0
         for person in session.query(Valid_person):
-            if person.login not in new_logins:
+            if person.login not in found_logins:
                 try:
                     # check for muni
                     int(person.login)
                     person.year = "MUNI"
                 except ValueError:
                     person.year = "dropout"
+            elif convert_0bit and person.login in new_logins:
+                if person.year == "FIT BITP 1r":
+                    person.year = "FIT BITP 0r"
+                    counter += 1
 
         session.commit()
 
         await ctx.send("Update databaze probehl uspesne")
+        if convert_0bit:
+            await ctx.send(f"Debug: Nasel jsem {counter} novych prvaku")
+
+
+    @commands.cooldown(rate=2, per=20.0, type=commands.BucketType.user)
+    @commands.check(is_in_modroom)
+    @commands.command()
+    async def get_db(self, ctx):
+        process = subprocess.Popen(["ssh", "merlin"], stdout=subprocess.PIPE)
+        try:
+            output, error = process.communicate(timeout=15)
+            if error:
+                await ctx.send("stazeni databaze nejak nefunguje")
+                return
+        except TimeoutExpired:
+            await ctx.send("stazeni databaze nejak timeoutuje")
+            return
+        with open("merlin-latest", "w") as f:
+            f.write(output.decode("utf-8"))
+        await ctx.send("Stazeni databaze probehlo uspesne")
 
     @commands.cooldown(rate=2, per=20.0, type=commands.BucketType.user)
     @commands.check(is_in_modroom)
@@ -425,6 +469,7 @@ class FitWide(commands.Cog):
     @role_check.error
     @increment_roles.error
     @update_db.error
+    @get_db.error
     async def fitwide_checks_error(self, ctx, error):
         if isinstance(error, commands.CheckFailure):
             await ctx.send('Nothing to see here comrade. ' +
