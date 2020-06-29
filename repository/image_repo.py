@@ -1,9 +1,6 @@
 # stolen from rubbergoddess
 import datetime
 
-import psycopg2
-import sqlalchemy
-
 from repository.base_repository import BaseRepository
 from repository.database import session
 from repository.database.image import Image
@@ -13,7 +10,7 @@ class ImageRepository(BaseRepository):
     def add_image(self, channel_id: int, message_id: int, attachment_id: int, dhash: str):
         """Add new image hash"""
 
-        if self.getByMessage(message_id) != None:
+        if self.getByMessage(message_id) is not None:
             # message already indexed
             return
 
