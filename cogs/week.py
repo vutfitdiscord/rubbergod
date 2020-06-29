@@ -24,7 +24,7 @@ class week(commands.Cog):
         cal_type = even if cal_week % 2 == 0 else odd
         stud_type = even if stud_week % 2 == 0 else odd
 
-        embed = discord.Embed(title="Týden")
+        embed = discord.Embed(title="Týden", color=0xE5DC37)
         embed.set_footer(icon_url=ctx.author.avatar_url, text=str(ctx.author))
         embed.add_field(name="Studijní", value="{} ({})".format(stud_type, stud_week))
         embed.add_field(name="Kalendářní", value="{} ({})".format(cal_type, cal_week))
