@@ -20,9 +20,6 @@ repo_i = image_repo.ImageRepository()
 class Warden(commands.Cog):
     """A cog for database lookups"""
 
-    # TODO Implement template matching to prevent false positives
-    # TODO Implement ?deepscan to test against all database hashes
-
     def __init__(self, bot):
         self.bot = bot
 
@@ -92,7 +89,7 @@ class Warden(commands.Cog):
                     await orig.remove_reaction("🤷🏻", self.bot.user)
                     await orig.remove_reaction("🤔", self.bot.user)
                 except Exception as e:
-                    print("Warden:on_raw_reaction_add", "Could not remove ♻️", e)
+                    print("Warden:on_raw_reaction_add", "Could not remove bot's emote", e)
                     return
                 await message.delete()
 
@@ -102,9 +99,8 @@ class Warden(commands.Cog):
             await f.save(fp)
             try:
                 image = Image.open(fp)
-            except OSError as e:
+            except OSError:
                 # not an image
-                print(e)
                 continue
             img_hash = dhash.dhash_int(image)
 
@@ -120,7 +116,7 @@ class Warden(commands.Cog):
     @commands.check(utils.is_bot_owner)
     async def scan(self, ctx):
         """Scan for reposts"""
-        if ctx.invoked_subcommand == None:
+        if ctx.invoked_subcommand is None:
             await ctx.send_help(ctx.invoked_with)
 
     @commands.guild_only()
@@ -160,10 +156,9 @@ class Warden(commands.Cog):
         for i, message in enumerate(messages):
             # update info on every 10th message
             if i % 50 == 0:
-                await msg.edit(content=template.format(
-                    i, len(messages), (i / len(messages) * 100),
-                    ctr_hashes
-                ))
+                await msg.edit(
+                    content=template.format(i, len(messages), (i / len(messages) * 100), ctr_hashes)
+                )
 
             if len(message.attachments) == 0:
                 ctr_nofile += 1
@@ -172,10 +167,11 @@ class Warden(commands.Cog):
             hashes = [x async for x in self.saveMessageHashes(message)]
             ctr_hashes += len(hashes)
 
-        await msg.edit(content="**SCAN COMPLETE**\n\n"
-                       f"Processed **{len(messages)}** messages.\n"
-                       f"Computed **{ctr_hashes}** hashes in {(time.time() - now):.1f} seconds."
-                       )
+        await msg.edit(
+            content="**SCAN COMPLETE**\n\n"
+            f"Processed **{len(messages)}** messages.\n"
+            f"Computed **{ctr_hashes}** hashes in {(time.time() - now):.1f} seconds."
+        )
 
     @scan.command(name="message")
     async def scan_message(self, ctx, link):
@@ -238,7 +234,7 @@ class Warden(commands.Cog):
             author = "_??? (404)_"
 
         desc = utils.fill_message("repost_description", user=message.author.id, value=prob)
-        embed = discord.Embed(title=title, color=0xcb410b, description=desc, url=message.jump_url)
+        embed = discord.Embed(title=title, color=0xCB410B, description=desc, url=message.jump_url)
         embed.add_field(name=f"**{author}**, {timestamp}", value=link, inline=False)
 
         embed.add_field(

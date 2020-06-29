@@ -6,6 +6,9 @@ This bot manages the verification process, karma and a bunch of simple commands
 on our VUT FIT discord server. Since most of the features are custom-made I
 wouldn't recommend using it for different servers.
 
+[Rubbergoddess](https://github.com/sinus-x/rubbergoddess) is a Rubbergod-based
+bot used on VUT FEKT discord server.
+
 ## Installing and running the bot
 
 Prerequisites:
@@ -13,7 +16,7 @@ Prerequisites:
 * Python3.6+
 
 Start by cloning the repo:
-```sh
+```bash
 git clone https://github.com/toaster192/rubbergod.git
 cd rubbergod
 ```
@@ -38,12 +41,12 @@ docker-compose down && docker-compose up --build
 ## Local setup (not recommended)
 
 Install the required python modules (`venv` / `--user` flag recommended):
-```
+```bash
 pip3 install -r requirements.txt
 ```
 
 Run the bot (might want to use `nohup` or something):
-```
+```bash
 python3 rubbergod.py
 ```
 
@@ -67,6 +70,7 @@ libpq-dev
 * [_peter](https://github.com/peterdragun)
 * [Urumasi](https://github.com/Urumasi)
 * [Leo](https://github.com/ondryaso)
+* [sinus-x](https://github.com/sinus-x)
 
 **Pull requests, issues or tips for new features are very much welcome!**
 
