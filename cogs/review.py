@@ -11,127 +11,137 @@ config = config.Config
 messages = messages.Messages
 review_repo = review_repo.ReviewRepository()
 
+
 class Review(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
         self.rev = Review_helper(bot)
 
+    async def check_member(self, ctx):
+        guild = self.bot.get_guild(config.guild_id)
+        member = guild.get_member(ctx.message.author.id)
+        if member is None:
+            await ctx.send(utils.fill_message("review_not_on_server", user=ctx.message.author.mention))
+            return False
+        roles = member.roles
+        verify = False
+        for role in roles:
+            if config.verification_role_id == role.id:
+                verify = True
+            if role.id in config.reviews_forbidden_roles:
+                await ctx.send(utils.fill_message("review_add_denied", user=ctx.message.author.id))
+                return False
+        if not verify:
+            await ctx.send(utils.fill_message("review_add_denied", user=ctx.message.author.id))
+            return
+        return True
+
     @commands.cooldown(rate=5, per=20.0, type=commands.BucketType.user)
-    @commands.command()
-    async def reviews(self, ctx, subcommand=None, subject=None,
-                      tier: int = None, *args):
-        if subcommand is None:
-            await ctx.send(messages.review_format)
-        else:
-            guild = self.bot.get_guild(config.guild_id)
-            member = guild.get_member(ctx.message.author.id)
-            if member == None:
-                await ctx.send(utils.fill_message("review_not_on_server",
-                                                  user=ctx.message.author.mention))
+    @commands.group(pass_context=True)
+    async def reviews(self, ctx):
+        if ctx.invoked_subcommand is None:
+            # show reviews
+            args = ctx.message.content.split()[1:]
+            if not args:
+                await ctx.send(messages.review_format)
                 return
-            roles = member.roles
-            if subcommand == 'add':
-                verify = False
-                for role in roles:
-                    if config.verification_role_id == role.id:
-                        verify = True
-                    if role.id in config.reviews_forbidden_roles:
-                        await ctx.send(utils.fill_message("review_add_denied",
-                                       user=ctx.message.author.id))
-                        return
-                if not verify:
-                    await ctx.send(utils.fill_message("review_add_denied", 
-                                   user=ctx.message.author.id))
-                    return
-                if subject is None or tier is None:
-                    await ctx.send(messages.review_add_format)
-                    return
-                author = ctx.message.author.id
-                anonym = False
-                if tier < 0 or tier > 4:
-                    await ctx.send(messages.review_tier)
-                    return
-                if not ctx.guild: # DM
-                    anonym = True
-                if args:
-                    args = ' '.join(args)
-                args_len = len(args)
-                if args_len == 0:
-                    args = None
-                try:
-                    self.rev.add_review(author, subject.lower(), tier, anonym, args)
-                except Exception:
-                    await ctx.send(messages.review_wrong_subject)
-                    return
-                await ctx.send(messages.review_added)
-            elif subcommand == 'remove':
-                if subject is None:
-                    if ctx.author.id == config.admin_id:
-                        await ctx.send(messages.review_remove_format_admin)
-                    else:
-                        await ctx.send(messages.review_remove_format)
-                elif subject == 'id':
-                    if ctx.author.id == config.admin_id:
-                        if tier is None:
-                            await ctx.send(messages.review_remove_id_format)
-                        else:
-                            review_repo.remove(tier) # tier => ID of review
-                            await ctx.send(messages.review_remove_success)
-                    else:
-                        await ctx.send(utils.fill_message("insufficient_rights",
-                                                          user=ctx.author.id))
-                else:
-                    subject = subject.lower()
-                    if self.rev.remove(str(ctx.message.author.id), subject):
-                        await ctx.send(messages.review_remove_success)
-                    else:
-                        await ctx.send(messages.review_remove_error)
+            subject = args[0]
+            embed = self.rev.list_reviews(subject.lower())
+            if not embed:
+                await ctx.send(messages.review_wrong_subject)
+                return
+            msg = await ctx.send(embed=embed)
+            footer = msg.embeds[0].footer.text.split('|')[0]
+            if msg.embeds[0].description[-1].isnumeric():
+                if footer != "Review: 1/1 ":
+                    await msg.add_reaction("⏪")
+                    await msg.add_reaction("◀")
+                    await msg.add_reaction("▶")
+                await msg.add_reaction("👍")
+                await msg.add_reaction("🛑")
+                await msg.add_reaction("👎")
+                if msg.embeds[0].fields[3].name == "Text page":
+                    await msg.add_reaction("🔼")
+                    await msg.add_reaction("🔽")
+
+    @reviews.command()
+    async def add(self, ctx, subject=None, tier: int = None, *args):
+        if not await self.check_member(ctx):
+            return
+        if subject is None or tier is None:
+            await ctx.send(messages.review_add_format)
+            return
+        if tier < 0 or tier > 4:
+            await ctx.send(messages.review_tier)
+            return
+        author = ctx.message.author.id
+        anonym = False
+        if not ctx.guild:  # DM
+            anonym = True
+        if args:
+            args = ' '.join(args)
+        args_len = len(args)
+        if args_len == 0:
+            args = None
+        if not self.rev.add_review(author, subject.lower(), tier, anonym, args):
+            await ctx.send(messages.review_wrong_subject)
+        else:
+            await ctx.send(messages.review_added)
+
+    @reviews.command()
+    async def remove(self, ctx, subject=None, id: int = None):
+        if not await self.check_member(ctx):
+            return
+        if subject is None:
+            if ctx.author.id == config.admin_id:
+                await ctx.send(messages.review_remove_format_admin)
             else:
-                subject = subcommand
-                embed = self.rev.list_reviews(subject.lower())
-                if not embed:
-                    await ctx.send(messages.review_wrong_subject)
-                    return
-                msg = await ctx.send(embed=embed)
-                footer = msg.embeds[0].footer.text.split('|')[0]
-                if msg.embeds[0].description[-1].isnumeric():
-                    if footer != "Review: 1/1 ":
-                        await msg.add_reaction("⏪")
-                        await msg.add_reaction("◀")
-                        await msg.add_reaction("▶")
-                    await msg.add_reaction("👍")
-                    await msg.add_reaction("🛑")
-                    await msg.add_reaction("👎")
-                    if msg.embeds[0].fields[3].name == "Text page":
-                        await msg.add_reaction("🔼")
-                        await msg.add_reaction("🔽")
+                await ctx.send(messages.review_remove_format)
+        elif subject == 'id':
+            if ctx.author.id == config.admin_id:
+                if id is None:
+                    await ctx.send(messages.review_remove_id_format)
+                else:
+                    review_repo.remove(id)
+                    await ctx.send(messages.review_remove_success)
+            else:
+                await ctx.send(utils.fill_message("insufficient_rights", user=ctx.author.id))
+        else:
+            subject = subject.lower()
+            if self.rev.remove(str(ctx.message.author.id), subject):
+                await ctx.send(messages.review_remove_success)
+            else:
+                await ctx.send(messages.review_remove_error)
+
+    @commands.cooldown(rate=5, per=20.0, type=commands.BucketType.user)
+    @commands.group(pass_context=True)
+    @commands.check(utils.is_bot_owner)
+    async def subject(self, ctx):
+        if ctx.invoked_subcommand is None:
+            await ctx.send(messages.subject_format)
+            return
+
+    @subject.command(name='add')
+    async def subject_add(self, ctx, *subjects):
+        for subject in subjects:
+            subject = subject.lower()
+            self.rev.add_subject(subject)
+        await ctx.send(f'Zkratky `{subjects}` byli přidány')
+
+    @subject.command(name='remove')
+    async def subject_remove(self, ctx, *subjects):
+        for subject in subjects:
+            subject = subject.lower()
+            self.rev.remove_subject(subject)
+        await ctx.send(f'Zkratky `{subjects}` byli odebrány')
 
     @reviews.error
+    @subject.error
     async def review_error(self, ctx, error):
         if isinstance(error, commands.BadArgument):
             await ctx.send(messages.review_add_format)
-
-    @commands.cooldown(rate=5, per=20.0, type=commands.BucketType.user)
-    @commands.command()
-    async def subject(self, ctx, subcommand=None, *subjects):
-        if ctx.author.id == config.admin_id:
-            if not subcommand or not subjects:
-                await ctx.send(messages.subject_format)
-                return
-            if subcommand == "add":
-                for subject in subjects:
-                    subject = subject.lower()
-                    self.rev.add_subject(subject)
-                await ctx.send(f'Zkratky `{subjects}` byli přidány')
-            elif subcommand == "remove":
-                for subject in subjects:
-                    subject = subject.lower()
-                    self.rev.remove_subject(subject)
-                await ctx.send(f'Zkratky `{subjects}` byli odebrány')
-            else:
-                await ctx.send(messages.review_wrong_subject)
-        else:
+        if isinstance(error, commands.CheckFailure):
             await ctx.send(utils.fill_message("insufficient_rights", user=ctx.author.id))
 
     @commands.Cog.listener()
@@ -201,11 +211,9 @@ class Review(commands.Cog):
                     elif emoji == "👎":
                         self.rev.add_vote(review_id, False, str(member.id))
                     elif emoji == "🛑":
-                        review_repo.remove_vote(
-                            review_id, str(member.id))
+                        review_repo.remove_vote(review_id, str(member.id))
                     page = str(page) + "/" + str(max_page)
-                    embed = self.rev.make_embed(
-                        review, subject, tier_average, page)
+                    embed = self.rev.make_embed(review, subject, tier_average, page)
                     await message.edit(embed=embed)
             elif emoji in ["🔼", "🔽"]:
                 if message.embeds[0].fields[3].name == "Text page":
@@ -216,16 +224,13 @@ class Review(commands.Cog):
                         pos = message.embeds[0].fields[3].value.find('/')
                         max_text_page = int(text_page[(pos + 1):])
                         text_page = int(text_page[:pos])
-                        next_text_page = utils.pagination_next(emoji, text_page,
-                                                              max_text_page)
+                        next_text_page = utils.pagination_next(emoji, text_page, max_text_page)
                         if next_text_page:
                             page = str(page) + "/" + str(max_page)
-                            embed = self.rev.make_embed(
-                                review, subject, tier_average, page)
-                            embed = self.rev.change_text_page(
-                                review, embed, next_text_page, max_text_page)
+                            embed = self.rev.make_embed(review, subject, tier_average, page)
+                            embed = self.rev.change_text_page(review, embed, next_text_page, max_text_page)
                             await message.edit(embed=embed)
-            if message.guild: # cannot remove reaction in DM
+            if message.guild:  # cannot remove reaction in DM
                 await message.remove_reaction(emoji, member)
 
 
@@ -256,8 +261,7 @@ class Review_helper():
                 if text_len > 1024:
                     pages = text_len // 1024 + (text_len % 1024 > 0)
                     text = review.text_review[:1024]
-                    embed.add_field(name="Text page",
-                                    value="1/" + str(pages), inline=False)
+                    embed.add_field(name="Text page", value="1/" + str(pages), inline=False)
                 embed.add_field(name="Text", value=text, inline=False)
             likes = review_repo.get_votes_count(review.id, True)
             embed.add_field(name="Likes", value="👍" + str(likes))
@@ -286,11 +290,14 @@ class Review_helper():
         return embed
 
     def add_review(self, author_id, subject, tier, anonym, text):
+        if not review_repo.get_subject(subject):
+            return False
         update = review_repo.get_review_by_author_subject(author_id, subject)
         if update:
             review_repo.update_review(update.id, tier, anonym, text)
         else:
             review_repo.add_review(author_id, subject, tier, anonym, text)
+        return True
 
     def list_reviews(self, subject):
         result = review_repo.get_subject(subject).first()
