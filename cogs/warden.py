@@ -91,7 +91,10 @@ class Warden(commands.Cog):
                 except Exception as e:
                     print("Warden:on_raw_reaction_add", "Could not remove bot's emote", e)
                     return
-                await message.delete()
+                try:
+                    await message.delete()
+                except discord.errors.NotFound:
+                    pass
 
     async def saveMessageHashes(self, message: discord.Message):
         for f in message.attachments:
