@@ -20,7 +20,6 @@ boottime = datetime.datetime.now().replace(microsecond=0)
 
 
 class Base(commands.Cog):
-
     def __init__(self, bot):
         self.bot = bot
         self.reaction = reaction.Reaction(bot, karma_r)
@@ -33,12 +32,12 @@ class Base(commands.Cog):
         if (isinstance(error, commands.BadArgument) or
             isinstance(error, commands.errors.CheckFailure) or
             isinstance(error, commands.errors.MissingAnyRole) or
-            isinstance(error, commands.errors.MissingRequiredArgument)) and\
-           hasattr(ctx.command, 'on_error'):
+            isinstance(error, commands.errors.MissingRequiredArgument)) \
+        and hasattr(ctx.command, 'on_error'):
             return
 
         if isinstance(error, commands.UserInputError):
-            await ctx.send("Chyba v inputu")
+            await ctx.send("Chyba ve vstupu")
             return
 
         if isinstance(error, commands.CommandNotFound):
@@ -51,10 +50,8 @@ class Base(commands.Cog):
             await ctx.send(utils.fill_message("spamming", user=ctx.author.id))
             return
 
-        output = 'Ignoring exception in command {}:\n'.format(ctx.command)
-        output += ''.join(traceback.format_exception(type(error),
-                                                     error,
-                                                     error.__traceback__))
+        output = "Ignoring exception in command {}:\n".format(ctx.command)
+        output += "".join(traceback.format_exception(type(error), error, error.__traceback__))
         channel = self.bot.get_channel(config.bot_dev_channel)
         print(output)
         output = utils.cut_string(output, 1900)
@@ -70,7 +67,7 @@ class Base(commands.Cog):
         await ctx.send(utils.fill_message("uptime_message", boottime=str(boottime), uptime=str(delta)))
 
     @commands.cooldown(rate=2, per=60.0, type=commands.BucketType.user)
-    @commands.command(aliases=['help'])
+    @commands.command(aliases=["help"])
     async def god(self, ctx):
         embed = self.reaction.make_embed(1)
 
