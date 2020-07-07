@@ -32,9 +32,9 @@ class Base(commands.Cog):
         if (isinstance(error, commands.BadArgument) or
             isinstance(error, commands.errors.CheckFailure) or
             isinstance(error, commands.errors.MissingAnyRole) or
-            isinstance(error, commands.errors.MissingRequiredArgument)) \
-        and hasattr(ctx.command, 'on_error'):
-            return
+            isinstance(error, commands.errors.MissingRequiredArgument)) and \
+            hasattr(ctx.command, 'on_error'):
+                return
 
         if isinstance(error, commands.UserInputError):
             await ctx.send("Chyba ve vstupu")
