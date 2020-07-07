@@ -34,6 +34,7 @@ class Config:
     karma_ban_role_id = -1
     #                        add-roles         back-to-school
     karma_banned_channels = [591384273051975683, 622202824377237504]
+    grillbot_leaderboard_size = 50
 
     # Voting
     vote_minimum = 20

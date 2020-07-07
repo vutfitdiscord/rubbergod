@@ -372,7 +372,7 @@ class Karma(BaseFeature):
         embed.timestamp = datetime.datetime.now(tz=datetime.timezone.utc)
 
         if action == "get" and order == "DESC":
-            value_num = math.ceil(start / 50)
+            value_num = math.ceil(start / cfg.grillbot_leaderboard_size)
             value = msg.karma_web if value_num == 1 else f"{msg.karma_web}{value_num}"
             embed.add_field(name=msg.karma_web_title, value=value)
 
