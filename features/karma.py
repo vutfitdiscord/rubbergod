@@ -1,5 +1,6 @@
 import asyncio
 import datetime
+import math
 
 import discord
 from discord import Emoji, TextChannel, Member
@@ -370,7 +371,9 @@ class Karma(BaseFeature):
         embed = discord.Embed(title=title, description=output)
         embed.timestamp = datetime.datetime.now(tz=datetime.timezone.utc)
 
-        if action == 'get' and order == "DESC":
-            embed.add_field(name=msg.karma_web_title, value=msg.karma_web)
+        if action == "get" and order == "DESC":
+            value_num = math.ceil(start / cfg.grillbot_leaderboard_size)
+            value = msg.karma_web if value_num == 1 else f"{msg.karma_web}{value_num}"
+            embed.add_field(name=msg.karma_web_title, value=value)
 
         await channel.send(embed=embed)
