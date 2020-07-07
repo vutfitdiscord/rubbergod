@@ -321,7 +321,7 @@ class FitWide(commands.Cog):
     @commands.cooldown(rate=2, per=20.0, type=commands.BucketType.user)
     @commands.check(is_in_modroom)
     @commands.command()
-    async def update_db(self, ctx, convert_0bit: bool = False):
+    async def update_db(self, ctx, convert_0xit: bool = False):
         with open("merlin-latest", "r") as f:
             data = f.readlines()
 
@@ -341,12 +341,12 @@ class FitWide(commands.Cog):
             except IndexError:
                 continue
 
-            if convert_0bit and year == "FIT BITP 1r":
+            if convert_0xit and year.endswith("1r"):
                 person = session.query(Valid_person).\
                     filter(Valid_person.login == login).\
                     one_or_none()
-                if person is not None and person.year == "FIT BITP 0r":
-                    year = "FIT BITP 0r"
+                if person is not None and person.year.endswith("0r"):
+                    year = year.replace("1r", "0r")
                  
             found_people.append(Valid_person(login=login, year=year,
                                              name=name))
@@ -361,7 +361,7 @@ class FitWide(commands.Cog):
         for person in found_people:
             session.merge(person)
 
-        counter = 0
+        cnt_new = 0
         for person in session.query(Valid_person):
             if person.login not in found_logins:
                 try:
@@ -370,16 +370,16 @@ class FitWide(commands.Cog):
                     person.year = "MUNI"
                 except ValueError:
                     person.year = "dropout"
-            elif convert_0bit and person.login in new_logins:
-                if person.year == "FIT BITP 1r":
-                    person.year = "FIT BITP 0r"
-                    counter += 1
+            elif convert_0xit and person.login in new_logins:
+                if person.year.endswith("1r"):
+                    person.year = person.year.replace("1r", "0r")
+                    cnt_new += 1
 
         session.commit()
 
         await ctx.send("Update databaze probehl uspesne")
-        if convert_0bit:
-            await ctx.send(f"Debug: Nasel jsem {counter} novych prvaku")
+        if convert_0xit:
+            await ctx.send(f"Debug: Nasel jsem {cnt_new} novych prvaku")
 
 
     @commands.cooldown(rate=2, per=20.0, type=commands.BucketType.user)
