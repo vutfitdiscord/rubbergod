@@ -428,7 +428,14 @@ class FitWide(commands.Cog):
             filter(Permit.login == login).one_or_none()
 
         if result is None:
-            await ctx.send("Neni na serveru prej")
+            person = session.query(Valid_person).\
+                filter(Valid_person.login == login).one_or_none()
+            if person is None:
+                await ctx.send("Neni ani v databazi moznych loginu prej.")
+            else:
+                await ctx.send(("Login: `{p.login}`\nJmeno: `{p.name}`\n"
+                                "Rocnik: `{p.year}`\nNeni na serveru prej"
+                                ).format(p=person))
         else:
             await ctx.send(utils.generate_mention(result.discord_ID))
 
