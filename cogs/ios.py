@@ -129,13 +129,13 @@ async def print_output(ctx, system, parsed_memory, parsed_semaphores, parsed_fil
                 continue
 
             if user is None:
-                await ctx.send("Sdilenou pamet nechava nejaky " + login +
-                               " co neni na serveru")
+                await ctx.send("Sdílenou paměť nechává nějaký " + login +
+                               " co není na serveru.")
             else:
                 await ctx.send(utils.generate_mention(user.discord_ID) +
-                               " mas na " + system + " " + str(count) +
-                               " sdilene pameti, ztracene prumerne " +
-                               str(avg_time) + " minut, ty prase")
+                               " máš na " + system + " " + str(count) +
+                               " sdílené paměti, ztracené průměrně " +
+                               str(avg_time) + " minut, ty prase.")
 
     if parsed_semaphores != dict():
         for login, array in parsed_semaphores.copy().items():
@@ -153,12 +153,12 @@ async def print_output(ctx, system, parsed_memory, parsed_semaphores, parsed_fil
                 continue
 
             if user is None:
-                await ctx.send("Semafory nechava nejaky " + login + " co neni na serveru")
+                await ctx.send("Semafory nechává nějaký " + login + " co není na serveru.")
             else:
                 await ctx.send(utils.generate_mention(user.discord_ID) +
-                               " mas na " + system + " " + str(count) +
-                               " semaforu, lezicich tam prumerne " +
-                               str(avg_time) + " minut, ty prase")
+                               " máš na " + system + " " + str(count) +
+                               " semaforů, ležících tam průměrně " +
+                               str(avg_time) + " minut, ty prase.")
 
     if parsed_files != dict():
         for login, array in parsed_files.copy().items():
@@ -178,18 +178,18 @@ async def print_output(ctx, system, parsed_memory, parsed_semaphores, parsed_fil
                 continue
 
             if user is None:
-                await ctx.send("Soubory semaforu nechava nejaky " +
-                               login + " co neni na serveru")
+                await ctx.send("Soubory semaforu nechává nějaký " +
+                               login + " co není na serveru.")
             else:
                 await ctx.send(utils.generate_mention(user.discord_ID) +
-                               " mas na " + system + "(/dev/shm) " +
-                               str(count) + " souboru semaforu")
+                               " máš na " + system + "(/dev/shm) " +
+                               str(count) + " souborů semaforu.")
                 if avg_time > 9:
-                    await ctx.send("Lezi ti tam prumerne uz " +
-                                   str(avg_time) + " minut, ty prase")
+                    await ctx.send("Leží ti tam průměrně už " +
+                                   str(avg_time) + " minut, ty prase.")
                 if login_not_in_name:
-                    await ctx.send("Nemas v nazvu tvuj login takze muzes" +
-                                   " mit kolize s ostatnima, ty prase")
+                    await ctx.send("Nemáš v názvu tvůj login, takže můžeš" +
+                                   " mit kolize s ostatními, ty prase.")
 
     if parsed_processes != dict():
         for login, array in parsed_processes.copy().items():
@@ -207,12 +207,12 @@ async def print_output(ctx, system, parsed_memory, parsed_semaphores, parsed_fil
                 continue
 
             if user is None:
-                await ctx.send("Nejakeho " + login + " co neni na serveru")
+                await ctx.send("Nějakého " + login + " co není na serveru.")
             else:
                 await ctx.send(utils.generate_mention(user.discord_ID) +
-                               " mas na " + system + " " + str(count) +
-                               " procesu, bezicich prumerne " +
-                               str(avg_time) + " minut, ty prase")
+                               " máš na " + system + " " + str(count) +
+                               " procesů, běžících průměrně " +
+                               str(avg_time) + " minut, ty prase.")
 
     if (parsed_memory == dict() and parsed_semaphores == dict()
             and parsed_processes == dict() and parsed_files == dict()):
@@ -237,7 +237,7 @@ class IOS(commands.Cog):
             parsed_semaphores, parsed_files = parse_semaphores(semaphores)
             parsed_processes = parse_processes(processes)
         except IndexError:
-            await ctx.send("Toastere mas bordel v parsovani")
+            await ctx.send("Toastere, máš bordel v parsování.")
 
         await print_output(ctx, "merlinovi", parsed_memory, parsed_semaphores,
                            parsed_files, parsed_processes)
@@ -254,11 +254,11 @@ class IOS(commands.Cog):
             parsed_semaphores, _ = parse_semaphores(semaphores)
             parsed_processes = parse_processes(processes)
         except IndexError:
-            await ctx.send("Toastere mas bordel v parsovani")
+            await ctx.send("Toastere, máš bordel v parsování.")
 
         # eva doesn't seem to have /dev/shm
         await print_output(ctx, "eve", parsed_memory, parsed_semaphores, dict(), parsed_processes)
-        await ctx.send("Pokud nevite jak po sobe uklidit checknete: " +
+        await ctx.send("Pokud nevíte jak po sobě uklidit, checkněte: " +
                        "https://discordapp.com/channels/" +
                        "461541385204400138/534431057001316362/" +
                        "698701631495340033")
@@ -266,7 +266,7 @@ class IOS(commands.Cog):
     @ios.error
     async def ios_role_checks_error(self, ctx, error):
         if isinstance(error, commands.errors.MissingAnyRole):
-            await ctx.send('Na tohle maji prava jen Helper+. ' +
+            await ctx.send('Na tohle mají práva jen Helper+. ' +
                            '<:KKomrade:484470873001164817>')
 
 

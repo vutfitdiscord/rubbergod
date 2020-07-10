@@ -62,7 +62,7 @@ class FitWide(commands.Cog):
         msg = ""
 
         if len(found_members) == 0:
-            msg = "Zadne jsem nenasel :slight_smile:"
+            msg = "Žádné jsem nenašel :slight_smile:"
         else:
             found_members.sort(key=lambda x: x[1], reverse=True)
             for member, role_count in found_members[:limit]:
@@ -112,7 +112,7 @@ class FitWide(commands.Cog):
         for member in verified:
             if member.id not in permited_ids:
                 if p_verified:
-                    await ctx.send("Nenasel jsem v verified databazi: " +
+                    await ctx.send("Ve verified databázi jsem nenašel: " +
                                    utils.generate_mention(member.id))
             else:
                 try:
@@ -126,7 +126,7 @@ class FitWide(commands.Cog):
 
                 if person.status != 0:
                     if p_status:
-                        await ctx.send("Status nesedi u: " + login)
+                        await ctx.send("Status nesedí u: " + login)
 
                 year = self.verification.transform_year(person.year)
 
@@ -138,34 +138,34 @@ class FitWide(commands.Cog):
                             if role in member.roles:
                                 await member.add_roles(correct_role)
                                 await member.remove_roles(role)
-                                await ctx.send("Presouvam: " + member.display_name +
+                                await ctx.send("Přesouvám: " + member.display_name +
                                                " z " + role_name + " do " + year)
                                 break
                         else:
                             await member.add_roles(dropout)
-                            await ctx.send("Presouvam: " + member.display_name +
+                            await ctx.send("Přesouvám: " + member.display_name +
                                            " z " + role_name + " do dropout")
                     elif p_role:
-                        await ctx.send("Nesedi mi role u: " +
+                        await ctx.send("Nesedí mi role u: " +
                                        utils.generate_mention(member.id) +
-                                       ", mel by mit roli: " + year)
+                                       ", měl by mít roli: " + year)
                 elif year is None:
                     if p_move:
                         for role_name, role in year_roles.items():
                             if role in member.roles:
                                 await member.add_roles(dropout)
                                 await member.remove_roles(role)
-                                await ctx.send("Presouvam: " + member.display_name +
+                                await ctx.send("Přesouvám: " + member.display_name +
                                                " z " + role_name + " do dropout")
                                 break
                         else:
                             await member.add_roles(dropout)
-                            await ctx.send("Presouvam: " + member.display_name +
+                            await ctx.send("Přesouvám: " + member.display_name +
                                            " z " + role_name + " do dropout")
                     elif p_role:
-                        await ctx.send("Nesedi mi role u: " +
+                        await ctx.send("Nesedí mi role u: " +
                                        utils.generate_mention(member.id) +
-                                       ", ma ted rocnik: " + person.year)
+                                       ", má teď ročník: " + person.year)
 
         await ctx.send("Done")
 
@@ -312,7 +312,7 @@ class FitWide(commands.Cog):
                                           read_messages=True,
                                           send_messages=True)
 
-        await ctx.send('Holy fuck, vsechno se povedlo, '
+        await ctx.send('Holy fuck, všechno se povedlo, '
                        'tak zase za rok <:Cauec:602052606210211850>')
 
     # TODO: the opposite of increment_roles (for rollback and testing)
@@ -356,7 +356,7 @@ class FitWide(commands.Cog):
             if login not in old_logins:
                 new_logins.append(login)
 
-        await ctx.send(f"Nasel jsem {len(new_logins)} novych loginu")
+        await ctx.send(f"Našel jsem {len(new_logins)} nových loginů.")
 
         for person in found_people:
             session.merge(person)
@@ -377,9 +377,9 @@ class FitWide(commands.Cog):
 
         session.commit()
 
-        await ctx.send("Update databaze probehl uspesne")
+        await ctx.send("Aktualizace databáze proběhla úspěšně.")
         if convert_0xit:
-            await ctx.send(f"Debug: Nasel jsem {cnt_new} novych prvaku")
+            await ctx.send(f"Debug: Našel jsem {cnt_new} nových prvaků.")
 
 
     @commands.cooldown(rate=2, per=20.0, type=commands.BucketType.user)
@@ -390,14 +390,14 @@ class FitWide(commands.Cog):
         try:
             output, error = process.communicate(timeout=15)
             if error:
-                await ctx.send("stazeni databaze nejak nefunguje")
+                await ctx.send("Stažené databáze nějak nefunguje.")
                 return
         except TimeoutExpired:
-            await ctx.send("stazeni databaze nejak timeoutuje")
+            await ctx.send("Timeout při stahování databáze.")
             return
         with open("merlin-latest", "w") as f:
             f.write(output.decode("utf-8"))
-        await ctx.send("Stazeni databaze probehlo uspesne")
+        await ctx.send("Stažení databáze proběhlo úspěšně.")
 
     @commands.cooldown(rate=2, per=20.0, type=commands.BucketType.user)
     @commands.check(is_in_modroom)
@@ -407,7 +407,7 @@ class FitWide(commands.Cog):
             filter(Permit.discord_ID == str(member.id)).one_or_none()
 
         if result is None:
-            await ctx.send("Neni v DB prej")
+            await ctx.send("Uživatel není v databázi.")
             return
 
         person = session.query(Valid_person).\
@@ -417,8 +417,8 @@ class FitWide(commands.Cog):
             await ctx.send(result.login)
             return
 
-        await ctx.send(("Login: `{p.login}`\nJmeno: `{p.name}`\n"
-                        "Rocnik: `{p.year}`").format(p=person))
+        await ctx.send(("Login: `{p.login}`\nJméno: `{p.name}`\n"
+                        "Ročník: `{p.year}`").format(p=person))
 
     @commands.cooldown(rate=2, per=20.0, type=commands.BucketType.user)
     @commands.check(is_in_modroom)
@@ -431,10 +431,10 @@ class FitWide(commands.Cog):
             person = session.query(Valid_person).\
                 filter(Valid_person.login == login).one_or_none()
             if person is None:
-                await ctx.send("Neni ani v databazi moznych loginu prej.")
+                await ctx.send("Uživatel není v databázi možných loginů.")
             else:
-                await ctx.send(("Login: `{p.login}`\nJmeno: `{p.name}`\n"
-                                "Rocnik: `{p.year}`\nNeni na serveru prej"
+                await ctx.send(("Login: `{p.login}`\nJméno: `{p.name}`\n"
+                                "Ročník: `{p.year}`\nNení na serveru."
                                 ).format(p=person))
         else:
             await ctx.send(utils.generate_mention(result.discord_ID))
@@ -447,13 +447,13 @@ class FitWide(commands.Cog):
         result = session.query(Valid_person).\
             filter(Valid_person.login == login).one_or_none()
         if result is None:
-            await ctx.send("Neni validni login pre")
+            await ctx.send("To není validní login.")
         else:
             session.query(Permit).\
                 filter(Permit.login == login).delete()
             result.status = 1
             session.commit()
-            await ctx.send("Done")
+            await ctx.send("Hotovo.")
 
     @commands.cooldown(rate=2, per=20.0, type=commands.BucketType.user)
     @commands.check(is_in_modroom)
@@ -463,12 +463,12 @@ class FitWide(commands.Cog):
         result = session.query(Valid_person).\
             filter(Valid_person.login == login).one_or_none()
         if result is None:
-            await ctx.send("Neni validni login prej")
+            await ctx.send("To není validní login.")
         else:
             session.add(Permit(login=login, discord_ID=str(member.id)))
             result.status = 0
             session.commit()
-            await ctx.send("Done")
+            await ctx.send("Hotovo.")
 
     @get_users_login.error
     @reset_login.error
