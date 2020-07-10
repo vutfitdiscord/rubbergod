@@ -27,7 +27,7 @@ class Random(commands.Cog):
         """"Pick an option"""
         option = rng.pick_option(args)
         if option:
-            await ctx.send("{} {}".format(option, utils.generate_mention(ctx.author.id)))
+            await ctx.send("{} {}".format(option, ctx.author.mention))
         await self.check.botroom_check(ctx.message)
 
     @commands.cooldown(rate=5, per=20.0, type=commands.BucketType.user)
