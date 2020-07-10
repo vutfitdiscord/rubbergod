@@ -127,14 +127,14 @@ class Review(commands.Cog):
         for subject in subjects:
             subject = subject.lower()
             self.rev.add_subject(subject)
-        await ctx.send(f'Zkratky `{subjects}` byli přidány')
+        await ctx.send(f'Zkratky `{subjects}` byli přidány.')
 
     @subject.command(name='remove')
     async def subject_remove(self, ctx, *subjects):
         for subject in subjects:
             subject = subject.lower()
             self.rev.remove_subject(subject)
-        await ctx.send(f'Zkratky `{subjects}` byli odebrány')
+        await ctx.send(f'Zkratky `{subjects}` byli odebrány.')
 
     @reviews.error
     @subject.error
@@ -154,7 +154,7 @@ class Review(commands.Cog):
         else:
             guild = self.bot.get_guild(config.guild_id)
             if guild is None:
-                raise Exception("Nemuzu najit guildu podle config.guild_id")
+                raise Exception("Nemůžu najit guildu podle config.guild_id")
         member = guild.get_member(payload.user_id)
         try:
             message = await channel.fetch_message(payload.message_id)

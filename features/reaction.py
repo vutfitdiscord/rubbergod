@@ -226,7 +226,7 @@ class Reaction(BaseFeature):
         else:
             guild = self.bot.get_guild(Config.guild_id)
             if guild is None:
-                raise Exception("Nemuzu najit guildu podle config.guild_id")
+                raise Exception("Nemůžu najít guildu podle config.guild_id")
         member = guild.get_member(payload.user_id)
 
         try:

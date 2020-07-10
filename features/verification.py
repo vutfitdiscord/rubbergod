@@ -85,7 +85,7 @@ class Verification(BaseFeature):
                     await message.channel.send(utils.fill_message("verify_send_not_found",
                                                user=message.author.id, admin=Config.admin_id))
 
-                    embed = discord.Embed(title="Neuspesny pokus o verify",
+                    embed = discord.Embed(title="Neúspěšný pokus o verify",
                                           color=0xeee657)
                     embed.add_field(name="User", value=utils.generate_mention(message.author.id))
                     embed.add_field(name="Message",
@@ -100,7 +100,7 @@ class Verification(BaseFeature):
                     await message.channel.send(utils.fill_message("verify_send_not_found",
                                                user=message.author.id, admin=Config.admin_id))
 
-                    embed = discord.Embed(title="Neuspesny pokus o verify",
+                    embed = discord.Embed(title="Neúspěšný pokus o verify",
                                           color=0xeee657)
                     embed.add_field(name="User", value=utils.generate_mention(message.author.id))
                     embed.add_field(name="Message",
@@ -124,7 +124,7 @@ class Verification(BaseFeature):
                     await message.channel.send(utils.fill_message("verify_send_not_found",
                                                user=message.author.id, admin=Config.admin_id))
 
-                    embed = discord.Embed(title="Neuspesny pokus o verify",
+                    embed = discord.Embed(title="Neúspěšný pokus o verify",
                                           color=0xeee657)
                     embed.add_field(name="User", value=utils.generate_mention(message.author.id))
                     embed.add_field(name="Message",
@@ -216,7 +216,7 @@ class Verification(BaseFeature):
                 if code != new_user.code:
                     await message.channel.send(utils.fill_message("verify_verify_wrong_code",
                                                user=message.author.id))
-                    embed = discord.Embed(title="Neuspesny pokus o verify(kod)",
+                    embed = discord.Embed(title="Neúspěšný pokus o verify (kód)",
                                           color=0xeee657)
                     embed.add_field(name="User", value=utils.generate_mention(message.author.id))
                     embed.add_field(name="Message",
@@ -237,7 +237,7 @@ class Verification(BaseFeature):
                         )
                     )
 
-                    embed = discord.Embed(title="Neuspesny pokus o verify(manual)",
+                    embed = discord.Embed(title="Neúspěšný pokus o verify (manuál)",
                                           color=0xeee657)
                     embed.add_field(name="User", value=utils.generate_mention(message.author.id))
                     embed.add_field(name="Message",
@@ -279,7 +279,7 @@ class Verification(BaseFeature):
                 await message.channel.send(utils.fill_message("verify_verify_not_found",
                                            user=message.author.id, admin=Config.admin_id))
 
-                embed = discord.Embed(title="Neuspesny pokus o verify",
+                embed = discord.Embed(title="Neúspěšný pokus o verify",
                                       color=0xeee657)
                 embed.add_field(name="User", value=utils.generate_mention(message.author.id))
                 embed.add_field(name="Message",
