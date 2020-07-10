@@ -6,16 +6,11 @@ from config.messages import Messages
 
 class Rng:
     @staticmethod
-    def pick_option(message):
+    def pick_option(arguments):
         """"Pick one option from message"""
-        if "?" in message:
-            message = message.split('?', 1)[1]
-
-        options = message.split()
-        if len(options) > 0:
-            return choice(options)
-        else:
-            return False
+        if len(arguments):
+            return choice(arguments)
+        return False
 
     @staticmethod
     def generate_number(message):

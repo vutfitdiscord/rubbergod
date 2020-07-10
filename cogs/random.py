@@ -11,7 +11,6 @@ rng = rng.Rng()
 
 
 class Random(commands.Cog):
-
     def __init__(self, bot):
         self.bot = bot
         self.check = room_check.RoomCheck(bot)
@@ -26,7 +25,7 @@ class Random(commands.Cog):
     @commands.command()
     async def pick(self, ctx, *args):
         """"Pick an option"""
-        option = rng.pick_option(discord.utils.escape_mentions(' '.join(args)))
+        option = rng.pick_option(args)
         if option:
             await ctx.send("{} {}".format(option, utils.generate_mention(ctx.author.id)))
         await self.check.botroom_check(ctx.message)
