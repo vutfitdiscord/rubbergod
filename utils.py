@@ -88,3 +88,32 @@ def is_bot_owner(ctx: commands.Context):
 
 def cut_string(string: str, part_len: int):
     return list(string[0+i:part_len+i] for i in range(0, len(string), part_len))
+
+async def reaction_get_ctx(bot, payload):
+    channel = bot.get_channel(payload.channel_id)
+    if channel is None:
+        return None
+    if channel.type is discord.ChannelType.text:
+        guild = channel.guild
+    else:
+        guild = bot.get_guild(Config.guild_id)
+        if guild is None:
+            raise Exception("Nemůžu najít guildu podle config.guild_id")
+    member = guild.get_member(payload.user_id)
+
+    try:
+        message = await channel.fetch_message(payload.message_id)
+    except discord.errors.NotFound:
+        return None
+
+    if member is None or message is None or member.bot:
+        return None
+
+    if payload.emoji.is_custom_emoji():
+        emoji = bot.get_emoji(payload.emoji.id)
+        if emoji is None:
+            emoji = payload.emoji
+    else:
+        emoji = payload.emoji.name
+
+    return dict(channel=channel, guild=guild, member=member, message=message, emoji=emoji)
