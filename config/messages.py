@@ -30,8 +30,6 @@ class Messages:
     vote_room_only = "Tohle funguje jen v {room}."
     bot_room_redirect = "{user} <:sadcat:576171980118687754> 👉 " \
                         "<#{bot_room}>\n"
-    message_link_prefix = 'https://discordapp.com/channels/' \
-                          + str(Config.guild_id) + '/'
 
     uhoh_counter = "{uhohs} uh ohs od spuštění."
     uptime_message = "Up since:  `{boottime}`\nUptime:\t`{uptime}`"
