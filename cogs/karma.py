@@ -3,7 +3,7 @@ from discord.ext import commands
 
 import utils
 from config import app_config as config, messages
-from features import karma, reaction
+from features import karma
 from repository import karma_repo
 from cogs import room_check
 
@@ -19,23 +19,54 @@ class Karma(commands.Cog):
         self.bot = bot
         self.karma = karma.Karma(bot, karma_r)
         self.check = room_check.RoomCheck(bot)
-        self.reaction = reaction.Reaction(bot, karma_r)
 
     @commands.Cog.listener()
     async def on_raw_reaction_add(self, payload):
-        try:
-            await self.reaction.add(payload)
-        except discord.HTTPException:
-            # ignore HTTP Exceptions
+        ctx = await utils.reaction_get_ctx(self.bot, payload)
+        if ctx is None:
             return
+        if ctx['emoji'] == "⏹️":
+            return
+            # grillbot emoji for removing message causes errors
+        if ctx['message'].content.startswith(config.role_string) or\
+           ctx['channel'].id in config.role_channels:
+            return
+        elif ctx['message'].content.startswith(messages.karma_vote_message_hack):
+            if ctx['emoji'] not in ["✅", "❌", "0⃣"]:
+                await ctx['message'].remove_reaction(ctx['emoji'], ctx['member'])
+            else:
+                users = []
+                for reaction in ctx['message'].reactions:
+                    users.append(await reaction.users().flatten())
+                # Flatten the final list
+                users = [x for y in users for x in y]
+                if users.count(ctx['member']) > 1:
+                    await ctx['message'].remove_reaction(ctx['emoji'], ctx['member'])
+        elif ctx['member'].id != ctx['message'].author.id and\
+                ctx['guild'].id == config.guild_id and\
+                ctx['message'].channel.id not in \
+                config.karma_banned_channels and \
+                config.karma_ban_role_id not in map(lambda x: x.id, ctx['member'].roles):
+            if isinstance(ctx['emoji'], str):
+                karma_r.karma_emoji(ctx['message'].author, ctx['member'], ctx['emoji'])
+            else:
+                karma_r.karma_emoji(ctx['message'].author, ctx['member'], ctx['emoji'].id)
 
     @commands.Cog.listener()
     async def on_raw_reaction_remove(self, payload):
-        try:
-            await self.reaction.remove(payload)
-        except discord.HTTPException:
-            # ignore HTTP Exceptions
+        ctx = await utils.reaction_get_ctx(self.bot, payload)
+        if ctx is None:
             return
+
+        if ctx['member'].id != ctx['message'].author.id and \
+                ctx['guild'].id == config.guild_id and \
+                ctx['message'].channel.id not in \
+                config.karma_banned_channels and \
+                config.karma_ban_role_id not in map(lambda x: x.id, ctx['member'].roles):
+            if isinstance(ctx['emoji'], str):
+                karma_r.karma_emoji_remove(ctx['message'].author, ctx['member'], ctx['emoji'])
+            else:
+                karma_r.karma_emoji_remove(ctx['message'].author, ctx['member'], ctx['emoji'].id)
 
     @commands.cooldown(rate=5, per=30.0, type=commands.BucketType.user)
     @commands.group(pass_context=True)
