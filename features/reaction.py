@@ -1,4 +1,3 @@
-import discord
 from discord.ext.commands import Bot
 
 import utils
@@ -62,4 +61,3 @@ class Reaction(BaseFeature):
             else:
                 self.karma_repo.karma_emoji_remove(
                     ctx['message'].author, ctx['member'], ctx['emoji'].id)
-

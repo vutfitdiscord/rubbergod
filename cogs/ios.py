@@ -1,9 +1,7 @@
-from discord import Member
 from discord.ext import commands
 from config import app_config as config, messages
 from repository.database import session
 from repository.database.verification import Permit, Valid_person
-import discord
 import utils
 import subprocess
 import datetime
@@ -107,7 +105,7 @@ def parse_processes(processes):
 def filter_processes(processes):
     out = []
     for line in processes.strip().splitlines():
-        if re.search("/[a-zA-Z0-9.]+ \d+ \d+ \d+ \d+ \d+$", line):
+        if re.search(r"/[a-zA-Z0-9.]+ \d+ \d+ \d+ \d+ \d+$", line):
             out.append(line)
     return "\n".join(out)
 

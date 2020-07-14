@@ -30,11 +30,11 @@ class Base(commands.Cog):
         # The local handlers so far only catch bad arguments so we still
         # want to print the rest
         if (isinstance(error, commands.BadArgument) or
-            isinstance(error, commands.errors.CheckFailure) or
-            isinstance(error, commands.errors.MissingAnyRole) or
-            isinstance(error, commands.errors.MissingRequiredArgument)) and \
-            hasattr(ctx.command, 'on_error'):
-                return
+           isinstance(error, commands.errors.CheckFailure) or
+           isinstance(error, commands.errors.MissingAnyRole) or
+           isinstance(error, commands.errors.MissingRequiredArgument)) and \
+           hasattr(ctx.command, 'on_error'):
+            return
 
         if isinstance(error, commands.UserInputError):
             await ctx.send("Chyba ve vstupu")

@@ -62,7 +62,7 @@ class Config:
     # Karma
     karma_ban_role_id: int = get_attr('karma_ban_role_id')
     karma_banned_channels: List[int] = get_attr('karma_banned_channels')
-    grillbot_leaderboard_size : int = get_attr('grillbot_leaderboard_size')
+    grillbot_leaderboard_size: int = get_attr('grillbot_leaderboard_size')
 
     # Voting
     vote_minimum: int = get_attr('vote_minimum')

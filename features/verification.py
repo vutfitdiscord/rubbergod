@@ -117,7 +117,7 @@ class Verification(BaseFeature):
 
                     if self.repo.get_user(login, status=1) is None:
                         self.repo.add_user(login, "MUNI", status=1)
-                        
+
                     await self.gen_code_and_send_mail(message, login,
                                                       "@mail.muni.cz")
                 else:
@@ -164,7 +164,7 @@ class Verification(BaseFeature):
                                            "NSEC", "NEMB", "NHPC", "NISD",
                                            "NIDE", "NISY", "NMAL", "NMAT",
                                            "NSEN", "NVER", "NSPE", "MGH"]:
-                    year = "MIT" # MGH is also Erasmus
+                    year = "MIT"  # MGH is also Erasmus
                     if raw_year_parts[2] < 3:
                         year = str(raw_year_parts[2]) + year
                     else:
@@ -172,7 +172,7 @@ class Verification(BaseFeature):
                 elif raw_year_parts[1] in ["DVI4", "DRH"]:
                     year = "PhD+"
                 elif raw_year_parts[1] in ["BCH", "CZV"]:
-                    year = "1BIT" # TODO: fix erasmus students (BCH)
+                    year = "1BIT"  # TODO: fix erasmus students (BCH)
         elif raw_year_parts[0] == "FEKT":
             year = "VUT"
         elif len(raw_year_parts) == 1:
