@@ -7,7 +7,6 @@ from discord.ext import commands
 import utils
 from config import app_config as config, messages
 from logic import rng
-from features import reaction
 from repository import karma_repo
 from cogs import room_check
 
@@ -22,7 +21,6 @@ boottime = datetime.datetime.now().replace(microsecond=0)
 class Base(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.reaction = reaction.Reaction(bot, karma_r)
         self.check = room_check.RoomCheck(bot)
 
     @commands.Cog.listener()
