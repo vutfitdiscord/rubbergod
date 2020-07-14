@@ -89,6 +89,7 @@ def is_bot_owner(ctx: commands.Context):
 def cut_string(string: str, part_len: int):
     return list(string[0+i:part_len+i] for i in range(0, len(string), part_len))
 
+
 async def reaction_get_ctx(bot, payload):
     channel = bot.get_channel(payload.channel_id)
     if channel is None:

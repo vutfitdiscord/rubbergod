@@ -25,7 +25,6 @@ class ReactToRole(commands.Cog):
             role_data = await self.get_join_role_data(message)
             await self.message_role_reactions(message, role_data)
 
-
     @commands.Cog.listener()
     async def on_raw_reaction_add(self, payload):
         ctx = await utils.reaction_get_ctx(self.bot, payload)

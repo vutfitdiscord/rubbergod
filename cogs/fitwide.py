@@ -347,7 +347,7 @@ class FitWide(commands.Cog):
                     one_or_none()
                 if person is not None and person.year.endswith("0r"):
                     year = year.replace("1r", "0r")
-                 
+
             found_people.append(Valid_person(login=login, year=year,
                                              name=name))
             found_logins.append(login)
@@ -380,7 +380,6 @@ class FitWide(commands.Cog):
         await ctx.send("Aktualizace databáze proběhla úspěšně.")
         if convert_0xit:
             await ctx.send(f"Debug: Našel jsem {cnt_new} nových prvaků.")
-
 
     @commands.cooldown(rate=2, per=20.0, type=commands.BucketType.user)
     @commands.check(is_in_modroom)

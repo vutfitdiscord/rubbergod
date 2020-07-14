@@ -151,12 +151,14 @@ class Messages:
 
     vote_format = "Použití vote:\n`" + prefix + "vote [datum] [čas] [otázka]\n[emoji]" \
                                                 " [odpověď 1]\n[emoji] [odpověď 2]\na tak dále`\n" \
-                                                "Datum je ve formátu `dd.MM.(yy)`. Čas je ve formátu `hh:mm`. " \
+                                                "Datum je ve formátu `dd.MM.(yy)`." \
+                                                "Čas je ve formátu `hh:mm`. " \
                                                 "Pouze vyplněný čas použije den odeslání zprávy, " \
                                                 "pouze vyplněné datum použije čas 00:00. " \
                                                 "Datum a čas jsou nepovinné argumenty, " \
                                                 "hlasování bude bez jejich uvedení funkční neustále. " \
-                                                "Pokud jsou vyplněny, bot pošle po uplynutí zprávu o výsledku," \
+                                                "Pokud jsou vyplněny," \
+                                                "bot pošle po uplynutí zprávu o výsledku," \
                                                 "když ho mezitím nikdo nevypne. " \
                                                 "Indikace výherné možnosti přežije i vypnutí."
     vote_not_emoji = "{not_emoji} není emoji. <:sadcat:576171980118687754>"
@@ -167,7 +169,8 @@ class Messages:
 
     vote_none = "Čekám na hlasy."
 
-    vote_result = "V hlasování „{question}“ vyhrála možnost {winning_emoji} „{winning_option}“ s {votes} hlasy."
+    vote_result = "V hlasování „{question}“ vyhrála možnost {winning_emoji} " \
+                  "„{winning_option}“ s {votes} hlasy."
     vote_result_multiple = "V hlasování „{question}“ vyhrály možnosti {winning_emojis} s {votes} hlasy."
     vote_result_none = "V hlasování „{question}“ nikdo nehlasoval. <:sadcat:576171980118687754>"
 
@@ -203,7 +206,8 @@ class Messages:
 
     repost_title = "Nápověda"
     repost_description = "{user}, shoda **{value}**!"
-    repost_content = "Pokud je obrázek repost, dej mu ♻️.\nJestli není, klikni tady na ❎ a při {limit} takových reakcích se toho upozornění smaže."
+    repost_content = "Pokud je obrázek repost, dej mu ♻️.\nJestli není, klikni tady na ❎ "\
+                     "a při {limit} takových reakcích se toho upozornění smaže."
 
     on_ready_message = "<:peepowave:693070888546861096>"
 

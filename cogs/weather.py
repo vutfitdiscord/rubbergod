@@ -3,7 +3,6 @@ import requests
 import discord
 from discord.ext import commands
 
-import utils
 from config import app_config as config, messages
 
 config = config.Config
@@ -56,7 +55,6 @@ class weather(commands.Cog):
             await ctx.send(
                 "Město nenalezeno! <:pepeGun:484470874246742018> (" + res["message"] + ")"
             )
-
 
 
 def setup(bot):
