@@ -1,4 +1,3 @@
-import datetime
 import discord
 from discord.ext.commands import Bot
 
@@ -191,31 +190,6 @@ class Reaction(BaseFeature):
                 self.karma_repo.karma_emoji(message.author, member, emoji)
             else:
                 self.karma_repo.karma_emoji(message.author, member, emoji.id)
-
-        # if the message has X or more 'pin' emojis pin the message
-        if emoji == '📌':
-            for reaction in message.reactions:
-                if reaction.emoji == '📌' and \
-                   reaction.count >= Config.pin_count and \
-                   not message.pinned and \
-                   message.channel.id not in Config.pin_banned_channels:
-                    embed = discord.Embed(title="📌 Auto pin message log",
-                                          color=0xeee657)
-                    users = await reaction.users().flatten()
-                    user_names = ', '.join([user.name for user in users])
-                    message_link = Messages.message_link_prefix +\
-                        str(message.channel.id) + '/' +\
-                        str(message.id)
-                    embed.add_field(name="Users", value=user_names)
-                    embed.add_field(name="In channel", value=message.channel)
-                    embed.add_field(name="Message",
-                                    value=message_link, inline=False)
-                    embed.timestamp = datetime.datetime.now()
-                    channel = self.bot.get_channel(Config.log_channel)
-                    await channel.send(embed=embed)
-                    await message.pin()
-                    await message.clear_reaction('📌')
-                    break
 
     async def remove(self, payload):
         channel = self.bot.get_channel(payload.channel_id)

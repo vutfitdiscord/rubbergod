@@ -21,8 +21,8 @@ class Config:
     ignored_prefixes = ('!')
 
     # Extensions loaded on bot start
-    extensions = ['base', 'karma', 'meme', 'random', 'verify', 'fitwide',
-                  'acl', 'review', 'vote', 'kachna', 'name_day', "week", "weather"]
+    extensions = ['base', 'karma', 'meme', 'random', 'verify', 'fitwide', 'autopin',
+                  'acl', 'review', 'vote', 'kachna', 'name_day', 'week', 'weather']
 
     # Roll dice
     max_dice_at_once = 1000
