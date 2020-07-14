@@ -46,7 +46,7 @@ class AutoPin(commands.Cog):
         embed.add_field(name="Users", value=user_names)
         embed.add_field(name="In channel", value=message.channel)
         embed.add_field(name="Message", value=message_link, inline=False)
-        embed.timestamp = datetime.datetime.now()
+        embed.timestamp = datetime.datetime.now(tz=datetime.timezone.utc)
         channel = self.bot.get_channel(Config.log_channel)
         await channel.send(embed=embed)
 
