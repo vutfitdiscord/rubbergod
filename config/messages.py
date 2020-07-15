@@ -178,9 +178,12 @@ class Messages:
         prefix + "reviews add IZP 2 text recenze`"
     review_wrong_subject = "Nesprávná zkratka předmětu."
     review_tier = "Tier je z rozsahu 0-4, kde 0 je nejlepší."
-    review_text_len = "Maximální počet znaků v části 'text' je 1024."
     review_added = "Hodnocení předmětu bylo přidáno."
     reviews_page_e = "Zavolej reviews znovu pro aktualizaci."
+    reviews_reaction_help = "Pokud byla recenze užitečná dejte 👍, jinak 👎.\n" \
+                            "Pro odstranění hlasu je možné použit 🛑.\n" \
+                            "Použijte reakce ◀️ a ▶️ pro navigaci mezi recenzemi.\n" \
+                            "Pro navigaci v textu delších recenzí použijte 🔼 a 🔽.\n"
 
     review_get_format = prefix + "reviews [zkratka předmětu]"
     review_remove_format = prefix + "reviews remove [zkratka předmětu]"

@@ -252,6 +252,7 @@ class Review_helper():
             elif diff < 0:
                 colour = 0xcb410b
             id = review.id
+            embed.add_field(name="Help", value=messages.reviews_reaction_help, inline=False)
         embed.set_footer(text="Review: " + page + ' | ID: ' + str(id))
         embed.timestamp = datetime.datetime.now(tz=datetime.timezone.utc)
         embed.colour = colour
