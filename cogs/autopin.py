@@ -3,7 +3,6 @@ import discord
 from discord.ext import commands
 
 from config.app_config import Config
-from config.messages import Messages
 
 
 class AutoPin(commands.Cog):
