@@ -2,6 +2,8 @@ import discord
 from discord.ext import commands
 
 import utils
+import re
+import datetime
 from config import app_config as config, messages
 from features import karma
 from repository import karma_repo
@@ -25,12 +27,13 @@ class Karma(commands.Cog):
         ctx = await utils.reaction_get_ctx(self.bot, payload)
         if ctx is None:
             return
+        # grillbot emoji for removing message causes errors
         if ctx['emoji'] == "⏹️":
             return
-            # grillbot emoji for removing message causes errors
         if ctx['message'].content.startswith(config.role_string) or\
            ctx['channel'].id in config.role_channels:
             return
+        # handle karma vote
         elif ctx['message'].content.startswith(messages.karma_vote_message_hack):
             if ctx['emoji'] not in ["✅", "❌", "0⃣"]:
                 await ctx['message'].remove_reaction(ctx['emoji'], ctx['member'])
@@ -42,6 +45,34 @@ class Karma(commands.Cog):
                 users = [x for y in users for x in y]
                 if users.count(ctx['member']) > 1:
                     await ctx['message'].remove_reaction(ctx['emoji'], ctx['member'])
+        # leaderboard pagination
+        elif ctx['message'].embeds and ctx['message'].embeds[0].title is not discord.Embed.Empty and\
+                re.match(r".* (LEADER|BAJKAR|ISHA|GIVING)BOARD .*", ctx['message'].embeds[0].title) and\
+                ctx['emoji'] in ["◀", "▶", "⏪"]:
+            embed = ctx['message'].embeds[0]
+            column, attribute, max_page = self.karma.get_db_from_title(embed.title)
+            if column is None:
+                return
+            
+            if not embed.description is discord.Embed.Empty:
+                current_page = int(embed.description.split(' – ')[0])
+            else:
+                current_page = max_page
+            if ctx['emoji'] == "▶":
+                next_page = current_page + 10
+                if next_page > max_page - 9:
+                    next_page = max_page - 9
+            elif ctx['emoji'] == "◀":
+                next_page = current_page - 10
+                if next_page <= 0:
+                    next_page = 1
+            elif ctx['emoji'] == "⏪":
+                next_page = 1
+            embed.description = self.karma.gen_leaderboard_content(attribute, next_page, column)
+            embed.timestamp = datetime.datetime.now(tz=datetime.timezone.utc)
+            await ctx['message'].edit(embed=embed)
+            await ctx['message'].remove_reaction(ctx['emoji'], ctx['member'])
+        # handle karma
         elif ctx['member'].id != ctx['message'].author.id and\
                 ctx['guild'].id == config.guild_id and\
                 ctx['message'].channel.id not in \
