@@ -169,14 +169,13 @@ class Review(commands.Cog):
                     if review.count() >= next_page:
                         review = review.all()[next_page - 1].Review
                         next_page = str(next_page) + "/" + str(max_page)
-                        embed = self.rev.make_embed(
-                            review, subject, tier_average, next_page)
+                        embed = self.rev.make_embed(review, subject, tier_average, next_page)
                         if embed.fields[3].name == "Text page":
                             await ctx['message'].add_reaction("🔼")
                             await ctx['message'].add_reaction("🔽")
                         else:
                             for emote in ctx['message'].reactions:
-                                if emote == "🔼":
+                                if emote.emoji == "🔼":
                                     await ctx['message'].remove_reaction("🔼", self.bot.user)
                                     await ctx['message'].remove_reaction("🔽", self.bot.user)
                                     break
