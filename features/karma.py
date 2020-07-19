@@ -1,6 +1,7 @@
 import asyncio
 import datetime
 import math
+import re
 
 import discord
 from discord import Emoji, TextChannel, Member
@@ -355,6 +356,22 @@ class Karma(BaseFeature):
         else:
             raise Exception('Action neni get/give')
 
+        output = self.gen_leaderboard_content(attribute, start, column)
+
+        embed = discord.Embed(title=title, description=output)
+        embed.timestamp = datetime.datetime.now(tz=datetime.timezone.utc)
+
+        if action == "get" and order == "DESC":
+            value_num = math.ceil(start / cfg.grillbot_leaderboard_size)
+            value = msg.karma_web if value_num == 1 else f"{msg.karma_web}{value_num}"
+            embed.add_field(name=msg.karma_web_title, value=value)
+
+        message = await channel.send(embed=embed)
+        await message.add_reaction("⏪")
+        await message.add_reaction("◀")
+        await message.add_reaction("▶")
+
+    def gen_leaderboard_content(self, attribute, start, column):
         board = self.repo.get_leaderboard(attribute, start-1)
         guild = self.bot.get_guild(cfg.guild_id)
 
@@ -368,12 +385,22 @@ class Karma(BaseFeature):
                 line = '{} – **{}**: {} pts\n'.format(i, username, getattr(user, column))
             output += line
 
-        embed = discord.Embed(title=title, description=output)
-        embed.timestamp = datetime.datetime.now(tz=datetime.timezone.utc)
+        return output
 
-        if action == "get" and order == "DESC":
-            value_num = math.ceil(start / cfg.grillbot_leaderboard_size)
-            value = msg.karma_web if value_num == 1 else f"{msg.karma_web}{value_num}"
-            embed.add_field(name=msg.karma_web_title, value=value)
-
-        await channel.send(embed=embed)
+    def get_db_from_title(self, embed_title):
+        if re.match(r".* GIVINGBOARD .*", embed_title):
+            column = 'positive'
+            attribute = Database_karma.positive.desc()
+        elif re.match(r".* ISHABOARD .*", embed_title):
+            column = 'negative'
+            attribute = Database_karma.negative.desc()
+        elif re.match(r".* LEADERBOARD .*", embed_title):
+            column = 'karma'
+            attribute = Database_karma.karma.desc()
+        elif re.match(r".* BAJKARBOARD .*", embed_title):
+            column = 'karma'
+            attribute = Database_karma.karma
+        else:
+            return None
+        max_page = self.repo.get_leaderboard_max()
+        return column, attribute, max_page
