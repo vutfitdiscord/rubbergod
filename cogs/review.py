@@ -176,7 +176,7 @@ class Review(commands.Cog):
                             await ctx['message'].add_reaction("🔽")
                         else:
                             for emote in ctx['message'].reactions:
-                                if ctx['emoji'] == "🔼":
+                                if emote == "🔼":
                                     await ctx['message'].remove_reaction("🔼", self.bot.user)
                                     await ctx['message'].remove_reaction("🔽", self.bot.user)
                                     break
