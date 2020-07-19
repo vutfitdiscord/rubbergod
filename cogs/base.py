@@ -96,10 +96,8 @@ class Base(commands.Cog):
                 if next_page:
                     embed = self.make_embed(next_page)
                     await ctx['message'].edit(embed=embed)
-            try:
+            if ctx['message'].guild: 
                 await ctx['message'].remove_reaction(ctx['emoji'], ctx['member'])
-            except Exception:
-                pass
 
     def make_embed(self, page):
         embed = discord.Embed(title="Rubbergod",
@@ -129,9 +127,7 @@ class Base(commands.Cog):
         if len(messages.info) > 1:
             footer_text = f"Page {page} | {footer_text}"
 
-        embed.set_footer(text=footer_text, icon_url="https://cdn.discordapp.com/avatars/"
-                         "560917571663298568/b93e8c1e93c2d18b"
-                         "fbd226a0b614cf57.png?size=32")
+        embed.set_footer(text=footer_text, icon_url=self.bot.user.avatar_url)
         return embed
 
 
