@@ -14,14 +14,16 @@ class weather(commands.Cog):
         self.bot = bot
 
     @commands.command(aliases=["pocasi", "pocasie", "počasí", "počasie"])
-    async def weather(self, ctx, *args):
+    async def weather(self, ctx, *, place: str = "Brno"):
         token = config.weather_token
-        city = "Brno"
-        if len(args) != 0:
-            city = " ".join(map(str, args))
+
+        place = place[:100]
+        if "&" in place:
+            return await ctx.send("Takhle se žádné město určitě nejmenuje.")
+
         url = (
             "http://api.openweathermap.org/data/2.5/weather?q="
-            + city
+            + place
             + "&units=metric&lang=cz&appid="
             + token
         )
