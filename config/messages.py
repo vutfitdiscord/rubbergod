@@ -219,9 +219,10 @@ class Messages:
     cog_cannot_be_unloadable = 'Toto rozšíření `{cog}` je neodebratelné.'
     cog_reloaded = 'Rozšíření `{cog}` bylo načteno znovu.'
 
-    config_help = prefix + 'config [get, list, set, update]'
+    config_help = prefix + 'config [get, list, set, update, backup]'
     config_updated = 'Config updated'
     config_wrong_key = 'Nesprávny klíč'
+    config_wrong_type = 'Nesprávny typ'
     config_backup_created = 'Config backup created'
     config_get_format = prefix + 'config get [key]'
     config_set_format = prefix + 'config set [key]'
