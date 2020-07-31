@@ -1,11 +1,13 @@
+import random
+
+import discord
 from discord.ext import commands
 
 from cogs import room_check
-from logic import roll_dice, rng
+from logic import roll_dice
 
 # Logic (functionality used by features or rubbergod directly)
 roll_dice = roll_dice.Roll()
-rng = rng.Rng()
 
 
 class Random(commands.Cog):
@@ -23,7 +25,10 @@ class Random(commands.Cog):
     @commands.command()
     async def pick(self, ctx, *args):
         """"Pick an option"""
-        option = rng.pick_option(args)
+        if not len(args):
+            return
+
+        option = discord.utils.escape_mentions(rng.pick_option(args))
         if option:
             await ctx.send("{} {}".format(option, ctx.author.mention))
         await self.check.botroom_check(ctx.message)
@@ -31,16 +36,23 @@ class Random(commands.Cog):
     @commands.cooldown(rate=5, per=20.0, type=commands.BucketType.user)
     @commands.command()
     async def flip(self, ctx):
-        await ctx.send(rng.flip())
+        await ctx.send(random.choice(["True", "False"]))
         await self.check.botroom_check(ctx.message)
 
     @commands.cooldown(rate=5, per=20.0, type=commands.BucketType.user)
-    @commands.command()
-    async def roll(self, ctx):
-        # TODO: use
-        # https://discordpy.readthedocs.io/en/latest/ext/commands/commands.html#basic-converters
-        # and only pass integers to the function?
-        await ctx.send(rng.generate_number(ctx.message))
+    @commands.command(aliases=["random", "randint"])
+    async def roll(self, ctx, first: int, second: int = None):
+        if second is None:
+            second = 0
+
+        if first > second:
+            first, second = second, first
+
+        option = str(random.randint(first, second))
+        # prevent 2000-character overflows
+        if len(option) > 1950:
+            option = option[:1950] + "..." + option[-1]
+        await ctx.send("{} {}".format(ctx.author.mention, option))
         await self.check.botroom_check(ctx.message)
 
 
