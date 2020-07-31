@@ -41,18 +41,12 @@ class Random(commands.Cog):
 
     @commands.cooldown(rate=5, per=20.0, type=commands.BucketType.user)
     @commands.command(aliases=["random", "randint"])
-    async def roll(self, ctx, first: int, second: int = None):
-        if second is None:
-            second = 0
-
+    async def roll(self, ctx, first: int, second: int = 0):
         if first > second:
             first, second = second, first
 
         option = str(random.randint(first, second))
-        # prevent 2000-character overflows
-        if len(option) > 1950:
-            option = option[:1950] + "..." + option[-1]
-        await ctx.send("{} {}".format(ctx.author.mention, option))
+        await ctx.send(option)
         await self.check.botroom_check(ctx.message)
 
 
