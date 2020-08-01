@@ -6,11 +6,9 @@ from discord.ext import commands
 
 import utils
 from config import app_config as config, messages
-from logic import rng
 from repository import karma_repo
 from cogs import room_check
 
-rng = rng.Rng()
 config = config.Config
 messages = messages.Messages
 karma_r = karma_repo.KarmaRepository()
