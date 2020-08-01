@@ -28,9 +28,9 @@ class DynamicConfig(commands.Cog):
         await self.change_value(ctx, key, list(value), False)
 
     @config.command()
-    async def update(self, ctx, key=None, *value):
+    async def append(self, ctx, key=None, *value):
         if key is None:
-            await ctx.send(Messages.config_update_format)
+            await ctx.send(Messages.config_append_format)
             return
         await self.change_value(ctx, key, list(value), True)
 
@@ -83,7 +83,9 @@ class DynamicConfig(commands.Cog):
                     if append:
                         value = attr + value
                 elif isinstance(attr, tuple) and append:
-                    value = tuple(list(attr) + key)
+                    value = tuple(list(attr) + value)
+                elif isinstance(attr, str):
+                    value = " ".join(value)
                 elif isinstance(attr, int):
                     try:
                         value = int(value[0])
@@ -99,6 +101,11 @@ class DynamicConfig(commands.Cog):
         with open(config_path, "w+") as fd:
             toml.dump(Config.toml_dict, fd)
         await ctx.send(Messages.config_updated)
+
+    @config.error
+    async def configerror(self, ctx, error):
+        if isinstance(error, commands.CheckFailure):
+            await ctx.send(utils.fill_message("insufficient_rights", user=ctx.author.id))
 
 
 def setup(bot):
