@@ -106,7 +106,7 @@ class Config:
     rolehoarder_default_limit: int = get_attr("rolehoarder", "default_limit")
 
     # memes
-    hug_emojis: List[str] = get_attr("meme", "hugs_emojis")
+    hug_emojis: List[str] = get_attr("meme", "hug_emojis")
     # Arcas
     arcas_id: int = get_attr("meme", "arcas_id")
     arcas_delay: int = get_attr("meme", "arcas_delay")  # Value is in hours
