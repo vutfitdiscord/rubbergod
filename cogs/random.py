@@ -28,7 +28,7 @@ class Random(commands.Cog):
         if not len(args):
             return
 
-        option = discord.utils.escape_mentions(rng.pick_option(args))
+        option = discord.utils.escape_mentions(random.choice(args))
         if option:
             await ctx.send("{} {}".format(option, ctx.author.mention))
         await self.check.botroom_check(ctx.message)
