@@ -61,7 +61,7 @@ class Config:
     email_pass: str = get_attr("email", "pass")
 
     # Extensions loaded on bot start
-    extensions: List[str] = get_attr("extensions", "extensions")
+    extensions: List[str] = get_attr("cogs", "extensions")
 
     # Roll dice
     max_dice_at_once: int = get_attr("random", "max_dice_at_once")
@@ -72,15 +72,15 @@ class Config:
     # Karma
     karma_ban_role_id: int = get_attr("karma", "ban_role_id")
     karma_banned_channels: List[int] = get_attr("karma", "banned_channels")
-    grillbot_leaderboard_size: int = get_attr("karma", "grillbot_leaderboard_size")
+    karma_grillbot_leaderboard_size: int = get_attr("karma", "grillbot_leaderboard_size")
 
     # Voting
     vote_minimum: int = get_attr("vote", "minimum")
     vote_minutes: int = get_attr("vote", "minutes")
 
     # Pin emoji count to pin
-    pin_count: int = get_attr("autopin", "count")
-    pin_banned_channels: List[int] = get_attr("autopin", "banned_channels")
+    autopin_count: int = get_attr("autopin", "count")
+    autopin_banned_channels: List[int] = get_attr("autopin", "banned_channels")
 
     # Special channel IDs
     log_channel: int = get_attr("channels", "log_channel")
@@ -100,7 +100,7 @@ class Config:
 
     # Subjects shortcuts
     subjects: List[str] = get_attr("review", "subjects")
-    reviews_forbidden_roles: List[int] = get_attr("review", "forbidden_roles")
+    review_forbidden_roles: List[int] = get_attr("review", "forbidden_roles")
 
     # How many people to print if the limit argument is not specified
     rolehoarder_default_limit: int = get_attr("rolehoarder", "default_limit")

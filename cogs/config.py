@@ -70,9 +70,10 @@ class DynamicConfig(commands.Cog):
             return
         config_path = os.path.dirname(__file__)[:-4] + "config/config.toml"
         key_toml = key
+        key_split = key.split('_', 1)
         for section in Config.toml_dict:
-            if key.split('_', 1)[0] == section:
-                key_toml = key.split('_', 1)[1]
+            if key_split[0] == section:
+                key_toml = key_split[1]
             if key_toml in Config.toml_dict[section]:
                 attr = getattr(Config, key)
                 if isinstance(attr, list):
