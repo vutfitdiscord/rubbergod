@@ -20,7 +20,7 @@ pass = ''
 [database]
 db_string = "postgres://postgres:postgres@db:5432/postgres"
 
-[extensions]
+[cogs]
 extensions = ['base', 'karma', 'meme', 'random', 'verify', 'fitwide', 'autopin',
     'acl', 'review', 'vote', 'kachna', 'name_day', 'week', 'weather', 'roles']
 

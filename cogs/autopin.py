@@ -26,9 +26,9 @@ class AutoPin(commands.Cog):
         if emoji == '📌':
             for reaction in message.reactions:
                 if reaction.emoji == '📌' and \
-                   reaction.count >= Config.pin_count and \
+                   reaction.count >= Config.autopin_count and \
                    not message.pinned and \
-                   message.channel.id not in Config.pin_banned_channels:
+                   message.channel.id not in Config.autopin_banned_channels:
                     users = await reaction.users().flatten()
                     await self.log(message, users)
                     await message.pin()

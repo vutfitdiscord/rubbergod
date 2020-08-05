@@ -29,7 +29,7 @@ class Review(commands.Cog):
         for role in roles:
             if config.verification_role_id == role.id:
                 verify = True
-            if role.id in config.reviews_forbidden_roles:
+            if role.id in config.review_forbidden_roles:
                 await ctx.send(utils.fill_message("review_add_denied", user=ctx.message.author.id))
                 return False
         if not verify:
