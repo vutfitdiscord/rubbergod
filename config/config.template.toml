@@ -58,7 +58,7 @@ allowed_channels = [
 ]
 
 [role]
-string = 'Role\n'
+string = "Role\n"
 #           add-roles           back-to-school      summertime-madness
 channels = [591384273051975683, 622202824377237504, 623290691774316574]
 
