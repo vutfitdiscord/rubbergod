@@ -69,8 +69,11 @@ class DynamicConfig(commands.Cog):
             ctx.send(Messages.config_wrong_key)
             return
         config_path = os.path.dirname(__file__)[:-4] + "config/config.toml"
+        key_toml = key
         for section in Config.toml_dict:
-            if key in Config.toml_dict[section]:
+            if key.split('_', 1)[0] == section:
+                key_toml = key.split('_', 1)[1]
+            if key_toml in Config.toml_dict[section]:
                 attr = getattr(Config, key)
                 if isinstance(attr, list):
                     if isinstance(attr[0], int):
