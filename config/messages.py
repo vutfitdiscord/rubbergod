@@ -219,14 +219,15 @@ class Messages:
     cog_cannot_be_unloadable = 'Toto rozšíření `{cog}` je neodebratelné.'
     cog_reloaded = 'Rozšíření `{cog}` bylo načteno znovu.'
 
-    config_help = prefix + 'config [get, list, set, append, backup]'
+    config_help = prefix + 'config [get, list, set, append, load, backup]'
     config_updated = 'Config updated'
+    config_loaded = 'Config loaded'
     config_wrong_key = 'Nesprávny klíč'
     config_wrong_type = 'Nesprávny typ'
     config_backup_created = 'Config backup created'
     config_get_format = prefix + 'config get [key]'
-    config_set_format = prefix + 'config set [key]'
-    config_append_format = prefix + 'config append [key]'
+    config_set_format = prefix + 'config set [key] hodnota/y'
+    config_append_format = prefix + 'config append [key] hodnota/y'
 
     info = [[('karma', 'Vypíše karmu vaši, rozdanou a odebranou'),
              ('karma stalk [user]', 'Vypíše karmu uživatele, karmu rozdanou a odebranou.'),
