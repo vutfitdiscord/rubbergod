@@ -39,7 +39,7 @@ class DynamicConfig(commands.Cog):
         keys = dir(Config)
         output = "```"
         for key in keys[:]:
-            if not re.match(r"__.*__", key):
+            if not re.match(r"__.*__", key) and key not in Config.config_static:
                 output += key + "\n"
         output += "```"
         await ctx.send(output)
@@ -49,7 +49,7 @@ class DynamicConfig(commands.Cog):
         if key is None:
             await ctx.send(Messages.config_get_format)
             return
-        if not hasattr(Config, key):
+        if not hasattr(Config, key) or key in Config.config_static:
             await ctx.send(Messages.config_wrong_key)
             return
         value = getattr(Config, key)
@@ -65,8 +65,8 @@ class DynamicConfig(commands.Cog):
         await ctx.send(Messages.config_backup_created)
 
     async def change_value(self, ctx, key, value, append):
-        if not hasattr(Config, key):
-            ctx.send(Messages.config_wrong_key)
+        if not hasattr(Config, key) or key in Config.config_static:
+            await ctx.send(Messages.config_wrong_key)
             return
         config_path = os.path.dirname(__file__)[:-4] + "config/config.toml"
         key_toml = key

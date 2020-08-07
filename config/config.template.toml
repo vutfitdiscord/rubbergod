@@ -24,6 +24,9 @@ db_string = "postgres://postgres:postgres@db:5432/postgres"
 extensions = ['base', 'karma', 'meme', 'random', 'verify', 'fitwide', 'autopin',
     'acl', 'review', 'vote', 'kachna', 'name_day', 'week', 'weather', 'roles']
 
+[config]
+static = ['config_static', 'toml_dict', 'key', 'weather_token', 'db_string']
+
 [random]
 max_dice_at_once = 1000
 dice_before_collation = 20

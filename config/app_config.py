@@ -63,6 +63,9 @@ class Config:
     # Extensions loaded on bot start
     extensions: List[str] = get_attr("cogs", "extensions")
 
+    # Config: static values -> cannot be got/set by command
+    config_static: List[str] = get_attr("config", "static")
+
     # Roll dice
     max_dice_at_once: int = get_attr("random", "max_dice_at_once")
     dice_before_collation: int = get_attr("random", "dice_before_collation")
