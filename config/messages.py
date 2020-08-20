@@ -195,6 +195,15 @@ class Messages:
     review_add_denied = "{user}, na přidání hodnocení předmětu nemáš právo."
     review_not_on_server = "{user}, na použití tohto příkazu musíš být na FITwide serveru."
     subject_format = prefix + "subject [add, remove] [zkratka předmětu]"
+    subject_update_error = "Aktualizace se nezdařila."
+    subject_update_success = "Předměty byly úspěšně aktualizovány."
+    shorcut_format = prefix + "{command} [zkratka předmětu]"
+    tierboard_help = f"{prefix}tierboard [typ] [semestr] [rok]\n"\
+                     "Založeno na `reviews` z průměru tier hodnot.\n"\
+                     "typ -> P, V, PVT, PVA\n"\
+                     "semestr -> Z, L\n"\
+                     "rok -> jen pro povinné předměty e.g 1BIT, 2NADE"
+    tierboard_missing_year = f"Nezadal jsi rok a nemáš školní roli\n{tierboard_help}"
 
     pr_meme = "https://github.com/Toaster192/rubbergod/pulls"
     uhoh = "uh oh"
