@@ -222,8 +222,7 @@ class IOS(commands.Cog):
         self.bot = bot
 
     @commands.cooldown(rate=5, per=30.0, type=commands.BucketType.user)
-    @commands.has_any_role(461550034668748800, 591372495936815114,
-                           461550323727859712)
+    @commands.check(utils.helper_plus)
     @commands.command()
     async def ios(self, ctx):
         process = subprocess.Popen(["ssh", "merlin"], stdout=subprocess.PIPE)
@@ -260,12 +259,6 @@ class IOS(commands.Cog):
                        "https://discordapp.com/channels/" +
                        "461541385204400138/534431057001316362/" +
                        "698701631495340033")
-
-    @ios.error
-    async def ios_role_checks_error(self, ctx, error):
-        if isinstance(error, commands.errors.MissingAnyRole):
-            await ctx.send('Na tohle mají práva jen Helper+. ' +
-                           '<:KKomrade:484470873001164817>')
 
 
 def setup(bot):

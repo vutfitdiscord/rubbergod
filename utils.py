@@ -118,3 +118,17 @@ async def reaction_get_ctx(bot, payload):
         emoji = payload.emoji.name
 
     return dict(channel=channel, guild=guild, member=member, message=message, emoji=emoji)
+
+
+class NotHelperPlusError(commands.CommandError):
+    """An error indicating that a user doesn't have permissions to use
+    a command that is available only to helpers, submods and mods.
+    """
+
+
+async def helper_plus(ctx):
+    allowed_roles = {Config.mod_role, Config.submod_role, Config.helper_role}
+    for role in ctx.author.roles:
+        if role.id in allowed_roles:
+            return True
+    raise NotHelperPlusError

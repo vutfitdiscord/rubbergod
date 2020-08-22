@@ -6,6 +6,10 @@ key = ''
 admin_id = 0  # for mention in case of false verification
 guild_id = 0
 
+mod_role = 461550034668748800
+submod_role = 591372495936815114
+helper_role = 461550323727859712
+
 [verification]
 role = ''
 role_id = 591349196267716608
