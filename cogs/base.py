@@ -46,6 +46,10 @@ class Base(commands.Cog):
             await ctx.send(utils.fill_message("spamming", user=ctx.author.id))
             return
 
+        if isinstance(error, utils.NotHelperPlusError):
+            await ctx.send(messages.helper_plus_only)
+            return
+
         output = "Ignoring exception in command {}:\n".format(ctx.command)
         output += "".join(traceback.format_exception(type(error), error, error.__traceback__))
         channel = self.bot.get_channel(config.bot_dev_channel)

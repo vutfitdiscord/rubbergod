@@ -27,6 +27,7 @@ class Messages:
     no_such_command = "Takový příkaz neznám. <:sadcat:576171980118687754>"
     spamming = "{user} Nespamuj tolik <:sadcat:576171980118687754>"
     insufficient_rights = "{user}, na použití tohoto příkazu nemáš právo."
+    helper_plus_only = "Na tohle mají práva jen Helper+. <:KKomrade:484470873001164817>"
     vote_room_only = "Tohle funguje jen v {room}."
     bot_room_redirect = "{user} <:sadcat:576171980118687754> 👉 " \
                         "<#{bot_room}>\n"

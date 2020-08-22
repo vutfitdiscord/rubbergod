@@ -49,6 +49,11 @@ class Config:
     default_prefix: str = get_attr("base", "default_prefix")
     ignored_prefixes: tuple = tuple(get_attr("base", "ignored_prefixes"))
 
+    # Role IDs
+    mod_role: int = get_attr("base", "mod_role")
+    submod_role: int = get_attr("base", "submod_role")
+    helper_role: int = get_attr("base", "helper_role")
+
     # Verification
     verification_role: str = get_attr("verification", "role")
     verification_role_id: int = get_attr("verification", "role_id")
