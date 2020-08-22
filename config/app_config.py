@@ -110,7 +110,7 @@ class Config:
     subjects: List[str] = get_attr("review", "subjects")
     review_forbidden_roles: List[int] = get_attr("review", "forbidden_roles")
 
-    # How many people to print if the limit argument is not specified
+    # How many roles a user needs to have to be considered a rolehoarder
     rolehoarder_default_limit: int = get_attr("rolehoarder", "default_limit")
 
     # memes
