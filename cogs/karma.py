@@ -71,7 +71,8 @@ class Karma(commands.Cog):
             embed.description = self.karma.gen_leaderboard_content(attribute, next_page, column)
             embed.timestamp = datetime.datetime.now(tz=datetime.timezone.utc)
             await ctx['message'].edit(embed=embed)
-            await ctx['message'].remove_reaction(ctx['emoji'], ctx['member'])
+            if ctx['message'].guild:
+                await ctx['message'].remove_reaction(ctx['emoji'], ctx['member'])
         # handle karma
         elif ctx['member'].id != ctx['message'].author.id and\
                 ctx['guild'].id == config.guild_id and\
