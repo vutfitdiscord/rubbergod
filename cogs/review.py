@@ -179,6 +179,7 @@ class Review(commands.Cog):
         embed.add_field(name="Kredity", value=subject.credits)
         embed.add_field(name="Ukončení", value=subject.end)
         embed.add_field(name="Karta předmětu", value=subject.card, inline=False)
+        embed.add_field(name="Statistika úspěšnosti předmětu", value="http://fit.nechutny.net/?detail=" + subject.shortcut, inline=False)
         embed.timestamp = datetime.datetime.now(tz=datetime.timezone.utc)
         embed.set_footer(icon_url=ctx.author.avatar_url, text=ctx.author)
         await ctx.send(embed=embed)
