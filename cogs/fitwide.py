@@ -170,9 +170,8 @@ class FitWide(commands.Cog):
     @commands.check(is_admin)
     @commands.command()
     async def increment_roles(self, ctx):
-        database.base.metadata.create_all(database.db)
-
-        guild = self.bot.get_guild(config.guild_id)
+        # guild = self.bot.get_guild(config.guild_id)
+        guild = ctx.guild
 
         BIT_names = [str(x) + "BIT" + ("+" if x == 4 else "")
                      for x in range(5)]
@@ -183,17 +182,6 @@ class FitWide(commands.Cog):
                      for x in range(4)]
         MIT = [discord.utils.get(guild.roles, name=role_name)
                for role_name in MIT_names]
-
-        # pridat kazdeho 3BIT a 2MIT cloveka do DB pred tim nez je jebnem do
-        # 4BIT+ respektive 3MIT+ role kvuli rollbacku
-        session.query(User_backup).delete()
-
-        for member in BIT[3].members:
-            session.add(User_backup(member_ID=member.id))
-        for member in MIT[2].members:
-            session.add(User_backup(member_ID=member.id))
-
-        session.commit()
 
         for member in BIT[3].members:
             await member.add_roles(BIT[4])
@@ -223,10 +211,6 @@ class FitWide(commands.Cog):
         terminy_channels = [discord.utils.get(guild.channels,
                                               name=channel_name)
                             for channel_name in terminy_names]
-        # TODO: do smth about 4bit general next year, delete it in the meantime
-        bit4_general = discord.utils.get(guild.channels, name="4bit-general")
-        if bit4_general is not None:
-            await bit4_general.delete()
 
         # move names
         await general_channels[3].edit(name="4bit-general")
@@ -246,6 +230,10 @@ class FitWide(commands.Cog):
             category=general_channels[0].category,
             position=general_channels[0].position - 1
         )
+        # give 0mit access to mit-general
+        mit_general = discord.utils.get(guild.channels,
+                                        name="mit-general")
+        await mit_general.set_permissions(mit0, read_messages=True)
 
         # delete 3bit-terminy
         await discord.utils.get(guild.channels, name="3bit-terminy").delete()
@@ -278,42 +266,46 @@ class FitWide(commands.Cog):
                     for semester_name in semester_names]
         await semester[0].set_permissions(discord.utils.get(guild.roles,
                                                             name="1BIT"),
-                                          read_messages=True,
-                                          send_messages=True)
+                                          read_messages=True)
         await semester[0].set_permissions(discord.utils.get(guild.roles,
                                                             name="2BIT"),
                                           overwrite=None)
         await semester[1].set_permissions(discord.utils.get(guild.roles,
                                                             name="1BIT"),
-                                          read_messages=True,
-                                          send_messages=True)
+                                          read_messages=True)
         await semester[1].set_permissions(discord.utils.get(guild.roles,
                                                             name="2BIT"),
                                           overwrite=None)
         await semester[2].set_permissions(discord.utils.get(guild.roles,
                                                             name="2BIT"),
-                                          read_messages=True,
-                                          send_messages=True)
+                                          read_messages=True)
         await semester[2].set_permissions(discord.utils.get(guild.roles,
                                                             name="3BIT"),
                                           overwrite=None)
         await semester[3].set_permissions(discord.utils.get(guild.roles,
                                                             name="2BIT"),
-                                          read_messages=True,
-                                          send_messages=True)
+                                          read_messages=True)
         await semester[3].set_permissions(discord.utils.get(guild.roles,
                                                             name="3BIT"),
                                           overwrite=None)
         await semester[4].set_permissions(discord.utils.get(guild.roles,
                                                             name="3BIT"),
-                                          read_messages=True,
-                                          send_messages=True)
+                                          read_messages=True)
+
+        # Warning: This was somehow ran before the semester permissions changed
+        # So just keep in mind that weird shit happens
+        for category in semester:
+            for channel in category.channels:
+                await channel.edit(sync_permissions=True)
+
+        # skolni-info override
+        skolni_info = discord.utils.get(guild.channels,
+                                        name="skolni-info")
+        await skolni_info.set_permissions(bit0, read_messages=True)
+        await skolni_info.set_permissions(mit0, read_messages=True)
 
         await ctx.send('Holy fuck, všechno se povedlo, '
                        'tak zase za rok <:Cauec:602052606210211850>')
-
-    # TODO: the opposite of increment_roles (for rollback and testing)
-    # and role_check to check if peoples roles match the database
 
     @commands.cooldown(rate=2, per=20.0, type=commands.BucketType.user)
     @commands.check(is_in_modroom)
