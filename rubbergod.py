@@ -1,6 +1,7 @@
 import traceback
 import argparse
 
+from discord import Embed
 from discord import TextChannel
 from discord.ext import commands
 
@@ -29,7 +30,7 @@ elif args.load_subjects:
     exit(0)
 elif args.init_db:
     migrations.init_db()
-    print('Init complete')
+    print("Init complete")
     exit(0)
 
 config = Config
@@ -38,7 +39,8 @@ is_initialized = False
 bot = commands.Bot(
     command_prefix=commands.when_mentioned_or(*config.command_prefix),
     help_command=None,
-    case_insensitive=True)
+    case_insensitive=True,
+)
 
 presence = presence.Presence(bot)
 
@@ -62,23 +64,71 @@ async def on_ready():
 
 @bot.event
 async def on_error(event, *args, **kwargs):
-    channel = bot.get_channel(config.bot_dev_channel)
+    channel_out = bot.get_channel(config.bot_dev_channel)
     output = traceback.format_exc()
     print(output)
-    if channel is not None:
+
+    embeds = []
+    guild = None
+    for arg in args:
+        if arg.guild_id:
+            guild = bot.get_guild(arg.guild_id)
+            event_guild = guild.name
+            channel = guild.get_channel(arg.channel_id)
+            message = await channel.fetch_message(arg.message_id)
+            message = message.content[:1000]
+        else:
+            event_guild = "DM"
+            message = arg.message_id
+
+        user = bot.get_user(arg.user_id)
+        if not user:
+            user = arg.user_id
+        else:
+            channel = bot.get_channel(arg.channel_id)
+            if channel:
+                message = await channel.fetch_message(arg.message_id)
+                if message.content:
+                    message = message.content[:1000]
+                else:
+                    embeds.extend(message.embeds)
+                    message = "Embed v předchozí zprávě"
+            else:
+                message = arg.message_id
+            user = str(user)
+        embed = Embed(title=f"Ignoring exception in event '{event}'", color=0xFF0000)
+        embed.add_field(name="Zpráva", value=message, inline=False)
+        if arg.guild_id != config.guild_id:
+            embed.add_field(name="Guild", value=event_guild)
+
+        if arg.member:
+            reaction_from = str(arg.member)
+        else:
+            reaction_from = user
+        embed.add_field(name="Reakce od", value=reaction_from)
+        embed.add_field(name="Reaction", value=arg.emoji)
+        embed.add_field(name="Typ", value=arg.event_type)
+        if arg.guild_id:
+            link = f"https://discord.com/channels/{arg.guild_id}/{arg.channel_id}/{arg.message_id}"
+            embed.add_field(name="Link", value=link, inline=False)
+        embeds.append(embed)
+
+    if channel_out is not None:
         output = utils.cut_string(output, 1900)
+        for embed in embeds:
+            await channel_out.send(embed=embed)
         for message in output:
-            await channel.send("```\n{}```".format(message))
+            await channel_out.send(f"```\n{message}```")
 
 
 # Create missing tables at start
 migrations.init_db()
 
-bot.load_extension('cogs.system')
-print('System cog loaded')
+bot.load_extension("cogs.system")
+print("System cog loaded")
 
 for extension in config.extensions:
-    bot.load_extension(f'cogs.{extension}')
-    print(f'{extension} loaded')
+    bot.load_extension(f"cogs.{extension}")
+    print(f"{extension} loaded")
 
 bot.run(config.key)
