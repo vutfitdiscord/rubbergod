@@ -4,8 +4,6 @@ from discord.ext import commands
 import utils
 from config.app_config import Config
 from config.messages import Messages
-from repository.acl_repo import AclRepository
-from features.acl import Acl
 from repository import roles_group_repo
 
 group_repo = roles_group_repo.RoleGroupRepository()
@@ -14,16 +12,13 @@ class ReactToRole(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
-        self.acl_repo = AclRepository()
-        self.acl = Acl(self.acl_repo)
 
     @commands.Cog.listener()
     async def on_message(self, message):
         if message.author.bot:
             return
 
-        if message.content.startswith(Config.role_string) or\
-           message.channel.id in Config.role_channels:
+        if message.channel.id in Config.role_channels:
             role_data = await self.get_join_role_data(message)
             await self.message_role_reactions(message, role_data)
 
@@ -33,14 +28,12 @@ class ReactToRole(commands.Cog):
         if ctx is None:
             return
 
-        if ctx['message'].content.startswith(Config.role_string) or\
-           ctx['channel'].id in Config.role_channels:
+        if ctx['channel'].id in Config.role_channels:
             role_data = await self.get_join_role_data(ctx['message'])
             for line in role_data:
                 if str(ctx['emoji']) == line[1]:
                     await self.add_role_on_reaction(line[0],
                                                     ctx['member'],
-                                                    ctx['message'].channel,
                                                     ctx['guild'])
                     break
             else:
@@ -52,14 +45,12 @@ class ReactToRole(commands.Cog):
         if ctx is None:
             return
 
-        if ctx['message'].content.startswith(Config.role_string) or\
-           ctx['channel'].id in Config.role_channels:
+        if ctx['channel'].id in Config.role_channels:
             role_data = await self.get_join_role_data(ctx['message'])
             for line in role_data:
                 if str(ctx['emoji']) == line[1]:
                     await self.remove_role_on_reaction(line[0],
                                                        ctx['member'],
-                                                       ctx['message'].channel,
                                                        ctx['guild'])
                     break
 
@@ -68,8 +59,6 @@ class ReactToRole(commands.Cog):
         input_string = message.content
         input_string = input_string.replace("**", "")
         try:
-            if input_string.startswith(Config.role_string):
-                input_string = input_string[input_string.index('\n') + 1:]
             input_string = input_string.rstrip().split('\n')
         except ValueError:
             await message.channel.send(utils.fill_message("role_format", user=message.author.id))
@@ -129,62 +118,55 @@ class ReactToRole(commands.Cog):
                                              role=discord.utils.escape_mentions(line[0]))
                     await message.channel.send(msg)
 
-    # Adds a role for user based on reaction
-    async def add_role_on_reaction(self, target, member, channel, guild):
-        role = discord.utils.get(guild.roles, name=target)
-        if role is not None:
-            if self.acl.get_perms(member.id, member.top_role, role.id, guild.roles):
+    async def add_perms(self, target, member, guild):
+        """Add a target role / channel to a member."""
+        roles, channels = self.get_target(target, guild)
+        for roles in roles:
+            if role is not None and role not in member.roles:
                 await member.add_roles(role)
-            else:
-                bot_room = self.bot.get_channel(Config.bot_room)
-                await bot_room.send(utils.fill_message("role_add_denied",
-                                                       user=member.id, role=role.name))
-        else:
-            try:
-                channel = discord.utils.get(guild.channels, id=int(target))
-            except ValueError:
-                channel = None
-            if channel is None:
-                channel = discord.utils.get(guild.channels, name=target[1:].lower())
-            if channel is None:
-                return
-            perms = self.acl.get_perms(member.id, member.top_role, channel.id, guild.roles)
-            # TODO give perms based on the int (like read-only)
-            if perms:
+        for channel in channels:
+            if channel is not None:
                 await channel.set_permissions(member, read_messages=True)
-            else:
-                bot_room = self.bot.get_channel(Config.bot_room)
-                await bot_room.send(utils.fill_message("role_add_denied",
-                                                       user=member.id, role=channel.name))
 
-    # Removes a role for user based on reaction
-    async def remove_role_on_reaction(self, target, member, channel, guild):
+    async def remove_perms(self, target, member, guild):
+        """Remove a target role / channel from a member."""
+        role, channel = self.get_target(target, guild)
+        if role is not None:
+            if role in member.roles:
+                await member.remove_roles(role)
+        elif channel is not None:
+            await channel.set_permissions(member, read_messages=False)
+        return
+
+    async def get_target(self, target, guild):
+        """Detect if target is a channel a role or a group."""
+        # Try a group first
+        group = group_repo.get_group(target)
+        if group is not None:
+            roles, channels = [], []
+            for role_id in group.role_ids:
+                roles.append(discord.utils.get(guild.roles,
+                                               id=target))
+            for channel_id in group.channel_ids:
+                channels.append(discord.utils.get(guild.channels,
+                                                  id=target))
+            return roles, channels
+
+        # Check for a role
         role = discord.utils.get(guild.roles,
                                  name=target)
         if role is not None:
-            if role in member.roles:
-                if self.acl.get_perms(member.id, member.top_role, role.id, guild.roles):
-                    await member.remove_roles(role)
-                else:
-                    bot_room = self.bot.get_channel(Config.bot_room)
-                    await bot_room.send(utils.fill_message("role_remove_denied",
-                                                           user=member.id, role=role.name))
-        else:
-            try:
-                channel = discord.utils.get(guild.channels, id=int(target))
-            except ValueError:
-                channel = None
-            if channel is None:
-                channel = discord.utils.get(guild.channels, name=target[1:].lower())
-            if channel is None:
-                return
-            perms = self.acl.get_perms(member.id, member.top_role, channel.id, guild.roles)
-            if perms:
-                await channel.set_permissions(member, read_messages=None, send_messages=None)
-            else:
-                bot_room = self.bot.get_channel(Config.bot_room)
-                await bot_room.send(utils.fill_message("role_remove_denied",
-                                                       user=member.id, role=channel.name))
+            return [role], []
+
+        # Not a role, check for a channel mention
+        try:
+            channel = discord.utils.get(guild.channels, id=int(target))
+        except ValueError:
+            channel = None
+        if channel is None:
+            # not a channel mention, try again with a channel name
+            channel = discord.utils.get(guild.channels, name=target[1:].lower())
+        return [], [channel]
 
 
 class RolesGroupManager(commands.Cog):
