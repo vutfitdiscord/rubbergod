@@ -23,6 +23,9 @@ class ReviewRepository(BaseRepository):
             .order_by(desc("total"))
         )
 
+    def get_review_by_id(self, id):
+        return session.query(Review).filter(Review.id == id).one_or_none()
+
     def get_review_by_author_subject(self, author_id, subject):
         return (
             session.query(Review)

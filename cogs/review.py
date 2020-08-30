@@ -2,7 +2,6 @@ from bs4 import BeautifulSoup
 import discord
 import datetime
 from discord.ext import commands
-import re
 import requests
 
 from config import app_config as config, messages
@@ -179,7 +178,11 @@ class Review(commands.Cog):
         embed.add_field(name="Kredity", value=subject.credits)
         embed.add_field(name="Ukončení", value=subject.end)
         embed.add_field(name="Karta předmětu", value=subject.card, inline=False)
-        embed.add_field(name="Statistika úspěšnosti předmětu", value="http://fit.nechutny.net/?detail=" + subject.shortcut, inline=False)
+        embed.add_field(
+            name="Statistika úspěšnosti předmětu",
+            value=f"http://fit.nechutny.net/?detail={subject.shortcut}",
+            inline=False,
+        )
         embed.timestamp = datetime.datetime.now(tz=datetime.timezone.utc)
         embed.set_footer(icon_url=ctx.author.avatar_url, text=ctx.author)
         await ctx.send(embed=embed)
@@ -247,14 +250,15 @@ class Review(commands.Cog):
         if (
             ctx["message"].embeds
             and ctx["message"].embeds[0].title is not discord.Embed.Empty
-            and re.match(".* reviews", ctx["message"].embeds[0].title)
+            and "reviews" in ctx["message"].embeds[0].title
         ):
             subject = ctx["message"].embeds[0].title.split(" ", 1)[0].lower()
-            footer = ctx["message"].embeds[0].footer.text.split("|")[0]
-            pos = footer.find("/")
+            footer = ctx["message"].embeds[0].footer.text.split("|")
+            review_id = footer[1][5:]
+            pages = footer[0].split(":")[1].split("/")
             try:
-                page = int(footer[8:pos])
-                max_page = int(footer[(pos + 1) :])
+                page = int(pages[0])
+                max_page = int(pages[1])
             except ValueError:
                 await ctx["message"].edit(content=messages.reviews_page_e, embed=None)
                 return
@@ -265,7 +269,7 @@ class Review(commands.Cog):
                     review = review_repo.get_subject_reviews(subject)
                     if review.count() >= next_page:
                         review = review.all()[next_page - 1].Review
-                        next_page = str(next_page) + "/" + str(max_page)
+                        next_page = f"{next_page}/{max_page}"
                         embed = self.rev.make_embed(review, subject, description, next_page)
                         if embed.fields[3].name == "Text page":
                             await ctx["message"].add_reaction("🔼")
@@ -278,30 +282,28 @@ class Review(commands.Cog):
                                     break
                         await ctx["message"].edit(embed=embed)
             elif ctx["emoji"] in ["👍", "👎", "🛑"]:
-                review = review_repo.get_subject_reviews(subject)[page - 1].Review
-                if str(ctx["member"].id) != review.member_ID:
-                    review_id = review.id
+                review = review_repo.get_review_by_id(review_id)
+                member_id = str(ctx["member"].id)
+                if review and member_id != review.member_ID:
                     if ctx["emoji"] == "👍":
-                        self.rev.add_vote(review_id, True, str(ctx["member"].id))
+                        self.rev.add_vote(review_id, True, member_id)
                     elif ctx["emoji"] == "👎":
-                        self.rev.add_vote(review_id, False, str(ctx["member"].id))
+                        self.rev.add_vote(review_id, False, member_id)
                     elif ctx["emoji"] == "🛑":
-                        review_repo.remove_vote(review_id, str(ctx["member"].id))
-                    page = str(page) + "/" + str(max_page)
+                        review_repo.remove_vote(review_id, member_id)
+                    page = f"{page}/{max_page}"
                     embed = self.rev.make_embed(review, subject, description, page)
                     await ctx["message"].edit(embed=embed)
             elif ctx["emoji"] in ["🔼", "🔽"]:
                 if ctx["message"].embeds[0].fields[3].name == "Text page":
-                    review = review_repo.get_subject_reviews(subject)
+                    review = review_repo.get_review_by_id(review_id)
                     if review:
-                        review = review[page - 1].Review
-                        text_page = ctx["message"].embeds[0].fields[3].value
-                        pos = ctx["message"].embeds[0].fields[3].value.find("/")
-                        max_text_page = int(text_page[(pos + 1) :])
-                        text_page = int(text_page[:pos])
+                        pages = ctx["message"].embeds[0].fields[3].value.split("/")
+                        text_page = int(pages[0])
+                        max_text_page = int(pages[1])
                         next_text_page = utils.pagination_next(ctx["emoji"], text_page, max_text_page)
                         if next_text_page:
-                            page = str(page) + "/" + str(max_page)
+                            page = f"{page}/{max_page}"
                             embed = self.rev.make_embed(review, subject, description, page)
                             embed = self.rev.change_text_page(review, embed, next_text_page, max_text_page)
                             await ctx["message"].edit(embed=embed)
