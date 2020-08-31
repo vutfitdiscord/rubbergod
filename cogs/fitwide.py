@@ -76,8 +76,8 @@ class FitWide(commands.Cog):
     @commands.check(is_admin)
     @commands.command()
     async def role_check(self, ctx, p_verified: bool = True,
-                         p_move: bool = True, p_status: bool = True,
-                         p_role: bool = True, p_muni: bool = True):
+                         p_move: bool = False, p_status: bool = True,
+                         p_role: bool = True, p_zapis: bool = False):
         guild = self.bot.get_guild(config.guild_id)
         members = guild.members
 
@@ -86,17 +86,14 @@ class FitWide(commands.Cog):
         bot = discord.utils.get(guild.roles, name="Bot")
         poradce = discord.utils.get(guild.roles, name="Poradce")
         dropout = discord.utils.get(guild.roles, name="Dropout")
-        muni = discord.utils.get(guild.roles, name="MUNI")
+        vut = discord.utils.get(guild.roles, name="VUT")
 
         verified = [member for member in members
                     if verify in member.roles and
                     host not in member.roles and
                     bot not in member.roles and
-                    poradce not in member.roles]
-
-        if not p_muni:
-            verified = [member for member in verified
-                        if muni not in member.roles]
+                    poradce not in member.roles and
+                    vut not in member.roles]
 
         permited = session.query(Permit)
         permited_ids = [int(person.discord_ID) for person in permited]
@@ -105,6 +102,9 @@ class FitWide(commands.Cog):
                  "0MIT", "1MIT", "2MIT", "3MIT+", "Dropout"]
 
         year_roles = {year: discord.utils.get(guild.roles, name=year) for year in years}
+
+        weird_members = {year_y: {year_x: [] for year_x in year_roles.values()}
+                         for year_y in year_roles.values()}
 
         for member in verified:
             if member.id not in permited_ids:
@@ -126,45 +126,63 @@ class FitWide(commands.Cog):
                         await ctx.send("Status nesedí u: " + login)
 
                 year = self.verification.transform_year(person.year)
+                
+                if year is None:
+                    year = "Dropout"
 
                 correct_role = discord.utils.get(guild.roles, name=year)
 
-                if year is not None and correct_role not in member.roles:
-                    if p_move:
-                        for role_name, role in year_roles.items():
-                            if role in member.roles:
-                                await member.add_roles(correct_role)
-                                await member.remove_roles(role)
-                                await ctx.send("Přesouvám: " + member.display_name +
-                                               " z " + role_name + " do " + year)
-                                break
-                        else:
-                            await member.add_roles(dropout)
-                            await ctx.send("Přesouvám: " + member.display_name +
-                                           " z " + role_name + " do dropout")
-                    elif p_role:
-                        await ctx.send("Nesedí mi role u: " +
-                                       utils.generate_mention(member.id) +
-                                       ", měl by mít roli: " + year)
-                elif year is None:
-                    if p_move:
-                        for role_name, role in year_roles.items():
-                            if role in member.roles:
-                                await member.add_roles(dropout)
-                                await member.remove_roles(role)
-                                await ctx.send("Přesouvám: " + member.display_name +
-                                               " z " + role_name + " do dropout")
-                                break
-                        else:
-                            await member.add_roles(dropout)
-                            await ctx.send("Přesouvám: " + member.display_name +
-                                           " z " + role_name + " do dropout")
-                    elif p_role:
-                        await ctx.send("Nesedí mi role u: " +
-                                       utils.generate_mention(member.id) +
-                                       ", má teď ročník: " + person.year)
+                if correct_role not in member.roles:
+                    for role_name, role in year_roles.items():
+                        if role in member.roles and correct_role in weird_members[role].keys():
+                            weird_members[role][correct_role].append(member)
+                            break
+                    else:
+                        await ctx.send(f"{utils.generate_mention(member.id)} by mel "
+                                       f"mit prej `{year}`")
+
+        for source_role, target_data in weird_members.items():
+            for target_role, target_members in target_data.items():
+                if len(target_members) == 0:
+                    continue
+                source_year = source_role.name
+                target_year = target_role.name
+                target_ids = [member.id for member in target_members]
+                if p_zapis and \
+                   ("BIT" in source_year and "BIT" in target_year) or \
+                   ("MIT" in source_year and "MIT" in target_year) and \
+                   int(source_year[0]) == int(target_year[0]) + 1:
+                    message_prefix = f"Vypada ze do dalsiho rocniku se nezapsali (protoze na merlinovi maji {target_year}): "
+                    await self.send_masstag_messages(ctx, message_prefix, target_ids)
+                elif p_move and (
+                    # presun bakalaru do 1MIT
+                    ("BIT" in source_year and target_year == "1MIT") or
+                    target_year == "Dropout"):
+                    await ctx.send(f"Přesouvám techle {len(target_members)} lidi z "
+                                   f"{source_year} do {target_year}:")
+                    await self.send_masstag_messages(ctx, "", target_ids)
+                    for member in target_members:
+                        await member.add_roles(target_role)
+                        await member.remove_roles(source_role)
+                elif p_role:
+                    await ctx.send(f"Nasel jsem {len(target_members)} lidi kteri maji na merlinovi "
+                                   f"{target_year} ale roli {source_year}:")
+                    await self.send_masstag_messages(ctx, "", target_ids)
 
         await ctx.send("Done")
+
+    async def send_masstag_messages(self, ctx, prefix, target_ids):
+        messages = []
+        message = prefix
+        for index in range(len(target_ids)):
+            # 35 sounds like a safe amount of tags per message
+            if index % 35 == 0 and index:
+                await ctx.send(message)
+                message = prefix
+            message += utils.generate_mention(target_ids[index])
+            message += " "
+        await ctx.send(message)
+        return
 
     @commands.cooldown(rate=2, per=20.0, type=commands.BucketType.user)
     @commands.check(is_admin)
