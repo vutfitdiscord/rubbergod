@@ -1,3 +1,5 @@
+from datetime import datetime
+
 import git
 import discord
 from discord import Member
@@ -25,6 +27,10 @@ def git_pull():
     repo = git.Repo(search_parent_directories=True)
     cmd = repo.git
     return cmd.pull()
+
+
+def id_to_datetime(snowflake_id: int):
+    return datetime.fromtimestamp(((snowflake_id >> 22) + 1420070400000) / 1000)
 
 
 def str_emoji_id(emoji):
