@@ -1,8 +1,7 @@
 import traceback
 import argparse
 
-from discord import Embed
-from discord import TextChannel
+from discord import Embed, TextChannel, AllowedMentions
 from discord.ext import commands
 
 import utils
@@ -40,7 +39,7 @@ bot = commands.Bot(
     command_prefix=commands.when_mentioned_or(*config.command_prefix),
     help_command=None,
     case_insensitive=True,
-    allowed_mentions=discord.AllowedMentions(roles=False, everyone=False, users=True),
+    allowed_mentions=AllowedMentions(roles=False, everyone=False, users=True),
 )
 
 presence = presence.Presence(bot)
