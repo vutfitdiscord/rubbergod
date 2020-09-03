@@ -40,6 +40,7 @@ bot = commands.Bot(
     command_prefix=commands.when_mentioned_or(*config.command_prefix),
     help_command=None,
     case_insensitive=True,
+    allowed_mentions=discord.AllowedMentions(roles=False, everyone=False, users=True),
 )
 
 presence = presence.Presence(bot)
