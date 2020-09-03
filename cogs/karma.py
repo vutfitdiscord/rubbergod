@@ -30,8 +30,7 @@ class Karma(commands.Cog):
         # grillbot emoji for removing message causes errors
         if ctx['emoji'] == "⏹️":
             return
-        if ctx['message'].content.startswith(config.role_string) or\
-           ctx['channel'].id in config.role_channels:
+        if ctx['channel'].id in config.role_channels:
             return
         # handle karma vote
         elif ctx['message'].content.startswith(messages.karma_vote_message_hack):
