@@ -11,10 +11,10 @@ class RoleGroupRepository(BaseRepository):
         super().__init__()
 
     def group_names(self):
-        return [group.name for group in self.groups]
+        return [group.name for group in self.groups()]
 
     def groups(self):
-        return session.query(RoleGroup)
+        return session.query(RoleGroup).all()
 
     def get_group(self, name):
         query = session.query(RoleGroup).filter(RoleGroup.name == name)
@@ -25,22 +25,22 @@ class RoleGroupRepository(BaseRepository):
         session.add(group)
         session.commit()
 
-    def group_add_channel_id(self, name, channel_id)
+    def group_add_channel_id(self, name, channel_id):
         group = self.get_group(name)
         group.channel_ids.append(channel_id)
         session.commit()
 
-    def group_add_role_id(self, name, role_id)
+    def group_add_role_id(self, name, role_id):
         group = self.get_group(name)
         group.role_ids.append(role_ids)
         session.commit()
 
-    def group_reset_channels(self, name)
+    def group_reset_channels(self, name):
         group = self.get_group(name)
         group.channel_ids = []
         session.commit()
 
-    def group_reset_roles(self, name)
+    def group_reset_roles(self, name):
         group = self.get_group(name)
         group.role_ids = []
         session.commit()

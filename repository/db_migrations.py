@@ -5,6 +5,7 @@ from repository.database.karma import Karma, Karma_emoji
 from repository.database.review import (Review, ReviewRelevance, Subject, Subject_details)
 from repository.database.verification import Permit, Valid_person
 from repository.database.image import Image
+from repository.database.role_group import RoleGroup
 from repository.review_repo import ReviewRepository
 
 from config.app_config import Config
