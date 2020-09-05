@@ -98,9 +98,7 @@ class Config:
     mod_room: int = get_attr("channels", "mod_room")
 
     # Bot rooms
-    allowed_channels: List[int] = eval_channels(
-        get_attr("channels", "allowed_channels")
-    )
+    allowed_channels: List[int] = eval_channels(get_attr("channels", "allowed_channels"))
 
     # Roles
     role_string: str = get_attr("role", "string")
@@ -133,3 +131,7 @@ class Config:
 
     # week command
     starting_week: int = get_attr("week", "starting_week")
+
+    # absolvent
+    bc_role_id: int = get_attr("absolvent", "bc_role_id")
+    ing_role_id: int = get_attr("absolvent", "ing_role_id")
