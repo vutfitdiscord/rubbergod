@@ -1,4 +1,4 @@
-discord >= 1.4.1
+discord.py >= 1.4.1
 emoji
 gitpython
 sqlalchemy
@@ -8,3 +8,4 @@ pillow
 dhash
 toml
 beautifulsoup4
+lxml

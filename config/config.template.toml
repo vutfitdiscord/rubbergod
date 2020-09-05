@@ -26,7 +26,7 @@ db_string = "postgres://postgres:postgres@db:5432/postgres"
 
 [cogs]
 extensions = ['base', 'karma', 'meme', 'random', 'verify', 'fitwide', 'autopin',
-    'acl', 'review', 'vote', 'kachna', 'name_day', 'week', 'weather', 'roles', 'error']
+    'acl', 'review', 'vote', 'kachna', 'name_day', 'week', 'weather', 'roles', 'error', 'absolvent']
 
 [config]
 static = ['config_static', 'toml_dict', 'key', 'weather_token', 'db_string']
@@ -149,3 +149,7 @@ deduplication_channels = [461548323116154880, 543083844736253964]
 
 [week]
 starting_week = 5
+
+[absolvent]
+bc_role_id = 0
+ing_role_id = 0
