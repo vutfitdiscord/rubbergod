@@ -30,8 +30,10 @@ class Absolvent(commands.Cog):
         """
         # prepare
         htmlparser = etree.HTMLParser()
-        full_name = f"{degree} {name} {surname}"
+        full_name_with_degree = f"{degree} {name} {surname}"
+        full_name_without_degree = f"{name} {surname}"
         diploma_year = re.search(r"\d+/(\d+)", diploma_number).group(1)
+        guild = self.bot.get_guild(Config.guild_id)
 
         # CHECK WHETHER THE PROVIDED NAME MATCHES THE ONE STORED FOR FIT VUT VERIFICATION
 
@@ -41,9 +43,9 @@ class Absolvent(commands.Cog):
             return only_ascii
 
         # get "surname name" for bot database fot the current command caller
-        name_from_db = user_r.get_fit_user_by_id(ctx.author.id).name
+        name_from_db = user_r.get_user_by_id(ctx.author.id).name
         # remove diacritics from the user-supplied name
-        name_from_user_without_diacritics = remove_accents(f"{name} {surname}")
+        name_from_user_without_diacritics = remove_accents(f"{surname} {name}")
 
         if name_from_db != name_from_user_without_diacritics:
             await ctx.send(Messages.absolvent_wrong_name)
@@ -85,13 +87,14 @@ class Absolvent(commands.Cog):
         )
 
         habilitation_year = re.search(r"\d+\.\s*\d+\.\s*(\d+)", habilitation_date).group(1)
+        thesis_author_without_degree = re.search(r"(\w+.)? ([\w ]+)", thesis_author).group(2)
 
         if not (
             ((degree == "Ing." and master_thesis != "") or (degree == "Bc." and bachelor_thesis != ""))
             and diploma_year == habilitation_year
             and faculty == "Fakulta informačních technologií"
             and result == "obhájeno (práce byla úspěšně obhájena)"
-            and thesis_author == full_name
+            and thesis_author_without_degree == full_name_without_degree
         ):
             await ctx.send(Messages.absolvent_web_error)
             return
@@ -140,11 +143,12 @@ class Absolvent(commands.Cog):
         guild = self.bot.get_guild(Config.guild_id)
         role = None
         if degree == "Bc.":
-            role = discord.utils.get(guild.roles, name=Config.bc_role_id)
+            role = discord.utils.get(guild.roles, id=Config.bc_role_id)
         if degree == "Ing.":
-            role = discord.utils.get(guild.roles, name=Config.ing_role_id)
+            role = discord.utils.get(guild.roles, id=Config.ing_role_id)
         if role:
-            ctx.author.add_roles(role)
+            member = guild.get_member(ctx.author.id)
+            await member.add_roles(role)
             await ctx.send(Messages.absolvent_success)
 
     @diplom.error

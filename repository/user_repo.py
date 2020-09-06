@@ -42,13 +42,12 @@ class UserRepository(BaseRepository):
         )
         return user
 
-    def get_fit_user_by_id(self, discord_ID):
-        """Returns user specified by discord ID with FIT year"""
+    def get_user_by_id(self, discord_ID):
+        """Returns user specified by discord ID"""
         return (
-            session.query(Permit, Valid_person)
-            .filter(Permit.discord_ID == discord_ID)
-            .outerjoin(Permit.login == Valid_person.login)
-            .filter(Valid_person.year.contains("FIT"))
+            session.query(Valid_person)
+            .outerjoin(Permit, Permit.login == Valid_person.login)
+            .filter(Permit.discord_ID == str(discord_ID))
             .one_or_none()
         )
 
