@@ -87,7 +87,7 @@ class Absolvent(commands.Cog):
         )
 
         habilitation_year = re.search(r"\d+\.\s*\d+\.\s*(\d+)", habilitation_date).group(1)
-        thesis_author_without_degree = re.search(r"(\w+.)? ([\w ]+)", thesis_author).group(2)
+        thesis_author_without_degree = re.search(r"(\w+\. +)?([\w ]+)", thesis_author).group(2)
 
         if not (
             ((degree == "Ing." and master_thesis != "") or (degree == "Bc." and bachelor_thesis != ""))
