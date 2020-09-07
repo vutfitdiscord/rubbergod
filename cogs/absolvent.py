@@ -29,11 +29,15 @@ class Absolvent(commands.Cog):
         :param thesis_web_id: ID from URL https://www.vutbr.cz/studenti/zav-prace?zp_id=<num>
         """
         # prepare
+        guild = self.bot.get_guild(Config.guild_id)
         htmlparser = etree.HTMLParser()
+        diploma_year = re.search(r"\d+/(\d+)", diploma_number)
+        if not diploma_year:
+            await ctx.send(Messages.absolvent_wrong_diploma_format)
+            return
+        diploma_year = diploma_year.group(1)
         full_name_with_degree = f"{degree} {name} {surname}"
         full_name_without_degree = f"{name} {surname}"
-        diploma_year = re.search(r"\d+/(\d+)", diploma_number).group(1)
-        guild = self.bot.get_guild(Config.guild_id)
 
         # CHECK WHETHER THE PROVIDED NAME MATCHES THE ONE STORED FOR FIT VUT VERIFICATION
 
