@@ -94,7 +94,7 @@ class Absolvent(commands.Cog):
         )
         
         if "Detail závěrečné práce nebyl nalezen" in not_found:
-        	await ctx.send(Messages.absolvent_thesis_not_found_error)
+            await ctx.send(Messages.absolvent_thesis_not_found_error)
             return
 
         habilitation_year = re.search(r"\d+\.\s*\d+\.\s*(\d+)", habilitation_date).group(1)
