@@ -220,11 +220,14 @@ class Messages:
     repost_content = "Pokud je obrázek repost, dej mu ♻️.\nJestli není, klikni tady na ❎ "\
                      "a při {limit} takových reakcích se toho upozornění smaže."
 
+    absolvent_wrong_diploma_format = "Chybný formát čísla diplomu! Př: 123456/2019"
     absolvent_wrong_name = "Nepovedla se ověřit shoda zadaného jména s tvým předchozím záznamem o studiu na FIT VUT."
-    absolvent_web_error = "Nepovedlo se ověřit obhájená práce pod uvedeným číslem na webu, jménem, typem práce a rokem obhájení (dle čísla diplomu)."
+    absolvent_thesis_not_found_error = "Práce dle zadaného ID nebyla na webu nalezena."
+    absolvent_web_error = "Nepovedlo se ověřit obhájení kvalifikační práce pod uvedeným číslem na webu, jménem, typem práce a rokem obhájení (dle čísla diplomu)."
+    absolvent_diploma_error = "Diplom (číslo a jméno) se nepovedlo na webu ověřit."
     absolvent_success = "Diplom byl úspěšne ověřen."
     absolvent_help = "Příkaz pro ověření absolvování studia na FIT VUT - zadejte CASE-SENSITIVE údaje ve formátu:\n" \
-        "?diplom <Titul.> <Jméno> <Příjmení> <Číslo diplomu> <ID kvalifikační práce z URL na webu VUT https://www.vutbr.cz/studenti/zav-prace>\n" \
+        "?diplom <Titul.> <Jméno> <Příjmení> <Číslo diplomu> <ID kvalifikační práce z URL na webu VUT <https://www.vutbr.cz/studenti/zav-prace> >\n" \
         "např: Bc. Josef Novák 123456/2019 135791\n" \
         "(při <https://www.vutbr.cz/studenti/zav-prace/detail/135791> nebo <https://www.vutbr.cz/studenti/zav-prace?zp_id=135791>)\n" \
         "Údaje slouží k jednorázovému ověření a nejsou nikam ukládány."
