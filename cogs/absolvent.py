@@ -59,6 +59,9 @@ class Absolvent(commands.Cog):
         result_thesis = requests.get(thesis_url)
         # parse it using lxml
         xDoc_thesis = etree.fromstring(result_thesis.text, htmlparser)
+        not_found = "".join(
+            xDoc_thesis.xpath("//*[@id='main']/div/p/text()")
+        )
         master_thesis = "".join(
             xDoc_thesis.xpath("//*[@id='main']//span[contains(@class,'tag') and .='diplomová práce']/text()")
         )
@@ -85,6 +88,10 @@ class Absolvent(commands.Cog):
                 "//*[@id='main']//div[contains(@class,'b-detail__body')]//div[p='Fakulta']/following-sibling::div[1]//text()"
             )
         )
+        
+        if "Detail závěrečné práce nebyl nalezen" in not_found:
+        	await ctx.send(Messages.absolvent_thesis_not_found_error)
+            return
 
         habilitation_year = re.search(r"\d+\.\s*\d+\.\s*(\d+)", habilitation_date).group(1)
         thesis_author_without_degree = re.search(r"(\w+\. +)?([\w ]+)", thesis_author).group(2)
@@ -137,7 +144,7 @@ class Absolvent(commands.Cog):
             and "úspěšně ověřen" in absolventText
             and absolventText.endswith(", Fakulta informačních technologií")
         ):
-            await ctx.send(Messages.absolvent_web_error)
+            await ctx.send(Messages.absolvent_diploma_error)
             return
 
         guild = self.bot.get_guild(Config.guild_id)
