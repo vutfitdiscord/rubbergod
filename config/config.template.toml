@@ -25,7 +25,7 @@ pass = ''
 db_string = "postgres://postgres:postgres@db:5432/postgres"
 
 [cogs]
-extensions = ['base', 'karma', 'meme', 'random', 'verify', 'fitwide', 'autopin',
+extensions = ['base', 'karma', 'meme', 'random', 'verify', 'fitwide', 'autopin', 'urban',
     'acl', 'review', 'vote', 'kachna', 'name_day', 'week', 'weather', 'roles', 'error', 'absolvent']
 
 [config]

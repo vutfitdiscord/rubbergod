@@ -232,6 +232,9 @@ class Messages:
         "(při <https://www.vutbr.cz/studenti/zav-prace/detail/135791> nebo <https://www.vutbr.cz/studenti/zav-prace?zp_id=135791>)\n" \
         "Údaje slouží k jednorázovému ověření a nejsou nikam ukládány."
 
+    urban_help = f"`{prefix}urban výraz`\nPříklad:\n`{prefix}urban sure`"
+    urban_not_found = "Pro daný výraz neexistuje záznam <:sadcat:576171980118687754>"
+
     on_ready_message = "<:peepowave:693070888546861096>"
 
     cog_is_loaded = 'Toto rozšíření `{cog}` je již načtené.'
