@@ -29,14 +29,12 @@ class Absolvent(commands.Cog):
         :param thesis_web_id: ID from URL https://www.vutbr.cz/studenti/zav-prace?zp_id=<num>
         """
         # prepare
-        guild = self.bot.get_guild(Config.guild_id)
         htmlparser = etree.HTMLParser()
         diploma_year = re.search(r"\d+/(\d+)", diploma_number)
         if not diploma_year:
             await ctx.send(Messages.absolvent_wrong_diploma_format)
             return
         diploma_year = diploma_year.group(1)
-        full_name_with_degree = f"{degree} {name} {surname}"
         full_name_without_degree = f"{name} {surname}"
 
         # CHECK WHETHER THE PROVIDED NAME MATCHES THE ONE STORED FOR FIT VUT VERIFICATION
@@ -50,6 +48,9 @@ class Absolvent(commands.Cog):
         name_from_db = user_r.get_user_by_id(ctx.author.id).name
         # remove diacritics from the user-supplied name
         name_from_user_without_diacritics = remove_accents(f"{surname} {name}")
+
+        if ctx.guild:
+            await ctx.message.delete()
 
         if name_from_db != name_from_user_without_diacritics:
             await ctx.send(Messages.absolvent_wrong_name)
@@ -159,6 +160,9 @@ class Absolvent(commands.Cog):
             role = discord.utils.get(guild.roles, id=Config.ing_role_id)
         if role:
             member = guild.get_member(ctx.author.id)
+            for drop_role in member.roles:
+                if "Dropout" in drop_role.name:
+                    await member.remove_roles(drop_role, reason="Diploma verification")
             await member.add_roles(role)
             await ctx.send(Messages.absolvent_success)
 
