@@ -383,14 +383,20 @@ class Review_helper:
             return None
         reviews = review_repo.get_subject_reviews(subject)
         tier_cnt = reviews.count()
-        name = review_repo.get_subject_details(subject).name
+        name = review_repo.get_subject_details(subject)
         if tier_cnt == 0:
-            description = f"{name}\n*No reviews*"
+            if name:
+                description = f"{name.name}\n*No reviews*"
+            else:
+                description = "*No reviews*"
             review = None
             page = "1/1"
         else:
             review = reviews[0].Review
-            description = f"{name}\n**Average tier:** {round(reviews[0].avg_tier)}"
+            if name:
+                description = f"{name.name}\n**Average tier:** {round(reviews[0].avg_tier)}"
+            else:
+                description = f"**Average tier:** {round(reviews[0].avg_tier)}"
             page = f"1/{tier_cnt}"
         return self.make_embed(review, subject, description, page)
 
