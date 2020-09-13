@@ -1,5 +1,6 @@
 import traceback
 import argparse
+import logging
 
 from discord import Embed, TextChannel, AllowedMentions
 from discord.ext import commands
@@ -10,6 +11,12 @@ from config.app_config import Config
 from features import presence
 
 import repository.db_migrations as migrations
+
+logger = logging.getLogger('discord')
+logger.setLevel(logging.WARNING)
+handler = logging.FileHandler(filename='discord.log', encoding='utf-8', mode='w')
+handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
+logger.addHandler(handler)
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--load_dump', type=str,
