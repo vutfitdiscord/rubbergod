@@ -17,30 +17,34 @@ class RoleGroupRepository(BaseRepository):
         return session.query(RoleGroup).all()
 
     def get_group(self, name):
-        query = session.query(RoleGroup).filter(RoleGroup.name == name)
+        query = session.query(RoleGroup).filter(RoleGroup.name == str(name))
         return query.one_or_none()
 
     def add_group(self, name):
-        group = RoleGroup(name=name)
+        group = RoleGroup(name=name, role_ids=[], channel_ids=[])
         session.add(group)
         session.commit()
 
     def group_add_channel_id(self, name, channel_id):
         group = self.get_group(name)
-        group.channel_ids.append(channel_id)
-        session.commit()
+        if group is not None:
+            group.channel_ids.append(str(channel_id))
+            session.commit()
 
     def group_add_role_id(self, name, role_id):
         group = self.get_group(name)
-        group.role_ids.append(role_ids)
-        session.commit()
+        if group is not None:
+            group.role_ids.append(str(role_id))
+            session.commit()
 
     def group_reset_channels(self, name):
         group = self.get_group(name)
-        group.channel_ids = []
-        session.commit()
+        if group is not None:
+            group.channel_ids = []
+            session.commit()
 
     def group_reset_roles(self, name):
         group = self.get_group(name)
-        group.role_ids = []
-        session.commit()
+        if group is not None:
+            group.role_ids = []
+            session.commit()
