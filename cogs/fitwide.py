@@ -77,7 +77,8 @@ class FitWide(commands.Cog):
     @commands.command()
     async def role_check(self, ctx, p_verified: bool = True,
                          p_move: bool = False, p_status: bool = True,
-                         p_role: bool = True, p_zapis: bool = False):
+                         p_role: bool = True, p_zapis: bool = False,
+                         p_debug: bool = True):
         guild = self.bot.get_guild(config.guild_id)
         members = guild.members
 
@@ -149,8 +150,8 @@ class FitWide(commands.Cog):
                 target_year = target_role.name
                 target_ids = [member.id for member in target_members]
                 if p_zapis and \
-                   ("BIT" in source_year and "BIT" in target_year) or \
-                   ("MIT" in source_year and "MIT" in target_year) and \
+                   (("BIT" in source_year and "BIT" in target_year) or \
+                   ("MIT" in source_year and "MIT" in target_year)) and \
                    int(source_year[0]) == int(target_year[0]) + 1:
                     message_prefix = f"Vypada ze do dalsiho rocniku se nezapsali (protoze na merlinovi maji {target_year}): "
                     await self.send_masstag_messages(ctx, message_prefix, target_ids)
@@ -161,9 +162,12 @@ class FitWide(commands.Cog):
                     await ctx.send(f"Přesouvám techle {len(target_members)} lidi z "
                                    f"{source_year} do {target_year}:")
                     await self.send_masstag_messages(ctx, "", target_ids)
-                    for member in target_members:
-                        await member.add_roles(target_role)
-                        await member.remove_roles(source_role)
+                    if p_debug:
+                        await ctx.send(f"jk, debug mode")
+                    else:
+                        for member in target_members:
+                            await member.add_roles(target_role)
+                            await member.remove_roles(source_role)
                 elif p_role:
                     await ctx.send(f"Nasel jsem {len(target_members)} lidi kteri maji na merlinovi "
                                    f"{target_year} ale roli {source_year}:")
