@@ -33,9 +33,7 @@ class ReactToRole(commands.Cog):
             role_data = await self.get_join_role_data(ctx['message'])
             for line in role_data:
                 if str(ctx['emoji']) == line[1]:
-                    await self.add_role_on_reaction(line[0],
-                                                    ctx['member'],
-                                                    ctx['guild'])
+                    await self.add_perms(line[0], ctx['member'], ctx['guild'])
                     break
             else:
                 await ctx['message'].remove_reaction(ctx['emoji'], ctx['member'])
@@ -50,9 +48,7 @@ class ReactToRole(commands.Cog):
             role_data = await self.get_join_role_data(ctx['message'])
             for line in role_data:
                 if str(ctx['emoji']) == line[1]:
-                    await self.remove_role_on_reaction(line[0],
-                                                       ctx['member'],
-                                                       ctx['guild'])
+                    await self.remove_perms(line[0], ctx['member'], ctx['guild'])
                     break
 
     # Returns list of role names and emotes that represent them
@@ -77,8 +73,10 @@ class ReactToRole(commands.Cog):
                                              line=discord.utils.escape_mentions(line))
                     await message.channel.send(msg)
         for line in output:
-            if "<#" in line[0]:
+            if "<#" in line[0] or "<@" in line[0]:
                 line[0] = line[0].replace("<#", "")
+                line[0] = line[0].replace("<@&", "")
+                line[0] = line[0].replace("<@", "")
                 line[0] = line[0].replace(">", "")
                 try:
                     line[0] = int(line[0])
@@ -98,13 +96,8 @@ class ReactToRole(commands.Cog):
         else:
             guild = message.guild
         for line in data:
-            not_role = discord.utils.get(guild.roles, name=line[0]) is None
-            if isinstance(line[0], int) or line[0].isdigit():
-                not_channel = discord.utils.get(guild.channels, id=int(line[0])) is None
-            else:
-                not_channel = line[0][0] != "#" or\
-                    discord.utils.get(guild.channels, name=line[0][1:].lower()) is None
-            if not_role and not_channel:
+            roles, channels = self.get_target(line[0], guild)
+            if roles == [None] and channels == [None]:
                 msg = utils.fill_message("role_not_role",
                                          user=message.author.id,
                                          not_role=discord.utils.escape_mentions(line[0]))
@@ -122,7 +115,7 @@ class ReactToRole(commands.Cog):
     async def add_perms(self, target, member, guild):
         """Add a target role / channel to a member."""
         roles, channels = self.get_target(target, guild)
-        for roles in roles:
+        for role in roles:
             if role is not None and role not in member.roles:
                 await member.add_roles(role)
         for channel in channels:
@@ -131,15 +124,15 @@ class ReactToRole(commands.Cog):
 
     async def remove_perms(self, target, member, guild):
         """Remove a target role / channel from a member."""
-        role, channel = self.get_target(target, guild)
-        if role is not None:
-            if role in member.roles:
+        roles, channels = self.get_target(target, guild)
+        for role in roles:
+            if role is not None and role in member.roles:
                 await member.remove_roles(role)
-        elif channel is not None:
-            await channel.set_permissions(member, read_messages=False)
-        return
+        for channel in channels:
+            if channel is not None:
+                await channel.set_permissions(member, read_messages=False)
 
-    async def get_target(self, target, guild):
+    def get_target(self, target, guild):
         """Detect if target is a channel a role or a group."""
         # Try a group first
         group = group_repo.get_group(target)
@@ -147,27 +140,22 @@ class ReactToRole(commands.Cog):
             roles, channels = [], []
             for role_id in group.role_ids:
                 roles.append(discord.utils.get(guild.roles,
-                                               id=target))
+                                               id=int(role_id)))
             for channel_id in group.channel_ids:
                 channels.append(discord.utils.get(guild.channels,
-                                                  id=target))
+                                                  id=int(channel_id)))
             return roles, channels
 
-        # Check for a role
-        role = discord.utils.get(guild.roles,
-                                 name=target)
-        if role is not None:
-            return [role], []
-
-        # Not a role, check for a channel mention
-        try:
+        # if ID
+        if isinstance(target, int) or target.isdigit():
+            role = discord.utils.get(guild.roles, id=int(target))
             channel = discord.utils.get(guild.channels, id=int(target))
-        except ValueError:
-            channel = None
-        if channel is None:
-            # not a channel mention, try again with a channel name
+        # else if name of role / #channel
+        else:
+            role = discord.utils.get(guild.roles, name=target)
             channel = discord.utils.get(guild.channels, name=target[1:].lower())
-        return [], [channel]
+
+        return [role], [channel]
 
 
 class RolesGroupManager(commands.Cog):
@@ -188,8 +176,9 @@ class RolesGroupManager(commands.Cog):
     @commands.command()
     async def get_group(self, ctx, name: str):
         group = group_repo.get_group(name)
+        channels = ", ".join([f"<#{channel_id}>" for channel_id in group.channel_ids])
         await ctx.send(f"Jmeno: {group.name}\n"
-                 f"Channel IDs:{group.channel_ids}\n"
+                 f"Channel IDs: {channels}\n"
                  f"Role IDs:{group.role_ids}")
 
     @commands.check(is_admin)
@@ -203,25 +192,25 @@ class RolesGroupManager(commands.Cog):
     @commands.command()
     async def add_channel_id(self, ctx, name: str, channel_id: int):
         group_repo.group_add_channel_id(name, channel_id)
-        await ctx.send(f"Done")
+        await ctx.send("Done")
 
     @commands.check(is_admin)
     @commands.command()
     async def add_role_id(self, ctx, name: str, role_id: int):
         group_repo.group_add_role_id(name, role_id)
-        await ctx.send(f"Done")
+        await ctx.send("Done")
 
     @commands.check(is_admin)
     @commands.command()
     async def group_reset_channels(self, ctx, name: str):
         group_repo.group_reset_channels(name)
-        await ctx.send(f"Done")
+        await ctx.send("Done")
 
     @commands.check(is_admin)
     @commands.command()
     async def group_reset_roles(self, ctx, name: str):
         group_repo.group_reset_roles(name)
-        await ctx.send(f"Done")
+        await ctx.send("Done")
 
 
 def setup(bot):
