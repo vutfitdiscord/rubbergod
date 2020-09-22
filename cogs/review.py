@@ -154,7 +154,7 @@ class Review(commands.Cog):
             if not self.rev.update_subject_types("https://www.fit.vut.cz/study/program/18/.cs", False):
                 await ctx.send(messages.subject_update_error)
                 return
-            for id in range(31, 47):
+            for id in range(31, 48):
                 if not self.rev.update_subject_types(f"https://www.fit.vut.cz/study/field/{id}/.cs", True):
                     await ctx.send(messages.subject_update_error)
                     return
@@ -462,6 +462,12 @@ class Review_helper:
                 semester = "Z"
                 if sem == 2:
                     semester = "L"
+                if detail:
+                    type_list = detail.type.split(", ")
+                    # remove duplicated types -> bug fix
+                    if type_list.count(type) > 1:
+                        type = ", ".join(list(dict.fromkeys(type_list)))
+                        review_repo.update_subject_type(shortcut, type, detail.year)
                 if not detail:
                     # subject not in DB
                     review_repo.set_subject_details(
@@ -477,7 +483,7 @@ class Review_helper:
                     )
                 elif for_year not in detail.year.split(", "):
                     # subject already in DB with different year (applicable mainly for MIT)
-                    if detail.type != type:
+                    if type not in type_list:
                         type += f", {detail.type}"
                     if detail.year:
                         for_year += f", {detail.year}"
