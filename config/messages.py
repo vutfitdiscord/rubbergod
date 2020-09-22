@@ -227,7 +227,7 @@ class Messages:
     absolvent_diploma_error = "Diplom (číslo a jméno) se nepovedlo na webu ověřit."
     absolvent_success = "Diplom byl úspěšne ověřen."
     absolvent_help = "Příkaz pro ověření absolvování studia na FIT VUT - zadejte CASE-SENSITIVE údaje ve formátu:\n" \
-        "?diplom <Titul.> <Jméno> <Příjmení> <Číslo diplomu> <ID kvalifikační práce z URL na webu VUT <https://www.vutbr.cz/studenti/zav-prace> >\n" \
+        f"{prefix}{{command}} <Titul.> <Jméno> <Příjmení> <Číslo diplomu> <ID kvalifikační práce z URL na webu VUT <https://www.vutbr.cz/studenti/zav-prace> >\n" \
         "např: Bc. Josef Novák 123456/2019 135791\n" \
         "(při <https://www.vutbr.cz/studenti/zav-prace/detail/135791> nebo <https://www.vutbr.cz/studenti/zav-prace?zp_id=135791>)\n" \
         "Údaje slouží k jednorázovému ověření a nejsou nikam ukládány."
