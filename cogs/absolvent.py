@@ -9,6 +9,7 @@ import re
 from repository import user_repo
 from config.app_config import Config
 from config.messages import Messages
+import utils
 
 user_r = user_repo.UserRepository()
 
@@ -17,7 +18,7 @@ class Absolvent(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command()
+    @commands.command(aliases=["absolvent"])
     async def diplom(self, ctx, degree, name, surname, diploma_number, thesis_web_id):
         """Command for diploma verification and honourable role addition
 
@@ -168,7 +169,7 @@ class Absolvent(commands.Cog):
 
     @diplom.error
     async def diplom_error(self, ctx, error):
-        await ctx.send(Messages.absolvent_help)
+        await ctx.send(utils.fill_message("absolvent_help", command=ctx.invoked_with))
 
 
 def setup(bot):
