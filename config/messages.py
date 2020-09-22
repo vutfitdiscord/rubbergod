@@ -195,7 +195,7 @@ class Messages:
     review_remove_error = "Hodnocení předmětu nebylo nalezeno."
     review_add_denied = "{user}, na přidání hodnocení předmětu nemáš právo."
     review_not_on_server = "{user}, na použití tohto příkazu musíš být na FITwide serveru."
-    subject_format = prefix + "subject [add, remove] [zkratka předmětu]"
+    subject_format = prefix + "subject [add, remove, update] [zkratka předmětu]"
     subject_update_error = "Aktualizace se nezdařila."
     subject_update_success = "Předměty byly úspěšně aktualizovány."
     shorcut_format = prefix + "{command} [zkratka předmětu]"
