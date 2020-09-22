@@ -36,7 +36,8 @@ class Urban(commands.Cog):
             embed.timestamp = datetime.datetime.now(tz=datetime.timezone.utc)
             embed.set_footer(icon_url=ctx.author.avatar_url, text=ctx.author)
             embed.add_field(name="Definition", value=definition, inline=False)
-            embed.add_field(name="Example", value=example, inline=False)
+            if example:
+                embed.add_field(name="Example", value=example, inline=False)
             embed.add_field(
                 name="Page",
                 value=f"{idx + 1}/{len(dict['list'])}",
