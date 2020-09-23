@@ -47,9 +47,9 @@ class Messages:
 
     karma_invalid_command = "Neznámý karma příkaz."
     karma_vote_format = "Neočekávám žádný argument. " \
-                        "Správný formát: `" + prefix + "karma vote`"
+                        f"Správný formát: `{prefix}karma vote`"
     karma_vote_message_hack = "Hlasování o karma ohodnocení emotu"
-    karma_vote_message = karma_vote_message_hack + " {emote}"
+    karma_vote_message = f"{karma_vote_message_hack} {{emote}}"
     karma_vote_info = "Hlasování skončí za **{delay}** " \
                       "minut a minimální počet hlasů je " \
                       "**{minimum}**."
@@ -59,29 +59,29 @@ class Messages:
                            "Bylo třeba aspoň {minimum} hlasů."
     karma_vote_allvoted = "Už se hlasovalo o všech emotech."
     karma_revote_format = "Očekávám pouze formát " \
-                          "`" + prefix + "karma revote [emote]`"
+                          f"`{prefix}karma revote [emote]`"
     karma_emote_not_found = "Emote jsem na serveru nenašel."
     karma_get_format = "Použití:\n" \
-                       "`" + prefix + "karma get`: " \
+                       f"`{prefix}karma get`: " \
                        "vypíše všechny emoty s hodnotou.\n" \
-                       "`" + prefix + "karma get [emote]`: " \
+                       f"`{prefix}karma get [emote]`: " \
                        "zobrazí hodnotu daného emotu."
     karma_get = "Hodnota {emote} je {value}."
     karma_get_emote_not_voted = "{emote} není ohodnocen."
     karma_give_format = "Toaster pls, formát je " \
-                        "`" + prefix + "karma give [number] [user(s)]`"
+                        f"`{prefix}karma give [number] [user(s)]`"
     karma_give_format_number = "Toaster pls, formát je " \
-                               "`" + prefix + "karma give " \
+                               f"`{prefix}karma give " \
                                "[number, jakože číslo, " \
                                "ne {input}] [user(s)]` "
     karma_give_success = "Karma byla úspěšně přidaná."
     karma_give_negative_success = "Karma byla úspěšně odebraná."
-    karma_message_format = prefix + "karma message [url, id]"
+    karma_message_format = f"{prefix}karma message [url]"
     member_not_found = "{user} Nikoho takového jsem nenašel."
     karma_lederboard_offser_error = "{user} Špatný offset, zadej kladné číslo"
     karma_web_title = "Celý leaderboard"
     karma_web = "https://karma.grillbot.cloud/"
-    karma_transfer_format = "Správný formát je `" + prefix + "karma transfer [od koho] [komu]`"
+    karma_transfer_format = f"Správný formát je `{prefix} karma transfer [od koho] [komu]`"
     karma_transfer_complete = "Karma byla úspěšně převedena z `{from_user}` na `{to_user}`:\n" \
                               "Množství karmy: **{karma}**\n" \
                               "Množství pozitivně rozdané karmy: **{positive}** \n" \
@@ -95,7 +95,7 @@ class Messages:
     role_not_role = "{user}, {not_role} není role."
     role_invalid_emote = "{user}, {not_emote} pro roli {role} není emote."
 
-    rng_generator_format = "Použití: `" + prefix + "roll x [y]`\n" \
+    rng_generator_format = f"Použití: `{prefix}roll x [y]`\n" \
                            "rozmezí x, y jsou celá čísla,\n" \
                            "pokud y není specifikováno, " \
                            "je považováno za 0."
@@ -116,22 +116,22 @@ class Messages:
                               "({admin} pls)."
     verify_send_format = "Očekávám jeden argument. " \
                          "Správný formát: " \
-                         "`" + prefix + "getcode FIT login, " \
+                         f"`{prefix}getcode FIT login, " \
                          "ve tvaru xlogin00, nebo MUNI UCO`"
     verify_send_dumbshit = "{user} Tvůj login. {emote}"
     verify_send_success = "{user} Kód byl odeslán na tvůj mail " \
                           "({mail})!\n" \
                           "Pro verifikaci použij: " \
-                          "`" + prefix + "verify [login] [kód]`"
+                          f"`{prefix}verify [login] [kód]`"
     verify_send_not_found = "{user} Login nenalezen " \
                             "nebo jsi už tímhle krokem " \
                             "prošel ({admin} pls)."
     verify_verify_format = "Očekávám dva argumenty. " \
                            "Správný formát:\n" \
-                           "`" + prefix + "verify [FIT login nebo " \
+                           f"`{prefix}verify [FIT login nebo " \
                            "MUNI UCO] [kód]`\n" \
-                           "Pro získání kódu použij\n`" +\
-                           prefix + "getcode [FIT login, ve tvaru " \
+                           "Pro získání kódu použij\n" \
+                           f"`{prefix}getcode [FIT login, ve tvaru " \
                            "xlogin00, nebo MUNI UCO]`"
     verify_verify_dumbshit = "{user} Kód, " \
                              "který ti přišel na mail. {emote}"
@@ -148,18 +148,18 @@ class Messages:
                               "({admin} pls)."
     verify_verify_wrong_code = "{user} Špatný kód."
 
-    vote_format = "Použití vote:\n`" + prefix + "vote [datum] [čas] [otázka]\n[emoji]" \
-                                                " [odpověď 1]\n[emoji] [odpověď 2]\na tak dále`\n" \
-                                                "Datum je ve formátu `dd.MM.(yy)`." \
-                                                "Čas je ve formátu `hh:mm`. " \
-                                                "Pouze vyplněný čas použije den odeslání zprávy, " \
-                                                "pouze vyplněné datum použije čas 00:00. " \
-                                                "Datum a čas jsou nepovinné argumenty, " \
-                                                "hlasování bude bez jejich uvedení funkční neustále. " \
-                                                "Pokud jsou vyplněny," \
-                                                "bot pošle po uplynutí zprávu o výsledku," \
-                                                "když ho mezitím nikdo nevypne. " \
-                                                "Indikace výherné možnosti přežije i vypnutí."
+    vote_format = f"Použití vote:\n`{prefix}vote [datum] [čas] [otázka]\n[emoji] " \
+                                    "[odpověď 1]\n[emoji] [odpověď 2]\na tak dále`\n" \
+                                    "Datum je ve formátu `dd.MM.(yy)`." \
+                                    "Čas je ve formátu `hh:mm`. " \
+                                    "Pouze vyplněný čas použije den odeslání zprávy, " \
+                                    "pouze vyplněné datum použije čas 00:00. " \
+                                    "Datum a čas jsou nepovinné argumenty, " \
+                                    "hlasování bude bez jejich uvedení funkční neustále. " \
+                                    "Pokud jsou vyplněny," \
+                                    "bot pošle po uplynutí zprávu o výsledku," \
+                                    "když ho mezitím nikdo nevypne. " \
+                                    "Indikace výherné možnosti přežije i vypnutí."
     vote_not_emoji = "{not_emoji} není emoji. <:sadcat:576171980118687754>"
     vote_bad_date = "Hlasování může skončit jen v budoucnosti. <:objection:490989324125470720>"
 
@@ -173,10 +173,10 @@ class Messages:
     vote_result_multiple = "V hlasování „{question}“ vyhrály možnosti {winning_emojis} s {votes} hlasy."
     vote_result_none = "V hlasování „{question}“ nikdo nehlasoval. <:sadcat:576171980118687754>"
 
-    review_format = prefix + "reviews [add, remove, zkratka předmětu]"
-    review_add_format = prefix + "reviews add {ZkratkaPredmetu} {Tier (0-4, 0 je TOP)} (VolitelnyText)\n" \
-        "Pro anonymní příspěvek použijte DM.\nNapříklad:\n`" + \
-        prefix + "reviews add IZP 2 text recenze`"
+    review_format = f"{prefix}reviews [add, remove, zkratka předmětu]"
+    review_add_format = f"{prefix}reviews add {{ZkratkaPredmetu}} {{Tier (0-4, 0 je TOP)}} (VolitelnyText)\n" \
+                        "Pro anonymní příspěvek použijte DM.\nNapříklad:\n`" \
+                        f"{prefix}reviews add IZP 2 text recenze`"
     review_wrong_subject = "Nesprávná zkratka předmětu."
     review_tier = "Tier je z rozsahu 0-4, kde 0 je nejlepší."
     review_added = "Hodnocení předmětu bylo přidáno."
@@ -186,19 +186,18 @@ class Messages:
                             "Použijte reakce ◀️ a ▶️ pro navigaci mezi recenzemi.\n" \
                             "Pro navigaci v textu delších recenzí použijte 🔼 a 🔽.\n"
 
-    review_get_format = prefix + "reviews [zkratka předmětu]"
-    review_remove_format = prefix + "reviews remove [zkratka předmětu]"
-    review_remove_format_admin = prefix + \
-        "reviews remove [zkratka předmětu, id + číslo]"
+    review_get_format = f"{prefix}reviews [zkratka předmětu]"
+    review_remove_format = f"{prefix}reviews remove [zkratka předmětu]"
+    review_remove_format_admin = f"{prefix}reviews remove [zkratka předmětu, id + číslo]"
     review_remove_id_format = "reviews remove id [id]"
     review_remove_success = "Hodnocení předmětu bylo odebráno."
     review_remove_error = "Hodnocení předmětu nebylo nalezeno."
     review_add_denied = "{user}, na přidání hodnocení předmětu nemáš právo."
     review_not_on_server = "{user}, na použití tohto příkazu musíš být na FITwide serveru."
-    subject_format = prefix + "subject [add, remove, update] [zkratka předmětu]"
+    subject_format = f"{prefix}subject [add, remove, update] [zkratka předmětu]"
     subject_update_error = "Aktualizace se nezdařila."
     subject_update_success = "Předměty byly úspěšně aktualizovány."
-    shorcut_format = prefix + "{command} [zkratka předmětu]"
+    shorcut_format = f"{prefix}{{command}} [zkratka předmětu]"
     tierboard_help = f"{prefix}tierboard [typ] [semestr] [rok]\n"\
                      "Založeno na `reviews` z průměru tier hodnot.\n"\
                      "typ -> P, V, PVT, PVA\n"\
@@ -244,15 +243,15 @@ class Messages:
     cog_cannot_be_unloadable = 'Toto rozšíření `{cog}` je neodebratelné.'
     cog_reloaded = 'Rozšíření `{cog}` bylo načteno znovu.'
 
-    config_help = prefix + 'config [get, list, set, append, load, backup]'
+    config_help = f'{prefix}config [get, list, set, append, load, backup]'
     config_updated = 'Config updated'
     config_loaded = 'Config loaded'
     config_wrong_key = 'Nesprávny klíč'
     config_wrong_type = 'Nesprávny typ'
     config_backup_created = 'Config backup created'
-    config_get_format = prefix + 'config get [key]'
-    config_set_format = prefix + 'config set [key] hodnota/y'
-    config_append_format = prefix + 'config append [key] hodnota/y'
+    config_get_format = f'{prefix}config get [key]'
+    config_set_format = f'{prefix}config set [key] hodnota/y'
+    config_append_format = f'{prefix}config append [key] hodnota/y'
 
     info = [[('karma', 'Vypíše karmu vaši, rozdanou a odebranou'),
              ('karma stalk [user]', 'Vypíše karmu uživatele, karmu rozdanou a odebranou.'),
@@ -260,7 +259,7 @@ class Messages:
              ('karma get [emote]', 'Vrátí karma hodnotu emotu.'),
              ('karma vote', 'Odstartuje hlasování o hodnotě zatím neohodnoceného emotu.'),
              ('karma revote [emote]', 'Odstartuje hlasování o nové hodnotě emotu.'),
-             ('karma message [url, id]', 'Zobrazí karmu získanou za zprávu')],
+             ('karma message [url]', 'Zobrazí karmu získanou za zprávu')],
             [('leaderboard [offset]', 'Karma leaderboard'),
              ('bajkarboard [offset]', 'Karma leaderboard reversed'),
              ('givingboard [offset]', 'Leaderboard rozdávání pozitivní karmy.'),
