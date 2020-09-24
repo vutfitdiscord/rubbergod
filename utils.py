@@ -1,4 +1,5 @@
 from datetime import datetime, timezone
+from typing import Iterable
 
 import git
 import discord
@@ -141,8 +142,17 @@ async def helper_plus(ctx):
 
 
 def add_author_footer(embed: discord.Embed, ctx: discord.ext.commands.Context,
-                      set_timestamp=True, additional_text: str = ""):
+                      set_timestamp=True, additional_text: Iterable[str] = []):
+    """
+    Adds footer to the embed with author name and icon from ctx.
+
+    :param ctx: command Context object for author info
+    :param embed: discord.Embed object
+    :param set_timestamp: bool, should the embed's timestamp be set
+    :param additional_text: Iterable of strings that will be joined over " | " into one string
+    and added after author name.
+    """
+
     if set_timestamp:
         embed.timestamp = datetime.now(tz=timezone.utc)
-
-    embed.set_footer(icon_url=ctx.author.avatar_url, text=str(ctx.author)+additional_text)
+    embed.set_footer(icon_url=ctx.author.avatar_url, text=str(ctx.author) + ' | '.join(additional_text))
