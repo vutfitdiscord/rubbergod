@@ -97,9 +97,14 @@ async def on_error(event, *args, **kwargs):
                 message = await channel.fetch_message(arg.message_id)
                 if message.content:
                     message = message.content[:1000]
-                else:
+                elif message.embeds:
                     embeds.extend(message.embeds)
                     message = "Embed v předchozí zprávě"
+                elif message.attachments:
+                    message_out = ""
+                    for attachment in message.attachments:
+                        message_out += f"{attachment.url}\n"
+                    message = message_out
             else:
                 message = arg.message_id
             user = str(user)
