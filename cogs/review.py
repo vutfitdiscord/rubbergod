@@ -231,7 +231,7 @@ class Review(commands.Cog):
             degree = year
         embed.add_field(name="Program", value=degree)
 
-        utils.add_author_footer(embed, ctx, additional_text=" | ?tierboard help")
+        utils.add_author_footer(embed, ctx, additional_text=("?tierboard help",))
         await ctx.send(embed=embed)
 
     @reviews.error
