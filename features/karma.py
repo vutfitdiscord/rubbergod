@@ -327,8 +327,9 @@ class Karma(BaseFeature):
         elif karma < 0:
             colour = 0xcb410b
         embed.colour = colour
-        embed.set_footer(text=author, icon_url=author.avatar_url)
         embed.add_field(name='Celková karma za zprávu:', value=karma, inline=False)
+        utils.add_author_footer(embed, ctx=channel_out)
+
         await channel_out.send(embed=embed)
 
     async def leaderboard(self, channel, action, order, start=1):

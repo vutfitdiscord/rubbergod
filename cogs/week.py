@@ -3,6 +3,7 @@ from datetime import date
 import discord
 from discord.ext import commands
 
+import utils
 from config import app_config as config, messages
 
 config = config.Config
@@ -24,9 +25,11 @@ class week(commands.Cog):
         stud_type = even if stud_week % 2 == 0 else odd
 
         embed = discord.Embed(title="Týden", color=0xE5DC37)
-        embed.set_footer(icon_url=ctx.author.avatar_url, text=str(ctx.author))
         embed.add_field(name="Studijní", value="{} ({})".format(stud_type, stud_week))
         embed.add_field(name="Kalendářní", value="{} ({})".format(cal_type, cal_week))
+
+        utils.add_author_footer(embed, ctx)
+
         await ctx.send(embed=embed)
 
 

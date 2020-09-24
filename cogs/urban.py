@@ -7,6 +7,7 @@ from urllib import parse as url_parse
 import discord
 from discord.ext import commands
 
+import utils
 from config.messages import Messages
 
 
@@ -33,8 +34,6 @@ class Urban(commands.Cog):
                 title=item["word"],
                 url=item["permalink"],
             )
-            embed.timestamp = datetime.datetime.now(tz=datetime.timezone.utc)
-            embed.set_footer(icon_url=ctx.author.avatar_url, text=ctx.author)
             embed.add_field(name="Definition", value=definition, inline=False)
             if example:
                 embed.add_field(name="Example", value=example, inline=False)
@@ -43,7 +42,10 @@ class Urban(commands.Cog):
                 value=f"{idx + 1}/{len(dict['list'])}",
                 inline=False,
             )
+            utils.add_author_footer(embed, ctx)
+
             embed_list.append(embed)
+
         return embed_list
 
     async def urban_pages(self, ctx, embeds):

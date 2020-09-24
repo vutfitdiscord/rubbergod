@@ -1,12 +1,12 @@
 from datetime import datetime, timezone
 
-import discord
 import git
+import discord
 from discord import Member
 from discord.ext import commands
 
-from config.app_config import Config
 from config.messages import Messages
+from config.app_config import Config
 
 
 def generate_mention(user_id):
@@ -140,6 +140,9 @@ async def helper_plus(ctx):
     raise NotHelperPlusError
 
 
-def add_author_footer(embed: discord.Embed, ctx: discord.ext.commands.Context):
-    embed.timestamp = datetime.now(tz=timezone.utc)
-    embed.set_footer(icon_url=ctx.author.avatar_url, text=ctx.author.name)
+def add_author_footer(embed: discord.Embed, ctx: discord.ext.commands.Context,
+                      set_timestamp=True, additional_text: str = ""):
+    if set_timestamp:
+        embed.timestamp = datetime.now(tz=timezone.utc)
+
+    embed.set_footer(icon_url=ctx.author.avatar_url, text=str(ctx.author)+additional_text)
