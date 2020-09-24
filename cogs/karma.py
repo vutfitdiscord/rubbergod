@@ -173,13 +173,14 @@ class Karma(commands.Cog):
 
     @karma.command()
     async def message(self, ctx, *args):
-        try:
-            converter = commands.MessageConverter()
-            target_message = await converter.convert(ctx=ctx, argument=' '.join(args))
-        except commands.errors.BadArgument:
-            await ctx.send(utils.fill_message("karma_message_format", user=ctx.author.id))
-            return
-        await self.karma.message_karma(ctx, target_message)
+        async with ctx.channel.typing():
+            try:
+                converter = commands.MessageConverter()
+                target_message = await converter.convert(ctx=ctx, argument=' '.join(args))
+            except commands.errors.BadArgument:
+                await ctx.send(utils.fill_message("karma_message_format", user=ctx.author.id))
+                return
+            await self.karma.message_karma(ctx, target_message)
 
     @karma.command()
     @commands.check(utils.is_bot_owner)
