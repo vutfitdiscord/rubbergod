@@ -332,7 +332,7 @@ class Karma(BaseFeature):
 
         await channel_out.send(embed=embed)
 
-    async def leaderboard(self, channel, action, order, start=1):
+    async def leaderboard(self, ctx: discord.ext.commands.Context, action, order, start=1):
         if action == 'give':
             if order == "DESC":
                 column = 'positive'
@@ -360,14 +360,15 @@ class Karma(BaseFeature):
         output = self.gen_leaderboard_content(attribute, start, column)
 
         embed = discord.Embed(title=title, description=output)
-        embed.timestamp = datetime.datetime.now(tz=datetime.timezone.utc)
+        utils.add_author_footer(embed, ctx)
 
         if action == "get" and order == "DESC":
             value_num = math.ceil(start / cfg.karma_grillbot_leaderboard_size)
             value = msg.karma_web if value_num == 1 else f"{msg.karma_web}{value_num}"
             embed.add_field(name=msg.karma_web_title, value=value)
 
-        message = await channel.send(embed=embed)
+        message = await ctx.message.channel.send(embed=embed)
+
         await message.add_reaction("⏪")
         await message.add_reaction("◀")
         await message.add_reaction("▶")
