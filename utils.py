@@ -1,12 +1,12 @@
-from datetime import datetime
+from datetime import datetime, timezone
 
-import git
 import discord
+import git
 from discord import Member
 from discord.ext import commands
 
-from config.messages import Messages
 from config.app_config import Config
+from config.messages import Messages
 
 
 def generate_mention(user_id):
@@ -93,7 +93,7 @@ def is_bot_admin(ctx: commands.Context):
 
 
 def cut_string(string: str, part_len: int):
-    return list(string[0 + i : part_len + i] for i in range(0, len(string), part_len))
+    return list(string[0 + i: part_len + i] for i in range(0, len(string), part_len))
 
 
 async def reaction_get_ctx(bot, payload):
@@ -138,3 +138,8 @@ async def helper_plus(ctx):
         if role.id in allowed_roles:
             return True
     raise NotHelperPlusError
+
+
+def add_author_footer(embed: discord.Embed, ctx: discord.ext.commands.Context):
+    embed.timestamp = datetime.now(tz=timezone.utc)
+    embed.set_footer(icon_url=ctx.author.avatar_url, text=ctx.author.name)
