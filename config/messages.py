@@ -234,6 +234,8 @@ class Messages:
     urban_help = f"`{prefix}urban výraz`\nPříklad:\n`{prefix}urban sure`"
     urban_not_found = "Pro daný výraz neexistuje záznam <:sadcat:576171980118687754>"
 
+    autopin_max_pins_error = "Byl dosažen maximální počet připnutých správ."
+
     on_ready_message = "<:peepowave:693070888546861096>"
 
     cog_is_loaded = 'Toto rozšíření `{cog}` je již načtené.'

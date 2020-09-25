@@ -3,10 +3,10 @@ import discord
 from discord.ext import commands
 
 from config.app_config import Config
+from config.messages import Messages
 
 
 class AutoPin(commands.Cog):
-
     def __init__(self, bot):
         self.bot = bot
 
@@ -23,24 +23,31 @@ class AutoPin(commands.Cog):
         except discord.errors.NotFound:
             return
         emoji = payload.emoji.name
-        if emoji == '📌':
+        if emoji == "📌":
             for reaction in message.reactions:
-                if reaction.emoji == '📌' and \
-                   reaction.count >= Config.autopin_count and \
-                   not message.pinned and \
-                   message.channel.id not in Config.autopin_banned_channels:
+                if (
+                    reaction.emoji == "📌"
+                    and reaction.count >= Config.autopin_count
+                    and not message.pinned
+                    and message.type == discord.MessageType.default
+                    and message.channel.id not in Config.autopin_banned_channels
+                ):
+                    pin_count = await channel.pins()
+                    if len(pin_count) == 50:
+                        await channel.send(Messages.autopin_max_pins_error)
+                        return
                     users = await reaction.users().flatten()
                     await self.log(message, users)
                     await message.pin()
-                    await message.clear_reaction('📌')
+                    await message.clear_reaction("📌")
                     break
 
     async def log(self, message, users):
         """
         Logging message link and users that pinned message
         """
-        embed = discord.Embed(title="📌 Auto pin message log", color=0xeee657)
-        user_names = ', '.join([user.name for user in users])
+        embed = discord.Embed(title="📌 Auto pin message log", color=0xEEE657)
+        user_names = ", ".join([user.name for user in users])
         message_link = message.jump_url
         embed.add_field(name="Users", value=user_names)
         embed.add_field(name="In channel", value=message.channel)
