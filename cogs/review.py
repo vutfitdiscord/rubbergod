@@ -183,8 +183,8 @@ class Review(commands.Cog):
             value=f"http://fit.nechutny.net/?detail={subject.shortcut}",
             inline=False,
         )
-        embed.timestamp = datetime.datetime.now(tz=datetime.timezone.utc)
-        embed.set_footer(icon_url=ctx.author.avatar_url, text=ctx.author)
+
+        utils.add_author_footer(embed, ctx)
         await ctx.send(embed=embed)
 
     @commands.command()
@@ -230,7 +230,8 @@ class Review(commands.Cog):
         if year:
             degree = year
         embed.add_field(name="Program", value=degree)
-        embed.set_footer(icon_url=ctx.author.avatar_url, text=f"{ctx.author} | ?tierboard help")
+
+        utils.add_author_footer(embed, ctx, additional_text=("?tierboard help",))
         await ctx.send(embed=embed)
 
     @reviews.error

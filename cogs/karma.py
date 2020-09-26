@@ -83,6 +83,7 @@ class Karma(commands.Cog):
             else:
                 karma_r.karma_emoji(ctx['message'].author, ctx['member'], ctx['emoji'].id)
 
+
     @commands.Cog.listener()
     async def on_raw_reaction_remove(self, payload):
         ctx = await utils.reaction_get_ctx(self.bot, payload)
@@ -193,7 +194,7 @@ class Karma(commands.Cog):
         if not await self.validate_leaderboard_offset(start, ctx):
             return
 
-        await self.karma.leaderboard(ctx.message.channel, 'get', 'DESC', start)
+        await self.karma.leaderboard(ctx, 'get', 'DESC', start)
         await self.check.botroom_check(ctx.message)
 
     @commands.cooldown(rate=2, per=30.0, type=commands.BucketType.user)
@@ -202,7 +203,7 @@ class Karma(commands.Cog):
         if not await self.validate_leaderboard_offset(start, ctx):
             return
 
-        await self.karma.leaderboard(ctx.message.channel, 'get', 'ASC', start)
+        await self.karma.leaderboard(ctx, 'get', 'ASC', start)
         await self.check.botroom_check(ctx.message)
 
     @commands.cooldown(rate=2, per=30.0, type=commands.BucketType.user)
@@ -211,7 +212,7 @@ class Karma(commands.Cog):
         if not await self.validate_leaderboard_offset(start, ctx):
             return
 
-        await self.karma.leaderboard(ctx.message.channel, 'give', 'DESC', start)
+        await self.karma.leaderboard(ctx, 'give', 'DESC', start)
         await self.check.botroom_check(ctx.message)
 
     @commands.cooldown(rate=2, per=30.0, type=commands.BucketType.user)
@@ -220,7 +221,7 @@ class Karma(commands.Cog):
         if not await self.validate_leaderboard_offset(start, ctx):
             return
 
-        await self.karma.leaderboard(ctx.message.channel, 'give', 'ASC', start)
+        await self.karma.leaderboard(ctx, 'give', 'ASC', start)
         await self.check.botroom_check(ctx.message)
 
     @leaderboard.error

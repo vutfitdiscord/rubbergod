@@ -1,12 +1,13 @@
-from datetime import datetime
+from datetime import datetime, timezone
+from typing import Iterable
 
-import git
 import discord
+import git
 from discord import Member
 from discord.ext import commands
 
-from config.messages import Messages
 from config.app_config import Config
+from config.messages import Messages
 
 
 def generate_mention(user_id):
@@ -93,7 +94,7 @@ def is_bot_admin(ctx: commands.Context):
 
 
 def cut_string(string: str, part_len: int):
-    return list(string[0 + i : part_len + i] for i in range(0, len(string), part_len))
+    return list(string[0 + i: part_len + i] for i in range(0, len(string), part_len))
 
 
 async def reaction_get_ctx(bot, payload):
@@ -138,3 +139,21 @@ async def helper_plus(ctx):
         if role.id in allowed_roles:
             return True
     raise NotHelperPlusError
+
+
+def add_author_footer(embed: discord.Embed, ctx: discord.ext.commands.Context,
+                      set_timestamp=True, additional_text: Iterable[str] = []):
+    """
+    Adds footer to the embed with author name and icon from ctx.
+
+    :param ctx: command Context object for author info
+    :param embed: discord.Embed object
+    :param set_timestamp: bool, should the embed's timestamp be set
+    :param additional_text: Iterable of strings that will be joined with author name by pipe symbol, eg.:
+    "john#2121 | text1 | text2".
+    """
+
+    if set_timestamp:
+        embed.timestamp = datetime.now(tz=timezone.utc)
+
+    embed.set_footer(icon_url=ctx.author.avatar_url, text=' | '.join((str(ctx.author), *additional_text)))

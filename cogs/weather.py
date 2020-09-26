@@ -4,7 +4,7 @@ import discord
 from discord.ext import commands
 
 from config import app_config as config, messages
-
+import utils
 config = config.Config
 messages = messages.Messages
 
@@ -48,7 +48,11 @@ class weather(commands.Cog):
             embed.add_field(name="Vítr", value=wind, inline=True)
             embed.add_field(name="Oblačnost", value=clouds, inline=True)
             embed.add_field(name="Viditelnost", value=visibility, inline=True)
+
+            utils.add_author_footer(embed, ctx)
+
             await ctx.send(embed=embed)
+
         elif str(res["cod"]) == "404":
             await ctx.send("Město nenalezeno")
         elif str(res["cod"]) == "401":
