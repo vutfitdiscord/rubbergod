@@ -210,6 +210,44 @@ class RolesGroupManager(commands.Cog):
         await ctx.send("Done")
 
 
+class ChannelManager(commands.Cog):
+
+    def __init__(self, bot):
+        self.bot = bot
+
+    @commands.check(utils.is_bot_admin)
+    @commands.group()
+    async def channel(self, ctx):
+        if ctx.invoked_subcommand is None:
+            await ctx.send(Messages.channel_help)
+
+    @channel.command(aliases=["cp"])
+    async def copy(self, ctx, src: discord.TextChannel, dst: discord.TextChannel):
+        """
+        Copy permissions from src channel to dst.
+        Both channels are expected as tags or IDs
+        """
+        for key in src.overwrites:
+            await dst.set_permissions(key, overwrite=src.overwrites[key])
+        await ctx.send(Messages.channel_copy_done)
+
+    @channel.command()
+    async def clone(self, ctx, src: discord.TextChannel, name):
+        """Clone channel with same permissions as src."""
+        new = await src.clone(name=name)
+        await ctx.send(utils.fill_message("channel_clone_done", id=new.id))
+
+    @copy.error
+    @clone.error
+    async def error(self, ctx, error):
+        """Print help on missing argument"""
+        if isinstance(error, commands.MissingRequiredArgument):
+            if "copy" in ctx.invoked_subcommand.name:
+                await ctx.send(Messages.channel_copy_help)
+            elif "clone" in ctx.invoked_subcommand.name:
+                await ctx.send(Messages.channel_clone_help)
+
 def setup(bot):
     bot.add_cog(ReactToRole(bot))
     bot.add_cog(RolesGroupManager(bot))
+    bot.add_cog(ChannelManager(bot))
