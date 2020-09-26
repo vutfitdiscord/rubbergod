@@ -10,7 +10,7 @@ from config.app_config import Config
 
 
 def generate_mention(user_id):
-    return '<@' + str(user_id) + '>'
+    return f"<@{user_id}>"
 
 
 def git_hash():
@@ -55,13 +55,13 @@ def fill_message(message_name, *args, **kwargs):
     """
 
     # Convert username/admin to a mention
-    if 'user' in kwargs:
-        kwargs['user'] = generate_mention(kwargs['user'])
+    if "user" in kwargs:
+        kwargs["user"] = generate_mention(kwargs["user"])
 
-    if 'admin' in kwargs:
-        kwargs['admin'] = generate_mention(kwargs['admin'])
+    if "admin" in kwargs:
+        kwargs["admin"] = generate_mention(kwargs["admin"])
 
-    to_escape = ['role', 'not_role', 'line']
+    to_escape = ["role", "not_role", "line"]
 
     for arg in to_escape:
         if arg in kwargs:
@@ -88,12 +88,12 @@ def pagination_next(emoji, page, max_page):
         return 0
 
 
-def is_bot_owner(ctx: commands.Context):
-    return ctx.author.id == Config.admin_id
+def is_bot_admin(ctx: commands.Context):
+    return ctx.author.id in Config.admin_ids
 
 
 def cut_string(string: str, part_len: int):
-    return list(string[0+i:part_len+i] for i in range(0, len(string), part_len))
+    return list(string[0 + i : part_len + i] for i in range(0, len(string), part_len))
 
 
 async def reaction_get_ctx(bot, payload):

@@ -16,7 +16,7 @@ class DynamicConfig(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.check(utils.is_bot_owner)
+    @commands.check(utils.is_bot_admin)
     @commands.group(pass_context=True)
     async def config(self, ctx):
         """

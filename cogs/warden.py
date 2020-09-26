@@ -116,7 +116,7 @@ class Warden(commands.Cog):
             yield img_hash
 
     @commands.group()
-    @commands.check(utils.is_bot_owner)
+    @commands.check(utils.is_bot_admin)
     async def scan(self, ctx):
         """Scan for reposts"""
         if ctx.invoked_subcommand is None:

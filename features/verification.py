@@ -83,7 +83,7 @@ class Verification(BaseFeature):
                                                       "@stud.fit.vutbr.cz")
                 else:
                     await message.channel.send(utils.fill_message("verify_send_not_found",
-                                               user=message.author.id, admin=Config.admin_id))
+                                               user=message.author.id, admin=Config.admin_ids[0]))
 
                     embed = discord.Embed(title="Neúspěšný pokus o verify",
                                           color=0xeee657)
@@ -98,7 +98,7 @@ class Verification(BaseFeature):
                     int(login)
                 except ValueError:
                     await message.channel.send(utils.fill_message("verify_send_not_found",
-                                               user=message.author.id, admin=Config.admin_id))
+                                               user=message.author.id, admin=Config.admin_ids[0]))
 
                     embed = discord.Embed(title="Neúspěšný pokus o verify",
                                           color=0xeee657)
@@ -122,7 +122,7 @@ class Verification(BaseFeature):
                                                       "@mail.muni.cz")
                 else:
                     await message.channel.send(utils.fill_message("verify_send_not_found",
-                                               user=message.author.id, admin=Config.admin_id))
+                                               user=message.author.id, admin=Config.admin_ids[0]))
 
                     embed = discord.Embed(title="Neúspěšný pokus o verify",
                                           color=0xeee657)
@@ -133,7 +133,7 @@ class Verification(BaseFeature):
                     await channel.send(embed=embed)
         else:
             await message.channel.send(utils.fill_message("verify_already_verified",
-                                       user=message.author.id, admin=Config.admin_id))
+                                       user=message.author.id, admin=Config.admin_ids[0]))
         try:
             await message.delete()
         except discord.errors.HTTPException:
@@ -232,7 +232,7 @@ class Verification(BaseFeature):
                     await message.channel.send(utils.fill_message(
                         "verify_verify_manual",
                         user=message.author.id,
-                        admin=Config.admin_id,
+                        admin=Config.admin_ids[0],
                         year=str(new_user.year)
                         )
                     )
@@ -277,7 +277,7 @@ class Verification(BaseFeature):
                                                user=message.author.id))
             else:
                 await message.channel.send(utils.fill_message("verify_verify_not_found",
-                                           user=message.author.id, admin=Config.admin_id))
+                                           user=message.author.id, admin=Config.admin_ids[0]))
 
                 embed = discord.Embed(title="Neúspěšný pokus o verify",
                                       color=0xeee657)
@@ -288,7 +288,7 @@ class Verification(BaseFeature):
                 await channel.send(embed=embed)
         else:
             await message.channel.send(utils.fill_message("verify_already_verified",
-                                       user=message.author.id, admin=Config.admin_id))
+                                       user=message.author.id, admin=Config.admin_ids[0]))
 
         try:
             await message.delete()
