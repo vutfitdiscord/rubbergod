@@ -135,7 +135,7 @@ class Karma(commands.Cog):
                 return
 
     @karma.command()
-    @commands.check(utils.is_bot_owner)
+    @commands.check(utils.is_bot_admin)
     async def revote(self, ctx, *args):
         if not await self.check.guild_check(ctx.message):
             await ctx.send(messages.server_warning)
@@ -151,7 +151,7 @@ class Karma(commands.Cog):
                 await ctx.send(utils.fill_message("vote_room_only", room=dc_vote_room))
 
     @karma.command()
-    @commands.check(utils.is_bot_owner)
+    @commands.check(utils.is_bot_admin)
     async def vote(self, ctx, *args):
         if not await self.check.guild_check(ctx.message):
             await ctx.send(messages.server_warning)
@@ -167,7 +167,7 @@ class Karma(commands.Cog):
                 await ctx.send(utils.fill_message("vote_room_only", room=dc_vote_room))
 
     @karma.command()
-    @commands.check(utils.is_bot_owner)
+    @commands.check(utils.is_bot_admin)
     async def give(self, ctx, *args):
         await self.karma.karma_give(ctx.message)
 
@@ -183,7 +183,7 @@ class Karma(commands.Cog):
             await self.karma.message_karma(ctx, target_message)
 
     @karma.command()
-    @commands.check(utils.is_bot_owner)
+    @commands.check(utils.is_bot_admin)
     async def transfer(self, ctx, *args):
         await self.karma.karma_transfer(ctx.message)
 

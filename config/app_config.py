@@ -38,7 +38,7 @@ class Config:
     key: str = get_attr("base", "key")
 
     # Base information
-    admin_id: int = get_attr("base", "admin_id")
+    admin_ids: List[int] = get_attr("base", "admin_ids")
     guild_id: int = get_attr("base", "guild_id")
 
     # Database

@@ -102,12 +102,12 @@ class Review(commands.Cog):
         if not await self.check_member(ctx):
             return
         if subject is None:
-            if ctx.author.id == config.admin_id:
+            if utils.is_bot_admin():
                 await ctx.send(messages.review_remove_format_admin)
             else:
                 await ctx.send(messages.review_remove_format)
         elif subject == "id":
-            if ctx.author.id == config.admin_id:
+            if utils.is_bot_admin():
                 if id is None:
                     await ctx.send(messages.review_remove_id_format)
                 else:
@@ -124,7 +124,7 @@ class Review(commands.Cog):
 
     @commands.cooldown(rate=5, per=20.0, type=commands.BucketType.user)
     @commands.group()
-    @commands.check(utils.is_bot_owner)
+    @commands.check(utils.is_bot_admin)
     async def subject(self, ctx):
         """Group of commands for managing subjects in DB"""
         if ctx.invoked_subcommand is None:

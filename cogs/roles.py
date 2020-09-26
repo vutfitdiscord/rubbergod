@@ -163,16 +163,13 @@ class RolesGroupManager(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    async def is_admin(ctx):
-        return ctx.author.id == Config.admin_id
-
-    @commands.check(is_admin)
+    @commands.check(utils.is_bot_admin)
     @commands.command()
     async def add_group(self, ctx, name: str):
         group_repo.add_group(name)
         await ctx.send(f"Pridal jsem groupu {name}")
 
-    @commands.check(is_admin)
+    @commands.check(utils.is_bot_admin)
     @commands.command()
     async def get_group(self, ctx, name: str):
         group = group_repo.get_group(name)
@@ -181,32 +178,32 @@ class RolesGroupManager(commands.Cog):
                  f"Channel IDs: {channels}\n"
                  f"Role IDs:{group.role_ids}")
 
-    @commands.check(is_admin)
+    @commands.check(utils.is_bot_admin)
     @commands.command()
     async def groups(self, ctx):
         names = group_repo.group_names()
         for name in names:
             await ctx.send(name)
 
-    @commands.check(is_admin)
+    @commands.check(utils.is_bot_admin)
     @commands.command()
     async def add_channel_id(self, ctx, name: str, channel_id: int):
         group_repo.group_add_channel_id(name, channel_id)
         await ctx.send("Done")
 
-    @commands.check(is_admin)
+    @commands.check(utils.is_bot_admin)
     @commands.command()
     async def add_role_id(self, ctx, name: str, role_id: int):
         group_repo.group_add_role_id(name, role_id)
         await ctx.send("Done")
 
-    @commands.check(is_admin)
+    @commands.check(utils.is_bot_admin)
     @commands.command()
     async def group_reset_channels(self, ctx, name: str):
         group_repo.group_reset_channels(name)
         await ctx.send("Done")
 
-    @commands.check(is_admin)
+    @commands.check(utils.is_bot_admin)
     @commands.command()
     async def group_reset_roles(self, ctx, name: str):
         group_repo.group_reset_roles(name)

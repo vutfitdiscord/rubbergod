@@ -18,7 +18,7 @@ class System(commands.Cog):
         pass
 
     @git.command()
-    @commands.check(utils.is_bot_owner)
+    @commands.check(utils.is_bot_admin)
     async def pull(self, ctx: commands.Context):
         message: Message = await ctx.send('Pulling')
 
@@ -31,13 +31,13 @@ class System(commands.Cog):
             await ctx.send(f'```{part}```')
 
     @commands.command()
-    @commands.check(utils.is_bot_owner)
+    @commands.check(utils.is_bot_admin)
     async def load(self, ctx: commands.Context, extension: str):
         self.bot.load_extension(f'cogs.{extension}')
         await ctx.send(utils.fill_message('cog_loaded', cog=extension))
 
     @commands.command()
-    @commands.check(utils.is_bot_owner)
+    @commands.check(utils.is_bot_admin)
     async def unload(self, ctx: commands.Context, extension: str):
         if extension in self.unloadable_cogs:
             await ctx.send(utils.fill_message('cog_cannot_be_unloadable', cog=extension))
@@ -47,7 +47,7 @@ class System(commands.Cog):
         await ctx.send(utils.fill_message('cog_unloaded', cog=extension))
 
     @commands.command()
-    @commands.check(utils.is_bot_owner)
+    @commands.check(utils.is_bot_admin)
     async def reload(self, ctx: commands.Context, extension: str):
         self.bot.reload_extension(f'cogs.{extension}')
         await ctx.send(utils.fill_message('cog_reloaded', cog=extension))

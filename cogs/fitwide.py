@@ -26,9 +26,6 @@ class FitWide(commands.Cog):
         self.bot = bot
         self.verification = verification.Verification(bot, user_r)
 
-    async def is_admin(ctx):
-        return ctx.author.id == config.admin_id
-
     async def is_in_modroom(ctx):
         return ctx.message.channel.id == config.mod_room
 
@@ -73,7 +70,7 @@ class FitWide(commands.Cog):
         await ctx.send(msg)
 
     @commands.cooldown(rate=2, per=20.0, type=commands.BucketType.user)
-    @commands.check(is_admin)
+    @commands.check(utils.is_bot_admin)
     @commands.command()
     async def role_check(self, ctx, p_verified: bool = True,
                          p_move: bool = False, p_status: bool = True,
@@ -189,7 +186,7 @@ class FitWide(commands.Cog):
         return
 
     @commands.cooldown(rate=2, per=20.0, type=commands.BucketType.user)
-    @commands.check(is_admin)
+    @commands.check(utils.is_bot_admin)
     @commands.command()
     async def increment_roles(self, ctx):
         # guild = self.bot.get_guild(config.guild_id)
