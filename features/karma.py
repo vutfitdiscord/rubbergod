@@ -367,7 +367,7 @@ class Karma(BaseFeature):
             value = msg.karma_web if value_num == 1 else f"{msg.karma_web}{value_num}"
             embed.add_field(name=msg.karma_web_title, value=value)
 
-        message = await ctx.message.channel.send(embed=embed)
+        message = await ctx.send(embed=embed)
 
         await message.add_reaction("⏪")
         await message.add_reaction("◀")
