@@ -81,7 +81,7 @@ class Warden(commands.Cog):
             return
 
         for react in message.reactions:
-            if react.emoji == "❎" and react.count > config.duplicate_limit:
+            if react.emoji == "❎" and react.count >= config.duplicate_limit:
                 try:
                     orig = message.embeds[0].footer.text
                     orig = await message.channel.fetch_message(int(orig))
