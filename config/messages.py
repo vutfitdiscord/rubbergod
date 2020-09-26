@@ -255,6 +255,12 @@ class Messages:
     config_set_format = f'{prefix}config set [key] hodnota/y'
     config_append_format = f'{prefix}config append [key] hodnota/y'
 
+    channel_help = f"{prefix}channel [clone, copy]"
+    channel_copy_help = f"{prefix}channel copy [source] [destination]"
+    channel_copy_done = "Práva byla skopírována."
+    channel_clone_help = f"{prefix}channel clone [source] [jméno]"
+    channel_clone_done = "Kanál <#{id}> byl vytvořen."
+
     info = [[('karma', 'Vypíše karmu vaši, rozdanou a odebranou'),
              ('karma stalk [user]', 'Vypíše karmu uživatele, karmu rozdanou a odebranou.'),
              ('karma get', 'Vypíše, které emoty mají hodnotu 1 a -1.'),
