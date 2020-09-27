@@ -7,6 +7,7 @@ from repository.database.verification import Permit, Valid_person
 from repository.database.image import Image
 from repository.database.role_group import RoleGroup
 from repository.review_repo import ReviewRepository
+from repository.database.hugs import HugsTable
 
 from config.app_config import Config
 
@@ -25,6 +26,7 @@ def load_dump(filename: str):
     session.query(Karma_emoji).delete()
     session.query(Permit).delete()
     session.query(Valid_person).delete()
+    session.query(HugsTable).delete()
     session.commit()
 
     print(f'Loading dump from {filename}')
