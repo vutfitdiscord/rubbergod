@@ -466,9 +466,10 @@ class Review_helper:
                 if detail:
                     type_list = detail.type.split(", ")
                     # remove duplicated types -> bug fix
-                    if type_list.count(type) > 1:
-                        type = ", ".join(list(dict.fromkeys(type_list)))
-                        review_repo.update_subject_type(shortcut, type, detail.year)
+                    if type_list.count(type) != 1:
+                        type_list.append(type)
+                        type_list = list(dict.fromkeys(type_list))
+                        review_repo.update_subject_type(shortcut, ", ".join(type_list), detail.year)
                 if not detail:
                     # subject not in DB
                     review_repo.set_subject_details(
