@@ -28,7 +28,7 @@ class week(commands.Cog):
         embed.add_field(name="Studijní", value="{} ({})".format(stud_type, stud_week))
         embed.add_field(name="Kalendářní", value="{} ({})".format(cal_type, cal_week))
 
-        utils.add_author_footer(embed, ctx)
+        utils.add_author_footer(embed, ctx.author)
 
         await ctx.send(embed=embed)
 
