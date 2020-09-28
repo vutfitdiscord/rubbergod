@@ -141,12 +141,12 @@ async def helper_plus(ctx):
     raise NotHelperPlusError
 
 
-def add_author_footer(embed: discord.Embed, ctx: discord.ext.commands.Context,
+def add_author_footer(embed: discord.Embed, author: discord.User,
                       set_timestamp=True, additional_text: Iterable[str] = []):
     """
     Adds footer to the embed with author name and icon from ctx.
 
-    :param ctx: command Context object for author info
+    :param author: author info
     :param embed: discord.Embed object
     :param set_timestamp: bool, should the embed's timestamp be set
     :param additional_text: Iterable of strings that will be joined with author name by pipe symbol, eg.:
@@ -156,4 +156,4 @@ def add_author_footer(embed: discord.Embed, ctx: discord.ext.commands.Context,
     if set_timestamp:
         embed.timestamp = datetime.now(tz=timezone.utc)
 
-    embed.set_footer(icon_url=ctx.author.avatar_url, text=' | '.join((str(ctx.author), *additional_text)))
+    embed.set_footer(icon_url=author.avatar_url, text=' | '.join((str(author), *additional_text)))

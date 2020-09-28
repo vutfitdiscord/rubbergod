@@ -17,7 +17,7 @@ class Urban(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    def urban_embeds(self, ctx, dict):
+    def urban_embeds(self, author, dict):
         """Generate embeds from dictionary of resposes"""
         embed_list = []
 
@@ -42,7 +42,7 @@ class Urban(commands.Cog):
                 value=f"{idx + 1}/{len(dict['list'])}",
                 inline=False,
             )
-            utils.add_author_footer(embed, ctx)
+            utils.add_author_footer(embed, author)
 
             embed_list.append(embed)
 
@@ -106,7 +106,7 @@ class Urban(commands.Cog):
             await ctx.send(f"Error occurred: {err}")
         else:
             # Request was successful
-            embeds = self.urban_embeds(ctx, dict)
+            embeds = self.urban_embeds(ctx.author, dict)
 
         if embeds:
             await self.urban_pages(ctx, embeds)

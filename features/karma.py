@@ -328,7 +328,7 @@ class Karma(BaseFeature):
             colour = 0xcb410b
         embed.colour = colour
         embed.add_field(name='Celková karma za zprávu:', value=karma, inline=False)
-        utils.add_author_footer(embed, ctx=channel_out)
+        utils.add_author_footer(embed, author)
 
         await channel_out.send(embed=embed)
 
@@ -360,7 +360,7 @@ class Karma(BaseFeature):
         output = self.gen_leaderboard_content(attribute, start, column)
 
         embed = discord.Embed(title=title, description=output)
-        utils.add_author_footer(embed, ctx)
+        utils.add_author_footer(embed, ctx.author)
 
         if action == "get" and order == "DESC":
             value_num = math.ceil(start / cfg.karma_grillbot_leaderboard_size)

@@ -49,7 +49,7 @@ class weather(commands.Cog):
             embed.add_field(name="Oblačnost", value=clouds, inline=True)
             embed.add_field(name="Viditelnost", value=visibility, inline=True)
 
-            utils.add_author_footer(embed, ctx)
+            utils.add_author_footer(embed, ctx.author)
 
             await ctx.send(embed=embed)
 

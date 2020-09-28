@@ -51,7 +51,7 @@ class Review(commands.Cog):
                 await ctx.send(messages.review_format)
                 return
             subject = args[0]
-            embed = self.rev.list_reviews(subject.lower())
+            embed = self.rev.list_reviews(ctx.author, subject.lower())
             if not embed:
                 await ctx.send(messages.review_wrong_subject)
                 return
@@ -184,7 +184,7 @@ class Review(commands.Cog):
             inline=False,
         )
 
-        utils.add_author_footer(embed, ctx)
+        utils.add_author_footer(embed, ctx.author)
         await ctx.send(embed=embed)
 
     @commands.command()
@@ -231,7 +231,7 @@ class Review(commands.Cog):
             degree = year
         embed.add_field(name="Program", value=degree)
 
-        utils.add_author_footer(embed, ctx, additional_text=("?tierboard help",))
+        utils.add_author_footer(embed, ctx.author, additional_text=("?tierboard help",))
         await ctx.send(embed=embed)
 
     @reviews.error
@@ -255,15 +255,14 @@ class Review(commands.Cog):
         ):
             subject = ctx["message"].embeds[0].title.split(" ", 1)[0].lower()
             footer = ctx["message"].embeds[0].footer.text.split("|")
-            review_id = footer[1][5:]
-            pages = footer[0].split(":")[1].split("/")
+            review_id = footer[2][5:]
+            pages = footer[1].split(":")[1].split("/")
             try:
                 page = int(pages[0])
                 max_page = int(pages[1])
             except ValueError:
                 await ctx["message"].edit(content=messages.reviews_page_e, embed=None)
                 return
-            description = ctx["message"].embeds[0].description
             if ctx["emoji"] in ["◀", "▶", "⏪"]:
                 next_page = utils.pagination_next(ctx["emoji"], page, max_page)
                 if next_page:
@@ -271,7 +270,7 @@ class Review(commands.Cog):
                     if review.count() >= next_page:
                         review = review.all()[next_page - 1].Review
                         next_page = f"{next_page}/{max_page}"
-                        embed = self.rev.make_embed(review, subject, description, next_page)
+                        embed = self.rev.update_embed(ctx["message"].embeds[0], review, next_page)
                         if embed.fields[3].name == "Text page":
                             await ctx["message"].add_reaction("🔼")
                             await ctx["message"].add_reaction("🔽")
@@ -293,7 +292,7 @@ class Review(commands.Cog):
                     elif ctx["emoji"] == "🛑":
                         review_repo.remove_vote(review_id, member_id)
                     page = f"{page}/{max_page}"
-                    embed = self.rev.make_embed(review, subject, description, page)
+                    embed = self.rev.update_embed(ctx["message"].embeds[0], review, page)
                     await ctx["message"].edit(embed=embed)
             elif ctx["emoji"] in ["🔼", "🔽"]:
                 if ctx["message"].embeds[0].fields[3].name == "Text page":
@@ -305,7 +304,7 @@ class Review(commands.Cog):
                         next_text_page = utils.pagination_next(ctx["emoji"], text_page, max_text_page)
                         if next_text_page:
                             page = f"{page}/{max_page}"
-                            embed = self.rev.make_embed(review, subject, description, page)
+                            embed = self.rev.update_embed(ctx["message"].embeds[0], review, page)
                             embed = self.rev.change_text_page(review, embed, next_text_page, max_text_page)
                             await ctx["message"].edit(embed=embed)
             if ctx["message"].guild:  # cannot remove reaction in DM
@@ -318,42 +317,50 @@ class Review_helper:
     def __init__(self, bot: commands.Bot):
         self.bot = bot
 
-    def make_embed(self, review, subject, description, page):
+    def make_embed(self, author, review, subject, description, page):
         """Create new embed for reviews"""
         embed = discord.Embed(title=f"{subject.upper()} reviews", description=description)
-        colour = 0x6D6A69
+        self.update_embed(embed, review, page, msg_author=author)
+        return embed
+
+    def update_embed(self, embed, review, page, msg_author=None):
+        """Update embed fields"""
         id = 0
-        if review is not None:
-            guild = self.bot.get_guild(config.guild_id)
-            if review.anonym:
-                author = "Anonym"
-            else:
-                author = guild.get_member(int(review.member_ID))
-            embed.add_field(name="Author", value=author)
-            embed.add_field(name="Tier", value=review.tier)
-            embed.add_field(name="Date", value=review.date)
-            text = review.text_review
-            if text is not None:
-                text_len = len(text)
-                if text_len > 1024:
-                    pages = text_len // 1024 + (text_len % 1024 > 0)
-                    text = review.text_review[:1024]
-                    embed.add_field(name="Text page", value=f"1/{pages}", inline=False)
-                embed.add_field(name="Text", value=text, inline=False)
-            likes = review_repo.get_votes_count(review.id, True)
-            embed.add_field(name="Likes", value=f"👍{likes}")
-            dislikes = review_repo.get_votes_count(review.id, False)
-            embed.add_field(name="Dislikes", value=f"👎{dislikes}")
-            diff = likes - dislikes
-            if diff > 0:
-                colour = 0x34CB0B
-            elif diff < 0:
-                colour = 0xCB410B
-            id = review.id
-            embed.add_field(name="Help", value=messages.reviews_reaction_help, inline=False)
-        embed.set_footer(text=f"Review: {page} | ID: {id}")
-        embed.timestamp = datetime.datetime.now(tz=datetime.timezone.utc)
+        colour = 0x6D6A69
+        guild = self.bot.get_guild(config.guild_id)
+        if review.anonym:
+            author = "Anonym"
+        else:
+            author = guild.get_member(int(review.member_ID))
+        embed.add_field(name="Author", value=author)
+        embed.add_field(name="Tier", value=review.tier)
+        embed.add_field(name="Date", value=review.date)
+        text = review.text_review
+        if text is not None:
+            text_len = len(text)
+            if text_len > 1024:
+                pages = text_len // 1024 + (text_len % 1024 > 0)
+                text = review.text_review[:1024]
+                embed.add_field(name="Text page", value=f"1/{pages}", inline=False)
+            embed.add_field(name="Text", value=text, inline=False)
+        likes = review_repo.get_votes_count(review.id, True)
+        embed.add_field(name="Likes", value=f"👍{likes}")
+        dislikes = review_repo.get_votes_count(review.id, False)
+        embed.add_field(name="Dislikes", value=f"👎{dislikes}")
+        diff = likes - dislikes
+        if diff > 0:
+            colour = 0x34CB0B
+        elif diff < 0:
+            colour = 0xCB410B
         embed.colour = colour
+        id = review.id
+        footer = f"Review: {page} | ID: {id}"
+        if msg_author:
+            utils.add_author_footer(embed, msg_author, additional_text=[footer])
+        else:
+            embed.set_footer(
+                text=f"{embed.footer.text.split(' | ')[0]} | {footer}", icon_url=embed.footer.icon_url
+            )
         return embed
 
     def change_text_page(self, review, embed, new_page, max_page):
@@ -378,7 +385,7 @@ class Review_helper:
             review_repo.add_review(author_id, subject, tier, anonym, text)
         return True
 
-    def list_reviews(self, subject):
+    def list_reviews(self, author, subject):
         result = review_repo.get_subject(subject).first()
         if not result:
             return None
@@ -399,7 +406,7 @@ class Review_helper:
             else:
                 description = f"**Average tier:** {round(reviews[0].avg_tier)}"
             page = f"1/{tier_cnt}"
-        return self.make_embed(review, subject, description, page)
+        return self.make_embed(author, review, subject, description, page)
 
     def remove(self, author, subject):
         """Remove review from DB"""
