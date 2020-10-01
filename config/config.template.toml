@@ -26,7 +26,7 @@ db_string = "postgres://postgres:postgres@db:5432/postgres"
 
 [cogs]
 extensions = ['base', 'karma', 'meme', 'random', 'verify', 'fitwide', 'autopin', 'urban',
-    'acl', 'review', 'vote', 'kachna', 'name_day', 'week', 'weather', 'roles', 'error', 'absolvent']
+    'acl', 'review', 'vote', 'kachna', 'name_day', 'week', 'weather', 'roles', 'error', 'absolvent', 'pet']
 
 [config]
 static = ['config_static', 'toml_dict', 'key', 'weather_token', 'db_string']
