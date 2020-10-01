@@ -14,53 +14,44 @@ class HugsRepository(BaseRepository):
         super().__init__()
 
     @staticmethod
-    def _get_member(member_id):
+    def _get_member(member_id) -> Optional[HugsTable]:
         return session.query(HugsTable).filter(HugsTable.member_id == member_id).one_or_none()
 
-    @staticmethod
-    def get_members_stats(member_id: int) -> Optional[Tuple[int, int]]:
+    def get_members_stats(self, member_id) -> Tuple[int, int]:
         """
         :param member_id: Member's discord id
         :return: Tuple of [Given, Received] hugs, both zero if member not found
         """
-        hugs = (
-            session.query(HugsTable.given, HugsTable.received)
-            .filter(HugsTable.member_id == member_id)
-            .one_or_none()
-        )
-        return hugs if hugs else 0, 0
+        hugs = self._get_member(member_id)
+        return (hugs.given, hugs.received) if hugs else (0, 0)
 
     @staticmethod
-    def _get_hugs(limit, offset, order_by: tuple = None, columns=None):
-        # TODO
-        return session.query(HugsTable).order_by(*order_by).limit(limit).offset(offset).all()
+    def get_top_all_query():
+        return session.query(HugsTable).order_by(HugsTable.given.desc(), HugsTable.received.desc())
 
-    def get_top_all(self, limit=10, offset=0):
-        return self._get_hugs(limit, offset, order_by=(HugsTable.given.desc(), HugsTable.received.desc()))
+    @staticmethod
+    def get_top_givers_query(limit=10, offset=0):
+        return session.query(HugsTable).order_by(HugsTable.given.desc())
 
-    def get_top_givers(self, limit=10, offset=0):
-        return self._get_hugs(
-            limit, offset, order_by=HugsTable.given.desc(), columns=(HugsTable.member_id, HugsTable.given)
-        ).all()
+    @staticmethod
+    def get_top_receivers_query(limit=10, offset=0):
+        return session.query(HugsTable).order_by(HugsTable.received.desc())
 
-    def get_top_receivers(self, limit=10, offset=0):
-        return self._get_hugs(
-            limit,
-            offset,
-            order_by=HugsTable.received.desc(),
-            columns=(HugsTable.member_id, HugsTable.received),
-        ).all()
+    def do_hug(self, giver_id: int = None, receiver_id: int = None):
+        if giver_id:
+            giver = self._get_member(giver_id)
+            if not giver:
+                giver = HugsTable(member_id=giver_id, given=0)
+            giver.given += 1
+            session.add(giver)
 
-    def do_hug(self, giver_id: int, receiver_id: int):
-        giver = self._get_member(giver_id)
-        if not giver:
-            giver = HugsTable(member_id=giver_id, given=0)
-        giver.given += 1
+        if receiver_id:
+            receiver = self._get_member(receiver_id)
+            if not receiver:
+                receiver = HugsTable(member_id=receiver_id, received=0)
+            receiver.received += 1
 
-        receiver = self._get_member(receiver_id)
-        if not receiver:
-            receiver = HugsTable(member_id=receiver_id, received=0)
-        receiver.received += 1
+            session.add(receiver)
 
-        session.add_all((giver, receiver))
-        session.commit()
+        if giver_id is not None or receiver_id is not None:
+            session.commit()

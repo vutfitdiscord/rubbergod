@@ -1,14 +1,12 @@
 from random import choice
-from typing import Iterable
 
 import discord
 from discord.ext import commands
 
 import utils
 from config import app_config
-from config import app_config as config
-from repository.database.hugs import HugsTable
 from repository.hugs_repo import HugsRepository
+from .menus import get_hugboard_menu, get_top_huggers_menu, get_top_hugged_menu
 
 config = app_config.Config
 
@@ -28,11 +26,10 @@ class Hugs(commands.Cog):
         """
         Overall hugging stats.
         """
-        with ctx.typing():
-            hug_data = self.hugs_repo.get_top_all()
-            embed = self.format_stats(ctx, hug_data)
+        async with ctx.typing():
+            menu = get_hugboard_menu()
 
-        await ctx.send(embed=embed)
+        await menu.start(ctx)
 
     @commands.cooldown(rate=2, per=30.0, type=commands.BucketType.user)
     @commands.command()
@@ -40,7 +37,10 @@ class Hugs(commands.Cog):
         """
         Get the biggest huggers.
         """
-        pass
+        async with ctx.typing():
+            menu = get_top_huggers_menu()
+
+        await menu.start(ctx)
 
     @commands.cooldown(rate=2, per=30.0, type=commands.BucketType.user)
     @commands.command()
@@ -48,7 +48,10 @@ class Hugs(commands.Cog):
         """
         Get the most hugged.
         """
-        pass
+        async with ctx.typing():
+            menu = get_top_hugged_menu()
+
+        await menu.start(ctx)
 
     @commands.cooldown(rate=5, per=30.0, type=commands.BucketType.user)
     @commands.command()
@@ -56,36 +59,16 @@ class Hugs(commands.Cog):
         """
         Get your lovely hug stats.
         """
-        pass
+        async with ctx.typing():
+            embed = discord.Embed(title="Your Lovely Hug Stats")
+            embed.set_author(name=ctx.author.name, icon_url=ctx.author.avatar_url)
 
-    def format_stats(self, ctx: commands.Context, sql_data: Iterable) -> discord.Embed:
-        guild = self.bot.get_guild(config.guild_id)
-        if not guild:
-            guild = ctx.guild
+            stats = self.hugs_repo.get_members_stats(ctx.author.id)
 
-        content = []
-        for i, entry in enumerate(sql_data):  # type: int, HugsTable
-            user = guild.get_member(entry.member_id)
-            username = f"**{discord.utils.escape_markdown(user.name)}**" if user else "*User left*"
+            embed.add_field(name="Given", value=str(stats[0]), inline=False)
+            embed.add_field(name="Received", value=str(stats[1]), inline=False)
 
-            content.append(
-                "{i} - {user_name}: {given}/{received}".format(
-                    i=i + 1, user_name=username, given=entry.given, received=entry.received,
-                )
-            )
-
-        if guild == config.guild_id:
-            emoji_left, emoji_right = "<:peepoHugger:759846963456770069>", "<:huggers:602823825880514561>"
-        else:
-            # not in configured guild, default to normal emojis
-            emoji_left = emoji_right = ":people_hugging:"
-
-        embed = discord.Embed(
-            title=f"{emoji_left}Top Huggers{emoji_right}", description="\n" + "\n".join(content),
-        )
-        utils.add_author_footer(embed, ctx, additional_text=("Hint: dostal/rozdal",))
-
-        return embed
+        await ctx.send(embed=embed)
 
     @commands.cooldown(rate=5, per=20.0, type=commands.BucketType.user)
     @commands.command()
@@ -114,7 +97,3 @@ class Hugs(commands.Cog):
             await ctx.send(utils.fill_message("member_not_found", user=ctx.author.id))
         else:
             print(error)
-
-
-def setup(bot):
-    bot.add_cog(Hugs(bot))
