@@ -2,15 +2,11 @@ import discord
 from discord.ext import commands
 
 import utils
-from config import app_config as config, messages
 
 from PIL import Image, ImageDraw
 
 from io import BytesIO
 import requests
-
-config = config.Config
-messages = messages.Messages
 
 
 class Pet(commands.Cog):
@@ -35,10 +31,9 @@ class Pet(commands.Cog):
         for i in range(5):
             frame = Image.new('RGBA', (112, 112), (255, 255, 255, 1))
             hand = Image.open(f"images/pet/{i}.png")
-            avatar = avatarFull
             width = width - deformWidth[i]
             height = height - deformHeight[i]
-            avatar = avatar.resize((width, height))
+            avatar = avatarFull.resize((width, height))
             avatarMask = Image.new('1', avatar.size, 0)
             draw = ImageDraw.Draw(avatarMask)
             draw.ellipse((0, 0) + avatar.size, fill=255)
