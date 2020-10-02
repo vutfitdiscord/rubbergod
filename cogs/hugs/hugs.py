@@ -6,7 +6,9 @@ from discord.ext import commands
 import utils
 from config import app_config
 from repository.hugs_repo import HugsRepository
+from utils import get_emoji
 from .menus import get_hugboard_menu, get_top_huggers_menu, get_top_hugged_menu
+from .. import room_check
 
 config = app_config.Config
 
@@ -19,6 +21,7 @@ class Hugs(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.hugs_repo = HugsRepository()
+        self.check = room_check.RoomCheck(bot)
 
     @commands.cooldown(rate=2, per=60.0, type=commands.BucketType.user)
     @commands.command()
@@ -27,9 +30,14 @@ class Hugs(commands.Cog):
         Overall hugging stats.
         """
         async with ctx.typing():
-            menu = get_hugboard_menu()
+            menu = get_hugboard_menu(
+                base_embed=discord.Embed(
+                    title="{0} HUGBOARD {0}".format(get_emoji(ctx.message.guild, "peepoHugger"))
+                )
+            )
 
         await menu.start(ctx)
+        await self.check.botroom_check(ctx.message)
 
     @commands.cooldown(rate=2, per=60.0, type=commands.BucketType.user)
     @commands.command()
@@ -38,9 +46,14 @@ class Hugs(commands.Cog):
         Get the biggest huggers.
         """
         async with ctx.typing():
-            menu = get_top_huggers_menu()
+            menu = get_top_huggers_menu(
+                base_embed=discord.Embed(
+                    title="{0} TOP HUGGERS {0} ".format(get_emoji(ctx.message.guild, "peepoHugger"))
+                )
+            )
 
         await menu.start(ctx)
+        await self.check.botroom_check(ctx.message)
 
     @commands.cooldown(rate=2, per=60.0, type=commands.BucketType.user)
     @commands.command()
@@ -49,9 +62,14 @@ class Hugs(commands.Cog):
         Get the most hugged.
         """
         async with ctx.typing():
-            menu = get_top_hugged_menu()
+            menu = get_top_hugged_menu(
+                base_embed=discord.Embed(
+                    title="{0} TOP HUGGED {0} ".format(get_emoji(ctx.message.guild, "peepoHugger"))
+                )
+            )
 
         await menu.start(ctx)
+        await self.check.botroom_check(ctx.message)
 
     @commands.cooldown(rate=5, per=60.0, type=commands.BucketType.user)
     @commands.command()
@@ -65,7 +83,7 @@ class Hugs(commands.Cog):
             avg_position = int((positions[0] + positions[1]) // 2)
 
             embed = discord.Embed(
-                title="Your Lovely Hug Stats <:peepoHugger:761293739041620038>",
+                title="{0} Your Lovely Hug Stats {0}".format(get_emoji(ctx.message.guild, "peepoHugger")),
                 description=" | ".join(
                     (
                         "**Ranks**",
@@ -78,8 +96,9 @@ class Hugs(commands.Cog):
             embed.set_author(name=ctx.author.name, icon_url=ctx.author.avatar_url)
 
             if ctx.guild and ctx.guild.id == config.guild_id:
-                given_emoji = "<:peepohugs:761297281743716373>"
-                recv_emoji = "<:huggers:602823825880514561>"
+                given_emoji = get_emoji(ctx.message.guild, "peepohugs")
+
+                recv_emoji = get_emoji(ctx.message.guild, "huggers")
             else:
                 given_emoji = recv_emoji = ":people_hugging:"
 
@@ -87,15 +106,16 @@ class Hugs(commands.Cog):
             embed.add_field(name=f"{recv_emoji} Received", value=str(stats.received))
 
         await ctx.send(embed=embed)
+        await self.check.botroom_check(ctx.message)
 
     @commands.cooldown(rate=5, per=60.0, type=commands.BucketType.user)
     @commands.command()
-    async def hug(self, ctx: commands.Context, user: discord.Member = None, intensity: int = 0):
+    async def hug(self, ctx: commands.Context, user: discord.User = None, intensity: int = 0):
         """Because everyone likes hugs"""
         if user is None:
             user = ctx.author
-        elif user == self.bot.user:
-            await ctx.send("<:huggers:602823825880514561>")
+        elif user.bot:
+            await ctx.send(get_emoji(ctx.message.guild, "huggers"))
             return
 
         async with ctx.typing():
@@ -106,9 +126,9 @@ class Hugs(commands.Cog):
             user_str = discord.utils.escape_markdown(user.display_name).replace("@", "@ ")
 
         if 0 <= intensity < len(emojis):
-            await ctx.send(emojis[intensity] + f" **{user_str}**")
+            await ctx.send(f"{emojis[intensity]} **{user_str}**")
         else:
-            await ctx.send(choice(emojis) + f" **{user_str}**")
+            await ctx.send(f"{choice(emojis)} **{user_str}**")
 
     @hug.error
     async def hug_error(self, ctx, error):
