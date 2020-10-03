@@ -304,8 +304,9 @@ class Review(commands.Cog):
                         next_text_page = utils.pagination_next(ctx["emoji"], text_page, max_text_page)
                         if next_text_page:
                             page = f"{page}/{max_page}"
-                            embed = self.rev.update_embed(ctx["message"].embeds[0], review, page)
-                            embed = self.rev.change_text_page(review, embed, next_text_page, max_text_page)
+                            embed = self.rev.update_embed(
+                                ctx["message"].embeds[0], review, page, next_text_page
+                            )
                             await ctx["message"].edit(embed=embed)
             if ctx["message"].guild:  # cannot remove reaction in DM
                 await ctx["message"].remove_reaction(ctx["emoji"], ctx["member"])
@@ -317,61 +318,98 @@ class Review_helper:
     def __init__(self, bot: commands.Bot):
         self.bot = bot
 
-    def make_embed(self, author, review, subject, description, page):
+    def make_embed(self, msg_author, review, subject, description, page):
         """Create new embed for reviews"""
         embed = discord.Embed(title=f"{subject.upper()} reviews", description=description)
-        self.update_embed(embed, review, page, msg_author=author)
+        colour = 0x6D6A69
+        id = 0
+        if review:
+            id = review.id
+            if review.anonym:
+                author = "Anonym"
+            else:
+                guild = self.bot.get_guild(config.guild_id)
+                author = guild.get_member(int(review.member_ID))
+            embed.add_field(name="Author", value=author)
+            embed.add_field(name="Tier", value=review.tier)
+            embed.add_field(name="Date", value=review.date)
+            text = review.text_review
+            if text is not None:
+                text_len = len(text)
+                if text_len > 1024:
+                    pages = text_len // 1024 + (text_len % 1024 > 0)
+                    text = text[:1024]
+                    embed.add_field(name="Text page", value=f"1/{pages}", inline=False)
+                embed.add_field(name="Text", value=text, inline=False)
+            likes = review_repo.get_votes_count(review.id, True)
+            embed.add_field(name="Likes", value=f"👍{likes}")
+            dislikes = review_repo.get_votes_count(review.id, False)
+            embed.add_field(name="Dislikes", value=f"👎{dislikes}")
+            diff = likes - dislikes
+            if diff > 0:
+                colour = 0x34CB0B
+            elif diff < 0:
+                colour = 0xCB410B
+            embed.add_field(name="Help", value=messages.reviews_reaction_help, inline=False)
+        embed.colour = colour
+        utils.add_author_footer(embed, msg_author, additional_text=[f"Review: {page} | ID: {id}"])
         return embed
 
-    def update_embed(self, embed, review, page, msg_author=None):
+    def update_embed(self, embed, review, page, text_page=1):
         """Update embed fields"""
-        id = 0
         colour = 0x6D6A69
-        guild = self.bot.get_guild(config.guild_id)
         if review.anonym:
             author = "Anonym"
         else:
+            guild = self.bot.get_guild(config.guild_id)
             author = guild.get_member(int(review.member_ID))
-        embed.add_field(name="Author", value=author)
-        embed.add_field(name="Tier", value=review.tier)
-        embed.add_field(name="Date", value=review.date)
+        embed.set_field_at(0, name="Author", value=author)
+        embed.set_field_at(1, name="Tier", value=review.tier)
+        embed.set_field_at(2, name="Date", value=review.date)
         text = review.text_review
+        idx = 3
+        add_new_field = False
+        fields_cnt = len(embed.fields)
         if text is not None:
             text_len = len(text)
             if text_len > 1024:
                 pages = text_len // 1024 + (text_len % 1024 > 0)
-                text = review.text_review[:1024]
-                embed.add_field(name="Text page", value=f"1/{pages}", inline=False)
-            embed.add_field(name="Text", value=text, inline=False)
+                text_index = 1024 * (text_page - 1)
+                if len(review.text_review) < 1024 * text_page:
+                    text = review.text_review[text_index:]
+                else:
+                    text = review.text_review[text_index : 1024 * text_page]
+                embed.set_field_at(idx, name="Text page", value=f"{text_page}/{pages}", inline=False)
+                idx += 1
+            embed.set_field_at(idx, name="Text", value=text, inline=False)
+            idx += 1
         likes = review_repo.get_votes_count(review.id, True)
-        embed.add_field(name="Likes", value=f"👍{likes}")
+        embed.set_field_at(idx, name="Likes", value=f"👍{likes}")
         dislikes = review_repo.get_votes_count(review.id, False)
-        embed.add_field(name="Dislikes", value=f"👎{dislikes}")
+        idx += 1
+        if add_new_field or fields_cnt <= idx:
+            embed.add_field(name="Dislikes", value=f"👎{dislikes}")
+            add_new_field = True
+        else:
+            embed.set_field_at(idx, name="Dislikes", value=f"👎{dislikes}")
+        idx += 1
+        if add_new_field or fields_cnt <= idx:
+            embed.add_field(name="Help", value=messages.reviews_reaction_help, inline=False)
+        else:
+            embed.set_field_at(idx, name="Help", value=messages.reviews_reaction_help, inline=False)
+        idx += 1
+        for _ in range(fields_cnt - idx):
+            embed.remove_field(idx)
         diff = likes - dislikes
         if diff > 0:
             colour = 0x34CB0B
         elif diff < 0:
             colour = 0xCB410B
         embed.colour = colour
-        id = review.id
-        footer = f"Review: {page} | ID: {id}"
-        if msg_author:
-            utils.add_author_footer(embed, msg_author, additional_text=[footer])
-        else:
-            embed.set_footer(
-                text=f"{embed.footer.text.split(' | ')[0]} | {footer}", icon_url=embed.footer.icon_url
-            )
-        return embed
-
-    def change_text_page(self, review, embed, new_page, max_page):
-        """Function for scrolling in reviews text field"""
-        text_index = 1024 * (new_page - 1)
-        if len(review.text_review) < 1024 * new_page:
-            text = review.text_review[text_index:]
-        else:
-            text = review.text_review[text_index : 1024 * new_page]
-        embed.set_field_at(3, name="Text page", value=f"{new_page}/{max_page}")
-        embed.set_field_at(4, name="Text", value=text, inline=False)
+        footer = f"Review: {page} | ID: {review.id}"
+        embed.set_footer(
+            text=f"{embed.footer.text.split(' | ')[0]} | {footer}", icon_url=embed.footer.icon_url
+        )
         return embed
 
     def add_review(self, author_id, subject, tier, anonym, text):
