@@ -2,7 +2,7 @@ import traceback
 import argparse
 import logging
 
-from discord import Embed, TextChannel, AllowedMentions
+from discord import Embed, TextChannel, AllowedMentions, Intents
 from discord.ext import commands
 
 import utils
@@ -42,11 +42,19 @@ elif args.init_db:
 config = Config
 is_initialized = False
 
+intents = Intents.none()
+intents.guilds = True
+intents.members = True
+intents.emojis = True
+intents.messages = True
+intents.reactions = True
+
 bot = commands.Bot(
     command_prefix=commands.when_mentioned_or(*config.command_prefix),
     help_command=None,
     case_insensitive=True,
     allowed_mentions=AllowedMentions(roles=False, everyone=False, users=True),
+    intents=intents,
 )
 
 presence = presence.Presence(bot)
