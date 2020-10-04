@@ -3,6 +3,8 @@ version: '3.7'
 services:
     db:
         image: postgres:12-alpine
+        environment:
+            POSTGRES_HOST_AUTH_METHOD: "trust"
         volumes:
             - postgres_data:/var/lib/postgresql/data/
     bot:
