@@ -49,9 +49,7 @@ class Warden(commands.Cog):
             repo_i.deleteByMessage(message.id)
 
             # try to detect repost embed
-            messages = await message.channel.history(
-                after=message, limit=10, oldest_first=True
-            ).flatten()
+            messages = await message.channel.history(after=message, limit=10, oldest_first=True).flatten()
             for mess in messages:
                 if not mess.author.bot:
                     continue
@@ -90,7 +88,6 @@ class Warden(commands.Cog):
                     await orig.remove_reaction("🤔", self.bot.user)
                 except Exception as e:
                     print("Warden:on_raw_reaction_add", "Could not remove bot's emote", e)
-                    return
                 try:
                     await message.delete()
                 except discord.errors.NotFound:
@@ -217,13 +214,13 @@ class Warden(commands.Cog):
         """
         if hamming <= self.limit_full:
             title = "**♻️ To je repost!**"
-            await message.add_reaction("♻️")
+            reaction = "♻️"
         elif hamming <= self.limit_hard:
             title = "**♻️ To je asi repost**"
-            await message.add_reaction("🤔")
+            reaction = "🤔"
         else:
             title = "To je možná repost"
-            await message.add_reaction("🤷🏻")
+            reaction = "🤷🏻"
         prob = "{:.1f} %".format((1 - hamming / 128) * 100)
         timestamp = utils.id_to_datetime(original.attachment_id).strftime("%Y-%m-%d %H:%M:%S")
 
@@ -246,6 +243,11 @@ class Warden(commands.Cog):
         )
         embed.set_footer(text=message.id)
         send = await message.channel.send(embed=embed)
+        try:
+            await message.add_reaction(reaction)
+        except discord.errors.NotFound:
+            await send.delete()
+            return
         await send.add_reaction("❎")
 
     @scan.error
