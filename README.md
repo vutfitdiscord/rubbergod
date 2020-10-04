@@ -9,6 +9,15 @@ wouldn't recommend using it for different servers.
 [Rubbergoddess](https://github.com/sinus-x/rubbergoddess) is a Rubbergod-based
 bot used on VUT FEKT discord server.
 
+## Creating discord application
+
+Before first run of bot you need to create discord application.
+Guide for creating new application and adding bot to your server can be found at
+discord.py [documentation](https://discordpy.readthedocs.io/en/latest/discord.html)
+
+While creating discord appilication one more step is required.
+Since `discord.py` v. 1.5 you will also need to enable `SERVER MEMBERS INTENT` in `Bot` tab.
+
 ## Installing and running the bot
 
 Prerequisites:
@@ -67,7 +76,7 @@ libpq-dev
 * [Matthew](https://github.com/matejsoroka)
 * [Toaster](https://github.com/toaster192)
 * [Fpmk](https://github.com/TheGreatfpmK)
-* [_peter](https://github.com/peterdragun)
+* [peter](https://github.com/peterdragun)
 * [Urumasi](https://github.com/Urumasi)
 * [Leo](https://github.com/ondryaso)
 * [sinus-x](https://github.com/sinus-x)
