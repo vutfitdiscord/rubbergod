@@ -28,7 +28,7 @@ class Urban(commands.Cog):
             if len(definition) > 1024:
                 definition = definition[0:1021] + "`…`"
             if len(example) > 1024:
-                definition = definition[0:1021] + "`…`"
+                example = example[0:1021] + "`…`"
 
             embed = discord.Embed(
                 title=item["word"],
