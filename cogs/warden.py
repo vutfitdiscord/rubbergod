@@ -59,24 +59,9 @@ class Warden(commands.Cog):
                 except:
                     continue
 
-    @commands.Cog.listener()
-    async def on_raw_reaction_add(self, payload: discord.RawReactionActionEvent):
+    async def hadle_reaction(self, ctx):
         """Delete duplicate embed if original is not a duplicate"""
-        if payload.channel_id not in config.deduplication_channels:
-            return
-        if payload.member.bot:
-            return
-        try:
-            message = (
-                await self.bot.get_guild(config.guild_id)
-                .get_channel(payload.channel_id)
-                .fetch_message(payload.message_id)
-            )
-        except Exception as e:
-            print("Warden:on_raw_reaction_add", "Message not found", e)
-            return
-        if not message or not message.author.bot:
-            return
+        message = ctx["message"]
 
         for react in message.reactions:
             if react.emoji == "❎" and react.count >= config.duplicate_limit:

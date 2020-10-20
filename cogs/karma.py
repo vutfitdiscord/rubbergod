@@ -21,15 +21,9 @@ class Karma(commands.Cog):
         self.karma = karma.Karma(bot, karma_r)
         self.check = room_check.RoomCheck(bot)
 
-    @commands.Cog.listener()
-    async def on_raw_reaction_add(self, payload):
-        ctx = await utils.reaction_get_ctx(self.bot, payload)
-        if ctx is None:
-            return
+    async def hadle_reaction(self, ctx):
         # grillbot emoji for removing message causes errors
         if ctx["emoji"] == "⏹️":
-            return
-        if ctx["channel"].id in config.role_channels:
             return
         # handle karma vote
         elif ctx["message"].content.startswith(messages.karma_vote_message_hack):

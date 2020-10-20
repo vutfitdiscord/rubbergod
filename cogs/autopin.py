@@ -10,37 +10,30 @@ class AutoPin(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.Cog.listener()
-    async def on_raw_reaction_add(self, payload):
+    async def hadle_reaction(self, ctx):
         """
         if the message has X or more 'pin' emojis pin the message
         """
-        channel = self.bot.get_channel(payload.channel_id)
-        if channel is None:
-            return
-        try:
-            message = await channel.fetch_message(payload.message_id)
-        except discord.errors.NotFound:
-            return
-        emoji = payload.emoji.name
-        if emoji == "📌":
-            for reaction in message.reactions:
-                if (
-                    reaction.emoji == "📌"
-                    and reaction.count >= Config.autopin_count
-                    and not message.pinned
-                    and message.type == discord.MessageType.default
-                    and message.channel.id not in Config.autopin_banned_channels
-                ):
-                    pin_count = await channel.pins()
-                    if len(pin_count) == 50:
-                        await channel.send(Messages.autopin_max_pins_error)
-                        return
-                    users = await reaction.users().flatten()
-                    await self.log(message, users)
-                    await message.pin()
-                    await message.clear_reaction("📌")
-                    break
+        reaction = ctx["emoji"]
+        message = ctx["message"]
+        channel = ctx["channel"]
+        for reaction in message.reactions:
+            if (
+                reaction.emoji == "📌"
+                and reaction.count >= Config.autopin_count
+                and not message.pinned
+                and message.type == discord.MessageType.default
+                and message.channel.id not in Config.autopin_banned_channels
+            ):
+                pin_count = await channel.pins()
+                if len(pin_count) == 50:
+                    await channel.send(Messages.autopin_max_pins_error)
+                    return
+                users = await reaction.users().flatten()
+                await self.log(message, users)
+                await message.pin()
+                await message.clear_reaction("📌")
+                break
 
     async def log(self, message, users):
         """
