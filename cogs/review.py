@@ -255,6 +255,9 @@ class Review(commands.Cog):
         ):
             subject = ctx["message"].embeds[0].title.split(" ", 1)[0].lower()
             footer = ctx["message"].embeds[0].footer.text.split("|")
+            # don't track old reviews as they are not compatible
+            if len(footer) != 3:
+                return
             review_id = footer[2][5:]
             pages = footer[1].split(":")[1].split("/")
             try:
