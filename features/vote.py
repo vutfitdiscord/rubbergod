@@ -6,6 +6,7 @@ from discord import HTTPException, Reaction, User, Message
 from discord.ext.commands import Bot, Context
 
 from config import messages
+from config.app_config import Config
 from features.base_feature import BaseFeature
 
 import utils
@@ -70,7 +71,7 @@ class Vote(BaseFeature):
             return None
 
         vote_par = 0
-        if msg_split[0][1:] == "vote":
+        if msg_split[0][1:] == "vote" and msg_split[0][1:] in Config.command_prefix:
             vote_par = 0
         elif msg_split[1] == "vote":
             vote_par = 1
@@ -105,8 +106,12 @@ class Vote(BaseFeature):
             return None
 
         question = lines[0]
-        options_raw = [(x[:x.index(" ")].strip(), x[x.index(" "):].strip()) for
-                       x in lines[1:]]
+        options_raw = []
+        for x in lines[1:]:
+            # lines with just emote
+            if not x[1:]:
+                return None
+            options_raw.append((x[:x.index(" ")].strip(), x[x.index(" "):].strip()))
 
         return MessageData(question, options_raw)
 
