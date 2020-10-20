@@ -242,77 +242,67 @@ class Review(commands.Cog):
         if isinstance(error, commands.CheckFailure):
             await ctx.send(utils.fill_message("insufficient_rights", user=ctx.author.id))
 
-    @commands.Cog.listener()
-    async def on_raw_reaction_add(self, payload):
-        ctx = await utils.reaction_get_ctx(self.bot, payload)
-        if ctx is None:
+    async def hadle_reaction(self, ctx):
+        subject = ctx["message"].embeds[0].title.split(" ", 1)[0].lower()
+        footer = ctx["message"].embeds[0].footer.text.split("|")
+        # don't track old reviews as they are not compatible
+        if len(footer) != 3:
             return
-
-        if (
-            ctx["message"].embeds
-            and ctx["message"].embeds[0].title is not discord.Embed.Empty
-            and "reviews" in ctx["message"].embeds[0].title
-        ):
-            subject = ctx["message"].embeds[0].title.split(" ", 1)[0].lower()
-            footer = ctx["message"].embeds[0].footer.text.split("|")
-            # don't track old reviews as they are not compatible
-            if len(footer) != 3:
-                return
-            review_id = footer[2][5:]
-            pages = footer[1].split(":")[1].split("/")
-            try:
-                page = int(pages[0])
-                max_page = int(pages[1])
-            except ValueError:
-                await ctx["message"].edit(content=messages.reviews_page_e, embed=None)
-                return
-            if ctx["emoji"] in ["◀", "▶", "⏪"]:
-                next_page = utils.pagination_next(ctx["emoji"], page, max_page)
-                if next_page:
-                    review = review_repo.get_subject_reviews(subject)
-                    if review.count() >= next_page:
-                        review = review.all()[next_page - 1].Review
-                        next_page = f"{next_page}/{max_page}"
-                        embed = self.rev.update_embed(ctx["message"].embeds[0], review, next_page)
-                        if embed.fields[3].name == "Text page":
-                            await ctx["message"].add_reaction("🔼")
-                            await ctx["message"].add_reaction("🔽")
-                        else:
-                            for emote in ctx["message"].reactions:
-                                if emote.emoji == "🔼":
-                                    await ctx["message"].remove_reaction("🔼", self.bot.user)
-                                    await ctx["message"].remove_reaction("🔽", self.bot.user)
-                                    break
-                        await ctx["message"].edit(embed=embed)
-            elif ctx["emoji"] in ["👍", "👎", "🛑"]:
-                review = review_repo.get_review_by_id(review_id)
-                member_id = str(ctx["member"].id)
-                if review and member_id != review.member_ID:
-                    if ctx["emoji"] == "👍":
-                        self.rev.add_vote(review_id, True, member_id)
-                    elif ctx["emoji"] == "👎":
-                        self.rev.add_vote(review_id, False, member_id)
-                    elif ctx["emoji"] == "🛑":
-                        review_repo.remove_vote(review_id, member_id)
-                    page = f"{page}/{max_page}"
-                    embed = self.rev.update_embed(ctx["message"].embeds[0], review, page)
+        review_id = footer[2][5:]
+        pages = footer[1].split(":")[1].split("/")
+        try:
+            page = int(pages[0])
+            max_page = int(pages[1])
+        except ValueError:
+            await ctx["message"].edit(content=messages.reviews_page_e, embed=None)
+            return
+        if ctx["emoji"] in ["◀", "▶", "⏪"]:
+            next_page = utils.pagination_next(ctx["emoji"], page, max_page)
+            if next_page:
+                review = review_repo.get_subject_reviews(subject)
+                if review.count() >= next_page:
+                    review = review.all()[next_page - 1].Review
+                    next_page = f"{next_page}/{max_page}"
+                    embed = self.rev.update_embed(ctx["message"].embeds[0], review, next_page)
+                    if embed.fields[3].name == "Text page":
+                        await ctx["message"].add_reaction("🔼")
+                        await ctx["message"].add_reaction("🔽")
+                    else:
+                        for emote in ctx["message"].reactions:
+                            if emote.emoji == "🔼":
+                                await ctx["message"].remove_reaction("🔼", self.bot.user)
+                                await ctx["message"].remove_reaction("🔽", self.bot.user)
+                                break
                     await ctx["message"].edit(embed=embed)
-            elif ctx["emoji"] in ["🔼", "🔽"]:
-                if ctx["message"].embeds[0].fields[3].name == "Text page":
-                    review = review_repo.get_review_by_id(review_id)
-                    if review:
-                        pages = ctx["message"].embeds[0].fields[3].value.split("/")
-                        text_page = int(pages[0])
-                        max_text_page = int(pages[1])
-                        next_text_page = utils.pagination_next(ctx["emoji"], text_page, max_text_page)
-                        if next_text_page:
-                            page = f"{page}/{max_page}"
-                            embed = self.rev.update_embed(
-                                ctx["message"].embeds[0], review, page, next_text_page
-                            )
-                            await ctx["message"].edit(embed=embed)
-            if ctx["message"].guild:  # cannot remove reaction in DM
-                await ctx["message"].remove_reaction(ctx["emoji"], ctx["member"])
+        elif ctx["emoji"] in ["👍", "👎", "🛑"]:
+            review = review_repo.get_review_by_id(review_id)
+            member_id = str(ctx["member"].id)
+            if review and member_id != review.member_ID:
+                if ctx["emoji"] == "👍":
+                    self.rev.add_vote(review_id, True, member_id)
+                elif ctx["emoji"] == "👎":
+                    self.rev.add_vote(review_id, False, member_id)
+                elif ctx["emoji"] == "🛑":
+                    review_repo.remove_vote(review_id, member_id)
+                page = f"{page}/{max_page}"
+                embed = self.rev.update_embed(ctx["message"].embeds[0], review, page)
+                await ctx["message"].edit(embed=embed)
+        elif ctx["emoji"] in ["🔼", "🔽"]:
+            if ctx["message"].embeds[0].fields[3].name == "Text page":
+                review = review_repo.get_review_by_id(review_id)
+                if review:
+                    pages = ctx["message"].embeds[0].fields[3].value.split("/")
+                    text_page = int(pages[0])
+                    max_text_page = int(pages[1])
+                    next_text_page = utils.pagination_next(ctx["emoji"], text_page, max_text_page)
+                    if next_text_page:
+                        page = f"{page}/{max_page}"
+                        embed = self.rev.update_embed(
+                            ctx["message"].embeds[0], review, page, next_text_page
+                        )
+                        await ctx["message"].edit(embed=embed)
+        if ctx["message"].guild:  # cannot remove reaction in DM
+            await ctx["message"].remove_reaction(ctx["emoji"], ctx["member"])
 
 
 class Review_helper:

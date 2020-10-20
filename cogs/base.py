@@ -47,21 +47,15 @@ class Base(commands.Cog):
             await msg.add_reaction("◀")
             await msg.add_reaction("▶")
 
-    @commands.Cog.listener()
-    async def on_raw_reaction_add(self, payload):
-        ctx = await utils.reaction_get_ctx(self.bot, payload)
-        if ctx is None:
-            return
-
-        if ctx['message'].embeds and ctx['message'].embeds[0].title == "Rubbergod":
-            if ctx['emoji'] in ["◀", "▶"]:
-                page = int(ctx['message'].embeds[0].footer.text[5])
-                next_page = utils.pagination_next(ctx['emoji'], page, len(messages.info))
-                if next_page:
-                    embed = self.make_embed(next_page)
-                    await ctx['message'].edit(embed=embed)
-            if ctx['message'].guild: 
-                await ctx['message'].remove_reaction(ctx['emoji'], ctx['member'])
+    async def hadle_reaction(self, ctx):
+        if ctx['emoji'] in ["◀", "▶"]:
+            page = int(ctx['message'].embeds[0].footer.text[5])
+            next_page = utils.pagination_next(ctx['emoji'], page, len(messages.info))
+            if next_page:
+                embed = self.make_embed(next_page)
+                await ctx['message'].edit(embed=embed)
+        if ctx['message'].guild: 
+            await ctx['message'].remove_reaction(ctx['emoji'], ctx['member'])
 
     def make_embed(self, page):
         embed = discord.Embed(title="Rubbergod",

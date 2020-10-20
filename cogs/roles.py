@@ -24,20 +24,14 @@ class ReactToRole(commands.Cog):
             role_data = await self.get_join_role_data(message)
             await self.message_role_reactions(message, role_data)
 
-    @commands.Cog.listener()
-    async def on_raw_reaction_add(self, payload):
-        ctx = await utils.reaction_get_ctx(self.bot, payload)
-        if ctx is None:
-            return
-
-        if ctx["channel"].id in Config.role_channels:
-            role_data = await self.get_join_role_data(ctx["message"])
-            for line in role_data:
-                if str(ctx["emoji"]) == line[1]:
-                    await self.add_perms(line[0], ctx["member"], ctx["guild"])
-                    break
-            else:
-                await ctx["message"].remove_reaction(ctx["emoji"], ctx["member"])
+    async def hadle_reaction(self, ctx):
+        role_data = await self.get_join_role_data(ctx["message"])
+        for line in role_data:
+            if str(ctx["emoji"]) == line[1]:
+                await self.add_perms(line[0], ctx["member"], ctx["guild"])
+                break
+        else:
+            await ctx["message"].remove_reaction(ctx["emoji"], ctx["member"])
 
     @commands.Cog.listener()
     async def on_raw_reaction_remove(self, payload):
