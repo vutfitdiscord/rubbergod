@@ -18,7 +18,7 @@ class Meme(commands.Cog):
         self.bot = bot
 
     @commands.Cog.listener()
-    async def on_message(self, message):
+    async def on_message(self, message: discord.message):
         global uhoh_counter
 
         if message.author.bot:
@@ -33,6 +33,10 @@ class Meme(commands.Cog):
             uhoh_counter += 1
         elif message.content == "PR":
             await message.channel.send(messages.pr_meme)
+        elif "storno" in message.content and message.channel.id == config.covid_channel_id:
+            await message.channel.send(
+                utils.fill_message("covid_storno", user=message.author.id),
+                file=discord.File("images/storno.png", filename="storno.png"))
 
     @commands.command()
     async def uhoh(self, ctx):
