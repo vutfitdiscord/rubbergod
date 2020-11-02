@@ -31,7 +31,7 @@ class Messages:
     vote_room_only = "Tohle funguje jen v {room}."
     bot_room_redirect = "{user} <:sadcat:576171980118687754> 👉 " \
                         "<#{bot_room}>\n"
-
+    covid_storno = "{user} <:WeirdChamp:680711174802899007>"
     uhoh_counter = "{uhohs} uh ohs od spuštění."
     uptime_message = "Up since:  `{boottime}`\nUptime:\t`{uptime}`"
 
