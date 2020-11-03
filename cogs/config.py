@@ -12,6 +12,7 @@ from config.messages import Messages
 
 Config = Config_module.Config()
 
+
 class DynamicConfig(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
@@ -57,7 +58,7 @@ class DynamicConfig(commands.Cog):
         await ctx.send(Messages.config_loaded)
 
     @config.command(name="list")
-    async def list_all(self, ctx, regex = None):
+    async def list_all(self, ctx, regex=None):
         if regex is not None:
             try:
                 regex = re.compile(regex)
@@ -100,7 +101,7 @@ class DynamicConfig(commands.Cog):
             toml.dump(Config.toml_dict, fd)
         await ctx.send(Messages.config_backup_created)
 
-    async def change_value(self, ctx, key:str, value:list, append:bool):
+    async def change_value(self, ctx, key: str, value: list, append: bool):
         """
         Changes config atrribute specified by `key` to `value`.
         If `append` values are appended to current setting.
