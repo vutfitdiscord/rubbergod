@@ -254,6 +254,7 @@ class Messages:
     config_get_format = f'{prefix}config get [key]'
     config_set_format = f'{prefix}config set [key] hodnota/y'
     config_append_format = f'{prefix}config append [key] hodnota/y'
+    config_list_invalid_regex = 'Chybný regex\n`{regex_err}`'
 
     channel_help = f"{prefix}channel [clone, copy]"
     channel_copy_help = f"{prefix}channel copy [source] [destination]"
