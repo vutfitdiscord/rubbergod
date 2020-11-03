@@ -42,7 +42,7 @@ class AutoPin(commands.Cog):
         embed = discord.Embed(title="📌 Auto pin message log", color=0xEEE657)
         user_names = ", ".join([user.name for user in users])
         message_link = message.jump_url
-        embed.add_field(name="Users", value=user_names)
+        embed.add_field(name="Users", value=user_names if len(user_names) > 0 else "**Missing users**")
         embed.add_field(name="In channel", value=message.channel)
         embed.add_field(name="Message", value=message_link, inline=False)
         embed.timestamp = datetime.datetime.now(tz=datetime.timezone.utc)
