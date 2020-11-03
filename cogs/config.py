@@ -57,12 +57,20 @@ class DynamicConfig(commands.Cog):
         await ctx.send(Messages.config_loaded)
 
     @config.command(name="list")
-    async def list_all(self, ctx):
+    async def list_all(self, ctx, regex = None):
+        if regex is not None:
+            try:
+                regex = re.compile(regex)
+            except re.error as ex:
+                await ctx.send(utils.fill_message('config_list_invalid_regex', regex_err=str(ex)))
+                return
+
         keys = dir(Config)
-        output = "```"
+        output = "```\n"
         for key in keys[:]:
             if not re.match(r"__.*__", key) and key not in Config.config_static:
-                output += key + "\n"
+                if regex is None or regex.match(key) is not None:
+                    output += key + "\n"
         output += "```"
         await ctx.send(output)
 
