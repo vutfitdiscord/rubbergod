@@ -3,3 +3,4 @@ config/config.toml
 __pycache__
 .idea
 .venv/
+*.log
