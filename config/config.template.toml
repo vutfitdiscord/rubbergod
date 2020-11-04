@@ -73,6 +73,7 @@ uhoh_string = 'uh oh'
 arcas_id = 140547421733126145
 arcas_delay = 24
 covid_channel_id = 686554441167405077
+storno_delay = 24
 hug_emojis = ["<:peepoHug:600435649786544151>",
     "<:peepoHugger:602052621007585280>",
     "<:huggers:602823825880514561>", "(っ˘̩╭╮˘̩)っ", "(っ´▽｀)っ",
