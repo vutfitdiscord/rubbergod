@@ -62,7 +62,7 @@ class Messages:
                           f"`{prefix}karma revote [emote]`"
     karma_emote_not_found = "Emote jsem na serveru nenašel."
     karma_get_format = "Použití:\n" \
-                       f"`{prefix}karma get`: " \
+                       f"`{prefix}karma getall`: " \
                        "vypíše všechny emoty s hodnotou.\n" \
                        f"`{prefix}karma get [emote]`: " \
                        "zobrazí hodnotu daného emotu."
@@ -264,7 +264,7 @@ class Messages:
 
     info = [[('karma', 'Vypíše karmu vaši, rozdanou a odebranou'),
              ('karma stalk [user]', 'Vypíše karmu uživatele, karmu rozdanou a odebranou.'),
-             ('karma get', 'Vypíše, které emoty mají hodnotu 1 a -1.'),
+             ('karma getall', 'Vypíše, které emoty mají hodnotu 1 a -1.'),
              ('karma get [emote]', 'Vrátí karma hodnotu emotu.'),
              ('karma vote', 'Odstartuje hlasování o hodnotě zatím neohodnoceného emotu.'),
              ('karma revote [emote]', 'Odstartuje hlasování o nové hodnotě emotu.'),
