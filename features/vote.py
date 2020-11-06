@@ -71,7 +71,7 @@ class Vote(BaseFeature):
             return None
 
         vote_par = 0
-        if msg_split[0][1:] == "vote" and msg_split[0][1:] in Config.command_prefix:
+        if msg_split[0][1:] == "vote" and msg_split[0][0] in Config.command_prefix:
             vote_par = 0
         elif msg_split[1] == "vote":
             vote_par = 1
