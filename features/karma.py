@@ -1,5 +1,4 @@
 import asyncio
-import datetime
 import math
 import re
 
@@ -141,7 +140,8 @@ class Karma(BaseFeature):
     async def emoji_get_value(self, message):
         content = message.content.split()
         if len(content) != 3:
-            return await self.emoji_list_all_values(message.channel)
+            await message.channel.send(msg.karma_get_format)
+            return
 
         emoji = content[2]
         if not is_unicode(emoji):
@@ -173,6 +173,8 @@ class Karma(BaseFeature):
 
         for cnt, emoji_id in enumerate(emojis):
             if cnt % 8 == 0 and cnt:
+                line += "\n"
+            if cnt % 24 == 0 and cnt:
                 message.append(line)
                 line = ""
 

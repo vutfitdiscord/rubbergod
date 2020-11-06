@@ -49,7 +49,7 @@ class Karma(commands.Cog):
             if column is None:
                 return
 
-            if not embed.description is discord.Embed.Empty:
+            if embed.description is not discord.Embed.Empty:
                 current_page = int(embed.description.split(" – ")[0])
             else:
                 current_page = max_page
@@ -122,7 +122,19 @@ class Karma(commands.Cog):
         await self.check.botroom_check(ctx.message)
 
     @karma.command()
-    @commands.cooldown(rate=2, per=30.0, type=commands.BucketType.user)
+    @commands.cooldown(rate=1, per=300.0, type=commands.BucketType.guild)
+    async def getall(self, ctx, *args):
+        if not await self.check.guild_check(ctx.message):
+            await ctx.send(messages.server_warning)
+        else:
+            try:
+                await self.karma.emoji_list_all_values(ctx.channel)
+                await self.check.botroom_check(ctx.message)
+            except discord.errors.Forbidden:
+                return
+
+    @karma.command()
+    @commands.cooldown(rate=4, per=30.0, type=commands.BucketType.user)
     async def get(self, ctx, *args):
         if not await self.check.guild_check(ctx.message):
             await ctx.send(messages.server_warning)
