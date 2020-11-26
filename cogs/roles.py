@@ -119,7 +119,9 @@ class ReactToRole(commands.Cog):
                 await member.add_roles(role)
         for channel in channels:
             if channel is not None:
-                await channel.set_permissions(member, read_messages=True)
+                perms = channel.overwrites_for(member)
+                perms.read_messages=True
+                await channel.set_permissions(member, override=perms)
 
     async def remove_perms(self, target, member, guild):
         """Remove a target role / channel from a member."""
@@ -129,7 +131,9 @@ class ReactToRole(commands.Cog):
                 await member.remove_roles(role)
         for channel in channels:
             if channel is not None:
-                await channel.set_permissions(member, read_messages=False)
+                perms = channel.overwrites_for(member)
+                perms.read_messages=False
+                await channel.set_permissions(member, override=perms)
 
     def get_target(self, target, guild):
         """Detect if target is a channel a role or a group."""
