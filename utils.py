@@ -164,6 +164,6 @@ def get_emoji(guild: discord.Guild, name: str) -> Union[discord.Emoji, str]:
     guild: :class:`discord.Guild`
 
     name: :class:`str`
-    returns: :class:`discord.Emoji` - emoji object or None.
+    returns: :class:`discord.Emoji` - emoji object or the name itself
     """
     return discord.utils.get(guild.emojis, name=name) or name
