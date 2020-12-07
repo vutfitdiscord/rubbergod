@@ -9,7 +9,7 @@ from repository.database.hugs import HugsTable
 
 Member = Union[discord.Member, discord.User]
 
-HugStats = namedtuple("Hugstats", ("given", "received"))
+UserHugStats = namedtuple("UserHugStats", ("given", "received"))
 
 
 class HugsRepository(BaseRepository):
@@ -20,20 +20,20 @@ class HugsRepository(BaseRepository):
     def _get_member(member_id) -> Optional[HugsTable]:
         return session.query(HugsTable).filter(HugsTable.member_id == member_id).one_or_none()
 
-    def get_members_stats(self, member_id) -> HugStats:
+    def get_members_stats(self, member_id) -> UserHugStats:
         """
         :param member_id: Member's discord id
         :return: Tuple of [Given, Received] hugs, both zero if member not found
         """
         hugs = self._get_member(member_id)
-        return HugStats(hugs.given, hugs.received) if hugs else HugStats(0, 0)
+        return UserHugStats(hugs.given, hugs.received) if hugs else UserHugStats(0, 0)
 
     @staticmethod
     def _get_count(order_by=None):
         # this should be cached for some time
         return session.query(HugsTable).order_by(order_by).count()
 
-    def get_member_position(self, member_stats: HugStats) -> Tuple[int, int]:
+    def get_member_position(self, member_stats: UserHugStats) -> Tuple[int, int]:
         if member_stats.given > 0:
             give_position = 1 + session.query(HugsTable).filter(HugsTable.given > member_stats.given).count()
         else:
@@ -64,6 +64,7 @@ class HugsRepository(BaseRepository):
             giver = self._get_member(giver_id)
             if not giver:
                 giver = HugsTable(member_id=giver_id, given=0)
+
             giver.given += 1
             session.add(giver)
 
@@ -71,8 +72,8 @@ class HugsRepository(BaseRepository):
             receiver = self._get_member(receiver_id)
             if not receiver:
                 receiver = HugsTable(member_id=receiver_id, received=0)
-            receiver.received += 1
 
+            receiver.received += 1
             session.add(receiver)
 
         if giver_id is not None or receiver_id is not None:
