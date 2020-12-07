@@ -1,13 +1,13 @@
 from sqlalchemy.schema import Table
 
-from .source import base_leaderboard_format_str
+base_leaderboard_format_str = "_{position}._ - **{member_name}**:"
 
 
-def make_pts_column_formatter(column_name: str):
-    """For leaderboards with one points column."""
+def make_pts_column_row_formatter(pts_column_name: str):
+    """For leaderboards with one column of points."""
 
     def formatter(entry: Table, **kwargs):
         return base_leaderboard_format_str.format_map(
-            kwargs) + "{} pts".format(getattr(entry, column_name))
+            kwargs) + " {} pts".format(getattr(entry, pts_column_name))
 
     return formatter

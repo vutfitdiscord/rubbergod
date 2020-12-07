@@ -1,7 +1,8 @@
 """
-This builds on what discord-ext-menus does but for our usecase.
+Custom data sources for menus
 
-That is - getting data from database, where the pagination info
+This builds on what discord-ext-menus does but for our usage.
+Which is - getting data from database, where the pagination info
 goes directly down to the used database query (with .offset, .limit),
 whereas the already implemented ones only work with iterables/generators of the data.
 
@@ -35,14 +36,14 @@ class DatabaseIteratorPageSource(PageSource):
 
     def __init__(self, query: Query, per_page=10):
         """
-
         query: :class:`Query`
             The query which will be realized to poll for database items.
             It MUST NOT have `.offset`, `.limit` or `.slice` already applied on it.
 
             Example: ``session.query(KarmaTable).order_by(KarmaTable.count)``
+
         per_page: :class:`int`
-            How many elements are in a page.
+            How many rows to return per one page.
             Will be used on database query to poll for that amount.
         """
 
@@ -59,7 +60,6 @@ class DatabaseIteratorPageSource(PageSource):
         return math.ceil(count / self.per_page) if count > 0 else 0
 
     def get_max_pages(self):
-        # has to be a method, not property
         return self._get_max_pages
 
     async def get_page(self, page_number) -> DatabasePage:
@@ -68,17 +68,24 @@ class DatabaseIteratorPageSource(PageSource):
         return self._query.limit(self.per_page).offset(self.current_page * self.per_page).all()
 
     def is_paginating(self) -> bool:
+        # Do not show pagination controls if there is only one page
         return (self.current_page + 1) < self.get_max_pages()
 
     def format_page(self, menu: Menu, page: DatabasePage) -> Union[str, discord.Embed, dict]:
         raise NotImplemented
 
 
-base_leaderboard_format_str = "_{position}._ - **{member_name}**:"
-
-
 class LeaderboardPageSource(DatabaseIteratorPageSource):
-    base_embed = None
+    """
+    Page source for menus with leaderboard-like structure,
+    builds on top of database iterator and abstracts formatting
+    of the query data into strings (leaderboard rows).
+
+    Only `row_formatter` needs to be set, which can be format string
+    or callable.
+    """
+    base_embed: discord.Embed = None
+    member_id_col_name: str = None
 
     def __init__(
             self,
@@ -86,28 +93,36 @@ class LeaderboardPageSource(DatabaseIteratorPageSource):
             query: Query,
             per_page=10,
             base_embed: discord.Embed = None,
+            member_id_col_name="member_id",
     ):
         """
         Initialize this page source.
 
-        row_formatter: :class:`str` or :class:`Callable`
-            These are always supplied as keywords either into
-            ``str.format`` or call of the ``formatter``:
+        row_formatter: Format :class:`str` or :class:`Callable`.
+            These are always supplied as formatting keywords (or just keyword args for callables).
                 - ``position`` :class:`int`
                 - ``member_name`` :class:`str`
                 - ``entry`` :class:`Table`
 
-        base_embed: :class:`discord.Embed`, defaults to empty Embed
+        base_embed: :class:`discord.Embed` defaults to empty Embed.
             The embed that will be used as a foundation for the message,
             it's ``.description`` and ``.footer`` will be used
             for the pagination purposes.
 
-        Warning: The table entry returned by the underlying ``Query`` has to contain
+        Notice:
+            The table entry returned by the underlying ``Query`` has to contain
             ``member_id/_ID`` column.
         """
-        self.row_formatter: Union[str, Callable] = row_formatter
-        self.base_embed = base_embed if base_embed else discord.Embed()
 
+        if type(row_formatter) == str:
+            self.row_formatter = lambda **kw: row_formatter.format_map(kw)
+        elif callable(row_formatter):
+            self.row_formatter = row_formatter
+        else:
+            raise Exception("row_formatter has invalid type, should be str or callable.")
+
+        self.base_embed = base_embed if base_embed else discord.Embed()
+        self.member_id_col_name = member_id_col_name
         super().__init__(query=query, per_page=per_page)
 
     @staticmethod
@@ -120,37 +135,37 @@ class LeaderboardPageSource(DatabaseIteratorPageSource):
     async def _format_row(self, entry: Table, position: int, ctx: Context) -> str:
         """
         Applies current query results onto self.row_formatter.
-        The result's member_id/ID attribute value is converted into string and available
+        The entry's member id attribute is converted and available
         as member_name keyword for the formatter.
 
         :raises :class:`AssertionError`:
-            If neither ``member_id`` nor ``member_ID`` column is found in data returned from query.
+            If the specified member id column can't be found in entry
         :returns: Formatted string, result of calling/applying `self.row_formatter`.
         """
 
-        # try to guess member_id key
-        member_id = getattr(entry, "member_id", None) or getattr(entry, "member_ID", None)
-        assert member_id, f"Table {entry} row does not contain member_id/_ID."
+        member_id = getattr(entry, self.member_id_col_name, None)
+        assert member_id, f"Table {entry} row does not contain '{self.member_id_col_name}'?"
+
         member_name = await self._get_member_name(ctx, member_id)
 
         kwargs = {"position": position, "member_name": member_name, "entry": entry}
-
-        if type(self.row_formatter) == str:
-            return self.row_formatter.format_map(kwargs)
-
         return self.row_formatter(**kwargs)
 
     async def format_page(self, menu, page: DatabasePage) -> Union[str, discord.Embed, dict]:
-        lines = []
+        board_lines = []
 
         for i, entry in enumerate(page):  # type: int, Table
-            lines.append(await self._format_row(entry, (self.current_page * self.per_page) + i + 1, menu.ctx))
+            board_lines.append(await self._format_row(
+                entry=entry, position=(self.current_page * self.per_page) + i + 1, ctx=menu.ctx
+            ))
 
-        self.base_embed.description = "\n" + "\n".join(lines)
+        self.base_embed.description = "\n" + "\n".join(board_lines)
 
-        # possibility to optimize, author should be set only once
+        # possibility to optimize, author could be set only once
         utils.add_author_footer(
-            self.base_embed, menu.ctx, additional_text=(f"{self.current_page + 1}/{self.get_max_pages()} pages.",)
+            self.base_embed,
+            menu.ctx.author,
+            additional_text=(f"{self.current_page + 1}/{self.get_max_pages()} pages.",),
         )
 
         return self.base_embed
