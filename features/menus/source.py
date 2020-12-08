@@ -81,8 +81,9 @@ class LeaderboardPageSource(DatabaseIteratorPageSource):
     builds on top of database iterator and abstracts formatting
     of the query data into strings (leaderboard rows).
 
-    Only `row_formatter` needs to be set, which can be format string
-    or callable.
+    This is a final class that shouldn't have to be subclassed,
+    as most of the possible leaderboard params can be supplied as
+    init args.
     """
     base_embed: discord.Embed = None
     member_id_col_name: str = None
