@@ -1,5 +1,6 @@
 import datetime
 import discord
+import utils
 from discord.ext import commands
 
 from config.app_config import Config
@@ -9,6 +10,20 @@ from config.messages import Messages
 class AutoPin(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+
+    @commands.command()
+    @commands.check(utils.helper_plus)
+    async def repin(self, ctx, *args):
+        try:
+            converter = commands.MessageConverter()
+            message: discord.Message = await converter.convert(ctx=ctx, argument=" ".join(args))
+
+            if message.pinned:
+                await message.unpin()
+            await message.pin()
+        except commands.errors.BadArgument:
+            await ctx.send(Messages.autopin_repin_unknown_message)
+            return
 
     async def hadle_reaction(self, ctx):
         """

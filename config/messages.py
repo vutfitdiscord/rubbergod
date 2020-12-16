@@ -235,6 +235,7 @@ class Messages:
     urban_not_found = "Pro daný výraz neexistuje záznam <:sadcat:576171980118687754>"
 
     autopin_max_pins_error = "Byl dosažen maximální počet připnutých správ."
+    autopin_repin_unknown_message = f"Formát je: `{prefix}repin [ID zprávy]`"
 
     on_ready_message = "<:peepowave:693070888546861096>"
 
