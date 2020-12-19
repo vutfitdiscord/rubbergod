@@ -2,6 +2,7 @@ import datetime
 import discord
 import utils
 from discord.ext import commands
+from repository import pin_repo
 
 from config.app_config import Config
 from config.messages import Messages
@@ -10,6 +11,7 @@ from config.messages import Messages
 class AutoPin(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+        self.repo = pin_repo.PinRepository()
 
     @commands.command()
     @commands.check(utils.helper_plus)
@@ -23,6 +25,28 @@ class AutoPin(commands.Cog):
             await message.pin()
         except commands.errors.BadArgument:
             await ctx.send(Messages.autopin_repin_unknown_message)
+            return
+
+    @commands.check(utils.helper_plus)
+    @commands.group(pass_context=True)
+    async def pin(self, ctx: commands.Context):
+        """
+        Controls auto pin.
+        """
+
+        if ctx.invoked_subcommand is None:
+            await ctx.send(Messages.autopin_help)
+
+    @pin.command()
+    async def add(self, ctx: commands.Context, message_url: str):
+        try:
+            converter = commands.MessageConverter()
+            message: discord.Message = await converter.convert(ctx, message_url)
+
+            self.repo.add_or_update_channel(str(message.channel.id), str(message.id))
+            await ctx.send(Messages.autopin_add_done)
+        except commands.errors.BadArgument:
+            await ctx.send(Messages.autopin_add_unknown_message)
             return
 
     async def hadle_reaction(self, ctx):

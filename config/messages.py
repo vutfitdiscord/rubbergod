@@ -234,6 +234,9 @@ class Messages:
     urban_help = f"`{prefix}urban výraz`\nPříklad:\n`{prefix}urban sure`"
     urban_not_found = "Pro daný výraz neexistuje záznam <:sadcat:576171980118687754>"
 
+    autopin_help = f"{prefix}pin [add,remove,toggle] {{channel}}"
+    autopin_add_unknown_message = "Očekáváno URL zprávy"
+    autopin_add_done = "Priorita pinu nastavena."
     autopin_max_pins_error = "Byl dosažen maximální počet připnutých správ."
     autopin_repin_unknown_message = f"Formát je: `{prefix}repin [ID zprávy]`"
 

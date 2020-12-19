@@ -7,6 +7,7 @@ from repository.database.verification import Permit, Valid_person
 from repository.database.image import Image
 from repository.database.role_group import RoleGroup
 from repository.review_repo import ReviewRepository
+from repository.database.pin_map import PinMap
 
 from config.app_config import Config
 
