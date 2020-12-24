@@ -149,17 +149,17 @@ class Messages:
     verify_verify_wrong_code = "{user} Špatný kód."
 
     vote_format = f"Použití vote:\n`{prefix}vote [datum] [čas] [otázka]\n[emoji] " \
-        "[odpověď 1]\n[emoji] [odpověď 2]\na tak dále`\n" \
-        "Datum je ve formátu `dd.MM.(yy)`." \
-        "Čas je ve formátu `hh:mm`. " \
-        "Pouze vyplněný čas použije den odeslání zprávy, " \
-        "pouze vyplněné datum použije čas 00:00. " \
-        "Datum a čas jsou nepovinné argumenty, " \
-        "hlasování bude bez jejich uvedení funkční neustále. " \
-        "Pokud jsou vyplněny," \
-        "bot pošle po uplynutí zprávu o výsledku," \
-        "když ho mezitím nikdo nevypne. " \
-        "Indikace výherné možnosti přežije i vypnutí."
+                                    "[odpověď 1]\n[emoji] [odpověď 2]\na tak dále`\n" \
+                                    "Datum je ve formátu `dd.MM.(yy)`." \
+                                    "Čas je ve formátu `hh:mm`. " \
+                                    "Pouze vyplněný čas použije den odeslání zprávy, " \
+                                    "pouze vyplněné datum použije čas 00:00. " \
+                                    "Datum a čas jsou nepovinné argumenty, " \
+                                    "hlasování bude bez jejich uvedení funkční neustále. " \
+                                    "Pokud jsou vyplněny," \
+                                    "bot pošle po uplynutí zprávu o výsledku," \
+                                    "když ho mezitím nikdo nevypne. " \
+                                    "Indikace výherné možnosti přežije i vypnutí."
     vote_not_emoji = "{not_emoji} není emoji. <:sadcat:576171980118687754>"
     vote_bad_date = "Hlasování může skončit jen v budoucnosti. <:objection:490989324125470720>"
 
