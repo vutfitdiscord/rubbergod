@@ -1,8 +1,11 @@
+from typing import List
+
 import datetime
 import discord
 import utils
 from discord.ext import commands
 from repository import pin_repo
+from repository.database.pin_map import PinMap
 
 from config.app_config import Config
 from config.messages import Messages
@@ -12,20 +15,6 @@ class AutoPin(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.repo = pin_repo.PinRepository()
-
-    @commands.command()
-    @commands.check(utils.helper_plus)
-    async def repin(self, ctx, *args):
-        try:
-            converter = commands.MessageConverter()
-            message: discord.Message = await converter.convert(ctx=ctx, argument=" ".join(args))
-
-            if message.pinned:
-                await message.unpin()
-            await message.pin()
-        except commands.errors.BadArgument:
-            await ctx.send(Messages.autopin_repin_unknown_message)
-            return
 
     @commands.check(utils.helper_plus)
     @commands.group(pass_context=True)
@@ -44,10 +33,89 @@ class AutoPin(commands.Cog):
             message: discord.Message = await converter.convert(ctx, message_url)
 
             self.repo.add_or_update_channel(str(message.channel.id), str(message.id))
+
+            if not message.pinned:
+                await message.pin()
+
             await ctx.send(Messages.autopin_add_done)
         except commands.errors.BadArgument:
             await ctx.send(Messages.autopin_add_unknown_message)
             return
+
+    @pin.command()
+    async def remove(self, ctx: commands.Context, channel: discord.TextChannel = None):
+        if channel is None:
+            channel = ctx.channel
+
+        if self.repo.find_channel_by_id(str(channel.id)) is None:
+            await ctx.send(utils.fill_message("autopin_remove_not_exists", channel_name=channel.name))
+            return
+
+        self.repo.remove_channel(str(channel.id))
+        await ctx.send(Messages.autopin_remove_done)
+
+    @pin.command(aliases=["list"])
+    async def get_list(self, ctx: commands.Context):
+        mappings: List[PinMap] = self.repo.get_mappings()
+
+        if len(mappings) == 0:
+            await ctx.send(Messages.autopin_no_messages)
+            return
+
+        lines: List[str] = []
+        for item in mappings:
+            channel: discord.TextChannel = await self.bot.fetch_channel(int(item.channel_id))
+
+            if channel is None:
+                lines.append(utils.fill_message('autopin_list_unknown_channel', channel_id=item.channel_id))
+            else:
+                message: discord.Message = await channel.fetch_message(int(item.message_id))
+                if message is None:
+                    msg: str = utils.fill_message('autopin_list_unknown_message', channel=channel.mention)
+                    lines.append(msg)
+                else:
+                    jump_url: str = message.jump_url
+                    msg: str = utils.fill_message('autopin_list_item', channel=channel.mention, url=jump_url)
+                    lines.append(msg)
+
+        for part in utils.split_to_parts(lines, 10):
+            await ctx.send('\n'.join(part))
+
+    @commands.Cog.listener()
+    async def on_guild_channel_pins_update(self, channel: discord.TextChannel, last_pin):
+        pin_map: PinMap = self.repo.find_channel_by_id(str(channel.id))
+
+        if pin_map is None:
+            # This channel is not used to check pins.
+            return
+
+        pins: List[discord.Message] = await channel.pins()
+
+        if not any(x.id == int(pin_map.message_id) for x in pins):
+            # Mapped pin was removed. Remove from map.
+            self.repo.remove_channel(str(channel.id))
+            print(f'INFO:\tRemoved {channel.id} from PIN mapping. (on_guild_channel_pins_update)')
+        elif pins[0].id != int(pin_map.message_id):
+            message: discord.Message = await channel.fetch_message(int(pin_map.message_id))
+
+            if message is None:
+                # Message not exists. Remove from map.
+                self.repo.remove_channel(str(channel.id))
+                return
+
+            await message.unpin()
+            await message.pin()
+            print(f'INFO:\tMessage: {message.id} was repinned. (on_guild_channel_pins_update)')
+
+    @commands.Cog.listener()
+    async def on_raw_message_delete(self, payload: discord.RawMessageDeleteEvent):
+        pin_map: PinMap = self.repo.find_channel_by_id(str(payload.channel_id))
+
+        if pin_map is None or pin_map.message_id != str(payload.message_id):
+            return
+
+        self.repo.remove_channel(str(payload.channel_id))
+        print(f'INFO:\tRemoved {pin_map.channel_id} from PIN mapping. (on_raw_message_delete)')
 
     async def hadle_reaction(self, ctx):
         """

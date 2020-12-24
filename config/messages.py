@@ -149,17 +149,17 @@ class Messages:
     verify_verify_wrong_code = "{user} Špatný kód."
 
     vote_format = f"Použití vote:\n`{prefix}vote [datum] [čas] [otázka]\n[emoji] " \
-                                    "[odpověď 1]\n[emoji] [odpověď 2]\na tak dále`\n" \
-                                    "Datum je ve formátu `dd.MM.(yy)`." \
-                                    "Čas je ve formátu `hh:mm`. " \
-                                    "Pouze vyplněný čas použije den odeslání zprávy, " \
-                                    "pouze vyplněné datum použije čas 00:00. " \
-                                    "Datum a čas jsou nepovinné argumenty, " \
-                                    "hlasování bude bez jejich uvedení funkční neustále. " \
-                                    "Pokud jsou vyplněny," \
-                                    "bot pošle po uplynutí zprávu o výsledku," \
-                                    "když ho mezitím nikdo nevypne. " \
-                                    "Indikace výherné možnosti přežije i vypnutí."
+        "[odpověď 1]\n[emoji] [odpověď 2]\na tak dále`\n" \
+        "Datum je ve formátu `dd.MM.(yy)`." \
+        "Čas je ve formátu `hh:mm`. " \
+        "Pouze vyplněný čas použije den odeslání zprávy, " \
+        "pouze vyplněné datum použije čas 00:00. " \
+        "Datum a čas jsou nepovinné argumenty, " \
+        "hlasování bude bez jejich uvedení funkční neustále. " \
+        "Pokud jsou vyplněny," \
+        "bot pošle po uplynutí zprávu o výsledku," \
+        "když ho mezitím nikdo nevypne. " \
+        "Indikace výherné možnosti přežije i vypnutí."
     vote_not_emoji = "{not_emoji} není emoji. <:sadcat:576171980118687754>"
     vote_bad_date = "Hlasování může skončit jen v budoucnosti. <:objection:490989324125470720>"
 
@@ -234,11 +234,17 @@ class Messages:
     urban_help = f"`{prefix}urban výraz`\nPříklad:\n`{prefix}urban sure`"
     urban_not_found = "Pro daný výraz neexistuje záznam <:sadcat:576171980118687754>"
 
-    autopin_help = f"{prefix}pin [add,remove,toggle] {{channel}}"
+    autopin_max_pins_error = "Byl dosažen maximální počet připnutých správ."
+    autopin_help = f"`{prefix}pin add {{jump_url}}` - Začne sledovat zprávu jako prioritní pin.\n" \
+        f"`{prefix}remove {{channel_mention}}` - Odebere sledování prioritního pinu."
     autopin_add_unknown_message = "Očekáváno URL zprávy"
     autopin_add_done = "Priorita pinu nastavena."
-    autopin_max_pins_error = "Byl dosažen maximální počet připnutých správ."
-    autopin_repin_unknown_message = f"Formát je: `{prefix}repin [ID zprávy]`"
+    autopin_remove_not_exists = "V kanálu {channel_name} není nastavena prioritní zpráva pro piny."
+    autopin_remove_done = "Priorita pinu odebrána."
+    autopin_no_messages = "Ještě neexistuje žádné mapování."
+    autopin_list_unknown_channel = "> Neznámý kanál ({channel_id})"
+    autopin_list_unknown_message = "> {channel} - Neznámá zpráva"
+    autopin_list_item = "> {channel} - {url}"
 
     on_ready_message = "<:peepowave:693070888546861096>"
 
