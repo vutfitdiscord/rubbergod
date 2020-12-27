@@ -12,6 +12,7 @@ messages = messages.Messages
 
 uhoh_counter = 0
 storno_time = datetime.datetime.utcnow() - datetime.timedelta(hours=config.storno_delay)
+storno_images = ["storno.png", "storno_lgtm.png"]
 
 
 class Meme(commands.Cog):
@@ -38,14 +39,16 @@ class Meme(commands.Cog):
         elif message.content == "PR":
             await message.channel.send(messages.pr_meme)
         elif (
-            storno_time + datetime.timedelta(hours=config.storno_delay) < message.created_at
+            storno_time + datetime.timedelta(hours=config.storno_delay)
+            < message.created_at
             and "storno" in message.content.lower()
             and message.channel.id == config.covid_channel_id
         ):
             storno_time = message.created_at
+            image = choice(storno_images)
             await message.channel.send(
                 utils.fill_message("covid_storno", user=message.author.id),
-                file=discord.File("images/storno.png", filename="storno.png"),
+                file=discord.File(f"images/{image}", filename=image),
             )
 
     @commands.command()
