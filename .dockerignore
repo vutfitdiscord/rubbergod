@@ -1,0 +1,8 @@
+LICENSE
+README.md
+**/__pycache__/
+config.toml
+**/docker-compose*
+**/Dockerfile*
+**/other
+*.log
