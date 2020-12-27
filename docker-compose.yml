@@ -1,4 +1,4 @@
-version: '3.7'
+version: "3.7"
 
 services:
     db:
@@ -9,7 +9,8 @@ services:
             - postgres_data:/var/lib/postgresql/data/
     bot:
         build: .
-        command: python rubbergod.py
+        volumes:
+            - ./config/config.toml:/rubbergod/config/config.toml
         depends_on:
             - db
 

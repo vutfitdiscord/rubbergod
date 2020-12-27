@@ -30,7 +30,7 @@ git clone https://github.com/toaster192/rubbergod.git
 cd rubbergod
 ```
 
-## Docker compose setup
+## Docker compose setup (recomended)
 
 Install `docker` and `docker-compose` for your system (will vary from system to system)
 and run `docker` (`systemctl start docker.service`)
