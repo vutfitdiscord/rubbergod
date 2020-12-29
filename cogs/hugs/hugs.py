@@ -71,12 +71,15 @@ class Hugs(commands.Cog):
 
     @commands.cooldown(rate=5, per=60.0, type=commands.BucketType.user)
     @commands.command()
-    async def hugs(self, ctx: commands.Context):
+    async def hugs(self, ctx: commands.Context, user: discord.User = None):
         """
         Get your lovely hug stats.
         """
+        if user is None:
+            user = ctx.author
+
         async with ctx.typing():
-            stats = self.hugs_repo.get_members_stats(ctx.author.id)
+            stats = self.hugs_repo.get_members_stats(user.id)
             positions = self.hugs_repo.get_member_position(stats)
             avg_position = int((positions[0] + positions[1]) // 2)
 
@@ -93,11 +96,12 @@ class Hugs(commands.Cog):
                     )
                 ),
             )
-            embed.set_author(name=ctx.author.name, icon_url=ctx.author.avatar_url)
+
+            embed.set_author(name=user.name, icon_url=user.avatar_url)
+            utils.add_author_footer(embed, ctx.author)
 
             if ctx.guild and ctx.guild.id == config.guild_id:
                 given_emoji = utils.get_emoji(ctx.message.guild, "peepohugs")
-
                 recv_emoji = utils.get_emoji(ctx.message.guild, "huggers")
             else:
                 given_emoji = recv_emoji = ":people_hugging:"
