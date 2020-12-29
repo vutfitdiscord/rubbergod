@@ -153,7 +153,7 @@ class Vote(BaseFeature):
 
     @staticmethod
     def singularise(msg: str):
-        return msg.replace("1 hlasy.", "1 hlasem.")
+        return msg.replace(" 1 hlasy.", " 1 hlasem.")
 
     async def send_winning_msg(self, channel_id, vote_msg_id, timeout):
         await asyncio.sleep(timeout)

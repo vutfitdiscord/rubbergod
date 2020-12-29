@@ -1,5 +1,5 @@
 from datetime import datetime, timezone
-from typing import Iterable
+from typing import Iterable, Optional, Union
 
 import discord
 import git
@@ -167,3 +167,13 @@ def add_author_footer(embed: discord.Embed, author: discord.User,
         embed.timestamp = datetime.now(tz=timezone.utc)
 
     embed.set_footer(icon_url=author.avatar_url, text=' | '.join((str(author), *additional_text)))
+
+
+def get_emoji(guild: discord.Guild, name: str) -> Union[discord.Emoji, str]:
+    """
+    guild: :class:`discord.Guild`
+
+    name: :class:`str`
+    returns: :class:`discord.Emoji` - emoji object or the name itself
+    """
+    return discord.utils.get(guild.emojis, name=name) or name
