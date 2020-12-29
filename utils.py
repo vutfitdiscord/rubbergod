@@ -3,6 +3,7 @@ from typing import Iterable, Optional, Union
 
 import discord
 import git
+import math
 from discord import Member
 from discord.ext import commands
 
@@ -95,6 +96,15 @@ def is_bot_admin(ctx: commands.Context):
 
 def cut_string(string: str, part_len: int):
     return list(string[0 + i: part_len + i] for i in range(0, len(string), part_len))
+
+
+def split_to_parts(items, size: int):
+    result = []
+
+    for x in range(math.ceil(len(items) / size)):
+        result.append(items[x * size:(x * size) + size])
+
+    return result
 
 
 async def reaction_get_ctx(bot, payload):
