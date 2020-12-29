@@ -6,7 +6,6 @@ from discord.ext import commands
 import utils
 from config import app_config
 from repository.hugs_repo import HugsRepository
-from utils import get_emoji
 from .menus import get_hugboard_menu, get_top_huggers_menu, get_top_hugged_menu
 from .. import room_check
 
@@ -32,7 +31,7 @@ class Hugs(commands.Cog):
         async with ctx.typing():
             menu = get_hugboard_menu(
                 base_embed=discord.Embed(
-                    title="{0} HUGBOARD {0}".format(get_emoji(ctx.message.guild, "peepoHugger"))
+                    title="{0} HUGBOARD {0}".format(utils.get_emoji(ctx.message.guild, "peepoHugger"))
                 )
             )
 
@@ -48,7 +47,7 @@ class Hugs(commands.Cog):
         async with ctx.typing():
             menu = get_top_huggers_menu(
                 base_embed=discord.Embed(
-                    title="{0} TOP HUGGERS {0} ".format(get_emoji(ctx.message.guild, "peepoHugger"))
+                    title="{0} TOP HUGGERS {0} ".format(utils.get_emoji(ctx.message.guild, "peepoHugger"))
                 )
             )
         await self.check.botroom_check(ctx.message)
@@ -63,7 +62,7 @@ class Hugs(commands.Cog):
         async with ctx.typing():
             menu = get_top_hugged_menu(
                 base_embed=discord.Embed(
-                    title="{0} TOP HUGGED {0} ".format(get_emoji(ctx.message.guild, "peepoHugger"))
+                    title="{0} TOP HUGGED {0} ".format(utils.get_emoji(ctx.message.guild, "peepoHugger"))
                 )
             )
 
@@ -83,7 +82,7 @@ class Hugs(commands.Cog):
 
             embed = discord.Embed(
                 title="{0} Your Lovely Hug Stats {0}".format(
-                    get_emoji(ctx.message.guild, "peepoHugger")
+                    utils.get_emoji(ctx.message.guild, "peepoHugger")
                 ),
                 description=" | ".join(
                     (
@@ -97,9 +96,9 @@ class Hugs(commands.Cog):
             embed.set_author(name=ctx.author.name, icon_url=ctx.author.avatar_url)
 
             if ctx.guild and ctx.guild.id == config.guild_id:
-                given_emoji = get_emoji(ctx.message.guild, "peepohugs")
+                given_emoji = utils.get_emoji(ctx.message.guild, "peepohugs")
 
-                recv_emoji = get_emoji(ctx.message.guild, "huggers")
+                recv_emoji = utils.get_emoji(ctx.message.guild, "huggers")
             else:
                 given_emoji = recv_emoji = ":people_hugging:"
 
@@ -116,7 +115,7 @@ class Hugs(commands.Cog):
         if user is None:
             user = ctx.author
         elif user.bot:
-            await ctx.send(get_emoji(ctx.message.guild, "huggers"))
+            await ctx.send(utils.get_emoji(ctx.message.guild, "huggers"))
             return
 
         async with ctx.typing():
