@@ -169,11 +169,15 @@ def add_author_footer(embed: discord.Embed, author: discord.User,
     embed.set_footer(icon_url=author.avatar_url, text=' | '.join((str(author), *additional_text)))
 
 
-def get_emoji(guild: discord.Guild, name: str) -> Union[discord.Emoji, str]:
+def get_emoji(guild: discord.Guild, name: str) -> Optional[discord.Emoji]:
     """
     guild: :class:`discord.Guild`
 
     name: :class:`str`
-    returns: :class:`discord.Emoji` - emoji object or the name itself
+    returns: :class:`discord.Emoji` or None
     """
-    return discord.utils.get(guild.emojis, name=name) or name
+    return discord.utils.get(guild.emojis, name=name)
+
+
+def get_username(user: Union[discord.User, discord.Member]) -> str:
+    return discord.utils.escape_markdown(user.display_name).replace("@", "@ ")
