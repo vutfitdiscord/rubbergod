@@ -10,7 +10,6 @@ We also need the command ctx to populate some values (member_ID) from discord.
 """
 
 import math
-from functools import cached_property
 from typing import Iterable, Union, Callable
 
 import discord
@@ -33,6 +32,7 @@ class DatabaseIteratorPageSource(PageSource):
     This page source does not handle any sort of formatting, leaving it up
     to the user. To do so, implement the :meth:`format_page` method.
     """
+    max_pages_cache = None
 
     def __init__(self, query: Query, per_page=10):
         """
@@ -52,15 +52,15 @@ class DatabaseIteratorPageSource(PageSource):
         self.per_page = per_page
         self.current_page = 0
 
-    @cached_property
-    def _get_max_pages(self):
-        # .count() might be slow
-        # https://stackoverflow.com/q/14754994/5881796
-        count = self._query.count()
-        return math.ceil(count / self.per_page) if count > 0 else 0
-
     def get_max_pages(self):
-        return self._get_max_pages
+        # .count() might be slow, cache it
+        # https://stackoverflow.com/q/14754994/5881796
+
+        if self.max_pages_cache is None:
+            count = self._query.count()
+            self.max_pages_cache = math.ceil(count / self.per_page) if count > 0 else 0
+
+        return self.max_pages_cache
 
     async def get_page(self, page_number) -> DatabasePage:
         # result of this is passed into format_page(..., page) arg
