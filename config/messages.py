@@ -235,6 +235,16 @@ class Messages:
     urban_not_found = "Pro daný výraz neexistuje záznam <:sadcat:576171980118687754>"
 
     autopin_max_pins_error = "Byl dosažen maximální počet připnutých správ."
+    autopin_help = f"`{prefix}pin add {{jump_url}}` - Začne sledovat zprávu jako prioritní pin.\n" \
+        f"`{prefix}remove {{channel_mention}}` - Odebere sledování prioritního pinu."
+    autopin_add_unknown_message = "Očekáváno URL zprávy"
+    autopin_add_done = "Priorita pinu nastavena."
+    autopin_remove_not_exists = "V kanálu {channel_name} není nastavena prioritní zpráva pro piny."
+    autopin_remove_done = "Priorita pinu odebrána."
+    autopin_no_messages = "Ještě neexistuje žádné mapování."
+    autopin_list_unknown_channel = "> Neznámý kanál ({channel_id})"
+    autopin_list_unknown_message = "> {channel} - Neznámá zpráva"
+    autopin_list_item = "> {channel} - {url}"
 
     on_ready_message = "<:peepowave:693070888546861096>"
 
