@@ -148,6 +148,8 @@ async def helper_plus(ctx):
     for role in ctx.author.roles:
         if role.id in allowed_roles:
             return True
+    if ctx.author.id in Config.admin_ids:
+        return True
     raise NotHelperPlusError
 
 
