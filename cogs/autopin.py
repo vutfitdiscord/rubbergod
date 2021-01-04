@@ -134,7 +134,7 @@ class AutoPin(commands.Cog):
             ):
                 pin_count = await channel.pins()
                 if len(pin_count) == 50:
-                    await channel.send(Messages.autopin_max_pins_error)
+                    await channel.send(f"{ctx['member'].mention} {Messages.autopin_max_pins_error}")
                     return
                 users = await reaction.users().flatten()
                 await self.log(message, users)
