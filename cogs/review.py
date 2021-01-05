@@ -259,7 +259,7 @@ class Review(commands.Cog):
         except IndexError:  # handle legacy embed reviews
             try:
                 await ctx["member"].send(messages.review_legacy_clicked)
-            except discord.HttpException as e:
+            except discord.HTTPException as e:
                 if e.code != 50007:
                     raise
             return
