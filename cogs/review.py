@@ -259,7 +259,7 @@ class Review(commands.Cog):
         except IndexError:  # handle legacy embed reviews
             try:
                 await ctx["member"].send("Toto review je zastaralé a již není podporováno")
-            except HttpException as e:
+            except discord.HttpException as e:
                 if e.code != 50007:
                     raise
             return
