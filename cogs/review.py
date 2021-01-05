@@ -256,6 +256,13 @@ class Review(commands.Cog):
         except ValueError:
             await ctx["message"].edit(content=messages.reviews_page_e, embed=None)
             return
+        except IndexError:  # handle legacy embed reviews
+            try:
+                await ctx["member"].send("Toto review je zastaralé a již není podporováno")
+            except HttpException as e:
+                if e.code != 50007:
+                    raise
+            return
         if ctx["emoji"] in ["◀", "▶", "⏪"]:
             next_page = utils.pagination_next(ctx["emoji"], page, max_page)
             if next_page:
