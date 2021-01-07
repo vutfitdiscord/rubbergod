@@ -9,6 +9,9 @@ from config import app_config as config, messages
 config = config.Config
 messages = messages.Messages
 
+def get_last_year_week_count():
+    last_week = date(date.today().year - 1, 12, 28)
+    return last_week.isocalendar()[1]
 
 class week(commands.Cog):
     def __init__(self, bot):
@@ -20,6 +23,11 @@ class week(commands.Cog):
         """See if the current week is odd or even"""
         cal_week = date.today().isocalendar()[1]
         stud_week = cal_week - config.starting_week
+
+        # correct for stud_week being negative after new year's
+        if stud_week < 0:
+            stud_week += get_last_year_week_count()
+
         even, odd = "sudý", "lichý"
         cal_type = even if cal_week % 2 == 0 else odd
         stud_type = even if stud_week % 2 == 0 else odd
