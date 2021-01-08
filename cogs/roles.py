@@ -119,12 +119,24 @@ class ReactToRole(commands.Cog):
                 await member.add_roles(role)
         for channel in channels:
             if channel is not None:
+                perms: discord.PermissionOverwrite = channel.overwrites_for(member)
+
+                if not perms.is_empty():
+                    deny_exp_perm = discord.Permissions()
+                    deny_exp_perm.view_channel = True
+
+                    perm_pair = perms.pair()
+                    if deny_exp_perm.value == perm_pair[1].value and perm_pair[0].value == 0:
+                        # User have only expected permission (Allow: None, Deny: view_channel).
+                        # This configuration will remove overwrite before checks and set.
+                        # This will prevent from removing higher permissions from channels (or bans).
+                        await channel.set_permissions(member, overwrite=None)
+
                 perms_for: discord.Permissions = channel.permissions_for(member)
                 if perms_for.administrator or perms_for.view_channel:  # Is mod, or now have access. Ignore
                     continue
 
-                perms = channel.overwrites_for(member)
-                if perms is not None:
+                if not perms.is_empty():
                     perms.read_messages = True
                     await channel.set_permissions(member, overwrite=perms)
                 else:
