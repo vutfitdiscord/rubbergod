@@ -119,9 +119,13 @@ class ReactToRole(commands.Cog):
                 await member.add_roles(role)
         for channel in channels:
             if channel is not None:
+                perms_for: discord.Permissions = channel.permissions_for(member)
+                if perms_for.administrator or perms_for.view_channel:  # Is mod, or now have access. Ignore
+                    continue
+
                 perms = channel.overwrites_for(member)
                 if perms is not None:
-                    perms.read_messages=True
+                    perms.read_messages = True
                     await channel.set_permissions(member, overwrite=perms)
                 else:
                     await channel.set_permissions(member, read_messages=True)
@@ -134,9 +138,13 @@ class ReactToRole(commands.Cog):
                 await member.remove_roles(role)
         for channel in channels:
             if channel is not None:
+                perms_for: discord.Permissions = channel.permissions_for(member)
+                if perms_for.administrator:  # Is useless create overwrite if user is moderator.
+                    continue
+
                 perms = channel.overwrites_for(member)
                 if perms is not None:
-                    perms.read_messages=False
+                    perms.read_messages = False
                     await channel.set_permissions(member, overwrite=perms)
                 else:
                     await channel.set_permissions(member, read_messages=False)
