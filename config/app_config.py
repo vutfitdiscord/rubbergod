@@ -76,6 +76,7 @@ class Config:
     dice_before_collation: int = get_attr("random", "dice_before_collation")
     max_dice_groups: int = get_attr("random", "max_dice_groups")
     max_dice_sides: int = get_attr("random", "max_dice_sides")
+    enable_room_check: bool = get_attr("random", "enable_room_check")
 
     # Karma
     karma_ban_role_id: int = get_attr("karma", "ban_role_id")

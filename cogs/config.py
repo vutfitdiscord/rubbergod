@@ -131,6 +131,11 @@ class DynamicConfig(commands.Cog):
                     value = tuple(list(attr) + value)
                 elif isinstance(attr, str):
                     value = " ".join(value)
+                elif isinstance(attr, bool):
+                    if value[0].lower() == "false":
+                        value = False
+                    else:
+                        value = True
                 elif isinstance(attr, int):
                     try:
                         value = int(value[0])
