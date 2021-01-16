@@ -49,7 +49,11 @@ class Random(commands.Cog):
         option = str(random.randint(first, second))
         await ctx.send(option)
 
-    async def cog_command_error(self, ctx, error):
+    @diceroll.error
+    @pick.error
+    @roll.error
+    @flip.error
+    async def command_error(self, ctx, error):
         if isinstance(error, (commands.MissingRequiredArgument, commands.BadArgument)):
             await ctx.send(f"{Config.default_prefix}{ctx.command.usage}")
         if isinstance(error, commands.CheckFailure):
