@@ -67,7 +67,7 @@ class Random(commands.Cog):
                 utils.fill_message("bot_room_redirect", user=ctx.message.author.id, bot_room=Config.bot_room)
             )
 
-    async def bot_check(self, ctx):
+    async def cog_check(self, ctx):
         if not Config.enable_room_check:
             return True
         return ctx.channel.id in Config.allowed_channels
