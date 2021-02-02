@@ -102,12 +102,12 @@ class Review(commands.Cog):
         if not await self.check_member(ctx):
             return
         if subject is None:
-            if utils.is_bot_admin():
+            if utils.is_bot_admin(ctx):
                 await ctx.send(messages.review_remove_format_admin)
             else:
                 await ctx.send(messages.review_remove_format)
         elif subject == "id":
-            if utils.is_bot_admin():
+            if utils.is_bot_admin(ctx):
                 if id is None:
                     await ctx.send(messages.review_remove_id_format)
                 else:
