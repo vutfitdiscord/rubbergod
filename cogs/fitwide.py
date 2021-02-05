@@ -26,7 +26,7 @@ class FitWide(commands.Cog):
         self.bot = bot
         self.verification = verification.Verification(bot, user_r)
 
-    async def is_in_modroom(ctx):
+    def is_in_modroom(ctx):
         return ctx.message.channel.id == config.mod_room
 
     @commands.Cog.listener()

@@ -14,18 +14,33 @@ class Help(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    def generate_pages(self):
+    def generate_pages(self, ctx):
+        """Generate pages for help. Including subcommands and applying commands checks"""
         pages = []
         prefix = config.default_prefix
         for name, cog in self.bot.cogs.items():
             current_page = dict()
             for command in cog.walk_commands():
-                if type(command) == commands.Group:
-                    key = f"{prefix}{command.name}"
-                    for subcommand in command.commands:
-                        current_page[f"{key} {subcommand.name}"] = subcommand.brief
-                elif not command.parent:
-                    current_page[f"{prefix}{command.name}"] = command.brief
+                for check in command.checks:
+                    try:
+                        if not check(ctx):
+                            break
+                    except Exception:
+                        break
+                else:
+                    if type(command) == commands.Group:
+                        key = f"{prefix}{command.name}"
+                        for subcommand in command.commands:
+                            for check in subcommand.checks:
+                                try:
+                                    if not check(ctx):
+                                        break
+                                except Exception:
+                                    break
+                            else:
+                                current_page[f"{key} {subcommand.name}"] = subcommand.brief
+                    elif not command.parent:
+                        current_page[f"{prefix}{command.name}"] = command.brief
             if current_page:
                 pages.append(current_page)
 
@@ -47,7 +62,7 @@ class Help(commands.Cog):
     async def help(self, ctx: commands.Context, command: str=""):
         page_num = 1
 
-        pages = self.generate_pages()
+        pages = self.generate_pages(ctx)
         embed = self.generate_embed(pages[0])
 
         pages_total = len(pages)
