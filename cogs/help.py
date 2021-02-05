@@ -47,20 +47,30 @@ class Help(commands.Cog):
         return pages
 
     def generate_embed(self, page):
-        embed = discord.Embed(title="Rubbergod",
-            description="Nejlepší a nejúžasnější bot ever.",
-            color=0xeee657,
-        )
-        embed.add_field(name="Autor", value="Toaster#1111")
+        embed = discord.Embed(title="Nápověda", color=0xeee657)
+        embed.set_thumbnail(url=self.bot.user.avatar_url)
         for key, value in page.items():
             embed.add_field(name=key, value=value, inline=False)
         return embed
 
 
-    @commands.cooldown(rate=2, per=60.0, type=commands.BucketType.user)
-    @commands.command(aliases=['god'], brief="Show this help")
+    @commands.cooldown(rate=2, per=30.0, type=commands.BucketType.user)
+    @commands.command(aliases=['god'], brief="Nápověda")
     async def help(self, ctx: commands.Context, command: str=""):
-        page_num = 1
+        # Subcommand help
+        if command:
+            command_obj = self.bot.get_command(command)
+            if not command_obj:
+                await ctx.send(f"Žádný příkaz jako `{command}` neexistuje.")
+            else:
+                if command_obj.help:
+                    await ctx.send(command_obj.help)
+                elif command_obj.brief:
+                    await ctx.send(command_obj.brief)
+            return
+
+        # General help
+        page_num = 0
 
         pages = self.generate_pages(ctx)
         embed = self.generate_embed(pages[0])
@@ -70,8 +80,8 @@ class Help(commands.Cog):
         commit = f"Commit {utils.git_hash()}"
         footer_text = commit
         if pages_total > 1:
-            footer_text = f"Page {page_num}/{pages_total} | {commit}"
-        embed.set_footer(text=footer_text, icon_url=self.bot.user.avatar_url)
+            footer_text = f"Strana {page_num + 1}/{pages_total} | {commit}"
+        embed.set_footer(text=footer_text, icon_url=ctx.author.avatar_url)
 
         message = await ctx.send(embed=embed)
 
@@ -116,7 +126,7 @@ class Help(commands.Cog):
             embed.clear_fields()
             for key, value in pages[page_num].items():
                 embed.add_field(name=key, value=value, inline=False)
-            embed.set_footer(text=f"Page {page_num + 1}/{pages_total} | {commit}")
+            embed.set_footer(text=f"Strana {page_num + 1}/{pages_total} | {commit}")
             await message.edit(embed=embed)
 
 
