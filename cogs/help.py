@@ -38,9 +38,10 @@ class Help(commands.Cog):
                                 except Exception:
                                     break
                             else:
-                                current_page[f"{key} {subcommand.name}"] = subcommand.brief
+                                key = f"{key} {subcommand.name} {subcommand.signature}"
+                                current_page[key] = subcommand.brief
                     elif not command.parent:
-                        current_page[f"{prefix}{command.name}"] = command.brief
+                        current_page[f"{prefix}{command.name} {command.signature}"] = command.brief
             if current_page:
                 pages.append(current_page)
 
@@ -54,7 +55,7 @@ class Help(commands.Cog):
         return embed
 
 
-    @commands.cooldown(rate=2, per=30.0, type=commands.BucketType.user)
+    @commands.cooldown(rate=2, per=20.0, type=commands.BucketType.user)
     @commands.command(aliases=['god'], brief="Nápověda")
     async def help(self, ctx: commands.Context, command: str=""):
         # Subcommand help
@@ -63,10 +64,17 @@ class Help(commands.Cog):
             if not command_obj:
                 await ctx.send(f"Žádný příkaz jako `{command}` neexistuje.")
             else:
+                # if command group, show all possible subcommands
+                if type(command_obj) == commands.Group:
+                    subcommands = [subcommand.name for subcommand in command_obj.commands]
+                    text = f"`{config.default_prefix}{command_obj.name} [{', '.join(subcommands)}]`"
+                else:
+                    text = f"`{config.default_prefix}{command_obj.name} {command_obj.signature}`"
                 if command_obj.help:
-                    await ctx.send(command_obj.help)
+                    text += f"\n{command_obj.help}"
                 elif command_obj.brief:
-                    await ctx.send(command_obj.brief)
+                    text += f"\n{command_obj.brief}"
+                await ctx.send(text)
             return
 
         # General help
