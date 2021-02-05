@@ -143,7 +143,7 @@ class NotHelperPlusError(commands.CommandError):
     """
 
 
-async def helper_plus(ctx):
+def helper_plus(ctx):
     allowed_roles = {Config.mod_role, Config.submod_role, Config.helper_role}
     for role in ctx.author.roles:
         if role.id in allowed_roles:
