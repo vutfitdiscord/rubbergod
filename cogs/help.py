@@ -16,10 +16,16 @@ class Help(commands.Cog):
 
     def generate_pages(self):
         pages = []
+        prefix = config.default_prefix
         for name, cog in self.bot.cogs.items():
             current_page = dict()
             for command in cog.walk_commands():
-                current_page[f"{config.default_prefix}{command.name}"] = command.brief
+                if type(command) == commands.Group:
+                    key = f"{prefix}{command.name}"
+                    for subcommand in command.commands:
+                        current_page[f"{key} {subcommand.name}"] = subcommand.brief
+                elif not command.parent:
+                    current_page[f"{prefix}{command.name}"] = command.brief
             if current_page:
                 pages.append(current_page)
 
