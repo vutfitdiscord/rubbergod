@@ -104,38 +104,35 @@ class Help(commands.Cog):
         while True:
 
             def check(reaction, user):
-                return (
-                    reaction.message.id == message.id
-                    and str(reaction.emoji) in ["⏪", "◀", "▶", "⏩"]
-                    and not user.bot
-                )
+                return reaction.message.id == message.id and not user.bot
 
             try:
                 reaction, user = await self.bot.wait_for("reaction_add", check=check, timeout=300.0)
             except asyncio.TimeoutError:
                 return
             emoji = str(reaction.emoji)
-            if emoji == "⏪":
-                page_num = 0
-            elif emoji == "◀":
-                page_num -= 1
-                if page_num < 0:
-                    page_num = pages_total - 1
-            elif emoji == "▶":
-                page_num += 1
-                if page_num >= pages_total:
+            if emoji in ["⏪", "◀", "▶", "⏩"] and user.id == ctx.author.id:
+                if emoji == "⏪":
                     page_num = 0
-            elif emoji == "⏩":
-                page_num = pages_total - 1
+                elif emoji == "◀":
+                    page_num -= 1
+                    if page_num < 0:
+                        page_num = pages_total - 1
+                elif emoji == "▶":
+                    page_num += 1
+                    if page_num >= pages_total:
+                        page_num = 0
+                elif emoji == "⏩":
+                    page_num = pages_total - 1
+                embed.clear_fields()
+                for key, value in pages[page_num].items():
+                    embed.add_field(name=key, value=value, inline=False)
+                embed.set_footer(text=f"Strana {page_num + 1}/{pages_total} | {commit}")
+                await message.edit(embed=embed)
             try:
                 await message.remove_reaction(emoji, user)
             except discord.errors.Forbidden:
                 pass
-            embed.clear_fields()
-            for key, value in pages[page_num].items():
-                embed.add_field(name=key, value=value, inline=False)
-            embed.set_footer(text=f"Strana {page_num + 1}/{pages_total} | {commit}")
-            await message.edit(embed=embed)
 
 
 def setup(bot):
