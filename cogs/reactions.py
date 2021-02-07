@@ -26,8 +26,6 @@ class Reaction(commands.Cog):
             cogs.append(self.bot.get_cog("Review"))
         if ctx["emoji"] == "📌":
             cogs.append(self.bot.get_cog("AutoPin"))
-        if ctx["message"].embeds and ctx["message"].embeds[0].title == "Rubbergod":
-            cogs.append(self.bot.get_cog("Base"))
         if ctx["channel"].id not in Config.role_channels:
             cogs.append(self.bot.get_cog("Karma"))
         else:
