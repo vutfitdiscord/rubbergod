@@ -28,35 +28,6 @@ class Base(commands.Cog):
         delta = now - boottime
         await ctx.send(utils.fill_message("uptime_message", boottime=str(boottime), uptime=str(delta)))
 
-    @commands.cooldown(rate=2, per=60.0, type=commands.BucketType.user)
-    @commands.command(aliases=["help"])
-    async def god(self, ctx):
-        embed = self.make_embed(1)
-
-        channel = await self.check.get_room(ctx.message)
-        if channel is not None and channel.id != config.bot_room:
-            try:
-                msg = await ctx.author.send(embed=embed)
-                await ctx.message.delete()
-            except discord.errors.Forbidden:
-                return
-        else:
-            msg = await ctx.send(embed=embed)
-
-        if len(messages.info) > 1:
-            await msg.add_reaction("◀")
-            await msg.add_reaction("▶")
-
-    async def hadle_reaction(self, ctx):
-        if ctx['emoji'] in ["◀", "▶"]:
-            page = int(ctx['message'].embeds[0].footer.text[5])
-            next_page = utils.pagination_next(ctx['emoji'], page, len(messages.info))
-            if next_page:
-                embed = self.make_embed(next_page)
-                await ctx['message'].edit(embed=embed)
-        if ctx['message'].guild: 
-            await ctx['message'].remove_reaction(ctx['emoji'], ctx['member'])
-
     def make_embed(self, page):
         embed = discord.Embed(title="Rubbergod",
                               description="Nejlepší a nejúžasnější bot ever.",
