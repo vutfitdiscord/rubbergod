@@ -193,8 +193,8 @@ def get_command_group_signature(ctx: commands.Context):
     return f"`{ctx.prefix}{ctx.command.name} [{', '.join(subcommands)}]`"
 
 
-def get_subcommand_signature(ctx: commands.Context):
+def get_command_signature(ctx: commands.Context):
     """Return signature of command in group
-    `?group subcommand [args]`
+    `?(group sub)command [args]`
     """
-    return f"{ctx.prefix}{ctx.command.parent.name} {ctx.command.name} {ctx.command.signature}"
+    return f"{ctx.prefix}{ctx.command} {ctx.command.signature}"
