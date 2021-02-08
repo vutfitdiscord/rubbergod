@@ -160,7 +160,7 @@ class Review(commands.Cog):
                     return
             await ctx.send(messages.subject_update_success)
 
-    @commands.command(aliases=["skratka", "zkratka", "wtf"])
+    @commands.command(aliases=["skratka", "zkratka", "wtf"], brief=messages.shorcut_brief)
     async def shortcut(self, ctx, shortcut=None):
         """Informations about subject specified by its shorcut"""
         if not shortcut:
@@ -187,14 +187,14 @@ class Review(commands.Cog):
         utils.add_author_footer(embed, ctx.author)
         await ctx.send(embed=embed)
 
-    @commands.command()
+    @commands.command(brief=messages.tierboard_brief, description=messages.tierboard_help)
     async def tierboard(self, ctx, type="V", sem="Z", year=""):
         """Board of suject based on average tier from reviews"""
         # TODO autochange sem based on week command?
         degree = None
         type = type.upper()
         if type == "HELP":
-            await ctx.send(messages.tierboard_help)
+            await ctx.send(f"`{utils.get_command_signature(ctx)}`\n{messages.tierboard_help}")
             return
         sem = sem.upper()
         for role in ctx.author.roles:

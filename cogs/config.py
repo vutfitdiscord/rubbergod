@@ -32,7 +32,7 @@ class DynamicConfig(commands.Cog):
         Dynamicaly change config values
         """
         if key is None or not value:
-            await ctx.send(utils.get_subcommand_signature(ctx))
+            await ctx.send(utils.get_command_signature(ctx))
             return
         await self.change_value(ctx, key, list(value), False)
 
@@ -81,7 +81,7 @@ class DynamicConfig(commands.Cog):
         Get value of specified key
         """
         if key is None:
-            await ctx.send(utils.get_subcommand_signature(ctx))
+            await ctx.send(utils.get_command_signature(ctx))
             return
         if not hasattr(Config, key) or key in Config.config_static:
             await ctx.send(Messages.config_wrong_key)
