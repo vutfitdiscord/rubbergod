@@ -47,9 +47,9 @@ class Messages:
             "(**{karma_pos_order}.**)\n" \
             "**{karma_neg}** negativní karmy " \
             "(**{karma_neg_order}.**)"
-    karma_brief = 'Vypíše karmu vaši, rozdanou a odebranou'
-    karma_stalk_brief = 'Vypíše karmu uživatele, karmu rozdanou a odebranou'
-    karma_message_brief = 'Zobrazí karmu získanou za zprávu'
+    karma_brief = 'Vypíše stav vaší karmy (vč. rozdané a odebrané)'
+    karma_stalk_brief = 'Vypíše karmu uživatele'
+    karma_message_brief = 'Zobrazí karmu za zprávu'
     karma_get_brief = 'Vrátí karma hodnotu emotu'
     karma_getall_brief = 'Vypíše, které emoty mají hodnotu 1 a -1'
     karma_give_brief = 'Přidá karmu uživateli'
@@ -291,7 +291,7 @@ class Messages:
 
     git_pull_brief = 'Stáhne aktuálni změny z repa'
 
-    cogs_brief = 'Vypíše zoznam načtených cogs'
+    cogs_brief = 'Vypíše seznam načtených cogs'
     cog_load_brief = 'Načte cog'
     cog_unload_brief = 'Odebere cog'
     cog_reload_brief = 'Znovu načte cog'
@@ -302,12 +302,12 @@ class Messages:
     cog_cannot_be_unloadable = 'Toto rozšíření `{cog}` je neodebratelné.'
     cog_reloaded = 'Rozšíření `{cog}` bylo načteno znovu.'
 
-    config_backup_brief = "Vytvoří záložní kopii configu v novém souboru"
-    config_get_brief = "Získa hodnotu z configu"
-    config_set_brief = "Nastaví hodnotu v configu"
-    config_append_brief = "Přidá hodnotu do pole v configu"
+    config_backup_brief = "Vytvoří záložní kopii konfigurace v novém souboru"
+    config_get_brief = "Získa hodnotu z konfigurace"
+    config_set_brief = "Nastaví hodnotu v konfiguraci"
+    config_append_brief = "Přidá hodnotu do pole v konfiguraci"
     config_load_brief = "Znovu načíta třídu zo souboru. Pro aplikováni změn je potřeba znovu načíst i cog"
-    config_list_brief = "Vypíše klíče configu"
+    config_list_brief = "Vypíše klíče konfigurace"
     config_updated = 'Config updated'
     config_loaded = 'Config loaded'
     config_wrong_key = 'Nesprávny klíč'
@@ -322,7 +322,7 @@ class Messages:
     channel_clone_help = f"{prefix}channel clone [source] [jméno]"
     channel_clone_done = "Kanál <#{id}> byl vytvořen."
 
-    warden_scan_brief = "Prohledá obrázky v aktuálním kanále a uložit je jako hash pre detekci repostu.\nlimit: [all | <int>]"
+    warden_scan_brief = "Prohledá obrázky v aktuálním kanále a uloží je jako hash pro detekci repostu.\nlimit: [all | <int>]"
 
     weather_brief = "Vypíše informace o počasí ve zvoleném městě"
 
