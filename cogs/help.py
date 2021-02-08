@@ -29,7 +29,11 @@ class Help(commands.Cog):
                         break
                 else:
                     if type(command) == commands.Group:
-                        key = f"{prefix}{command.name}"
+                        # group command without invoked subcommand is separate command
+                        # e.g. karma, reviews
+                        if command.usage:
+                            current_page[f"{prefix}{command.name} {command.signature}"] = command.brief
+                        key_prefix = f"{prefix}{command.name}"
                         for subcommand in command.commands:
                             for check in subcommand.checks:
                                 try:
@@ -38,7 +42,7 @@ class Help(commands.Cog):
                                 except Exception:
                                     break
                             else:
-                                key = f"{key} {subcommand.name} {subcommand.signature}"
+                                key = f"{key_prefix} {subcommand.name} {subcommand.signature}"
                                 current_page[key] = subcommand.brief
                     elif not command.parent:
                         current_page[f"{prefix}{command.name} {command.signature}"] = command.brief
