@@ -71,6 +71,10 @@ postgresql-contrib
 libpq-dev
 ```
 
+## Auto help generation
+
+We are using custom auto help function for our commands. Help is generated from command brief (used in help summary) and command description (used in command help). If group of commands is working without invoked subcommand, command usage should be specified to include in help function. (e.g. karma, reviews)
+
 ## Authors
 
 * [Matthew](https://github.com/matejsoroka)
