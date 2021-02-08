@@ -244,7 +244,7 @@ class ChannelManager(commands.Cog):
         if ctx.invoked_subcommand is None:
             await ctx.send(Messages.channel_help)
 
-    @channel.command(aliases=["cp"])
+    @channel.command(aliases=["cp"], brief=Messages.role_channel_copy_brief)
     async def copy(self, ctx, src: discord.TextChannel, dst: discord.TextChannel):
         """
         Copy permissions from src channel to dst.
@@ -254,7 +254,7 @@ class ChannelManager(commands.Cog):
             await dst.set_permissions(key, overwrite=src.overwrites[key])
         await ctx.send(Messages.channel_copy_done)
 
-    @channel.command()
+    @channel.command(brief=Messages.role_channel_clone_brief)
     async def clone(self, ctx, src: discord.TextChannel, name):
         """Clone channel with same permissions as src."""
         new = await src.clone(name=name)

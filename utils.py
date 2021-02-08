@@ -183,3 +183,18 @@ def get_emoji(guild: discord.Guild, name: str) -> Optional[discord.Emoji]:
 
 def get_username(user: Union[discord.User, discord.Member]) -> str:
     return discord.utils.escape_markdown(user.display_name).replace("@", "@ ")
+
+
+def get_command_group_signature(ctx: commands.Context):
+    """Return signature of group command
+    `?group [subcommand1, subcommand2]`
+    """
+    subcommands = [subcommand.name for subcommand in ctx.command.commands]
+    return f"`{ctx.prefix}{ctx.command.name} [{', '.join(subcommands)}]`"
+
+
+def get_subcommand_signature(ctx: commands.Context):
+    """Return signature of command in group
+    `?group subcommand [args]`
+    """
+    return f"{ctx.prefix}{ctx.command.parent.name} {ctx.command.name} {ctx.command.signature}"

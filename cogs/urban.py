@@ -88,7 +88,7 @@ class Urban(commands.Cog):
 
 
     @commands.cooldown(rate=5, per=20.0, type=commands.BucketType.user)
-    @commands.command()
+    @commands.command(brief=Messages.urban_brief)
     async def urban(self, ctx, *expression):
         if not len(expression):
             await ctx.send(Messages.urban_help)

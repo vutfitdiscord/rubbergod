@@ -98,7 +98,7 @@ class Karma(commands.Cog):
                 karma_r.karma_emoji_remove(ctx["message"].author, ctx["member"], ctx["emoji"].id)
 
     @commands.cooldown(rate=5, per=30.0, type=commands.BucketType.user)
-    @commands.group(pass_context=True)
+    @commands.group(brief=messages.karma_brief, usage=' ')
     async def karma(self, ctx: commands.Context):
         if ctx.invoked_subcommand is None:
             args = ctx.message.content.split()[1:]
@@ -109,21 +109,14 @@ class Karma(commands.Cog):
             else:
                 await ctx.send(utils.fill_message("karma_invalid_command", user=ctx.author.id))
 
-    @karma.command()
-    async def stalk(self, ctx, *args):
-        try:
-            converter = commands.MemberConverter()
-            target_member = await converter.convert(ctx=ctx, argument=" ".join(args))
-        except commands.errors.BadArgument:
-            await ctx.send(utils.fill_message("member_not_found", user=ctx.author.id))
-            return
-
-        await ctx.send(self.karma.karma_get(ctx.author, target_member))
+    @karma.command(brief=messages.karma_stalk_brief)
+    async def stalk(self, ctx, user: discord.Member):
+        await ctx.send(self.karma.karma_get(ctx.author, user))
         await self.check.botroom_check(ctx.message)
 
-    @karma.command()
+    @karma.command(brief=messages.karma_getall_brief)
     @commands.cooldown(rate=1, per=300.0, type=commands.BucketType.guild)
-    async def getall(self, ctx, *args):
+    async def getall(self, ctx):
         if not await self.check.guild_check(ctx.message):
             await ctx.send(messages.server_warning)
         else:
@@ -133,7 +126,7 @@ class Karma(commands.Cog):
             except discord.errors.Forbidden:
                 return
 
-    @karma.command()
+    @karma.command(brief=messages.karma_get_brief)
     @commands.cooldown(rate=4, per=30.0, type=commands.BucketType.user)
     async def get(self, ctx, *args):
         if not await self.check.guild_check(ctx.message):
@@ -145,7 +138,7 @@ class Karma(commands.Cog):
             except discord.errors.Forbidden:
                 return
 
-    @karma.command()
+    @karma.command(brief=messages.karma_revote_brief)
     @commands.check(utils.is_bot_admin)
     async def revote(self, ctx, *args):
         if not await self.check.guild_check(ctx.message):
@@ -161,7 +154,7 @@ class Karma(commands.Cog):
                 dc_vote_room = discord.utils.get(ctx.guild.channels, id=config.vote_room)
                 await ctx.send(utils.fill_message("vote_room_only", room=dc_vote_room))
 
-    @karma.command()
+    @karma.command(brief=messages.karma_vote_brief)
     @commands.check(utils.is_bot_admin)
     async def vote(self, ctx, *args):
         if not await self.check.guild_check(ctx.message):
@@ -177,29 +170,23 @@ class Karma(commands.Cog):
                 dc_vote_room = discord.utils.get(ctx.guild.channels, id=config.vote_room)
                 await ctx.send(utils.fill_message("vote_room_only", room=dc_vote_room))
 
-    @karma.command()
+    @karma.command(brief=messages.karma_give_brief)
     @commands.check(utils.is_bot_admin)
     async def give(self, ctx, *args):
         await self.karma.karma_give(ctx.message)
 
-    @karma.command()
-    async def message(self, ctx, *args):
+    @karma.command(brief=messages.karma_message_brief)
+    async def message(self, ctx, message: discord.Message):
         async with ctx.channel.typing():
-            try:
-                converter = commands.MessageConverter()
-                target_message = await converter.convert(ctx=ctx, argument=" ".join(args))
-            except commands.errors.BadArgument:
-                await ctx.send(utils.fill_message("karma_message_format", user=ctx.author.id))
-                return
-            await self.karma.message_karma(ctx, target_message)
+            await self.karma.message_karma(ctx, message)
 
-    @karma.command()
+    @karma.command(brief=messages.karma_transfer_brief)
     @commands.check(utils.is_bot_admin)
     async def transfer(self, ctx, *args):
         await self.karma.karma_transfer(ctx.message)
 
     @commands.cooldown(rate=2, per=30.0, type=commands.BucketType.user)
-    @commands.command()
+    @commands.command(brief=messages.karma_leaderboard_brief)
     async def leaderboard(self, ctx, start=1):
         if not await self.validate_leaderboard_offset(start, ctx):
             return
@@ -208,7 +195,7 @@ class Karma(commands.Cog):
         await self.check.botroom_check(ctx.message)
 
     @commands.cooldown(rate=2, per=30.0, type=commands.BucketType.user)
-    @commands.command()
+    @commands.command(brief=messages.karma_bajkarboard_brief)
     async def bajkarboard(self, ctx, start=1):
         if not await self.validate_leaderboard_offset(start, ctx):
             return
@@ -217,7 +204,7 @@ class Karma(commands.Cog):
         await self.check.botroom_check(ctx.message)
 
     @commands.cooldown(rate=2, per=30.0, type=commands.BucketType.user)
-    @commands.command()
+    @commands.command(brief=messages.karma_givingboard_brief)
     async def givingboard(self, ctx, start=1):
         if not await self.validate_leaderboard_offset(start, ctx):
             return
@@ -226,7 +213,7 @@ class Karma(commands.Cog):
         await self.check.botroom_check(ctx.message)
 
     @commands.cooldown(rate=2, per=30.0, type=commands.BucketType.user)
-    @commands.command()
+    @commands.command(brief=messages.karma_ishaboard_brief)
     async def ishaboard(self, ctx, start=1):
         if not await self.validate_leaderboard_offset(start, ctx):
             return
@@ -246,7 +233,14 @@ class Karma(commands.Cog):
     @vote.error
     @give.error
     @transfer.error
+    @stalk.error
+    @message.error
     async def karma_error(self, ctx, error):
+        if isinstance(error, commands.BadArgument):
+            if ctx.invoked_subcommand.name == 'stalk':
+                await ctx.send(utils.fill_message("member_not_found", user=ctx.author.id))
+            elif ctx.invoked_subcommand.name == 'message':
+                await ctx.send(utils.fill_message("karma_message_format", user=ctx.author.id))
         if isinstance(error, commands.CheckFailure):
             await ctx.send(utils.fill_message("insufficient_rights", user=ctx.author.id))
 

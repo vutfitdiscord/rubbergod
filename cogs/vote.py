@@ -7,6 +7,8 @@ from discord.ext.commands import BadArgument
 
 from features import vote
 
+from config.messages import Messages
+
 
 class DateConverter(commands.Converter):
     async def convert(self, ctx, argument):
@@ -36,7 +38,7 @@ class Vote(commands.Cog):
         self.handled = []
 
     @commands.cooldown(rate=5, per=20.0, type=commands.BucketType.user)
-    @commands.command(rest_is_raw=True)
+    @commands.command(rest_is_raw=True, description=Messages.vote_format, brief=Messages.vote_brief)
     async def vote(self, ctx, date: typing.Optional[DateConverter],
                    time: typing.Optional[TimeConverter], *, message):
         await self.voter.handle_vote(ctx, date, time, message)

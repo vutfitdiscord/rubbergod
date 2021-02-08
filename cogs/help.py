@@ -31,7 +31,7 @@ class Help(commands.Cog):
                     if type(command) == commands.Group:
                         # group command without invoked subcommand is separate command
                         # e.g. karma, reviews
-                        if command.usage:
+                        if command.usage is not None:
                             current_page[f"{prefix}{command.name} {command.signature}"] = command.brief
                         key_prefix = f"{prefix}{command.name}"
                         for subcommand in command.commands:
@@ -61,8 +61,9 @@ class Help(commands.Cog):
 
     @commands.cooldown(rate=2, per=20.0, type=commands.BucketType.user)
     @commands.command(aliases=['god'], brief="Nápověda")
-    async def help(self, ctx: commands.Context, command: str=""):
+    async def help(self, ctx: commands.Context, *command):
         # Subcommand help
+        command = ' '.join(command)
         if command:
             command_obj = self.bot.get_command(command)
             if not command_obj:
@@ -70,12 +71,15 @@ class Help(commands.Cog):
             else:
                 # if command group, show all possible subcommands
                 if type(command_obj) == commands.Group:
-                    subcommands = [subcommand.name for subcommand in command_obj.commands]
+                    subcommands = []
+                    if command_obj.usage is not None:
+                        subcommands.append(command_obj.usage.replace('[', '').replace(']', ''))
+                    subcommands += [subcommand.name for subcommand in command_obj.commands]
                     text = f"`{config.default_prefix}{command_obj.name} [{', '.join(subcommands)}]`"
                 else:
-                    text = f"`{config.default_prefix}{command_obj.name} {command_obj.signature}`"
-                if command_obj.help:
-                    text += f"\n{command_obj.help}"
+                    text = f"`{config.default_prefix}{command_obj} {command_obj.signature}`"
+                if command_obj.description:
+                    text += f"\n{command_obj.description}"
                 elif command_obj.brief:
                     text += f"\n{command_obj.brief}"
                 await ctx.send(text)

@@ -5,6 +5,7 @@ from discord.ext import commands
 
 from logic import roll_dice
 from config.app_config import Config
+from config.messages import Messages
 import utils
 
 # Logic (functionality used by features or rubbergod directly)
@@ -16,12 +17,12 @@ class Random(commands.Cog):
         self.bot = bot
 
     @commands.cooldown(rate=5, per=20.0, type=commands.BucketType.user)
-    @commands.command()
+    @commands.command(brief=Messages.random_diceroll_brief, description=Messages.rd_help)
     async def diceroll(self, ctx, *, arg=""):
         await ctx.send(roll_dice.roll_dice(arg))
 
     @commands.cooldown(rate=5, per=20.0, type=commands.BucketType.user)
-    @commands.command()
+    @commands.command(brief=Messages.random_pick_brief, usage=Messages.random_pick_usage)
     async def pick(self, ctx, *args):
         """"Pick an option"""
         for i, arg in enumerate(args):
@@ -36,12 +37,16 @@ class Random(commands.Cog):
             await ctx.send(f"{option} {ctx.author.mention}")
 
     @commands.cooldown(rate=5, per=20.0, type=commands.BucketType.user)
-    @commands.command()
+    @commands.command(brief=Messages.random_flip_brief)
     async def flip(self, ctx):
         await ctx.send(random.choice(["True", "False"]))
 
     @commands.cooldown(rate=5, per=20.0, type=commands.BucketType.user)
-    @commands.command(aliases=["random", "randint"], usage="roll x (y)")
+    @commands.command(
+        aliases=["random", "randint"],
+        brief=Messages.random_roll_brief,
+        description=Messages.rng_generator_format,
+    )
     async def roll(self, ctx, first: int, second: int = 0):
         if first > second:
             first, second = second, first

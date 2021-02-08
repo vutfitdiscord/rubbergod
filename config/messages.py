@@ -33,6 +33,9 @@ class Messages:
                         "<#{bot_room}>\n"
     covid_storno = "{user} <:WeirdChamp:680711174802899007>"
     uhoh_counter = "{uhohs} uh ohs od spuštění."
+    uhoh_brief = "Vypíše počet uh ohs od spuštění"
+
+    uptime_brief = "Vypíše čas spuštění a čas uplynulý od spuštění"
     uptime_message = "Up since:  `{boottime}`\nUptime:\t`{uptime}`"
 
     kachna_grillbot = "O Kachnu se teď stará Grillbot " \
@@ -44,6 +47,19 @@ class Messages:
             "(**{karma_pos_order}.**)\n" \
             "**{karma_neg}** negativní karmy " \
             "(**{karma_neg_order}.**)"
+    karma_brief = 'Vypíše karmu vaši, rozdanou a odebranou'
+    karma_stalk_brief = 'Vypíše karmu uživatele, karmu rozdanou a odebranou'
+    karma_message_brief = 'Zobrazí karmu získanou za zprávu'
+    karma_get_brief = 'Vrátí karma hodnotu emotu'
+    karma_getall_brief = 'Vypíše, které emoty mají hodnotu 1 a -1'
+    karma_give_brief = 'Přidá karmu uživateli'
+    karma_transfer_brief = 'Převede karmu z jednoho uživatele na druhého'
+    karma_vote_brief = 'Odstartuje hlasování o hodnotě zatím neohodnoceného emotu'
+    karma_revote_brief = 'Odstartuje hlasování o nové hodnotě emotu'
+    karma_leaderboard_brief = 'Karma leaderboard'
+    karma_bajkarboard_brief = 'Karma leaderboard reversed'
+    karma_givingboard_brief = 'Leaderboard rozdávání pozitivní karmy'
+    karma_ishaboard_brief = 'Leaderboard rozdávání negativní karmy'
 
     karma_invalid_command = "Neznámý karma příkaz."
     karma_vote_format = "Neočekávám žádný argument. " \
@@ -94,6 +110,14 @@ class Messages:
     role_not_on_server = "Nepíšeš na serveru, takže předpokládám, že myslíš role VUT FIT serveru."
     role_not_role = "{user}, {not_role} není role."
     role_invalid_emote = "{user}, {not_emote} pro roli {role} není emote."
+    role_channel_copy_brief = 'Zkopíruje opravnení z jednoho kanálu na druhý'
+    role_channel_clone_brief = 'Naklonuje kanál'
+
+    random_diceroll_brief = 'Všechno možné házení kostkami'
+    random_roll_brief = 'Vygeneruje náhodné celé číslo z intervalu <**first**, **second**>'
+    random_flip_brief = 'Hodí mincí'
+    random_pick_brief = 'Vybere jedno ze slov za otazníkem'
+    random_pick_usage = '*Is foo bar? Yes No Maybe*'
 
     rng_generator_format = f"Použití: `{prefix}roll x [y]`\n" \
                            "rozmezí x, y jsou celá čísla,\n" \
@@ -112,6 +136,8 @@ class Messages:
               "https://wiki.roll20.net/Dice_Reference\n" \
               "Implementovány featury podle obsahu: **8. Drop/Keep**"
 
+    get_code_brief = "Příkaz na získaní kódu pro verifikaci"
+    verify_brief = "Verifikace studenta"
     verify_already_verified = "{user} Už jsi byl verifikován " \
                               "({admin} pls)."
     verify_send_format = "Očekávám jeden argument. " \
@@ -148,6 +174,7 @@ class Messages:
                               "({admin} pls)."
     verify_verify_wrong_code = "{user} Špatný kód."
 
+    vote_brief = "Zahájí hlasování"
     vote_format = f"Použití vote:\n`{prefix}vote [datum] [čas] [otázka]\n[emoji] " \
                                     "[odpověď 1]\n[emoji] [odpověď 2]\na tak dále`\n" \
                                     "Datum je ve formátu `dd.MM.(yy)`." \
@@ -172,6 +199,13 @@ class Messages:
                   "„{winning_option}“ s {votes} hlasy."
     vote_result_multiple = "V hlasování „{question}“ vyhrály možnosti {winning_emojis} s {votes} hlasy."
     vote_result_none = "V hlasování „{question}“ nikdo nehlasoval. <:sadcat:576171980118687754>"
+
+    review_add_brief = 'Přidá recenzi na předmět'
+    review_get_brief = 'Vypíše recenze na vybraný předmět'
+    review_remove_brief = 'Odstraní hodnocení'
+    subject_add_biref = 'Manuálne přidá předmět/y do reviews databáze'
+    subject_remove_biref = 'Manuálne odebere předmět/y z reviews databáze'
+    subject_update_biref = 'Automaticky vyhledá a přidá předměty do reviews i subject databáze'
 
     review_format = f"{prefix}reviews [add, remove, zkratka předmětu]"
     review_add_format = f"{prefix}reviews add {{ZkratkaPredmetu}} {{Tier (0-4, 0 je TOP)}} (VolitelnyText)\n" \
@@ -213,7 +247,9 @@ class Messages:
                 "nech mě <:sadcat:576171980118687754>"]
 
     name_day_cz = "Dnes má svátek {name}"
+    name_day_cz_brief = "Vypíše, kdo má dnes svátek"
     name_day_sk = "Dnes má meniny {name}"
+    name_day_sk_brief = "Vypíše, kto má dnes meniny"
 
     repost_title = "Nápověda"
     repost_description = "{user}, shoda **{value}**!"
@@ -226,29 +262,38 @@ class Messages:
     absolvent_web_error = "Nepovedlo se ověřit obhájení kvalifikační práce pod uvedeným číslem na webu, jménem, typem práce a rokem obhájení (dle čísla diplomu)."
     absolvent_diploma_error = "Diplom (číslo a jméno) se nepovedlo na webu ověřit."
     absolvent_success = "Diplom byl úspěšne ověřen."
-    absolvent_help = "Příkaz pro ověření absolvování studia na FIT VUT - zadejte CASE-SENSITIVE údaje ve formátu:\n" \
+    absolvent_brief = "Příkaz pro ověření absolvování studia na FIT VUT"
+    absolvent_help = f"{absolvent_brief} - zadejte CASE-SENSITIVE údaje ve formátu:\n" \
         f"{prefix}{{command}} <Titul.> <Jméno> <Příjmení> <Číslo diplomu> <ID kvalifikační práce z URL na webu VUT <https://www.vutbr.cz/studenti/zav-prace> >\n" \
         "např: Bc. Josef Novák 123456/2019 135791\n" \
         "(při <https://www.vutbr.cz/studenti/zav-prace/detail/135791> nebo <https://www.vutbr.cz/studenti/zav-prace?zp_id=135791>)\n" \
         "Údaje slouží k jednorázovému ověření a nejsou nikam ukládány."
 
+    urban_brief = "Vyhledávaní výrazu v urban slovníku"
     urban_help = f"`{prefix}urban výraz`\nPříklad:\n`{prefix}urban sure`"
     urban_not_found = "Pro daný výraz neexistuje záznam <:sadcat:576171980118687754>"
 
     autopin_max_pins_error = "Byl dosažen maximální počet připnutých správ."
-    autopin_help = f"`{prefix}pin add {{jump_url}}` - Začne sledovat zprávu jako prioritní pin.\n" \
-        f"`{prefix}remove {{channel_mention}}` - Odebere sledování prioritního pinu."
+    autopin_add_brief = "Začne sledovat zprávu jako prioritní pin.\n"
     autopin_add_unknown_message = "Očekáváno URL zprávy"
     autopin_add_done = "Priorita pinu nastavena."
+    autopin_remove_brief = "Odebere sledování prioritního pinu."
     autopin_remove_not_exists = "V kanálu {channel_name} není nastavena prioritní zpráva pro piny."
     autopin_remove_done = "Priorita pinu odebrána."
     autopin_no_messages = "Ještě neexistuje žádné mapování."
+    autopin_list_brief = "Zobrazí všechny piny s nastevenou prioritou"
     autopin_list_unknown_channel = "> Neznámý kanál ({channel_id})"
     autopin_list_unknown_message = "> {channel} - Neznámá zpráva"
     autopin_list_item = "> {channel} - {url}"
 
     on_ready_message = "<:peepowave:693070888546861096>"
 
+    git_pull_brief = 'Stáhne aktuálni změny z repa'
+
+    cogs_brief = 'Vypíše zoznam načtených cogs'
+    cog_load_brief = 'Načte cog'
+    cog_unload_brief = 'Odebere cog'
+    cog_reload_brief = 'Znovu načte cog'
     cog_is_loaded = 'Toto rozšíření `{cog}` je již načtené.'
     cog_unloaded = 'Rozšíření `{cog}` odebráno.'
     cog_loaded = 'Rozšíření `{cog}` načteno.'
@@ -256,14 +301,17 @@ class Messages:
     cog_cannot_be_unloadable = 'Toto rozšíření `{cog}` je neodebratelné.'
     cog_reloaded = 'Rozšíření `{cog}` bylo načteno znovu.'
 
-    config_help = f'{prefix}config [get, list, set, append, load, backup]'
+    config_backup_brief = "Vytvoří záložní kopii configu v novém souboru"
+    config_get_brief = "Získa hodnotu z configu"
+    config_set_brief = "Nastaví hodnotu v configu"
+    config_append_brief = "Přidá hodnotu do pole v configu"
+    config_load_brief = "Znovu načíta třídu zo souboru. Pro aplikováni změn je potřeba znovu načíst i cog"
+    config_list_brief = "Vypíše klíče configu"
     config_updated = 'Config updated'
     config_loaded = 'Config loaded'
     config_wrong_key = 'Nesprávny klíč'
     config_wrong_type = 'Nesprávny typ'
     config_backup_created = 'Config backup created'
-    config_get_format = f'{prefix}config get [key]'
-    config_set_format = f'{prefix}config set [key] hodnota/y'
     config_append_format = f'{prefix}config append [key] hodnota/y'
     config_list_invalid_regex = 'Chybný regex\n`{regex_err}`'
 
@@ -273,27 +321,8 @@ class Messages:
     channel_clone_help = f"{prefix}channel clone [source] [jméno]"
     channel_clone_done = "Kanál <#{id}> byl vytvořen."
 
-    info = [[('karma', 'Vypíše karmu vaši, rozdanou a odebranou'),
-             ('karma stalk [user]', 'Vypíše karmu uživatele, karmu rozdanou a odebranou.'),
-             ('karma getall', 'Vypíše, které emoty mají hodnotu 1 a -1.'),
-             ('karma get [emote]', 'Vrátí karma hodnotu emotu.'),
-             ('karma vote', 'Odstartuje hlasování o hodnotě zatím neohodnoceného emotu.'),
-             ('karma revote [emote]', 'Odstartuje hlasování o nové hodnotě emotu.'),
-             ('karma message [url]', 'Zobrazí karmu získanou za zprávu')],
-            [('leaderboard [offset]', 'Karma leaderboard'),
-             ('bajkarboard [offset]', 'Karma leaderboard reversed'),
-             ('givingboard [offset]', 'Leaderboard rozdávání pozitivní karmy.'),
-             ('ishaboard [offset]', 'Leaderboard rozdávání negativní karmy.'),
-             (review_add_format[1:], 'Přidá recenzi na předmět.'),
-             (review_get_format[1:], 'Vypíše recenze na vybraný předmět.'),
-             (review_remove_format[1:], 'Odstraní hodnocení.'),
-             ('vote', 'Zahájí hlasování.')],
-            [('roll X Y', 'Vygeneruje náhodné celé číslo z intervalu <**X**, **Y**>.'),
-             ('flip', 'Hodí mincí'),
-             ('pick *Is foo bar? Yes No Maybe*', 'Vybere jedno ze slov za otazníkem.'),
-             ('diceroll', 'Všechno možné házení kostkami.'),
-             ('week', 'Vypíše, kolikátý je zrovna týden a jestli je sudý nebo lichý.'),
-             ('uhoh', 'Vypíše počet uh ohs od spuštění.'),
-             ('uptime', 'Vypíše čas spuštění a čas uplynulý od spuštění.'),
-             ('kachna', 'Vypíše čas do otevření kachny.'),
-             ('god', 'Vypíše tuto zprávu.')]]
+    warden_scan_brief = "Prohledá obrázky v aktuálním kanále a uložit je jako hash pre detekci repostu.\nlimit: [all | <int>]"
+
+    weather_brief = "Vypíše informace o počasí ve zvoleném městě"
+
+    week_brief = "Vypíše, kolikátý je zrovna týden a jestli je sudý nebo lichý"

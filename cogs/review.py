@@ -39,7 +39,7 @@ class Review(commands.Cog):
         return True
 
     @commands.cooldown(rate=5, per=20.0, type=commands.BucketType.user)
-    @commands.group(aliases=["review"])
+    @commands.group(aliases=["review"], brief=messages.review_get_brief, usage="[subject]")
     async def reviews(self, ctx):
         """Group of commands for reviews.
         If not subcommand is invoked, try to find subject reviews specified by first argument
@@ -69,7 +69,7 @@ class Review(commands.Cog):
                     await msg.add_reaction("🔼")
                     await msg.add_reaction("🔽")
 
-    @reviews.command()
+    @reviews.command(brief=messages.review_add_brief)
     async def add(self, ctx, subject=None, tier: int = None, *args):
         """Add new review for `subject`"""
         if not await self.check_member(ctx):
@@ -94,7 +94,7 @@ class Review(commands.Cog):
         else:
             await ctx.send(messages.review_added)
 
-    @reviews.command()
+    @reviews.command(brief=messages.review_remove_brief)
     async def remove(self, ctx, subject=None, id: int = None):
         """Remove review from DB. User is just allowed to remove his own review
         For admin it is possible to use 'id' as subject shorcut and delete review by its ID
@@ -131,7 +131,7 @@ class Review(commands.Cog):
             await ctx.send(messages.subject_format)
             return
 
-    @subject.command(name="add")
+    @subject.command(name="add", brief=messages.subject_add_biref)
     async def subject_add(self, ctx, *subjects):
         """Manually adding subjects to DB"""
         for subject in subjects:
@@ -139,7 +139,7 @@ class Review(commands.Cog):
             review_repo.add_subject(subject)
         await ctx.send(f"Zkratky `{subjects}` byli přidány.")
 
-    @subject.command(name="remove")
+    @subject.command(name="remove", brief=messages.subject_remove_biref)
     async def subject_remove(self, ctx, *subjects):
         """Manually removing subjects to DB"""
         for subject in subjects:
@@ -147,7 +147,7 @@ class Review(commands.Cog):
             review_repo.get_subject(subject).delete()
         await ctx.send(f"Zkratky `{subjects}` byli odebrány.")
 
-    @subject.command()
+    @subject.command(brief=messages.subject_update_biref)
     async def update(self, ctx):
         """Updates subjects from web"""
         async with ctx.channel.typing():

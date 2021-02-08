@@ -2,6 +2,7 @@ from discord.ext import commands
 from features.git import Git
 from discord.message import Message
 import utils
+from config.messages import Messages
 
 
 class System(commands.Cog):
@@ -15,7 +16,7 @@ class System(commands.Cog):
     async def git(self, ctx: commands.Context):
         pass
 
-    @git.command()
+    @git.command(brief=Messages.git_pull_brief)
     @commands.check(utils.is_bot_admin)
     async def pull(self, ctx: commands.Context):
         message: Message = await ctx.send("Pulling")
@@ -28,7 +29,7 @@ class System(commands.Cog):
         for part in pull_parts[1:]:
             await ctx.send(f"```{part}```")
 
-    @commands.command()
+    @commands.command(brief=Messages.cog_load_brief)
     @commands.check(utils.is_bot_admin)
     async def load(self, ctx: commands.Context, extension: str):
         """Load cog"""
@@ -38,7 +39,7 @@ class System(commands.Cog):
         except Exception as e:
             await ctx.send(f"Loading error\n`{e}`")
 
-    @commands.command()
+    @commands.command(brief=Messages.cog_unload_brief)
     @commands.check(utils.is_bot_admin)
     async def unload(self, ctx: commands.Context, extension: str):
         """Unload cog"""
@@ -52,7 +53,7 @@ class System(commands.Cog):
         except Exception as e:
             await ctx.send(f"Unloading error\n`{e}`")
 
-    @commands.command()
+    @commands.command(brief=Messages.cog_reload_brief)
     @commands.check(utils.is_bot_admin)
     async def reload(self, ctx: commands.Context, extension: str):
         """Reload cog"""
@@ -62,7 +63,7 @@ class System(commands.Cog):
         except Exception as e:
             await ctx.send(f"Reloading error\n`{e}`")
 
-    @commands.command(aliases=["extensions"])
+    @commands.command(aliases=["extensions"], brief=Messages.cogs_brief)
     @commands.check(utils.is_bot_admin)
     async def cogs(self, ctx: commands.Context):
         """Return loaded cogs"""
