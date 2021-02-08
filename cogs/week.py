@@ -15,7 +15,7 @@ class week(commands.Cog):
         self.bot = bot
 
     @commands.cooldown(rate=2, per=20.0, type=commands.BucketType.user)
-    @commands.command(aliases=["tyden", "týden", "tyzden", "týždeň"])
+    @commands.command(aliases=["tyden", "týden", "tyzden", "týždeň"], brief=messages.week_brief)
     async def week(self, ctx: commands.Context):
         """See if the current week is odd or even"""
         cal_week = date.today().isocalendar()[1]

@@ -18,7 +18,11 @@ class Absolvent(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command(aliases=["absolvent"])
+    @commands.command(
+        aliases=["absolvent"],
+        brief=Messages.absolvent_brief,
+        description=utils.fill_message("absolvent_help", command="diplom")
+    )
     async def diplom(self, ctx, degree, name, surname, diploma_number, thesis_web_id):
         """Command for diploma verification and honourable role addition
 

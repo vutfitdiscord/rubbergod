@@ -26,7 +26,7 @@ class AutoPin(commands.Cog):
         if ctx.invoked_subcommand is None:
             await ctx.send(Messages.autopin_help)
 
-    @pin.command()
+    @pin.command(brief=Messages.autopin_add_brief)
     async def add(self, ctx: commands.Context, message_url: str):
         try:
             converter = commands.MessageConverter()
@@ -42,7 +42,7 @@ class AutoPin(commands.Cog):
             await ctx.send(Messages.autopin_add_unknown_message)
             return
 
-    @pin.command()
+    @pin.command(brief=Messages.autopin_remove_brief)
     async def remove(self, ctx: commands.Context, channel: discord.TextChannel = None):
         if channel is None:
             channel = ctx.channel
@@ -54,7 +54,7 @@ class AutoPin(commands.Cog):
         self.repo.remove_channel(str(channel.id))
         await ctx.send(Messages.autopin_remove_done)
 
-    @pin.command(aliases=["list"])
+    @pin.command(aliases=["list"], brief=Messages.autopin_list_brief)
     async def get_list(self, ctx: commands.Context):
         mappings: List[PinMap] = self.repo.get_mappings()
 

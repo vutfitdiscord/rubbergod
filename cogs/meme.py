@@ -51,12 +51,12 @@ class Meme(commands.Cog):
                 file=discord.File(f"images/{image}", filename=image),
             )
 
-    @commands.command()
+    @commands.command(brief=messages.uhoh_brief)
     async def uhoh(self, ctx):
         await ctx.send(utils.fill_message("uhoh_counter", uhohs=uhoh_counter))
 
     @commands.cooldown(rate=5, per=20.0, type=commands.BucketType.user)
-    @commands.command(name="??")
+    @commands.command(name="??", brief="???")
     async def question(self, ctx):
         await ctx.send(choice(messages.question))
 

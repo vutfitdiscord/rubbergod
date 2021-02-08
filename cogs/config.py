@@ -24,19 +24,19 @@ class DynamicConfig(commands.Cog):
         Group of commands for dynamicaly changing config
         """
         if ctx.invoked_subcommand is None:
-            await ctx.send(Messages.config_help)
+            await ctx.send(utils.get_command_group_signature(ctx))
 
-    @config.command(name="set")
+    @config.command(name="set", brief=Messages.config_set_brief)
     async def set_value(self, ctx, key=None, *value):
         """
         Dynamicaly change config values
         """
         if key is None or not value:
-            await ctx.send(Messages.config_set_format)
+            await ctx.send(utils.get_subcommand_signature(ctx))
             return
         await self.change_value(ctx, key, list(value), False)
 
-    @config.command()
+    @config.command(brief=Messages.config_append_brief)
     async def append(self, ctx, key=None, *value):
         """
         Append value(s) to existing config
@@ -47,7 +47,7 @@ class DynamicConfig(commands.Cog):
             return
         await self.change_value(ctx, key, list(value), True)
 
-    @config.command()
+    @config.command(brief=Messages.config_load_brief)
     async def load(self, ctx):
         """
         Load config from `config.toml`
@@ -57,7 +57,7 @@ class DynamicConfig(commands.Cog):
         Config = Config_module.Config()
         await ctx.send(Messages.config_loaded)
 
-    @config.command(name="list")
+    @config.command(name="list", brief=Messages.config_list_brief)
     async def list_all(self, ctx, regex=None):
         if regex is not None:
             try:
@@ -75,13 +75,13 @@ class DynamicConfig(commands.Cog):
         output += "```"
         await ctx.send(output)
 
-    @config.command()
+    @config.command(brief=Messages.config_get_brief)
     async def get(self, ctx, key=None):
         """
         Get value of specified key
         """
         if key is None:
-            await ctx.send(Messages.config_get_format)
+            await ctx.send(utils.get_subcommand_signature(ctx))
             return
         if not hasattr(Config, key) or key in Config.config_static:
             await ctx.send(Messages.config_wrong_key)
@@ -90,7 +90,7 @@ class DynamicConfig(commands.Cog):
         embed = discord.Embed(title=key, description=str(value))
         await ctx.send(embed=embed)
 
-    @config.command()
+    @config.command(brief=Messages.config_backup_brief)
     async def backup(self, ctx):
         """
         Create backup from current config. Backup filename will contain current date.
