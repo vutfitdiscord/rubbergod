@@ -1,4 +1,5 @@
 import datetime
+import math
 from sqlalchemy import func, desc, asc
 
 from repository.base_repository import BaseRepository
@@ -96,8 +97,8 @@ class ReviewRepository(BaseRepository):
         session.merge(subject)
         session.commit()
 
-    def get_tierboard(self, type, sem, degree, year, offset=0):
-        subquery = (
+    def gen_tierboard_subquery(self, type, sem, degree, year):
+        return (
             session.query(Subject.reviews, Subject_details, func.avg(Review.tier).label("avg_tier"))
             .outerjoin(Subject.reviews)
             .group_by(Subject)
@@ -110,6 +111,9 @@ class ReviewRepository(BaseRepository):
             .filter(Subject_details.year.contains(year))
             .subquery()
         )
+
+    def get_tierboard(self, type, sem, degree, year, offset=0):
+        subquery = self.gen_tierboard_subquery(type, sem, degree, year)
         return (
             session.query(subquery.c.shortcut, subquery.c.avg_tier)
             .filter(subquery.c.avg_tier != None)
@@ -118,6 +122,15 @@ class ReviewRepository(BaseRepository):
             .limit(10)
             .all()
         )
+
+    def get_tierboard_page_count(self, type, sem, degree, year):
+        subquery = self.gen_tierboard_subquery(type, sem, degree, year)
+        return math.ceil((
+            session.query(subquery.c.shortcut, subquery.c.avg_tier)
+            .filter(subquery.c.avg_tier != None)
+            .order_by(asc("avg_tier"))
+            .count()
+        )/10)
 
     def set_subject_details(self, shortcut, name, credits, semester, end, card, type, for_year, degree):
         subject = Subject_details(

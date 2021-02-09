@@ -3,6 +3,7 @@ import discord
 import datetime
 from discord.ext import commands
 import requests
+import asyncio
 
 from config import app_config as config, messages
 from repository import review_repo
@@ -193,10 +194,11 @@ class Review(commands.Cog):
         # TODO autochange sem based on week command?
         degree = None
         type = type.upper()
-        if type == "HELP":
+        sem = sem.upper()
+        if type == "HELP" or sem not in ['V', 'L'] or type not in ['P', 'PVT', 'PVA', 'V']:
             await ctx.send(f"`{utils.get_command_signature(ctx)}`\n{messages.tierboard_help}")
             return
-        sem = sem.upper()
+
         for role in ctx.author.roles:
             if "BIT" in role.name:
                 degree = "BIT"
@@ -225,14 +227,56 @@ class Review(commands.Cog):
             cnt += 1
         embed = discord.Embed(title="Tierboard", description=output)
         embed.timestamp = datetime.datetime.now(tz=datetime.timezone.utc)
-        embed.add_field(name="Semester", value=sem)
         embed.add_field(name="Typ", value=type)
+        embed.add_field(name="Semester", value=sem)
         if year:
             degree = year
         embed.add_field(name="Program", value=degree)
 
         utils.add_author_footer(embed, ctx.author, additional_text=("?tierboard help",))
-        await ctx.send(embed=embed)
+        msg = await ctx.send(embed=embed)
+        await msg.add_reaction("⏪")
+        await msg.add_reaction("◀")
+        await msg.add_reaction("▶")
+        
+        page_num = 0
+        pages_total = review_repo.get_tierboard_page_count(type, sem, degree, year)
+        while True:
+
+            def check(reaction, user):
+                return reaction.message.id == msg.id and not user.bot
+
+            try:
+                reaction, user = await self.bot.wait_for("reaction_add", check=check, timeout=300.0)
+            except asyncio.TimeoutError:
+                return
+            emoji = str(reaction.emoji)
+            if emoji in ["⏪", "◀", "▶"] and user.id == ctx.author.id:
+                if emoji == "⏪":
+                    page_num = 0
+                elif emoji == "◀":
+                    page_num -= 1
+                    if page_num < 0:
+                        page_num = pages_total - 1
+                elif emoji == "▶":
+                    page_num += 1
+                    if page_num >= pages_total:
+                        page_num = 0
+
+                offset = page_num * 10
+                board = review_repo.get_tierboard(type, sem, degree, year, offset)
+                output = ""
+                cnt = 1 + offset
+                for line in board:
+                    output += f"{cnt} - **{line.shortcut}**: {round(line.avg_tier, 1)}\n"
+                    cnt += 1
+                embed.description = output
+                await msg.edit(embed=embed)
+            try:
+                await msg.remove_reaction(emoji, user)
+            except discord.errors.Forbidden:
+                pass
+
 
     @reviews.error
     @subject.error
@@ -414,7 +458,7 @@ class Review_helper:
 
     def add_review(self, author_id, subject, tier, anonym, text):
         """Add new review, if review with same author and subject exists -> update"""
-        if not review_repo.get_subject(subject):
+        if not review_repo.get_subject(subject).first():
             return False
         update = review_repo.get_review_by_author_subject(author_id, subject)
         if update:
