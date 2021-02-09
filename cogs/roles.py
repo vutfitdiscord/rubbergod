@@ -1,5 +1,6 @@
 import discord
 from discord.ext import commands
+from typing import Union
 
 import utils
 from config.app_config import Config
@@ -245,7 +246,7 @@ class ChannelManager(commands.Cog):
             await ctx.send(Messages.channel_help)
 
     @channel.command(aliases=["cp"], brief=Messages.role_channel_copy_brief)
-    async def copy(self, ctx, src: discord.TextChannel, dst: discord.TextChannel):
+    async def copy(self, ctx, src: Union[discord.TextChannel, discord.VoiceChannel], dst: Union[discord.TextChannel, discord.VoiceChannel]):
         """
         Copy permissions from src channel to dst.
         Both channels are expected as tags or IDs
@@ -255,7 +256,7 @@ class ChannelManager(commands.Cog):
         await ctx.send(Messages.channel_copy_done)
 
     @channel.command(brief=Messages.role_channel_clone_brief)
-    async def clone(self, ctx, src: discord.TextChannel, name):
+    async def clone(self, ctx, src: Union[discord.TextChannel, discord.VoiceChannel], name):
         """Clone channel with same permissions as src."""
         new = await src.clone(name=name)
         await ctx.send(utils.fill_message("channel_clone_done", id=new.id))
@@ -269,6 +270,9 @@ class ChannelManager(commands.Cog):
                 await ctx.send(Messages.channel_copy_help)
             elif "clone" in ctx.invoked_subcommand.name:
                 await ctx.send(Messages.channel_clone_help)
+        else:
+            # channel not found
+            await ctx.send(error)
 
 
 def setup(bot):
