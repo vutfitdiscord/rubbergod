@@ -24,7 +24,7 @@ class Error(commands.Cog):
             return
 
         if isinstance(error, commands.UserInputError):
-            await ctx.send("Chyba ve vstupu")
+            await ctx.send("Chyba ve vstupu, jestli vstup obsahuje `\"` nahraď je za `'`")
             return
 
         if isinstance(error, commands.CommandNotFound):
