@@ -2,6 +2,7 @@ import random
 import smtplib
 import ssl
 import string
+import re
 
 import discord
 from discord import Member
@@ -128,44 +129,37 @@ class Verification(BaseFeature):
     @staticmethod
     def transform_year(raw_year: str):
         """Parses year string originally from /etc/passwd into a role name"""
-        raw_year_parts = raw_year.split()
-        year = None
 
         if raw_year.lower() == "dropout":
             return "Dropout"
 
-        if len(raw_year_parts) == 3:
-            if raw_year_parts[0] == "FIT":
-                raw_year_parts[2] = int(raw_year_parts[2][:-1])  # rip types
-                if raw_year_parts[1] == "BIT" or raw_year_parts[1] == "BITP":
-                    year = "BIT"
-                    if raw_year_parts[2] < 4:
-                        year = str(raw_year_parts[2]) + year
-                    else:
-                        year = "4BIT+"
-                elif raw_year_parts[1] in ["MBS", "MBI", "MIS", "MIN",
-                                           "MMI", "MMM", "MGM", "MGMe",
-                                           "MPV", "MSK", "NADE", "NBIO",
-                                           "NGRI", "NNET", "NVIZ", "NCPS",
-                                           "NSEC", "NEMB", "NHPC", "NISD",
-                                           "NIDE", "NISY", "NMAL", "NMAT",
-                                           "NSEN", "NVER", "NSPE", "MGH"]:
-                    year = "MIT"  # MGH is also Erasmus
-                    if raw_year_parts[2] < 3:
-                        year = str(raw_year_parts[2]) + year
-                    else:
-                        year = "3MIT+"
-                elif raw_year_parts[1] in ["DVI4", "DRH"]:
-                    year = "PhD+"
-                elif raw_year_parts[1] in ["BCH", "CZV"]:
-                    year = "1BIT"  # TODO: fix erasmus students (BCH)
-        elif raw_year_parts[0] == "FEKT":
-            year = "VUT"
-        elif len(raw_year_parts) == 1:
-            if raw_year_parts[0] == "MUNI":
-                year = "MUNI"
+        year_parts = list(filter(lambda x: len(x.strip()) > 0, raw_year.split()))
 
-        return year
+        if year_parts[0] == "FIT":  # FIT student, or some VUT student.
+            #  ['FIT']                 ['FIT', '1r'], ...
+            if len(year_parts) == 1 or len(year_parts) != 3:
+                return "VUT"  # TODO: Is this only NON FIT? or this role have fit person?
+
+            year_value_match = re.search(r'(\d*)r', year_parts[2])
+            year_value = int(year_value_match.group(1))
+
+            if year_parts[1] in ["BIT", "BITP"]:
+                return "4BIT+" if year_value >= 4 else f"{year_value}BIT"
+            elif year_parts[1] in ["BCH", "CZV"]:
+                return "1BIT" # TODO: fix erasmus students (BCH)
+            elif year_parts[1] in ["MBS", "MBI", "MIS", "MIN", "MMI", "MMM", "MGM", "MGMe",
+                                   "MPV", "MSK", "NADE", "NBIO", "NGRI", "NNET", "NVIZ", "NCPS",
+                                   "NSEC", "NEMB", "NHPC", "NISD", "NIDE", "NISY", "NMAL", "NMAT",
+                                   "NSEN", "NVER", "NSPE", "MGH"]:
+                return '3MIT+' if year_value >= 3 else f'{year_value}MIT'
+            elif year_parts[1] in ["DVI4", "DRH"]:
+                return 'PhD+'
+        elif "FEKT" in year_parts:  # FEKT student
+            return "VUT"
+        elif len(year_parts) == 1 and year_parts[0] == "MUNI":  # Maybe MUNI?
+            return "MUNI"
+
+        return None
 
     async def verify(self, message):
         """"Verify if VUT login is from database"""
@@ -210,12 +204,9 @@ class Verification(BaseFeature):
                 year = self.transform_year(new_user.year)
 
                 if year is None:
-                    await message.channel.send(utils.fill_message(
-                        "verify_verify_manual",
-                        user=message.author.id,
-                        admin=Config.admin_ids[0],
-                        year=str(new_user.year)
-                    ))
+                    msg = utils.fill_message("verify_verify_manual", user=message.author.id,
+                                             admin=Config.admin_ids[0], year=str(new_user.year))
+                    await message.channel.send(msg)
 
                     await self.log_verify_fail(message, 'Verify (with code) (Invalid year)')
                     return
