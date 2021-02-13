@@ -56,7 +56,7 @@ class Verification(BaseFeature):
         self.repo.save_sent_code(login, code)
 
         await message.channel.send(utils.fill_message("verify_send_success",
-                                   user=message.author.id, mail=mail_postfix))
+                                                      user=message.author.id, mail=mail_postfix))
 
     async def send_code(self, message):
         if len(str(message.content).split(" ")) != 2:
@@ -73,7 +73,7 @@ class Verification(BaseFeature):
                 guild = self.bot.get_guild(Config.guild_id)
                 fp = await guild.fetch_emoji(585915845146968093)
                 await message.channel.send(utils.fill_message("verify_send_dumbshit",
-                                           user=message.author.id, emote=str(fp)))
+                                                              user=message.author.id, emote=str(fp)))
                 return
             if login[0] == 'x':
                 # VUT
@@ -83,30 +83,21 @@ class Verification(BaseFeature):
                                                       "@stud.fit.vutbr.cz")
                 else:
                     await message.channel.send(utils.fill_message("verify_send_not_found",
-                                               user=message.author.id, admin=Config.admin_ids[0]))
+                                                                  user=message.author.id,
+                                                                  admin=Config.admin_ids[0]))
 
-                    embed = discord.Embed(title="Neúspěšný pokus o verify",
-                                          color=0xeee657)
-                    embed.add_field(name="User", value=utils.generate_mention(message.author.id))
-                    embed.add_field(name="Message",
-                                    value=message.content, inline=False)
-                    channel = self.bot.get_channel(Config.log_channel)
-                    await channel.send(embed=embed)
+                    await self.log_verify_fail(message, 'getcode (xlogin)')
             else:
                 # MUNI
                 try:
                     int(login)
                 except ValueError:
-                    await message.channel.send(utils.fill_message("verify_send_not_found",
-                                               user=message.author.id, admin=Config.admin_ids[0]))
+                    msg = utils.fill_message("verify_send_not_found", user=message.author.id,
+                                             admin=Config.admin_ids[0])
+                    await message.channel.send(msg)
 
-                    embed = discord.Embed(title="Neúspěšný pokus o verify",
-                                          color=0xeee657)
-                    embed.add_field(name="User", value=utils.generate_mention(message.author.id))
-                    embed.add_field(name="Message",
-                                    value=message.content, inline=False)
-                    channel = self.bot.get_channel(Config.log_channel)
-                    await channel.send(embed=embed)
+                    self.log_verify_fail(message, 'getcode (MUNI)')
+
                     try:
                         await message.delete()
                         return
@@ -122,18 +113,13 @@ class Verification(BaseFeature):
                                                       "@mail.muni.cz")
                 else:
                     await message.channel.send(utils.fill_message("verify_send_not_found",
-                                               user=message.author.id, admin=Config.admin_ids[0]))
+                                                                  user=message.author.id,
+                                                                  admin=Config.admin_ids[0]))
 
-                    embed = discord.Embed(title="Neúspěšný pokus o verify",
-                                          color=0xeee657)
-                    embed.add_field(name="User", value=utils.generate_mention(message.author.id))
-                    embed.add_field(name="Message",
-                                    value=message.content, inline=False)
-                    channel = self.bot.get_channel(Config.log_channel)
-                    await channel.send(embed=embed)
+                    await self.log_verify_fail(message, 'getcode (MUNI) - Verified')
         else:
             await message.channel.send(utils.fill_message("verify_already_verified",
-                                       user=message.author.id, admin=Config.admin_ids[0]))
+                                                          user=message.author.id, admin=Config.admin_ids[0]))
         try:
             await message.delete()
         except discord.errors.HTTPException:
@@ -199,14 +185,14 @@ class Verification(BaseFeature):
                 guild = self.bot.get_guild(Config.guild_id)
                 fp = await guild.fetch_emoji(585915845146968093)
                 await message.channel.send(utils.fill_message("verify_send_dumbshit",
-                                           user=message.author.id, emote=str(fp)))
+                                                              user=message.author.id, emote=str(fp)))
                 return
             # Same here
             if code == "kód" or code == "[kód]":
                 guild = self.bot.get_guild(Config.guild_id)
                 fp = await guild.fetch_emoji(585915845146968093)
                 await message.channel.send(utils.fill_message("verify_verify_dumbshit",
-                                           user=message.author.id, emote=str(fp)))
+                                                              user=message.author.id, emote=str(fp)))
                 return
 
             new_user = self.repo.get_user(login)
@@ -215,14 +201,9 @@ class Verification(BaseFeature):
                 # Check the code
                 if code != new_user.code:
                     await message.channel.send(utils.fill_message("verify_verify_wrong_code",
-                                               user=message.author.id))
-                    embed = discord.Embed(title="Neúspěšný pokus o verify (kód)",
-                                          color=0xeee657)
-                    embed.add_field(name="User", value=utils.generate_mention(message.author.id))
-                    embed.add_field(name="Message",
-                                    value=message.content, inline=False)
-                    channel = self.bot.get_channel(Config.log_channel)
-                    await channel.send(embed=embed)
+                                                                  user=message.author.id))
+
+                    await self.log_verify_fail(message, 'Verify (with code)')
                     return
 
                 # Try and transform the year into the role name
@@ -234,31 +215,20 @@ class Verification(BaseFeature):
                         user=message.author.id,
                         admin=Config.admin_ids[0],
                         year=str(new_user.year)
-                        )
-                    )
+                    ))
 
-                    embed = discord.Embed(title="Neúspěšný pokus o verify (manuál)",
-                                          color=0xeee657)
-                    embed.add_field(name="User", value=utils.generate_mention(message.author.id))
-                    embed.add_field(name="Message",
-                                    value=message.content, inline=False)
-                    channel = self.bot.get_channel(Config.log_channel)
-                    await channel.send(embed=embed)
+                    await self.log_verify_fail(message, 'Verify (with code) (Invalid year)')
                     return
 
                 try:
                     # Get server verify role
-                    verify = discord.utils.get(
-                        message.guild.roles,
-                        name=Config.verification_role)
+                    verify = discord.utils.get(message.guild.roles, name=Config.verification_role)
                     year = discord.utils.get(message.guild.roles, name=year)
                     member = message.author
                 except AttributeError:
                     # jsme v PM
                     guild = self.bot.get_guild(Config.guild_id)
-                    verify = discord.utils.get(
-                        guild.roles,
-                        name=Config.verification_role)
+                    verify = discord.utils.get(guild.roles, name=Config.verification_role)
                     year = discord.utils.get(guild.roles, name=year)
                     member = guild.get_member(message.author.id)
 
@@ -274,23 +244,26 @@ class Verification(BaseFeature):
 
                 if message.channel.type is not discord.ChannelType.private:
                     await message.channel.send(utils.fill_message("verify_verify_success",
-                                               user=message.author.id))
+                                                                  user=message.author.id))
             else:
-                await message.channel.send(utils.fill_message("verify_verify_not_found",
-                                           user=message.author.id, admin=Config.admin_ids[0]))
+                msg = utils.fill_message("verify_verify_not_found", user=message.author.id,
+                                         admin=Config.admin_ids[0])
+                await message.channel.send(msg)
 
-                embed = discord.Embed(title="Neúspěšný pokus o verify",
-                                      color=0xeee657)
-                embed.add_field(name="User", value=utils.generate_mention(message.author.id))
-                embed.add_field(name="Message",
-                                value=message.content, inline=False)
-                channel = self.bot.get_channel(Config.log_channel)
-                await channel.send(embed=embed)
+                await self.log_verify_fail(message, 'Verify (with code) - Not exists in DB')
         else:
             await message.channel.send(utils.fill_message("verify_already_verified",
-                                       user=message.author.id, admin=Config.admin_ids[0]))
+                                                          user=message.author.id, admin=Config.admin_ids[0]))
 
         try:
             await message.delete()
         except discord.errors.Forbidden:
             return
+
+    async def log_verify_fail(self, message: discord.Message, phase: str):
+        embed = discord.Embed(title="Neúspěšný pokus o verify", color=0xeee657)
+        embed.add_field(name="User", value=utils.generate_mention(message.author.id))
+        embed.add_field(name='Verify phase', value=phase)
+        embed.add_field(name="Message", value=message.content, inline=False)
+        channel = self.bot.get_channel(Config.log_channel)
+        await channel.send(embed=embed)
