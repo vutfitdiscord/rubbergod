@@ -71,10 +71,7 @@ class Verification(BaseFeature):
             # Some of them will use 'xlogin00' as stated in help,
             # cuz they dumb
             if login == "xlogin00":
-                guild = self.bot.get_guild(Config.guild_id)
-                fp = await guild.fetch_emoji(585915845146968093)
-                await message.channel.send(utils.fill_message("verify_send_dumbshit",
-                                                              user=message.author.id, emote=str(fp)))
+                await self.send_xlogin_info(message)
                 return
             if login[0] == 'x':
                 # VUT
@@ -146,7 +143,7 @@ class Verification(BaseFeature):
             if year_parts[1] in ["BIT", "BITP"]:
                 return "4BIT+" if year_value >= 4 else f"{year_value}BIT"
             elif year_parts[1] in ["BCH", "CZV"]:
-                return "1BIT" # TODO: fix erasmus students (BCH)
+                return "1BIT"  # TODO: fix erasmus students (BCH)
             elif year_parts[1] in ["MBS", "MBI", "MIS", "MIN", "MMI", "MMM", "MGM", "MGMe",
                                    "MPV", "MSK", "NADE", "NBIO", "NGRI", "NNET", "NVIZ", "NCPS",
                                    "NSEC", "NEMB", "NHPC", "NISD", "NIDE", "NISY", "NMAL", "NMAT",
@@ -176,10 +173,7 @@ class Verification(BaseFeature):
             # Some of them will use 'xlogin00' as stated in help
             # yet again, cuz they dumb
             if login == "xlogin00":
-                guild = self.bot.get_guild(Config.guild_id)
-                fp = await guild.fetch_emoji(585915845146968093)
-                await message.channel.send(utils.fill_message("verify_send_dumbshit",
-                                                              user=message.author.id, emote=str(fp)))
+                await self.send_xlogin_info(message)
                 return
             # Same here
             if code == "kód" or code == "[kód]":
@@ -258,3 +252,9 @@ class Verification(BaseFeature):
         embed.add_field(name="Message", value=message.content, inline=False)
         channel = self.bot.get_channel(Config.log_channel)
         await channel.send(embed=embed)
+
+    async def send_xlogin_info(self, message: discord.Message):
+        guild = self.bot.get_guild(Config.guild_id)
+        fp = await guild.fetch_emoji(585915845146968093)
+        await message.channel.send(utils.fill_message("verify_send_dumbshit",
+                                                      user=message.author.id, emote=str(fp)))
