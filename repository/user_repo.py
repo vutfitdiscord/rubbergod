@@ -1,6 +1,14 @@
 from repository.base_repository import BaseRepository
 from repository.database import session
 from repository.database.verification import Permit, Valid_person
+from enum import IntEnum
+
+
+class VerifyStatus(IntEnum):
+    """ Common enum to verification states. """
+    Verified = 0
+    Unverified = 1
+    InProcess = 2
 
 
 class UserRepository(BaseRepository):
@@ -24,15 +32,6 @@ class UserRepository(BaseRepository):
 
         session.commit()
 
-    def has_unverified_login(self, login: str):
-        """"Checks if there's a login """
-        query = (
-            session.query(Valid_person)
-            .filter(Valid_person.login == login, Valid_person.status == 1)
-            .one_or_none()
-        )
-        return True if query is not None else False
-
     def get_user(self, login: str, status: int = 2):
         """"Finds login from database"""
         user = (
@@ -55,3 +54,11 @@ class UserRepository(BaseRepository):
         """Add user to database"""
         session.add(Valid_person(login=login, year=year, status=status))
         session.commit()
+
+    def get_user_by_login(self, login: str):
+        """Finds login from DB (without status check)"""
+        user = (
+            session.query(Valid_person).filter(Valid_person.login == login).one_or_none()
+        )
+
+        return user
