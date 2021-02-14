@@ -135,7 +135,7 @@ class Verification(BaseFeature):
         year_parts = list(filter(lambda x: len(x.strip()) > 0, raw_year.split()))
 
         if year_parts[0] == "FIT":  # FIT student, or some VUT student.
-            if len(year_parts) != 1:  # ['FIT'], ['FIT', '1r'], .... Who knows. Other faculty students, dropouts, ...
+            if len(year_parts) != 3:  # ['FIT'], ['FIT', '1r'], .... Who knows. Other faculty students, dropouts, ...
                 return None
 
             year_value_match = re.search(r'(\d*)r', year_parts[2])
