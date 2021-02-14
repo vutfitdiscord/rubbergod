@@ -149,9 +149,6 @@ class Messages:
                           "({mail})!\n" \
                           "Pro verifikaci použij: " \
                           f"`{prefix}verify [login] [kód]`"
-    verify_send_not_found = "{user} Login nenalezen " \
-                            "nebo jsi už tímhle krokem " \
-                            "prošel ({admin} pls)."
     verify_verify_format = "Očekávám dva argumenty. " \
                            "Správný formát:\n" \
                            f"`{prefix}verify [FIT login nebo " \
@@ -169,10 +166,11 @@ class Messages:
                               "<#591384273051975683> Pro pridani roli\n" \
                               "<#489461089432633346> Pro pravidla a další info"
 
-    verify_verify_not_found = "{user} Login nenalezen nebo " \
-                              "jsi už tímhle krokem prošel " \
-                              "({admin} pls)."
+    verify_verify_not_found = "{user} Login nenalezen nebo jsi neprošel krokem !getcode. Přečti si prosím <#591386755547136020>. ({admin} pls)."
     verify_verify_wrong_code = "{user} Špatný kód."
+    verify_unknown_login = "{user} Tvůj login nebyl nalezen v databázi. ({admin} pls)"
+    verify_step_done = "{user} Tímto krokem jsi už prošel. ({admin} pls)"
+    invalid_login = "{user} Neplatný login. Přečti si prosím <#591386755547136020>. ({admin} pls)"
 
     vote_brief = "Zahájí hlasování"
     vote_format = f"Použití vote:\n`{prefix}vote [datum] [čas] [otázka]\n[emoji] " \

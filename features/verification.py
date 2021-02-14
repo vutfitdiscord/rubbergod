@@ -12,7 +12,7 @@ import utils
 from config.app_config import Config
 from config.messages import Messages
 from features.base_feature import BaseFeature
-from repository.user_repo import UserRepository
+from repository.user_repo import UserRepository, VerifyStatus
 
 
 class Verification(BaseFeature):
@@ -45,8 +45,7 @@ class Verification(BaseFeature):
 
     async def gen_code_and_send_mail(self, message, login, mail_postfix):
         # Generate a verification code
-        code = ''.join(random.choices(string.ascii_uppercase +
-                                      string.digits, k=20))
+        code = ''.join(random.choices(string.ascii_uppercase + string.digits, k=20))
 
         email_message = Config.default_prefix + "verify "
         email_message += login + " " + code
@@ -76,45 +75,48 @@ class Verification(BaseFeature):
             if login[0] == 'x':
                 # VUT
                 # Check if the login we got is in the database
-                if self.repo.has_unverified_login(login):
-                    await self.gen_code_and_send_mail(message, login,
-                                                      "@stud.fit.vutbr.cz")
-                else:
-                    await message.channel.send(utils.fill_message("verify_send_not_found",
-                                                                  user=message.author.id,
-                                                                  admin=Config.admin_ids[0]))
+                user = self.repo.get_user_by_login(login)
 
-                    await self.log_verify_fail(message, 'getcode (xlogin)')
+                if user is None:
+                    msg = utils.fill_message("verify_unknown_login",
+                                             user=message.author.id, admin=Config.admin_ids[0])
+                    await message.channel.send(msg)
+                    await self.log_verify_fail(message, 'getcode (xlogin) - Unknown login')
+                elif user is not None and user.status != VerifyStatus.Unverified.value:
+                    msg = utils.fill_message(
+                        "verify_step_done", user=message.author.id, admin=Config.admin_ids[0])
+                    await message.channel.send(msg)
+                    await self.log_verify_fail(message, 'getcode (xlogin) - Invalid verify state')
+                else:
+                    await self.gen_code_and_send_mail(message, login, "@stud.fit.vutbr.cz")
             else:
                 # MUNI
                 try:
                     int(login)
                 except ValueError:
-                    msg = utils.fill_message("verify_send_not_found", user=message.author.id,
+                    msg = utils.fill_message("invalid_login", user=message.author.id,
                                              admin=Config.admin_ids[0])
                     await message.channel.send(msg)
-
-                    self.log_verify_fail(message, 'getcode (MUNI)')
+                    await self.log_verify_fail(message, 'getcode (MUNI)')
 
                     try:
                         await message.delete()
                         return
                     except discord.errors.Forbidden:
                         return
-                if self.repo.get_user(login, status=2) is None and\
-                   self.repo.get_user(login, status=0) is None:
 
-                    if self.repo.get_user(login, status=1) is None:
-                        self.repo.add_user(login, "MUNI", status=1)
+                user = self.repo.get_user_by_login(login)
 
-                    await self.gen_code_and_send_mail(message, login,
-                                                      "@mail.muni.cz")
-                else:
-                    await message.channel.send(utils.fill_message("verify_send_not_found",
-                                                                  user=message.author.id,
-                                                                  admin=Config.admin_ids[0]))
-
+                if user is not None and user.status != VerifyStatus.Unverified.value:
+                    msg = utils.fill_message(
+                        "verify_step_done", user=message.author.id, admin=Config.admin_ids[0])
+                    await message.channel.send(msg)
                     await self.log_verify_fail(message, 'getcode (MUNI) - Verified')
+                    return
+
+                if self.repo.get_user(login, status=VerifyStatus.Unverified.value) is None:
+                    self.repo.add_user(login, "MUNI", status=VerifyStatus.Unverified.value)
+                await self.gen_code_and_send_mail(message, login, "@mail.muni.cz")
         else:
             await message.channel.send(utils.fill_message("verify_already_verified",
                                                           user=message.author.id, admin=Config.admin_ids[0]))
@@ -133,9 +135,9 @@ class Verification(BaseFeature):
         year_parts = list(filter(lambda x: len(x.strip()) > 0, raw_year.split()))
 
         if year_parts[0] == "FIT":  # FIT student, or some VUT student.
-            if len(year_parts) == 1: # ['FIT']. Who knows. Other faculty students, dropouts, ...
+            if len(year_parts) == 1:  # ['FIT']. Who knows. Other faculty students, dropouts, ...
                 return None
-            
+
             #  ['FIT', '1r'], ...
             if len(year_parts) != 3:
                 return "VUT"  # TODO: Is this only NON FIT? or this role have fit person?
