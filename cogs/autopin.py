@@ -24,7 +24,7 @@ class AutoPin(commands.Cog):
         """
 
         if ctx.invoked_subcommand is None:
-            await ctx.send(Messages.autopin_help)
+            await ctx.send(utils.get_command_group_signature(ctx))
 
     @pin.command(brief=Messages.autopin_add_brief)
     async def add(self, ctx: commands.Context, message_url: str):
