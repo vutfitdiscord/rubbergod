@@ -135,12 +135,8 @@ class Verification(BaseFeature):
         year_parts = list(filter(lambda x: len(x.strip()) > 0, raw_year.split()))
 
         if year_parts[0] == "FIT":  # FIT student, or some VUT student.
-            if len(year_parts) == 1:  # ['FIT']. Who knows. Other faculty students, dropouts, ...
+            if len(year_parts) != 1:  # ['FIT'], ['FIT', '1r'], .... Who knows. Other faculty students, dropouts, ...
                 return None
-
-            #  ['FIT', '1r'], ...
-            if len(year_parts) != 3:
-                return "VUT"  # TODO: Is this only NON FIT? or this role have fit person?
 
             year_value_match = re.search(r'(\d*)r', year_parts[2])
             year_value = int(year_value_match.group(1))
