@@ -172,7 +172,12 @@ class Review(commands.Cog):
             await ctx.send(messages.review_wrong_subject)
             return
         embed = discord.Embed(title=subject.shortcut, description=subject.name)
-        embed.add_field(name="Semestr", value=subject.semester)
+
+        if subject.semester == "L":
+            embed.add_field(name="Semestr", value="Letní")
+        else:
+            embed.add_field(name="Semestr", value="Zimní")
+
         embed.add_field(name="Typ", value=subject.type)
         if subject.year:
             embed.add_field(name="Ročník", value=subject.year)
@@ -195,7 +200,7 @@ class Review(commands.Cog):
         degree = None
         type = type.upper()
         sem = sem.upper()
-        if type == "HELP" or sem not in ['V', 'L'] or type not in ['P', 'PVT', 'PVA', 'V']:
+        if type == "HELP" or sem not in ['Z', 'L'] or type not in ['P', 'PVT', 'PVA', 'V']:
             await ctx.send(f"`{utils.get_command_signature(ctx)}`\n{messages.tierboard_help}")
             return
 
@@ -228,7 +233,7 @@ class Review(commands.Cog):
         embed = discord.Embed(title="Tierboard", description=output)
         embed.timestamp = datetime.datetime.now(tz=datetime.timezone.utc)
         embed.add_field(name="Typ", value=type)
-        embed.add_field(name="Semester", value=sem)
+        embed.add_field(name="Semestr", value="Letní" if sem == "L" else "Zimní")
         if year:
             degree = year
         embed.add_field(name="Program", value=degree)
