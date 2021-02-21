@@ -30,6 +30,7 @@ class Random(commands.Cog):
                 args = args[i + 1 :]
                 break
         if not len(args):
+            await ctx.send(utils.get_command_signature(ctx))
             return
 
         option = discord.utils.escape_mentions(random.choice(args))
@@ -60,7 +61,7 @@ class Random(commands.Cog):
     @flip.error
     async def command_error(self, ctx, error):
         if isinstance(error, (commands.MissingRequiredArgument, commands.BadArgument)):
-            await ctx.send(f"{Config.default_prefix}{ctx.command.usage}")
+            await ctx.send(utils.get_command_signature(ctx))
         if isinstance(error, commands.CheckFailure):
             await ctx.message.channel.send(
                 utils.fill_message("bot_room_redirect", user=ctx.message.author.id, bot_room=Config.bot_room)
