@@ -172,12 +172,10 @@ class Review(commands.Cog):
             await ctx.send(messages.review_wrong_subject)
             return
         embed = discord.Embed(title=subject.shortcut, description=subject.name)
-
         if subject.semester == "L":
             embed.add_field(name="Semestr", value="Letní")
         else:
             embed.add_field(name="Semestr", value="Zimní")
-
         embed.add_field(name="Typ", value=subject.type)
         if subject.year:
             embed.add_field(name="Ročník", value=subject.year)
@@ -243,7 +241,7 @@ class Review(commands.Cog):
         await msg.add_reaction("⏪")
         await msg.add_reaction("◀")
         await msg.add_reaction("▶")
-        
+
         page_num = 0
         pages_total = review_repo.get_tierboard_page_count(type, sem, degree, year)
         while True:
@@ -281,7 +279,6 @@ class Review(commands.Cog):
                 await msg.remove_reaction(emoji, user)
             except discord.errors.Forbidden:
                 pass
-
 
     @reviews.error
     @subject.error
@@ -427,7 +424,7 @@ class Review_helper:
                 if len(review.text_review) < 1024 * text_page:
                     text = review.text_review[text_index:]
                 else:
-                    text = review.text_review[text_index : 1024 * text_page]
+                    text = review.text_review[text_index:1024 * text_page]
                 embed.set_field_at(idx, name="Text page", value=f"{text_page}/{pages}", inline=False)
                 idx += 1
             embed.set_field_at(idx, name="Text", value=text, inline=False)
@@ -513,7 +510,7 @@ class Review_helper:
     def update_subject_types(self, link, MIT):
         """Send request to `link`, parse page and find all subjects.
         Add new subjects to DB, if subject already exists update its years.
-        For MITAI links please set `MIT` to True. 
+        For MITAI links please set `MIT` to True.
         If update succeeded return True, otherwise False
         """
         response = requests.get(link)
