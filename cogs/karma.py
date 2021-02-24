@@ -4,6 +4,7 @@ from discord.ext import commands
 import utils
 import re
 import datetime
+import math
 from config import app_config as config, messages
 from features import karma
 from repository import karma_repo
@@ -65,6 +66,10 @@ class Karma(commands.Cog):
                 next_page = 1
             embed.description = self.karma.gen_leaderboard_content(attribute, next_page, column)
             embed.timestamp = datetime.datetime.now(tz=datetime.timezone.utc)
+            if "LEADERBOARD" in embed.title:
+                value_num = math.ceil(next_page / config.karma_grillbot_leaderboard_size)
+                value = messages.karma_web if value_num == 1 else f"{messages.karma_web}{value_num}"
+                embed.set_field_at(index=0, name=messages.karma_web_title, value=value)
             await ctx["message"].edit(embed=embed)
             if ctx["message"].guild:
                 await ctx["message"].remove_reaction(ctx["emoji"], ctx["member"])
