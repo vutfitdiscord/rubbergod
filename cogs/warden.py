@@ -59,7 +59,7 @@ class Warden(commands.Cog):
                 except:
                     continue
 
-    async def hadle_reaction(self, ctx):
+    async def handle_reaction(self, ctx):
         """Delete duplicate embed if original is not a duplicate"""
         message = ctx["message"]
 

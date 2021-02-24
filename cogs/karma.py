@@ -21,7 +21,7 @@ class Karma(commands.Cog):
         self.karma = karma.Karma(bot, karma_r)
         self.check = room_check.RoomCheck(bot)
 
-    async def hadle_reaction(self, ctx):
+    async def handle_reaction(self, ctx):
         # grillbot emoji for removing message causes errors
         if ctx["emoji"] == "⏹️":
             return

@@ -288,7 +288,7 @@ class Review(commands.Cog):
         if isinstance(error, commands.CheckFailure):
             await ctx.send(utils.fill_message("insufficient_rights", user=ctx.author.id))
 
-    async def hadle_reaction(self, ctx):
+    async def handle_reaction(self, ctx):
         subject = ctx["message"].embeds[0].title.split(" ", 1)[0].lower()
         footer = ctx["message"].embeds[0].footer.text.split("|")
         # don't track old reviews as they are not compatible

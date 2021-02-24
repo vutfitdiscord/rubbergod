@@ -117,7 +117,7 @@ class AutoPin(commands.Cog):
         self.repo.remove_channel(str(payload.channel_id))
         print(f'INFO:\tRemoved {pin_map.channel_id} from PIN mapping. (on_raw_message_delete)')
 
-    async def hadle_reaction(self, ctx):
+    async def handle_reaction(self, ctx):
         """
         if the message has X or more 'pin' emojis pin the message
         """

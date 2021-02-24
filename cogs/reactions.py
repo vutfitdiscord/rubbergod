@@ -41,7 +41,7 @@ class Reaction(commands.Cog):
         for cog in cogs:
             # check if cog is loaded
             if cog:
-                await cog.hadle_reaction(ctx)
+                await cog.handle_reaction(ctx)
 
 
 def setup(bot):
