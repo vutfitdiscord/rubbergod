@@ -1,5 +1,4 @@
 """Inspired by https://github.com/Czechbol/Amadeus/blob/master/cogs/urban.py"""
-import datetime
 import requests
 import asyncio
 from urllib import parse as url_parse
@@ -67,25 +66,26 @@ class Urban(commands.Cog):
                 reaction, user = await self.bot.wait_for("reaction_add", check=check, timeout=300.0)
             except asyncio.TimeoutError:
                 return
-            if str(reaction.emoji) == "◀️":
+            emoji = str(reaction.emoji)
+            if emoji == "◀️":
                 pagenum -= 1
                 if pagenum < 0:
                     pagenum = len(embeds) - 1
-                try:
-                    await message.remove_reaction("◀️", user)
-                except discord.errors.Forbidden:
-                    pass
-                await message.edit(embed=embeds[pagenum])
-            if str(reaction.emoji) == "▶️":
+            elif emoji == "▶️":
                 pagenum += 1
                 if pagenum >= len(embeds):
                     pagenum = 0
-                try:
-                    await message.remove_reaction("▶️", user)
-                except discord.errors.Forbidden:
-                    pass
-                await message.edit(embed=embeds[pagenum])
+            try:
+                await message.remove_reaction(emoji, user)
+            except discord.errors.Forbidden:
+                pass
 
+            try:
+                await message.edit(embed=embeds[pagenum])
+            except discord.errors.HTTPException:
+                # not well formed url, API bug
+                embeds[pagenum].url = ""
+            await message.edit(embed=embeds[pagenum])
 
     @commands.cooldown(rate=5, per=20.0, type=commands.BucketType.user)
     @commands.command(brief=Messages.urban_brief)
