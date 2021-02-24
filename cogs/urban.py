@@ -49,7 +49,13 @@ class Urban(commands.Cog):
 
     async def urban_pages(self, ctx, embeds):
         """Send message and handle pagination for 300 seconds"""
-        message = await ctx.send(embed=embeds[0])
+        try:
+            message = await ctx.send(embed=embeds[0])
+        except discord.errors.HTTPException:
+            # not well formed url, API bug
+            embeds[0].url = ""
+            message = await ctx.send(embed=embeds[0])
+
         pagenum = 0
         await message.add_reaction("◀️")
         await message.add_reaction("▶️")
@@ -85,7 +91,7 @@ class Urban(commands.Cog):
             except discord.errors.HTTPException:
                 # not well formed url, API bug
                 embeds[pagenum].url = ""
-            await message.edit(embed=embeds[pagenum])
+                await message.edit(embed=embeds[pagenum])
 
     @commands.cooldown(rate=5, per=20.0, type=commands.BucketType.user)
     @commands.command(brief=Messages.urban_brief)
