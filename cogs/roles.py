@@ -25,7 +25,7 @@ class ReactToRole(commands.Cog):
             role_data = await self.get_join_role_data(message)
             await self.message_role_reactions(message, role_data)
 
-    async def hadle_reaction(self, ctx):
+    async def handle_reaction(self, ctx):
         role_data = await self.get_join_role_data(ctx["message"])
         for line in role_data:
             if str(ctx["emoji"]) == line[1]:
