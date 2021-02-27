@@ -125,19 +125,23 @@ class StreamLinks(commands.Cog):
         embed.add_field(name="Odkaz", value=f"[{streamlink.link}]({streamlink.link})", inline=False)
         embed.add_field(name="Popis", value=streamlink.description, inline=False)
         embed.timestamp = datetime.utcnow()
-        embed.set_footer(icon_url=author.avatar_url,
-                         text=f"[{streamlink.subject.upper()}] Page: {current_pos} / {links_count}")
+        utils.add_author_footer(embed, author, additional_text=[
+                                f"[{streamlink.subject.upper()}] Page: {current_pos} / {links_count}"])
 
         return embed
 
-    async def hadle_reaction(self, ctx):
+    async def handle_reaction(self, ctx):
         try:
+            if ctx['reply_to'] is None:  # Reply is required to render embed.
+                await ctx['message'].edit(content=Messages.streamlinks_missing_original, embed=None)
+                return
+
             embed: discord.Embed = ctx['message'].embeds[0]
-            match = pagination_regex.match(embed.footer.text)
+            footer_text = embed.footer.text.split('|')[1].strip()
+            match = pagination_regex.match(footer_text)
 
             if match is None:
-                print('DEBUG: Match failed')
-                # TODO: Edit to notify update required.
+                await ctx['message'].edit(content=Messages.streamlinks_unsupported_embed, embed=None)
                 return  # Invalid or unsupported embed.
 
             groups = match.groups()
@@ -147,29 +151,17 @@ class StreamLinks(commands.Cog):
 
             streamlinks = self.repo.get_streamlinks_of_subject(subject)
 
-            if len(streamlinks) != pages_count:
-                # New streamlink was added, but removed.
-                print('DEBUG: Invalid pages count')
-                # TODO: Edit to notify update required
+            if len(streamlinks) != pages_count:  # New streamlink was added, but removed.
+                await ctx['message'].edit(content=Messages.streamlinks_not_actual, embed=None)
                 return
 
-            if ctx['emoji'] == "⏪":
-                new_page = 1
-            elif ctx['emoji'] == "◀":
-                if current_page > 1:
-                    new_page = current_page - 1
-            elif ctx['emoji'] == "▶":
-                if current_page != pages_count:
-                    new_page = current_page + 1
-            elif ctx['emoji'] == "⏩":
-                new_page = pages_count
-
-            if new_page == current_page:
+            new_page = utils.pagination_next(ctx['emoji'], current_page, pages_count)
+            if new_page <= 0 or new_page == current_page:
                 return  # Pagination to same page. We can ignore.
 
             # Index - 1, because index position.
             streamlink: StreamLink = streamlinks[new_page - 1]
-            embed = self.create_embed_of_link(streamlink, ctx['message'].author, len(streamlinks), new_page)
+            embed = self.create_embed_of_link(streamlink, ctx['reply_to'].author, len(streamlinks), new_page)
             await ctx['message'].edit(embed=embed)
         finally:
             if ctx["message"].guild:  # cannot remove reaction in DM
