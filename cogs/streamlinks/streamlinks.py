@@ -15,6 +15,7 @@ import re
 
 # Pattern: "AnyText | [Subject] Page: CurrentPage / {TotalPages}"
 pagination_regex = re.compile(r'^\[([^\]]*)\]\s*Page:\s*(\d*)\s*\/\s*(\d*)')
+iso_date_regex = re.compile(r'(\d*)-(\d*)-(\d*)')
 
 
 class StreamLinks(commands.Cog):
@@ -58,14 +59,15 @@ class StreamLinks(commands.Cog):
                 return
 
             link_data = self.get_link_data(link)
+            is_iso_date = iso_date_regex.match(args[0]) is not None
             if link_data['upload_date'] is None:
-                if args[0].isnumeric(): # TODO: Bug. Check regex ISO date.
+                if is_iso_date:
                     link_data['upload_date'] = datetime.strptime(args[0], '%Y-%m-%d')
                     del args[0]
                 else:
                     link_data['upload_date'] = datetime.utcnow()
             else:
-                if args[0].isnumeric():
+                if is_iso_date:
                     del args[0]
 
             self.repo.create(subject.lower(), link, username,
