@@ -13,11 +13,8 @@ from bs4 import BeautifulSoup
 from datetime import datetime
 import re
 
-# Pattern: "[Subject] CurrentPage / {TotalPages}"
+# Pattern: "AnyText | [Subject] Page: CurrentPage / {TotalPages}"
 pagination_regex = re.compile(r'^\[([^\]]*)\]\s*Page:\s*(\d*)\s*\/\s*(\d*)')
-
-# TODO: Handle DMs
-# TODO: Perms
 
 
 class StreamLinks(commands.Cog):
@@ -62,8 +59,8 @@ class StreamLinks(commands.Cog):
 
             link_data = self.get_link_data(link)
             if link_data['upload_date'] is None:
-                if args[0].isnumeric():
-                    link_data['upload_date'] = datetime.strptime(args[0], '%Y')
+                if args[0].isnumeric(): # TODO: Bug. Check regex ISO date.
+                    link_data['upload_date'] = datetime.strptime(args[0], '%Y-%m-%d')
                     del args[0]
                 else:
                     link_data['upload_date'] = datetime.utcnow()
@@ -166,3 +163,8 @@ class StreamLinks(commands.Cog):
         finally:
             if ctx["message"].guild:  # cannot remove reaction in DM
                 await ctx["message"].remove_reaction(ctx["emoji"], ctx["member"])
+
+    @add.error
+    async def streamlinks_add_error(self, ctx: commands.Context, error):
+        if isinstance(error, discord.ext.commands.MissingRequiredArgument):
+            await ctx.send(Messages.streamlinks_add_format)
