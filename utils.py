@@ -124,14 +124,18 @@ async def reaction_get_ctx(bot, payload):
 
     try:
         message: discord.Message = await channel.fetch_message(payload.message_id)
-
-        if message is not None and message.reference is not None and message.reference.message_id is not None:
-            reply_to = await channel.fetch_message(message.reference.message_id)
     except discord.errors.NotFound:
         return None
 
     if message is None:
         return None
+
+    reply_to = None
+    if message is not None and message.reference is not None and message.reference.message_id is not None:
+        try:
+            reply_to = await channel.fetch_message(message.reference.message_id)
+        except discord.errors.NotFound:
+            pass # Reply is there optional.
 
     if payload.emoji.is_custom_emoji():
         emoji = bot.get_emoji(payload.emoji.id)
