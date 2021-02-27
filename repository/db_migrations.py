@@ -9,6 +9,7 @@ from repository.database.role_group import RoleGroup
 from repository.review_repo import ReviewRepository
 from repository.database.hugs import HugsTable
 from repository.database.pin_map import PinMap
+from repository.database.stream_link import StreamLink
 
 from config.app_config import Config
 

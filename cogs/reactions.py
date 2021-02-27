@@ -37,6 +37,12 @@ class Reaction(commands.Cog):
             and ctx["message"].author.bot
         ):
             cogs.append(self.bot.get_cog("Warden"))
+        if(
+            ctx['message'].embeds
+            and ctx['message'].embeds[0].author.name is not discord.Embed.Empty
+            and "streamlinks" in ctx['message'].embeds[0].author.name.lower()
+        ):
+            cogs.append(self.bot.get_cog("StreamLinks"))
 
         for cog in cogs:
             # check if cog is loaded

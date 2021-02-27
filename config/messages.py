@@ -325,3 +325,9 @@ class Messages:
     weather_brief = "Vypíše informace o počasí ve zvoleném městě"
 
     week_brief = "Vypíše, kolikátý je zrovna týden a jestli je sudý nebo lichý"
+
+    streamlinks_brief = "Úložiště všech streamů"
+    streamlinks_format = f"{prefix}streamlinks [zkratka předmětu]"
+    streamlinks_add_brief = "Zapíše nový stream k předmětu"
+    streamlinks_add_link_exists = "{user} Tento stream již existuje."
+    streamlinks_add_success = "Stream byl úspěšně vytvořen <:HYPERS:493154327318233088>"
