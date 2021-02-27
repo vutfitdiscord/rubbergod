@@ -117,14 +117,20 @@ async def reaction_get_ctx(bot, payload):
         guild = bot.get_guild(Config.guild_id)
         if guild is None:
             raise Exception("Nemůžu najít guildu podle config.guild_id")
-    member = guild.get_member(payload.user_id)
+    member = payload.member if payload.member is not None else guild.get_member(payload.user_id)
+
+    if member is None or member.bot:
+        return None
 
     try:
-        message = await channel.fetch_message(payload.message_id)
+        message: discord.Message = await channel.fetch_message(payload.message_id)
+
+        if message is not None and message.reference is not None and message.reference.message_id is not None:
+            reply_to = await channel.fetch_message(message.reference.message_id)
     except discord.errors.NotFound:
         return None
 
-    if member is None or message is None or member.bot:
+    if message is None:
         return None
 
     if payload.emoji.is_custom_emoji():
@@ -134,7 +140,7 @@ async def reaction_get_ctx(bot, payload):
     else:
         emoji = payload.emoji.name
 
-    return dict(channel=channel, guild=guild, member=member, message=message, emoji=emoji)
+    return dict(channel=channel, guild=guild, member=member, message=message, emoji=emoji, reply_to=reply_to)
 
 
 class NotHelperPlusError(commands.CommandError):
@@ -210,15 +216,16 @@ def clear_link_escape(link: str):
 
     return link
 
+
 async def add_pagination_reactions(message: discord.Message, items_count: int):
     """Common method to add pagination reactions to message."""
-    
+
     if items_count == 0:
         return
-    
+
     if items_count > 1:
         await message.add_reaction("⏪")
-    
+
     await message.add_reaction("◀")
     await message.add_reaction("▶")
 
