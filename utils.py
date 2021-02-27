@@ -226,14 +226,14 @@ def clear_link_escape(link: str):
 async def add_pagination_reactions(message: discord.Message, items_count: int):
     """Common method to add pagination reactions to message."""
 
-    if items_count == 0:
+    if items_count <= 1:
         return
 
-    if items_count > 1:
+    if items_count > 2:
         await message.add_reaction("⏪")
 
     await message.add_reaction("◀")
     await message.add_reaction("▶")
 
-    if items_count > 1:
+    if items_count > 2:
         await message.add_reaction("⏩")
