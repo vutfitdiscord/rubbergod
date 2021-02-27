@@ -198,3 +198,29 @@ def get_command_signature(ctx: commands.Context):
     `?(group sub)command [args]`
     """
     return f"{ctx.prefix}{ctx.command} {ctx.command.signature}"
+
+
+def clear_link_escape(link: str):
+    """Removes < and > escapes from link."""
+
+    if(link.startswith("<")):
+        link = link[1:]
+    if(link.endswith(">")):
+        link = link[:-1]
+
+    return link
+
+async def add_pagination_reactions(message: discord.Message, items_count: int):
+    """Common method to add pagination reactions to message."""
+    
+    if items_count == 0:
+        return
+    
+    if items_count > 1:
+        await message.add_reaction("⏪")
+    
+    await message.add_reaction("◀")
+    await message.add_reaction("▶")
+
+    if items_count > 1:
+        await message.add_reaction("⏩")

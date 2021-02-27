@@ -155,3 +155,6 @@ starting_week = 5
 [absolvent]
 bc_role_id = 0
 ing_role_id = 0
+
+[emote]
+loading="<a:loading:814969399442014259>"

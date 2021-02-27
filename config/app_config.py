@@ -138,3 +138,6 @@ class Config:
     # absolvent
     bc_role_id: int = get_attr("absolvent", "bc_role_id")
     ing_role_id: int = get_attr("absolvent", "ing_role_id")
+
+    # Emotes
+    emote_loading: str = get_attr("emote", "loading")
