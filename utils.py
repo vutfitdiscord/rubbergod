@@ -84,6 +84,8 @@ def pagination_next(emoji, page, max_page):
         next_page = page - 1
     elif emoji == "⏪":
         next_page = 1
+    elif emoji == "⏩":
+        next_page = max_page
     if 1 <= next_page <= max_page:
         return next_page
     else:
