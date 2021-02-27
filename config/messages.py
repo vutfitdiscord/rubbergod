@@ -331,6 +331,11 @@ class Messages:
     streamlinks_add_brief = "Zapíše nový stream k předmětu"
     streamlinks_add_link_exists = "Tento stream již existuje."
     streamlinks_add_success = "Stream byl úspěšně vytvořen <:HYPERS:493154327318233088>"
+    streamlinks_add_format = f"{prefix}streamlinks add [zkratka předmětu] [link] [Kdo (Jméno, nebo Tag)] [Datum nahrání(Volitelně)] [Popis]\n\n"\
+        "Datum nahrání se bere následovně. Nejdříve se pokusí získat automaticky ze služby, odkud odkaz pochází (youtube, ...), "\
+        "pokud ze služby, kde je video nahráno nepůjde získat datum, tak bot zjistí, zda nebyl zadán jako volitelný parametr před popisem. "\
+        "Datum se zadává ve formátu `{Rok}-{Měsíc}-{Den}`. Pokud ani tam nebude zadán datum, tak se jako datum nahrání bere aktuální datum.\n\n"\
+        f"Příklad volání:\n`{prefix}streamlinks add izp https://youtu.be/randomlink Rubbergod Ten nejlepší stream ever kappa.`"
     streamlinks_unsupported_embed = "Tento seznam již není podporován. Zavolej znovu příkaz pro aktualizaci."
     streamlinks_not_actual = "Tento seznam již není aktuální. Zavolej znovu příkaz pro aktualizaci."
     streamlinks_missing_original = "Originální zpráva s příkazem byla smazána. Zavolej znovu příkaz a nemaž originální zprávu."
