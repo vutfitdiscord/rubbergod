@@ -93,46 +93,6 @@ def split_to_parts(items, size: int):
     return result
 
 
-async def reaction_get_ctx(bot, payload):
-    channel = bot.get_channel(payload.channel_id)
-    if channel is None:
-        return None
-    if channel.type is discord.ChannelType.text:
-        guild = channel.guild
-    else:
-        guild = bot.get_guild(Config.guild_id)
-        if guild is None:
-            raise Exception("Nemůžu najít guildu podle config.guild_id")
-    member = payload.member if payload.member is not None else guild.get_member(payload.user_id)
-
-    if member is None or member.bot:
-        return None
-
-    try:
-        message: discord.Message = await channel.fetch_message(payload.message_id)
-    except discord.errors.NotFound:
-        return None
-
-    if message is None:
-        return None
-
-    reply_to = None
-    if message is not None and message.reference is not None and message.reference.message_id is not None:
-        try:
-            reply_to = await channel.fetch_message(message.reference.message_id)
-        except discord.errors.NotFound:
-            pass  # Reply is there optional.
-
-    if payload.emoji.is_custom_emoji():
-        emoji = bot.get_emoji(payload.emoji.id)
-        if emoji is None:
-            emoji = payload.emoji
-    else:
-        emoji = payload.emoji.name
-
-    return dict(channel=channel, guild=guild, member=member, message=message, emoji=emoji, reply_to=reply_to)
-
-
 class NotHelperPlusError(commands.CommandError):
     """An error indicating that a user doesn't have permissions to use
     a command that is available only to helpers, submods and mods.

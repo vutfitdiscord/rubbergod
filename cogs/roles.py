@@ -8,6 +8,7 @@ from config.app_config import Config
 # TODO: use messages
 from config.messages import Messages
 from repository import role_group_repo
+from features.reaction_context import ReactionContext
 
 group_repo = role_group_repo.RoleGroupRepository()
 
@@ -25,26 +26,26 @@ class ReactToRole(commands.Cog):
             role_data = await self.get_join_role_data(message)
             await self.message_role_reactions(message, role_data)
 
-    async def handle_reaction(self, ctx):
-        role_data = await self.get_join_role_data(ctx["message"])
+    async def handle_reaction(self, ctx: ReactionContext):
+        role_data = await self.get_join_role_data(ctx.message)
         for line in role_data:
-            if str(ctx["emoji"]) == line[1]:
-                await self.add_perms(line[0], ctx["member"], ctx["guild"])
+            if str(ctx.emoji) == line[1]:
+                await self.add_perms(line[0], ctx.member, ctx.guild)
                 break
         else:
-            await ctx["message"].remove_reaction(ctx["emoji"], ctx["member"])
+            await ctx.message.remove_reaction(ctx.emoji, ctx.member)
 
     @commands.Cog.listener()
     async def on_raw_reaction_remove(self, payload):
-        ctx = await utils.reaction_get_ctx(self.bot, payload)
+        ctx: ReactionContext = await ReactionContext.from_payload(self.bot, payload)
         if ctx is None:
             return
 
-        if ctx["channel"].id in Config.role_channels:
-            role_data = await self.get_join_role_data(ctx["message"])
+        if ctx.channel.id in Config.role_channels:
+            role_data = await self.get_join_role_data(ctx.message)
             for line in role_data:
-                if str(ctx["emoji"]) == line[1]:
-                    await self.remove_perms(line[0], ctx["member"], ctx["guild"])
+                if str(ctx.emoji) == line[1]:
+                    await self.remove_perms(line[0], ctx.member, ctx.guild)
                     break
 
     # Returns list of role names and emotes that represent them
