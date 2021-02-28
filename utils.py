@@ -15,22 +15,6 @@ def generate_mention(user_id):
     return f"<@{user_id}>"
 
 
-def git_hash():
-    repo = git.Repo(search_parent_directories=True)
-    return repo.head.object.hexsha
-
-
-def git_commit_msg():
-    repo = git.Repo(search_parent_directories=True)
-    return repo.head.commit.message
-
-
-def git_pull():
-    repo = git.Repo(search_parent_directories=True)
-    cmd = repo.git
-    return cmd.pull()
-
-
 def id_to_datetime(snowflake_id: int):
     return datetime.fromtimestamp(((snowflake_id >> 22) + 1420070400000) / 1000)
 
@@ -137,7 +121,7 @@ async def reaction_get_ctx(bot, payload):
         try:
             reply_to = await channel.fetch_message(message.reference.message_id)
         except discord.errors.NotFound:
-            pass # Reply is there optional.
+            pass  # Reply is there optional.
 
     if payload.emoji.is_custom_emoji():
         emoji = bot.get_emoji(payload.emoji.id)

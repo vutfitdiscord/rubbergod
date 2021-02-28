@@ -10,3 +10,12 @@ class Git():
 
     async def pull(self, ctx: commands.Context):
         return self.cmd.pull()
+
+    def hash(self):
+        return self.repo.head.object.hexsha
+
+    def short_hash(self):
+        return self.hash()[:7]
+
+    def last_commit_msg(self):
+        return self.repo.head.commit.message
