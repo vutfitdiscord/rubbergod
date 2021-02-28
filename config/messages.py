@@ -339,3 +339,5 @@ class Messages:
     streamlinks_unsupported_embed = "Tento seznam již není podporován. Zavolej znovu příkaz pro aktualizaci."
     streamlinks_not_actual = "Tento seznam již není aktuální. Zavolej znovu příkaz pro aktualizaci."
     streamlinks_missing_original = "Originální zpráva s příkazem byla smazána. Zavolej znovu příkaz a nemaž originální zprávu."
+    streamlinks_list_brief = "Vypíše zjednodušený seznam všech streamů k daném předmětu."
+    streamlinks_no_stream = "K tomuto předmětu ještě neexistuje žádný stream."
