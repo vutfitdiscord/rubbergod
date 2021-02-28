@@ -3,7 +3,7 @@ import discord
 from discord.ext import commands
 
 from config import app_config as config, messages
-import utils
+from features.git import Git
 
 config = config.Config
 
@@ -13,6 +13,7 @@ class Help(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
+        self.git = Git()
 
     def generate_pages(self, ctx):
         """Generate pages for help. Including subcommands and applying commands checks"""
@@ -93,7 +94,7 @@ class Help(commands.Cog):
 
         pages_total = len(pages)
 
-        commit = f"Commit {utils.git_hash()}"
+        commit = f"Commit {self.git.hash()}"
         footer_text = commit
         if pages_total > 1:
             footer_text = f"Strana {page_num + 1}/{pages_total} | {commit}"
