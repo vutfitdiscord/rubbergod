@@ -15,6 +15,7 @@ import re
 
 # Pattern: "AnyText | [Subject] Page: CurrentPage / {TotalPages}"
 pagination_regex = re.compile(r'^\[([^\]]*)\]\s*Page:\s*(\d*)\s*\/\s*(\d*)')
+# Pattern (ISO Date): "YYYY-MM-DD"
 iso_date_regex = re.compile(r'(\d*)-(\d*)-(\d*)')
 
 
