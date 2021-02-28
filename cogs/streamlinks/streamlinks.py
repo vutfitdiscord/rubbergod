@@ -40,6 +40,10 @@ class StreamLinks(commands.Cog):
     async def get_streamlinks(self, ctx: commands.Context, subject: str):
         streamlinks = self.repo.get_streamlinks_of_subject(subject)
 
+        if len(streamlinks) == 0:
+            await ctx.reply(content=Messages.streamlinks_no_stream)
+            return
+
         embed = self.create_embed_of_link(streamlinks[0], ctx.author, len(streamlinks), 1)
         message: discord.Message = await ctx.reply(embed=embed)
         await utils.add_pagination_reactions(message, len(streamlinks))
@@ -78,6 +82,34 @@ class StreamLinks(commands.Cog):
         except:
             await self.replace_reaction(ctx, "❌")
             raise
+
+    @streamlinks.command(brief=Messages.streamlinks_list_brief)
+    async def list(self, ctx: commands.Context, subject: str):
+        streamlinks: List[StreamLink] = self.repo.get_streamlinks_of_subject(subject)
+
+        if len(streamlinks) == 0:
+            await ctx.reply(content=Messages.streamlinks_no_stream)
+            return
+
+        msg = ""
+        groups = []
+        for stream in streamlinks:
+            at = stream.created_at.strftime("%d. %m. %Y")
+            stream_msg: str = f"**{stream.member_name}** ({at}): <{stream.link}> - {stream.description}\n"
+
+            if len(msg) + len(stream_msg) > 2000:
+                groups.append(msg)
+                msg = stream_msg
+            else:
+                msg = msg + stream_msg
+
+        if len(msg) > 0:
+            groups.append(msg)
+
+        await ctx.reply(content=groups[0])
+        del groups[0]
+        for group in groups:
+            await ctx.send(group)
 
     def get_link_data(self, link: str):
         """
