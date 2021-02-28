@@ -1,7 +1,6 @@
 import discord
 from discord.ext import commands
 from repository.stream_links_repo import StreamLinksRepo
-from cogs.room_check import RoomCheck
 from config import app_config
 from config.messages import Messages
 from typing import List, Union
@@ -23,7 +22,6 @@ class StreamLinks(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.repo = StreamLinksRepo()
-        self.check = RoomCheck(bot)
         self.config = app_config.Config
 
     @commands.cooldown(rate=4, per=30.0, type=commands.BucketType.user)
