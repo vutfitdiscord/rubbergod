@@ -1,7 +1,7 @@
 import discord
 from discord.ext import commands
 from repository.stream_links_repo import StreamLinksRepo
-from ..room_check import RoomCheck
+from cogs.room_check import RoomCheck
 from config import app_config
 from config.messages import Messages
 from typing import List, Union
@@ -223,3 +223,7 @@ class StreamLinks(commands.Cog):
     async def streamlinks_list_error(self, ctx: commands.Context, error):
         if isinstance(error, discord.ext.commands.MissingRequiredArgument):
             await ctx.reply(Messages.streamlinks_list_format)
+
+
+def setup(bot):
+    bot.add_cog(StreamLinks(bot))
