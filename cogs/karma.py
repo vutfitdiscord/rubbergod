@@ -9,6 +9,7 @@ from config import app_config as config, messages
 from features import karma
 from repository import karma_repo
 from cogs import room_check
+from features.reaction_context import ReactionContext
 
 
 karma_r = karma_repo.KarmaRepository()
@@ -22,30 +23,30 @@ class Karma(commands.Cog):
         self.karma = karma.Karma(bot, karma_r)
         self.check = room_check.RoomCheck(bot)
 
-    async def handle_reaction(self, ctx):
+    async def handle_reaction(self, ctx: ReactionContext):
         # grillbot emoji for removing message causes errors
-        if ctx["emoji"] == "⏹️":
+        if ctx.emoji == "⏹️":
             return
         # handle karma vote
-        elif ctx["message"].content.startswith(messages.karma_vote_message_hack):
-            if ctx["emoji"] not in ["✅", "❌", "0⃣"]:
-                await ctx["message"].remove_reaction(ctx["emoji"], ctx["member"])
+        elif ctx.message.content.startswith(messages.karma_vote_message_hack):
+            if ctx.emoji not in ["✅", "❌", "0⃣"]:
+                await ctx.message.remove_reaction(ctx.emoji, ctx.member)
             else:
                 users = []
-                for reaction in ctx["message"].reactions:
+                for reaction in ctx.message.reactions:
                     users.append(await reaction.users().flatten())
                 # Flatten the final list
                 users = [x for y in users for x in y]
-                if users.count(ctx["member"]) > 1:
-                    await ctx["message"].remove_reaction(ctx["emoji"], ctx["member"])
+                if users.count(ctx.member) > 1:
+                    await ctx.message.remove_reaction(ctx.emoji, ctx.member)
         # leaderboard pagination
         elif (
-            ctx["message"].embeds
-            and ctx["message"].embeds[0].title is not discord.Embed.Empty
-            and re.match(r".* (LEADER|BAJKAR|ISHA|GIVING)BOARD .*", ctx["message"].embeds[0].title)
-            and ctx["emoji"] in ["◀", "▶", "⏪"]
+            ctx.message.embeds
+            and ctx.message.embeds[0].title is not discord.Embed.Empty
+            and re.match(r".* (LEADER|BAJKAR|ISHA|GIVING)BOARD .*", ctx.message.embeds[0].title)
+            and ctx.emoji in ["◀", "▶", "⏪"]
         ):
-            embed = ctx["message"].embeds[0]
+            embed = ctx.message.embeds[0]
             column, attribute, max_page = self.karma.get_db_from_title(embed.title)
             if column is None:
                 return
@@ -54,15 +55,15 @@ class Karma(commands.Cog):
                 current_page = int(embed.description.split(" – ")[0])
             else:
                 current_page = max_page
-            if ctx["emoji"] == "▶":
+            if ctx.emoji == "▶":
                 next_page = current_page + 10
                 if next_page > max_page - 9:
                     next_page = max_page - 9
-            elif ctx["emoji"] == "◀":
+            elif ctx.emoji == "◀":
                 next_page = current_page - 10
                 if next_page <= 0:
                     next_page = 1
-            elif ctx["emoji"] == "⏪":
+            elif ctx.emoji == "⏪":
                 next_page = 1
             embed.description = self.karma.gen_leaderboard_content(attribute, next_page, column)
             embed.timestamp = datetime.datetime.now(tz=datetime.timezone.utc)
@@ -70,37 +71,37 @@ class Karma(commands.Cog):
                 value_num = math.ceil(next_page / config.karma_grillbot_leaderboard_size)
                 value = messages.karma_web if value_num == 1 else f"{messages.karma_web}{value_num}"
                 embed.set_field_at(index=0, name=messages.karma_web_title, value=value)
-            await ctx["message"].edit(embed=embed)
-            if ctx["message"].guild:
-                await ctx["message"].remove_reaction(ctx["emoji"], ctx["member"])
+            await ctx.message.edit(embed=embed)
+            if ctx.message.guild:
+                await ctx.message.remove_reaction(ctx.emoji, ctx.member)
         # handle karma
         elif (
-            ctx["member"].id != ctx["message"].author.id
-            and ctx["guild"].id == config.guild_id
-            and ctx["message"].channel.id not in config.karma_banned_channels
-            and config.karma_ban_role_id not in map(lambda x: x.id, ctx["member"].roles)
+            ctx.member.id != ctx.message.author.id
+            and ctx.guild.id == config.guild_id
+            and ctx.message.channel.id not in config.karma_banned_channels
+            and config.karma_ban_role_id not in map(lambda x: x.id, ctx.member.roles)
         ):
-            if isinstance(ctx["emoji"], str):
-                karma_r.karma_emoji(ctx["message"].author, ctx["member"], ctx["emoji"])
+            if isinstance(ctx.emoji, str):
+                karma_r.karma_emoji(ctx.message.author, ctx.member, ctx.emoji)
             else:
-                karma_r.karma_emoji(ctx["message"].author, ctx["member"], ctx["emoji"].id)
+                karma_r.karma_emoji(ctx.message.author, ctx.member, ctx.emoji.id)
 
     @commands.Cog.listener()
     async def on_raw_reaction_remove(self, payload):
-        ctx = await utils.reaction_get_ctx(self.bot, payload)
+        ctx: ReactionContext = await ReactionContext.from_payload(self.bot, payload)
         if ctx is None:
             return
 
         if (
-            ctx["member"].id != ctx["message"].author.id
-            and ctx["guild"].id == config.guild_id
-            and ctx["message"].channel.id not in config.karma_banned_channels
-            and config.karma_ban_role_id not in map(lambda x: x.id, ctx["member"].roles)
+            ctx.member.id != ctx.message.author.id
+            and ctx.guild.id == config.guild_id
+            and ctx.message.channel.id not in config.karma_banned_channels
+            and config.karma_ban_role_id not in map(lambda x: x.id, ctx.member.roles)
         ):
-            if isinstance(ctx["emoji"], str):
-                karma_r.karma_emoji_remove(ctx["message"].author, ctx["member"], ctx["emoji"])
+            if isinstance(ctx.emoji, str):
+                karma_r.karma_emoji_remove(ctx.message.author, ctx.member, ctx.emoji)
             else:
-                karma_r.karma_emoji_remove(ctx["message"].author, ctx["member"], ctx["emoji"].id)
+                karma_r.karma_emoji_remove(ctx.message.author, ctx.member, ctx.emoji.id)
 
     @commands.cooldown(rate=5, per=30.0, type=commands.BucketType.user)
     @commands.group(brief=messages.karma_brief, usage=' ')
