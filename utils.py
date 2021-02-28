@@ -181,3 +181,12 @@ async def add_pagination_reactions(message: discord.Message, items_count: int):
 
     if items_count > 2:
         await message.add_reaction("⏩")
+
+def is_valid_datetime_format(dt: str, fmt: str) -> bool:
+    """Checks if string have valid datetime format"""
+
+    try:
+        datetime.strptime(dt, fmt)
+        return True
+    except ValueError:
+        return False

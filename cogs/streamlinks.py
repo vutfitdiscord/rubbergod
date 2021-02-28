@@ -11,12 +11,10 @@ import requests
 from bs4 import BeautifulSoup
 from datetime import datetime
 import re
+from features.reaction_context import ReactionContext
 
 # Pattern: "AnyText | [Subject] Page: CurrentPage / {TotalPages}"
 pagination_regex = re.compile(r'^\[([^\]]*)\]\s*Page:\s*(\d*)\s*\/\s*(\d*)')
-# Pattern (ISO Date): "YYYY-MM-DD"
-iso_date_regex = re.compile(r'(\d*)-(\d*)-(\d*)')
-
 
 class StreamLinks(commands.Cog):
     def __init__(self, bot):
@@ -62,15 +60,14 @@ class StreamLinks(commands.Cog):
                 return
 
             link_data = self.get_link_data(link)
-            is_iso_date = iso_date_regex.match(args[0]) is not None
             if link_data['upload_date'] is None:
-                if is_iso_date:
+                try:
                     link_data['upload_date'] = datetime.strptime(args[0], '%Y-%m-%d')
                     del args[0]
-                else:
+                except ValueError:
                     link_data['upload_date'] = datetime.utcnow()
             else:
-                if is_iso_date:
+                if utils.is_valid_datetime_format(args[0], '%Y-%m-%d'):
                     del args[0]
 
             self.repo.create(subject.lower(), link, username,
@@ -170,18 +167,18 @@ class StreamLinks(commands.Cog):
 
         return embed
 
-    async def handle_reaction(self, ctx):
+    async def handle_reaction(self, ctx: ReactionContext):
         try:
-            if ctx['reply_to'] is None:  # Reply is required to render embed.
-                await ctx['message'].edit(content=Messages.streamlinks_missing_original, embed=None)
+            if ctx.reply_to is None:  # Reply is required to render embed.
+                await ctx.message.edit(content=Messages.streamlinks_missing_original, embed=None)
                 return
 
-            embed: discord.Embed = ctx['message'].embeds[0]
+            embed: discord.Embed = ctx.message.embeds[0]
             footer_text = embed.footer.text.split('|')[1].strip()
             match = pagination_regex.match(footer_text)
 
             if match is None:
-                await ctx['message'].edit(content=Messages.streamlinks_unsupported_embed, embed=None)
+                await ctx.message.edit(content=Messages.streamlinks_unsupported_embed, embed=None)
                 return  # Invalid or unsupported embed.
 
             groups = match.groups()
@@ -192,20 +189,20 @@ class StreamLinks(commands.Cog):
             streamlinks = self.repo.get_streamlinks_of_subject(subject)
 
             if len(streamlinks) != pages_count:  # New streamlink was added, but removed.
-                await ctx['message'].edit(content=Messages.streamlinks_not_actual, embed=None)
+                await ctx.message.edit(content=Messages.streamlinks_not_actual, embed=None)
                 return
 
-            new_page = utils.pagination_next(ctx['emoji'], current_page, pages_count)
+            new_page = utils.pagination_next(ctx.emoji, current_page, pages_count)
             if new_page <= 0 or new_page == current_page:
                 return  # Pagination to same page. We can ignore.
 
             # Index - 1, because index position.
             streamlink: StreamLink = streamlinks[new_page - 1]
-            embed = self.create_embed_of_link(streamlink, ctx['reply_to'].author, len(streamlinks), new_page)
-            await ctx['message'].edit(embed=embed)
+            embed = self.create_embed_of_link(streamlink, ctx.reply_to.author, len(streamlinks), new_page)
+            await ctx.message.edit(embed=embed)
         finally:
-            if ctx["message"].guild:  # cannot remove reaction in DM
-                await ctx["message"].remove_reaction(ctx["emoji"], ctx["member"])
+            if ctx.message.guild:  # cannot remove reaction in DM
+                await ctx.message.remove_reaction(ctx.emoji, ctx.member)
 
     @add.error
     async def streamlinks_add_error(self, ctx: commands.Context, error):
