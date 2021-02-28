@@ -26,7 +26,7 @@ class StreamLinks(commands.Cog):
         self.check = RoomCheck(bot)
         self.config = app_config.Config
 
-    @commands.cooldown(rate=2, per=30.0, type=commands.BucketType.user)
+    @commands.cooldown(rate=4, per=30.0, type=commands.BucketType.user)
     @commands.group(brief=Messages.streamlinks_brief, usage="<subject>")
     async def streamlinks(self, ctx: commands.Context):
         if ctx.invoked_subcommand is None:
@@ -158,7 +158,7 @@ class StreamLinks(commands.Cog):
         embed.add_field(name="Popis", value=streamlink.description, inline=False)
         embed.timestamp = datetime.utcnow()
         utils.add_author_footer(embed, author, additional_text=[
-                                f"[{streamlink.subject.upper()}] Page: {current_pos} / {links_count}"])
+                                f"[{streamlink.subject.upper()}] Page: {current_pos} / {links_count} (#{streamlink.id})"])
 
         return embed
 
