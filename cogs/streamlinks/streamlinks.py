@@ -111,6 +111,16 @@ class StreamLinks(commands.Cog):
         for group in groups:
             await ctx.send(group)
 
+    @commands.check(utils.helper_plus)
+    @streamlinks.command(brief=Messages.streamlinks_remove_brief)
+    async def remove(self, ctx: commands.Context, id: int):
+        if not self.repo.exists(id):
+            await ctx.reply(Messages.streamlinks_not_exists)
+            return
+
+        self.repo.remove(id)
+        await ctx.reply(Messages.streamlinks_remove_success)
+
     def get_link_data(self, link: str):
         """
         Gets thumbnail from youtube or maybe from another service.
@@ -202,4 +212,14 @@ class StreamLinks(commands.Cog):
     @add.error
     async def streamlinks_add_error(self, ctx: commands.Context, error):
         if isinstance(error, discord.ext.commands.MissingRequiredArgument):
-            await ctx.send(Messages.streamlinks_add_format)
+            await ctx.reply(Messages.streamlinks_add_format)
+
+    @remove.error
+    async def streamlinks_remove_error(self, ctx: commands.Context, error):
+        if isinstance(error, discord.ext.commands.MissingRequiredArgument):
+            await ctx.reply(Messages.streamlinks_remove_format)
+
+    @list.error
+    async def streamlinks_list_error(self, ctx: commands.Context, error):
+        if isinstance(error, discord.ext.commands.MissingRequiredArgument):
+            await ctx.reply(Messages.streamlinks_list_format)

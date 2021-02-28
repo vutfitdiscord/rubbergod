@@ -31,9 +31,15 @@ class StreamLinksRepo(BaseRepository):
     def exists_link(self, link: str):
         return session.query(exists().where(StreamLink.link == link)).scalar()
 
+    def exists(self, id: int):
+        return session.query(exists().where(StreamLink.id == id)).scalar()
+
     def get_streamlinks_of_subject(self, subject: str):
         return list(session.query(StreamLink)\
             .filter(StreamLink.subject == subject)\
             .order_by(desc("created_at"))\
             .all()
         )
+
+    def remove(self, id: int):
+        return session.query(StreamLink).filter(StreamLink.id == id).delete()

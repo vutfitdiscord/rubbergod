@@ -327,11 +327,11 @@ class Messages:
     week_brief = "Vypíše, kolikátý je zrovna týden a jestli je sudý nebo lichý"
 
     streamlinks_brief = "Úložiště všech streamů"
-    streamlinks_format = f"{prefix}streamlinks [zkratka předmětu]"
+    streamlinks_format = f"`{prefix}streamlinks [zkratka předmětu]`"
     streamlinks_add_brief = "Zapíše nový stream k předmětu"
     streamlinks_add_link_exists = "Tento stream již existuje."
     streamlinks_add_success = "Stream byl úspěšně vytvořen <:HYPERS:493154327318233088>"
-    streamlinks_add_format = f"{prefix}streamlinks add [zkratka předmětu] [link] [Kdo (Jméno, nebo Tag)] [Datum nahrání(Volitelně)] [Popis]\n\n"\
+    streamlinks_add_format = f"`{prefix}streamlinks add [zkratka předmětu] [link] [Kdo (Jméno, nebo Tag)] [Datum nahrání(Volitelně)] [Popis]`\n\n"\
         "Datum nahrání se bere následovně. Nejdříve se pokusí získat automaticky ze služby, odkud odkaz pochází (youtube, ...), "\
         "pokud ze služby, kde je video nahráno nepůjde získat datum, tak bot zjistí, zda nebyl zadán jako volitelný parametr před popisem. "\
         "Datum se zadává ve formátu `{Rok}-{Měsíc}-{Den}`. Pokud ani tam nebude zadán datum, tak se jako datum nahrání bere aktuální datum.\n\n"\
@@ -340,4 +340,9 @@ class Messages:
     streamlinks_not_actual = "Tento seznam již není aktuální. Zavolej znovu příkaz pro aktualizaci."
     streamlinks_missing_original = "Originální zpráva s příkazem byla smazána. Zavolej znovu příkaz a nemaž originální zprávu."
     streamlinks_list_brief = "Vypíše zjednodušený seznam všech streamů k daném předmětu."
+    streamlinks_list_format = f"`{prefix}streamlinks list [zkratka předmětu]`"
     streamlinks_no_stream = "K tomuto předmětu ještě neexistuje žádný stream."
+    streamlinks_remove_brief = "Smazání streamu z předmětu."
+    streamlinks_remove_format = f"`{prefix}streamlinks remove [id]`\n\nID se nachází v patičce embedu. Na konci v textu v závorce, kde je # (Jen to číslo je ID)."
+    streamlinks_not_exists = "Stream s tímto ID nebyl nalezen."
+    streamlinks_remove_success = "Stream byl úspěšně smazán."
