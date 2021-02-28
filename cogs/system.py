@@ -35,6 +35,7 @@ class System(commands.Cog):
         """Load cog"""
         try:
             self.bot.load_extension(f"cogs.{extension}")
+            print(f'{extension} loaded')
             await ctx.send(utils.fill_message("cog_loaded", cog=extension))
         except Exception as e:
             await ctx.send(f"Loading error\n`{e}`")
@@ -49,6 +50,7 @@ class System(commands.Cog):
 
         try:
             self.bot.unload_extension(f"cogs.{extension}")
+            print(f'{extension} unloaded')
             await ctx.send(utils.fill_message("cog_unloaded", cog=extension))
         except Exception as e:
             await ctx.send(f"Unloading error\n`{e}`")
@@ -59,6 +61,7 @@ class System(commands.Cog):
         """Reload cog"""
         try:
             self.bot.reload_extension(f"cogs.{extension}")
+            print(f'{extension} reloaded')
             await ctx.send(utils.fill_message("cog_reloaded", cog=extension))
         except Exception as e:
             await ctx.send(f"Reloading error\n`{e}`")
