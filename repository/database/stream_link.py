@@ -1,6 +1,6 @@
-from sqlalchemy import *
+from sqlalchemy import BIGINT, Column, String, DateTime
 from repository.database import database
-import datetime
+
 
 class StreamLink(database.base):
     __tablename__ = 'stream_links'

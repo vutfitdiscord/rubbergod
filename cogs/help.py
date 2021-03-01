@@ -2,7 +2,7 @@ import asyncio
 import discord
 from discord.ext import commands
 
-from config import app_config as config, messages
+from config import app_config as config
 from features.git import Git
 
 config = config.Config
@@ -59,7 +59,6 @@ class Help(commands.Cog):
             embed.add_field(name=key, value=value, inline=False)
         return embed
 
-
     @commands.cooldown(rate=2, per=20.0, type=commands.BucketType.user)
     @commands.command(aliases=['god'], brief="Nápověda")
     async def help(self, ctx: commands.Context, *command):
@@ -104,7 +103,7 @@ class Help(commands.Cog):
 
         if pages_total <= 1:
             return
-        
+
         await message.add_reaction("⏪")
         await message.add_reaction("◀")
         await message.add_reaction("▶")

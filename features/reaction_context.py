@@ -2,7 +2,6 @@ import discord
 from discord.ext.commands import Bot
 from typing import Union
 from config.app_config import Config
-from config.messages import Messages
 
 
 class ReactionContext():

@@ -247,7 +247,8 @@ class ChannelManager(commands.Cog):
             await ctx.send(Messages.channel_help)
 
     @channel.command(aliases=["cp"], brief=Messages.role_channel_copy_brief)
-    async def copy(self, ctx, src: Union[discord.TextChannel, discord.VoiceChannel], dst: Union[discord.TextChannel, discord.VoiceChannel]):
+    async def copy(self, ctx, src: Union[discord.TextChannel, discord.VoiceChannel],
+                   dst: Union[discord.TextChannel, discord.VoiceChannel]):
         """
         Copy permissions from src channel to dst.
         Both channels are expected as tags or IDs
