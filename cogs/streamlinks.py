@@ -16,6 +16,7 @@ from features.reaction_context import ReactionContext
 # Pattern: "AnyText | [Subject] Page: CurrentPage / {TotalPages}"
 pagination_regex = re.compile(r'^\[([^\]]*)\]\s*Page:\s*(\d*)\s*\/\s*(\d*)')
 
+
 class StreamLinks(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
@@ -46,7 +47,8 @@ class StreamLinks(commands.Cog):
 
     @commands.check(utils.helper_plus)
     @streamlinks.command(brief=Messages.streamlinks_add_brief)
-    async def add(self, ctx: commands.Context, subject: str, link: str, user: Union[discord.User, discord.Member, str], *args):
+    async def add(self, ctx: commands.Context, subject: str, link: str,
+                  user: Union[discord.User, discord.Member, str], *args):
         try:
             await ctx.message.add_reaction(self.config.emote_loading)
 
@@ -74,7 +76,7 @@ class StreamLinks(commands.Cog):
                              " ".join(args), link_data['image'], link_data['upload_date'])
             await ctx.reply(content=Messages.streamlinks_add_success)
             await self.replace_reaction(ctx, "✅")
-        except:
+        except:  # noqa: E722
             await self.replace_reaction(ctx, "❌")
             raise
 
@@ -163,7 +165,8 @@ class StreamLinks(commands.Cog):
         embed.add_field(name="Popis", value=streamlink.description, inline=False)
         embed.timestamp = datetime.utcnow()
         utils.add_author_footer(embed, author, additional_text=[
-                                f"[{streamlink.subject.upper()}] Page: {current_pos} / {links_count} (#{streamlink.id})"])
+                                f"[{streamlink.subject.upper()}] Page: {current_pos} / {links_count}"
+                                f" (#{streamlink.id})"])
 
         return embed
 

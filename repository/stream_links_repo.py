@@ -24,7 +24,7 @@ class StreamLinksRepo(BaseRepository):
 
             session.add(streamlink)
             session.commit()
-        except:
+        except:  # noqa: E722
             session.rollback()
             raise
 
@@ -35,11 +35,11 @@ class StreamLinksRepo(BaseRepository):
         return session.query(exists().where(StreamLink.id == id)).scalar()
 
     def get_streamlinks_of_subject(self, subject: str):
-        return list(session.query(StreamLink)\
-            .filter(StreamLink.subject == subject)\
-            .order_by(desc("created_at"))\
-            .all()
-        )
+        return list(session.query(StreamLink)
+                    .filter(StreamLink.subject == subject)
+                    .order_by(desc("created_at"))
+                    .all()
+                    )
 
     def remove(self, id: int):
         return session.query(StreamLink).filter(StreamLink.id == id).delete()

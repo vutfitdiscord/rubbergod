@@ -1,7 +1,6 @@
 import discord
 from discord.ext import commands
 from features.reaction_context import ReactionContext
-import utils
 from config.app_config import Config
 
 
