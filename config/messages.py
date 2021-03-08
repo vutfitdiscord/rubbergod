@@ -347,5 +347,5 @@ class Messages:
     streamlinks_not_exists = "Stream s tímto ID nebyl nalezen."
     streamlinks_remove_success = "Stream byl úspěšně smazán."
 
-    latex_help = "Příklad:\n`{prefix}latex x^n + y^n = z^n`"
+    latex_help = f"Příklad:\n`{prefix}latex x^n + y^n = z^n`"
     latex_desc = "Vykreslí LaTeX výraz"
