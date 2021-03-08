@@ -2,10 +2,11 @@ discord.py >= 1.6.0
 emoji
 gitpython
 sqlalchemy
-psycopg2
+psycopg2-binary
 requests
 pillow
 dhash
 toml
 beautifulsoup4
 lxml
+git+https://github.com/Rapptz/discord-ext-menus
