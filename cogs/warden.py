@@ -61,7 +61,7 @@ class Warden(commands.Cog):
 
     async def handle_reaction(self, ctx):
         """Delete duplicate embed if original is not a duplicate"""
-        message = ctx["message"]
+        message = ctx.message
 
         for react in message.reactions:
             if react.emoji == "❎" and react.count >= config.duplicate_limit:
