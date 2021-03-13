@@ -1,120 +1,287 @@
-import typing
+import asyncio
+import re
+from typing import Dict
 from datetime import datetime
-
-from discord import Reaction, RawReactionActionEvent, NotFound, HTTPException
+import emoji
+from discord import RawReactionActionEvent, Message, TextChannel
 from discord.ext import commands
-from discord.ext.commands import BadArgument
+from discord.ext.commands import Bot, Context
 
-from features import vote
-
+from utils import is_command_message, str_emoji_id, fill_message
 from config.messages import Messages
+from dateutil import parser
+
+from repository import vote_repo
+
+vote_r = vote_repo.VoteRepository()
 
 
-class DateConverter(commands.Converter):
-    async def convert(self, ctx, argument):
+async def get_or_fetch_channel(bot: Bot, channel_id):
+    channel = bot.get_channel(channel_id)
+    if channel is None:
+        channel = await bot.fetch_channel(channel_id)
+    return channel
+
+
+async def get_or_fetch_user(bot: Bot, user_id):
+    user = bot.get_user(user_id)
+    if user is None:
+        user = await bot.fetch_user(user_id)
+    return user
+
+
+class VoteMessage:
+    class VoteOption:
+        def __init__(self, emoji: str, is_unicode: bool, message: str, count: int):
+            self.emoji = emoji
+            self.message = message
+            self.count = count
+            self.is_unicode = is_unicode
+
+    class ParseError(Exception):
+        pass
+
+    class NotEmojiError(Exception):
+        pass
+
+    emoji_regex = re.compile('^<:.*:([0-9]+)>(.+)')
+
+    @classmethod
+    def parse_option(cls, opt_line: str) -> VoteOption:
+        matches = cls.emoji_regex.match(opt_line)
+        if matches is None:
+            # it is not a discord emoji, try unicode
+            emojis = emoji.emoji_lis(opt_line)
+            if len(emojis) > 0 and emojis[0]['location'] == 0:
+                opt_emoji = emojis[0]['emoji']
+                opt_message = opt_line[len(opt_emoji):].strip()
+            else:
+                raise cls.NotEmojiError(opt_line)
+        else:
+            opt_emoji = matches.group(1)
+            opt_message = matches.group(2).strip()
+
+        return cls.VoteOption(opt_emoji, matches is None, opt_message, 0)
+
+    def __init__(self, message: str, is_one_of: bool):
+        self.is_one_of = is_one_of
+        if is_command_message('vote', message) or is_command_message('singlevote', message):
+            message = message[(message.index('vote') + 4):]
+
+        # If date/time line is present:
+        # line 1: date
+        # line 2: question
+        # lines 3,4..n: emoji option
+        if len(message.strip()) == 0:
+            raise self.ParseError()
+        lines = message.splitlines(False)
+        if len(lines) < 3:
+            raise self.ParseError()
+
         try:
-            dt = datetime.strptime(argument, "%d.%m.")
-            dt = dt.replace(year=ctx.message.created_at.year)
-            return dt
-        except ValueError:
-            raise BadArgument()
+            self.end_date = parser.parse(lines[0], dayfirst=True, fuzzy=True)
+            lines = lines[1:]  # Only keep lines with the question and the options
+        except parser.ParserError:
+            self.end_date = None
+            # The user might have actually followed the help and put a newline before the question
+            if len(lines[0].strip()) == 0:
+                lines = lines[1:]
 
+        if len(lines) < 3:  # Do we still have at least the question and two options?
+            raise self.ParseError()
 
-class TimeConverter(commands.Converter):
-    async def convert(self, ctx, argument):
-        try:
-            dt = datetime.strptime(argument, "%H:%M")
-            d = ctx.message.created_at
-            dt = dt.replace(year=d.year, month=d.month, day=d.day)
-            return dt
-        except ValueError:
-            raise BadArgument()
+        self.question = lines[0]
+        parsed_opts = [self.parse_option(x.strip()) for x in lines[1:]]
+        self.options: Dict[str, 'VoteMessage.VoteOption'] = {x.emoji: x for x in parsed_opts}
+        # Check if emojis are unique
+        if len(self.options) != len(set(self.options.keys())):
+            raise self.ParseError()
 
 
 class Vote(commands.Cog):
-    def __init__(self, bot):
+    def __init__(self, bot: Bot):
         self.bot = bot
-        self.voter = vote.Vote(bot)
-        self.handled = []
+        self.vote_cache: Dict[int, VoteMessage] = {}
+
+    async def load_cached(self):
+        db_votes = vote_r.get_pending_votes()
+        for v in db_votes:
+            try:
+                chan = await get_or_fetch_channel(self.bot, v.channel_id)
+                msg = await chan.fetch_message(v.message_id)
+                self.vote_cache[v.message_id] = VoteMessage(msg.content, v.is_one_of)
+                await self.init_vote(msg)
+            except (VoteMessage.ParseError, VoteMessage.NotEmojiError):
+                pass
 
     @commands.cooldown(rate=5, per=20.0, type=commands.BucketType.user)
     @commands.command(rest_is_raw=True, description=Messages.vote_format, brief=Messages.vote_brief)
-    async def vote(self, ctx, date: typing.Optional[DateConverter],
-                   time: typing.Optional[TimeConverter], *, message):
-        await self.voter.handle_vote(ctx, date, time, message)
+    async def vote(self, ctx, *, message):
+        await self.handle_vote_command(ctx, message, False)
 
-    def __handle(self, msg_id, user_id, emoji, add, raw):
-        t = (msg_id, user_id,)
+    @commands.cooldown(rate=5, per=20.0, type=commands.BucketType.user)
+    @commands.command(rest_is_raw=True, name='singlevote', description=Messages.vote_format,
+                      brief=Messages.vote_one_of_brief)
+    async def vote_one_of(self, ctx, *, message):
+        await self.handle_vote_command(ctx, message, True)
 
-        if t in self.handled:
-            self.handled.remove(t)
-            return True
-
-        if not raw:
-            self.handled.append(t)
-        return False
-
-    async def handle_raw_reaction(self, payload: RawReactionActionEvent,
-                                  added: bool):
-        chan = await self.bot.fetch_channel(payload.channel_id)
+    async def handle_vote_command(self, ctx: Context, message: str, one_of: bool):
+        if len(message.strip()) == 0:
+            await ctx.send(Messages.vote_format)
+            return
         try:
+            parsed_vote = VoteMessage(message, one_of)
+        except VoteMessage.ParseError:
+            await ctx.send(Messages.vote_bad_format)
+            return
+        except VoteMessage.NotEmojiError as e:
+            await ctx.send(Messages.vote_not_emoji.format(opt=str(e)))
+            return
+
+        if parsed_vote.end_date is not None and parsed_vote.end_date < datetime.now():
+            await ctx.send(Messages.vote_bad_date)
+            return
+
+        self.vote_cache[ctx.message.id] = parsed_vote
+        vote_r.add_vote(ctx.message.id, ctx.channel.id, parsed_vote.end_date, one_of)
+        await self.init_vote(ctx.message)
+        await ctx.send(Messages.vote_none)
+
+    async def init_vote(self, message: Message):
+        vote = self.vote_cache[message.id]
+        handled_opts = []
+        for msg_reaction in message.reactions:
+            r_id = str_emoji_id(msg_reaction.emoji)
+            if r_id in vote.options:
+                vote.options[r_id].count = msg_reaction.count - 1
+                handled_opts.append(r_id)
+            else:
+                async for u in msg_reaction.users():
+                    await msg_reaction.remove(u)
+
+        for opt in vote.options:
+            if opt not in handled_opts:
+                if vote.options[opt].is_unicode:
+                    e = vote.options[opt].emoji
+                else:
+                    e = self.bot.get_emoji(int(vote.options[opt].emoji))
+                await message.add_reaction(e)
+
+        if vote.end_date is not None:
+            sec = (vote.end_date - datetime.now()).total_seconds()
+            if sec < 1:
+                sec = 1
+            asyncio.ensure_future(self.send_final_message(sec, message.id, message.channel.id))
+
+    async def handle_raw_reaction_add(self, payload: RawReactionActionEvent):
+        # Called from reactions.py
+        if payload.message_id not in self.vote_cache:
+            return
+
+        vote = self.vote_cache[payload.message_id]
+        chan = await get_or_fetch_channel(self.bot, payload.channel_id)
+
+        emoji_str = str_emoji_id(payload.emoji)
+
+        if emoji_str not in vote.options:
             msg = await chan.fetch_message(payload.message_id)
-            usr = await self.bot.fetch_user(payload.user_id)
-        except NotFound:
-            return False
-
-        for r in msg.reactions:
-            if str(r.emoji) == str(payload.emoji):
-                await self.voter.handle_reaction(r, usr, added)
-                return True
-
-        return False
-
-    @commands.Cog.listener()
-    async def on_reaction_add(self, reaction: Reaction, user):
-        if self.__handle(reaction.message.id, user.id, reaction.emoji, True,
-                         False):
-            # print("Already handled")
+            usr = await get_or_fetch_user(self.bot, payload.user_id)
+            await msg.remove_reaction(payload.emoji, usr)
             return
 
-        # print("Handling")
-        await self.voter.handle_reaction(reaction, user, True)
+        if vote.is_one_of:
+            msg: Message = await chan.fetch_message(payload.message_id)
+            usr = await get_or_fetch_user(self.bot, payload.user_id)
+            for r in msg.reactions:
+                if str_emoji_id(r.emoji) == emoji_str:
+                    continue
 
-    @commands.Cog.listener()
-    async def on_raw_reaction_add(self, payload: RawReactionActionEvent):
-        if self.__handle(payload.message_id, payload.user_id, payload.emoji,
-                         True, True):
-            # print("Already handled (in RAW)")
-            return
+                if await r.users().find(lambda x: x.id == usr.id):
+                    # Increment the counter here, so that on_raw_reaction_remove can decrement it again
+                    vote.options[emoji_str].count += 1
+                    await msg.remove_reaction(payload.emoji, usr)
+                    return
 
-        # print("Handling RAW")
-        try:
-            if not await self.handle_raw_reaction(payload, True):
-                print("Couldn't find reaction, that is rather weird.")
-        except HTTPException:
-            # ignore HTTP Exceptions
-            return
+        last_max_opt = max(vote.options.values(), key=lambda x: x.count).count
 
-    @commands.Cog.listener()
-    async def on_reaction_remove(self, reaction: Reaction, user):
-        if self.__handle(reaction.message.id, user.id, reaction.emoji, False,
-                         False):
-            # print("Already handled")
-            return
-
-        # print("Handling")
-        await self.voter.handle_reaction(reaction, user, False)
+        vote.options[emoji_str].count += 1
+        if vote.options[emoji_str].count >= last_max_opt:
+            msg = await chan.fetch_message(payload.message_id)
+            await self.update_bot_vote_message(msg, chan)
 
     @commands.Cog.listener()
     async def on_raw_reaction_remove(self, payload: RawReactionActionEvent):
-        if self.__handle(payload.message_id, payload.user_id, payload.emoji,
-                         False, True):
-            # print("Already handled (in RAW)")
+        if payload.message_id not in self.vote_cache:
             return
 
-        # print("Handling RAW")
-        if not await self.handle_raw_reaction(payload, False):
-            print("Couldn't find reaction, that is rather weird.")
+        vote = self.vote_cache[payload.message_id]
+        if str_emoji_id(payload.emoji) not in vote.options:
+            return
+
+        chan = await get_or_fetch_channel(self.bot, payload.channel_id)
+        emoji_str = str_emoji_id(payload.emoji)
+
+        last_max_opt = max(vote.options.values(), key=lambda x: x.count).count
+
+        vote.options[emoji_str].count -= 1
+        if (vote.options[emoji_str].count + 1) == last_max_opt:
+            msg = await chan.fetch_message(payload.message_id)
+            await self.update_bot_vote_message(msg, chan)
+
+    @commands.Cog.listener()
+    async def on_ready(self):
+        await self.load_cached()
+
+    def get_message(self, vote: VoteMessage, final: bool):
+        def singularise(msg: str):
+            return msg.replace(" 1 hlasy.", " 1 hlasem.")
+
+        most_voted = max(vote.options.values(), key=lambda x: x.count).count
+        all_most_voted = list(filter(lambda x: x.count == most_voted, vote.options.values()))
+
+        if most_voted <= 0:
+            return Messages.vote_result_none if final else Messages.vote_none
+
+        if len(all_most_voted) == 1:
+            option = all_most_voted[0]
+
+            return singularise(fill_message(
+                "vote_result" if final else "vote_winning",
+                winning_emoji=(option.emoji if option.is_unicode else str(self.bot.get_emoji(int(option.emoji)))),
+                winning_option=option.message,
+                votes=option.count,
+                question=vote.question
+            ))
+        else:
+            emoji_str = ""
+            for e in all_most_voted:
+                emoji_str += (e.emoji if e.is_unicode else str(self.bot.get_emoji(int(e.emoji)))) + ", "
+            emoji_str = emoji_str[:-2]
+            return singularise(fill_message(
+                "vote_result_multiple" if final else "vote_winning_multiple",
+                winning_emojis=emoji_str,
+                votes=most_voted,
+                question=vote.question
+            ))
+
+    async def update_bot_vote_message(self, vote_msg: Message, channel: TextChannel):
+        vote = self.vote_cache[vote_msg.id]
+        bot_msg = await channel.history(
+            limit=3,
+            after=vote_msg.created_at
+        ).get(author__id=self.bot.user.id)
+
+        if bot_msg is None:
+            return
+
+        await bot_msg.edit(content=self.get_message(vote, False))
+
+    async def send_final_message(self, timeout, message_id, channel_id):
+        await asyncio.sleep(timeout)
+        vote = self.vote_cache[message_id]
+        chan = await get_or_fetch_channel(self.bot, channel_id)
+        await chan.send(content=self.get_message(vote, True))
+        vote_r.finish_vote(message_id)
 
 
 def setup(bot):
