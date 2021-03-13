@@ -2,6 +2,7 @@ import discord
 from discord.ext import commands
 from features.reaction_context import ReactionContext
 from config.app_config import Config
+from utils import is_command_message
 
 
 class Reaction(commands.Cog):
@@ -13,6 +14,11 @@ class Reaction(commands.Cog):
         """Catch reaction, get all properties and then call proper cog/s"""
         ctx: ReactionContext = await ReactionContext.from_payload(self.bot, payload)
         if ctx is None:
+            return
+
+        if self.bot.get_cog("Vote") is not None and (is_command_message('vote', ctx.message.content)
+                or is_command_message('singlevote', ctx.message.content, False)):
+            await self.bot.get_cog("Vote").handle_raw_reaction_add(payload)
             return
 
         cogs = []

@@ -3,7 +3,7 @@ from typing import Iterable, Optional, Union
 
 import discord
 import math
-from discord import Member
+from discord import Member, PartialEmoji, Emoji
 from discord.ext import commands
 
 from config.app_config import Config
@@ -21,8 +21,15 @@ def id_to_datetime(snowflake_id: int):
 def str_emoji_id(emoji):
     if isinstance(emoji, int):
         return str(emoji)
+    if isinstance(emoji, str):
+        return emoji
+    if isinstance(emoji, PartialEmoji) or isinstance(emoji, Emoji):
+        if emoji.id is None:
+            return emoji.name
+        else:
+            return str(emoji.id)
 
-    return emoji if isinstance(emoji, str) else str(emoji.id)
+    return None
 
 
 def has_role(user, role_name: str):
@@ -158,9 +165,9 @@ def get_command_signature(ctx: commands.Context):
 def clear_link_escape(link: str):
     """Removes < and > escapes from link."""
 
-    if(link.startswith("<")):
+    if (link.startswith("<")):
         link = link[1:]
-    if(link.endswith(">")):
+    if (link.endswith(">")):
         link = link[:-1]
 
     return link
@@ -190,3 +197,21 @@ def is_valid_datetime_format(dt: str, fmt: str) -> bool:
         return True
     except ValueError:
         return False
+
+
+def is_command_message(cmd: str, msg: str, require_space=True) -> bool:
+    """Checks whether the message starts with a specified command"""
+    cmd = cmd.strip()
+    msg_len = len(msg)
+
+    for prefix in Config.command_prefix:
+        cmd_p = f"{prefix}{cmd}"
+        cmd_p_len = len(cmd_p)
+
+        if msg.find(cmd_p) == 0:
+            if require_space:
+                return msg_len > cmd_p_len and msg[cmd_p_len].isspace()
+            else:
+                return True
+
+    return False

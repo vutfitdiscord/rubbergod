@@ -10,6 +10,7 @@ from repository.review_repo import ReviewRepository
 from repository.database.hugs import HugsTable
 from repository.database.pin_map import PinMap
 from repository.database.stream_link import StreamLink
+from repository.database.vote import Vote
 
 from config.app_config import Config
 
