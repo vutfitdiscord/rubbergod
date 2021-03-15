@@ -22,7 +22,7 @@ smtp_port = 465
 pass = ''
 
 [database]
-db_string = "postgres://postgres:postgres@db:5432/postgres"
+db_string = "postgresql://postgres:postgres@db:5432/postgres"
 
 [cogs]
 extensions = ['base', 'karma', 'meme', 'random', 'verify', 'fitwide', 'autopin', 'urban', 'help',
