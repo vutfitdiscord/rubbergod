@@ -1,5 +1,9 @@
 import datetime
+from io import BytesIO
+from PIL import Image, ImageDraw
 from random import choice
+import requests
+from typing import List
 
 import discord
 from discord.ext import commands
@@ -59,6 +63,74 @@ class Meme(commands.Cog):
     @commands.command(name="??", brief="???")
     async def question(self, ctx):
         await ctx.send(choice(messages.question))
+
+    @commands.cooldown(rate=5, per=20.0, type=commands.BucketType.user)
+    @commands.command(brief=messages.bonk_brief)
+    async def bonk(self, ctx, *, member: discord.Member = None):
+        """Bonk someone
+        member: Discord user. If none, the bot will bonk you.
+        """
+        if member is None:
+            bonker = self.bot.user
+            bonked = ctx.author
+        else:
+            bonker = ctx.author
+            bonked = member
+
+        async with ctx.typing():
+            url = bonked.avatar_url_as(format="jpg")
+            response = requests.get(url)
+            avatar = Image.open(BytesIO(response.content))
+
+            frames = self.get_bonk_frames(avatar)
+
+            with BytesIO() as image_binary:
+                frames[0].save(
+                    image_binary,
+                    format="GIF",
+                    save_all=True,
+                    append_images=frames[1:],
+                    duration=30,
+                    loop=0,
+                    transparency=0,
+                    disposal=2,
+                    optimize=False,
+                )
+                image_binary.seek(0)
+                await ctx.reply(
+                    file=discord.File(fp=image_binary, filename="bonk.gif"),
+                    mention_author=False,
+                )
+
+    def get_bonk_frames(self, avatar: Image.Image) -> List[Image.Image]:
+        """Get frames for the bonk"""
+        frames = []
+        width, height = 200, 170
+        deformation = (0, 0, 0, 5, 10, 20, 15, 5)
+
+        avatar = self.round_image(avatar.resize((100, 100)))
+
+        for i in range(8):
+            img = "%02d" % (i + 1)
+            frame = Image.new("RGBA", (width, height), (54, 57, 63, 1))
+            bat = Image.open(f"images/bonk/{img}.png")
+
+            frame_avatar = avatar.resize((100, 100 - deformation[i]))
+
+            frame.paste(frame_avatar, (80, 60 + deformation[i]), frame_avatar)
+            frame.paste(bat, (10, 5), bat)
+            frames.append(frame)
+
+        return frames
+
+    @staticmethod
+    def round_image(frame_avatar: Image.Image) -> Image.Image:
+        """Convert square avatar to circle"""
+        frame_mask = Image.new("1", frame_avatar.size, 0)
+        draw = ImageDraw.Draw(frame_mask)
+        draw.ellipse((0, 0) + frame_avatar.size, fill=255)
+        frame_avatar.putalpha(frame_mask)
+        return frame_avatar
 
 
 def setup(bot):
