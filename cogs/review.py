@@ -40,7 +40,11 @@ class Review(commands.Cog):
         return True
 
     @commands.cooldown(rate=5, per=20.0, type=commands.BucketType.user)
-    @commands.group(aliases=["review"], brief=messages.review_get_brief, usage="[subject]")
+    @commands.group(
+        aliases=["review", "recenze", "recenzie", "reviev", "rewiev"],
+        brief=messages.review_get_brief,
+        usage="[subject]"
+    )
     async def reviews(self, ctx):
         """Group of commands for reviews.
         If not subcommand is invoked, try to find subject reviews specified by first argument
@@ -238,12 +242,17 @@ class Review(commands.Cog):
 
         utils.add_author_footer(embed, ctx.author, additional_text=("?tierboard help",))
         msg = await ctx.send(embed=embed)
+
+        page_num = 0
+        pages_total = review_repo.get_tierboard_page_count(type, sem, degree, year)
+
+        if pages_total == 0:
+            return
+
         await msg.add_reaction("⏪")
         await msg.add_reaction("◀")
         await msg.add_reaction("▶")
 
-        page_num = 0
-        pages_total = review_repo.get_tierboard_page_count(type, sem, degree, year)
         while True:
 
             def check(reaction, user):
