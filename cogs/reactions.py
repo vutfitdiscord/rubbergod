@@ -1,8 +1,11 @@
 import discord
 from discord.ext import commands
+import sqlalchemy
+
 from features.reaction_context import ReactionContext
 from config.app_config import Config
 from utils import is_command_message
+from repository.database import session
 
 
 class Reaction(commands.Cog):
@@ -18,7 +21,10 @@ class Reaction(commands.Cog):
 
         if self.bot.get_cog("Vote") is not None and (is_command_message('vote', ctx.message.content)
                 or is_command_message('singlevote', ctx.message.content, False)):
-            await self.bot.get_cog("Vote").handle_raw_reaction_add(payload)
+            try:
+                await self.bot.get_cog("Vote").handle_raw_reaction_add(payload)
+            except sqlalchemy.exc.InternalError:
+                session.rollback()
             return
 
         cogs = []
@@ -52,7 +58,10 @@ class Reaction(commands.Cog):
         for cog in cogs:
             # check if cog is loaded
             if cog:
-                await cog.handle_reaction(ctx)
+                try:
+                    await cog.handle_reaction(ctx)
+                except sqlalchemy.exc.InternalError:
+                    session.rollback()
 
 
 def setup(bot):

@@ -2,7 +2,9 @@ import traceback
 
 import discord
 from discord.ext import commands
+import sqlalchemy
 
+from repository.database import session
 from config import app_config as config, messages
 import utils
 
@@ -15,6 +17,9 @@ class Error(commands.Cog):
     async def on_command_error(self, ctx, error):
         # The local handlers so far only catch bad arguments so we still
         # want to print the rest
+        if isinstance(error, sqlalchemy.exc.InternalError):
+            session.rollback()
+            return
         if (
             isinstance(error, commands.BadArgument)
             or isinstance(error, commands.errors.CheckFailure)
