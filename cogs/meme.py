@@ -132,6 +132,12 @@ class Meme(commands.Cog):
         frame_avatar.putalpha(frame_mask)
         return frame_avatar
 
+    @bonk.error
+    async def bonk_error(self, ctx, error):
+        if isinstance(error, commands.BadArgument):
+            await ctx.send(utils.fill_message("member_not_found", user=ctx.author.id))
+
+
 
 def setup(bot):
     bot.add_cog(Meme(bot))
