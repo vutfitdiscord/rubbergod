@@ -1,7 +1,6 @@
 import discord
 from discord.ext import commands, tasks
 from config import app_config as config, messages
-from config.app_config import Config
 from repository.database import session
 from repository.database.verification import Permit, Valid_person
 import utils
@@ -239,7 +238,7 @@ class IOS(commands.Cog):
     async def ios_stop(self, ctx):
         self.ios_body.stop()
 
-    @tasks.loop(minutes=Config.ios_looptime_minutes)
+    @tasks.loop(minutes=config.ios_looptime_minutes)
     async def ios_body(self, channel=discord.Object(id='534431057001316362')):
         process = subprocess.Popen(["ssh", "merlin"], stdout=subprocess.PIPE)
         output, error = process.communicate()
