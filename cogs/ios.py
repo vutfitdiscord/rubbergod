@@ -1,6 +1,7 @@
 import discord
 from discord.ext import commands, tasks
 from config import app_config as config, messages
+from config.app_config import Config
 from repository.database import session
 from repository.database.verification import Permit, Valid_person
 import utils
@@ -238,7 +239,7 @@ class IOS(commands.Cog):
     async def ios_stop(self, ctx):
         self.ios_body.stop()
 
-    @tasks.loop(minutes=30)
+    @tasks.loop(minutes=Config.ios_looptime_minutes)
     async def ios_body(self, channel=discord.Object(id='534431057001316362')):
         process = subprocess.Popen(["ssh", "merlin"], stdout=subprocess.PIPE)
         output, error = process.communicate()
@@ -248,11 +249,10 @@ class IOS(commands.Cog):
             parsed_memory = parse_memory(memory)
             parsed_semaphores, parsed_files = parse_semaphores(semaphores)
             parsed_processes = parse_processes(processes)
+            await print_output(self.bot, channel, "merlinovi", parsed_memory, parsed_semaphores,
+                               parsed_files, parsed_processes)
         except IndexError:
-            await self.bot.send("Toastere, máš bordel v parsování.")
-
-        await print_output(self.bot, channel, "merlinovi", parsed_memory, parsed_semaphores,
-                           parsed_files, parsed_processes)
+            await self.bot.send(channel, "Toastere, máš bordel v parsování.")
 
         process = subprocess.Popen(["ssh", "eva"], stdout=subprocess.PIPE)
         output = process.communicate()[0]
@@ -265,10 +265,10 @@ class IOS(commands.Cog):
             parsed_memory = parse_memory(memory)
             parsed_semaphores, _ = parse_semaphores(semaphores)
             parsed_processes = parse_processes(processes)
+            await print_output(self.bot, channel, "eve", parsed_memory, parsed_semaphores, dict(), parsed_processes)
         except IndexError:
             await self.bot.send(channel, "Toastere, máš bordel v parsování.")
         # eva doesn't seem to have /dev/shm
-        await print_output(self.bot, channel, "eve", parsed_memory, parsed_semaphores, dict(), parsed_processes)
         await self.bot.send(channel, "Pokud nevíte jak po sobě uklidit, checkněte: " +
                        "https://discordapp.com/channels/" +
                        "461541385204400138/534431057001316362/" +

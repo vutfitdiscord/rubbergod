@@ -159,3 +159,6 @@ ing_role_id = 0
 
 [emote]
 loading="<a:loading:814969399442014259>"
+
+[util]
+ios_looptime_minutes=120
