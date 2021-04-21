@@ -1,16 +1,12 @@
 import discord
 from discord.ext import commands, tasks
-from config import app_config as config, messages
+from config.app_config import Config
 from repository.database import session
 from repository.database.verification import Permit, Valid_person
 import utils
 import subprocess
 import datetime
 import re
-
-
-config = config.Config
-Messages = messages.Messages
 
 
 def running_for(time):
@@ -111,64 +107,49 @@ def filter_processes(processes):
     return "\n".join(out)
 
 
+async def insult_login(parsed_items, non_user_format: str, user_format: str, bot, channel, system):
+    for login, array in parsed_items.copy().items():
+        user = session.query(Permit).filter(Permit.login == login).one_or_none()
+        count = len(array)
+        avg_time = sum(array) // count
+
+        person = session.query(Valid_person).filter(Valid_person.login == login).one_or_none()
+
+        if "BIT" not in person.year and "FEKT" not in person.year:
+            if login in parsed_items:
+                parsed_items.pop(login)
+            continue
+
+        if user is None:
+            await bot.send(channel, non_user_format.format(login))
+        else:
+            await bot.send(channel, user_format.format(utils.generate_mention(user.discord_ID),
+                                                       system, str(count), str(avg_time)))
+
+
 async def print_output(bot, channel, system, parsed_memory, parsed_semaphores, parsed_files, parsed_processes):
     if parsed_memory != dict():
-        for login, array in parsed_memory.copy().items():
-            user = session.query(Permit).\
-                filter(Permit.login == login).one_or_none()
-            count = len(array)
-            avg_time = sum(array) // count
-
-            person = session.query(Valid_person).\
-                filter(Valid_person.login == login).one_or_none()
-
-            if "BIT" not in person.year and "FEKT" not in person.year:
-                if login in parsed_memory:
-                    parsed_memory.pop(login)
-                continue
-
-            if user is None:
-                await bot.send(channel, "Sdílenou paměť nechává nějaký " + login +
-                               " co není na serveru.")
-            else:
-                await bot.send(channel, utils.generate_mention(user.discord_ID) +
-                               " máš na " + system + " " + str(count) +
-                               " sdílené paměti, ztracené průměrně " +
-                               str(avg_time) + " minut, ty prase.")
+        await insult_login(parsed_memory,
+                           "Sdílenou paměť nechává nějaký {} co není na serveru.",
+                           "{} máš na {} {} sdílené paměti, ztracené průměrně {} minut, ty prase.",
+                           bot, channel, system)
 
     if parsed_semaphores != dict():
-        for login, array in parsed_semaphores.copy().items():
-            user = session.query(Permit).\
-                filter(Permit.login == login).one_or_none()
-            count = len(array)
-            avg_time = sum(array) // count
-
-            person = session.query(Valid_person).\
-                filter(Valid_person.login == login).one_or_none()
-
-            if "BIT" not in person.year and "FEKT" not in person.year:
-                if login in parsed_semaphores:
-                    parsed_semaphores.pop(login)
-                continue
-
-            if user is None:
-                await bot.send(channel, "Semafory nechává nějaký " + login + " co není na serveru.")
-            else:
-                await bot.send(channel, utils.generate_mention(user.discord_ID) +
-                               " máš na " + system + " " + str(count) +
-                               " semaforů, ležících tam průměrně " +
-                               str(avg_time) + " minut, ty prase.")
+        await insult_login(parsed_semaphores,
+                           "Semafory nechává nějaký {} co není na serveru",
+                           "{} máš na {} {} semaforů, ležících tam průměrně {} minut, ty prase.",
+                           bot, channel, system)
 
     if parsed_files != dict():
         for login, array in parsed_files.copy().items():
-            user = session.query(Permit).\
+            user = session.query(Permit). \
                 filter(Permit.login == login).one_or_none()
             login_not_in_name = array[1]
             array = array[0]
             count = len(array)
             avg_time = sum(array) // count
 
-            person = session.query(Valid_person).\
+            person = session.query(Valid_person). \
                 filter(Valid_person.login == login).one_or_none()
 
             if "BIT" not in person.year and "FEKT" not in person.year:
@@ -191,27 +172,10 @@ async def print_output(bot, channel, system, parsed_memory, parsed_semaphores, p
                                    " mit kolize s ostatními, ty prase.")
 
     if parsed_processes != dict():
-        for login, array in parsed_processes.copy().items():
-            user = session.query(Permit).\
-                filter(Permit.login == login).one_or_none()
-            count = len(array)
-            avg_time = sum(array) // count
-
-            person = session.query(Valid_person).\
-                filter(Valid_person.login == login).one_or_none()
-
-            if "BIT" not in person.year and "FEKT" not in person.year:
-                if login in parsed_processes:
-                    parsed_processes.pop(login)
-                continue
-
-            if user is None:
-                await bot.send(channel, "Nějakého " + login + " co není na serveru.")
-            else:
-                await bot.send(channel, utils.generate_mention(user.discord_ID) +
-                               " máš na " + system + " " + str(count) +
-                               " procesů, běžících průměrně " +
-                               str(avg_time) + " minut, ty prase.")
+        await insult_login(parsed_processes,
+                           "Nějakého {} co není na serveru.",
+                           "{} máš na {} {} procesů, běžících průměrně {} minut, ty prase",
+                           bot, channel, system)
 
     if (parsed_memory == dict() and parsed_semaphores == dict()
             and parsed_processes == dict() and parsed_files == dict()):
@@ -238,7 +202,7 @@ class IOS(commands.Cog):
     async def ios_stop(self, ctx):
         self.ios_body.stop()
 
-    @tasks.loop(minutes=config.ios_looptime_minutes)
+    @tasks.loop(minutes=Config.ios_looptime_minutes)
     async def ios_body(self, channel=discord.Object(id='534431057001316362')):
         process = subprocess.Popen(["ssh", "merlin"], stdout=subprocess.PIPE)
         output, error = process.communicate()
@@ -269,9 +233,9 @@ class IOS(commands.Cog):
             await self.bot.send(channel, "Toastere, máš bordel v parsování.")
         # eva doesn't seem to have /dev/shm
         await self.bot.send(channel, "Pokud nevíte jak po sobě uklidit, checkněte: " +
-                       "https://discordapp.com/channels/" +
-                       "461541385204400138/534431057001316362/" +
-                       "698701631495340033")
+                            "https://discordapp.com/channels/" +
+                            "461541385204400138/534431057001316362/" +
+                            "698701631495340033")
 
 
 def setup(bot):
