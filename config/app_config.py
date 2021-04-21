@@ -141,3 +141,6 @@ class Config:
 
     # Emotes
     emote_loading: str = get_attr("emote", "loading")
+
+    # util
+    ios_looptime_minutes: int = get_attr("util", "ios_looptime_minutes")
