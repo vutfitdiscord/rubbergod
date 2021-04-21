@@ -1,4 +1,5 @@
-from discord.ext import commands
+import discord
+from discord.ext import commands, tasks
 from config import app_config as config, messages
 from repository.database import session
 from repository.database.verification import Permit, Valid_person
@@ -110,7 +111,7 @@ def filter_processes(processes):
     return "\n".join(out)
 
 
-async def print_output(ctx, system, parsed_memory, parsed_semaphores, parsed_files, parsed_processes):
+async def print_output(bot, channel, system, parsed_memory, parsed_semaphores, parsed_files, parsed_processes):
     if parsed_memory != dict():
         for login, array in parsed_memory.copy().items():
             user = session.query(Permit).\
@@ -127,10 +128,10 @@ async def print_output(ctx, system, parsed_memory, parsed_semaphores, parsed_fil
                 continue
 
             if user is None:
-                await ctx.send("Sdílenou paměť nechává nějaký " + login +
+                await bot.send(channel, "Sdílenou paměť nechává nějaký " + login +
                                " co není na serveru.")
             else:
-                await ctx.send(utils.generate_mention(user.discord_ID) +
+                await bot.send(channel, utils.generate_mention(user.discord_ID) +
                                " máš na " + system + " " + str(count) +
                                " sdílené paměti, ztracené průměrně " +
                                str(avg_time) + " minut, ty prase.")
@@ -151,9 +152,9 @@ async def print_output(ctx, system, parsed_memory, parsed_semaphores, parsed_fil
                 continue
 
             if user is None:
-                await ctx.send("Semafory nechává nějaký " + login + " co není na serveru.")
+                await bot.send(channel, "Semafory nechává nějaký " + login + " co není na serveru.")
             else:
-                await ctx.send(utils.generate_mention(user.discord_ID) +
+                await bot.send(channel, utils.generate_mention(user.discord_ID) +
                                " máš na " + system + " " + str(count) +
                                " semaforů, ležících tam průměrně " +
                                str(avg_time) + " minut, ty prase.")
@@ -176,17 +177,17 @@ async def print_output(ctx, system, parsed_memory, parsed_semaphores, parsed_fil
                 continue
 
             if user is None:
-                await ctx.send("Soubory semaforu nechává nějaký " +
+                await bot.send(channel, "Soubory semaforu nechává nějaký " +
                                login + " co není na serveru.")
             else:
-                await ctx.send(utils.generate_mention(user.discord_ID) +
+                await bot.send(channel, utils.generate_mention(user.discord_ID) +
                                " máš na " + system + "(/dev/shm) " +
                                str(count) + " souborů semaforu.")
                 if avg_time > 9:
-                    await ctx.send("Leží ti tam průměrně už " +
+                    await bot.send(channel, "Leží ti tam průměrně už " +
                                    str(avg_time) + " minut, ty prase.")
                 if login_not_in_name:
-                    await ctx.send("Nemáš v názvu tvůj login, takže můžeš" +
+                    await bot.send(channel, "Nemáš v názvu tvůj login, takže můžeš" +
                                    " mit kolize s ostatními, ty prase.")
 
     if parsed_processes != dict():
@@ -205,16 +206,16 @@ async def print_output(ctx, system, parsed_memory, parsed_semaphores, parsed_fil
                 continue
 
             if user is None:
-                await ctx.send("Nějakého " + login + " co není na serveru.")
+                await bot.send(channel, "Nějakého " + login + " co není na serveru.")
             else:
-                await ctx.send(utils.generate_mention(user.discord_ID) +
+                await bot.send(channel, utils.generate_mention(user.discord_ID) +
                                " máš na " + system + " " + str(count) +
                                " procesů, běžících průměrně " +
                                str(avg_time) + " minut, ty prase.")
 
     if (parsed_memory == dict() and parsed_semaphores == dict()
             and parsed_processes == dict() and parsed_files == dict()):
-        await ctx.send("Na " + system + " uklizeno <:HYPERS:493154327318233088>")
+        await bot.send(channel, "Na " + system + " uklizeno <:HYPERS:493154327318233088>")
 
 
 class IOS(commands.Cog):
@@ -225,6 +226,20 @@ class IOS(commands.Cog):
     @commands.check(utils.helper_plus)
     @commands.command()
     async def ios(self, ctx):
+        await self.ios_body(ctx.channel)
+
+    @commands.check(utils.is_bot_admin)
+    @commands.command()
+    async def ios_start(self, ctx):
+        self.ios_body.start()
+
+    @commands.check(utils.is_bot_admin)
+    @commands.command()
+    async def ios_stop(self, ctx):
+        self.ios_body.stop()
+
+    @tasks.loop(minutes=30)
+    async def ios_body(self, channel=discord.Object(id='534431057001316362')):
         process = subprocess.Popen(["ssh", "merlin"], stdout=subprocess.PIPE)
         output, error = process.communicate()
         memory, rest = output.decode('utf-8').split("semafory:\n")
@@ -234,9 +249,9 @@ class IOS(commands.Cog):
             parsed_semaphores, parsed_files = parse_semaphores(semaphores)
             parsed_processes = parse_processes(processes)
         except IndexError:
-            await ctx.send("Toastere, máš bordel v parsování.")
+            await self.bot.send("Toastere, máš bordel v parsování.")
 
-        await print_output(ctx, "merlinovi", parsed_memory, parsed_semaphores,
+        await print_output(self.bot, channel, "merlinovi", parsed_memory, parsed_semaphores,
                            parsed_files, parsed_processes)
 
         process = subprocess.Popen(["ssh", "eva"], stdout=subprocess.PIPE)
@@ -251,11 +266,10 @@ class IOS(commands.Cog):
             parsed_semaphores, _ = parse_semaphores(semaphores)
             parsed_processes = parse_processes(processes)
         except IndexError:
-            await ctx.send("Toastere, máš bordel v parsování.")
-
+            await self.bot.send(channel, "Toastere, máš bordel v parsování.")
         # eva doesn't seem to have /dev/shm
-        await print_output(ctx, "eve", parsed_memory, parsed_semaphores, dict(), parsed_processes)
-        await ctx.send("Pokud nevíte jak po sobě uklidit, checkněte: " +
+        await print_output(self.bot, channel, "eve", parsed_memory, parsed_semaphores, dict(), parsed_processes)
+        await self.bot.send(channel, "Pokud nevíte jak po sobě uklidit, checkněte: " +
                        "https://discordapp.com/channels/" +
                        "461541385204400138/534431057001316362/" +
                        "698701631495340033")
