@@ -121,9 +121,9 @@ async def insult_login(parsed_items, non_user_format: str, user_format: str, bot
             continue
 
         if user is None:
-            await bot.send(channel, non_user_format.format(login))
+            await channel.send(non_user_format.format(login))
         else:
-            await bot.send(channel, user_format.format(utils.generate_mention(user.discord_ID),
+            await channel.send(user_format.format(utils.generate_mention(user.discord_ID),
                                                        system, str(count), str(avg_time)))
 
 
@@ -158,17 +158,17 @@ async def print_output(bot, channel, system, parsed_memory, parsed_semaphores, p
                 continue
 
             if user is None:
-                await bot.send(channel, "Soubory semaforu nechává nějaký " +
+                await channel.send("Soubory semaforu nechává nějaký " +
                                login + " co není na serveru.")
             else:
-                await bot.send(channel, utils.generate_mention(user.discord_ID) +
+                await channel.send(utils.generate_mention(user.discord_ID) +
                                " máš na " + system + "(/dev/shm) " +
                                str(count) + " souborů semaforu.")
                 if avg_time > 9:
-                    await bot.send(channel, "Leží ti tam průměrně už " +
+                    await channel.send("Leží ti tam průměrně už " +
                                    str(avg_time) + " minut, ty prase.")
                 if login_not_in_name:
-                    await bot.send(channel, "Nemáš v názvu tvůj login, takže můžeš" +
+                    await channel.send("Nemáš v názvu tvůj login, takže můžeš" +
                                    " mit kolize s ostatními, ty prase.")
 
     if parsed_processes != dict():
@@ -179,7 +179,7 @@ async def print_output(bot, channel, system, parsed_memory, parsed_semaphores, p
 
     if (parsed_memory == dict() and parsed_semaphores == dict()
             and parsed_processes == dict() and parsed_files == dict()):
-        await bot.send(channel, "Na " + system + " uklizeno <:HYPERS:493154327318233088>")
+        await channel.send("Na " + system + " uklizeno <:HYPERS:493154327318233088>")
 
 
 class IOS(commands.Cog):
@@ -195,12 +195,17 @@ class IOS(commands.Cog):
     @commands.check(utils.is_bot_admin)
     @commands.command()
     async def ios_start(self, ctx):
-        self.ios_body.start()
+        self.ios_body.start(ctx.channel)
 
     @commands.check(utils.is_bot_admin)
     @commands.command()
     async def ios_stop(self, ctx):
         self.ios_body.stop()
+
+    @commands.check(utils.is_bot_admin)
+    @commands.command()
+    async def ios_cancel(self, ctx):
+        self.ios_body.cancel()
 
     @tasks.loop(minutes=Config.ios_looptime_minutes)
     async def ios_body(self, channel=discord.Object(id='534431057001316362')):
@@ -215,7 +220,7 @@ class IOS(commands.Cog):
             await print_output(self.bot, channel, "merlinovi", parsed_memory, parsed_semaphores,
                                parsed_files, parsed_processes)
         except IndexError:
-            await self.bot.send(channel, "Toastere, máš bordel v parsování.")
+            await channel.send("Toastere, máš bordel v parsování.")
 
         process = subprocess.Popen(["ssh", "eva"], stdout=subprocess.PIPE)
         output = process.communicate()[0]
@@ -230,9 +235,9 @@ class IOS(commands.Cog):
             parsed_processes = parse_processes(processes)
             await print_output(self.bot, channel, "eve", parsed_memory, parsed_semaphores, dict(), parsed_processes)
         except IndexError:
-            await self.bot.send(channel, "Toastere, máš bordel v parsování.")
+            await channel.send("Toastere, máš bordel v parsování.")
         # eva doesn't seem to have /dev/shm
-        await self.bot.send(channel, "Pokud nevíte jak po sobě uklidit, checkněte: " +
+        await channel.send("Pokud nevíte jak po sobě uklidit, checkněte: " +
                             "https://discordapp.com/channels/" +
                             "461541385204400138/534431057001316362/" +
                             "698701631495340033")
