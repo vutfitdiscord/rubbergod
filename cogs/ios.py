@@ -107,14 +107,14 @@ def filter_processes(processes):
     return "\n".join(out)
 
 def minutes_to_formated_time(minutes):
-    hours = minutes // 60
-    days = hours // 24
-    weeks = days // 7
+    hours = minutes / 60
+    days = hours / 24
+    weeks = days / 7
 
-    if weeks > 0: return str(weeks) + " týdnů"
-    elif days > 0: return str(days) + " dní"
-    elif hours > 0: return str(hours) + " hodin"
-    return str(minutes) + " minut"
+    if weeks >= 1: return f"{round(weeks, 1)} týdnů"
+    elif days >= 1: return f"{round(days, 1)} dní"
+    elif hours >= 1: return f"{hours, 1} hodin"
+    return f"{minutes} minut"
 
 async def insult_login(parsed_items, non_user_format: str, user_format: str, bot, channel, system):
     for login, array in parsed_items.copy().items():
