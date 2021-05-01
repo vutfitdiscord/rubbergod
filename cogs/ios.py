@@ -106,6 +106,15 @@ def filter_processes(processes):
             out.append(line)
     return "\n".join(out)
 
+def minutes_to_formated_time(minutes):
+    hours = minutes // 60
+    days = hours // 24
+    weeks = days // 7
+
+    if weeks > 0: return str(weeks) + " týdnů"
+    elif days > 0: return str(days) + " dní"
+    elif hours > 0: return str(hours) + " hodin"
+    return str(minutes) + " minut"
 
 async def insult_login(parsed_items, non_user_format: str, user_format: str, bot, channel, system):
     for login, array in parsed_items.copy().items():
@@ -124,20 +133,20 @@ async def insult_login(parsed_items, non_user_format: str, user_format: str, bot
             await channel.send(non_user_format.format(login))
         else:
             await channel.send(user_format.format(utils.generate_mention(user.discord_ID),
-                                                       system, str(count), str(avg_time)))
+                                                       system, str(count), minutes_to_formated_time(avg_time)))
 
 
 async def print_output(bot, channel, system, parsed_memory, parsed_semaphores, parsed_files, parsed_processes):
     if parsed_memory != dict():
         await insult_login(parsed_memory,
                            "Sdílenou paměť nechává nějaký {} co není na serveru.",
-                           "{} máš na {} {} sdílené paměti, ztracené průměrně {} minut, ty prase.",
+                           "{} máš na {} {} sdílené paměti, ztracené průměrně {}, ty prase.",
                            bot, channel, system)
 
     if parsed_semaphores != dict():
         await insult_login(parsed_semaphores,
                            "Semafory nechává nějaký {} co není na serveru",
-                           "{} máš na {} {} semaforů, ležících tam průměrně {} minut, ty prase.",
+                           "{} máš na {} {} semaforů, ležících tam průměrně {}, ty prase.",
                            bot, channel, system)
 
     if parsed_files != dict():
@@ -166,7 +175,7 @@ async def print_output(bot, channel, system, parsed_memory, parsed_semaphores, p
                                str(count) + " souborů semaforu.")
                 if avg_time > 9:
                     await channel.send("Leží ti tam průměrně už " +
-                                   str(avg_time) + " minut, ty prase.")
+                                   minutes_to_formated_time(avg_time) + ", ty prase.")
                 if login_not_in_name:
                     await channel.send("Nemáš v názvu tvůj login, takže můžeš" +
                                    " mit kolize s ostatními, ty prase.")
@@ -174,7 +183,7 @@ async def print_output(bot, channel, system, parsed_memory, parsed_semaphores, p
     if parsed_processes != dict():
         await insult_login(parsed_processes,
                            "Nějakého {} co není na serveru.",
-                           "{} máš na {} {} procesů, běžících průměrně {} minut, ty prase",
+                           "{} máš na {} {} procesů, běžících průměrně {}, ty prase",
                            bot, channel, system)
 
     if (parsed_memory == dict() and parsed_semaphores == dict()
