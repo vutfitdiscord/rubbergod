@@ -113,7 +113,7 @@ def minutes_to_formated_time(minutes):
 
     if weeks >= 1: return f"{round(weeks, 1)} týdnů"
     elif days >= 1: return f"{round(days, 1)} dní"
-    elif hours >= 1: return f"{hours, 1} hodin"
+    elif hours >= 1: return f"{round(hours, 1)} hodin"
     return f"{minutes} minut"
 
 async def insult_login(parsed_items, non_user_format: str, user_format: str, bot, channel, system):
