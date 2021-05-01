@@ -167,18 +167,13 @@ async def print_output(bot, channel, system, parsed_memory, parsed_semaphores, p
                 continue
 
             if user is None:
-                await channel.send("Soubory semaforu nechává nějaký " +
-                               login + " co není na serveru.")
+                await channel.send(f"Soubory semaforu nechává nějaký {login} co není na serveru.")
             else:
-                await channel.send(utils.generate_mention(user.discord_ID) +
-                               " máš na " + system + "(/dev/shm) " +
-                               str(count) + " souborů semaforu.")
+                await channel.send(f"{utils.generate_mention(user.discord_ID)} máš na {system}(/dev/shm) {count} souborů semaforu.")
                 if avg_time > 9:
-                    await channel.send("Leží ti tam průměrně už " +
-                                   minutes_to_formated_time(avg_time) + ", ty prase.")
+                    await channel.send(f"Leží ti tam průměrně už {minutes_to_formated_time(avg_time)}, ty prase.")
                 if login_not_in_name:
-                    await channel.send("Nemáš v názvu tvůj login, takže můžeš" +
-                                   " mit kolize s ostatními, ty prase.")
+                    await channel.send("Nemáš v názvu tvůj login, takže můžeš mit kolize s ostatními, ty prase.")
 
     if parsed_processes != dict():
         await insult_login(parsed_processes,
