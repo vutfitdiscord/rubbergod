@@ -177,7 +177,7 @@ async def print_output(bot, channel, system, parsed_memory, parsed_semaphores, p
 
     if parsed_processes != dict():
         await insult_login(parsed_processes,
-                           "Nějakého {} co není na serveru.",
+                           "Lezi tam procesy nějakého {} co není na serveru.",
                            "{} máš na {} {} procesů, běžících průměrně {}, ty prase",
                            bot, channel, system)
 
