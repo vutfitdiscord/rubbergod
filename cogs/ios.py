@@ -114,13 +114,13 @@ def minutes_to_formated_time(minutes):
     if weeks >= 1: return f"{round(weeks, 1)} týdnů"
     elif days >= 1: return f"{round(days, 1)} dní"
     elif hours >= 1: return f"{round(hours, 1)} hodin"
-    return f"{minutes} minut"
+    return f"{round(minutes, 1)} minut"
 
 async def insult_login(parsed_items, non_user_format: str, user_format: str, bot, channel, system):
     for login, array in parsed_items.copy().items():
         user = session.query(Permit).filter(Permit.login == login).one_or_none()
         count = len(array)
-        avg_time = sum(array) // count
+        avg_time = float(sum(array)) // count
 
         person = session.query(Valid_person).filter(Valid_person.login == login).one_or_none()
 
@@ -156,7 +156,7 @@ async def print_output(bot, channel, system, parsed_memory, parsed_semaphores, p
             login_not_in_name = array[1]
             array = array[0]
             count = len(array)
-            avg_time = sum(array) // count
+            avg_time = float(sum(array)) // count
 
             person = session.query(Valid_person). \
                 filter(Valid_person.login == login).one_or_none()
