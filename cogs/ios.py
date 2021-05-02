@@ -138,9 +138,9 @@ def insult_login(parsed_items, non_user_format: str, user_format: str, bot, chan
         if user is None:
             output_array.append(f"{non_user_format.format(system, login)}\n")
         else:
-            output_array.append(
-                f"""{user_format.format(utils.generate_mention(user.discord_ID), system, str(count),
-                                        format_time(avg_time))}\n""")
+            user = utils.generate_mention(user.discord_ID)
+            message = f"{user_format.format(user, system, str(count), format_time(avg_time))}\n"
+            output_array.append(message)
     return output_array
 
 
