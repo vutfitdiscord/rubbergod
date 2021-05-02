@@ -106,15 +106,20 @@ def filter_processes(processes):
             out.append(line)
     return "\n".join(out)
 
-def minutes_to_formated_time(minutes):
+
+def format_time(minutes):
     hours = minutes / 60
     days = hours / 24
     weeks = days / 7
 
-    if weeks >= 1: return f"{round(weeks, 1)} týdnů"
-    elif days >= 1: return f"{round(days, 1)} dní"
-    elif hours >= 1: return f"{round(hours, 1)} hodin"
+    if weeks >= 1:
+        return f"{round(weeks, 1)} týdnů"
+    elif days >= 1:
+        return f"{round(days, 1)} dní"
+    elif hours >= 1:
+        return f"{round(hours, 1)} hodin"
     return f"{round(minutes, 1)} minut"
+
 
 def insult_login(parsed_items, non_user_format: str, user_format: str, bot, channel, system):
     output_array = []
@@ -133,23 +138,26 @@ def insult_login(parsed_items, non_user_format: str, user_format: str, bot, chan
         if user is None:
             output_array.append(f"{non_user_format.format(system, login)}\n")
         else:
-            output_array.append(f"{user_format.format(utils.generate_mention(user.discord_ID), system, str(count), minutes_to_formated_time(avg_time))}\n")
+            output_array.append(
+                f"""{user_format.format(utils.generate_mention(user.discord_ID), system, str(count),
+                                        format_time(avg_time))}\n""")
     return output_array
 
 
-async def print_output(bot, channel, system, parsed_memory, parsed_semaphores, parsed_files, parsed_processes):
-    output_array = []
+async def print_output(bot, channel, system, parsed_memory, parsed_semaphores, parsed_files,
+                       parsed_processes):
+    out_arr = []
     if parsed_memory != dict():
-        output_array.extend(insult_login(parsed_memory,
-                                        "Sdílenou paměť na {} nechává nějaký {} co není na serveru.",
-                                        "{} máš na {} {} sdílené paměti, ztracené průměrně {}, ty prase.",
-                                        bot, channel, system))
+        out_arr.extend(insult_login(parsed_memory,
+                                    "Sdílenou paměť na {} nechává nějaký {} co není na serveru.",
+                                    "{} máš na {} {} sdílené paměti, ztracené průměrně {}, ty prase.",
+                                    bot, channel, system))
 
     if parsed_semaphores != dict():
-        output_array.extend(insult_login(parsed_semaphores,
-                                        "Semafory nechává na {} nějaký {} co není na serveru",
-                                        "{} máš na {} {} semaforů, ležících tam průměrně {}, ty prase.",
-                                        bot, channel, system))
+        out_arr.extend(insult_login(parsed_semaphores,
+                                    "Semafory nechává na {} nějaký {} co není na serveru",
+                                    "{} máš na {} {} semaforů, ležících tam průměrně {}, ty prase.",
+                                    bot, channel, system))
 
     if parsed_files != dict():
         for login, array in parsed_files.copy().items():
@@ -169,29 +177,35 @@ async def print_output(bot, channel, system, parsed_memory, parsed_semaphores, p
                 continue
 
             if user is None:
-                output_array.append(f"Soubory semaforu nechává na {system} nějaký {login} co není na serveru.\n")
+                out_arr.append(
+                    f"Soubory semaforu nechává na {system} nějaký {login} co není na serveru.\n")
             else:
-                output_array.append(f"{utils.generate_mention(user.discord_ID)} máš na {system}(/dev/shm) {count} souborů semaforu.\n")
+                out_arr.append(
+                    f"{utils.generate_mention(user.discord_ID)}" +
+                    f"máš na {system}(/dev/shm) {count} souborů semaforu.\n")
                 if avg_time > 9:
-                    output_array.append(f"Leží ti tam průměrně už {minutes_to_formated_time(avg_time)}, ty prase.\n")
+                    out_arr.append(
+                        f"Leží ti tam průměrně už {format_time(avg_time)}, ty prase.\n")
                 if login_not_in_name:
-                    output_array.append("Nemáš v názvu tvůj login, takže můžeš mit kolize s ostatními, ty prase.\n")
+                    out_arr.append(
+                        "Nemáš v názvu tvůj login, takže můžeš mit kolize s ostatními, ty prase.\n")
 
     if parsed_processes != dict():
-        output_array.extend(insult_login(parsed_processes,
-                                        "Na {} leží procesy nějakého {} co není na serveru.",
-                                        "{} máš na {} {} procesů, běžících průměrně {}, ty prase",
-                                        bot, channel, system))
+        out_arr.extend(insult_login(parsed_processes,
+                                    "Na {} leží procesy nějakého {} co není na serveru.",
+                                    "{} máš na {} {} procesů, běžících průměrně {}, ty prase",
+                                    bot, channel, system))
 
     if (parsed_memory == dict() and parsed_semaphores == dict()
             and parsed_processes == dict() and parsed_files == dict()):
         await channel.send("Na " + system + " uklizeno <:HYPERS:493154327318233088>")
     else:
         output_message = ""
-        for msg in output_array:
+        for msg in out_arr:
             tmp_msg = output_message + msg
 
-            if len(tmp_msg) >= 1900: # Limit is 2000 chars but we will split it by this weird number to have some headroom
+            # Limit is 2000 chars but we will split it by this weird number to have some headroom
+            if len(tmp_msg) >= 1900:
                 await channel.send(output_message[:-1])
                 output_message = msg
             else:
@@ -252,14 +266,15 @@ class IOS(commands.Cog):
             parsed_memory = parse_memory(memory)
             parsed_semaphores, _ = parse_semaphores(semaphores)
             parsed_processes = parse_processes(processes)
-            await print_output(self.bot, channel, "eve", parsed_memory, parsed_semaphores, dict(), parsed_processes)
+            await print_output(self.bot, channel, "eve", parsed_memory, parsed_semaphores, dict(),
+                               parsed_processes)
         except IndexError:
             await channel.send("Toastere, máš bordel v parsování.")
         # eva doesn't seem to have /dev/shm
         await channel.send("Pokud nevíte jak po sobě uklidit, checkněte: " +
-                            "https://discordapp.com/channels/" +
-                            "461541385204400138/534431057001316362/" +
-                            "698701631495340033")
+                           "https://discordapp.com/channels/" +
+                           "461541385204400138/534431057001316362/" +
+                           "698701631495340033")
 
 
 def setup(bot):
