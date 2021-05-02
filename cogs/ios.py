@@ -116,7 +116,8 @@ def minutes_to_formated_time(minutes):
     elif hours >= 1: return f"{round(hours, 1)} hodin"
     return f"{round(minutes, 1)} minut"
 
-async def insult_login(parsed_items, non_user_format: str, user_format: str, bot, channel, system):
+def insult_login(parsed_items, non_user_format: str, user_format: str, bot, channel, system):
+    output_array = []
     for login, array in parsed_items.copy().items():
         user = session.query(Permit).filter(Permit.login == login).one_or_none()
         count = len(array)
@@ -130,24 +131,25 @@ async def insult_login(parsed_items, non_user_format: str, user_format: str, bot
             continue
 
         if user is None:
-            await channel.send(non_user_format.format(login))
+            output_array.append(f"{non_user_format.format(system, login)}\n")
         else:
-            await channel.send(user_format.format(utils.generate_mention(user.discord_ID),
-                                                       system, str(count), minutes_to_formated_time(avg_time)))
+            output_array.append(f"{user_format.format(utils.generate_mention(user.discord_ID), system, str(count), minutes_to_formated_time(avg_time))}\n")
+    return output_array
 
 
 async def print_output(bot, channel, system, parsed_memory, parsed_semaphores, parsed_files, parsed_processes):
+    output_array = []
     if parsed_memory != dict():
-        await insult_login(parsed_memory,
-                           "Sdílenou paměť nechává nějaký {} co není na serveru.",
-                           "{} máš na {} {} sdílené paměti, ztracené průměrně {}, ty prase.",
-                           bot, channel, system)
+        output_array.extend(insult_login(parsed_memory,
+                                        "Sdílenou paměť na {} nechává nějaký {} co není na serveru.",
+                                        "{} máš na {} {} sdílené paměti, ztracené průměrně {}, ty prase.",
+                                        bot, channel, system))
 
     if parsed_semaphores != dict():
-        await insult_login(parsed_semaphores,
-                           "Semafory nechává nějaký {} co není na serveru",
-                           "{} máš na {} {} semaforů, ležících tam průměrně {}, ty prase.",
-                           bot, channel, system)
+        output_array.extend(insult_login(parsed_semaphores,
+                                        "Semafory nechává na {} nějaký {} co není na serveru",
+                                        "{} máš na {} {} semaforů, ležících tam průměrně {}, ty prase.",
+                                        bot, channel, system))
 
     if parsed_files != dict():
         for login, array in parsed_files.copy().items():
@@ -167,23 +169,36 @@ async def print_output(bot, channel, system, parsed_memory, parsed_semaphores, p
                 continue
 
             if user is None:
-                await channel.send(f"Soubory semaforu nechává nějaký {login} co není na serveru.")
+                output_array.append(f"Soubory semaforu nechává na {system} nějaký {login} co není na serveru.\n")
             else:
-                await channel.send(f"{utils.generate_mention(user.discord_ID)} máš na {system}(/dev/shm) {count} souborů semaforu.")
+                output_array.append(f"{utils.generate_mention(user.discord_ID)} máš na {system}(/dev/shm) {count} souborů semaforu.\n")
                 if avg_time > 9:
-                    await channel.send(f"Leží ti tam průměrně už {minutes_to_formated_time(avg_time)}, ty prase.")
+                    output_array.append(f"Leží ti tam průměrně už {minutes_to_formated_time(avg_time)}, ty prase.\n")
                 if login_not_in_name:
-                    await channel.send("Nemáš v názvu tvůj login, takže můžeš mit kolize s ostatními, ty prase.")
+                    output_array.append("Nemáš v názvu tvůj login, takže můžeš mit kolize s ostatními, ty prase.\n")
 
     if parsed_processes != dict():
-        await insult_login(parsed_processes,
-                           "Lezi tam procesy nějakého {} co není na serveru.",
-                           "{} máš na {} {} procesů, běžících průměrně {}, ty prase",
-                           bot, channel, system)
+        output_array.extend(insult_login(parsed_processes,
+                                        "Na {} leží procesy nějakého {} co není na serveru.",
+                                        "{} máš na {} {} procesů, běžících průměrně {}, ty prase",
+                                        bot, channel, system))
 
     if (parsed_memory == dict() and parsed_semaphores == dict()
             and parsed_processes == dict() and parsed_files == dict()):
         await channel.send("Na " + system + " uklizeno <:HYPERS:493154327318233088>")
+    else:
+        output_message = ""
+        for msg in output_array:
+            tmp_msg = output_message + msg
+
+            if len(tmp_msg) >= 1900: # Limit is 2000 chars but we will split it by this weird number to have some headroom
+                await channel.send(output_message[:-1])
+                output_message = msg
+            else:
+                output_message = tmp_msg
+
+        if output_message != "":
+            await channel.send(output_message[:-1])
 
 
 class IOS(commands.Cog):
