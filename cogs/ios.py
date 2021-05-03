@@ -3,6 +3,7 @@ from discord.ext import commands, tasks
 from config.app_config import Config
 from repository.database import session
 from repository.database.verification import Permit, Valid_person
+from features.list_message_sender import send_list_of_messages
 import utils
 import subprocess
 import datetime
@@ -200,19 +201,7 @@ async def print_output(bot, channel, system, parsed_memory, parsed_semaphores, p
             and parsed_processes == dict() and parsed_files == dict()):
         await channel.send("Na " + system + " uklizeno <:HYPERS:493154327318233088>")
     else:
-        output_message = ""
-        for msg in out_arr:
-            tmp_msg = output_message + msg
-
-            # Limit is 2000 chars but we will split it by this weird number to have some headroom
-            if len(tmp_msg) >= 1900:
-                await channel.send(output_message[:-1])
-                output_message = msg
-            else:
-                output_message = tmp_msg
-
-        if output_message != "":
-            await channel.send(output_message[:-1])
+        await send_list_of_messages(channel, out_arr)
 
 
 class IOS(commands.Cog):
