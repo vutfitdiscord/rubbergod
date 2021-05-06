@@ -2,6 +2,7 @@ import discord
 from typing import Union, Iterable
 import utils
 
+# Take care of single messages larger than message len limit
 def trim_messages(message_list:Iterable, max_msg_len:int):
     assert isinstance(max_msg_len, int)
     if max_msg_len < 1: return []
@@ -14,6 +15,7 @@ def trim_messages(message_list:Iterable, max_msg_len:int):
             output_arr.append(it)
     return output_arr
 
+# Merge messages and add newline char between them
 def merge_messages(message_list:Iterable, max_msg_len:int):
     assert isinstance(max_msg_len, int)
     if max_msg_len < 1: return []
