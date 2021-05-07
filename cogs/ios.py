@@ -162,7 +162,7 @@ def insult_login(parsed_items, system, res_type):
             count = len(array)
             avg_time = int(sum(array) // count)
 
-            msg = ((f"{utils.generate_mention(user.discord_ID)}" if user else "@MENTION") +f" máš na {system} `{count}` {_inflected_resources[res_type][1]}, "
+            msg = (f"{utils.generate_mention(user.discord_ID)} máš na {system} `{count}` {_inflected_resources[res_type][1]}, "
                    f"{_inflected_resources[res_type][2]} průměrně `{format_time(avg_time)}`, ty prase")
         output_array += [msg]
     return output_array
@@ -180,7 +180,7 @@ def insult_login_shm(parsed_files, system):
             avg_time = float(sum(array)) // count
 
             msg = (
-                (f"{utils.generate_mention(user.discord_ID)} " if user else "@MENTION ")+
+                f"{utils.generate_mention(user.discord_ID)} "
                 f"máš na {system}(`/dev/shm`) `{count}` souborů semaforů.")
             if avg_time > 9:
                 msg += f"\n        Leží ti tam průměrně už `{format_time(avg_time)}`, ty prase."
