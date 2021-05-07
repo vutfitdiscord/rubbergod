@@ -63,8 +63,8 @@ python3 rubbergod.py
 
 ```
 git
-python3.7
-python3.7-dev
+python3.8
+python3.8-dev
 python3-pip
 postgresql
 postgresql-contrib
