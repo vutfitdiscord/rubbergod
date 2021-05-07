@@ -183,9 +183,9 @@ def insult_login_shm(parsed_files, system):
                 f"{utils.generate_mention(user.discord_ID)} "
                 f"máš na {system}(`/dev/shm`) `{count}` souborů semaforů.")
             if avg_time > 9:
-                msg += f"\n        Leží ti tam průměrně už `{format_time(avg_time)}`, ty prase."
+                msg += f"\n\t\tLeží ti tam průměrně už `{format_time(avg_time)}`, ty prase."
             if login_not_in_name:
-                msg += "\n        Nemáš v názvu tvůj login, takže můžeš mit kolize s ostatními, ty prase."
+                msg += "\n\t\tNemáš v názvu tvůj login, takže můžeš mit kolize s ostatními, ty prase."
         output_array += [msg]
     return output_array
 
