@@ -29,13 +29,30 @@ def unchanged_for(date, format_str):
     date = datetime.datetime.strptime(date, format_str)
     return (now - date.replace(year=now.year)).total_seconds() // 60
 
+# filter people and keep only those containing "BIT" or "FEKT" in person.year
+def filter_year(resources):
+    # get unique logins and people objects from db
+    logins = set(login for res_data in resources.values() for login in res_data.keys())
+    people = {
+        login: session.query(Valid_person).filter(Valid_person.login == login).one_or_none()
+            for login in logins
+    }
+
+    # keep only people with "BIT" or "FEKT" in their person.year
+    out_res = {res_type: {} for res_type in resources.keys()}
+    for res_type, res_data in resources.items():
+        for login, data in res_data.items():
+            if not people.get(login) or "BIT" in people[login].year or "FEKT" in people[login].year:
+                out_res[res_type][login] = data
+    return out_res
+
 
 def parse_memory(memory):
-    parsed = dict()
+    parsed = {}
     for line in memory.strip().splitlines():
         line = line.split()
         login = line[1]
-        if login[0] != 'x':
+        if not login.startswith('x'):
             continue
         last_change = " ".join(line[-3:])
         since_last_change = unchanged_for(last_change, '%b %d %H:%M:%S')
@@ -47,8 +64,8 @@ def parse_memory(memory):
 
 
 def parse_semaphores(semaphores):
-    parsed = dict()
-    parsed_files = dict()
+    parsed = {}
+    parsed_files = {}
     if "soubory semaforu" in semaphores:
         semaphores, files = semaphores.split("soubory semaforu:\n")
     else:
@@ -57,7 +74,7 @@ def parse_semaphores(semaphores):
     for line in semaphores.strip().splitlines():
         line = line.split()
         login = line[1]
-        if login[0] != 'x':
+        if not login.startswith('x'):
             continue
         last_change = " ".join(line[-4:-1])
         since_last_change = unchanged_for(last_change, '%b %d %H:%M:%S')
@@ -69,7 +86,7 @@ def parse_semaphores(semaphores):
     for line in files.strip().splitlines():
         line = line.split()
         login = line[2]
-        if login[0] != 'x':
+        if not login.startswith('x'):
             continue
         last_change = " ".join(line[5:7])
         name = line[7]
@@ -85,11 +102,11 @@ def parse_semaphores(semaphores):
 
 
 def parse_processes(processes):
-    parsed = dict()
+    parsed = {}
     for line in processes.strip().splitlines():
         line = line.split()
         login = line[0]
-        if login[0] != 'x':
+        if not login.startswith('x'):
             continue
         time = line[8]
         uptime = running_for(time)
@@ -122,84 +139,66 @@ def format_time(minutes):
     return f"{round(minutes, 1)} minut"
 
 
-def insult_login(parsed_items, non_user_format: str, user_format: str, bot, channel, system):
+class RESOURCE_TYPE:
+    MEMORY      = 'MEMORY'
+    SEMAPHORE   = 'SEMAPHORE'
+    PROCESS     = 'PROCESS'
+    FILE        = 'FILE'
+
+# inflected resource names to match the czech language
+_inflected_resources = {
+    RESOURCE_TYPE.MEMORY:   ('sdílená paměť', 'sdílené paměti', 'ztracené'),
+    RESOURCE_TYPE.SEMAPHORE:('semafory',      'semaforů',       'ležících'),
+    RESOURCE_TYPE.PROCESS:  ('procesy',       'procesů',        'běžících'),
+}
+def insult_login(parsed_items, system, res_type):
     output_array = []
-    for login, array in parsed_items.copy().items():
+    for login, array in parsed_items.items():
         user = session.query(Permit).filter(Permit.login == login).one_or_none()
-        count = len(array)
-        avg_time = float(sum(array)) // count
 
-        person = session.query(Valid_person).filter(Valid_person.login == login).one_or_none()
-
-        if "BIT" not in person.year and "FEKT" not in person.year:
-            if login in parsed_items:
-                parsed_items.pop(login)
-            continue
-
-        if user is None:
-            output_array.append(f"{non_user_format.format(system, login)}\n")
+        if False:
+            msg = f"Na {system} leží {_inflected_resources[res_type][0]} nějakého `{login}` co není na serveru."
         else:
-            user = utils.generate_mention(user.discord_ID)
-            message = f"{user_format.format(user, system, str(count), format_time(avg_time))}\n"
-            output_array.append(message)
+            count = len(array)
+            avg_time = int(sum(array) // count)
+
+            msg = ((f"{utils.generate_mention(user.discord_ID)}" if user else "@MENTION") +f" máš na {system} `{count}` {_inflected_resources[res_type][1]}, "
+                   f"{_inflected_resources[res_type][2]} průměrně `{format_time(avg_time)}`, ty prase")
+        output_array += [msg]
     return output_array
 
+def insult_login_shm(parsed_files, system):
+    output_array = []
+    for login, data in parsed_files.items():
+        user = session.query(Permit).filter(Permit.login == login).one_or_none()
+        array, login_not_in_name = data
 
-async def print_output(bot, channel, system, parsed_memory, parsed_semaphores, parsed_files,
-                       parsed_processes):
-    out_arr = []
-    if parsed_memory != dict():
-        out_arr.extend(insult_login(parsed_memory,
-                                    "Sdílenou paměť na {} nechává nějaký {} co není na serveru.",
-                                    "{} máš na {} {} sdílené paměti, ztracené průměrně {}, ty prase.",
-                                    bot, channel, system))
-
-    if parsed_semaphores != dict():
-        out_arr.extend(insult_login(parsed_semaphores,
-                                    "Semafory nechává na {} nějaký {} co není na serveru",
-                                    "{} máš na {} {} semaforů, ležících tam průměrně {}, ty prase.",
-                                    bot, channel, system))
-
-    if parsed_files != dict():
-        for login, array in parsed_files.copy().items():
-            user = session.query(Permit). \
-                filter(Permit.login == login).one_or_none()
-            login_not_in_name = array[1]
-            array = array[0]
+        if False:
+            msg = f"Na {system} leží soubory semaforů nějakého `{login}` co není na serveru."
+        else:
             count = len(array)
             avg_time = float(sum(array)) // count
 
-            person = session.query(Valid_person). \
-                filter(Valid_person.login == login).one_or_none()
+            msg = (
+                (f"{utils.generate_mention(user.discord_ID)} " if user else "@MENTION ")+
+                f"máš na {system}(`/dev/shm`) `{count}` souborů semaforů.")
+            if avg_time > 9:
+                msg += f"\n        Leží ti tam průměrně už `{format_time(avg_time)}`, ty prase."
+            if login_not_in_name:
+                msg += "\n        Nemáš v názvu tvůj login, takže můžeš mit kolize s ostatními, ty prase."
+        output_array += [msg]
+    return output_array
 
-            if "BIT" not in person.year and "FEKT" not in person.year:
-                if login in parsed_files:
-                    parsed_files.pop(login)
-                continue
+async def print_output(bot, channel, system, resources):
+    out_arr = []
+    for res_type in [RESOURCE_TYPE.MEMORY, RESOURCE_TYPE.SEMAPHORE, RESOURCE_TYPE.PROCESS]:
+        if resources.get(res_type):
+            out_arr += insult_login(resources[res_type], system, res_type)
+    if (shm_resources := resources.get(RESOURCE_TYPE.FILE)):
+        out_arr += insult_login_shm(shm_resources, system)
 
-            if user is None:
-                out_arr.append(
-                    f"Soubory semaforu nechává na {system} nějaký {login} co není na serveru.\n")
-            else:
-                out_arr.append(
-                    f"{utils.generate_mention(user.discord_ID)}" +
-                    f"máš na {system}(/dev/shm) {count} souborů semaforu.\n")
-                if avg_time > 9:
-                    out_arr.append(
-                        f"Leží ti tam průměrně už {format_time(avg_time)}, ty prase.\n")
-                if login_not_in_name:
-                    out_arr.append(
-                        "Nemáš v názvu tvůj login, takže můžeš mit kolize s ostatními, ty prase.\n")
-
-    if parsed_processes != dict():
-        out_arr.extend(insult_login(parsed_processes,
-                                    "Na {} leží procesy nějakého {} co není na serveru.",
-                                    "{} máš na {} {} procesů, běžících průměrně {}, ty prase",
-                                    bot, channel, system))
-
-    if (parsed_memory == dict() and parsed_semaphores == dict()
-            and parsed_processes == dict() and parsed_files == dict()):
-        await channel.send("Na " + system + " uklizeno <:HYPERS:493154327318233088>")
+    if not any(resources.values()):
+        await channel.send(f"Na {system} uklizeno <:HYPERS:493154327318233088>")
     else:
         await send_list_of_messages(channel, out_arr)
 
@@ -232,20 +231,25 @@ class IOS(commands.Cog):
     @tasks.loop(minutes=Config.ios_looptime_minutes)
     async def ios_body(self, channel=discord.Object(id='534431057001316362')):
         process = subprocess.Popen(["ssh", "merlin"], stdout=subprocess.PIPE)
-        output, error = process.communicate()
+        output, _ = process.communicate()
         memory, rest = output.decode('utf-8').split("semafory:\n")
         semaphores, processes = rest.split("procesy:\n")
         try:
             parsed_memory = parse_memory(memory)
             parsed_semaphores, parsed_files = parse_semaphores(semaphores)
             parsed_processes = parse_processes(processes)
-            await print_output(self.bot, channel, "merlinovi", parsed_memory, parsed_semaphores,
-                               parsed_files, parsed_processes)
+            parsed_resources = {
+                RESOURCE_TYPE.MEMORY:   parsed_memory,
+                RESOURCE_TYPE.SEMAPHORE:parsed_semaphores,
+                RESOURCE_TYPE.FILE:     parsed_files,
+                RESOURCE_TYPE.PROCESS:  parsed_processes,
+            }
+            await print_output(self.bot, channel, "merlinovi", filter_year(parsed_resources))
         except IndexError:
             await channel.send("Toastere, máš bordel v parsování.")
 
         process = subprocess.Popen(["ssh", "eva"], stdout=subprocess.PIPE)
-        output = process.communicate()[0]
+        output, _ = process.communicate()
 
         memory, rest = output.decode('utf-8').split("semafory:\n")
         semaphores, processes = rest.split("procesy:\n")
@@ -255,8 +259,12 @@ class IOS(commands.Cog):
             parsed_memory = parse_memory(memory)
             parsed_semaphores, _ = parse_semaphores(semaphores)
             parsed_processes = parse_processes(processes)
-            await print_output(self.bot, channel, "eve", parsed_memory, parsed_semaphores, dict(),
-                               parsed_processes)
+            parsed_resources = {
+                RESOURCE_TYPE.MEMORY:   parsed_memory,
+                RESOURCE_TYPE.SEMAPHORE:parsed_semaphores,
+                RESOURCE_TYPE.PROCESS:  parsed_processes,
+            }
+            await print_output(self.bot, channel, "evě", filter_year(parsed_resources))
         except IndexError:
             await channel.send("Toastere, máš bordel v parsování.")
         # eva doesn't seem to have /dev/shm
