@@ -156,7 +156,7 @@ def insult_login(parsed_items, system, res_type):
     for login, array in parsed_items.items():
         user = session.query(Permit).filter(Permit.login == login).one_or_none()
 
-        if False:
+        if not user:
             msg = f"Na {system} leží {_inflected_resources[res_type][0]} nějakého `{login}` co není na serveru."
         else:
             count = len(array)
@@ -173,7 +173,7 @@ def insult_login_shm(parsed_files, system):
         user = session.query(Permit).filter(Permit.login == login).one_or_none()
         array, login_not_in_name = data
 
-        if False:
+        if not user:
             msg = f"Na {system} leží soubory semaforů nějakého `{login}` co není na serveru."
         else:
             count = len(array)
