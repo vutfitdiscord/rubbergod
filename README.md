@@ -22,7 +22,7 @@ Since `discord.py` v. 1.5 you will also need to enable `SERVER MEMBERS INTENT` i
 
 Prerequisites:
 * Postgresql
-* Python3.6+
+* Python3.8+
 
 Start by cloning the repo:
 ```bash
