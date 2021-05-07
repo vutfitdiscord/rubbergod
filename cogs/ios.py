@@ -163,7 +163,7 @@ def insult_login(parsed_items, system, res_type):
             avg_time = int(sum(array) // count)
 
             msg = (f"{utils.generate_mention(user.discord_ID)} máš na {system} `{count}` {_inflected_resources[res_type][1]}, "
-                   f"{_inflected_resources[res_type][2]} průměrně `{format_time(avg_time)}`, ty prase")
+                   f"{_inflected_resources[res_type][2]} průměrně `{format_time(avg_time)}`, ty prase.")
         output_array += [msg]
     return output_array
 
