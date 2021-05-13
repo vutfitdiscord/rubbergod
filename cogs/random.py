@@ -38,20 +38,40 @@ class Random(commands.Cog):
         option = discord.utils.escape_mentions(random.choice(args))
         if option:
             await ctx.send(f"{option} {ctx.author.mention}")
-
-    @commands.cooldown(rate=5, per=20.0, type=commands.BucketType.user)
-    @cog_ext.cog_slash(name="flip", description=Messages.random_flip_brief, guild_ids=Config.guild_id)
-    async def flip(self, ctx):
+    
+    async def flip_func(self, ctx):
         await ctx.send(random.choice(["True", "False"]))
 
     @commands.cooldown(rate=5, per=20.0, type=commands.BucketType.user)
-    @cog_ext.cog_slash(name="roll", description=Messages.rng_generator_format, guild_ids=Config.guild_id)
-    async def roll(self, ctx, first: int, second: int = 0):
+    @commands.command(brief=Messages.random_flip_brief)
+    async def flip(self, ctx):
+        await self.flip_func(ctx)
+
+    @commands.cooldown(rate=5, per=20.0, type=commands.BucketType.user)
+    @cog_ext.cog_slash(name="flip", description=Messages.random_flip_brief, guild_ids=Config.guild_id)
+    async def flip_slash(self, ctx):
+        await self.flip_func(ctx)
+
+    async def roll_func(self, ctx, first, second):
         if first > second:
             first, second = second, first
 
         option = str(random.randint(first, second))
         await ctx.send(option)
+    
+    @commands.cooldown(rate=5, per=20.0, type=commands.BucketType.user)
+    @commands.command(
+        aliases=["random", "randint"],
+        brief=Messages.random_roll_brief,
+        description=Messages.rng_generator_format,
+    )
+    async def roll(self, ctx, first: int, second: int = 0):
+        await self.roll_func(ctx, first, second)
+    
+    @commands.cooldown(rate=5, per=20.0, type=commands.BucketType.user)
+    @cog_ext.cog_slash(name="roll", description=Messages.rng_generator_format, guild_ids=Config.guild_id)
+    async def roll_slash(self, ctx, first: int, second: int = 0):
+        await self.roll_func(ctx, first, second)
 
     @diceroll.error
     @pick.error
