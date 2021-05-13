@@ -50,7 +50,7 @@ class Error(commands.Cog):
         embed = discord.Embed(title=f"Ignoring exception in command {ctx.command}", color=0xFF0000)
         embed.add_field(name="Zpráva", value=ctx.message.content[:1000])
         embed.add_field(name="Autor", value=str(ctx.author))
-        if ctx.guild.id != config.Config.guild_id:
+        if ctx.guild and ctx.guild.id != config.Config.guild_id:
             embed.add_field(name="Guild", value=ctx.guild.name)
         embed.add_field(name="Link", value=ctx.message.jump_url, inline=False)
         channel = self.bot.get_channel(config.Config.bot_dev_channel)
