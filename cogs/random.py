@@ -2,7 +2,7 @@ import random
 
 import discord
 from discord.ext import commands
-from discord_slash import SlashCommand, SlashContext
+from discord_slash import SlashCommand, SlashContext, cog_ext
 
 from config.app_config import Config
 from logic import roll_dice
@@ -48,7 +48,7 @@ class Random(commands.Cog):
         await self.flip_func(ctx)
 
     @commands.cooldown(rate=5, per=20.0, type=commands.BucketType.user)
-    @cog_ext.cog_slash(name="flip", description=Messages.random_flip_brief, guild_ids=Config.guild_id)
+    @cog_ext.cog_slash(name="flip", description=Messages.random_flip_brief, guild_ids=[Config.guild_id])
     async def flip_slash(self, ctx):
         await self.flip_func(ctx)
 
@@ -69,7 +69,7 @@ class Random(commands.Cog):
         await self.roll_func(ctx, first, second)
     
     @commands.cooldown(rate=5, per=20.0, type=commands.BucketType.user)
-    @cog_ext.cog_slash(name="roll", description=Messages.rng_generator_format, guild_ids=Config.guild_id)
+    @cog_ext.cog_slash(name="roll", description=Messages.rng_generator_format, guild_ids=[Config.guild_id])
     async def roll_slash(self, ctx, first: int, second: int = 0):
         await self.roll_func(ctx, first, second)
 
