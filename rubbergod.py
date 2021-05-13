@@ -4,6 +4,7 @@ import logging
 
 from discord import Embed, TextChannel, AllowedMentions, Intents
 from discord.ext import commands
+from discord_slash import SlashCommand
 
 import utils
 from config.messages import Messages
@@ -56,6 +57,7 @@ bot = commands.Bot(
     allowed_mentions=AllowedMentions(roles=False, everyone=False, users=True),
     intents=intents,
 )
+slash = SlashCommand(bot, sync_commands=True, sync_on_cog_reload = True)
 
 presence = presence.Presence(bot)
 

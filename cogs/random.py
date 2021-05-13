@@ -2,7 +2,9 @@ import random
 
 import discord
 from discord.ext import commands
+from discord_slash import SlashCommand, SlashContext
 
+from config.app_config import Config
 from logic import roll_dice
 from config.app_config import Config
 from config.messages import Messages
@@ -38,16 +40,12 @@ class Random(commands.Cog):
             await ctx.send(f"{option} {ctx.author.mention}")
 
     @commands.cooldown(rate=5, per=20.0, type=commands.BucketType.user)
-    @commands.command(brief=Messages.random_flip_brief)
+    @cog_ext.cog_slash(name="flip", description=Messages.random_flip_brief, guild_ids=Config.guild_id)
     async def flip(self, ctx):
         await ctx.send(random.choice(["True", "False"]))
 
     @commands.cooldown(rate=5, per=20.0, type=commands.BucketType.user)
-    @commands.command(
-        aliases=["random", "randint"],
-        brief=Messages.random_roll_brief,
-        description=Messages.rng_generator_format,
-    )
+    @cog_ext.cog_slash(name="roll", description=Messages.rng_generator_format, guild_ids=Config.guild_id)
     async def roll(self, ctx, first: int, second: int = 0):
         if first > second:
             first, second = second, first
