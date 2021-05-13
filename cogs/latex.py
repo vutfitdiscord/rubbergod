@@ -1,4 +1,5 @@
 import aiohttp
+import asyncio
 import discord
 from discord.ext import commands
 import io
@@ -33,7 +34,7 @@ class Latex(commands.Cog):
 
                         datastream = io.BytesIO(data)
                         await channel.send(file=discord.File(datastream, "latex.png"))
-                except (aiohttp.ServerTimeoutError, aiohttp.client_exceptions.ClientConnectorError):
+                except (asyncio.exceptions.TimeoutError, aiohttp.client_exceptions.ClientConnectorError):
                     await channel.send("Website unreachable")
 
 
