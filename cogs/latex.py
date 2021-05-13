@@ -21,17 +21,20 @@ class Latex(commands.Cog):
             imgURL = f"http://www.sciweavers.org/tex2img.php?eq={eq}&fc=White&im=png&fs=25&edit=0"
 
             async with aiohttp.ClientSession() as session:
-                async with session.get(imgURL) as resp:
+                try:
+                    async with session.get(imgURL) as resp:
 
-                    if resp.status != 200:
-                        return await ctx.send("Could not get image.")
+                        if resp.status != 200:
+                            return await ctx.send("Could not get image.")
 
-                    data = await resp.read()
-                    if not data.startswith(PNG_HEADER):
-                        return await ctx.send("Could not get image.")
+                        data = await resp.read()
+                        if not data.startswith(PNG_HEADER):
+                            return await ctx.send("Could not get image.")
 
-                    datastream = io.BytesIO(data)
-                    await channel.send(file=discord.File(datastream, "latex.png"))
+                        datastream = io.BytesIO(data)
+                        await channel.send(file=discord.File(datastream, "latex.png"))
+                except aiohttp.client_exceptions.ClientConnectorError:
+                    await channel.send("Website unreachable")
 
 
 def setup(bot):
