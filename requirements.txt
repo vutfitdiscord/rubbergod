@@ -11,3 +11,4 @@ beautifulsoup4
 lxml
 git+https://github.com/Rapptz/discord-ext-menus
 python-dateutil
+discord-py-slash-command
