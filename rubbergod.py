@@ -57,6 +57,7 @@ bot = commands.Bot(
     allowed_mentions=AllowedMentions(roles=False, everyone=False, users=True),
     intents=intents,
 )
+slash = SlashCommand(bot, sync_commands=True, sync_on_cog_reload = True)
 
 presence = presence.Presence(bot)
 
