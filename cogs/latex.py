@@ -20,7 +20,7 @@ class Latex(commands.Cog):
             eq = urllib.parse.quote(equation)
             imgURL = f"http://www.sciweavers.org/tex2img.php?eq={eq}&fc=White&im=png&fs=25&edit=0"
 
-            async with aiohttp.ClientSession() as session:
+            async with aiohttp.ClientSession(timeout=aiohttp.ClientTimeout(total=10)) as session:
                 try:
                     async with session.get(imgURL) as resp:
 
@@ -33,7 +33,7 @@ class Latex(commands.Cog):
 
                         datastream = io.BytesIO(data)
                         await channel.send(file=discord.File(datastream, "latex.png"))
-                except aiohttp.client_exceptions.ClientConnectorError:
+                except (aiohttp.ServerTimeoutError, aiohttp.client_exceptions.ClientConnectorError):
                     await channel.send("Website unreachable")
 
 
