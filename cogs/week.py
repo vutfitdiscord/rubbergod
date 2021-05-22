@@ -4,7 +4,7 @@ import discord
 from discord.ext import commands
 
 import utils
-from config import app_config as config, messages
+from config import app_config as config, messages, cooldowns
 
 config = config.Config
 messages = messages.Messages
@@ -14,7 +14,7 @@ class week(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.cooldown(rate=2, per=20.0, type=commands.BucketType.user)
+    @cooldowns.default_cooldown
     @commands.command(aliases=["tyden", "týden", "tyzden", "týždeň"], brief=messages.week_brief)
     async def week(self, ctx: commands.Context):
         """See if the current week is odd or even"""

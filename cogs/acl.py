@@ -4,7 +4,7 @@ from discord.ext import commands
 import utils
 from cogs import room_check
 from features import acl
-from config import app_config as config
+from config import app_config as config, cooldowns
 from repository import acl_repo
 
 acl_repo = acl_repo.AclRepository()
@@ -19,7 +19,7 @@ class Acl(commands.Cog):
         self.check = room_check.RoomCheck(bot)
         self.mod = None
 
-    @commands.cooldown(rate=5, per=20.0, type=commands.BucketType.user)
+    @cooldowns.short_cooldown
     @commands.command()
     async def acl(self, ctx, *args):
         if self.mod is None:
@@ -46,7 +46,7 @@ class Acl(commands.Cog):
 
     # TODO: this is only to help init the acl database
     # should be rewritten or removed later
-    @commands.cooldown(rate=5, per=20.0, type=commands.BucketType.user)
+    @cooldowns.short_cooldown
     @commands.command()
     async def acl_roles(self, ctx, *args):
         guild = self.bot.get_guild(config.guild_id)

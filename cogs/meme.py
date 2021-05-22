@@ -9,7 +9,7 @@ import discord
 from discord.ext import commands
 
 import utils
-from config import app_config as config, messages
+from config import app_config as config, messages, cooldowns
 
 config = config.Config
 messages = messages.Messages
@@ -59,12 +59,12 @@ class Meme(commands.Cog):
     async def uhoh(self, ctx):
         await ctx.send(utils.fill_message("uhoh_counter", uhohs=uhoh_counter))
 
-    @commands.cooldown(rate=5, per=20.0, type=commands.BucketType.user)
+    @cooldowns.short_cooldown
     @commands.command(name="??", brief="???")
     async def question(self, ctx):
         await ctx.send(choice(messages.question))
 
-    @commands.cooldown(rate=5, per=20.0, type=commands.BucketType.user)
+    @cooldowns.short_cooldown
     @commands.command(brief=messages.bonk_brief)
     async def bonk(self, ctx, *, member: discord.Member = None):
         """Bonk someone

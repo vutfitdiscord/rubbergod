@@ -7,6 +7,7 @@ import discord
 from discord.ext import commands
 
 import utils
+from config import cooldowns
 from config.messages import Messages
 
 
@@ -93,7 +94,7 @@ class Urban(commands.Cog):
                 embeds[pagenum].url = ""
                 await message.edit(embed=embeds[pagenum])
 
-    @commands.cooldown(rate=5, per=20.0, type=commands.BucketType.user)
+    @cooldowns.short_cooldown
     @commands.command(brief=Messages.urban_brief)
     async def urban(self, ctx, *expression):
         if not len(expression):

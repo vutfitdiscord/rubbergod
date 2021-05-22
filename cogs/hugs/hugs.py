@@ -5,7 +5,7 @@ import discord
 from discord.ext import commands
 
 import utils
-from config import app_config
+from config import app_config, cooldowns
 from repository.hugs_repo import HugsRepository
 from .menus import get_hugboard_menu, get_top_huggers_menu, get_top_hugged_menu
 from .. import room_check
@@ -27,7 +27,7 @@ class Hugs(commands.Cog):
     def get_default_emoji(self, emoji: str):
         return utils.get_emoji(self.bot.get_guild(config.guild_id), emoji)
 
-    @commands.cooldown(rate=2, per=60.0, type=commands.BucketType.user)
+    @cooldowns.long_cooldown
     @commands.command()
     async def hugboard(self, ctx: commands.Context):
         """
@@ -45,7 +45,7 @@ class Hugs(commands.Cog):
         await self.check.botroom_check(ctx.message)
         await menu.start(ctx)
 
-    @commands.cooldown(rate=2, per=60.0, type=commands.BucketType.user)
+    @cooldowns.long_cooldown
     @commands.command()
     async def huggers(self, ctx: commands.Context):
         """
@@ -62,7 +62,7 @@ class Hugs(commands.Cog):
         await self.check.botroom_check(ctx.message)
         await menu.start(ctx)
 
-    @commands.cooldown(rate=2, per=60.0, type=commands.BucketType.user)
+    @cooldowns.long_cooldown
     @commands.command()
     async def hugged(self, ctx: commands.Context):
         """
@@ -80,7 +80,7 @@ class Hugs(commands.Cog):
         await self.check.botroom_check(ctx.message)
         await menu.start(ctx)
 
-    @commands.cooldown(rate=5, per=60.0, type=commands.BucketType.user)
+    @cooldowns.long_cooldown
     @commands.command()
     async def hugs(self, ctx: commands.Context, user: discord.Member = None):
         """
@@ -125,7 +125,7 @@ class Hugs(commands.Cog):
         await ctx.send(embed=embed)
         await self.check.botroom_check(ctx.message)
 
-    @commands.cooldown(rate=5, per=60.0, type=commands.BucketType.user)
+    @cooldowns.long_cooldown
     @commands.command()
     async def hug(self, ctx: commands.Context, user: discord.Member = None, intensity: int = 0):
         """Because everyone likes hugs"""

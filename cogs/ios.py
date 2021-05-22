@@ -1,5 +1,6 @@
 import discord
 from discord.ext import commands, tasks
+from config import cooldowns
 from config.app_config import Config
 from repository.database import session
 from repository.database.verification import Permit, Valid_person
@@ -207,7 +208,7 @@ class IOS(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.cooldown(rate=5, per=30.0, type=commands.BucketType.user)
+    @cooldowns.default_cooldown
     @commands.check(utils.helper_plus)
     @commands.command()
     async def ios(self, ctx):

@@ -5,7 +5,7 @@ from discord.ext import commands
 import requests
 import asyncio
 
-from config import app_config as config, messages
+from config import app_config as config, messages, cooldowns
 from repository import review_repo
 import utils
 
@@ -39,7 +39,7 @@ class Review(commands.Cog):
             return False
         return True
 
-    @commands.cooldown(rate=5, per=20.0, type=commands.BucketType.user)
+    @cooldowns.short_cooldown
     @commands.group(
         aliases=["review", "recenze", "recenzie", "reviev", "rewiev"],
         brief=messages.review_get_brief,
@@ -127,7 +127,7 @@ class Review(commands.Cog):
             else:
                 await ctx.send(messages.review_remove_error)
 
-    @commands.cooldown(rate=5, per=20.0, type=commands.BucketType.user)
+    @cooldowns.short_cooldown
     @commands.group()
     @commands.check(utils.is_bot_admin)
     async def subject(self, ctx):

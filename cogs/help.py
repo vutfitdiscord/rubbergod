@@ -2,7 +2,7 @@ import asyncio
 import discord
 from discord.ext import commands
 
-from config import app_config as config
+from config import app_config as config, cooldowns
 from features.git import Git
 
 config = config.Config
@@ -59,7 +59,7 @@ class Help(commands.Cog):
             embed.add_field(name=key, value=value, inline=False)
         return embed
 
-    @commands.cooldown(rate=2, per=20.0, type=commands.BucketType.user)
+    @cooldowns.default_cooldown
     @commands.command(aliases=['god'], brief="Nápověda")
     async def help(self, ctx: commands.Context, *command):
         # Subcommand help

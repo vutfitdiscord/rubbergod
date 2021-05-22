@@ -7,7 +7,7 @@ from discord.ext import commands
 
 
 import utils
-from config import app_config as config
+from config import app_config as config, cooldowns
 from features import verification
 from repository import user_repo
 from repository.database import database, session
@@ -39,7 +39,7 @@ class FitWide(commands.Cog):
             gif.set_image(url="https://i.imgur.com/v2ueHcl.gif")
             await channel.send(embed=gif)
 
-    @commands.cooldown(rate=2, per=20.0, type=commands.BucketType.user)
+    @cooldowns.default_cooldown
     @commands.check(utils.helper_plus)
     @commands.command()
     async def rolehoarders(self, ctx, limit=config.rolehoarder_default_limit):
@@ -69,7 +69,7 @@ class FitWide(commands.Cog):
 
         await ctx.send(msg)
 
-    @commands.cooldown(rate=2, per=20.0, type=commands.BucketType.user)
+    @cooldowns.default_cooldown
     @commands.check(utils.is_bot_admin)
     @commands.command()
     async def role_check(self, ctx, p_verified: bool = True,
@@ -185,7 +185,7 @@ class FitWide(commands.Cog):
         await ctx.send(message)
         return
 
-    @commands.cooldown(rate=2, per=20.0, type=commands.BucketType.user)
+    @cooldowns.default_cooldown
     @commands.check(utils.is_bot_admin)
     @commands.command()
     async def increment_roles(self, ctx):
@@ -326,7 +326,7 @@ class FitWide(commands.Cog):
         await ctx.send('Holy fuck, všechno se povedlo, '
                        'tak zase za rok <:Cauec:602052606210211850>')
 
-    @commands.cooldown(rate=2, per=20.0, type=commands.BucketType.user)
+    @cooldowns.default_cooldown
     @commands.check(is_in_modroom)
     @commands.command()
     async def update_db(self, ctx, convert_0xit: bool = False):
@@ -389,7 +389,7 @@ class FitWide(commands.Cog):
         if convert_0xit:
             await ctx.send(f"Debug: Našel jsem {cnt_new} nových prvaků.")
 
-    @commands.cooldown(rate=2, per=20.0, type=commands.BucketType.user)
+    @cooldowns.default_cooldown
     @commands.check(is_in_modroom)
     @commands.command()
     async def get_db(self, ctx):
@@ -406,7 +406,7 @@ class FitWide(commands.Cog):
             f.write(output.decode("utf-8"))
         await ctx.send("Stažení databáze proběhlo úspěšně.")
 
-    @commands.cooldown(rate=2, per=20.0, type=commands.BucketType.user)
+    @cooldowns.default_cooldown
     @commands.check(is_in_modroom)
     @commands.command()
     async def get_users_login(self, ctx, member: discord.Member):
@@ -427,7 +427,7 @@ class FitWide(commands.Cog):
         await ctx.send(("Login: `{p.login}`\nJméno: `{p.name}`\n"
                         "Ročník: `{p.year}`").format(p=person))
 
-    @commands.cooldown(rate=2, per=20.0, type=commands.BucketType.user)
+    @cooldowns.default_cooldown
     @commands.check(is_in_modroom)
     @commands.command()
     async def get_logins_user(self, ctx, login):
@@ -446,7 +446,7 @@ class FitWide(commands.Cog):
         else:
             await ctx.send(utils.generate_mention(result.discord_ID))
 
-    @commands.cooldown(rate=2, per=20.0, type=commands.BucketType.user)
+    @cooldowns.default_cooldown
     @commands.check(is_in_modroom)
     @commands.command()
     async def reset_login(self, ctx, login):
@@ -462,7 +462,7 @@ class FitWide(commands.Cog):
             session.commit()
             await ctx.send("Hotovo.")
 
-    @commands.cooldown(rate=2, per=20.0, type=commands.BucketType.user)
+    @cooldowns.default_cooldown
     @commands.check(is_in_modroom)
     @commands.command()
     async def connect_login_to_user(self, ctx, login, member: discord.Member):

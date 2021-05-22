@@ -1,7 +1,7 @@
 import discord
 from discord.ext import commands
 from repository.stream_links_repo import StreamLinksRepo
-from config import app_config
+from config import app_config, cooldowns
 from config.messages import Messages
 from typing import List, Union
 import shlex
@@ -23,7 +23,7 @@ class StreamLinks(commands.Cog):
         self.repo = StreamLinksRepo()
         self.config = app_config.Config
 
-    @commands.cooldown(rate=4, per=30.0, type=commands.BucketType.user)
+    @default_cooldown
     @commands.group(brief=Messages.streamlinks_brief, usage="<subject>")
     async def streamlinks(self, ctx: commands.Context):
         if ctx.invoked_subcommand is None:

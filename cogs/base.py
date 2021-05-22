@@ -3,6 +3,7 @@ import datetime
 from discord.ext import commands
 
 import utils
+from config import cooldowns
 from config.messages import Messages
 
 
@@ -13,7 +14,7 @@ class Base(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.cooldown(rate=2, per=20.0, type=commands.BucketType.user)
+    @cooldowns.default_cooldown
     @commands.command(brief=Messages.uptime_brief)
     async def uptime(self, ctx):
         now = datetime.datetime.now().replace(microsecond=0)
