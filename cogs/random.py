@@ -48,7 +48,7 @@ class Random(commands.Cog):
         await self.flip_func(ctx)
 
     @commands.cooldown(rate=5, per=20.0, type=commands.BucketType.user)
-    @cog_ext.cog_slash(name="flip", description=Messages.random_flip_brief, guild_ids=[Config.guild_id])
+    @cog_ext.cog_slash(name="flip", description=Messages.random_flip_brief)
     async def flip_slash(self, ctx):
         await self.flip_func(ctx)
 
@@ -69,7 +69,7 @@ class Random(commands.Cog):
         await self.roll_func(ctx, first, second)
     
     @commands.cooldown(rate=5, per=20.0, type=commands.BucketType.user)
-    @cog_ext.cog_slash(name="roll", description=Messages.rng_generator_format, guild_ids=[Config.guild_id])
+    @cog_ext.cog_slash(name="roll", description=Messages.rng_generator_format)
     async def roll_slash(self, ctx, first: int, second: int = 0):
         await self.roll_func(ctx, first, second)
 
@@ -92,9 +92,9 @@ class Random(commands.Cog):
             )
 
     async def cog_check(self, ctx):
-        if not Config.enable_room_check:
-            return True
-        return ctx.channel.id in Config.allowed_channels
+        return (not Config.enable_room_check or         # check not enforced
+            not ctx.guild or                            # or pm channel
+            ctx.channel.id in Config.allowed_channels)  # or channel is allowed
 
 
 def setup(bot):
