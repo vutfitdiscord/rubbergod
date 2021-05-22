@@ -5,7 +5,7 @@ import utils
 import re
 import datetime
 import math
-from config import app_config as config, messages
+from config import app_config as config, messages, cooldowns
 from features import karma
 from repository import karma_repo
 from cogs import room_check
@@ -103,7 +103,7 @@ class Karma(commands.Cog):
             else:
                 karma_r.karma_emoji_remove(ctx.message.author, ctx.member, ctx.emoji.id)
 
-    @commands.cooldown(rate=5, per=30.0, type=commands.BucketType.user)
+    @cooldowns.default_cooldown
     @commands.group(brief=messages.karma_brief, usage=' ')
     async def karma(self, ctx: commands.Context):
         if ctx.invoked_subcommand is None:
@@ -133,7 +133,7 @@ class Karma(commands.Cog):
                 return
 
     @karma.command(brief=messages.karma_get_brief)
-    @commands.cooldown(rate=4, per=30.0, type=commands.BucketType.user)
+    @cooldowns.default_cooldown
     async def get(self, ctx, *args):
         if not await self.check.guild_check(ctx.message):
             await ctx.send(messages.server_warning)
@@ -191,7 +191,7 @@ class Karma(commands.Cog):
     async def transfer(self, ctx, *args):
         await self.karma.karma_transfer(ctx.message)
 
-    @commands.cooldown(rate=2, per=30.0, type=commands.BucketType.user)
+    @cooldowns.long_cooldown
     @commands.command(brief=messages.karma_leaderboard_brief)
     async def leaderboard(self, ctx, start=1):
         if not await self.validate_leaderboard_offset(start, ctx):
@@ -200,7 +200,7 @@ class Karma(commands.Cog):
         await self.karma.leaderboard(ctx, "get", "DESC", start)
         await self.check.botroom_check(ctx.message)
 
-    @commands.cooldown(rate=2, per=30.0, type=commands.BucketType.user)
+    @cooldowns.long_cooldown
     @commands.command(brief=messages.karma_bajkarboard_brief)
     async def bajkarboard(self, ctx, start=1):
         if not await self.validate_leaderboard_offset(start, ctx):
@@ -209,7 +209,7 @@ class Karma(commands.Cog):
         await self.karma.leaderboard(ctx, "get", "ASC", start)
         await self.check.botroom_check(ctx.message)
 
-    @commands.cooldown(rate=2, per=30.0, type=commands.BucketType.user)
+    @cooldowns.long_cooldown
     @commands.command(brief=messages.karma_givingboard_brief)
     async def givingboard(self, ctx, start=1):
         if not await self.validate_leaderboard_offset(start, ctx):
@@ -218,7 +218,7 @@ class Karma(commands.Cog):
         await self.karma.leaderboard(ctx, "give", "DESC", start)
         await self.check.botroom_check(ctx.message)
 
-    @commands.cooldown(rate=2, per=30.0, type=commands.BucketType.user)
+    @cooldowns.long_cooldown
     @commands.command(brief=messages.karma_ishaboard_brief)
     async def ishaboard(self, ctx, start=1):
         if not await self.validate_leaderboard_offset(start, ctx):

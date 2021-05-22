@@ -8,12 +8,14 @@ from PIL import Image, ImageDraw
 from io import BytesIO
 import requests
 
+from config import cooldowns
+
 
 class Pet(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.cooldown(rate=5, per=20.0, type=commands.BucketType.user)
+    @cooldowns.short_cooldown
     @commands.command()
     async def pet(self, ctx, user: discord.Member = None):
         if user is None:

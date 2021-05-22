@@ -6,14 +6,14 @@ import io
 import urllib
 from PIL import Image
 
-from config import messages
+from config import messages, cooldowns
 
 messages = messages.Messages
 
 PNG_HEADER = b'\x89PNG\r\n\x1a\n'
 
 class Latex(commands.Cog):
-    @commands.cooldown(rate=2, per=20.0, type=commands.BucketType.user)
+    @cooldowns.default_cooldown
     @commands.command(brief=messages.latex_desc, description=messages.latex_help)
     async def latex(self, ctx, *, equation):
         channel = ctx.channel

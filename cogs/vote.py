@@ -8,6 +8,7 @@ from discord.ext import commands
 from discord.ext.commands import Bot, Context
 
 from utils import is_command_message, str_emoji_id, fill_message
+from config import cooldowns
 from config.messages import Messages
 from dateutil import parser
 
@@ -114,12 +115,12 @@ class Vote(commands.Cog):
             except (VoteMessage.ParseError, VoteMessage.NotEmojiError):
                 pass
 
-    @commands.cooldown(rate=5, per=20.0, type=commands.BucketType.user)
+    @cooldowns.short_cooldown
     @commands.command(rest_is_raw=True, description=Messages.vote_format, brief=Messages.vote_brief)
     async def vote(self, ctx, *, message):
         await self.handle_vote_command(ctx, message, False)
 
-    @commands.cooldown(rate=5, per=20.0, type=commands.BucketType.user)
+    @cooldowns.short_cooldown
     @commands.command(rest_is_raw=True, name='singlevote', description=Messages.vote_format,
                       brief=Messages.vote_one_of_brief)
     async def vote_one_of(self, ctx, *, message):

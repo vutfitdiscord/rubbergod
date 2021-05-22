@@ -4,6 +4,7 @@ import discord
 from discord.ext import commands
 from discord_slash import SlashCommand, SlashContext, cog_ext
 
+from config import cooldowns
 from config.app_config import Config
 from logic import roll_dice
 from config.app_config import Config
@@ -18,12 +19,12 @@ class Random(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.cooldown(rate=5, per=20.0, type=commands.BucketType.user)
+    @cooldowns.short_cooldown
     @commands.command(brief=Messages.random_diceroll_brief, description=Messages.rd_help)
     async def diceroll(self, ctx, *, arg=""):
         await ctx.send(roll_dice.roll_dice(arg))
 
-    @commands.cooldown(rate=5, per=20.0, type=commands.BucketType.user)
+    @cooldowns.short_cooldown
     @commands.command(brief=Messages.random_pick_brief, usage=Messages.random_pick_usage)
     async def pick(self, ctx, *args):
         """"Pick an option"""
@@ -42,12 +43,12 @@ class Random(commands.Cog):
     async def flip_func(self, ctx):
         await ctx.send(random.choice(["True", "False"]))
 
-    @commands.cooldown(rate=5, per=20.0, type=commands.BucketType.user)
+    @cooldowns.short_cooldown
     @commands.command(brief=Messages.random_flip_brief)
     async def flip(self, ctx):
         await self.flip_func(ctx)
 
-    @commands.cooldown(rate=5, per=20.0, type=commands.BucketType.user)
+    @cooldowns.short_cooldown
     @cog_ext.cog_slash(name="flip", description=Messages.random_flip_brief)
     async def flip_slash(self, ctx):
         await self.flip_func(ctx)
@@ -59,7 +60,7 @@ class Random(commands.Cog):
         option = str(random.randint(first, second))
         await ctx.send(option)
     
-    @commands.cooldown(rate=5, per=20.0, type=commands.BucketType.user)
+    @cooldowns.short_cooldown
     @commands.command(
         aliases=["random", "randint"],
         brief=Messages.random_roll_brief,
@@ -68,7 +69,7 @@ class Random(commands.Cog):
     async def roll(self, ctx, first: int, second: int = 0):
         await self.roll_func(ctx, first, second)
     
-    @commands.cooldown(rate=5, per=20.0, type=commands.BucketType.user)
+    @cooldowns.short_cooldown
     @cog_ext.cog_slash(name="roll", description=Messages.rng_generator_format)
     async def roll_slash(self, ctx, first: int, second: int = 0):
         await self.roll_func(ctx, first, second)
