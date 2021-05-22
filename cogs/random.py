@@ -93,9 +93,11 @@ class Random(commands.Cog):
             )
 
     async def cog_check(self, ctx):
-        return (not Config.enable_room_check or         # check not enforced
-            not ctx.guild or                            # or pm channel
-            ctx.channel.id in Config.allowed_channels)  # or channel is allowed
+        if not Config.enable_room_check:
+            return True
+        if not ctx.guild:
+            return True
+        return ctx.channel.id in Config.allowed_channels
 
 
 def setup(bot):
