@@ -130,10 +130,13 @@ def format_time(minutes):
     days = hours / 24
     weeks = days / 7
     months = days / 30
+    years = months / 12
 
-    if months >= 1:
+    if years >= 1:
+        return f"{round(years, 1)} roků"
+    elif months >= 1:
         return f"{round(months, 1)} měsíců"
-    if weeks >= 1:
+    elif weeks >= 1:
         return f"{round(weeks, 1)} týdnů"
     elif days >= 1:
         return f"{round(days, 1)} dní"
