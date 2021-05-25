@@ -260,9 +260,9 @@ class Messages:
     absolvent_success = "Diplom byl úspěšne ověřen."
     absolvent_brief = "Příkaz pro ověření absolvování studia na FIT VUT"
     absolvent_help = f"{absolvent_brief} - zadejte CASE-SENSITIVE údaje ve formátu:\n" \
-        f"{prefix}{{command}} <Titul.> <Jméno> <Příjmení> <Číslo diplomu> <ID kvalifikační práce z URL na webu VUT <https://www.vutbr.cz/studenti/zav-prace> >\n" \
-        "např: Bc. Josef Novák 123456/2019 135791\n" \
-        "(při <https://www.vutbr.cz/studenti/zav-prace/detail/135791> nebo <https://www.vutbr.cz/studenti/zav-prace?zp_id=135791>)\n" \
+        f"{prefix}{{command}} <Titul.> <Jméno> <Příjmení> <Číslo diplomu> <ID kvalifikační práce z URL na webu knihovny VUT <https://dspace.vutbr.cz/handle/11012/19121> >\n" \
+        "např: Bc. Josef Novák 123456/2019 99999\n" \
+        "(při <https://dspace.vutbr.cz/handle/11012/99999>)\n" \
         "Údaje slouží k jednorázovému ověření a nejsou nikam ukládány."
 
     urban_brief = "Vyhledávaní výrazu v urban slovníku"
