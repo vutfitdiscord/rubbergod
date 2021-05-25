@@ -31,7 +31,7 @@ class Absolvent(commands.Cog):
         :param surname: last name (case-sensitive)
         :param degree: strictly either "Bc." or "Ing." (case-sensitive)
         :param diploma_number: ID of diploma, in format NNNNNN/YYYY
-        :param thesis_web_id: ID from URL https://www.vutbr.cz/studenti/zav-prace?zp_id=<num>
+        :param thesis_web_id: ID from URL https://dspace.vutbr.cz/handle/11012/<num> can be discovered via https://dspace.vutbr.cz/handle/11012/19121 
         """
         # prepare
         htmlparser = etree.HTMLParser()
@@ -41,6 +41,7 @@ class Absolvent(commands.Cog):
             return
         diploma_year = diploma_year.group(1)
         full_name_without_degree = f"{name} {surname}"
+        full_name_without_degree_surname_first = f"{surname}, {name}"
 
         # CHECK WHETHER THE PROVIDED NAME MATCHES THE ONE STORED FOR FIT VUT VERIFICATION
 
@@ -63,59 +64,73 @@ class Absolvent(commands.Cog):
 
         # CHECK OWNERSHIP, TYPE AND YEAR OF THE QUALIFICATION WORK / THESIS
 
-        thesis_url = f"https://www.vutbr.cz/studenti/zav-prace?zp_id={thesis_web_id}"
+        thesis_url = f"https://dspace.vutbr.cz/handle/11012/{thesis_web_id}?locale-attribute=cs"
 
         # download the page
         result_thesis = requests.get(thesis_url)
         # parse it using lxml
         xDoc_thesis = etree.fromstring(result_thesis.text, htmlparser)
         not_found = "".join(
-            xDoc_thesis.xpath("//*[@id='main']/div/p/text()")
+            xDoc_thesis.xpath('//*[@id="main-container"]//h2/text()')
         )
         master_thesis = "".join(
-            xDoc_thesis.xpath("//*[@id='main']//span[contains(@class,'tag') and .='diplomová práce']/text()")
+            xDoc_thesis.xpath(
+               "/html/body/div[1]/div/div/div/ul[contains(@class,'breadcrumb')]/li[3]/a[.='diplomové práce']/text()"
+            )
         )
         bachelor_thesis = "".join(
-            xDoc_thesis.xpath("//*[@id='main']//span[contains(@class,'tag') and .='bakalářská práce']/text()")
-        )
-        thesis_author = "".join(
             xDoc_thesis.xpath(
-                "//*[@id='main']//p[contains(@class,'b-detail__annot')]/span[starts-with(.,'Autor práce')]/*[self::a or self::strong]/text()"
+               "/html/body/div[1]/div/div/div/ul[contains(@class,'breadcrumb')]/li[3]/a[.='bakalářské práce']/text()"
+            )
+        )
+        thesis_author_without_degree_surname_first = "".join(
+            xDoc_thesis.xpath(
+                '//*[@id="aspect_artifactbrowser_ItemViewer_div_item-view"]/div/div[2]/div[1]/div[./h5/b="Autor"]/div/a/text()'
             )
         )
         habilitation_date = "".join(
             xDoc_thesis.xpath(
-                "//*[@id='main']//div[contains(@class,'b-detail__body')]//div[p='Termín obhajoby']/following-sibling::div[1]//text()"
+                '//*[@id="aspect_artifactbrowser_ItemViewer_div_item-view"]/div/div[2]/div[2]/div[./h5="Termín obhajoby"]/span/text()'
             )
         )
         result = "".join(
             xDoc_thesis.xpath(
-                "//*[@id='main']//div[contains(@class,'b-detail__body')]//div[p='Výsledek obhajoby']/following-sibling::div[1]//text()"
+                '//*[@id="aspect_artifactbrowser_ItemViewer_div_item-view"]/div/div[2]/div[2]/div[./h5="Výsledek obhajoby"]/span/text()'
             )
         )
         faculty = "".join(
             xDoc_thesis.xpath(
-                "//*[@id='main']//div[contains(@class,'b-detail__body')]//div[p='Fakulta']/following-sibling::div[1]//text()"
+               "/html/body/div[1]/div/div/div/ul[contains(@class,'breadcrumb')]/li[4]/a[.='Fakulta informačních technologií']/text()"
             )
         )
         
-        if "Detail závěrečné práce nebyl nalezen" in not_found:
+        #await ctx.send(f"""
+        #DEBUG:
+        #nf: {not_found}
+        #mt: {master_thesis}
+        #bt: {bachelor_thesis}
+        #ta: {thesis_author_without_degree_surname_first}
+        #hd: {habilitation_date}
+        #re: {result}
+        #fa: {faculty}
+        #""")
+
+        if "Page cannot be found" in not_found:
             await ctx.send(Messages.absolvent_thesis_not_found_error)
             return
 
-        habilitation_year = re.search(r"\d+\.\s*\d+\.\s*(\d+)", habilitation_date).group(1)
-        thesis_author_without_degree = re.search(r"(\w+\. +)?([\w ]+)", thesis_author).group(2)
+        habilitation_year = re.search(r"(\d+)-\d+-\d+", habilitation_date).group(1)
 
         if not (
             ((degree == "Ing." and master_thesis != "") or (degree == "Bc." and bachelor_thesis != ""))
             and diploma_year == habilitation_year
-            and faculty == "Fakulta informačních technologií"
-            and result == "obhájeno (práce byla úspěšně obhájena)"
-            and thesis_author_without_degree == full_name_without_degree
+            and faculty != ""
+            and result == "práce byla úspěšně obhájena"
+            and thesis_author_without_degree_surname_first == full_name_without_degree_surname_first
         ):
             await ctx.send(Messages.absolvent_web_error)
             return
-
+        
         # DIPLOMA VALIDITY CHECK
 
         diplom_url1 = "https://www.vutbr.cz/overeni-diplomu"
