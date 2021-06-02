@@ -13,6 +13,9 @@ from config.messages import Messages
 
 class AutoPin(commands.Cog):
     def __init__(self, bot):
+        self.warning_time = datetime.datetime.utcnow() - datetime.timedelta(
+            minutes=Config.autopin_warning_cooldown
+        )
         self.bot = bot
         self.repo = pin_repo.PinRepository()
 
@@ -67,19 +70,19 @@ class AutoPin(commands.Cog):
             channel: discord.TextChannel = await self.bot.fetch_channel(int(item.channel_id))
 
             if channel is None:
-                lines.append(utils.fill_message('autopin_list_unknown_channel', channel_id=item.channel_id))
+                lines.append(utils.fill_message("autopin_list_unknown_channel", channel_id=item.channel_id))
             else:
                 message: discord.Message = await channel.fetch_message(int(item.message_id))
                 if message is None:
-                    msg: str = utils.fill_message('autopin_list_unknown_message', channel=channel.mention)
+                    msg: str = utils.fill_message("autopin_list_unknown_message", channel=channel.mention)
                     lines.append(msg)
                 else:
                     jump_url: str = message.jump_url
-                    msg: str = utils.fill_message('autopin_list_item', channel=channel.mention, url=jump_url)
+                    msg: str = utils.fill_message("autopin_list_item", channel=channel.mention, url=jump_url)
                     lines.append(msg)
 
         for part in utils.split_to_parts(lines, 10):
-            await ctx.send('\n'.join(part))
+            await ctx.send("\n".join(part))
 
     @commands.Cog.listener()
     async def on_guild_channel_pins_update(self, channel: discord.TextChannel, last_pin):
@@ -94,7 +97,7 @@ class AutoPin(commands.Cog):
         if not any(x.id == int(pin_map.message_id) for x in pins):
             # Mapped pin was removed. Remove from map.
             self.repo.remove_channel(str(channel.id))
-            print(f'INFO:\tRemoved {channel.id} from PIN mapping. (on_guild_channel_pins_update)')
+            print(f"INFO:\tRemoved {channel.id} from PIN mapping. (on_guild_channel_pins_update)")
         elif pins[0].id != int(pin_map.message_id):
             message: discord.Message = await channel.fetch_message(int(pin_map.message_id))
 
@@ -105,7 +108,7 @@ class AutoPin(commands.Cog):
 
             await message.unpin()
             await message.pin()
-            print(f'INFO:\tMessage: {message.id} was repinned. (on_guild_channel_pins_update)')
+            print(f"INFO:\tMessage: {message.id} was repinned. (on_guild_channel_pins_update)")
 
     @commands.Cog.listener()
     async def on_raw_message_delete(self, payload: discord.RawMessageDeleteEvent):
@@ -115,15 +118,17 @@ class AutoPin(commands.Cog):
             return
 
         self.repo.remove_channel(str(payload.channel_id))
-        print(f'INFO:\tRemoved {pin_map.channel_id} from PIN mapping. (on_raw_message_delete)')
+        print(f"INFO:\tRemoved {pin_map.channel_id} from PIN mapping. (on_raw_message_delete)")
 
     async def handle_reaction(self, ctx):
         """
         if the message has X or more 'pin' emojis pin the message
         """
-        reaction = ctx.emoji
         message = ctx.message
         channel = ctx.channel
+        if ctx.emoji == "📌" and ctx.member.id in Config.autopin_banned_users:
+            await message.remove_reaction("📌", ctx.member)
+            return
         for reaction in message.reactions:
             if (
                 reaction.emoji == "📌"
@@ -134,7 +139,10 @@ class AutoPin(commands.Cog):
             ):
                 pin_count = await channel.pins()
                 if len(pin_count) == 50:
-                    await channel.send(f"{ctx.member.mention} {Messages.autopin_max_pins_error}")
+                    now = datetime.datetime.utcnow()
+                    if self.warning_time + datetime.timedelta(minutes=Config.autopin_warning_cooldown) < now:
+                        await channel.send(f"{ctx.member.mention} {Messages.autopin_max_pins_error}")
+                        self.warning_time = now
                     return
                 users = await reaction.users().flatten()
                 await self.log(message, users)

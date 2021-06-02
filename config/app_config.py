@@ -90,6 +90,8 @@ class Config:
     # Pin emoji count to pin
     autopin_count: int = get_attr("autopin", "count")
     autopin_banned_channels: List[int] = get_attr("autopin", "banned_channels")
+    autopin_banned_users: List[int] = get_attr("autopin", "banned_users")
+    autopin_warning_cooldown: int = get_attr("autopin", "warning_cooldown")
 
     # Special channel IDs
     log_channel: int = get_attr("channels", "log_channel")
