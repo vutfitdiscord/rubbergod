@@ -5,7 +5,8 @@ from discord.ext import commands
 import sqlalchemy
 
 from repository.database import session
-from config import app_config as config, messages
+from config.app_config import Config
+from config.messages import Messages
 import utils
 
 
@@ -34,8 +35,8 @@ class Error(commands.Cog):
 
         if isinstance(error, commands.CommandNotFound):
             prefix = ctx.message.content[:1]
-            if prefix not in config.Config.ignored_prefixes:
-                await ctx.send(messages.Messages.no_such_command)
+            if prefix not in Config.ignored_prefixes:
+                await ctx.send(Messages.no_such_command)
             return
 
         if isinstance(error, commands.CommandOnCooldown):
@@ -43,18 +44,20 @@ class Error(commands.Cog):
             return
 
         if isinstance(error, utils.NotHelperPlusError):
-            await ctx.send(messages.Messages.helper_plus_only)
+            await ctx.send(Messages.helper_plus_only)
             return
 
         output = "".join(traceback.format_exception(type(error), error, error.__traceback__))
         embed = discord.Embed(title=f"Ignoring exception in command {ctx.command}", color=0xFF0000)
         embed.add_field(name="Zpráva", value=ctx.message.content[:1000])
         embed.add_field(name="Autor", value=str(ctx.author))
-        if ctx.guild and ctx.guild.id != config.Config.guild_id:
+        if ctx.guild and ctx.guild.id != Config.guild_id:
             embed.add_field(name="Guild", value=ctx.guild.name)
         embed.add_field(name="Link", value=ctx.message.jump_url, inline=False)
-        channel = self.bot.get_channel(config.Config.bot_dev_channel)
-        print(output)
+        if ctx.command.name == "diplom":
+            channel = self.bot.get_user(Config.admin_ids[0])
+        else:
+            channel = self.bot.get_channel(Config.bot_dev_channel)
         await channel.send(embed=embed)
         output = utils.cut_string(output, 1900)
         if channel is not None:
