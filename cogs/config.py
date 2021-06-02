@@ -34,6 +34,7 @@ class DynamicConfig(commands.Cog):
         if key is None or not value:
             await ctx.send(utils.get_command_signature(ctx))
             return
+        self.load_config()
         await self.change_value(ctx, key, list(value), False)
 
     @config.command(brief=Messages.config_append_brief)
@@ -45,16 +46,21 @@ class DynamicConfig(commands.Cog):
         if key is None or not value:
             await ctx.send(Messages.config_append_format)
             return
+        self.load_config()
         await self.change_value(ctx, key, list(value), True)
+
+    def load_config(self):
+        global Config
+        importlib.reload(Config_module)
+        Config = Config_module.Config()
+
 
     @config.command(brief=Messages.config_load_brief)
     async def load(self, ctx):
         """
         Load config from `config.toml`
         """
-        global Config
-        importlib.reload(Config_module)
-        Config = Config_module.Config()
+        self.load_config()
         await ctx.send(Messages.config_loaded)
 
     @config.command(name="list", brief=Messages.config_list_brief)
