@@ -53,6 +53,8 @@ minutes = 2
 count = 20
 #                       skolni-info          server-info
 banned_channels = [491277786489683979, 489461089432633346]
+banned_users = []
+warning_cooldown = 5 # in minutes
 
 [channels]
 log_channel = 531058805233156096
