@@ -23,7 +23,7 @@ class StreamLinks(commands.Cog):
         self.repo = StreamLinksRepo()
         self.config = app_config.Config
 
-    @default_cooldown
+    @cooldowns.default_cooldown
     @commands.group(brief=Messages.streamlinks_brief, usage="<subject>")
     async def streamlinks(self, ctx: commands.Context):
         if ctx.invoked_subcommand is None:
