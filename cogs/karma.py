@@ -39,6 +39,17 @@ class Karma(commands.Cog):
                 users = [x for y in users for x in y]
                 if users.count(ctx.member) > 1:
                     await ctx.message.remove_reaction(ctx.emoji, ctx.member)
+        # reeval karma message
+        elif (ctx.message.embeds 
+            and ctx.message.embeds[0].title is not discord.Embed.Empty 
+            and ctx.message.embeds[0].title == "Karma zprávy"
+        ):
+            async with ctx.channel.typing():
+                await ctx.message.remove_reaction(ctx.emoji, ctx.member)
+                msg_converter = commands.MessageConverter()
+                message = await msg_converter.convert(self, ctx.message.embeds[0].fields[0].value)
+                embed = await self.karma.message_karma(ctx.member, message)
+                await ctx.message.edit(embed=embed)
         # leaderboard pagination
         elif (
             ctx.message.embeds
@@ -184,7 +195,9 @@ class Karma(commands.Cog):
     @karma.command(brief=messages.karma_message_brief)
     async def message(self, ctx, message: discord.Message):
         async with ctx.channel.typing():
-            await self.karma.message_karma(ctx, message)
+            embed = await self.karma.message_karma(ctx.author, message)
+            response = await ctx.send(embed=embed)
+            await response.add_reaction("🔁")
 
     @karma.command(brief=messages.karma_transfer_brief)
     @commands.check(utils.is_bot_admin)
