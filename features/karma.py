@@ -285,8 +285,7 @@ class Karma(BaseFeature):
             karma_neg_order=k.negative.position
         )
 
-    async def message_karma(self, channel_out, msg):
-        author = channel_out.author
+    async def message_karma(self, author: discord.User, msg: discord.Message):
         reactions = msg.reactions
         colour = 0x6d6a69
         output = {'-1': [], '1': [], '0': []}
@@ -331,15 +330,14 @@ class Karma(BaseFeature):
         embed.colour = colour
         embed.add_field(name='Celková karma za zprávu:', value=karma, inline=False)
         utils.add_author_footer(embed, author)
-
-        await channel_out.send(embed=embed)
+        return embed
 
     async def leaderboard(self, ctx: discord.ext.commands.Context, action, order, start=1):
         if action == 'give':
             if order == "DESC":
                 column = 'positive'
                 attribute = Database_karma.positive.desc()
-                emote = "<:peepolove:562305740132450359>"
+                emote = "<:peepolove:851025266553258044>"
                 title = emote + "KARMA GIVINGBOARD " + emote
             else:
                 column = 'negative'
@@ -354,7 +352,7 @@ class Karma(BaseFeature):
                 title = emote + " KARMA LEADERBOARD " + emote
             else:
                 attribute = Database_karma.karma
-                emote = "<:coolStoryArcasCZ:489539455271829514>"
+                emote = "<:coolStoryBob:851029030689701898>"
                 title = emote + " KARMA BAJKARBOARD " + emote
         else:
             raise Exception('Action neni get/give')
