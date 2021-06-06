@@ -480,6 +480,13 @@ class FitWide(commands.Cog):
             session.commit()
             await ctx.send("Hotovo.")
 
+    @commands.check(utils.is_bot_admin)
+    @commands.command()
+    async def shutdown(self, ctx):
+        await ctx.send("Shutting down")
+        self.bot.close()
+        exit(0)
+
     @get_users_login.error
     @reset_login.error
     @get_logins_user.error
