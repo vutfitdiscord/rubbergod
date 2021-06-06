@@ -1,6 +1,6 @@
 import datetime
 import subprocess
-from sqlalchemy.orm.exc import NoResultFound
+from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 
 import discord
 from discord.ext import commands
@@ -117,6 +117,9 @@ class FitWide(commands.Cog):
                     person = session.query(Valid_person).\
                         filter(Valid_person.login == login).one()
                 except NoResultFound:
+                    continue
+                except MultipleResultsFound:
+                    await ctx.send(f"{member.id} je v permit databazi vickrat?")
                     continue
 
                 if person.status != 0:
