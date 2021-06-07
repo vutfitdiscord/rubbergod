@@ -128,7 +128,11 @@ class LeaderboardPageSource(DatabaseIteratorPageSource):
 
     @staticmethod
     async def _get_member_name(ctx: Context, member_id: Union[str, int]) -> str:
-        member = ctx.guild.get_member(member_id)
+        if ctx.guild:
+            member = ctx.guild.get_member(member_id)
+        else:
+            guild = ctx.bot.get_guild(config.guild_id)
+            member = guild.get_member(member_id)
         if not member:
             return "_User left_"
         return discord.utils.escape_markdown(str(member))
