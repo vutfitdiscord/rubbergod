@@ -4,7 +4,7 @@ from sqlalchemy import func, desc, asc
 
 from repository.base_repository import BaseRepository
 from repository.database import session
-from repository.database.review import Review, ReviewRelevance, Subject, Subject_details
+from repository.database.review import Programme, Review, ReviewRelevance, Subject, Subject_details
 
 
 class ReviewRepository(BaseRepository):
@@ -160,4 +160,16 @@ class ReviewRepository(BaseRepository):
     def update_subject_sem(self, shortcut, sem):
         subject = Subject_details(shortcut=shortcut, semester=sem)
         session.merge(subject)
+        session.commit()
+
+    def get_programme(self, shortcut):
+        return session.query(Programme).filter(Programme.shortcut == shortcut).first()
+
+    def set_programme(self, shortcut, name, link):
+        programme = Programme(
+            shortcut=shortcut,
+            name=name,
+            link=link
+        )
+        session.merge(programme)
         session.commit()

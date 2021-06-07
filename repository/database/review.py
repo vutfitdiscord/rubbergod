@@ -44,3 +44,11 @@ class Subject_details(database.base):
     year = Column(String)
     type = Column(String)
     degree = Column(String)
+
+
+class Programme(database.base):
+    __tablename__ = "bot_programme"
+
+    shortcut = Column(String, primary_key=True)
+    name = Column(String)
+    link = Column(String)

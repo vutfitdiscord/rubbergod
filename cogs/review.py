@@ -171,26 +171,31 @@ class Review(commands.Cog):
         if not shortcut:
             await ctx.send(utils.fill_message("shorcut_format", command=ctx.invoked_with))
             return
-        subject = review_repo.get_subject_details(shortcut.lower())
-        if not subject:
-            await ctx.send(messages.review_wrong_subject)
-            return
-        embed = discord.Embed(title=subject.shortcut, description=subject.name)
-        if subject.semester == "L":
-            embed.add_field(name="Semestr", value="Letní")
+        programme = review_repo.get_programme(shortcut.upper())
+        if programme:
+            embed = discord.Embed(title=programme.shortcut, description=programme.name)
+            embed.add_field(name="Link", value=programme.link)
         else:
-            embed.add_field(name="Semestr", value="Zimní")
-        embed.add_field(name="Typ", value=subject.type)
-        if subject.year:
-            embed.add_field(name="Ročník", value=subject.year)
-        embed.add_field(name="Kredity", value=subject.credits)
-        embed.add_field(name="Ukončení", value=subject.end)
-        embed.add_field(name="Karta předmětu", value=subject.card, inline=False)
-        embed.add_field(
-            name="Statistika úspěšnosti předmětu",
-            value=f"http://fit.nechutny.net/?detail={subject.shortcut}",
-            inline=False,
-        )
+            subject = review_repo.get_subject_details(shortcut.lower())
+            if not subject:
+                await ctx.send(messages.review_wrong_subject)
+                return
+            embed = discord.Embed(title=subject.shortcut, description=subject.name)
+            if subject.semester == "L":
+                embed.add_field(name="Semestr", value="Letní")
+            else:
+                embed.add_field(name="Semestr", value="Zimní")
+            embed.add_field(name="Typ", value=subject.type)
+            if subject.year:
+                embed.add_field(name="Ročník", value=subject.year)
+            embed.add_field(name="Kredity", value=subject.credits)
+            embed.add_field(name="Ukončení", value=subject.end)
+            embed.add_field(name="Karta předmětu", value=subject.card, inline=False)
+            embed.add_field(
+                name="Statistika úspěšnosti předmětu",
+                value=f"http://fit.nechutny.net/?detail={subject.shortcut}",
+                inline=False,
+            )
 
         utils.add_author_footer(embed, ctx.author)
         await ctx.send(embed=embed)
@@ -534,6 +539,10 @@ class Review_helper:
 
         # specialization shortcut for correct year definition in DB
         specialization = soup.select("main p strong")[0].get_text()
+        full_specialization = soup.select("h1")[0].get_text()
+
+        if review_repo.get_programme(specialization):
+            review_repo.set_programme(specialization, full_specialization, link)
 
         sem = 1
         year = 1
