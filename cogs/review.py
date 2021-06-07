@@ -541,7 +541,7 @@ class Review_helper:
         specialization = soup.select("main p strong")[0].get_text()
         full_specialization = soup.select("h1")[0].get_text()
 
-        if review_repo.get_programme(specialization):
+        if not review_repo.get_programme(specialization):
             review_repo.set_programme(specialization, full_specialization, link)
 
         sem = 1
