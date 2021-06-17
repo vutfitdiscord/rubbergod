@@ -1,3 +1,4 @@
+from config.messages import Messages
 import discord
 from discord.ext import commands
 
@@ -20,6 +21,9 @@ class Pet(commands.Cog):
     async def pet(self, ctx, user: discord.Member = None):
         if user is None:
             user = ctx.author
+        if user.default_avatar:
+            await ctx.send(Messages.pet_unsupported_image)
+            return
         url = user.avatar_url_as(format='jpg')
         response = requests.get(url)
         avatarFull = Image.open(BytesIO(response.content))
