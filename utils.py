@@ -107,7 +107,9 @@ class NotHelperPlusError(commands.CommandError):
 
 def helper_plus(ctx):
     allowed_roles = {Config.mod_role, Config.submod_role, Config.helper_role}
-    for role in ctx.author.roles:
+    guild = ctx.bot.get_guild(Config.guild_id)
+    user = guild.get_member(ctx.author.id)
+    for role in user.roles:
         if role.id in allowed_roles:
             return True
     if ctx.author.id in Config.admin_ids:
