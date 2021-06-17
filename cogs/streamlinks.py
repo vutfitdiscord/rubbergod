@@ -11,6 +11,8 @@ import requests
 from bs4 import BeautifulSoup
 from datetime import datetime
 import re
+from requests.packages.urllib3.util.retry import Retry
+from requests.adapters import HTTPAdapter
 from features.reaction_context import ReactionContext
 
 # Pattern: "AnyText | [Subject] Page: CurrentPage / {TotalPages}"
@@ -128,11 +130,30 @@ class StreamLinks(commands.Cog):
             'upload_date': None
         }
 
-        response = requests.get(link)
+        session = requests.Session()
+        retry = Retry(connect=5, backoff_factor=0.5)
+        adapter = HTTPAdapter(max_retries=retry)
+        session.mount('http://', adapter)
+        session.mount('https://', adapter)
+
+        response = session.get(link)
         if response.status_code != 200:
             return None
 
         soup = BeautifulSoup(response.content, 'html.parser')
+        form = soup.select('form', {'action': 'https://consent.youtube.com/s'})
+        if len(form) > 0:
+            # Consent check detected. Will try to pass...
+            params = form[0].select('input', {'type' : 'hidden'})
+            pars = {}
+            for par in params:
+                if 'name' in par.attrs:
+                    pars[par.attrs['name']] = par.attrs['value']
+            session.post("https://consent.youtube.com/s", data=pars)
+            response = session.get(link)
+            if response.status_code != 200:
+                return None
+            soup = BeautifulSoup(response.content, 'html.parser')
         meta_tags = soup.select('meta')
 
         for meta in meta_tags:
