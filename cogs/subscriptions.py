@@ -47,7 +47,7 @@ class Subscriptions(commands.Cog):
                 continue
 
     @commands.guild_only()
-    @commands.command()
+    @commands.command(brief=messages.subscribe_brief)
     async def subscribe(self, ctx: commands.Context, channel: discord.TextChannel):
         if channel.id not in config.subscribable_channels:
             await ctx.reply(messages.subscriptions_unsubscribable)
@@ -60,7 +60,7 @@ class Subscriptions(commands.Cog):
         await ctx.reply(messages.subscriptions_new_subscription)
 
     @commands.guild_only()
-    @commands.command()
+    @commands.command(brief=messages.unsubscribe_brief)
     async def unsubscribe(self, ctx: commands.Context, channel: discord.TextChannel):
         removed: int = repo.remove_subscription(ctx.author.id, channel.id)
         if removed == 0:
@@ -69,7 +69,20 @@ class Subscriptions(commands.Cog):
         await ctx.reply(messages.subscriptions_unsubscribed)
 
     @commands.guild_only()
-    @commands.command()
+    @commands.command(brief=messages.subscribeable_brief)
+    async def subscribeable(self, ctx):
+        channel_names = [
+            getattr(ctx.guild.get_channel(channel_id), "name", str(channel_id))
+            for channel_id in config.subscribable_channels
+        ]
+        if not len(channel_names):
+            await ctx.reply(messages.subscriptions_none)
+            return
+
+        await ctx.reply(", ".join(f"#{name}" for name in channel_names))
+
+    @commands.guild_only()
+    @commands.command(brief=messages.subscriptions_brief)
     async def subscriptions(self, ctx, *, target: Union[discord.User, discord.TextChannel] = None):
         if target is None:
             user_ids = set()
@@ -93,6 +106,10 @@ class Subscriptions(commands.Cog):
                 ]
                 result.append(f"> {user.name}: {', '.join(user_channels)}")
 
+            if not len(result):
+                await ctx.reply(messages.subscriptions_none)
+                return
+
             await ctx.reply("\n".join(result))
             return
 
@@ -113,6 +130,17 @@ class Subscriptions(commands.Cog):
             return
 
         await ctx.reply("> " + ", ".join(subs))
+
+    @subscribe.error
+    @unsubscribe.error
+    async def subscription_no_argument(self, ctx, error):
+        if isinstance(error, commands.UserInputError):
+            await ctx.send(messages.subscriptions_missing_argument)
+
+    @subscriptions.error
+    async def subscription_no_argument(self, ctx, error):
+        if isinstance(error, commands.UserInputError):
+            await ctx.send(messages.subscriptions_bad_argument)
 
 
 def setup(bot):
