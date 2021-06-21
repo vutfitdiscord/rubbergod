@@ -349,3 +349,12 @@ class Messages:
 
     bonk_brief = "Bonk na uživatele"
     pet_unsupported_image = "Tento avatar aktuálne není podporovaný <:sadcat:576171980118687754>"
+
+    subscriptions_embed_name = "Informace o zprávě"
+    subscriptions_embed_value = "Zpráva obsahuje přílohy."
+    subscriptions_unsubscribable = "Tento kanál odebírat nemůžeš."
+    subscriptions_already_subscribed = "Tuto místnost již odebíráš."
+    subscriptions_new_subscription = "Upozornění na nové zprávy ti budu posílat do DM."
+    subscriptions_not_subscribed = "Tuto místnost neodebíráš."
+    subscriptions_unsubscribed = "Nová upozornění na zprávy ti už posílat nebudu."
+    subscriptions_none = "Nebyly nalezeny žádné výsledky."

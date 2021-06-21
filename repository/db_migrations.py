@@ -11,6 +11,7 @@ from repository.database.hugs import HugsTable
 from repository.database.pin_map import PinMap
 from repository.database.stream_link import StreamLink
 from repository.database.vote import Vote
+from repository.database.subscription import Subscription
 
 from config.app_config import Config
 
