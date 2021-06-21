@@ -48,3 +48,7 @@ class SubscriptionRepository(BaseRepository):
     def get_user_subscriptions(self, user_id: int) -> List[Subscription]:
         query = session.query(Subscription).filter_by(user_id=user_id).all()
         return query
+
+    def get_all(self) -> List[Subscription]:
+        query = session.query(Subscription).all()
+        return query

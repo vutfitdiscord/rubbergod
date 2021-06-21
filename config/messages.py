@@ -352,6 +352,7 @@ class Messages:
 
     subscriptions_embed_name = "Informace o zprávě"
     subscriptions_embed_value = "Zpráva obsahuje přílohy."
+    subscriptions_message_link = "Odkaz na zprávu"
     subscriptions_unsubscribable = "Tento kanál odebírat nemůžeš."
     subscriptions_already_subscribed = "Tuto místnost již odebíráš."
     subscriptions_new_subscription = "Upozornění na nové zprávy ti budu posílat do DM."

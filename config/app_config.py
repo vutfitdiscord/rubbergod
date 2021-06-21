@@ -148,4 +148,4 @@ class Config:
     ios_looptime_minutes: int = get_attr("util", "ios_looptime_minutes")
 
     # subscriptions
-    unsubscribable_channels: list = get_attr("subscriptions", "unsubscribable_channels")
+    subscribable_channels: list = get_attr("subscriptions", "subscribable_channels")
