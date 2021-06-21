@@ -164,3 +164,7 @@ loading="<a:loading:814969399442014259>"
 
 [util]
 ios_looptime_minutes=120
+
+[subscriptions]
+# channels users shouldn't be allowed to subscribe to
+unsubscribable_channels = [0]
