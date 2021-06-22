@@ -38,13 +38,25 @@ class Subscriptions(commands.Cog):
             )
 
         for subscriber in subscribers:
-            user = self.bot.get_user(subscriber.user_id)
-            if user is None:
+            member = message.guild.get_member(subscriber.user_id)
+            if member is None:
                 continue
+            if not self.phone_or_offline(member):
+                continue
+
             try:
-                await user.send(embed=embed)
+                await member.send(embed=embed)
             except discord.errors.HTTPException:
                 continue
+
+    def phone_or_offline(self, member: discord.Member) -> bool:
+        """This helper function returns 'True' only if the member is not active
+        on desktop or web; they have to be on mobile or offline."""
+        if str(member.desktop_status) != "offline":
+            return False
+        if str(member.web_status) != "offline":
+            return False
+        return True
 
     @commands.guild_only()
     @commands.command(brief=messages.subscribe_brief)

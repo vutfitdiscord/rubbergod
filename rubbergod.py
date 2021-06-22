@@ -49,6 +49,7 @@ intents.members = True
 intents.emojis = True
 intents.messages = True
 intents.reactions = True
+intents.presences = True
 
 bot = commands.Bot(
     command_prefix=commands.when_mentioned_or(*config.command_prefix),
