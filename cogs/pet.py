@@ -21,7 +21,7 @@ class Pet(commands.Cog):
     async def pet(self, ctx, user: discord.Member = None):
         if user is None:
             user = ctx.author
-        if user.default_avatar:
+        if not user.avatar:
             await ctx.send(Messages.pet_unsupported_image)
             return
         url = user.avatar_url_as(format='jpg')
