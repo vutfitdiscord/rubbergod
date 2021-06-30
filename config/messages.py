@@ -258,6 +258,7 @@ class Messages:
     absolvent_web_error = "Nepovedlo se ověřit obhájení kvalifikační práce pod uvedeným číslem na webu, jménem, typem práce a rokem obhájení (dle čísla diplomu)."
     absolvent_diploma_error = "Diplom (číslo a jméno) se nepovedlo na webu ověřit."
     absolvent_success = "Diplom byl úspěšne ověřen."
+    absolvent_id_from_help = "Zadej svoje ID práce."
     absolvent_brief = "Příkaz pro ověření absolvování studia na FIT VUT"
     absolvent_help = f"{absolvent_brief} - zadejte CASE-SENSITIVE údaje ve formátu:\n" \
         f"{prefix}{{command}} <Titul.> <Jméno> <Příjmení> <Číslo diplomu> <ID kvalifikační práce z URL na webu knihovny VUT <https://dspace.vutbr.cz/handle/11012/19121> >\n" \

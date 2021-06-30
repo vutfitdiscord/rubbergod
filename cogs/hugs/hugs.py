@@ -125,7 +125,7 @@ class Hugs(commands.Cog):
         await ctx.send(embed=embed)
         await self.check.botroom_check(ctx.message)
 
-    @cooldowns.long_cooldown
+    @cooldowns.short_cooldown
     @commands.command()
     async def hug(self, ctx: commands.Context, user: discord.Member = None, intensity: int = 0):
         """Because everyone likes hugs"""
