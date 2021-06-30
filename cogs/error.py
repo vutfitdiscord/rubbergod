@@ -54,11 +54,16 @@ class Error(commands.Cog):
         if ctx.guild and ctx.guild.id != Config.guild_id:
             embed.add_field(name="Guild", value=ctx.guild.name)
         embed.add_field(name="Link", value=ctx.message.jump_url, inline=False)
+        
+        channel = self.bot.get_channel(Config.bot_dev_channel)
+
+        # send context of command with personal information to DM
         if ctx.command.name == "diplom":
-            channel = self.bot.get_user(Config.admin_ids[0])
+            channel_ctx = self.bot.get_user(Config.admin_ids[0])
         else:
-            channel = self.bot.get_channel(Config.bot_dev_channel)
-        await channel.send(embed=embed)
+            channel_ctx = channel
+        await channel_ctx.send(embed=embed)
+
         output = utils.cut_string(output, 1900)
         if channel is not None:
             for message in output:

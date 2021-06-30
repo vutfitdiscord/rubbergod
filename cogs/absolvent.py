@@ -33,6 +33,10 @@ class Absolvent(commands.Cog):
         :param diploma_number: ID of diploma, in format NNNNNN/YYYY
         :param thesis_web_id: ID from URL https://dspace.vutbr.cz/handle/11012/<num> can be discovered via https://dspace.vutbr.cz/handle/11012/19121 
         """
+        if thesis_web_id == "19121":
+            await ctx.send(Messages.absolvent_id_from_help)
+            return
+
         # prepare
         htmlparser = etree.HTMLParser()
         diploma_year = re.search(r"\d+/(\d+)", diploma_number)
@@ -119,7 +123,11 @@ class Absolvent(commands.Cog):
             await ctx.send(Messages.absolvent_thesis_not_found_error)
             return
 
-        habilitation_year = re.search(r"(\d+)-\d+-\d+", habilitation_date).group(1)
+        habilitation_year = re.search(r"(\d+)-\d+-\d+", habilitation_date)
+        if habilitation_year is None:
+            await ctx.send(Messages.absolvent_thesis_not_found_error)
+            return
+        habilitation_year = habilitation_year.group(1)
 
         if not (
             ((degree == "Ing." and master_thesis != "") or (degree == "Bc." and bachelor_thesis != ""))
