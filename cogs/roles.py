@@ -1,6 +1,6 @@
 import discord
 from discord.ext import commands
-from typing import Union
+from typing import Tuple, Union, List
 
 import utils
 from config.app_config import Config
@@ -144,26 +144,38 @@ class ReactToRole(commands.Cog):
                 else:
                     await channel.set_permissions(member, read_messages=True)
 
-    async def remove_perms(self, target, member, guild):
+    async def remove_perms(self, target, member: discord.Member, guild):
         """Remove a target role / channel from a member."""
         roles, channels = self.get_target(target, guild)
         for role in roles:
             if role is not None and role in member.roles:
                 await member.remove_roles(role)
         for channel in channels:
-            if channel is not None:
-                perms_for: discord.Permissions = channel.permissions_for(member)
-                if perms_for.administrator:  # Is useless create overwrite if user is moderator.
-                    continue
+            if channel is None:
+                continue
 
-                perms = channel.overwrites_for(member)
-                if perms is not None:
-                    perms.read_messages = False
-                    await channel.set_permissions(member, overwrite=perms)
-                else:
-                    await channel.set_permissions(member, read_messages=False)
+            perms = channel.permissions_for(member)
+            if perms.administrator:
+                continue  # User have administrator permission and it's useless do some operation.
 
-    def get_target(self, target, guild):
+            overwrite = channel.overwrites_for(member)
+            if overwrite.is_empty():
+                continue  # Overwrite not found. User maybe have access from role.
+
+            if overwrite != discord.PermissionOverwrite(read_messages=True):
+                # Member have extra permissions and we don't want remove it.
+                # Instead of remove permission we set only read messages permission to deny.
+                overwrite.update(read_messages=False)
+                await channel.set_permissions(member, overwrite=overwrite)
+                continue
+
+            await channel.set_permissions(member, overwrite=None)
+            perms = channel.permissions_for(member)
+            if perms.read_messages:
+                # The user still sees the channel. You need to create special permissions.
+                await channel.set_permissions(member, read_messages=False)
+
+    def get_target(self, target, guild) -> Tuple[List[discord.Role], List[discord.abc.GuildChannel]]:
         """Detect if target is a channel a role or a group."""
         # Try a group first
         group = group_repo.get_group(target)
