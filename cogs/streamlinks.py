@@ -192,6 +192,8 @@ class StreamLinks(commands.Cog):
         return embed
 
     async def handle_reaction(self, ctx: ReactionContext):
+        if ctx.emoji not in ["⏪", "◀", "▶", "⏩"]:
+            return
         try:
             if ctx.reply_to is None:  # Reply is required to render embed.
                 await ctx.message.edit(content=Messages.streamlinks_missing_original, embed=None)
