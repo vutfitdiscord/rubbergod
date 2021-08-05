@@ -480,10 +480,26 @@ class FitWide(commands.Cog):
             session.commit()
             await ctx.send("Hotovo.")
 
+    @commands.command()
+    async def reverify(self, ctx):
+        guild = self.bot.get_guild(config.guild_id)
+        if isinstance(ctx.author, discord.Member):
+            member = ctx.author
+        else:
+            member = guild.get_member(ctx.author.id)
+        host = discord.utils.get(guild.roles, name="Host")
+        if host in member.roles:
+            verify = discord.utils.get(guild.roles, name="Verify")
+            zajemce = discord.utils.get(guild.roles, name="ZajemceoStudium")
+            await member.remove_roles(host, verify, zajemce, reason="reverify")
+            await ctx.send("Done")
+        else:
+            await ctx.send("Tohle je pouze pro hosty kteri nastoupili na FIT")
+
     @commands.check(utils.is_bot_admin)
     @commands.command()
     async def shutdown(self, ctx):
-        await ctx.send("Shutting down")
+        await ctx.send("shutting down")
         self.bot.close()
         exit(0)
 
