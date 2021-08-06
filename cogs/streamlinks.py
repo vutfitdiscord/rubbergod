@@ -37,7 +37,7 @@ class StreamLinks(commands.Cog):
                 await ctx.reply(content=Messages.streamlinks_format)
 
     async def get_streamlinks(self, ctx: commands.Context, subject: str):
-        streamlinks = self.repo.get_streamlinks_of_subject(subject)
+        streamlinks = self.repo.get_streamlinks_of_subject(subject.lower())
 
         if len(streamlinks) == 0:
             await ctx.reply(content=Messages.streamlinks_no_stream)
@@ -84,7 +84,7 @@ class StreamLinks(commands.Cog):
 
     @streamlinks.command(brief=Messages.streamlinks_list_brief)
     async def list(self, ctx: commands.Context, subject: str):
-        streamlinks: List[StreamLink] = self.repo.get_streamlinks_of_subject(subject)
+        streamlinks: List[StreamLink] = self.repo.get_streamlinks_of_subject(subject.lower())
 
         if len(streamlinks) == 0:
             await ctx.reply(content=Messages.streamlinks_no_stream)
