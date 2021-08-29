@@ -326,6 +326,39 @@ class FitWide(commands.Cog):
         await skolni_info.set_permissions(bit0, read_messages=True)
         await skolni_info.set_permissions(mit0, read_messages=True)
 
+        await discord.utils.get(guild.channels, name="cvicici-info").\
+                set_permissions(discord.utils.get(guild.roles,
+                                                  name="1BIT"),
+                                read_messages=True)
+        await discord.utils.get(guild.channels, name="cvicici-info").\
+                set_permissions(discord.utils.get(guild.roles,
+                                                  name="1MIT"),
+                                read_messages=True)
+        await discord.utils.get(guild.channels, name="1bit-info").\
+                set_permissions(discord.utils.get(guild.roles,
+                                                  name="1BIT"),
+                                read_messages=True)
+        await discord.utils.get(guild.channels, name="1bit-info").\
+                set_permissions(discord.utils.get(guild.roles,
+                                                  name="2BIT"),
+                                overwrite=None)
+        await discord.utils.get(guild.channels, name="2bit-info").\
+                set_permissions(discord.utils.get(guild.roles,
+                                                  name="2BIT"),
+                                read_messages=True)
+        await discord.utils.get(guild.channels, name="2bit-info").\
+                set_permissions(discord.utils.get(guild.roles,
+                                                  name="3BIT"),
+                                overwrite=None)
+        await discord.utils.get(guild.channels, name="3bit-info").\
+                set_permissions(discord.utils.get(guild.roles,
+                                                  name="3BIT"),
+                                read_messages=True)
+        await discord.utils.get(guild.channels, name="mit-info").\
+                set_permissions(discord.utils.get(guild.roles,
+                                                  name="1MIT"),
+                                read_messages=True)
+
         await ctx.send('Holy fuck, všechno se povedlo, '
                        'tak zase za rok <:Cauec:602052606210211850>')
 
