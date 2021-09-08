@@ -35,6 +35,20 @@ class Verification(BaseFeature):
             server.login(Config.email_name, password)
             server.sendmail(sender_email, receiver_email, mail_content)
 
+    def send_mail_verified(self, receiver_email, user):
+        """Send mail with instructions in case of blocked DMs"""
+        password = Config.email_pass
+        port = Config.email_smtp_port
+        context = ssl.create_default_context()
+        sender_email = Config.email_addr
+        subject = f"{user} {Messages.verify_verify_success_mail}"
+        mail_content = f'Subject: {subject}\n\n{Messages.verify_post_verify_info_mail}'
+
+        with smtplib.SMTP_SSL(Config.email_smtp_server, port,
+                              context=context) as server:
+            server.login(Config.email_name, password)
+            server.sendmail(sender_email, receiver_email, mail_content)
+
     async def has_role(self, user, role_name):
         if type(user) == Member:
             return utils.has_role(user, role_name)
@@ -223,10 +237,16 @@ class Verification(BaseFeature):
 
                 self.repo.save_verified(login, message.author.id)
 
-                await member.send(utils.fill_message("verify_verify_success",
-                                                     user=message.author.id))
+                try:
+                    await member.send(utils.fill_message("verify_verify_success",
+                                                        user=message.author.id))
 
-                await member.send(Messages.verify_post_verify_info)
+                    await member.send(Messages.verify_post_verify_info)
+                except discord.errors.Forbidden:
+                    if login[0] == 'x':
+                        self.send_mail_verified(f"{login}@stud.fit.vutbr.cz", member)
+                    else:
+                        self.send_mail_verified(f"{login}@mail.muni.cz", member)
 
                 if message.channel.type is not discord.ChannelType.private:
                     await message.channel.send(utils.fill_message("verify_verify_success",

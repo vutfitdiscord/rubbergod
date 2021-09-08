@@ -165,6 +165,11 @@ class Messages:
     verify_post_verify_info = "Podívej se do kanálů:\n" \
                               "<#591384273051975683> Pro pridani roli\n" \
                               "<#489461089432633346> Pro pravidla a další info"
+    server_link = "https://discord.com/channels/461541385204400138/"
+    verify_verify_success_mail = "Gratuluji, byl jsi verifikovan!"
+    verify_post_verify_info_mail = "Podivej se do kanalu:\n" \
+                              f"#add-roles - Pro pridani roli ({server_link}591384273051975683) \n" \
+                              f"#server-info - Pro pravidla a dalsi info ({server_link}489461089432633346)"
 
     verify_verify_not_found = "{user} Login nenalezen nebo jsi neprošel krokem !getcode. Přečti si prosím <#591386755547136020>. ({admin} pls)."
     verify_verify_wrong_code = "{user} Špatný kód."
