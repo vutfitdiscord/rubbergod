@@ -84,7 +84,11 @@ class FitWide(commands.Cog):
         bot = discord.utils.get(guild.roles, name="Bot")
         poradce = discord.utils.get(guild.roles, name="Poradce")
         dropout = discord.utils.get(guild.roles, name="Dropout")
+        survivor = discord.utils.get(guild.roles, name="Survivor")
+        king = discord.utils.get(guild.roles, name="King")
         vut = discord.utils.get(guild.roles, name="VUT")
+
+        dropout_alternatives = [survivor, king]
 
         verified = [member for member in members
                     if verify in member.roles and
@@ -97,7 +101,7 @@ class FitWide(commands.Cog):
         permited_ids = [int(person.discord_ID) for person in permited]
 
         years = ["0BIT", "1BIT", "2BIT", "3BIT", "4BIT+",
-                 "0MIT", "1MIT", "2MIT", "3MIT+", "Dropout"]
+                 "0MIT", "1MIT", "2MIT", "3MIT+", "PhD+", "Dropout"]
 
         year_roles = {year: discord.utils.get(guild.roles, name=year) for year in years}
 
@@ -139,8 +143,9 @@ class FitWide(commands.Cog):
                             weird_members[role][correct_role].append(member)
                             break
                     else:
-                        await ctx.send(f"{utils.generate_mention(member.id)} by mel "
-                                       f"mit prej `{year}`")
+                        if correct_role == dropout and not any(role in member.roles for role in dropout_alternatives):
+                            await ctx.send(f"{utils.generate_mention(member.id)} by mel "
+                                           f"mit prej `{year}`")
 
         for source_role, target_data in weird_members.items():
             for target_role, target_members in target_data.items():
@@ -166,7 +171,8 @@ class FitWide(commands.Cog):
                         await ctx.send(f"jk, debug mode")
                     else:
                         for member in target_members:
-                            await member.add_roles(target_role)
+                            if target_role == dropout and not any(role in member.roles for role in dropout_alternatives):
+                                await member.add_roles(target_role)
                             await member.remove_roles(source_role)
                 elif p_role:
                     await ctx.send(f"Nasel jsem {len(target_members)} lidi kteri maji na merlinovi "
