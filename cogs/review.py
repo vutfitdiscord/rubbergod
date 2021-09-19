@@ -190,7 +190,11 @@ class Review(commands.Cog):
                 embed.add_field(name="Ročník", value=subject.year)
             embed.add_field(name="Kredity", value=subject.credits)
             embed.add_field(name="Ukončení", value=subject.end)
-            embed.add_field(name="Karta předmětu", value=subject.card, inline=False)
+            embed.add_field(
+                name="Karta předmětu",
+                value=f"https://www.fit.vut.cz/study/course/{subject.shortcut}/.cs",
+                inline=False
+            )
             embed.add_field(
                 name="Statistika úspěšnosti předmětu",
                 value=f"http://fit.nechutny.net/?detail={subject.shortcut}",
