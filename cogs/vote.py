@@ -4,6 +4,7 @@ from typing import Dict
 from datetime import datetime
 import emoji
 from discord import RawReactionActionEvent, Message, TextChannel
+from discord.errors import NotFound
 from discord.ext import commands
 from discord.ext.commands import Bot, Context
 
@@ -112,7 +113,7 @@ class Vote(commands.Cog):
                 msg = await chan.fetch_message(v.message_id)
                 self.vote_cache[v.message_id] = VoteMessage(msg.content, v.is_one_of)
                 await self.init_vote(msg)
-            except (VoteMessage.ParseError, VoteMessage.NotEmojiError):
+            except (VoteMessage.ParseError, VoteMessage.NotEmojiError, NotFound):
                 pass
 
     @cooldowns.short_cooldown

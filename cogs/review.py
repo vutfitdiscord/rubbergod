@@ -216,7 +216,7 @@ class Review(commands.Cog):
             return
 
         author = ctx.author
-        if not ctx.channel:
+        if not ctx.message.guild: # DM
             guild = self.bot.get_guild(config.guild_id)
             author = guild.get_member(author.id)
         for role in author.roles:
