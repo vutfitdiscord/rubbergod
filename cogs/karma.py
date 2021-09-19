@@ -47,7 +47,11 @@ class Karma(commands.Cog):
             async with ctx.channel.typing():
                 await ctx.message.remove_reaction(ctx.emoji, ctx.member)
                 msg_converter = commands.MessageConverter()
-                message = await msg_converter.convert(self, ctx.message.embeds[0].fields[0].value)
+                try:
+                    message = await msg_converter.convert(self, ctx.message.embeds[0].fields[0].value)
+                except commands.errors.MessageNotFound:
+                    ctx.message.delete()
+                    return
                 embed = await self.karma.message_karma(ctx.member, message)
                 await ctx.message.edit(embed=embed)
         # leaderboard pagination
