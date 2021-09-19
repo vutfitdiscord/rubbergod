@@ -211,7 +211,11 @@ class Review(commands.Cog):
             await ctx.send(f"`{utils.get_command_signature(ctx)}`\n{messages.tierboard_help}")
             return
 
-        for role in ctx.author.roles:
+        author = ctx.author
+        if not ctx.channel:
+            guild = self.bot.get_guild(config.guild_id)
+            author = guild.get_member(author.id)
+        for role in author.roles:
             if "BIT" in role.name:
                 degree = "BIT"
                 if not year and type == "P":
