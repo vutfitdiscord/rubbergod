@@ -164,7 +164,7 @@ class Verification(BaseFeature):
                                    "NSEC", "NEMB", "NHPC", "NISD", "NIDE", "NISY", "NMAL", "NMAT",
                                    "NSEN", "NVER", "NSPE", "MGH"]:
                 return '3MIT+' if year_value >= 3 else f'{year_value}MIT'
-            elif year_parts[1] in ["DVI4", "DRH"]:
+            elif year_parts[1] in ["DVI4", "DRH", "DITP"]:
                 return 'PhD+'
         elif "FEKT" in year_parts:  # FEKT student
             return "VUT"
