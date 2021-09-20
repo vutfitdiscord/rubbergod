@@ -141,9 +141,9 @@ class Absolvent(commands.Cog):
         
         # DIPLOMA VALIDITY CHECK
 
-        diplom_url1 = "https://www.vutbr.cz/overeni-diplomu"
-        diplom_url2 = "https://www.vutbr.cz/overeni-diplomu?aid_redir=1"
-        diplom_url3 = "https://www.vutbr.cz/overeni-diplomu"
+        diplom_url1 = "https://www.vut.cz/overeni-diplomu"
+        diplom_url2 = "https://www.vut.cz/overeni-diplomu?aid_redir=1"
+        diplom_url3 = "https://www.vut.cz/overeni-diplomu"
         data = {}
         session = requests.session()
 
