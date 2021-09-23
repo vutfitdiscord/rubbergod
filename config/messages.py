@@ -373,3 +373,5 @@ class Messages:
     subscriptions_none = "Nebyly nalezeny žádné výsledky."
     subscriptions_missing_argument = "Musíš specifikovat kanál."
     subscriptions_bad_argument = "Musíš specifikovat kanál nebo uživatele."
+
+    studijni_brief = "Úřední hodiny studijního Oddělení"
