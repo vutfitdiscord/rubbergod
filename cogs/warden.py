@@ -63,6 +63,10 @@ class Warden(commands.Cog):
         """Delete duplicate embed if original is not a duplicate"""
         message = ctx.message
 
+        if ctx.member.id in config.repost_ignore_users:
+            await message.remove_reaction("❎", ctx.member)
+            return
+
         for react in message.reactions:
             if react.emoji == "❎" and react.count >= config.duplicate_limit:
                 try:

@@ -151,6 +151,7 @@ token = "678a5932f6dd92ac668b20e9f89c0318"
 duplicate_limit = 5
 #                           #memes              #aww
 deduplication_channels = [461548323116154880, 543083844736253964]
+repost_ignore_users = [0]
 
 [week]
 starting_week = 5

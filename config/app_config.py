@@ -133,6 +133,7 @@ class Config:
     # warden
     duplicate_limit: int = get_attr("warden", "duplicate_limit")
     deduplication_channels: List[int] = get_attr("warden", "deduplication_channels")
+    repost_ignore_users: List[int] = get_attr("warden", "repost_ignore_users")
 
     # week command
     starting_week: int = get_attr("week", "starting_week")
