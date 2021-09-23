@@ -107,6 +107,24 @@ class DynamicConfig(commands.Cog):
             toml.dump(Config.toml_dict, fd)
         await ctx.send(Messages.config_backup_created)
 
+    @config.command(brief=Messages.config_sync_template_brief)
+    async def sync_template(self, ctx):
+        path = os.path.dirname(__file__)[:-4]
+        config_path = f"{path}config/config.toml"
+        template = toml.load(f"{path}config/config.template.toml", _dict=dict)
+        for section in template:
+            if section in Config.toml_dict:
+                for key in template[section]:
+                    if key not in Config.toml_dict[section]:
+                        Config.toml_dict[section][key] = template[section][key]
+            else:
+                Config.toml_dict[section] = template[section]
+        with open(config_path, "w+") as fd:
+            toml.dump(Config.toml_dict, fd)
+        self.load_config()
+        await ctx.send(Messages.config_synced)
+        
+
     async def change_value(self, ctx, key: str, value: list, append: bool):
         """
         Changes config atrribute specified by `key` to `value`.
