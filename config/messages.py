@@ -316,6 +316,8 @@ class Messages:
     config_backup_created = 'Config backup created'
     config_append_format = f'{prefix}config append [key] hodnota/y'
     config_list_invalid_regex = 'Chybný regex\n`{regex_err}`'
+    config_sync_template_brief = 'Synchronizuje config s template, přidá chybějíci klíče'
+    config_synced = 'Config byl synchronizován'
 
     channel_help = f"{prefix}channel [clone, copy]"
     channel_copy_help = f"{prefix}channel copy [source] [destination]"
