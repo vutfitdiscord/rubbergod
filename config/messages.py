@@ -330,6 +330,7 @@ class Messages:
     weather_brief = "Vypíše informace o počasí ve zvoleném městě"
 
     week_brief = "Vypíše, kolikátý je zrovna týden a jestli je sudý nebo lichý"
+    week_warning = "Pro sudý/lichý se využívá kalendářní týden"
 
     streamlinks_brief = "Úložiště všech streamů"
     streamlinks_format = f"`{prefix}streamlinks [zkratka předmětu]`"
