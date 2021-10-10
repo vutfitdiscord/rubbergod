@@ -115,11 +115,11 @@ class StreamLinks(commands.Cog):
     @commands.check(utils.helper_plus)
     @streamlinks.command(brief=Messages.streamlinks_remove_brief)
     async def remove(self, ctx: commands.Context, id: int):
-        stream = self.repo.exists(id)
-        if not stream:
+        if not self.repo.exists(id):
             await ctx.reply(Messages.streamlinks_not_exists)
             return
 
+        stream = self.repo.get_stream_by_id(id)
         self.repo.remove(id)
         await ctx.reply(utils.fill_message('streamlinks_remove_success', link=stream.link))
 
