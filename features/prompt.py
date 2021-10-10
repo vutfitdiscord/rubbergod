@@ -27,7 +27,7 @@ class PromptSession:
     async def __show_prompt(self):
         if self.__running: return False
 
-        em = discord.Embed(title="Confirmation prompt", color=self.color)
+        em = discord.Embed(title="Potvrzení", color=self.color)
         em.description = self.message
 
         self.__running = True
