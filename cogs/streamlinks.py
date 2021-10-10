@@ -14,6 +14,7 @@ import re
 from requests.packages.urllib3.util.retry import Retry
 from requests.adapters import HTTPAdapter
 from features.reaction_context import ReactionContext
+from features.prompt import PromptSession
 
 # Pattern: "AnyText | [Subject] Page: CurrentPage / {TotalPages}"
 pagination_regex = re.compile(r'^\[([^\]]*)\]\s*Page:\s*(\d*)\s*\/\s*(\d*)')
@@ -120,8 +121,10 @@ class StreamLinks(commands.Cog):
             await ctx.reply(Messages.streamlinks_not_exists)
             return
 
-        self.repo.remove(id)
-        await ctx.reply(utils.fill_message('streamlinks_remove_success', link=stream.link))
+        result = await PromptSession(self.bot, ctx, f"Do you really want to remove this stream ({stream.link})?", 60).run()
+        if result:
+            self.repo.remove(id)
+            await ctx.reply(utils.fill_message('streamlinks_remove_success', link=stream.link))
 
     def get_link_data(self, link: str):
         """
