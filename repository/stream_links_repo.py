@@ -34,6 +34,9 @@ class StreamLinksRepo(BaseRepository):
     def exists(self, id: int):
         return session.query(exists().where(StreamLink.id == id)).scalar()
 
+    def get_stream_by_id(self, id: int):
+        return session.query(StreamLink).filter(StreamLink.id == id).first()
+
     def get_streamlinks_of_subject(self, subject: str):
         return list(session.query(StreamLink)
                     .filter(StreamLink.subject == subject)
