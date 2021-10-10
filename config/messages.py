@@ -333,7 +333,6 @@ class Messages:
     week_warning = "Pro sudý/lichý se využívá kalendářní týden"
 
     streamlinks_brief = "Úložiště všech streamů"
-    streamlinks_format = f"`{prefix}streamlinks [zkratka předmětu]`"
     streamlinks_add_brief = "Zapíše nový stream k předmětu"
     streamlinks_add_link_exists = "Tento stream již existuje."
     streamlinks_add_success = "Stream byl úspěšně vytvořen <:HYPERS:493154327318233088>"
@@ -351,7 +350,7 @@ class Messages:
     streamlinks_remove_brief = "Smazání streamu z předmětu."
     streamlinks_remove_format = f"`{prefix}streamlinks remove [id]`\n\nID se nachází v patičce embedu. Na konci v textu v závorce, kde je # (Jen to číslo je ID)."
     streamlinks_not_exists = "Stream s tímto ID nebyl nalezen."
-    streamlinks_remove_success = "Stream byl úspěšně smazán."
+    streamlinks_remove_success = "Stream {link} byl úspěšně smazán."
 
     latex_help = f"Příklad:\n`{prefix}latex x^n + y^n = z^n`"
     latex_desc = "Vykreslí LaTeX výraz"

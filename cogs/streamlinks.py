@@ -34,7 +34,9 @@ class StreamLinks(commands.Cog):
             if len(params_arr) == 1:
                 await self.get_streamlinks(ctx, params_arr[0])
             else:
-                await ctx.reply(content=Messages.streamlinks_format)
+                await ctx.reply(content=
+                    f"{self.config.default_prefix}{ctx.command.name} {ctx.command.signature}\n{ctx.command.brief}"
+                )
 
     async def get_streamlinks(self, ctx: commands.Context, subject: str):
         streamlinks = self.repo.get_streamlinks_of_subject(subject.lower())
@@ -113,12 +115,13 @@ class StreamLinks(commands.Cog):
     @commands.check(utils.helper_plus)
     @streamlinks.command(brief=Messages.streamlinks_remove_brief)
     async def remove(self, ctx: commands.Context, id: int):
-        if not self.repo.exists(id):
+        stream = self.repo.exists(id)
+        if not stream:
             await ctx.reply(Messages.streamlinks_not_exists)
             return
 
         self.repo.remove(id)
-        await ctx.reply(Messages.streamlinks_remove_success)
+        await ctx.reply(utils.fill_message('streamlinks_remove_success', link=stream.link))
 
     def get_link_data(self, link: str):
         """
