@@ -350,6 +350,7 @@ class Messages:
     streamlinks_remove_brief = "Smazání streamu z předmětu."
     streamlinks_remove_format = f"`{prefix}streamlinks remove [id]`\n\nID se nachází v patičce embedu. Na konci v textu v závorce, kde je # (Jen to číslo je ID)."
     streamlinks_not_exists = "Stream s tímto ID nebyl nalezen."
+    streamlinks_remove_prompt = "Opravdu chceš tento stream odstranit ({link})?"
     streamlinks_remove_success = "Stream {link} byl úspěšně smazán."
 
     latex_help = f"Příklad:\n`{prefix}latex x^n + y^n = z^n`"

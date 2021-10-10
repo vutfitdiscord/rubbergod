@@ -122,9 +122,9 @@ class StreamLinks(commands.Cog):
 
         stream = self.repo.get_stream_by_id(id)
 
-        result = await PromptSession(self.bot, ctx,
-                                     f"Do you really want to remove this stream ({stream.link})?",
-                                     60).run()
+        prompt_message = utils.fill_message('streamlinks_remove_prompt', link=stream.link)
+        result = await PromptSession(self.bot, ctx, prompt_message, 60).run()
+
         if result:
             self.repo.remove(id)
             await ctx.reply(utils.fill_message('streamlinks_remove_success', link=stream.link))
