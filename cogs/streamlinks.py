@@ -35,9 +35,7 @@ class StreamLinks(commands.Cog):
             if len(params_arr) == 1:
                 await self.get_streamlinks(ctx, params_arr[0])
             else:
-                await ctx.reply(content=
-                    f"{self.config.default_prefix}{ctx.command.name} {ctx.command.signature}\n{ctx.command.brief}"
-                )
+                await ctx.reply(f"{utils.get_command_group_signature(ctx)}\n{ctx.command.brief}")
 
     async def get_streamlinks(self, ctx: commands.Context, subject: str):
         streamlinks = self.repo.get_streamlinks_of_subject(subject.lower())
@@ -121,13 +119,14 @@ class StreamLinks(commands.Cog):
             return
 
         stream = self.repo.get_stream_by_id(id)
+        link = stream.link
 
-        prompt_message = utils.fill_message('streamlinks_remove_prompt', link=stream.link)
+        prompt_message = utils.fill_message('streamlinks_remove_prompt', link=link)
         result = await PromptSession(self.bot, ctx, prompt_message, 60).run()
 
         if result:
             self.repo.remove(id)
-            await ctx.reply(utils.fill_message('streamlinks_remove_success', link=stream.link))
+            await ctx.reply(utils.fill_message('streamlinks_remove_success', link=link))
 
     def get_link_data(self, link: str):
         """
@@ -252,7 +251,7 @@ class StreamLinks(commands.Cog):
     @list.error
     async def streamlinks_list_error(self, ctx: commands.Context, error):
         if isinstance(error, discord.ext.commands.MissingRequiredArgument):
-            await ctx.reply(Messages.streamlinks_list_format)
+            await ctx.reply(f"{Messages.streamlinks_list_format}\n{ctx.command.brief}")
 
 
 def setup(bot):

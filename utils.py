@@ -150,10 +150,21 @@ def get_username(user: Union[discord.User, discord.Member]) -> str:
 
 
 def get_command_group_signature(ctx: commands.Context):
-    """Return signature of group command
+    """Return signature of group command with checks
     `?group [subcommand1, subcommand2]`
     """
-    subcommands = [subcommand.name for subcommand in ctx.command.commands]
+    subcommands = []
+    if ctx.command.usage is not None:
+        subcommands.append(ctx.command.signature)
+    for subcommand in ctx.command.commands:
+        for check in subcommand.checks:
+            try:
+                if not check(ctx):
+                    break
+            except Exception:
+                break
+        else:
+            subcommands.append(subcommand.name)
     return f"`{ctx.prefix}{ctx.command.name} [{', '.join(subcommands)}]`"
 
 
