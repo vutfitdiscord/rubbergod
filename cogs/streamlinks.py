@@ -111,6 +111,17 @@ class StreamLinks(commands.Cog):
         for group in groups:
             await ctx.send(group)
 
+    async def log(self, stream, user):
+        embed = discord.Embed(title="Odkaz na stream byl smazán", color=0xEEE657)
+        embed.add_field(name="Provedl", value=user.name)
+        embed.add_field(name="Předmět", value=stream.subject.upper())
+        embed.add_field(name="Od", value=stream.member_name)
+        embed.add_field(name="Popis", value=stream.description)
+        embed.add_field(name="Odkaz", value=f"[{stream.link}]({stream.link})", inline=False)
+        embed.timestamp = datetime.utcnow()
+        channel = self.bot.get_channel(self.config.log_channel)
+        await channel.send(embed=embed)
+
     @commands.check(utils.helper_plus)
     @streamlinks.command(brief=Messages.streamlinks_remove_brief)
     async def remove(self, ctx: commands.Context, id: int):
@@ -125,6 +136,7 @@ class StreamLinks(commands.Cog):
         result = await PromptSession(self.bot, ctx, prompt_message, 60).run()
 
         if result:
+            await self.log(stream, ctx.author)
             self.repo.remove(id)
             await ctx.reply(utils.fill_message('streamlinks_remove_success', link=link))
 
