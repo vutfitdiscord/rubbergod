@@ -8,7 +8,7 @@ from utils import add_author_footer
 
 class Studijni(commands.Cog):
 
-    @commands.command(aliases=["studijne", "študijné", "študinjní"] ,brief=Messages.studijni_brief)
+    @commands.command(aliases=["studijne", "študijné", "študijní"] ,brief=Messages.studijni_brief)
     async def studijni(self, ctx):
         link = "https://www.fit.vut.cz/fit/room/C109/.cs"
         htmlparser = etree.HTMLParser()
