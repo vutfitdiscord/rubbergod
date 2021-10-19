@@ -43,6 +43,7 @@ class Karma(commands.Cog):
         elif (ctx.message.embeds 
             and ctx.message.embeds[0].title is not discord.Embed.Empty 
             and ctx.message.embeds[0].title == "Karma zprávy"
+            and ctx.emoji == "🔁"
         ):
             async with ctx.channel.typing():
                 await ctx.message.remove_reaction(ctx.emoji, ctx.member)
