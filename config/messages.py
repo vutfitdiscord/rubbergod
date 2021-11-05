@@ -347,6 +347,7 @@ class Messages:
     streamlinks_list_brief = "Vypíše zjednodušený seznam všech streamů k daném předmětu."
     streamlinks_list_format = f"`{prefix}streamlinks list [zkratka předmětu]`"
     streamlinks_no_stream = "K tomuto předmětu ještě neexistuje žádný stream."
+    streamlinks_no_valid_timestamp = "Toto video nemá validní datum nahrání a nebylo předáno jako argument.\nZadej validní datum nahrání jako argument."
     streamlinks_remove_brief = "Smazání streamu z předmětu."
     streamlinks_remove_format = f"`{prefix}streamlinks remove [id]`\n\nID se nachází v patičce embedu. Na konci v textu v závorce, kde je # (Jen to číslo je ID)."
     streamlinks_not_exists = "Stream s tímto ID nebyl nalezen."
