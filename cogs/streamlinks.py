@@ -67,8 +67,11 @@ class StreamLinks(commands.Cog):
             link_data = self.get_link_data(link)
             if link_data['upload_date'] is None:
                 try:
-                    link_data['upload_date'] = datetime.strptime(args[0], '%Y-%m-%d')
-                    del args[0]
+                    if len(args) != 0:
+                        link_data['upload_date'] = datetime.strptime(args[0], '%Y-%m-%d')
+                        del args[0]
+                    else:
+                        link_data['upload_date'] = datetime.utcnow()
                 except ValueError:
                     link_data['upload_date'] = datetime.utcnow()
             else:
