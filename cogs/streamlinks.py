@@ -72,11 +72,13 @@ class StreamLinks(commands.Cog):
                 except ValueError:
                     link_data['upload_date'] = datetime.utcnow()
             else:
-                if len(args) == 0 or utils.is_valid_datetime_format(args[0], '%Y-%m-%d'):
-                    await ctx.reply(utils.fill_message('streamlinks_no_valid_timestamp'))
-                    return
-                else:
+                if len(args) != 0 and utils.is_valid_datetime_format(args[0], '%Y-%m-%d'):
+                    link_data['upload_date'] = datetime.strptime(args[0], '%Y-%m-%d')
                     del args[0]
+
+            if len(args) == 0:
+                await ctx.reply(utils.fill_message('streamlinks_missing_description'))
+                return
 
             self.repo.create(subject.lower(), link, username,
                              " ".join(args), link_data['image'], link_data['upload_date'])
