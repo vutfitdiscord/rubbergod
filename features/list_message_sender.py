@@ -1,4 +1,5 @@
 import discord
+from discord.ext import commands
 from typing import Union, Iterable
 import utils
 
@@ -52,7 +53,7 @@ def merge_messages(message_list:Iterable, max_msg_len:int):
 # @param message_list list of messages to send
 # @param max_msg_len maximal length of message
 #
-async def send_list_of_messages(channel:Union[discord.TextChannel, discord.Object],
+async def send_list_of_messages(channel:Union[discord.TextChannel, discord.Object, commands.Context],
                                 message_list:Iterable, max_msg_len:int=1900):
     assert isinstance(max_msg_len, int)
     if max_msg_len > 2000: max_msg_len = 2000
@@ -61,5 +62,8 @@ async def send_list_of_messages(channel:Union[discord.TextChannel, discord.Objec
     message_list = trim_messages(message_list, max_msg_len - 1)
     message_list = merge_messages(message_list, max_msg_len - 1)
 
-    for message in message_list:
-        await channel.send(message)
+    for idx, message in enumerate(message_list):
+        if idx == 0 and type(channel) is commands.Context:
+            await channel.reply(message)
+        else:
+            await channel.send(message)
