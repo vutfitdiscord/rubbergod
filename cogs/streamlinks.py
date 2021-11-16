@@ -15,6 +15,7 @@ from requests.packages.urllib3.util.retry import Retry
 from requests.adapters import HTTPAdapter
 from features.reaction_context import ReactionContext
 from features.prompt import PromptSession
+from features.list_message_sender import send_list_of_messages
 
 # Pattern: "AnyText | [Subject] Page: CurrentPage / {TotalPages}"
 pagination_regex = re.compile(r'^\[([^\]]*)\]\s*Page:\s*(\d*)\s*\/\s*(\d*)')
@@ -99,25 +100,12 @@ class StreamLinks(commands.Cog):
             await ctx.reply(content=Messages.streamlinks_no_stream)
             return
 
-        msg = ""
-        groups = []
+        messages = []
         for stream in streamlinks:
             at = stream.created_at.strftime("%d. %m. %Y")
-            stream_msg: str = f"**{stream.member_name}** ({at}): <{stream.link}> - {stream.description}\n"
+            messages.append(f"**{stream.member_name}** ({at}): <{stream.link}> - {stream.description}\n")
 
-            if len(msg) + len(stream_msg) > 2000:
-                groups.append(msg)
-                msg = stream_msg
-            else:
-                msg = msg + stream_msg
-
-        if len(msg) > 0:
-            groups.append(msg)
-
-        await ctx.reply(content=groups[0])
-        del groups[0]
-        for group in groups:
-            await ctx.send(group)
+        await send_list_of_messages(ctx, messages)
 
     async def log(self, stream, user):
         embed = discord.Embed(title="Odkaz na stream byl smazán", color=0xEEE657)
