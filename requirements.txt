@@ -12,3 +12,4 @@ lxml
 git+https://github.com/Rapptz/discord-ext-menus
 python-dateutil
 discord-py-slash-command
+CairoSVG>=2.5.2
