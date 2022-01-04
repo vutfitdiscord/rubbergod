@@ -5,6 +5,7 @@ from bs4 import BeautifulSoup
 from cairosvg import svg2png
 from io import BytesIO
 import utils
+from config import cooldowns
 from config.messages import Messages
 
 
@@ -12,6 +13,7 @@ class FitRoom(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
+    @cooldowns.default_cooldown
     @commands.command(brief=Messages.fit_room_brief, description=Messages.fit_room_help)
     async def room(self, ctx: commands.Context, *, room: str):
         url = f"https://www.fit.vut.cz/fit/map/3/.cs?show={room}&big=1"
