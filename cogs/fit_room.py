@@ -43,9 +43,9 @@ class FitRoom(commands.Cog):
                     parent_height=1000, background_color="white", dpi=300)
             image_bytes.seek(0)
 
-            embed = discord.Embed(title=f"Room {room}", color=discord.Color.dark_blue())
+            embed = discord.Embed(title=f"Místnost: {room}", color=discord.Color.dark_blue())
             embed.set_image(url="attachment://plan.png")
-            embed.description = f"[Link to website]({url})"
+            embed.description = f"[Odkaz na plánek]({url})"
             embed.set_footer(text=str(active_floor_.text))
             file = discord.File(fp=image_bytes, filename="plan.png")
             await ctx.send(embed=embed, file=file)
