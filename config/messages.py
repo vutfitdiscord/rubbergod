@@ -377,3 +377,6 @@ class Messages:
     subscriptions_bad_argument = "Musíš specifikovat kanál nebo uživatele."
 
     studijni_brief = "Úřední hodiny studijního Oddělení"
+    studijni_web_error = "Chyba při parsování webu"
+    studijni_office_hours = "Úřední hodiny"
+    studijni_title = "C109 Studijní oddělení"

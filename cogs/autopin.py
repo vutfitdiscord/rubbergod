@@ -141,7 +141,9 @@ class AutoPin(commands.Cog):
                 if len(pin_count) == 50:
                     now = datetime.datetime.utcnow()
                     if self.warning_time + datetime.timedelta(minutes=Config.autopin_warning_cooldown) < now:
-                        await channel.send(f"{ctx.member.mention} {Messages.autopin_max_pins_error}")
+                        await channel.send(
+                            f"{ctx.member.mention} {Messages.autopin_max_pins_error}\n{ctx.message.jump_url}"
+                        )
                         self.warning_time = now
                     return
                 users = await reaction.users().flatten()
