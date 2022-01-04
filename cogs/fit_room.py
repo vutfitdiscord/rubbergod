@@ -36,7 +36,7 @@ class FitRoom(commands.Cog):
 
             if image_ is None or cursor_ is None:
                 return await ctx.send(
-                    utils.fill_message(Messages.fit_room_room_not_on_plan, room=room))
+                    utils.fill_message("fit_room_room_not_on_plan", room=room))
 
             image_bytes = BytesIO()
             svg2png(bytestring=str(image_).encode("utf-8"), write_to=image_bytes, parent_width=720,
