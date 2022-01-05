@@ -384,5 +384,5 @@ class Messages:
     fit_room_brief = "Zobrazení místnosti na plánku fakulty."
     fit_room_help = f"{prefix}room <místnost>"
     fit_room_unreach = "Stránka s plánkem je nedostupná."
-    fit_room_parsing_failed = "Parsování stránky s plánkem selhalo, tuto chybu můžeš nahlásit správci discord bota."
+    fit_room_parsing_failed = "Načtení stránky s plánkem se nezdařilo. Nahlaš prosím tuto chybu správci bota."
     fit_room_room_not_on_plan = "Zadaná místnost {room} není na plánku nebo neexistuje."
