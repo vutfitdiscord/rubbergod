@@ -77,6 +77,10 @@ class Meme(commands.Cog):
             bonker = ctx.author
             bonked = member
 
+        if not bonked.avatar:
+            await ctx.send(messages.unsupported_image)
+            return
+
         async with ctx.typing():
             url = bonked.avatar_url_as(format="jpg")
             response = requests.get(url)

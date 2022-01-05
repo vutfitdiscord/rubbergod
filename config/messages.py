@@ -358,7 +358,7 @@ class Messages:
     latex_desc = "Vykreslí LaTeX výraz"
 
     bonk_brief = "Bonk na uživatele"
-    pet_unsupported_image = "Tento avatar aktuálne není podporovaný <:sadcat:576171980118687754>"
+    unsupported_image = "Tento avatar aktuálne není podporovaný <:sadcat:576171980118687754>"
 
     subscribe_brief = "Přihlášení k odběru zpráv kanálu do DM"
     unsubscribe_brief = "Odhlášení odběru zpráv do DM"

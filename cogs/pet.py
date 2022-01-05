@@ -22,7 +22,7 @@ class Pet(commands.Cog):
         if user is None:
             user = ctx.author
         if not user.avatar:
-            await ctx.send(Messages.pet_unsupported_image)
+            await ctx.send(Messages.unsupported_image)
             return
         url = user.avatar_url_as(format='jpg')
         response = requests.get(url)
