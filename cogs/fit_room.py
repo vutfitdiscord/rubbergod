@@ -68,7 +68,7 @@ class FitRoom(commands.Cog):
             embed = discord.Embed(title=f"Místnost: {room}", color=discord.Color.dark_blue())
             embed.set_image(url="attachment://plan.png")
             embed.description = f"[Odkaz na plánek]({url})"
-            embed.set_footer(text=str(active_floor.text))
+            utils.add_author_footer(embed, ctx.author, additional_text=[str(active_floor.text)])
             file = discord.File(fp=image_bytes, filename="plan.png")
             await ctx.send(embed=embed, file=file)
 
