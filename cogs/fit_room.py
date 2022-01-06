@@ -16,7 +16,7 @@ class FitRoom(commands.Cog):
     @cooldowns.default_cooldown
     @commands.command(brief=Messages.fit_room_brief, description=Messages.fit_room_help)
     async def room(self, ctx: commands.Context, *, room: str):
-        url = f"https://www.fit.vut.cz/fit/map/3/.cs?show={room.upper()}&big=1"
+        url = f"https://www.fit.vut.cz/fit/map/.cs?show={room.upper()}&big=1"
         r = requests.get(url)
         if r.status_code != 200:
             return await ctx.send(Messages.fit_room_unreach)
@@ -35,8 +35,31 @@ class FitRoom(commands.Cog):
                 return await ctx.send(Messages.fit_room_parsing_failed)
 
             if image is None or cursor is None:
-                return await ctx.send(
-                    utils.fill_message("fit_room_room_not_on_plan", room=room))
+                if len(room) >= 2:
+                    url = f"https://www.fit.vut.cz/fit/map/{room[1]}/.cs?show={room.upper()}&big=1"
+                    r = requests.get(url)
+                    if r.status_code != 200:
+                        if r.status_code != 200:
+                            return await ctx.send(Messages.fit_room_unreach)
+
+                    try:
+                        soup = BeautifulSoup(r.content, 'html.parser')
+                        main_body = soup.find("main", {"id": "main"})
+                        floor_list = main_body.find("ul", {"class": "pagination__list"})
+                        active_floor = floor_list.find("a", {"aria-current": "page"})
+                        image = main_body.find("svg")
+                        overlay = image.find("g", {"id": "layer3"})
+                        cursor = overlay.find("polygon", {
+                            "style": "fill:red;stroke:none;pointer-events:none"})
+                    except:
+                        return await ctx.send(Messages.fit_room_parsing_failed)
+
+                    if image is None or cursor is None:
+                        return await ctx.send(
+                            utils.fill_message("fit_room_room_not_on_plan", room=room))
+                else:
+                    return await ctx.send(
+                        utils.fill_message("fit_room_room_not_on_plan", room=room))
 
             image_bytes = BytesIO()
             svg2png(bytestring=str(image).encode("utf-8"), write_to=image_bytes, parent_width=720,
