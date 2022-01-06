@@ -39,8 +39,7 @@ class FitRoom(commands.Cog):
                     url = f"https://www.fit.vut.cz/fit/map/{room[1]}/.cs?show={room.upper()}&big=1"
                     r = requests.get(url)
                     if r.status_code != 200:
-                        if r.status_code != 200:
-                            return await ctx.send(Messages.fit_room_unreach)
+                        return await ctx.send(Messages.fit_room_unreach)
 
                     try:
                         soup = BeautifulSoup(r.content, 'html.parser')
