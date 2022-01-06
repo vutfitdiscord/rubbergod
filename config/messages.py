@@ -380,3 +380,9 @@ class Messages:
     studijni_web_error = "Chyba při parsování webu"
     studijni_office_hours = "Úřední hodiny"
     studijni_title = "C109 Studijní oddělení"
+
+    fit_room_brief = "Zobrazení místnosti na plánku fakulty."
+    fit_room_help = f"{prefix}room <místnost>"
+    fit_room_unreach = "Stránka s plánkem je nedostupná."
+    fit_room_parsing_failed = "Načtení stránky s plánkem se nezdařilo. Nahlaš prosím tuto chybu správci bota."
+    fit_room_room_not_on_plan = "Zadaná místnost {room} není na plánku nebo neexistuje."
