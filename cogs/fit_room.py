@@ -16,7 +16,7 @@ class FitRoom(commands.Cog):
     @cooldowns.default_cooldown
     @commands.command(brief=Messages.fit_room_brief, description=Messages.fit_room_help)
     async def room(self, ctx: commands.Context, *, room: str):
-        url = f"https://www.fit.vut.cz/fit/map/3/.cs?show={room}&big=1"
+        url = f"https://www.fit.vut.cz/fit/map/3/.cs?show={room.upper()}&big=1"
         r = requests.get(url)
         if r.status_code != 200:
             return await ctx.send(Messages.fit_room_unreach)
