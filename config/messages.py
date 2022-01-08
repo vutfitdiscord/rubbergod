@@ -386,3 +386,5 @@ class Messages:
     fit_room_unreach = "Stránka s plánkem je nedostupná."
     fit_room_parsing_failed = "Načtení stránky s plánkem se nezdařilo. Nahlaš prosím tuto chybu správci bota."
     fit_room_room_not_on_plan = "Zadaná místnost {room} není na plánku nebo neexistuje."
+
+    meme_repost_link = "[Odkaz na originál]({original_message_url}) v <#{original_channel}>"
