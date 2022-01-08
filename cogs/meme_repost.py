@@ -25,9 +25,9 @@ class MemeRepost(commands.Cog):
             return
 
         all_reactions: List[discord.Reaction] = ctx.message.reactions
-        for reaction in all_reactions:
-            if reaction.count >= Config.repost_threshold:
-                emoji_key = str(reaction.emoji.id) if type(reaction.emoji) != str else reaction.emoji
+        for reac in all_reactions:
+            if reac.count >= Config.repost_threshold:
+                emoji_key = str(reac.emoji.id) if type(reac.emoji) != str else reac.emoji
                 emoji_val = self.karma_repo.emoji_value(emoji_key)
 
                 if int(emoji_val) >= 1:
@@ -57,8 +57,8 @@ class MemeRepost(commands.Cog):
             utils.add_author_footer(embed, author=ctx.message.author)
 
             link = utils.fill_message("meme_repost_link",
-                                        original_message_url=ctx.message.jump_url,
-                                        original_channel=Config.meme_room)
+                                      original_message_url=ctx.message.jump_url,
+                                      original_channel=Config.meme_room)
             embed.add_field(name="Link", value=link, inline=False)
 
             if ctx.message.content:
@@ -67,8 +67,8 @@ class MemeRepost(commands.Cog):
             if number_of_files > 0:
                 embed.set_image(url=f"attachment://{files[0].filename}")
 
-            repost_message = await self.repost_channel.send(embed=embed,
-                                                            file=files[0] if number_of_files > 0 else None)
+            main_file = files[0] if number_of_files > 0 else None
+            repost_message = await self.repost_channel.send(embed=embed, file=main_file)
 
             sec_repost_message_id = None
             if number_of_files > 1:
@@ -76,7 +76,7 @@ class MemeRepost(commands.Cog):
                 sec_repost_message_id = sec_message.id
 
             self.repost_repo.create_repost(ctx.message.id, repost_message.id, ctx.member.id,
-                                            sec_repost_message_id)
+                                           sec_repost_message_id)
 
 
 def setup(bot):
