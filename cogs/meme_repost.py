@@ -6,6 +6,7 @@ from repository.karma_repo import KarmaRepository
 from repository.meme_repost_repo import MemeRepostRepo
 from typing import List, Union
 import utils
+import asyncio
 
 
 class MemeRepost(commands.Cog):
@@ -16,7 +17,7 @@ class MemeRepost(commands.Cog):
         self.repost_repo = MemeRepostRepo()
         self.repost_channel: Union[discord.TextChannel, None] = None
 
-        self.in_adding_process = []
+        self.repost_lock = asyncio.Lock()
 
     async def handle_reaction(self, ctx: ReactionContext):
         # Message was reposted before
@@ -40,45 +41,42 @@ class MemeRepost(commands.Cog):
         if self.repost_channel is None:
             return
 
-        # Message is already processing for repost
-        if ctx.message.id in self.in_adding_process:
-            return
+        async with self.repost_lock:
+            if self.repost_repo.find_repost_by_id(ctx.message.id) is not None:
+                return
 
-        self.in_adding_process.append(ctx.message.id)
+            files = []
+            for attachement in ctx.message.attachments:
+                file = await attachement.to_file()
+                if file is not None:
+                    files.append(file)
 
-        files = []
-        for attachement in ctx.message.attachments:
-            file = await attachement.to_file()
-            if file is not None:
-                files.append(file)
+            number_of_files = len(files)
 
-        number_of_files = len(files)
+            embed = discord.Embed(color=discord.Color.dark_blue())
+            utils.add_author_footer(embed, author=ctx.message.author)
 
-        embed = discord.Embed(color=discord.Color.dark_blue())
-        utils.add_author_footer(embed, author=ctx.message.author)
+            link = utils.fill_message("meme_repost_link",
+                                        original_message_url=ctx.message.jump_url,
+                                        original_channel=Config.meme_room)
+            embed.add_field(name="Link", value=link, inline=False)
 
-        link = utils.fill_message("meme_repost_link",
-                                  original_message_url=ctx.message.jump_url,
-                                  original_channel=Config.meme_room)
-        embed.add_field(name="Link", value=link, inline=False)
+            if ctx.message.content:
+                embed.add_field(name="Obsah", value=ctx.message.content[:1023])
 
-        if ctx.message.content:
-            embed.add_field(name="Obsah", value=ctx.message.content[:1023])
+            if number_of_files > 0:
+                embed.set_image(url=f"attachment://{files[0].filename}")
 
-        if number_of_files > 0:
-            embed.set_image(url=f"attachment://{files[0].filename}")
+            repost_message = await self.repost_channel.send(embed=embed,
+                                                            file=files[0] if number_of_files > 0 else None)
 
-        repost_message = await self.repost_channel.send(embed=embed,
-                                                        file=files[0] if number_of_files > 0 else None)
+            sec_repost_message_id = None
+            if number_of_files > 1:
+                sec_message = await self.repost_channel.send(files=files[1:11])
+                sec_repost_message_id = sec_message.id
 
-        sec_repost_message_id = None
-        if number_of_files > 1:
-            sec_message = await self.repost_channel.send(files=files[1:11])
-            sec_repost_message_id = sec_message.id
-
-        self.repost_repo.create_repost(ctx.message.id, repost_message.id, ctx.member.id,
-                                       sec_repost_message_id)
-        self.in_adding_process.remove(ctx.message.id)
+            self.repost_repo.create_repost(ctx.message.id, repost_message.id, ctx.member.id,
+                                            sec_repost_message_id)
 
 
 def setup(bot):
