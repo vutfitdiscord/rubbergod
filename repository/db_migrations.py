@@ -12,6 +12,7 @@ from repository.database.pin_map import PinMap
 from repository.database.stream_link import StreamLink
 from repository.database.vote import Vote
 from repository.database.subscription import Subscription
+from repository.database.meme_repost import MemeRepost
 
 from config.app_config import Config
 
