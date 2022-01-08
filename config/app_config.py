@@ -100,6 +100,11 @@ class Config:
     bot_room: int = get_attr("channels", "bot_room")
     mod_room: int = get_attr("channels", "mod_room")
 
+    # Meme repost
+    meme_room: int = get_attr("meme_repost", "meme_room")
+    meme_repost_room: int = get_attr("meme_repost", "meme_repost_room")
+    repost_threshold: int = get_attr("meme_repost", "repost_threshold")
+
     # Bot rooms
     allowed_channels: List[int] = eval_channels(get_attr("channels", "allowed_channels"))
 
