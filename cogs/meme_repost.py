@@ -5,6 +5,7 @@ from config.app_config import Config
 from repository.karma_repo import KarmaRepository
 from repository.meme_repost_repo import MemeRepostRepo
 from typing import List, Union
+import utils
 
 
 class MemeRepost(commands.Cog):
@@ -13,12 +14,9 @@ class MemeRepost(commands.Cog):
 
         self.karma_repo = KarmaRepository()
         self.repost_repo = MemeRepostRepo()
-        self.repost_channel:Union[discord.TextChannel, None] = None
+        self.repost_channel: Union[discord.TextChannel, None] = None
 
-    async def handle_reaction(self, ctx:ReactionContext):
-        if ctx.channel.id != Config.meme_room:
-            return
-
+    async def handle_reaction(self, ctx: ReactionContext):
         # Message was reposted before
         if self.repost_repo.find_repost_by_id(ctx.message.id) is not None:
             return
@@ -44,10 +42,24 @@ class MemeRepost(commands.Cog):
             if file is not None:
                 files.append(file)
 
-        # TODO: Think about more clever way of reposting messages
-        repost_message = await self.repost_channel.send(ctx.message.content, files=files[:10])
+        number_of_files = len(files)
 
-        self.repost_repo.create_repost(ctx.message.id, repost_message.id, ctx.member.id)
+        embed = discord.Embed(description=ctx.message.content, color=discord.Color.dark_blue())
+        utils.add_author_footer(embed, author=ctx.message.author)
+
+        if number_of_files > 0:
+            embed.set_image(url=f"attachment://{files[0].filename}")
+
+        repost_message = await self.repost_channel.send(embed=embed,
+                                                        file=files[0] if number_of_files > 0 else None)
+
+        sec_repost_message_id = None
+        if number_of_files > 1:
+            sec_repost_message_id = await self.repost_channel.send(files=files[1:11])
+
+        self.repost_repo.create_repost(ctx.message.id, repost_message.id, ctx.member.id,
+                                       sec_repost_message_id)
+
 
 def setup(bot):
     bot.add_cog(MemeRepost(bot))
