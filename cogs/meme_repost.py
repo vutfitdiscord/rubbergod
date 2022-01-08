@@ -71,12 +71,13 @@ class MemeRepost(commands.Cog):
         repost_message = await self.repost_channel.send(embed=embed,
                                                         file=files[0] if number_of_files > 0 else None)
 
-        sec_repost_message = None
+        sec_repost_message_id = None
         if number_of_files > 1:
-            sec_repost_message = await self.repost_channel.send(files=files[1:11])
+            sec_message = await self.repost_channel.send(files=files[1:11])
+            sec_repost_message_id = sec_message.id
 
         self.repost_repo.create_repost(ctx.message.id, repost_message.id, ctx.member.id,
-                                       sec_repost_message.id if sec_repost_message else None)
+                                       sec_repost_message_id)
         self.in_adding_process.remove(ctx.message.id)
 
 
