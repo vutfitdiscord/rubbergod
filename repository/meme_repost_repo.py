@@ -9,6 +9,6 @@ class MemeRepostRepo:
 
     @staticmethod
     def create_repost(original_message_id:int, repost_message_id:int, author_id:int, secondary_repost_message_id:int=None):
-        item = MemeRepost(original_message_id=original_message_id, repost_message_id=repost_message_id, author_id=author_id, secondary_repost_message_id=secondary_repost_message_id)
+        item = MemeRepost(original_message_id=str(original_message_id), repost_message_id=str(repost_message_id), author_id=str(author_id), secondary_repost_message_id=str(secondary_repost_message_id))
         session.add(item)
         session.commit()
