@@ -15,14 +15,8 @@ class MemeRepost(commands.Cog):
         self.repost_repo = MemeRepostRepo()
         self.repost_channel:Union[discord.TextChannel, None] = None
 
-    @commands.Cog.listener()
-    async def on_raw_reaction_add(self, payload: discord.RawReactionActionEvent):
-        if payload.channel_id != Config.meme_room:
-            return
-
-        # Info about message not retrieved
-        ctx: ReactionContext = await ReactionContext.from_payload(self.bot, payload)
-        if ctx is None:
+    async def handle_reaction(self, ctx:ReactionContext):
+        if ctx.channel.id != Config.meme_room:
             return
 
         # Message was reposted before
