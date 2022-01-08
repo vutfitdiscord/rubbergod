@@ -24,8 +24,9 @@ class MemeRepost(commands.Cog):
         all_reactions: List[discord.Reaction] = ctx.message.reactions
         for reaction in all_reactions:
             if reaction.count >= Config.repost_threshold:
-                if int(self.karma_repo.emoji_value(str(reaction.emoji.id) if
-                        type(reaction.emoji) != str else reaction.emoji)) >= Config.repost_threshold:
+                emoji_val = self.karma_repo.emoji_value(str(reaction.emoji.id) if
+                        type(reaction.emoji) != str else reaction.emoji)
+                if int(emoji_val) >= 1:
                     return await self.__repost_message(ctx)
 
     async def __repost_message(self, ctx: ReactionContext):
