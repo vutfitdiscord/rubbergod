@@ -9,7 +9,7 @@ from discord import Member
 from discord.ext.commands import Bot
 
 import utils
-from config.app_config import Config
+from config.app_config import config
 from config.messages import Messages
 from features.base_feature import BaseFeature
 from repository.user_repo import UserRepository, VerifyStatus
@@ -22,38 +22,38 @@ class Verification(BaseFeature):
         self.repo = user_repository
 
     def send_mail(self, receiver_email, contents):
-        password = Config.email_pass
-        port = Config.email_smtp_port
+        password = config.email_pass
+        port = config.email_smtp_port
         context = ssl.create_default_context()
-        sender_email = Config.email_addr
+        sender_email = config.email_addr
         subject = "FIT Discord verifikace"
         mail_content = 'Subject: {}\n\n{}'.format(subject,
                                                   contents)
 
-        with smtplib.SMTP_SSL(Config.email_smtp_server, port,
+        with smtplib.SMTP_SSL(config.email_smtp_server, port,
                               context=context) as server:
-            server.login(Config.email_name, password)
+            server.login(config.email_name, password)
             server.sendmail(sender_email, receiver_email, mail_content)
 
     def send_mail_verified(self, receiver_email, user):
         """Send mail with instructions in case of blocked DMs"""
-        password = Config.email_pass
-        port = Config.email_smtp_port
+        password = config.email_pass
+        port = config.email_smtp_port
         context = ssl.create_default_context()
-        sender_email = Config.email_addr
+        sender_email = config.email_addr
         subject = f"{user} {Messages.verify_verify_success_mail}"
         mail_content = f'Subject: {subject}\n\n{Messages.verify_post_verify_info_mail}'
 
-        with smtplib.SMTP_SSL(Config.email_smtp_server, port,
+        with smtplib.SMTP_SSL(config.email_smtp_server, port,
                               context=context) as server:
-            server.login(Config.email_name, password)
+            server.login(config.email_name, password)
             server.sendmail(sender_email, receiver_email, mail_content)
 
     async def has_role(self, user, role_name):
         if type(user) == Member:
             return utils.has_role(user, role_name)
         else:
-            guild = await self.bot.fetch_guild(Config.guild_id)
+            guild = await self.bot.fetch_guild(config.guild_id)
             member = await guild.fetch_member(user.id)
             return utils.has_role(member, role_name)
 
@@ -61,7 +61,7 @@ class Verification(BaseFeature):
         # Generate a verification code
         code = ''.join(random.choices(string.ascii_uppercase + string.digits, k=20))
 
-        email_message = Config.default_prefix + "verify "
+        email_message = config.default_prefix + "verify "
         email_message += login + " " + code
 
         self.send_mail(login + mail_postfix, email_message)
@@ -78,7 +78,7 @@ class Verification(BaseFeature):
             return
 
         # Check if the user doesn't have the verify role
-        if not await self.has_role(message.author, Config.verification_role):
+        if not await self.has_role(message.author, config.verification_role):
             login = str(message.content).split(" ")[1]
 
             # Some of them will use 'xlogin00' as stated in help,
@@ -93,12 +93,12 @@ class Verification(BaseFeature):
 
                 if user is None:
                     msg = utils.fill_message("verify_unknown_login",
-                                             user=message.author.id, admin=Config.admin_ids[0])
+                                             user=message.author.id, admin=config.admin_ids[0])
                     await message.channel.send(msg)
                     await self.log_verify_fail(message, 'getcode (xlogin) - Unknown login')
                 elif user is not None and user.status != VerifyStatus.Unverified.value:
                     msg = utils.fill_message(
-                        "verify_step_done", user=message.author.id, admin=Config.admin_ids[0])
+                        "verify_step_done", user=message.author.id, admin=config.admin_ids[0])
                     await message.channel.send(msg)
                     await self.log_verify_fail(message, 'getcode (xlogin) - Invalid verify state')
                 else:
@@ -109,7 +109,7 @@ class Verification(BaseFeature):
                     int(login)
                 except ValueError:
                     msg = utils.fill_message("invalid_login", user=message.author.id,
-                                             admin=Config.admin_ids[0])
+                                             admin=config.admin_ids[0])
                     await message.channel.send(msg)
                     await self.log_verify_fail(message, 'getcode (MUNI)')
 
@@ -123,7 +123,7 @@ class Verification(BaseFeature):
 
                 if user is not None and user.status != VerifyStatus.Unverified.value:
                     msg = utils.fill_message(
-                        "verify_step_done", user=message.author.id, admin=Config.admin_ids[0])
+                        "verify_step_done", user=message.author.id, admin=config.admin_ids[0])
                     await message.channel.send(msg)
                     await self.log_verify_fail(message, 'getcode (MUNI) - Verified')
                     return
@@ -133,7 +133,7 @@ class Verification(BaseFeature):
                 await self.gen_code_and_send_mail(message, login, "@mail.muni.cz")
         else:
             await message.channel.send(utils.fill_message("verify_already_verified",
-                                                          user=message.author.id, admin=Config.admin_ids[0]))
+                                                          user=message.author.id, admin=config.admin_ids[0]))
         try:
             await message.delete()
         except discord.errors.HTTPException:
@@ -184,7 +184,7 @@ class Verification(BaseFeature):
 
         # Check if the user doesn't have the verify role
         # otherwise they wouldn't need to verify, right?
-        if not await self.has_role(message.author, Config.verification_role):
+        if not await self.has_role(message.author, config.verification_role):
             # Some of them will use 'xlogin00' as stated in help
             # yet again, cuz they dumb
             if login == "xlogin00":
@@ -192,7 +192,7 @@ class Verification(BaseFeature):
                 return
             # Same here
             if code == "kód" or code == "[kód]":
-                guild = self.bot.get_guild(Config.guild_id)
+                guild = self.bot.get_guild(config.guild_id)
                 fp = await guild.fetch_emoji(585915845146968093)
                 await message.channel.send(utils.fill_message("verify_verify_dumbshit",
                                                               user=message.author.id, emote=str(fp)))
@@ -214,7 +214,7 @@ class Verification(BaseFeature):
 
                 if year is None:
                     msg = utils.fill_message("verify_verify_manual", user=message.author.id,
-                                             admin=Config.admin_ids[0], year=str(new_user.year))
+                                             admin=config.admin_ids[0], year=str(new_user.year))
                     await message.channel.send(msg)
 
                     await self.log_verify_fail(message, 'Verify (with code) (Invalid year)')
@@ -222,13 +222,13 @@ class Verification(BaseFeature):
 
                 try:
                     # Get server verify role
-                    verify = discord.utils.get(message.guild.roles, name=Config.verification_role)
+                    verify = discord.utils.get(message.guild.roles, name=config.verification_role)
                     year = discord.utils.get(message.guild.roles, name=year)
                     member = message.author
                 except AttributeError:
                     # jsme v PM
-                    guild = self.bot.get_guild(Config.guild_id)
-                    verify = discord.utils.get(guild.roles, name=Config.verification_role)
+                    guild = self.bot.get_guild(config.guild_id)
+                    verify = discord.utils.get(guild.roles, name=config.verification_role)
                     year = discord.utils.get(guild.roles, name=year)
                     member = guild.get_member(message.author.id)
 
@@ -253,13 +253,13 @@ class Verification(BaseFeature):
                                                                   user=message.author.id))
             else:
                 msg = utils.fill_message("verify_verify_not_found", user=message.author.id,
-                                         admin=Config.admin_ids[0])
+                                         admin=config.admin_ids[0])
                 await message.channel.send(msg)
 
                 await self.log_verify_fail(message, 'Verify (with code) - Not exists in DB')
         else:
             await message.channel.send(utils.fill_message("verify_already_verified",
-                                                          user=message.author.id, admin=Config.admin_ids[0]))
+                                                          user=message.author.id, admin=config.admin_ids[0]))
 
         try:
             await message.delete()
@@ -271,11 +271,11 @@ class Verification(BaseFeature):
         embed.add_field(name="User", value=utils.generate_mention(message.author.id))
         embed.add_field(name='Verify phase', value=phase)
         embed.add_field(name="Message", value=message.content, inline=False)
-        channel = self.bot.get_channel(Config.log_channel)
+        channel = self.bot.get_channel(config.log_channel)
         await channel.send(embed=embed)
 
     async def send_xlogin_info(self, message: discord.Message):
-        guild = self.bot.get_guild(Config.guild_id)
+        guild = self.bot.get_guild(config.guild_id)
         fp = await guild.fetch_emoji(585915845146968093)
         await message.channel.send(utils.fill_message("verify_send_dumbshit",
                                                       user=message.author.id, emote=str(fp)))

@@ -1,13 +1,13 @@
 import discord
 from discord.ext import commands
-from typing import Union, Optional
+from typing import Union, Optional, List
 
-from config import app_config, messages
+from config.app_config import config
+from config.messages import Messages as messages
 from repository import subscription_repo
+from repository.database.subscription import Subscription
 
 repo = subscription_repo.SubscriptionRepository()
-config = app_config.Config
-messages = messages.Messages
 
 
 class Subscriptions(commands.Cog):

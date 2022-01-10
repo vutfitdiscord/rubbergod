@@ -5,9 +5,8 @@ from discord.ext import commands
 from discord_slash import SlashCommand, SlashContext, cog_ext
 
 from config import cooldowns
-from config.app_config import Config
 from logic import roll_dice
-from config.app_config import Config
+from config.app_config import config
 from config.messages import Messages
 import utils
 
@@ -83,21 +82,21 @@ class Random(commands.Cog):
             await ctx.send(utils.get_command_signature(ctx))
         if isinstance(error, commands.CheckFailure):
             await ctx.message.channel.send(
-                utils.fill_message("bot_room_redirect", user=ctx.message.author.id, bot_room=Config.bot_room)
+                utils.fill_message("bot_room_redirect", user=ctx.message.author.id, bot_room=config.bot_room)
             )
 
     async def cog_after_invoke(self, ctx):
-        if ctx.channel.id not in Config.allowed_channels:
+        if ctx.channel.id not in config.allowed_channels:
             await ctx.message.channel.send(
-                utils.fill_message("bot_room_redirect", user=ctx.message.author.id, bot_room=Config.bot_room)
+                utils.fill_message("bot_room_redirect", user=ctx.message.author.id, bot_room=config.bot_room)
             )
 
     async def cog_check(self, ctx):
-        if not Config.enable_room_check:
+        if not config.enable_room_check:
             return True
         if not ctx.guild:
             return True
-        return ctx.channel.id in Config.allowed_channels
+        return ctx.channel.id in config.allowed_channels
 
 
 def setup(bot):

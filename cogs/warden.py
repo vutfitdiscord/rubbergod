@@ -9,11 +9,11 @@ import dhash
 from PIL import Image
 
 import utils
-from config import app_config as config, messages
+from config.app_config import config
+from config.messages import Messages as messages
 from repository import image_repo
 
 dhash.force_pil()
-config = config.Config
 repo_i = image_repo.ImageRepository()
 
 

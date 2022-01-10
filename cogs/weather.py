@@ -3,10 +3,9 @@ import requests
 import discord
 from discord.ext import commands
 
-from config import app_config as config, messages
+from config.app_config import config
+from config.messages import Messages as messages
 import utils
-config = config.Config
-messages = messages.Messages
 
 
 class weather(commands.Cog):

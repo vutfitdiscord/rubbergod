@@ -5,7 +5,7 @@ from discord.ext import commands
 import sqlalchemy
 
 from repository.database import session
-from config.app_config import Config
+from config.app_config import config
 from config.messages import Messages
 import utils
 
@@ -37,7 +37,7 @@ class Error(commands.Cog):
 
         if isinstance(error, commands.CommandNotFound):
             prefix = ctx.message.content[:1]
-            if prefix not in Config.ignored_prefixes:
+            if prefix not in config.ignored_prefixes:
                 await ctx.send(Messages.no_such_command)
             return
 
@@ -53,15 +53,15 @@ class Error(commands.Cog):
         embed = discord.Embed(title=f"Ignoring exception in command {ctx.command}", color=0xFF0000)
         embed.add_field(name="Zpráva", value=ctx.message.content[:1000])
         embed.add_field(name="Autor", value=str(ctx.author))
-        if ctx.guild and ctx.guild.id != Config.guild_id:
+        if ctx.guild and ctx.guild.id != config.guild_id:
             embed.add_field(name="Guild", value=ctx.guild.name)
         embed.add_field(name="Link", value=ctx.message.jump_url, inline=False)
         
-        channel = self.bot.get_channel(Config.bot_dev_channel)
+        channel = self.bot.get_channel(config.bot_dev_channel)
 
         # send context of command with personal information to DM
         if ctx.command.name == "diplom":
-            channel_ctx = self.bot.get_user(Config.admin_ids[0])
+            channel_ctx = self.bot.get_user(config.admin_ids[0])
         else:
             channel_ctx = channel
         await channel_ctx.send(embed=embed)

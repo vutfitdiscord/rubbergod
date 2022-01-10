@@ -3,7 +3,7 @@ from discord.ext import commands
 import sqlalchemy
 
 from features.reaction_context import ReactionContext
-from config.app_config import Config
+from config.app_config import config
 from utils import is_command_message
 from repository.database import session
 
@@ -37,13 +37,13 @@ class Reaction(commands.Cog):
             cogs.append(self.bot.get_cog("Review"))
         if ctx.emoji == "📌":
             cogs.append(self.bot.get_cog("AutoPin"))
-        if ctx.channel.id not in Config.role_channels:
+        if ctx.channel.id not in config.role_channels:
             cogs.append(self.bot.get_cog("Karma"))
         else:
             cogs.append(self.bot.get_cog("ReactToRole"))
         if (
             ctx.emoji == "❎"
-            and payload.channel_id in Config.deduplication_channels
+            and payload.channel_id in config.deduplication_channels
             and not payload.member.bot
             and ctx.message.author.bot
         ):
@@ -55,7 +55,7 @@ class Reaction(commands.Cog):
         ):
             cogs.append(self.bot.get_cog("StreamLinks"))
 
-        if (ctx.channel.id == Config.meme_room or ctx.channel.id == Config.meme_repost_room) and \
+        if (ctx.channel.id == config.meme_room or ctx.channel.id == config.meme_repost_room) and \
                 ctx.message.author.id != ctx.member.id:
             cogs.append(self.bot.get_cog("MemeRepost"))
 

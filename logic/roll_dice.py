@@ -2,7 +2,7 @@ from random import randint
 from re import match
 import utils
 
-from config.app_config import Config
+from config.app_config import config
 from config.messages import Messages
 
 """
@@ -50,13 +50,13 @@ class Roll():
         if groups[4] and int(groups[5]) <= 0:  # Keep
             return RollResult("(**0**)", 0)
 
-        if dice_count > Config.max_dice_at_once:
+        if dice_count > config.max_dice_at_once:
             raise SyntaxError(utils.fill_message("rd_too_many_dice_in_group",
-                              maximum=Config.max_dice_at_once))
+                              maximum=config.max_dice_at_once))
 
-        if dice_sides > Config.max_dice_sides:
+        if dice_sides > config.max_dice_sides:
             raise SyntaxError(utils.fill_message("rd_too_many_dice_sides",
-                              maximum=Config.max_dice_sides))
+                              maximum=config.max_dice_sides))
 
         dice = [randint(1, dice_sides) for i in range(dice_count)]
 
@@ -159,7 +159,7 @@ class Roll():
                 result += die
             text += " "
 
-        if dice_count > Config.dice_before_collation:
+        if dice_count > config.dice_before_collation:
             return RollResult("(***" + str(result) + "***)", result)
 
         # Remove last character since that is always a space
@@ -173,8 +173,8 @@ class Roll():
         results = []
         dice_groups = roll_string.split('+')
 
-        if len(dice_groups) > Config.max_dice_groups:
-            return utils.fill_message("rd_too_many_dice_groups", maximum=Config.max_dice_groups)
+        if len(dice_groups) > config.max_dice_groups:
+            return utils.fill_message("rd_too_many_dice_groups", maximum=config.max_dice_groups)
 
         for index, dice in enumerate(dice_groups):
             result = match(Roll.DICE_REGEX, dice)

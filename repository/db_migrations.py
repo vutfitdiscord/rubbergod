@@ -14,7 +14,7 @@ from repository.database.vote import Vote
 from repository.database.subscription import Subscription
 from repository.database.meme_repost import MemeRepost
 
-from config.app_config import Config
+from config.app_config import config
 
 
 def init_db(commit: bool = True):
@@ -104,7 +104,7 @@ def load_subjects():
     """
 
     # Remove duplicates
-    subjects = list(set(Config.subjects))
+    subjects = list(set(config.subjects))
 
     review_repo = ReviewRepository()
     for subject in subjects:

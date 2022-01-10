@@ -1,10 +1,8 @@
 import utils
-from config import app_config as config
-
-config = config.Config
+from config.app_config import config
 
 
-class RoomCheck():
+class RoomCheck:
 
     def __init__(self, bot):
         self.bot = bot

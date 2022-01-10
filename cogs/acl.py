@@ -4,12 +4,12 @@ from discord.ext import commands
 import utils
 from cogs import room_check
 from features import acl
-from config import app_config as config, cooldowns
+from config.app_config import config
+from config import cooldowns
 from repository import acl_repo
 
 acl_repo = acl_repo.AclRepository()
 acl = acl.Acl(acl_repo)
-config = config.Config
 
 
 class Acl(commands.Cog):
