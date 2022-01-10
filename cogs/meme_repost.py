@@ -49,7 +49,12 @@ class MemeRepost(commands.Cog):
             # Generate string with all reactions on post at the time
             title_string = ""
             for reaction in reactions:
-                title_string += f"{reaction.count}x{reaction.emoji} "
+                tmp_string = title_string + f"{reaction.count}x{reaction.emoji} "
+
+                if len(tmp_string) >= 255:
+                    break
+
+                title_string = tmp_string
 
             embed = discord.Embed(color=discord.Color.dark_blue(), title=title_string)
             utils.add_author_footer(embed, author=ctx.message.author)
