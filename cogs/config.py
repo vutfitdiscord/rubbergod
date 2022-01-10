@@ -30,7 +30,7 @@ class DynamicConfig(commands.Cog):
         if key is None or not value:
             await ctx.send(utils.get_command_signature(ctx))
             return
-        self.load_config()
+        load_config()
         await self.change_value(ctx, key, list(value), False)
 
     @config.command(brief=Messages.config_append_brief)
