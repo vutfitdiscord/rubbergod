@@ -96,9 +96,12 @@ class MemeRepost(commands.Cog):
             for idx, attachement_url in enumerate(attachement_urls):
                 embed.add_field(name=f"Příloha {idx + 1}", value=attachement_url, inline=False)
 
-            repost_message = await self.repost_channel.send(embed=embed, file=main_image)
+            repost_message_id = -1
+            if len(embed) < 6000:
+                repost_message = await self.repost_channel.send(embed=embed, file=main_image)
+                repost_message_id = repost_message.id
 
-            self.repost_repo.create_repost(ctx.message.id, repost_message.id, ctx.member.id)
+            self.repost_repo.create_repost(ctx.message.id, repost_message_id, ctx.member.id)
 
 
 def setup(bot):
