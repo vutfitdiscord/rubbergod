@@ -49,7 +49,12 @@ class MemeRepost(commands.Cog):
             # Generate string with all reactions on post at the time
             title_string = ""
             for reaction in reactions:
-                title_string += f"{reaction.count}x{reaction.emoji} "
+                tmp_string = title_string + f"{reaction.count}x{reaction.emoji} "
+
+                if len(tmp_string) >= 255:
+                    break
+
+                title_string = tmp_string
 
             embed = discord.Embed(color=discord.Color.dark_blue(), title=title_string)
             utils.add_author_footer(embed, author=ctx.message.author)
@@ -60,18 +65,20 @@ class MemeRepost(commands.Cog):
                                       original_channel=Config.meme_room)
             embed.add_field(name="Link", value=link, inline=False)
 
-            # Get all attachements of original post
+            # Get all attachments of original post
             main_image = None
             more_images = False
-            attachement_urls = []
-            for attachement in ctx.message.attachments:
-                if attachement.content_type.split("/")[0] == "image":
+            attachment_urls = []
+            for attachment in ctx.message.attachments:
+                content_type = attachment.content_type
+                if content_type is not None and content_type.split("/")[0] == "image":
                     if main_image is None:
-                        main_image = await attachement.to_file()
+                        main_image = await attachment.to_file()
                     else:
                         more_images = True
                 else:
-                    attachement_urls.append(attachement.proxy_url)
+                    if len(attachment.proxy_url) < 1023:
+                        attachment_urls.append(attachment.proxy_url)
 
             # Set content from original message if present
             if ctx.message.content:
@@ -86,13 +93,16 @@ class MemeRepost(commands.Cog):
             if main_image is not None:
                 embed.set_image(url=f"attachment://{main_image.filename}")
 
-            # Add all attachements as fields
-            for idx, attachement_url in enumerate(attachement_urls):
-                embed.add_field(name=f"Příloha {idx + 1}", value=attachement_url, inline=False)
+            # Add all attachments as fields
+            for idx, attachment_url in enumerate(attachment_urls):
+                embed.add_field(name=f"Příloha {idx + 1}", value=attachment_url, inline=False)
 
-            repost_message = await self.repost_channel.send(embed=embed, file=main_image)
+            repost_message_id = -1
+            if len(embed) < 6000:
+                repost_message = await self.repost_channel.send(embed=embed, file=main_image)
+                repost_message_id = repost_message.id
 
-            self.repost_repo.create_repost(ctx.message.id, repost_message.id, ctx.member.id)
+            self.repost_repo.create_repost(ctx.message.id, repost_message_id, ctx.member.id)
 
 
 def setup(bot):
