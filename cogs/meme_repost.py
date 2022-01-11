@@ -76,7 +76,8 @@ class MemeRepost(commands.Cog):
                     else:
                         more_images = True
                 else:
-                    attachement_urls.append(attachement.proxy_url)
+                    if len(attachement.proxy_url) < 1023:
+                        attachement_urls.append(attachement.proxy_url)
 
             # Set content from original message if present
             if ctx.message.content:
