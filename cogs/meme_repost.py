@@ -65,7 +65,7 @@ class MemeRepost(commands.Cog):
                                       original_channel=Config.meme_room)
             embed.add_field(name="Link", value=link, inline=False)
 
-            # Get all attachements of original post
+            # Get all attachments of original post
             main_image = None
             more_images = False
             attachment_urls = []
@@ -93,9 +93,9 @@ class MemeRepost(commands.Cog):
             if main_image is not None:
                 embed.set_image(url=f"attachment://{main_image.filename}")
 
-            # Add all attachements as fields
-            for idx, attachement_url in enumerate(attachment_urls):
-                embed.add_field(name=f"Příloha {idx + 1}", value=attachement_url, inline=False)
+            # Add all attachments as fields
+            for idx, attachment_url in enumerate(attachment_urls):
+                embed.add_field(name=f"Příloha {idx + 1}", value=attachment_url, inline=False)
 
             repost_message_id = -1
             if len(embed) < 6000:
