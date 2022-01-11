@@ -69,15 +69,16 @@ class MemeRepost(commands.Cog):
             main_image = None
             more_images = False
             attachement_urls = []
-            for attachement in ctx.message.attachments:
-                if attachement.content_type is not None and attachement.content_type.split("/")[0] == "image":
+            for attachment in ctx.message.attachments:
+                content_type = attachment.content_type
+                if content_type is not None and content_type.split("/")[0] == "image":
                     if main_image is None:
-                        main_image = await attachement.to_file()
+                        main_image = await attachment.to_file()
                     else:
                         more_images = True
                 else:
-                    if len(attachement.proxy_url) < 1023:
-                        attachement_urls.append(attachement.proxy_url)
+                    if len(attachment.proxy_url) < 1023:
+                        attachement_urls.append(attachment.proxy_url)
 
             # Set content from original message if present
             if ctx.message.content:
