@@ -68,7 +68,7 @@ class MemeRepost(commands.Cog):
             # Get all attachements of original post
             main_image = None
             more_images = False
-            attachement_urls = []
+            attachment_urls = []
             for attachment in ctx.message.attachments:
                 content_type = attachment.content_type
                 if content_type is not None and content_type.split("/")[0] == "image":
@@ -78,7 +78,7 @@ class MemeRepost(commands.Cog):
                         more_images = True
                 else:
                     if len(attachment.proxy_url) < 1023:
-                        attachement_urls.append(attachment.proxy_url)
+                        attachment_urls.append(attachment.proxy_url)
 
             # Set content from original message if present
             if ctx.message.content:
@@ -94,7 +94,7 @@ class MemeRepost(commands.Cog):
                 embed.set_image(url=f"attachment://{main_image.filename}")
 
             # Add all attachements as fields
-            for idx, attachement_url in enumerate(attachement_urls):
+            for idx, attachement_url in enumerate(attachment_urls):
                 embed.add_field(name=f"Příloha {idx + 1}", value=attachement_url, inline=False)
 
             repost_message_id = -1
