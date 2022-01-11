@@ -70,7 +70,8 @@ class MemeRepost(commands.Cog):
             more_images = False
             attachement_urls = []
             for attachement in ctx.message.attachments:
-                if attachement.content_type is not None and attachement.content_type.split("/")[0] == "image":
+                if attachement.content_type is not None and \
+                        attachement.content_type.split("/")[0] == "image":
                     if main_image is None:
                         main_image = await attachement.to_file()
                     else:
