@@ -147,8 +147,8 @@ class Exams(commands.Cog):
 
                                     term_time = f"{term}\n{time_cont}"
                                     if term_date < datetime.date.today():
-                                        name = "~~" + name + "~~"
-                                        term_time = "~~" + term_time + "~~"
+                                        name = f"~~{name}~~"
+                                        term_time = f"~~{term_time}~~"
 
                                     embed.add_field(name=name, value=term_time)
 
