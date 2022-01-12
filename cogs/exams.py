@@ -107,7 +107,7 @@ class Exams(commands.Cog):
 
                             if strong_tag is None:
                                 # There is no term - Only text
-                                embed.add_field(name=subject_tag, value=row.contents[0])
+                                embed.add_field(name=subject_tag, value=row.contents[0], inline=False)
                             else:
                                 term = str(strong_tag.contents[0]).replace(" ", "")
 
@@ -121,7 +121,7 @@ class Exams(commands.Cog):
                                     name = "~~" + name + "~~"
                                     term_time = "~~" + term_time + "~~"
 
-                                embed.add_field(name=name, value=term_time)
+                                embed.add_field(name=name, value=term_time, inline=False)
                         else:
                             # Classic terms
                             for idx, row in enumerate(rows):
