@@ -94,20 +94,20 @@ class Exams(commands.Cog):
 
                     for exam in exam_batch:
                         tag = exam.find("a")
-                        rows = exam.find_all("td")
-                        del rows[0]
+                        cols = exam.find_all("td")
+                        del cols[0]
 
                         subject_tag = tag.find("strong").contents[0]
 
-                        row_count = len(rows)
-                        if row_count == 1:
+                        col_count = len(cols)
+                        if col_count == 1:
                             # Support for credits
-                            row = rows[0]
-                            strong_tag = row.find("strong")
+                            col = cols[0]
+                            strong_tag = col.find("strong")
 
                             if strong_tag is None:
                                 # There is no term - Only text
-                                embed.add_field(name=subject_tag, value=row.contents[0], inline=False)
+                                embed.add_field(name=subject_tag, value=col.contents[0], inline=False)
                             else:
                                 term = str(strong_tag.contents[0]).replace(" ", "")
 
@@ -116,7 +116,7 @@ class Exams(commands.Cog):
                                                           int(date_splits[0]))
 
                                 name = f"{subject_tag}"
-                                term_time = f"{row.contents[0]}\n{term}"
+                                term_time = f"{col.contents[0]}\n{term}"
                                 if term_date < datetime.date.today():
                                     name = "~~" + name + "~~"
                                     term_time = "~~" + term_time + "~~"
@@ -124,9 +124,9 @@ class Exams(commands.Cog):
                                 embed.add_field(name=name, value=term_time, inline=False)
                         else:
                             # Classic terms
-                            for idx, row in enumerate(rows):
-                                terms = row.find_all("strong")
-                                times = row.find_all("em")
+                            for idx, col in enumerate(cols):
+                                terms = col.find_all("strong")
+                                times = col.find_all("em")
 
                                 number_of_terms = len(terms)
 
