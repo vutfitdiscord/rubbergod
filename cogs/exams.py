@@ -75,8 +75,9 @@ class Exams(commands.Cog):
         exams = body.find_all("tr")
 
         number_of_exams = len(exams)
-        number_of_batches = math.ceil(number_of_exams / config.exams_page_size)
-        exam_batches = [exams[i * config.exams_page_size:config.exams_page_size + i * config.exams_page_size] for i in range(number_of_batches)]
+        bs = config.exams_page_size
+        number_of_batches = math.ceil(number_of_exams / bs)
+        exam_batches = [exams[i * bs:bs + i * bs] for i in range(number_of_batches)]
 
         pages = []
         for exam_batch in exam_batches:
@@ -116,17 +117,22 @@ class Exams(commands.Cog):
                                            color=discord.Color.dark_blue(), delete_after=False)
 
           await page_sesstion.run()
-        elif number_of_pages > 0:
+        elif number_of_pages == 1:
+          # Only one page, no need paginator
           await ctx.send(embed=pages[0])
         else:
+          # No pages were parsed, so we will post only default embed
           embed = discord.Embed(title=title, description=description, color=discord.Color.dark_blue())
           utils.add_author_footer(embed, ctx.author)
           await ctx.send(embed=embed)
       except:
+        # Parsing failed
         embed = discord.Embed(title=title, description=description, color=discord.Color.dark_blue())
         utils.add_author_footer(embed, ctx.author)
         await ctx.send(embed=embed)
+        await ctx.send(Messages.exams_parsing_failed)
     else:
+      # Site returned fail code
       embed = discord.Embed(title=title, description=description, color=discord.Color.dark_blue())
       utils.add_author_footer(embed, ctx.author)
       await ctx.send(embed=embed)
