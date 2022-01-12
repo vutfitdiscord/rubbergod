@@ -174,3 +174,7 @@ ios_looptime_minutes=120
 [subscriptions]
 # list of channels users are allowed to subscribe to
 subscribable_channels = [0]
+
+[exams]
+page_size = 6
+paginator_duration = 60
