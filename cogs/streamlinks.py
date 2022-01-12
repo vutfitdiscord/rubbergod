@@ -28,7 +28,9 @@ class StreamLinks(commands.Cog):
         self.config = app_config.Config
 
     @cooldowns.default_cooldown
-    @commands.group(brief=Messages.streamlinks_brief, usage="<subject>")
+    @commands.group(brief=Messages.streamlinks_brief, usage="<subject>",
+        aliases=["streamlist", "steamlink", "streamlink", "steamlinks", "stream", "steam", "links", "sl"]
+    )
     async def streamlinks(self, ctx: commands.Context):
         if ctx.invoked_subcommand is None:
             parameters = ctx.message.content[len('streamlinks') + 1:].strip()
