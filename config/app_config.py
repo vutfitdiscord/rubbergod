@@ -155,3 +155,7 @@ class Config:
 
     # subscriptions
     subscribable_channels: list = get_attr("subscriptions", "subscribable_channels")
+
+    # exams
+    exams_page_size:int = get_attr("exams", "page_size")
+    exams_paginator_duration = get_attr("exams", "paginator_duration")
