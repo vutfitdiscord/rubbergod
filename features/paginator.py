@@ -80,23 +80,20 @@ class PaginatorSession:
 				reaction, user = await self.ctx.bot.wait_for('reaction_add',
 				                                             check=self.__react_check,
 				                                             timeout=self.timeout)
-			except asyncio.TimeoutError:
-				self.running = False
-				try:
-					await self.__close()
-				finally:
-					break  # stops no matter what
-			else:
-				# same as above
 				try:
 					await self.message.remove_reaction(reaction, user)
 				except:
 					pass
 
-				action = self.reactions[reaction.emoji]  # gets the function from the reaction map OrderedDict
-				await action()  # awaits here with () because __init__ can't be async
+				action = self.reactions[reaction.emoji]
+				await action()
+			except asyncio.TimeoutError:
+				self.running = False
+				try:
+					await self.__close()
+				finally:
+					break
 
-	# all functions with await must be async
 	async def __first_page(self):
 		if self.current == 0: return
 		return await self.__show_page(0)
