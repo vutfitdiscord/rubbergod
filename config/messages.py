@@ -388,3 +388,7 @@ class Messages:
     fit_room_room_not_on_plan = "Zadaná místnost {room} není na plánku nebo neexistuje."
 
     meme_repost_link = "[Odkaz na originál]({original_message_url}) v <#{original_channel}>"
+
+    exams_brief = f"{prefix}exams [rocnik] pro zobrazení zkoušek pro daný ročník a nebo bez ročníku pro ročník podle role"
+    exams_no_valid_role = "Nebyla nalezena ročníková role"
+    exams_no_valid_year = "Byl zadán neplatný ročník"
