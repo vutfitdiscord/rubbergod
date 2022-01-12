@@ -124,11 +124,13 @@ class Exams(commands.Cog):
                                 embed.add_field(name=name, value=term_time, inline=False)
                         else:
                             # Classic terms
+                            whole_term_count = 0
                             for idx, col in enumerate(cols):
                                 terms = col.find_all("strong")
                                 times = col.find_all("em")
 
                                 number_of_terms = len(terms)
+                                whole_term_count += number_of_terms
 
                                 for idx2, (term, time) in enumerate(zip(terms, times)):
                                     term = str(term.contents[0]).replace(" ", "")
@@ -149,6 +151,10 @@ class Exams(commands.Cog):
                                         term_time = "~~" + term_time + "~~"
 
                                     embed.add_field(name=name, value=term_time)
+
+                            to_add = math.ceil(whole_term_count / 3) * 3 - whole_term_count
+                            for _ in range(to_add):
+                                embed.add_field(name='\u200b', value='\u200b')
 
                     pages.append(embed)
 
