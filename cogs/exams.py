@@ -59,7 +59,7 @@ class Exams(commands.Cog):
 
     year_url = f"https://minerva3.fit.vutbr.cz/rozvrhis/{semester}{cal_year}/zkousky/{year}"
     all_url = f"https://minerva3.fit.vutbr.cz/rozvrhis/{semester}{cal_year}/zkousky"
-    description = f"[{year}]({year_url})\n" if year else ""
+    description = f"[Odkaz na zkoušky ročníku]({year_url})\n" if year else ""
     description += f"[Odkaz na všechny zkoušky]({all_url})"
 
     title = f"Zkoušky {year} {semester}{cal_year}-{cal_year + 1}" \
@@ -72,6 +72,14 @@ class Exams(commands.Cog):
       try:
         table = soup.find("table", {"class": "exam"})
         body = table.find("tbody")
+
+        if body is None:
+          # There is no table so no terms
+          embed = discord.Embed(title=title, description=description,
+                                color=discord.Color.dark_blue())
+          utils.add_author_footer(embed, ctx.author)
+          return await ctx.send(embed=embed)
+
         exams = body.find_all("tr")
 
         number_of_exams = len(exams)
@@ -91,22 +99,56 @@ class Exams(commands.Cog):
 
             subject_tag = tag.find("strong").contents[0]
 
-            for idx, row in enumerate(rows):
-              termin = str(row.find("strong").contents[0]).replace(" ", "")
-              time_cont = ""
-              for c in row.find("em").contents: time_cont += str(c)
-              time_cont = time_cont.replace("<sup>", ":").replace("</sup>", "")
+            row_count = len(rows)
+            if row_count == 1:
+              # Support for credits
+              row = rows[0]
+              strong_tag = row.find("strong")
 
-              date_splits = termin.split(".")
-              termin_date = datetime.date(int(date_splits[2]), int(date_splits[1]), int(date_splits[0]))
+              if strong_tag is None:
+                # There is no term - Only text
+                embed.add_field(name=subject_tag, value=row.contents[0])
+              else:
+                term = str(strong_tag.contents[0]).replace(" ", "")
 
-              termin_name = f"{idx + 1}. {subject_tag}"
-              termin_time = f"{termin}\n{time_cont}"
-              if termin_date < datetime.date.today():
-                termin_name = "~~" + termin_name + "~~"
-                termin_time = "~~" + termin_time + "~~"
+                date_splits = term.split(".")
+                term_date = datetime.date(int(date_splits[2]), int(date_splits[1]),
+                                            int(date_splits[0]))
 
-              embed.add_field(name=termin_name, value=termin_time)
+                name = f"{subject_tag}"
+                term_time = f"{row.contents[0]}\n{term}"
+                if term_date < datetime.date.today():
+                  name = "~~" + name + "~~"
+                  term_time = "~~" + term_time + "~~"
+
+                embed.add_field(name=name, value=term_time)
+            else:
+              # Classic terms
+              for idx, row in enumerate(rows):
+                terms = row.find_all("strong")
+                times = row.find_all("em")
+
+                number_of_terms = len(terms)
+
+                for idx2, (term, time) in enumerate(zip(terms, times)):
+                  term = str(term.contents[0]).replace(" ", "")
+                  time_cont = ""
+                  for c in time.contents: time_cont += str(c)
+                  time_cont = time_cont.replace("<sup>", ":").replace("</sup>", "")
+
+                  date_splits = term.split(".")
+                  term_date = datetime.date(int(date_splits[2]), int(date_splits[1]),
+                                            int(date_splits[0]))
+
+                  name = f"{idx + 1}. {subject_tag}" if number_of_terms == 1 else \
+                                f"{idx + 1}.{idx2 + 1} {subject_tag}"
+
+                  term_time = f"{term}\n{time_cont}"
+                  if term_date < datetime.date.today():
+                    name = "~~" + name + "~~"
+                    term_time = "~~" + term_time + "~~"
+
+                  embed.add_field(name=name, value=term_time)
 
           pages.append(embed)
 
