@@ -28,6 +28,8 @@ class Exams(commands.Cog):
 
                 if match is not None:
                     rocnik = self.process_match(match)
+                    if rocnik is None:
+                        return await ctx.send(Messages.exams_no_valid_year)
                     return await self.process_exams(ctx, rocnik)
 
             await ctx.send(Messages.exams_no_valid_role)
@@ -35,6 +37,8 @@ class Exams(commands.Cog):
             match = re.match(rocnik_regex, rocnik)
             if match is not None:
                 rocnik = self.process_match(match)
+                if rocnik is None:
+                    return await ctx.send(Messages.exams_no_valid_year)
                 await self.process_exams(ctx, rocnik)
             else:
                 await ctx.send(Messages.exams_no_valid_year)
@@ -44,6 +48,9 @@ class Exams(commands.Cog):
         year = match.string[match.regs[0][0]: match.regs[0][1]]
         if year in ("4BIT", "3MIT"):
             year = str(int(year[0]) - 1) + year[1:]
+
+        if year == "4MIT":
+            return None
         return year
 
     async def process_exams(self, ctx:commands.Context, year:Union[str, None]):
