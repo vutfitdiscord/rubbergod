@@ -89,10 +89,8 @@ class PaginatorSession:
                 await action()
             except asyncio.TimeoutError:
                 self.running = False
-                try:
-                    await self.__close()
-                finally:
-                    break
+                await self.__close()
+                break
 
     async def __first_page(self):
         if self.current == 0: return
@@ -111,10 +109,9 @@ class PaginatorSession:
     async def __close(self):
         self.running = False
         try:
-            await self.message.clear_reactions()
-            await asyncio.sleep(5)
-
             if self.delete_after:
                 await self.message.delete()
+            else:
+                await self.message.clear_reactions()
         except:
             pass
