@@ -4,7 +4,6 @@ from repository.stream_links_repo import StreamLinksRepo
 from config import app_config, cooldowns
 from config.messages import Messages
 from typing import List, Union
-import shlex
 import utils
 from repository.database.stream_link import StreamLink
 import requests
@@ -33,10 +32,9 @@ class StreamLinks(commands.Cog):
     )
     async def streamlinks(self, ctx: commands.Context):
         if ctx.invoked_subcommand is None:
-            parameters = ctx.message.content[len('streamlinks') + 1:].strip()
-            params_arr = shlex.split(parameters)
-            if len(params_arr) == 1:
-                await self.get_streamlinks(ctx, params_arr[0])
+            parameters = ctx.message.content.split()
+            if len(parameters) == 2:
+                await self.get_streamlinks(ctx, parameters[1])
             else:
                 await ctx.reply(f"{utils.get_command_group_signature(ctx)}\n{ctx.command.brief}")
 
