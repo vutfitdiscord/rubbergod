@@ -58,6 +58,7 @@ class MemeRepost(commands.Cog):
 
             embed = discord.Embed(color=discord.Color.dark_blue(), title=title_string)
             utils.add_author_footer(embed, author=ctx.message.author)
+            embed.timestamp = ctx.message.created_at
 
             # Create link to original post
             link = utils.fill_message("meme_repost_link",
