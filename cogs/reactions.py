@@ -66,6 +66,8 @@ class Reaction(commands.Cog):
                     await cog.handle_reaction(ctx)
                 except sqlalchemy.exc.InternalError:
                     session.rollback()
+                except discord.errors.DiscordServerError:
+                    pass
 
 
 def setup(bot):

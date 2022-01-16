@@ -155,12 +155,15 @@ class Review(commands.Cog):
     @subject.command(brief=messages.subject_update_biref)
     async def update(self, ctx):
         """Updates subjects from web"""
+        programme_details_link = "https://www.fit.vut.cz/study/field/144"
         async with ctx.channel.typing():
-            if not self.rev.update_subject_types("https://www.fit.vut.cz/study/program/18/.cs", False):
+            # bachelor
+            if not self.rev.update_subject_types(f"{programme_details_link}51/.cs", False):
                 await ctx.send(messages.subject_update_error)
                 return
-            for id in range(31, 48):
-                if not self.rev.update_subject_types(f"https://www.fit.vut.cz/study/field/{id}/.cs", True):
+            # engineer
+            for id in range(66, 83):
+                if not self.rev.update_subject_types(f"{programme_details_link}{id}/.cs", True):
                     await ctx.send(messages.subject_update_error)
                     return
             await ctx.send(messages.subject_update_success)
@@ -549,7 +552,8 @@ class Review_helper:
         specialization = soup.select("main p strong")[0].get_text()
         full_specialization = soup.select("h1")[0].get_text()
 
-        if not review_repo.get_programme(specialization):
+        programmme_db = review_repo.get_programme(specialization)
+        if not programmme_db or programmme_db.link != link:
             review_repo.set_programme(specialization, full_specialization, link)
 
         sem = 1
