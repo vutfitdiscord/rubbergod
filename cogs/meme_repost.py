@@ -20,18 +20,56 @@ class MemeRepost(commands.Cog):
         self.repost_lock = asyncio.Lock()
 
     async def handle_reaction(self, ctx: ReactionContext):
-        # Message was reposted before
-        if self.repost_repo.find_repost_by_original_message_id(ctx.message.id) is not None:
+        if ctx.channel.id == Config.meme_room:
+            if self.repost_repo.find_repost_by_original_message_id(ctx.message.id) is not None:
+                # Message was reposted before
+                return
+
+            all_reactions: List[discord.Reaction] = ctx.message.reactions
+            for reac in all_reactions:
+                if reac.count >= Config.repost_threshold:
+                    emoji_key = str(reac.emoji.id) if type(reac.emoji) != str else reac.emoji
+                    emoji_val = self.karma_repo.emoji_value(emoji_key)
+
+                    if int(emoji_val) >= 1:
+                        return await self.__repost_message(ctx, all_reactions)
+        elif ctx.channel.id == Config.meme_repost_room:
+            repost = self.repost_repo.find_repost_by_repost_message_id(ctx.message.id)
+
+            if repost is not None:
+                if ctx.member.id == int(repost.author_id):
+                    return
+
+                original_post_user = ctx.guild.get_member(int(repost.author_id))
+
+                if original_post_user:
+                    if isinstance(ctx.emoji, str):
+                        self.karma_repo.karma_emoji(original_post_user, ctx.member, ctx.emoji)
+                    else:
+                        self.karma_repo.karma_emoji(original_post_user, ctx.member, ctx.emoji.id)
+
+    @commands.Cog.listener()
+    async def on_raw_reaction_remove(self, payload):
+        ctx: ReactionContext = await ReactionContext.from_payload(self.bot, payload)
+        if ctx is None:
             return
 
-        all_reactions: List[discord.Reaction] = ctx.message.reactions
-        for reac in all_reactions:
-            if reac.count >= Config.repost_threshold:
-                emoji_key = str(reac.emoji.id) if type(reac.emoji) != str else reac.emoji
-                emoji_val = self.karma_repo.emoji_value(emoji_key)
+        if ctx.channel.id != Config.meme_repost_room:
+            return
 
-                if int(emoji_val) >= 1:
-                    return await self.__repost_message(ctx, all_reactions)
+        repost = self.repost_repo.find_repost_by_repost_message_id(ctx.message.id)
+        if repost is not None:
+
+            if ctx.member.id == int(repost.author_id):
+                return
+
+            original_post_user = ctx.guild.get_member(int(repost.author_id))
+
+            if original_post_user:
+                if isinstance(ctx.emoji, str):
+                    self.karma_repo.karma_emoji_remove(original_post_user, ctx.member, ctx.emoji)
+                else:
+                    self.karma_repo.karma_emoji_remove(original_post_user, ctx.member, ctx.emoji.id)
 
     async def __repost_message(self, ctx: ReactionContext,
                                reactions: List[discord.Reaction]):
