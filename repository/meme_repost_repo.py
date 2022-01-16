@@ -5,7 +5,13 @@ from typing import Union
 class MemeRepostRepo:
     @staticmethod
     def find_repost_by_original_message_id(message_id:int) -> Union[MemeRepost, None]:
-        return session.query(MemeRepost).filter(MemeRepost.original_message_id == str(message_id)).one_or_none()
+        return session.query(MemeRepost).filter(
+            MemeRepost.original_message_id == str(message_id)).one_or_none()
+
+    @staticmethod
+    def find_repost_by_repost_message_id(message_id: int) -> Union[MemeRepost, None]:
+        return session.query(MemeRepost).filter(
+            MemeRepost.reposted_message_id == str(message_id)).one_or_none()
 
     @staticmethod
     def create_repost(original_message_id:int, repost_message_id:int, author_id:int, secondary_repost_message_id:int=None):

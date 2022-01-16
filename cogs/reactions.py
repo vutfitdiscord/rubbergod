@@ -55,7 +55,8 @@ class Reaction(commands.Cog):
         ):
             cogs.append(self.bot.get_cog("StreamLinks"))
 
-        if ctx.channel.id == Config.meme_room:
+        if (ctx.channel.id == Config.meme_room or ctx.channel.id == Config.meme_repost_room) and \
+                ctx.message.author.id != ctx.member.id:
             cogs.append(self.bot.get_cog("MemeRepost"))
 
         for cog in cogs:
