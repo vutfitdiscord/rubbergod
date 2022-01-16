@@ -64,8 +64,8 @@ class Exams(commands.Cog):
         if semester == "ZS":
             cal_year -= 1
 
-        year_url = f"https://minerva3.fit.vutbr.cz/rozvrhis/{semester}{cal_year}/zkousky/{year}"
         all_url = f"https://minerva3.fit.vutbr.cz/rozvrhis/{semester}{cal_year}/zkousky"
+        year_url = f"{all_url}/{year}"
         description = f"[Odkaz na zkoušky ročníku]({year_url})\n" if year else ""
         description += f"[Odkaz na všechny zkoušky]({all_url})"
 
