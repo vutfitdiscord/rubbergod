@@ -130,9 +130,6 @@ class MemeRepost(commands.Cog):
                                 main_image = content_split
                             else:
                                 more_images = True
-                        else:
-                            if len(content_split) < 1023:
-                                attachment_urls.append(content_split)
 
                 content = ctx.message.content[:900]
                 if more_images:
