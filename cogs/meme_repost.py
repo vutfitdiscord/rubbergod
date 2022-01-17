@@ -121,6 +121,19 @@ class MemeRepost(commands.Cog):
 
             # Set content from original message if present
             if ctx.message.content:
+                content_splits = ctx.message.split(" ")
+                for content_split in content_splits:
+                    if content_split.startswith("https://media.discordapp.net/attachments/"):
+                        # Its attachement URL
+                        if ".png" in content_split:
+                            if main_image is None:
+                                main_image = content_split
+                            else:
+                                more_images = True
+                        else:
+                            if len(content_split) < 1023:
+                                attachment_urls.append(content_split)
+
                 content = ctx.message.content[:900]
                 if more_images:
                     content += "\n\nVíce obrázků v původním postu"
@@ -130,7 +143,10 @@ class MemeRepost(commands.Cog):
 
             # Set main image if present
             if main_image is not None:
-                embed.set_image(url=f"attachment://{main_image.filename}")
+                if isinstance(main_image, discord.File):
+                    embed.set_image(url=f"attachment://{main_image.filename}")
+                elif isinstance(main_image, str):
+                    embed.set_image(url=main_image)
 
             # Add all attachments as fields
             for idx, attachment_url in enumerate(attachment_urls):
