@@ -95,6 +95,7 @@ class Karma(commands.Cog):
             ctx.member.id != ctx.message.author.id
             and ctx.guild.id == config.guild_id
             and ctx.message.channel.id not in config.karma_banned_channels
+            and ctx.message.channel.id != config.meme_repost_room
             and config.karma_ban_role_id not in map(lambda x: x.id, ctx.member.roles)
         ):
             if isinstance(ctx.emoji, str):
@@ -112,6 +113,7 @@ class Karma(commands.Cog):
             ctx.member.id != ctx.message.author.id
             and ctx.guild.id == config.guild_id
             and ctx.message.channel.id not in config.karma_banned_channels
+            and ctx.message.channel.id != config.meme_repost_room
             and config.karma_ban_role_id not in map(lambda x: x.id, ctx.member.roles)
         ):
             if isinstance(ctx.emoji, str):
