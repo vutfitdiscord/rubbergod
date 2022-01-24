@@ -21,18 +21,24 @@ class Exams(commands.Cog):
     @commands.command(brief=Messages.exams_brief, aliases=["zkousky"])
     async def exams(self, ctx:commands.Context, rocnik:Union[str, None]=None):
         if rocnik is None:
-            user_roles: List[discord.Role] = ctx.author.roles
+            if isinstance(ctx.author, discord.Member):
+                user_roles: List[discord.Role] = ctx.author.roles
 
-            for role in user_roles:
-                match = re.match(rocnik_regex, role.name)
+                for role in user_roles:
+                    match = re.match(rocnik_regex, role.name)
 
-                if match is not None:
-                    rocnik = self.process_match(match)
-                    if rocnik is None:
-                        return await ctx.send(Messages.exams_no_valid_year)
-                    return await self.process_exams(ctx, rocnik)
+                    if match is not None:
+                        rocnik = self.process_match(match)
+                        if rocnik is None:
+                            return await ctx.send(Messages.exams_no_valid_year)
+                        return await self.process_exams(ctx, rocnik)
 
-            await ctx.send(Messages.exams_no_valid_role)
+                await ctx.send(Messages.exams_no_valid_role)
+            else:
+                try:
+                    await ctx.send(Messages.exams_specify_year)
+                except:
+                    pass
         else:
             match = re.match(rocnik_regex, rocnik)
             if match is not None:

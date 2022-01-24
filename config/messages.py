@@ -391,5 +391,6 @@ class Messages:
 
     exams_brief = f"{prefix}exams [rocnik] pro zobrazení zkoušek pro daný ročník a nebo bez ročníku pro ročník podle role"
     exams_no_valid_role = "Nebyla nalezena ročníková role"
+    exams_specify_year = "Specifikuj ročník"
     exams_no_valid_year = "Byl zadán neplatný ročník"
     exams_parsing_failed = "Parsing stránky selhal, nahlaš chybu správci bota"
