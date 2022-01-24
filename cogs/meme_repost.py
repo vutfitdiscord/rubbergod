@@ -7,7 +7,6 @@ from repository.meme_repost_repo import MemeRepostRepo
 from typing import List, Union
 import utils
 import asyncio
-import re
 
 class MemeRepost(commands.Cog):
     def __init__(self, bot):
