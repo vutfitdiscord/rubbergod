@@ -8,7 +8,7 @@ from bs4 import BeautifulSoup
 import math
 
 from features.paginator import PaginatorSession
-from config.app_config import Config as config
+from config.app_config import config
 from config.messages import Messages
 import utils
 
