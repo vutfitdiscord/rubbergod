@@ -93,7 +93,7 @@ class DynamicConfig(commands.Cog):
         """
         config_path = os.path.dirname(__file__)[:-4] + "config/config_backup_"
         config_path += str(datetime.now().date()) + ".toml"
-        with open(config_path, "w+") as fd:
+        with open(config_path, "w+", encoding="utf-8") as fd:
             toml.dump(config.toml_dict, fd)
         await ctx.send(Messages.config_backup_created)
 
@@ -109,7 +109,7 @@ class DynamicConfig(commands.Cog):
                         config.toml_dict[section][key] = template[section][key]
             else:
                 config.toml_dict[section] = template[section]
-        with open(config_path, "w+") as fd:
+        with open(config_path, "w+", encoding="utf-8") as fd:
             toml.dump(config.toml_dict, fd)
         load_config()
         await ctx.send(Messages.config_synced)
@@ -164,7 +164,7 @@ class DynamicConfig(commands.Cog):
             await ctx.send(Messages.config_wrong_key)
             return
         setattr(config, key, value)
-        with open(config_path, "w+") as fd:
+        with open(config_path, "w+", encoding="utf-8") as fd:
             toml.dump(config.toml_dict, fd)
         await ctx.send(Messages.config_updated)
 
