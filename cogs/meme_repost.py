@@ -120,7 +120,7 @@ class MemeRepost(commands.Cog):
 
             # Set content from original message if present
             if ctx.message.content:
-                content_splits = ctx.message.split(" ")
+                content_splits = ctx.message.content.split(" ")
                 for content_split in content_splits:
                     if content_split.startswith("https://media.discordapp.net/attachments/"):
                         # Its attachement URL
