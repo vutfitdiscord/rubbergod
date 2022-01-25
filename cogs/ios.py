@@ -1,7 +1,7 @@
 import discord
 from discord.ext import commands, tasks
 from config import cooldowns
-from config.app_config import Config
+from config.app_config import config
 from repository.database import session
 from repository.database.verification import Permit, Valid_person
 from features.list_message_sender import send_list_of_messages
@@ -235,7 +235,7 @@ class IOS(commands.Cog):
     async def ios_cancel(self, ctx):
         self.ios_body.cancel()
 
-    @tasks.loop(minutes=Config.ios_looptime_minutes)
+    @tasks.loop(minutes=config.ios_looptime_minutes)
     async def ios_body(self, channel=discord.Object(id='534431057001316362')):
         process = subprocess.Popen(["ssh", "merlin"], stdout=subprocess.PIPE)
         output, _ = process.communicate()

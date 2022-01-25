@@ -1,7 +1,7 @@
 import discord
 from discord.ext.commands import Bot
 from typing import Union
-from config.app_config import Config
+from config.app_config import config
 
 
 class ReactionContext():
@@ -29,7 +29,7 @@ class ReactionContext():
         if channel.type is discord.ChannelType.text:
             guild = channel.guild
         else:
-            guild = bot.get_guild(Config.guild_id)
+            guild = bot.get_guild(config.guild_id)
             if guild is None:
                 raise Exception("Nemůžu najít guildu podle config.guild_id")
 

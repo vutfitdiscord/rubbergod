@@ -20,9 +20,7 @@ from sqlalchemy.orm.query import Query
 from sqlalchemy.schema import Table
 
 import utils
-from config import app_config
-
-config = app_config.Config()
+from config.app_config import config
 
 DatabasePage = Iterable[Table]
 

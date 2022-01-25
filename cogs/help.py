@@ -2,10 +2,9 @@ import asyncio
 import discord
 from discord.ext import commands
 
-from config import app_config as config, cooldowns
+from config.app_config import config
+from config import cooldowns
 from features.git import Git
-
-config = config.Config
 
 
 class Help(commands.Cog):

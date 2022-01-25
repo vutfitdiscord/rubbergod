@@ -7,16 +7,15 @@ from discord.ext import commands
 
 
 import utils
-from config import app_config as config, cooldowns
+from config.app_config import config
+from config import cooldowns
 from features import verification
 from repository import user_repo
-from repository.database import database, session
+from repository.database import session
 from repository.database.verification import Valid_person, Permit
-from repository.database.year_increment import User_backup
 
 user_r = user_repo.UserRepository()
 
-config = config.Config
 arcas_time = (datetime.datetime.utcnow() -
               datetime.timedelta(hours=config.arcas_delay))
 

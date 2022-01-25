@@ -9,10 +9,9 @@ import discord
 from discord.ext import commands
 
 import utils
-from config import app_config as config, messages, cooldowns
-
-config = config.Config
-messages = messages.Messages
+from config.app_config import config
+from config.messages import Messages as messages
+from config import cooldowns
 
 uhoh_counter = 0
 storno_time = datetime.datetime.utcnow() - datetime.timedelta(hours=config.storno_delay)

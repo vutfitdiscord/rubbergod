@@ -8,7 +8,7 @@ from bs4 import BeautifulSoup
 import math
 
 from features.paginator import PaginatorSession
-from config.app_config import Config as config
+from config.app_config import config
 from config.messages import Messages
 import utils
 
@@ -25,7 +25,7 @@ class Exams(commands.Cog):
                 user_roles: List[discord.Role] = ctx.author.roles
 
                 for role in user_roles:
-                    match = re.match(rocnik_regex, role.name)
+                    match = re.match(rocnik_regex, role.name.upper())
 
                     if match is not None:
                         rocnik = self.process_match(match)
@@ -40,7 +40,8 @@ class Exams(commands.Cog):
                 except:
                     pass
         else:
-            match = re.match(rocnik_regex, rocnik)
+            match = re.match(rocnik_regex, rocnik.upper())
+
             if match is not None:
                 rocnik = self.process_match(match)
                 if rocnik is None:

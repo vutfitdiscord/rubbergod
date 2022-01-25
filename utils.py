@@ -6,7 +6,7 @@ import math
 from discord import Member, PartialEmoji, Emoji
 from discord.ext import commands
 
-from config.app_config import Config
+from config.app_config import config
 from config.messages import Messages
 
 
@@ -83,7 +83,7 @@ def pagination_next(emoji, page, max_page):
 
 
 def is_bot_admin(ctx: commands.Context):
-    return ctx.author.id in Config.admin_ids
+    return ctx.author.id in config.admin_ids
 
 
 def cut_string(string: str, part_len: int):
@@ -106,13 +106,13 @@ class NotHelperPlusError(commands.CommandError):
 
 
 def helper_plus(ctx):
-    allowed_roles = {Config.mod_role, Config.submod_role, Config.helper_role}
-    guild = ctx.bot.get_guild(Config.guild_id)
+    allowed_roles = {config.mod_role, config.submod_role, config.helper_role}
+    guild = ctx.bot.get_guild(config.guild_id)
     user = guild.get_member(ctx.author.id)
     for role in user.roles:
         if role.id in allowed_roles:
             return True
-    if ctx.author.id in Config.admin_ids:
+    if ctx.author.id in config.admin_ids:
         return True
     raise NotHelperPlusError
 
@@ -217,7 +217,7 @@ def is_command_message(cmd: str, msg: str, require_space=True) -> bool:
     cmd = cmd.strip()
     msg_len = len(msg)
 
-    for prefix in Config.command_prefix:
+    for prefix in config.command_prefix:
         cmd_p = f"{prefix}{cmd}"
         cmd_p_len = len(cmd_p)
 

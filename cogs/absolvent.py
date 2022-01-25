@@ -7,7 +7,7 @@ from lxml import etree
 import re
 
 from repository import user_repo
-from config.app_config import Config
+from config.app_config import config
 from config.messages import Messages
 import utils
 
@@ -180,12 +180,12 @@ class Absolvent(commands.Cog):
             await ctx.send(Messages.absolvent_diploma_error)
             return
 
-        guild = self.bot.get_guild(Config.guild_id)
+        guild = self.bot.get_guild(config.guild_id)
         role = None
         if degree == "Bc.":
-            role = discord.utils.get(guild.roles, id=Config.bc_role_id)
+            role = discord.utils.get(guild.roles, id=config.bc_role_id)
         if degree == "Ing.":
-            role = discord.utils.get(guild.roles, id=Config.ing_role_id)
+            role = discord.utils.get(guild.roles, id=config.ing_role_id)
         if role:
             member = guild.get_member(ctx.author.id)
             for drop_role in member.roles:

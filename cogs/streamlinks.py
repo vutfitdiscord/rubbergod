@@ -1,7 +1,8 @@
 import discord
 from discord.ext import commands
 from repository.stream_links_repo import StreamLinksRepo
-from config import app_config, cooldowns
+from config import cooldowns
+from config.app_config import config
 from config.messages import Messages
 from typing import List, Union
 import utils
@@ -24,7 +25,6 @@ class StreamLinks(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.repo = StreamLinksRepo()
-        self.config = app_config.Config
 
     @cooldowns.default_cooldown
     @commands.group(brief=Messages.streamlinks_brief, usage="<subject>",
@@ -54,7 +54,7 @@ class StreamLinks(commands.Cog):
     async def add(self, ctx: commands.Context, subject: str, link: str,
                   user: Union[discord.User, discord.Member, str], *args):
         try:
-            await ctx.message.add_reaction(self.config.emote_loading)
+            await ctx.message.add_reaction(config.emote_loading)
 
             username = user if type(user) == str else user.display_name
             link = utils.clear_link_escape(link)
@@ -115,7 +115,7 @@ class StreamLinks(commands.Cog):
         embed.add_field(name="Popis", value=stream.description)
         embed.add_field(name="Odkaz", value=f"[{stream.link}]({stream.link})", inline=False)
         embed.timestamp = datetime.utcnow()
-        channel = self.bot.get_channel(self.config.log_channel)
+        channel = self.bot.get_channel(config.log_channel)
         await channel.send(embed=embed)
 
     @commands.check(utils.helper_plus)

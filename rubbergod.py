@@ -8,7 +8,7 @@ from discord_slash import SlashCommand
 
 import utils
 from config.messages import Messages
-from config.app_config import Config
+from config.app_config import config
 from features import presence
 
 import repository.db_migrations as migrations
@@ -40,7 +40,6 @@ elif args.init_db:
     print("Init complete")
     exit(0)
 
-config = Config
 is_initialized = False
 
 intents = Intents.none()

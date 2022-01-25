@@ -1,13 +1,12 @@
 from discord.ext import commands
-from config import app_config as config, cooldowns
+from config.app_config import config
+from config import cooldowns
 from features import verification
 from repository import user_repo
 from config.messages import Messages
 
 
 user_r = user_repo.UserRepository()
-
-config = config.Config
 
 
 class Verify(commands.Cog):

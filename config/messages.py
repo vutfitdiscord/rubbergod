@@ -1,8 +1,8 @@
-from config.app_config import Config
+from config.app_config import config
 
 
 class Messages:
-    prefix = Config.default_prefix
+    prefix = config.default_prefix
 
     server_warning = "Tohle funguje jen na VUT FIT serveru."
     karma_get_missing = "Toaster pls, měl jsi bordel v DB. Musel jsem za tebe uklidit."

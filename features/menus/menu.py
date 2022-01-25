@@ -5,10 +5,8 @@ from discord import Message
 from discord.ext.commands import Bot, Context
 from discord.ext.menus import button, Last, First
 
-from config.app_config import Config
+from config.app_config import config
 from features.menus.base import BlockingPagedMenu, MemberLike
-
-config = Config()
 
 
 class AuthorOnlyPagedMenu(BlockingPagedMenu, inherit_buttons=False):

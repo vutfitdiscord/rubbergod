@@ -1,7 +1,7 @@
 import discord
 from discord.ext import commands
 from features.reaction_context import ReactionContext
-from config.app_config import Config
+from config.app_config import config
 from repository.karma_repo import KarmaRepository
 from repository.meme_repost_repo import MemeRepostRepo
 from typing import List, Union
@@ -19,20 +19,20 @@ class MemeRepost(commands.Cog):
         self.repost_lock = asyncio.Lock()
 
     async def handle_reaction(self, ctx: ReactionContext):
-        if ctx.channel.id == Config.meme_room:
+        if ctx.channel.id == config.meme_room:
             if self.repost_repo.find_repost_by_original_message_id(ctx.message.id) is not None:
                 # Message was reposted before
                 return
 
             all_reactions: List[discord.Reaction] = ctx.message.reactions
             for reac in all_reactions:
-                if reac.count >= Config.repost_threshold:
+                if reac.count >= config.repost_threshold:
                     emoji_key = str(reac.emoji.id) if type(reac.emoji) != str else reac.emoji
                     emoji_val = self.karma_repo.emoji_value(emoji_key)
 
                     if int(emoji_val) >= 1:
                         return await self.__repost_message(ctx, all_reactions)
-        elif ctx.channel.id == Config.meme_repost_room:
+        elif ctx.channel.id == config.meme_repost_room:
             repost = self.repost_repo.find_repost_by_repost_message_id(ctx.message.id)
 
             if repost is not None:
@@ -53,7 +53,7 @@ class MemeRepost(commands.Cog):
         if ctx is None:
             return
 
-        if ctx.channel.id != Config.meme_repost_room:
+        if ctx.channel.id != config.meme_repost_room:
             return
 
         repost = self.repost_repo.find_repost_by_repost_message_id(ctx.message.id)
@@ -72,8 +72,8 @@ class MemeRepost(commands.Cog):
 
     async def __repost_message(self, ctx: ReactionContext,
                                reactions: List[discord.Reaction]):
-        if self.repost_channel is None and Config.meme_repost_room != 0:
-            self.repost_channel = await self.bot.fetch_channel(Config.meme_repost_room)
+        if self.repost_channel is None and config.meme_repost_room != 0:
+            self.repost_channel = await self.bot.fetch_channel(config.meme_repost_room)
 
         # Invalid ID
         if self.repost_channel is None:
@@ -100,7 +100,7 @@ class MemeRepost(commands.Cog):
             # Create link to original post
             link = utils.fill_message("meme_repost_link",
                                       original_message_url=ctx.message.jump_url,
-                                      original_channel=Config.meme_room)
+                                      original_channel=config.meme_room)
             embed.add_field(name="Link", value=link, inline=False)
 
             # Get all attachments of original post

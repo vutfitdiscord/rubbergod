@@ -3,7 +3,7 @@ from discord.ext import commands
 from typing import Tuple, Union, List
 
 import utils
-from config.app_config import Config
+from config.app_config import config
 
 # TODO: use messages
 from config.messages import Messages
@@ -22,7 +22,7 @@ class ReactToRole(commands.Cog):
         if message.author.bot:
             return
 
-        if message.channel.id in Config.role_channels:
+        if message.channel.id in config.role_channels:
             role_data = await self.get_join_role_data(message)
             await self.message_role_reactions(message, role_data)
 
@@ -41,7 +41,7 @@ class ReactToRole(commands.Cog):
         if ctx is None:
             return
 
-        if ctx.channel.id in Config.role_channels:
+        if ctx.channel.id in config.role_channels:
             role_data = await self.get_join_role_data(ctx.message)
             for line in role_data:
                 if str(ctx.emoji) == line[1]:
@@ -64,7 +64,7 @@ class ReactToRole(commands.Cog):
                 out = [out[1], out[0]]
                 output.append(out)
             except Exception:
-                if message.channel.id not in Config.role_channels:
+                if message.channel.id not in config.role_channels:
                     msg = utils.fill_message(
                         "role_invalid_line", user=message.author.id, line=discord.utils.escape_mentions(line)
                     )
@@ -78,7 +78,7 @@ class ReactToRole(commands.Cog):
                 try:
                     line[0] = int(line[0])
                 except Exception:
-                    if message.channel.id not in Config.role_channels:
+                    if message.channel.id not in config.role_channels:
                         msg = utils.fill_message(
                             "role_invalid_line",
                             user=message.author.id,
@@ -91,7 +91,7 @@ class ReactToRole(commands.Cog):
     async def message_role_reactions(self, message, data):
         if message.channel.type is not discord.ChannelType.text:
             await message.channel.send(Messages.role_not_on_server)
-            guild = self.bot.get_guild(Config.guild_id)
+            guild = self.bot.get_guild(config.guild_id)
         else:
             guild = message.guild
         for line in data:

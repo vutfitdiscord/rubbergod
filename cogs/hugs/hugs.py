@@ -1,16 +1,15 @@
-from functools import partial, lru_cache
+from functools import lru_cache
 from random import choice
 
 import discord
 from discord.ext import commands
 
 import utils
-from config import app_config, cooldowns
+from config.app_config import config
+from config import cooldowns
 from repository.hugs_repo import HugsRepository
 from .menus import get_hugboard_menu, get_top_huggers_menu, get_top_hugged_menu
 from .. import room_check
-
-config = app_config.Config
 
 
 class Hugs(commands.Cog):

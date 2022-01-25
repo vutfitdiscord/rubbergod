@@ -5,12 +5,12 @@ from discord.ext import commands
 import requests
 import asyncio
 
-from config import app_config as config, messages, cooldowns
+from config.app_config import config
+from config.messages import Messages as messages
+from config import cooldowns
 from repository import review_repo
 import utils
 
-config = config.Config
-messages = messages.Messages
 review_repo = review_repo.ReviewRepository()
 
 

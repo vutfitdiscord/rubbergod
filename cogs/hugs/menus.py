@@ -1,4 +1,3 @@
-from config import app_config
 from features.menus import AuthorOnlyPagedMenu
 from features.menus.source import LeaderboardPageSource
 from features.menus.util import make_pts_column_row_formatter, base_leaderboard_format_str
@@ -7,7 +6,6 @@ from repository.hugs_repo import HugsRepository
 
 
 
-config = app_config.Config
 hugs_repo = HugsRepository()
 
 

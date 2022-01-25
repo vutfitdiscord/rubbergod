@@ -5,7 +5,8 @@ import utils
 import re
 import datetime
 import math
-from config import app_config as config, messages, cooldowns
+from config.app_config import config
+from config import messages, cooldowns
 from features import karma
 from repository import karma_repo
 from cogs import room_check
@@ -13,7 +14,6 @@ from features.reaction_context import ReactionContext
 
 
 karma_r = karma_repo.KarmaRepository()
-config = config.Config
 messages = messages.Messages
 
 
