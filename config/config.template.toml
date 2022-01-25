@@ -75,7 +75,8 @@ channels = [591384273051975683, 622202824377237504, 623290691774316574]
 [meme_repost]
 meme_room = 0
 meme_repost_room = 0
-repost_threshold = 20
+repost_threshold = 50
+image_extensions = ["png", "jpg"]
 
 [meme]
 uhoh_string = 'uh oh'

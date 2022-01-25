@@ -99,6 +99,7 @@ class Config:
     meme_room: int = get_attr(toml_dict, "meme_repost", "meme_room")
     meme_repost_room: int = get_attr(toml_dict, "meme_repost", "meme_repost_room")
     repost_threshold: int = get_attr(toml_dict, "meme_repost", "repost_threshold")
+    meme_repost_image_extensions: list = get_attr(toml_dict, "meme_repost", "image_extensions")
 
     # Bot rooms
     allowed_channels: List[int] = eval_channels(toml_dict, get_attr(toml_dict, "channels", "allowed_channels"))
