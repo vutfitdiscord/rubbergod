@@ -145,6 +145,9 @@ class MemeRepost(commands.Cog):
                     embed.set_image(url=f"attachment://{main_image.filename}")
                 elif isinstance(main_image, str):
                     embed.set_image(url=main_image)
+                    main_image = None
+                else:
+                    main_image = None
 
             # Add all attachments as fields
             for idx, attachment_url in enumerate(attachment_urls):
