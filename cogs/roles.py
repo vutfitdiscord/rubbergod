@@ -138,11 +138,13 @@ class ReactToRole(commands.Cog):
                 if perms_for.administrator or perms_for.view_channel:  # Is mod, or now have access. Ignore
                     continue
 
-                if not perms.is_empty():
-                    perms.read_messages = True
-                    await channel.set_permissions(member, overwrite=perms)
-                else:
-                    await channel.set_permissions(member, read_messages=True)
+                current_perms = channel.permissions_for(member)
+                if not current_perms.read_messages:
+                    if not perms.is_empty():
+                        perms.read_messages = True
+                        await channel.set_permissions(member, overwrite=perms)
+                    else:
+                        await channel.set_permissions(member, read_messages=True)
 
     async def remove_perms(self, target, member: discord.Member, guild):
         """Remove a target role / channel from a member."""
@@ -159,8 +161,8 @@ class ReactToRole(commands.Cog):
                 continue  # User have administrator permission and it's useless do some operation.
 
             overwrite = channel.overwrites_for(member)
-            if overwrite.is_empty():
-                continue  # Overwrite not found. User maybe have access from role.
+            #if overwrite.is_empty():
+            #    continue  # Overwrite not found. User maybe have access from role.
 
             if overwrite != discord.PermissionOverwrite(read_messages=True):
                 # Member have extra permissions and we don't want remove it.
