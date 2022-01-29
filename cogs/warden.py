@@ -111,7 +111,7 @@ class Warden(commands.Cog):
     @commands.guild_only()
     @commands.max_concurrency(1, per=commands.BucketType.default, wait=False)
     @commands.bot_has_permissions(read_message_history=True)
-    @scan.command(name="history", brief=messages.Messages.warden_scan_brief)
+    @scan.command(name="history", brief=messages.warden_scan_brief)
     async def scan_history(self, ctx, limit):
         """Scan current channel for images and save them as hashes
         limit: [all | <int>]
