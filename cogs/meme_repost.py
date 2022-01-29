@@ -122,15 +122,16 @@ class MemeRepost(commands.Cog):
             if ctx.message.content:
                 content_splits = ctx.message.content.split(" ")
                 for content_split in content_splits:
-                    if content_split.startswith("https://media.discordapp.net/attachments/"):
+                    if content_split.startswith("https://"):
                         # Its attachement URL
                         for extension in config.meme_repost_image_extensions:
-                            if f".{extension}?" in content_split:
+                            # Check for extension in URL
+                            if f".{extension}" in content_split:
                                 if main_image is None:
                                     main_image = content_split
                                 else:
                                     more_images = True
-                            break
+                                break
 
                 content = ctx.message.content[:900]
                 if more_images:
