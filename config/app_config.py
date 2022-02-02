@@ -160,6 +160,7 @@ class Config:
     # wordle
     wordle_spoil_hour: int = get_attr(toml_dict, "wordle", "autospoil_hour")
     wordle_spoil_minute: int = get_attr(toml_dict, "wordle", "autospoil_minute")
+    wordle_solutions: List[str] = get_attr(toml_dict, "wordle", "solutions")
 
 config = Config()
 
