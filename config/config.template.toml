@@ -27,7 +27,7 @@ db_string = "postgresql://postgres:postgres@db:5432/postgres"
 [cogs]
 extensions = ['base', 'karma', 'meme', 'random', 'verify', 'fitwide', 'autopin', 'urban', 'help',
     'acl', 'review', 'vote', 'kachna', 'name_day', 'week', 'weather', 'roles', 'error', 'absolvent', 'pet', 'reactions',
-    'streamlinks']
+    'streamlinks', 'wordle']
 
 [config]
 static = ['config_static', 'toml_dict', 'key', 'weather_token', 'db_string']
@@ -62,6 +62,7 @@ bot_dev_channel = 597009137905303552
 vote_room = 461544375105749003
 bot_room = 461549842896781312
 mod_room = 505679727936143361
+games_room = 489179004901785610
 
 allowed_channels = [
         'bot_room',
@@ -179,3 +180,8 @@ subscribable_channels = [0]
 [exams]
 page_size = 6
 paginator_duration = 60
+
+[wordle]
+# 23:55
+autospoil_hour = 23
+autospoil_minute = 55

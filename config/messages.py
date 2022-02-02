@@ -394,3 +394,7 @@ class Messages:
     exams_specify_year = "Specifikuj ročník"
     exams_no_valid_year = "Byl zadán neplatný ročník"
     exams_parsing_failed = "Parsing stránky selhal, nahlaš chybu správci bota"
+
+    wordle_spoil_tomorrow = "Zítřejší řešení Wordle #{number} je `{solution}` <:FeelsOkayMan:589472434147688480>"
+    wordle_spoil_today = "Dnešní řešení Wordle #{number} je `{solution}` <:FeelsOkayMan:589472434147688480>"
+    wordle_spoil_brief = "Vynutí vyspoilování dnešního Wordle v games roomce"

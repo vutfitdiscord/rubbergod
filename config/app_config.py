@@ -94,6 +94,7 @@ class Config:
     vote_room: int = get_attr(toml_dict, "channels", "vote_room")
     bot_room: int = get_attr(toml_dict, "channels", "bot_room")
     mod_room: int = get_attr(toml_dict, "channels", "mod_room")
+    games_room: int = get_attr(toml_dict, "channels", "games_room")
 
     # Meme repost
     meme_room: int = get_attr(toml_dict, "meme_repost", "meme_room")
@@ -155,6 +156,10 @@ class Config:
     # exams
     exams_page_size:int = get_attr(toml_dict, "exams", "page_size")
     exams_paginator_duration = get_attr(toml_dict, "exams", "paginator_duration")
+
+    # wordle
+    wordle_spoil_hour: int = get_attr(toml_dict, "wordle", "autospoil_hour")
+    wordle_spoil_minute: int = get_attr(toml_dict, "wordle", "autospoil_minute")
 
 config = Config()
 
