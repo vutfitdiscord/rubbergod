@@ -6,9 +6,10 @@ from config import cooldowns
 import datetime
 import asyncio
 import utils
+from typing import Tuple, Optional
 
 
-def get_wordle_solution(forward_days: int = 0) -> (int, str):
+def get_wordle_solution(forward_days: int = 0) -> Optional[Tuple[int, str]]:
     """
     Returns today's (if forward_days = 0) or other Wordle number and solution
     If forward_days is not 0, returns solution for Wordle #(today + forward_days)
@@ -16,6 +17,8 @@ def get_wordle_solution(forward_days: int = 0) -> (int, str):
     epoch = datetime.date(2021, 6, 19)  # Wordles start counting from this date
     wanted = datetime.date.today() + datetime.timedelta(days=forward_days)
     wordle_number = (wanted - epoch).days
+    if wordle_number < 0 or wordle_number >= len(config.wordle_solutions):
+        return None # No solution found
     return wordle_number, config.wordle_solutions[wordle_number]
 
 
@@ -53,6 +56,9 @@ class Wordle(commands.Cog):
             if self.games_channel is None:
                 return
         solution = get_wordle_solution(1)  # tomorrow
+        if solution is None:
+            self.spoil_job.cancel()
+            return
         await self.games_channel.edit(name=f'games-{solution[0]}-{solution[1]}')
         await self.games_channel.send(
             messages.wordle_spoil_tomorrow.format(number=solution[0],
@@ -74,6 +80,9 @@ class Wordle(commands.Cog):
             if self.games_channel is None:
                 return
         solution = get_wordle_solution()
+        if solution is None:
+            await ctx.send(messages.wordle_no_solution)
+            return
         await self.games_channel.edit(name=f'games-{solution[0]}-{solution[1]}')
         await self.games_channel.send(
             messages.wordle_spoil_today.format(number=solution[0],

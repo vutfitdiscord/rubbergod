@@ -398,3 +398,4 @@ class Messages:
     wordle_spoil_tomorrow = "Zítřejší řešení Wordle #{number} je `{solution}` <:feelsOkayMan:589472434147688480>"
     wordle_spoil_today = "Dnešní řešení Wordle #{number} je `{solution}` <:feelsOkayMan:589472434147688480>"
     wordle_spoil_brief = "Vynutí vyspoilování dnešního Wordle v games roomce"
+    wordle_no_solution = "Nepodařilo se najít dnešní řešení Wordle <:FeelsBadMan:572418927980707851>"
