@@ -10,6 +10,7 @@ from config.messages import Messages as messages
 from config import cooldowns
 from repository import review_repo
 import utils
+from features import sports
 
 review_repo = review_repo.ReviewRepository()
 
@@ -155,17 +156,23 @@ class Review(commands.Cog):
     @subject.command(brief=messages.subject_update_biref)
     async def update(self, ctx):
         """Updates subjects from web"""
-        programme_details_link = "https://www.fit.vut.cz/study/field/144"
+        programme_details_link = "https://www.fit.vut.cz/study/field/"
         async with ctx.channel.typing():
             # bachelor
-            if not self.rev.update_subject_types(f"{programme_details_link}51/.cs", False):
+            if not self.rev.update_subject_types(f"{programme_details_link}14451/.cs", False):
                 await ctx.send(messages.subject_update_error)
                 return
             # engineer
-            for id in range(66, 83):
-                if not self.rev.update_subject_types(f"{programme_details_link}{id}/.cs", True):
+            for id in range(66, 82):
+                if not self.rev.update_subject_types(f"{programme_details_link}144{id}/.cs", True):
                     await ctx.send(messages.subject_update_error)
                     return
+            # NISY with random ID
+            if not self.rev.update_subject_types(f"{programme_details_link}15340/.cs", True):
+                await ctx.send(messages.subject_update_error)
+                return
+            # sports
+            self.rev.update_sport_subjects()
             await ctx.send(messages.subject_update_success)
 
     @commands.command(aliases=["skratka", "zkratka", "wtf"], brief=messages.shorcut_brief)
@@ -179,30 +186,42 @@ class Review(commands.Cog):
             embed = discord.Embed(title=programme.shortcut, description=programme.name)
             embed.add_field(name="Link", value=programme.link)
         else:
-            subject = review_repo.get_subject_details(shortcut.lower())
+            subject = review_repo.get_subject_details(shortcut)
             if not subject:
-                await ctx.send(messages.review_wrong_subject)
-                return
+                subject = review_repo.get_subject_details(f"TV-{shortcut}")
+                if not subject:
+                    await ctx.send(messages.review_wrong_subject)
+                    return
             embed = discord.Embed(title=subject.shortcut, description=subject.name)
             if subject.semester == "L":
-                embed.add_field(name="Semestr", value="Letní")
+                semester_value = "Letní"
+            if subject.semester == "Z":
+                semester_value = "Zimní"
             else:
-                embed.add_field(name="Semestr", value="Zimní")
+                semester_value = "Zimní, Letní"
+            embed.add_field(name="Semestr", value=semester_value)
             embed.add_field(name="Typ", value=subject.type)
             if subject.year:
                 embed.add_field(name="Ročník", value=subject.year)
             embed.add_field(name="Kredity", value=subject.credits)
             embed.add_field(name="Ukončení", value=subject.end)
-            embed.add_field(
-                name="Karta předmětu",
-                value=f"https://www.fit.vut.cz/study/course/{subject.shortcut}/.cs",
-                inline=False
-            )
-            embed.add_field(
-                name="Statistika úspěšnosti předmětu",
-                value=f"http://fit.nechutny.net/?detail={subject.shortcut}",
-                inline=False,
-            )
+            if subject.shortcut.startswith("TV-"):
+                embed.add_field(
+                    name="Rozvrh předmětu v IS",
+                    value=f"https://www.vut.cz/studis/student.phtml?sn=rozvrhy&action=gm_rozvrh_predmetu&operation=rozvrh&predmet_id={subject.card}&fakulta_id=814",
+                    inline=False
+                )
+            else:
+                embed.add_field(
+                    name="Karta předmětu",
+                    value=f"https://www.fit.vut.cz/study/course/{subject.shortcut}/.cs",
+                    inline=False
+                )
+                embed.add_field(
+                    name="Statistika úspěšnosti předmětu",
+                    value=f"http://fit.nechutny.net/?detail={subject.shortcut}",
+                    inline=False,
+                )
 
         utils.add_author_footer(embed, ctx.author)
         await ctx.send(embed=embed)
@@ -497,10 +516,12 @@ class Review_helper:
     def list_reviews(self, author, subject):
         result = review_repo.get_subject(subject).first()
         if not result:
-            return None
-        reviews = review_repo.get_subject_reviews(subject)
+            result = review_repo.get_subject(f"tv-{subject}").first()
+            if not result:
+                return None
+        reviews = review_repo.get_subject_reviews(result.shortcut)
         tier_cnt = reviews.count()
-        name = review_repo.get_subject_details(subject)
+        name = review_repo.get_subject_details(result.shortcut)
         if tier_cnt == 0:
             if name:
                 description = f"{name.name}\n*No reviews*"
@@ -515,7 +536,7 @@ class Review_helper:
             else:
                 description = f"**Average tier:** {round(reviews[0].avg_tier)}"
             page = f"1/{tier_cnt}"
-        return self.make_embed(author, review, subject, description, page)
+        return self.make_embed(author, review, result.shortcut, description, page)
 
     def remove(self, author, subject):
         """Remove review from DB"""
@@ -580,7 +601,7 @@ class Review_helper:
                         for_year = "VMIT"
                 if MIT:
                     degree = "MIT"
-                detail = review_repo.get_subject_details(shortcut.lower())
+                detail = review_repo.get_subject_details(shortcut)
                 semester = "Z"
                 if sem == 2:
                     semester = "L"
@@ -624,6 +645,23 @@ class Review_helper:
                 year += 1
                 sem = 1
         return True
+
+    def update_sport_subjects(self):
+        sports_list = sports.VutSports().get_sports()
+        for item in sports_list:
+            if not review_repo.get_subject(item.shortcut.lower()).first():
+                review_repo.add_subject(item.shortcut.lower())
+                review_repo.set_subject_details(
+                    item.shortcut,
+                    item.name,
+                    1,
+                    item.semester.value,
+                    "Za",
+                    item.subject_id,
+                    "V",
+                    "VBIT, VMIT",
+                    "BIT, MIT"
+                )
 
 
 def setup(bot):

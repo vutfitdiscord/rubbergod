@@ -88,7 +88,7 @@ class ReviewRepository(BaseRepository):
     def get_subject_details(self, shortcut):
         return (
             session.query(Subject_details)
-            .filter(func.lower(Subject_details.shortcut) == shortcut)
+            .filter(Subject_details.shortcut.ilike(shortcut))
             .one_or_none()
         )
 
@@ -102,7 +102,7 @@ class ReviewRepository(BaseRepository):
             session.query(Subject.reviews, Subject_details, func.avg(Review.tier).label("avg_tier"))
             .outerjoin(Subject.reviews)
             .group_by(Subject)
-            .outerjoin(Subject_details, func.lower(Subject_details.shortcut) == Subject.shortcut)
+            .outerjoin(Subject_details, Subject_details.shortcut.ilike(Subject.shortcut))
             .group_by(Subject_details.shortcut)
             .group_by(Review.subject)
             .filter(Subject_details.degree.contains(degree))
