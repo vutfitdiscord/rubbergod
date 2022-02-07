@@ -86,6 +86,11 @@ class MemeRepost(commands.Cog):
             # Generate string with all reactions on post at the time
             title_string = ""
             for reaction in reactions:
+                if not isinstance(reaction.emoji, str):
+                    # Remove all emoji reactions that are not from current server
+                    if discord.utils.get(ctx.guild.emojis, id=reaction.emoji.id) is None:
+                        continue
+
                 tmp_string = title_string + f"{reaction.count}x{reaction.emoji} "
 
                 if len(tmp_string) >= 255:
@@ -150,16 +155,20 @@ class MemeRepost(commands.Cog):
                 else:
                     main_image = None
 
-            # Add all attachments as fields
-            for idx, attachment_url in enumerate(attachment_urls):
-                embed.add_field(name=f"Příloha {idx + 1}", value=attachment_url, inline=False)
-
             repost_message_id = -1
+            attachement_message_id = None
             if len(embed) < 6000:
                 repost_message = await self.repost_channel.send(embed=embed, file=main_image)
+                if len(attachment_urls) > 0:
+                    # If there are attachement urls then repost first one
+                    attachement_message = await self.repost_channel.send(attachment_urls[0])
+                    attachement_message_id = attachement_message.id
                 repost_message_id = repost_message.id
 
-            self.repost_repo.create_repost(ctx.message.id, repost_message_id, ctx.member.id)
+            self.repost_repo.create_repost(ctx.message.id,
+                                           repost_message_id,
+                                           ctx.member.id,
+                                           attachement_message_id)
 
 
 def setup(bot):
