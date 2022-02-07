@@ -137,6 +137,8 @@ class MemeRepost(commands.Cog):
                                 else:
                                     more_images = True
                                 break
+                        else:
+                            attachment_urls.append(content_split)
 
                 content = ctx.message.content[:900]
                 if more_images:
@@ -156,14 +158,20 @@ class MemeRepost(commands.Cog):
                     main_image = None
 
             repost_message_id = -1
+            secondary_message_id = None
             if len(embed) < 6000:
                 attachment_message = attachment_urls[0] if len(attachment_urls) > 0 else None
-                repost_message = await self.repost_channel.send(content=attachment_message, embed=embed, file=main_image)
+                repost_message = await self.repost_channel.send(embed=embed, file=main_image)
                 repost_message_id = repost_message.id
+
+                if attachment_message is not None:
+                    secondary_message = await self.repost_channel.send(attachment_message)
+                    secondary_message_id = secondary_message.id
 
             self.repost_repo.create_repost(ctx.message.id,
                                            repost_message_id,
-                                           ctx.member.id)
+                                           ctx.member.id,
+                                           secondary_message_id)
 
 
 def setup(bot):
