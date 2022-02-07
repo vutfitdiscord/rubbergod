@@ -156,19 +156,14 @@ class MemeRepost(commands.Cog):
                     main_image = None
 
             repost_message_id = -1
-            attachement_message_id = None
             if len(embed) < 6000:
-                repost_message = await self.repost_channel.send(embed=embed, file=main_image)
-                if len(attachment_urls) > 0:
-                    # If there are attachement urls then repost first one
-                    attachement_message = await self.repost_channel.send(attachment_urls[0])
-                    attachement_message_id = attachement_message.id
+                attachment_message = attachment_urls[0] if len(attachment_urls) > 0 else None
+                repost_message = await self.repost_channel.send(content=attachment_message, embed=embed, file=main_image)
                 repost_message_id = repost_message.id
 
             self.repost_repo.create_repost(ctx.message.id,
                                            repost_message_id,
-                                           ctx.member.id,
-                                           attachement_message_id)
+                                           ctx.member.id)
 
 
 def setup(bot):
