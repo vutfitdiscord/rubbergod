@@ -2,7 +2,7 @@ import traceback
 import argparse
 import logging
 
-from discord import Embed, TextChannel, AllowedMentions, Intents
+from discord import Embed, TextChannel, AllowedMentions, Intents, Message
 from discord.ext import commands
 from discord_slash import SlashCommand
 
@@ -88,50 +88,64 @@ async def on_error(event, *args, **kwargs):
     embeds = []
     guild = None
     for arg in args:
-        if arg.guild_id:
-            guild = bot.get_guild(arg.guild_id)
-            event_guild = guild.name
-            channel = guild.get_channel(arg.channel_id)
-            message = await channel.fetch_message(arg.message_id)
-            message = message.content[:1000]
-        else:
-            event_guild = "DM"
-            message = arg.message_id
-
-        user = bot.get_user(arg.user_id)
-        if not user:
-            user = arg.user_id
-        else:
-            channel = bot.get_channel(arg.channel_id)
-            if channel:
-                message = await channel.fetch_message(arg.message_id)
-                if message.content:
-                    message = message.content[:1000]
-                elif message.embeds:
-                    embeds.extend(message.embeds)
-                    message = "Embed v předchozí zprávě"
-                elif message.attachments:
-                    message_out = ""
-                    for attachment in message.attachments:
-                        message_out += f"{attachment.url}\n"
-                    message = message_out
+        if event == "on_message":
+            message = arg.content
+            channel = arg.channel
+            user = arg.author
+            if hasattr(arg, 'guild') and arg.guild:
+                event_guild = arg.guild.name
+                guild = arg.guild
             else:
+                event_guild = "DM"
+
+        else: # on_raw_reaction_add/remove
+
+            if hasattr(arg, 'guild_id'):
+                guild = bot.get_guild(arg.guild_id)
+                event_guild = guild.name
+                channel = guild.get_channel(arg.channel_id)
+                message = await channel.fetch_message(arg.message_id)
+                message = message.content[:1000]
+            else:
+                event_guild = "DM"
                 message = arg.message_id
-            user = str(user)
+
+            user = bot.get_user(arg.user_id)
+            if not user:
+                user = arg.user_id
+            else:
+                channel = bot.get_channel(arg.channel_id)
+                if channel:
+                    message = await channel.fetch_message(arg.message_id)
+                    if message.content:
+                        message = message.content[:1000]
+                    elif message.embeds:
+                        embeds.extend(message.embeds)
+                        message = "Embed v předchozí zprávě"
+                    elif message.attachments:
+                        message_out = ""
+                        for attachment in message.attachments:
+                            message_out += f"{attachment.url}\n"
+                        message = message_out
+                else:
+                    message = arg.message_id
+                user = str(user)
+
         embed = Embed(title=f"Ignoring exception in event '{event}'", color=0xFF0000)
         embed.add_field(name="Zpráva", value=message, inline=False)
-        if arg.guild_id != config.guild_id:
+        if not guild or guild.id != config.guild_id:
             embed.add_field(name="Guild", value=event_guild)
 
-        if arg.member:
-            reaction_from = str(arg.member)
-        else:
-            reaction_from = user
-        embed.add_field(name="Reakce od", value=reaction_from)
-        embed.add_field(name="Reaction", value=arg.emoji)
-        embed.add_field(name="Typ", value=arg.event_type)
-        if arg.guild_id:
-            link = f"https://discord.com/channels/{arg.guild_id}/{arg.channel_id}/{arg.message_id}"
+        if event != "on_message":
+            if arg.member:
+                reaction_from = str(arg.member)
+            else:
+                reaction_from = user
+            embed.add_field(name="Reakce od", value=reaction_from)
+            embed.add_field(name="Reaction", value=arg.emoji)
+            embed.add_field(name="Typ", value=arg.event_type)
+        if guild:
+            link = f"https://discord.com/channels/{guild.id}/{arg.channel_id}/{arg.message_id}"
             embed.add_field(name="Link", value=link, inline=False)
         embeds.append(embed)
 
