@@ -126,7 +126,7 @@ class Config:
     uhoh_string: str = get_attr(toml_dict, "meme", "uhoh_string")
 
     # grillbot
-    grillbot_id: int = get_attr(toml_dict, "grillbot", "id")
+    grillbot_ids: List[int] = get_attr(toml_dict, "grillbot", "ids")
 
     # weather token to openweather API
     weather_token: str = get_attr(toml_dict, "weather", "token")

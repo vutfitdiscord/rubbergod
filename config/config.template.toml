@@ -148,7 +148,8 @@ forbidden_roles = [600047283509264384, 603673568051462144]
 default_limit = 10
 
 [grillbot]
-id = 0
+#      Production,         Development
+ids = [902678773307174943, 599119578811072523]
 
 [weather]
 token = "678a5932f6dd92ac668b20e9f89c0318"
