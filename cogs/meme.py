@@ -29,7 +29,7 @@ class Meme(commands.Cog):
 
         if message.author.bot:
             if (
-                message.author.id == config.grillbot_id
+                message.author.id in config.grillbot_ids
                 and message.content.startswith("<:")
                 and message.content.endswith(">")
             ):

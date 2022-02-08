@@ -1,4 +1,5 @@
 import asyncio
+import copy
 from io import BytesIO
 import discord
 from discord.ext import commands
@@ -96,7 +97,7 @@ class Help(commands.Cog):
     @commands.Cog.listener()
     async def on_message(self, message: discord.message):
         """Sending commands help to grillbot"""
-        if message.author.id != config.grillbot_id and type(message.channel) == discord.DMChannel:
+        if message.author.id not in config.grillbot_ids and type(message.channel) == discord.DMChannel:
             return
 
         lines = message.content.split('\n')
@@ -106,18 +107,21 @@ class Help(commands.Cog):
         content = '\n'.join(lines)
         request = json.loads(content)
         if "method" not in request or request["method"] != "help":
-            message.reply("Unsupported method")
+            await message.reply("Unsupported method")
             return
         param = request["parameters"]
         # mock ctx
+        mock_message = copy.copy(message)
+        mock_message.author = self.bot.get_user(param["user_id"])
         ctx = commands.Context(
             prefix=config.default_prefix,
-            channel=message.channel,
-            author=self.bot.get_user(param["user_id"]),
-            message=message,
+            message=mock_message,
         )
         if "command" in param and param["command"] != None:
             command = self.bot.get_command(param["command"])
+            if not command:
+                await message.reply("Command not found")
+                return
             help = {}
             for check in command.checks:
                 try:
