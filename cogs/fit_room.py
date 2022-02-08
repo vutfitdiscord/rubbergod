@@ -8,6 +8,8 @@ import utils
 from config import cooldowns
 from config.messages import Messages
 
+kachnicka_path = "/img/su/logo-kachnicka-mapa.png"
+kachnicka_url = "https://www.fit.vut.cz/img/su/logo-kachnicka-mapa.png"
 
 class FitRoom(commands.Cog):
     def __init__(self, bot):
@@ -36,7 +38,8 @@ class FitRoom(commands.Cog):
                 return await ctx.send(utils.fill_message("fit_room_room_not_on_plan", room=room))
 
             image_bytes = BytesIO()
-            svg2png(bytestring=str(image).encode("utf-8"), write_to=image_bytes, parent_width=720,
+            image_bytestring = str(image).replace(kachnicka_path, kachnicka_url).encode("utf-8")
+            svg2png(bytestring=image_bytestring, write_to=image_bytes, parent_width=720,
                     parent_height=1000, background_color="white", dpi=300)
             image_bytes.seek(0)
 
