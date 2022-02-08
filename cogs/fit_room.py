@@ -28,9 +28,7 @@ class FitRoom(commands.Cog):
                 floor_list = main_body.find("ul", {"class": "pagination__list"})
                 active_floor = floor_list.find("a", {"aria-current": "page"})
                 image = main_body.find("svg")
-                overlay = image.find("g", {"id": "layer3"})
-                cursor = overlay.find("polygon",
-                                      {"style": "fill:red;stroke:none;pointer-events:none"})
+                cursor = image.find("polygon", {"class": "arrow"})
             except:
                 return await ctx.send(Messages.fit_room_parsing_failed)
 
