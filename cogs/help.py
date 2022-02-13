@@ -97,7 +97,7 @@ class Help(commands.Cog):
     @commands.Cog.listener()
     async def on_message(self, message: discord.message):
         """Sending commands help to grillbot"""
-        if message.author.id not in config.grillbot_ids and type(message.channel) == discord.DMChannel:
+        if message.author.id not in config.grillbot_ids:
             return
 
         lines = message.content.split('\n')
