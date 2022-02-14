@@ -1,4 +1,4 @@
-from discord.ext import commands
+from disnake.ext import commands
 
 # 5x/20s
 def short_cooldown(f):

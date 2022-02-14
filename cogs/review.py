@@ -1,7 +1,7 @@
 from bs4 import BeautifulSoup
-import discord
+import disnake
 import datetime
-from discord.ext import commands
+from disnake.ext import commands
 import requests
 import asyncio
 
@@ -183,7 +183,7 @@ class Review(commands.Cog):
             return
         programme = review_repo.get_programme(shortcut.upper())
         if programme:
-            embed = discord.Embed(title=programme.shortcut, description=programme.name)
+            embed = disnake.Embed(title=programme.shortcut, description=programme.name)
             embed.add_field(name="Link", value=programme.link)
         else:
             subject = review_repo.get_subject_details(shortcut)
@@ -192,7 +192,7 @@ class Review(commands.Cog):
                 if not subject:
                     await ctx.send(messages.review_wrong_subject)
                     return
-            embed = discord.Embed(title=subject.shortcut, description=subject.name)
+            embed = disnake.Embed(title=subject.shortcut, description=subject.name)
             if subject.semester == "L":
                 semester_value = "Letní"
             if subject.semester == "Z":
@@ -267,7 +267,7 @@ class Review(commands.Cog):
         for line in board:
             output += f"{cnt} - **{line.shortcut}**: {round(line.avg_tier, 1)}\n"
             cnt += 1
-        embed = discord.Embed(title="Tierboard", description=output)
+        embed = disnake.Embed(title="Tierboard", description=output)
         embed.timestamp = datetime.datetime.now(tz=datetime.timezone.utc)
         embed.add_field(name="Typ", value=type)
         embed.add_field(name="Semestr", value="Letní" if sem == "L" else "Zimní")
@@ -321,7 +321,7 @@ class Review(commands.Cog):
                 await msg.edit(embed=embed)
             try:
                 await msg.remove_reaction(emoji, user)
-            except discord.errors.Forbidden:
+            except disnake.errors.Forbidden:
                 pass
 
     @reviews.error
@@ -349,7 +349,7 @@ class Review(commands.Cog):
         except IndexError:  # handle legacy embed reviews
             try:
                 await ctx.member.send(messages.review_legacy_clicked)
-            except discord.HTTPException as e:
+            except disnake.HTTPException as e:
                 if e.code != 50007:
                     raise
             return
@@ -410,7 +410,7 @@ class Review_helper:
 
     def make_embed(self, msg_author, review, subject, description, page):
         """Create new embed for reviews"""
-        embed = discord.Embed(title=f"{subject.upper()} reviews", description=description)
+        embed = disnake.Embed(title=f"{subject.upper()} reviews", description=description)
         colour = 0x6D6A69
         id = 0
         if review:

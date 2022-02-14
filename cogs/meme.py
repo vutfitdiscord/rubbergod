@@ -5,8 +5,8 @@ from random import choice
 import requests
 from typing import List
 
-import discord
-from discord.ext import commands
+import disnake
+from disnake.ext import commands
 
 import utils
 from config.app_config import config
@@ -14,7 +14,7 @@ from config.messages import Messages as messages
 from config import cooldowns
 
 uhoh_counter = 0
-storno_time = datetime.datetime.utcnow() - datetime.timedelta(hours=config.storno_delay)
+storno_time = datetime.datetime.now(datetime.timezone.utc) - datetime.timedelta(hours=config.storno_delay)
 storno_images = ["storno.png", "storno_lgtm.png"]
 
 
@@ -23,7 +23,7 @@ class Meme(commands.Cog):
         self.bot = bot
 
     @commands.Cog.listener()
-    async def on_message(self, message: discord.message):
+    async def on_message(self, message: disnake.message):
         global uhoh_counter
         global storno_time
 
@@ -51,7 +51,7 @@ class Meme(commands.Cog):
             image = choice(storno_images)
             await message.channel.send(
                 utils.fill_message("covid_storno", user=message.author.id),
-                file=discord.File(f"images/{image}", filename=image),
+                file=disnake.File(f"images/{image}", filename=image),
             )
 
     @commands.command(brief=messages.uhoh_brief)
@@ -65,15 +65,13 @@ class Meme(commands.Cog):
 
     @cooldowns.short_cooldown
     @commands.command(brief=messages.bonk_brief)
-    async def bonk(self, ctx, *, member: discord.Member = None):
+    async def bonk(self, ctx, member: disnake.Member = None):
         """Bonk someone
-        member: Discord user. If none, the bot will bonk you.
+        member: disnake user. If none, the bot will bonk you.
         """
         if member is None:
-            bonker = self.bot.user
             bonked = ctx.author
         else:
-            bonker = ctx.author
             bonked = member
 
         if not bonked.avatar:
@@ -81,7 +79,7 @@ class Meme(commands.Cog):
             return
 
         async with ctx.typing():
-            url = bonked.avatar_url_as(format="jpg")
+            url = bonked.display_avatar.with_format("jpg")
             response = requests.get(url)
             avatar = Image.open(BytesIO(response.content))
 
@@ -101,7 +99,7 @@ class Meme(commands.Cog):
                 )
                 image_binary.seek(0)
                 await ctx.reply(
-                    file=discord.File(fp=image_binary, filename="bonk.gif"),
+                    file=disnake.File(fp=image_binary, filename="bonk.gif"),
                     mention_author=False,
                 )
 

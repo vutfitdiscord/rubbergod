@@ -1,5 +1,5 @@
-import discord
-from discord.ext import commands
+import disnake
+from disnake.ext import commands
 from typing import Union, Iterable
 import utils
 
@@ -53,7 +53,7 @@ def merge_messages(message_list:Iterable, max_msg_len:int):
 # @param message_list list of messages to send
 # @param max_msg_len maximal length of message
 #
-async def send_list_of_messages(channel:Union[discord.TextChannel, discord.Object, commands.Context],
+async def send_list_of_messages(channel:Union[disnake.TextChannel, disnake.Object, commands.Context],
                                 message_list:Iterable, max_msg_len:int=1900):
     assert isinstance(max_msg_len, int)
     if max_msg_len > 2000: max_msg_len = 2000

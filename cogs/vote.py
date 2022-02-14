@@ -3,10 +3,10 @@ import re
 from typing import Dict
 from datetime import datetime
 import emoji
-from discord import RawReactionActionEvent, Message, TextChannel
-from discord.errors import NotFound
-from discord.ext import commands
-from discord.ext.commands import Bot, Context
+from disnake import RawReactionActionEvent, Message, TextChannel
+from disnake.errors import NotFound
+from disnake.ext import commands
+from disnake.ext.commands import Bot, Context
 
 from utils import is_command_message, str_emoji_id, fill_message
 from config import cooldowns
@@ -52,7 +52,7 @@ class VoteMessage:
     def parse_option(cls, opt_line: str) -> VoteOption:
         matches = cls.emoji_regex.match(opt_line)
         if matches is None:
-            # it is not a discord emoji, try unicode
+            # it is not a disnake emoji, try unicode
             emojis = emoji.emoji_lis(opt_line)
             if len(emojis) > 0 and emojis[0]['location'] == 0:
                 opt_emoji = emojis[0]['emoji']

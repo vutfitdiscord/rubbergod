@@ -1,7 +1,7 @@
 from datetime import date
 
-import discord
-from discord.ext import commands
+import disnake
+from disnake.ext import commands
 
 import utils
 from config.app_config import config
@@ -22,7 +22,7 @@ class week(commands.Cog):
         even, odd = "sudý", "lichý"
         cal_type = even if cal_week % 2 == 0 else odd
 
-        embed = discord.Embed(title="Týden", color=0xE5DC37)
+        embed = disnake.Embed(title="Týden", color=0xE5DC37)
         embed.add_field(name="Studijní", value=stud_week)
         embed.add_field(name="Kalendářní", value=f"{cal_type} ({cal_week})")
         embed.add_field(name="Poznámka", value=messages.week_warning, inline=False)

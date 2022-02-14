@@ -1,8 +1,8 @@
+from curses.panel import bottom_panel
 import random
 
-import discord
-from discord.ext import commands
-from discord_slash import SlashCommand, SlashContext, cog_ext
+import disnake
+from disnake.ext import commands
 
 from config import cooldowns
 from logic import roll_dice
@@ -35,7 +35,7 @@ class Random(commands.Cog):
             await ctx.send(utils.get_command_signature(ctx))
             return
 
-        option = discord.utils.escape_mentions(random.choice(args))
+        option = disnake.utils.escape_mentions(random.choice(args))
         if option:
             await ctx.send(f"{option} {ctx.author.mention}")
     
@@ -48,9 +48,9 @@ class Random(commands.Cog):
         await self.flip_func(ctx)
 
     @cooldowns.short_cooldown
-    @cog_ext.cog_slash(name="flip", description=Messages.random_flip_brief)
-    async def flip_slash(self, ctx):
-        await self.flip_func(ctx)
+    @commands.slash_command(name="flip", description=Messages.random_flip_brief)
+    async def flip_slash(self, inter):
+        await self.flip_func(inter)
 
     async def roll_func(self, ctx, first, second):
         if first > second:
@@ -69,7 +69,7 @@ class Random(commands.Cog):
         await self.roll_func(ctx, first, second)
     
     @cooldowns.short_cooldown
-    @cog_ext.cog_slash(name="roll", description=Messages.rng_generator_format)
+    @commands.slash_command(name="roll", description=Messages.rng_generator_format)
     async def roll_slash(self, ctx, first: int, second: int = 0):
         await self.roll_func(ctx, first, second)
 

@@ -2,9 +2,9 @@ import asyncio
 import math
 import re
 
-import discord
-from discord import Emoji, TextChannel, Member
-from discord.ext.commands import Bot
+import disnake
+from disnake import Emoji, TextChannel, Member
+from disnake.ext.commands import Bot
 from emoji import demojize
 
 import utils
@@ -121,7 +121,7 @@ class Karma(BaseFeature):
             except (ValueError, IndexError):
                 await message.channel.send(msg.karma_revote_format)
                 return
-            except discord.NotFound:
+            except disnake.NotFound:
                 await message.channel.send(msg.karma_emote_not_found)
                 return
 
@@ -149,7 +149,7 @@ class Karma(BaseFeature):
             except (ValueError, IndexError):
                 await message.channel.send(msg.karma_get_format)
                 return
-            except discord.NotFound:
+            except disnake.NotFound:
                 await message.channel.send(msg.karma_emote_not_found)
                 return
 
@@ -183,7 +183,7 @@ class Karma(BaseFeature):
                 # ValueError part. If it is an int and it's not found
                 # in the emoji list, it will try to fetch it once again
                 # and as that will probably fail anyway, it'll jump to
-                # the discord.NotFound handler which will add it to
+                # the disnake.NotFound handler which will add it to
                 # the error message
                 emoji = next((x for x in guild.emojis if x.id == int(emoji_id)), None)
 
@@ -198,7 +198,7 @@ class Karma(BaseFeature):
                 else:
                     line += str(emoji_id)
 
-            except discord.NotFound:
+            except disnake.NotFound:
                 is_error = True
                 if isinstance(emoji_id, bytearray):
                     self.repo.remove_emoji(emoji_id.decode())
@@ -220,7 +220,7 @@ class Karma(BaseFeature):
                 await channel.send("Hodnota " + value + ":")
                 for line in emojis:
                     await channel.send(line)
-            except discord.errors.HTTPException:
+            except disnake.errors.HTTPException:
                 pass  # TODO: error handling?
 
         if error:
@@ -283,7 +283,7 @@ class Karma(BaseFeature):
             karma_neg_order=k.negative.position
         )
 
-    async def message_karma(self, author: discord.User, msg: discord.Message):
+    async def message_karma(self, author: disnake.User, msg: disnake.Message):
         reactions = msg.reactions
         colour = 0x6d6a69
         output = {'-1': [], '1': [], '0': []}
@@ -307,7 +307,7 @@ class Karma(BaseFeature):
                         break
             else:
                 output['0'].append(emoji)
-        embed = discord.Embed(title='Karma zprávy')
+        embed = disnake.Embed(title='Karma zprávy')
         embed.add_field(name="Zpráva", value=msg.jump_url, inline=False)
         for key in ['1', '-1', '0']:
             if output[key]:
@@ -330,7 +330,7 @@ class Karma(BaseFeature):
         utils.add_author_footer(embed, author)
         return embed
 
-    async def leaderboard(self, ctx: discord.ext.commands.Context, action, order, start=1):
+    async def leaderboard(self, ctx: disnake.ext.commands.Context, action, order, start=1):
         if action == 'give':
             if order == "DESC":
                 column = 'positive'
@@ -357,7 +357,7 @@ class Karma(BaseFeature):
 
         output = self.gen_leaderboard_content(attribute, start, column)
 
-        embed = discord.Embed(title=title, description=output)
+        embed = disnake.Embed(title=title, description=output)
         utils.add_author_footer(embed, ctx.author)
 
         if action == "get" and order == "DESC":
@@ -381,7 +381,7 @@ class Karma(BaseFeature):
             if username is None:
                 line = '{} – *User left*: {} pts\n'.format(i, getattr(user, column))
             else:
-                username = discord.utils.escape_markdown(username.display_name)
+                username = disnake.utils.escape_markdown(username.display_name)
                 line = '{} – **{}**: {} pts\n'.format(i, username, getattr(user, column))
             output += line
 

@@ -1,20 +1,20 @@
-import discord
-from discord.ext.commands import Context
+import disnake
+from disnake.ext.commands import Context
 from collections import OrderedDict
 import asyncio
 from typing import Union
 
 class PaginatorSession:
-    def __init__(self, bot, ctx:Context, timeout=60, pages=None, color=discord.Color.green(),
+    def __init__(self, bot, ctx:Context, timeout=60, pages=None, color=disnake.Color.green(),
                  footer:Union[str, None]=None, bot_author:bool=False, delete_after:bool=True):
         self.bot = bot
 
         self.footer = footer  # footer message
         self.ctx = ctx  # ctx
         self.timeout = timeout  # when the reactions get cleared, int[seconds]
-        self.pages = pages  # the list of embeds list[discord.Embed, discord.Embed]
+        self.pages = pages  # the list of embeds list[disnake.Embed, disnake.Embed]
         self.running = False  # currently running, bool
-        self.message = None  # current message being paginated, discord.Message
+        self.message = None  # current message being paginated, disnake.Message
         self.current = 0  # current page index, int
         self.color = color  # embed color
         self.bot_author = bot_author
@@ -42,7 +42,7 @@ class PaginatorSession:
             page.set_footer(text=self.footer)  # sets footer
 
         if self.bot_author:
-            page.set_author(name=f'{index + 1}/{len(self.pages)}', icon_url=self.bot.user.avatar_url)
+            page.set_author(name=f'{index + 1}/{len(self.pages)}', icon_url=self.bot.user.avatar.url)
         else:
             page.set_author(name=f'{index + 1}/{len(self.pages)}')
 

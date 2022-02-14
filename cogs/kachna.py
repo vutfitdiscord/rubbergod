@@ -1,4 +1,4 @@
-from discord.ext import commands
+from disnake.ext import commands
 from config import messages
 
 messages = messages.Messages

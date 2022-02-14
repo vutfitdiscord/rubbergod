@@ -1,6 +1,6 @@
-from discord.ext import commands
+from disnake.ext import commands
 from features.git import Git
-from discord.message import Message
+from disnake.message import Message
 import utils
 from config.messages import Messages
 
@@ -21,7 +21,7 @@ class System(commands.Cog):
     async def pull(self, ctx: commands.Context):
         message: Message = await ctx.send("Pulling")
 
-        pull_result = await self.git.pull(ctx)
+        pull_result = await self.git.pull()
         pull_parts = utils.cut_string(pull_result, 1900)
 
         await message.edit(content=f"```{pull_parts[0]}```")

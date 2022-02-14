@@ -1,5 +1,5 @@
-import discord
-from discord.ext import commands
+import disnake
+from disnake.ext import commands
 import requests
 from bs4 import BeautifulSoup
 from cairosvg import svg2png
@@ -43,11 +43,11 @@ class FitRoom(commands.Cog):
                     parent_height=1000, background_color="white", dpi=300)
             image_bytes.seek(0)
 
-            embed = discord.Embed(title=f"Místnost: {room}", color=discord.Color.dark_blue())
+            embed = disnake.Embed(title=f"Místnost: {room}", color=disnake.Color.dark_blue())
             embed.set_image(url="attachment://plan.png")
             embed.description = f"[Odkaz na plánek]({url})"
             utils.add_author_footer(embed, ctx.author, additional_text=[str(active_floor.text)])
-            file = discord.File(fp=image_bytes, filename="plan.png")
+            file = disnake.File(fp=image_bytes, filename="plan.png")
             await ctx.send(embed=embed, file=file)
 
 

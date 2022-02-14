@@ -1,10 +1,10 @@
 from datetime import datetime, timezone
 from typing import Iterable, Optional, Union
 
-import discord
+import disnake
 import math
-from discord import Member, PartialEmoji, Emoji
-from discord.ext import commands
+from disnake import Member, PartialEmoji, Emoji
+from disnake.ext import commands
 
 from config.app_config import config
 from config.messages import Messages
@@ -57,7 +57,7 @@ def fill_message(message_name, *args, **kwargs):
 
     for arg in to_escape:
         if arg in kwargs:
-            kwargs[arg] = discord.utils.escape_mentions(kwargs[arg])
+            kwargs[arg] = disnake.utils.escape_mentions(kwargs[arg])
 
     # Attempt to get message template and fill
     try:
@@ -121,13 +121,13 @@ def helper_plus(ctx):
     raise NotHelperPlusError
 
 
-def add_author_footer(embed: discord.Embed, author: discord.User,
+def add_author_footer(embed: disnake.Embed, author: disnake.User,
                       set_timestamp=True, additional_text: Iterable[str] = []):
     """
     Adds footer to the embed with author name and icon from ctx.
 
     :param author: author info
-    :param embed: discord.Embed object
+    :param embed: disnake.Embed object
     :param set_timestamp: bool, should the embed's timestamp be set
     :param additional_text: Iterable of strings that will be joined with author name by pipe symbol, eg.:
     "john#2121 | text1 | text2".
@@ -136,21 +136,21 @@ def add_author_footer(embed: discord.Embed, author: discord.User,
     if set_timestamp:
         embed.timestamp = datetime.now(tz=timezone.utc)
 
-    embed.set_footer(icon_url=author.avatar_url, text=' | '.join((str(author), *additional_text)))
+    embed.set_footer(icon_url=author.display_avatar.url, text=' | '.join((str(author), *additional_text)))
 
 
-def get_emoji(guild: discord.Guild, name: str) -> Optional[discord.Emoji]:
+def get_emoji(guild: disnake.Guild, name: str) -> Optional[disnake.Emoji]:
     """
-    guild: :class:`discord.Guild`
+    guild: :class:`disnake.Guild`
 
     name: :class:`str`
-    returns: :class:`discord.Emoji` or None
+    returns: :class:`disnake.Emoji` or None
     """
-    return discord.utils.get(guild.emojis, name=name)
+    return disnake.utils.get(guild.emojis, name=name)
 
 
-def get_username(user: Union[discord.User, discord.Member]) -> str:
-    return discord.utils.escape_markdown(user.display_name).replace("@", "@ ")
+def get_username(user: Union[disnake.User, disnake.Member]) -> str:
+    return disnake.utils.escape_markdown(user.display_name).replace("@", "@ ")
 
 
 def get_command_group_signature(ctx: commands.Context):
@@ -190,7 +190,7 @@ def clear_link_escape(link: str):
     return link
 
 
-async def add_pagination_reactions(message: discord.Message, items_count: int):
+async def add_pagination_reactions(message: disnake.Message, items_count: int):
     """Common method to add pagination reactions to message."""
 
     if items_count <= 1:

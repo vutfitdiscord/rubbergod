@@ -1,5 +1,5 @@
-import discord
-from discord.ext import commands
+import disnake
+from disnake.ext import commands
 from features.reaction_context import ReactionContext
 from config.app_config import config
 from repository.karma_repo import KarmaRepository
@@ -14,7 +14,7 @@ class MemeRepost(commands.Cog):
 
         self.karma_repo = KarmaRepository()
         self.repost_repo = MemeRepostRepo()
-        self.repost_channel: Union[discord.TextChannel, None] = None
+        self.repost_channel: Union[disnake.TextChannel, None] = None
 
         self.repost_lock = asyncio.Lock()
 
@@ -24,7 +24,7 @@ class MemeRepost(commands.Cog):
                 # Message was reposted before
                 return
 
-            all_reactions: List[discord.Reaction] = ctx.message.reactions
+            all_reactions: List[disnake.Reaction] = ctx.message.reactions
             for reac in all_reactions:
                 if reac.count >= config.repost_threshold:
                     emoji_key = str(reac.emoji.id) if type(reac.emoji) != str else reac.emoji
@@ -71,7 +71,7 @@ class MemeRepost(commands.Cog):
                     self.karma_repo.karma_emoji_remove(original_post_user, ctx.member, ctx.emoji.id)
 
     async def __repost_message(self, ctx: ReactionContext,
-                               reactions: List[discord.Reaction]):
+                               reactions: List[disnake.Reaction]):
         if self.repost_channel is None and config.meme_repost_room != 0:
             self.repost_channel = await self.bot.fetch_channel(config.meme_repost_room)
 
@@ -88,7 +88,7 @@ class MemeRepost(commands.Cog):
             for reaction in reactions:
                 if not isinstance(reaction.emoji, str):
                     # Remove all emoji reactions that are not from current server
-                    if discord.utils.get(ctx.guild.emojis, id=reaction.emoji.id) is None:
+                    if disnake.utils.get(ctx.guild.emojis, id=reaction.emoji.id) is None:
                         continue
 
                 tmp_string = title_string + f"{reaction.count}x{reaction.emoji} "
@@ -98,7 +98,7 @@ class MemeRepost(commands.Cog):
 
                 title_string = tmp_string
 
-            embed = discord.Embed(color=discord.Color.dark_blue(), title=title_string)
+            embed = disnake.Embed(color=disnake.Color.dark_blue(), title=title_string)
             utils.add_author_footer(embed, author=ctx.message.author)
             embed.timestamp = ctx.message.created_at
 
@@ -149,7 +149,7 @@ class MemeRepost(commands.Cog):
 
             # Set main image if present
             if main_image is not None:
-                if isinstance(main_image, discord.File):
+                if isinstance(main_image, disnake.File):
                     embed.set_image(url=f"attachment://{main_image.filename}")
                 elif isinstance(main_image, str):
                     embed.set_image(url=main_image)

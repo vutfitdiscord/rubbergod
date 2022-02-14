@@ -3,8 +3,8 @@ import asyncio
 import time
 from io import BytesIO
 
-import discord
-from discord.ext import commands
+import disnake
+from disnake.ext import commands
 import dhash
 from PIL import Image
 
@@ -29,7 +29,7 @@ class Warden(commands.Cog):
 
         self.message_channel = None
 
-    def doCheckRepost(self, message: discord.Message):
+    def doCheckRepost(self, message: disnake.Message):
         return (
             message.channel.id in config.deduplication_channels
             and message.attachments is not None
@@ -38,13 +38,13 @@ class Warden(commands.Cog):
         )
 
     @commands.Cog.listener()
-    async def on_message(self, message: discord.Message):
+    async def on_message(self, message: disnake.Message):
         # repost check
         if self.doCheckRepost(message):
             await self.checkDuplicate(message)
 
     @commands.Cog.listener()
-    async def on_message_delete(self, message: discord.Message):
+    async def on_message_delete(self, message: disnake.Message):
         if self.doCheckRepost(message):
             repo_i.deleteByMessage(message.id)
 
@@ -79,10 +79,10 @@ class Warden(commands.Cog):
                     print("Warden:on_raw_reaction_add", "Could not remove bot's emote", e)
                 try:
                     await message.delete()
-                except discord.errors.NotFound:
+                except disnake.errors.NotFound:
                     pass
 
-    async def saveMessageHashes(self, message: discord.Message):
+    async def saveMessageHashes(self, message: disnake.Message):
         for f in message.attachments:
             fp = BytesIO()
             await f.save(fp)
@@ -167,7 +167,7 @@ class Warden(commands.Cog):
         """Scan message attachments in whole database"""
         pass
 
-    async def checkDuplicate(self, message: discord.Message):
+    async def checkDuplicate(self, message: disnake.Message):
         """Check if uploaded files are known"""
         hashes = [x async for x in self.saveMessageHashes(message)]
 
@@ -196,7 +196,7 @@ class Warden(commands.Cog):
             if hamming_min <= self.limit_soft:
                 await self._announceDuplicate(message, duplicate, hamming_min)
 
-    async def _announceDuplicate(self, message: discord.Message, original: object, hamming: int):
+    async def _announceDuplicate(self, message: disnake.Message, original: object, hamming: int):
         """Send message that a post is a original
         original: object
         hamming: Hamming distance between the image and closest database entry
@@ -217,13 +217,13 @@ class Warden(commands.Cog):
         try:
             src_post = await src_chan.fetch_message(original.message_id)
             link = src_post.jump_url
-            author = discord.utils.escape_markdown(src_post.author.display_name)
+            author = disnake.utils.escape_markdown(src_post.author.display_name)
         except:
             link = "404 <:sadcat:576171980118687754>"
             author = "_??? (404)_"
 
         desc = utils.fill_message("repost_description", user=message.author.id, value=prob)
-        embed = discord.Embed(title=title, color=0xCB410B, description=desc, url=message.jump_url)
+        embed = disnake.Embed(title=title, color=0xCB410B, description=desc, url=message.jump_url)
         embed.add_field(name=f"**{author}**, {timestamp}", value=link, inline=False)
 
         embed.add_field(
@@ -234,7 +234,7 @@ class Warden(commands.Cog):
         send = await message.channel.send(embed=embed)
         try:
             await message.add_reaction(reaction)
-        except discord.errors.NotFound:
+        except disnake.errors.NotFound:
             await send.delete()
             return
         await send.add_reaction("❎")

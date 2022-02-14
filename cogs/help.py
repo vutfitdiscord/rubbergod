@@ -1,8 +1,8 @@
 import asyncio
 import copy
 from io import BytesIO
-import discord
-from discord.ext import commands
+import disnake
+from disnake.ext import commands
 import json
 
 from config.app_config import config
@@ -75,12 +75,12 @@ class Help(commands.Cog):
         return pages
 
     def generate_embed(self, page):
-        embed = discord.Embed(
+        embed = disnake.Embed(
             title=Messages.help_title,
             description=Messages.help_description,
             color=0xeee657
         )
-        embed.set_thumbnail(url=self.bot.user.avatar_url)
+        embed.set_thumbnail(url=self.bot.user.display_avatar.url)
         self.add_fields(embed, page["commands"])
         return embed
 
@@ -100,7 +100,7 @@ class Help(commands.Cog):
             embed.add_field(name=name, value=value if value else None, inline=False)
 
     @commands.Cog.listener()
-    async def on_message(self, message: discord.message):
+    async def on_message(self, message: disnake.Message):
         """Sending commands help to grillbot"""
         if message.author.id not in config.grillbot_ids:
             return
@@ -140,7 +140,7 @@ class Help(commands.Cog):
             help = self.generate_pages(ctx)
         help_json = json.dumps(help)
         with BytesIO(bytes(help_json, 'utf-8')) as file_binary:
-            await message.reply(file=discord.File(fp=file_binary, filename="help.json"))
+            await message.reply(file=disnake.File(fp=file_binary, filename="help.json"))
 
     @cooldowns.default_cooldown
     @commands.command(aliases=['god'], brief=Messages.help_title)
@@ -180,7 +180,7 @@ class Help(commands.Cog):
         footer_text = commit
         if pages_total > 1:
             footer_text = f"Strana {page_num}/{pages_total} | {commit}"
-        embed.set_footer(text=footer_text, icon_url=ctx.author.avatar_url)
+        embed.set_footer(text=footer_text, icon_url=ctx.author.display_avatar.url)
 
         message = await ctx.reply(embed=embed)
 
@@ -204,7 +204,7 @@ class Help(commands.Cog):
                 await message.edit(embed=embed)
             try:
                 await message.remove_reaction(emoji, user)
-            except discord.errors.Forbidden:
+            except disnake.errors.Forbidden:
                 pass
 
 

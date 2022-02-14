@@ -1,5 +1,5 @@
-import discord
-from discord.ext import commands
+import disnake
+from disnake.ext import commands
 import sqlalchemy
 
 from features.reaction_context import ReactionContext
@@ -31,7 +31,7 @@ class Reaction(commands.Cog):
 
         if (
             ctx.message.embeds
-            and ctx.message.embeds[0].title is not discord.Embed.Empty
+            and ctx.message.embeds[0].title is not disnake.Embed.Empty
             and "reviews" in ctx.message.embeds[0].title
         ):
             cogs.append(self.bot.get_cog("Review"))
@@ -50,7 +50,7 @@ class Reaction(commands.Cog):
             cogs.append(self.bot.get_cog("Warden"))
         if(
             ctx.message.embeds
-            and ctx.message.embeds[0].author.name is not discord.Embed.Empty
+            and ctx.message.embeds[0].author.name is not disnake.Embed.Empty
             and "streamlinks" in ctx.message.embeds[0].author.name.lower()
         ):
             cogs.append(self.bot.get_cog("StreamLinks"))
@@ -66,7 +66,7 @@ class Reaction(commands.Cog):
                     await cog.handle_reaction(ctx)
                 except sqlalchemy.exc.InternalError:
                     session.rollback()
-                except discord.errors.DiscordServerError:
+                except disnake.errors.DiscordServerError:
                     pass
 
 

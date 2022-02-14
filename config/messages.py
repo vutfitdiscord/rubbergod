@@ -5,6 +5,11 @@ class Messages:
     prefix = config.default_prefix
 
     server_warning = "Tohle funguje jen na VUT FIT serveru."
+
+    help_title = "Nápověda"
+    help_description = "Kompletní seznam lze také najít ve veřejné administraci bota (https://public.grillbot.cloud/)"
+    help_command_not_found = "Žádný příkaz jako `{command}` neexistuje."
+
     karma_get_missing = "Toaster pls, měl jsi bordel v DB. Musel jsem za tebe uklidit."
     missing_perms = "Na tohle nemáš práva, {user}"
     acl_help = "{user}, Použití:\n`!acl {{action}} {{table}} [args]`\n"\

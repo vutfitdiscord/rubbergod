@@ -1,13 +1,13 @@
 from collections import namedtuple
 from typing import Optional, Tuple, Union
 
-import discord
+import disnake
 
 from repository.base_repository import BaseRepository
 from repository.database import session
 from repository.database.hugs import HugsTable
 
-Member = Union[discord.Member, discord.User]
+Member = Union[disnake.Member, disnake.User]
 
 UserHugStats = namedtuple("UserHugStats", ("given", "received"))
 

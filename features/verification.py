@@ -4,9 +4,9 @@ import ssl
 import string
 import re
 
-import discord
-from discord import Member
-from discord.ext.commands import Bot
+import disnake
+from disnake import Member
+from disnake.ext.commands import Bot
 
 import utils
 from config.app_config import config
@@ -116,7 +116,7 @@ class Verification(BaseFeature):
                     try:
                         await message.delete()
                         return
-                    except discord.errors.Forbidden:
+                    except disnake.errors.Forbidden:
                         return
 
                 user = self.repo.get_user_by_login(login)
@@ -136,7 +136,7 @@ class Verification(BaseFeature):
                                                           user=message.author.id, admin=config.admin_ids[0]))
         try:
             await message.delete()
-        except discord.errors.HTTPException:
+        except disnake.errors.HTTPException:
             return
 
     @staticmethod
@@ -222,14 +222,14 @@ class Verification(BaseFeature):
 
                 try:
                     # Get server verify role
-                    verify = discord.utils.get(message.guild.roles, name=config.verification_role)
-                    year = discord.utils.get(message.guild.roles, name=year)
+                    verify = disnake.utils.get(message.guild.roles, name=config.verification_role)
+                    year = disnake.utils.get(message.guild.roles, name=year)
                     member = message.author
                 except AttributeError:
                     # jsme v PM
                     guild = self.bot.get_guild(config.guild_id)
-                    verify = discord.utils.get(guild.roles, name=config.verification_role)
-                    year = discord.utils.get(guild.roles, name=year)
+                    verify = disnake.utils.get(guild.roles, name=config.verification_role)
+                    year = disnake.utils.get(guild.roles, name=year)
                     member = guild.get_member(message.author.id)
 
                 await member.add_roles(verify)
@@ -242,13 +242,13 @@ class Verification(BaseFeature):
                                                         user=message.author.id))
 
                     await member.send(Messages.verify_post_verify_info)
-                except discord.errors.Forbidden:
+                except disnake.errors.Forbidden:
                     if login[0] == 'x':
                         self.send_mail_verified(f"{login}@stud.fit.vutbr.cz", member)
                     else:
                         self.send_mail_verified(f"{login}@mail.muni.cz", member)
 
-                if message.channel.type is not discord.ChannelType.private:
+                if message.channel.type is not disnake.ChannelType.private:
                     await message.channel.send(utils.fill_message("verify_verify_success",
                                                                   user=message.author.id))
             else:
@@ -263,18 +263,18 @@ class Verification(BaseFeature):
 
         try:
             await message.delete()
-        except discord.errors.Forbidden:
+        except disnake.errors.Forbidden:
             return
 
-    async def log_verify_fail(self, message: discord.Message, phase: str):
-        embed = discord.Embed(title="Neúspěšný pokus o verify", color=0xeee657)
+    async def log_verify_fail(self, message: disnake.Message, phase: str):
+        embed = disnake.Embed(title="Neúspěšný pokus o verify", color=0xeee657)
         embed.add_field(name="User", value=utils.generate_mention(message.author.id))
         embed.add_field(name='Verify phase', value=phase)
         embed.add_field(name="Message", value=message.content, inline=False)
         channel = self.bot.get_channel(config.log_channel)
         await channel.send(embed=embed)
 
-    async def send_xlogin_info(self, message: discord.Message):
+    async def send_xlogin_info(self, message: disnake.Message):
         guild = self.bot.get_guild(config.guild_id)
         fp = await guild.fetch_emoji(585915845146968093)
         await message.channel.send(utils.fill_message("verify_send_dumbshit",

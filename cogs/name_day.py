@@ -1,7 +1,7 @@
 import requests
 from datetime import date
 
-from discord.ext import commands
+from disnake.ext import commands
 
 from config.messages import Messages as messages
 

@@ -1,6 +1,6 @@
 import datetime
 
-from discord.ext import commands
+from disnake.ext import commands
 
 import utils
 from config import cooldowns

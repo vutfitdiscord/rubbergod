@@ -1,7 +1,7 @@
 import traceback
 
-import discord
-from discord.ext import commands
+import disnake
+from disnake.ext import commands
 import sqlalchemy
 
 from repository.database import session
@@ -18,7 +18,7 @@ class Error(commands.Cog):
     async def on_command_error(self, ctx, error):
         # The local handlers so far only catch bad arguments so we still
         # want to print the rest
-        if isinstance(error, discord.errors.DiscordServerError):
+        if isinstance(error, disnake.errors.DiscordServerError):
             return
         if isinstance(error, sqlalchemy.exc.InternalError):
             session.rollback()
@@ -50,7 +50,7 @@ class Error(commands.Cog):
             return
 
         output = "".join(traceback.format_exception(type(error), error, error.__traceback__))
-        embed = discord.Embed(title=f"Ignoring exception in command {ctx.command}", color=0xFF0000)
+        embed = disnake.Embed(title=f"Ignoring exception in command {ctx.command}", color=0xFF0000)
         embed.add_field(name="Zpráva", value=ctx.message.content[:1000])
         embed.add_field(name="Autor", value=str(ctx.author))
         if ctx.guild and ctx.guild.id != config.guild_id:

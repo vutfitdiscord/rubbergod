@@ -1,5 +1,5 @@
-import discord
-from discord.ext import commands
+import disnake
+from disnake.ext import commands
 
 import utils
 import re
@@ -41,7 +41,7 @@ class Karma(commands.Cog):
                     await ctx.message.remove_reaction(ctx.emoji, ctx.member)
         # reeval karma message
         elif (ctx.message.embeds 
-            and ctx.message.embeds[0].title is not discord.Embed.Empty 
+            and ctx.message.embeds[0].title is not disnake.Embed.Empty 
             and ctx.message.embeds[0].title == "Karma zprávy"
             and ctx.emoji == "🔁"
         ):
@@ -58,7 +58,7 @@ class Karma(commands.Cog):
         # leaderboard pagination
         elif (
             ctx.message.embeds
-            and ctx.message.embeds[0].title is not discord.Embed.Empty
+            and ctx.message.embeds[0].title is not disnake.Embed.Empty
             and re.match(r".* (LEADER|BAJKAR|ISHA|GIVING)BOARD .*", ctx.message.embeds[0].title)
             and ctx.emoji in ["◀", "▶", "⏪"]
         ):
@@ -67,7 +67,7 @@ class Karma(commands.Cog):
             if column is None:
                 return
 
-            if embed.description is not discord.Embed.Empty:
+            if embed.description is not disnake.Embed.Empty:
                 current_page = int(embed.description.split(" – ")[0])
             else:
                 current_page = max_page
@@ -134,7 +134,7 @@ class Karma(commands.Cog):
                 await ctx.send(utils.fill_message("karma_invalid_command", user=ctx.author.id))
 
     @karma.command(brief=messages.karma_stalk_brief)
-    async def stalk(self, ctx, user: discord.Member):
+    async def stalk(self, ctx, user: disnake.Member):
         await ctx.send(self.karma.karma_get(ctx.author, user))
         await self.check.botroom_check(ctx.message)
 
@@ -147,7 +147,7 @@ class Karma(commands.Cog):
             try:
                 await self.karma.emoji_list_all_values(ctx.channel)
                 await self.check.botroom_check(ctx.message)
-            except discord.errors.Forbidden:
+            except disnake.errors.Forbidden:
                 return
 
     @karma.command(brief=messages.karma_get_brief)
@@ -159,7 +159,7 @@ class Karma(commands.Cog):
             try:
                 await self.karma.emoji_get_value(ctx.message)
                 await self.check.botroom_check(ctx.message)
-            except discord.errors.Forbidden:
+            except disnake.errors.Forbidden:
                 return
 
     @karma.command(brief=messages.karma_revote_brief)
@@ -172,10 +172,10 @@ class Karma(commands.Cog):
                 try:
                     await ctx.message.delete()
                     await self.karma.emoji_revote_value(ctx.message)
-                except discord.errors.Forbidden:
+                except disnake.errors.Forbidden:
                     return
             else:
-                dc_vote_room = discord.utils.get(ctx.guild.channels, id=config.vote_room)
+                dc_vote_room = disnake.utils.get(ctx.guild.channels, id=config.vote_room)
                 await ctx.send(utils.fill_message("vote_room_only", room=dc_vote_room))
 
     @karma.command(brief=messages.karma_vote_brief)
@@ -188,10 +188,10 @@ class Karma(commands.Cog):
                 try:
                     await ctx.message.delete()
                     await self.karma.emoji_vote_value(ctx.message)
-                except discord.errors.Forbidden:
+                except disnake.errors.Forbidden:
                     return
             else:
-                dc_vote_room = discord.utils.get(ctx.guild.channels, id=config.vote_room)
+                dc_vote_room = disnake.utils.get(ctx.guild.channels, id=config.vote_room)
                 await ctx.send(utils.fill_message("vote_room_only", room=dc_vote_room))
 
     @karma.command(brief=messages.karma_give_brief)
@@ -200,7 +200,7 @@ class Karma(commands.Cog):
         await self.karma.karma_give(ctx.message)
 
     @karma.command(brief=messages.karma_message_brief)
-    async def message(self, ctx, message: discord.Message):
+    async def message(self, ctx, message: disnake.Message):
         async with ctx.channel.typing():
             embed = await self.karma.message_karma(ctx.author, message)
             response = await ctx.send(embed=embed)

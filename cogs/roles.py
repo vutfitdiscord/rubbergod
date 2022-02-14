@@ -1,5 +1,5 @@
-import discord
-from discord.ext import commands
+import disnake
+from disnake.ext import commands
 from typing import Tuple, Union, List
 
 import utils
@@ -66,7 +66,7 @@ class ReactToRole(commands.Cog):
             except Exception:
                 if message.channel.id not in config.role_channels:
                     msg = utils.fill_message(
-                        "role_invalid_line", user=message.author.id, line=discord.utils.escape_mentions(line)
+                        "role_invalid_line", user=message.author.id, line=disnake.utils.escape_mentions(line)
                     )
                     await message.channel.send(msg)
         for line in output:
@@ -82,14 +82,14 @@ class ReactToRole(commands.Cog):
                         msg = utils.fill_message(
                             "role_invalid_line",
                             user=message.author.id,
-                            line=discord.utils.escape_mentions(line[0]),
+                            line=disnake.utils.escape_mentions(line[0]),
                         )
                         await message.channel.send(msg)
         return output
 
     # Adds reactions to message
     async def message_role_reactions(self, message, data):
-        if message.channel.type is not discord.ChannelType.text:
+        if message.channel.type is not disnake.ChannelType.text:
             await message.channel.send(Messages.role_not_on_server)
             guild = self.bot.get_guild(config.guild_id)
         else:
@@ -98,18 +98,18 @@ class ReactToRole(commands.Cog):
             roles, channels = self.get_target(line[0], guild)
             if roles == [None] and channels == [None]:
                 msg = utils.fill_message(
-                    "role_not_role", user=message.author.id, not_role=discord.utils.escape_mentions(line[0])
+                    "role_not_role", user=message.author.id, not_role=disnake.utils.escape_mentions(line[0])
                 )
                 await message.channel.send(msg)
             else:
                 try:
                     await message.add_reaction(line[1])
-                except discord.errors.HTTPException:
+                except disnake.errors.HTTPException:
                     msg = utils.fill_message(
                         "role_invalid_emote",
                         user=message.author.id,
-                        not_emote=discord.utils.escape_mentions(line[1]),
-                        role=discord.utils.escape_mentions(line[0]),
+                        not_emote=disnake.utils.escape_mentions(line[1]),
+                        role=disnake.utils.escape_mentions(line[0]),
                     )
                     await message.channel.send(msg)
 
@@ -121,10 +121,10 @@ class ReactToRole(commands.Cog):
                 await member.add_roles(role)
         for channel in channels:
             if channel is not None:
-                perms: discord.PermissionOverwrite = channel.overwrites_for(member)
+                perms: disnake.PermissionOverwrite = channel.overwrites_for(member)
 
                 if not perms.is_empty():
-                    deny_exp_perm = discord.Permissions()
+                    deny_exp_perm = disnake.Permissions()
                     deny_exp_perm.view_channel = True
 
                     perm_pair = perms.pair()
@@ -134,7 +134,7 @@ class ReactToRole(commands.Cog):
                         # This will prevent from removing higher permissions from channels (or bans).
                         await channel.set_permissions(member, overwrite=None)
 
-                perms_for: discord.Permissions = channel.permissions_for(member)
+                perms_for: disnake.Permissions = channel.permissions_for(member)
                 if perms_for.administrator or perms_for.view_channel:  # Is mod, or now have access. Ignore
                     continue
 
@@ -146,7 +146,7 @@ class ReactToRole(commands.Cog):
                     else:
                         await channel.set_permissions(member, read_messages=True)
 
-    async def remove_perms(self, target, member: discord.Member, guild):
+    async def remove_perms(self, target, member: disnake.Member, guild):
         """Remove a target role / channel from a member."""
         roles, channels = self.get_target(target, guild)
         for role in roles:
@@ -164,7 +164,7 @@ class ReactToRole(commands.Cog):
             #if overwrite.is_empty():
             #    continue  # Overwrite not found. User maybe have access from role.
 
-            if overwrite != discord.PermissionOverwrite(read_messages=True):
+            if overwrite != disnake.PermissionOverwrite(read_messages=True):
                 # Member have extra permissions and we don't want remove it.
                 # Instead of remove permission we set only read messages permission to deny.
                 overwrite.update(read_messages=False)
@@ -177,26 +177,26 @@ class ReactToRole(commands.Cog):
                 # The user still sees the channel. You need to create special permissions.
                 await channel.set_permissions(member, read_messages=False)
 
-    def get_target(self, target, guild) -> Tuple[List[discord.Role], List[discord.abc.GuildChannel]]:
+    def get_target(self, target, guild) -> Tuple[List[disnake.Role], List[disnake.abc.GuildChannel]]:
         """Detect if target is a channel a role or a group."""
         # Try a group first
         group = group_repo.get_group(target)
         if group is not None:
             roles, channels = [], []
             for role_id in group.role_ids:
-                roles.append(discord.utils.get(guild.roles, id=int(role_id)))
+                roles.append(disnake.utils.get(guild.roles, id=int(role_id)))
             for channel_id in group.channel_ids:
-                channels.append(discord.utils.get(guild.channels, id=int(channel_id)))
+                channels.append(disnake.utils.get(guild.channels, id=int(channel_id)))
             return roles, channels
 
         # if ID
         if isinstance(target, int) or target.isdigit():
-            role = discord.utils.get(guild.roles, id=int(target))
-            channel = discord.utils.get(guild.channels, id=int(target))
+            role = disnake.utils.get(guild.roles, id=int(target))
+            channel = disnake.utils.get(guild.channels, id=int(target))
         # else if name of role / #channel
         else:
-            role = discord.utils.get(guild.roles, name=target)
-            channel = discord.utils.get(guild.channels, name=target[1:].lower())
+            role = disnake.utils.get(guild.roles, name=target)
+            channel = disnake.utils.get(guild.channels, name=target[1:].lower())
 
         return [role], [channel]
 
@@ -261,8 +261,8 @@ class ChannelManager(commands.Cog):
             await ctx.send(Messages.channel_help)
 
     @channel.command(aliases=["cp"], brief=Messages.role_channel_copy_brief)
-    async def copy(self, ctx, src: Union[discord.TextChannel, discord.VoiceChannel],
-                   dst: Union[discord.TextChannel, discord.VoiceChannel]):
+    async def copy(self, ctx, src: Union[disnake.TextChannel, disnake.VoiceChannel],
+                   dst: Union[disnake.TextChannel, disnake.VoiceChannel]):
         """
         Copy permissions from src channel to dst.
         Both channels are expected as tags or IDs
@@ -272,7 +272,7 @@ class ChannelManager(commands.Cog):
         await ctx.send(Messages.channel_copy_done)
 
     @channel.command(brief=Messages.role_channel_clone_brief)
-    async def clone(self, ctx, src: Union[discord.TextChannel, discord.VoiceChannel], name):
+    async def clone(self, ctx, src: Union[disnake.TextChannel, disnake.VoiceChannel], name):
         """Clone channel with same permissions as src."""
         new = await src.clone(name=name)
         await ctx.send(utils.fill_message("channel_clone_done", id=new.id))

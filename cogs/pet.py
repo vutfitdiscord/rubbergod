@@ -1,6 +1,6 @@
 from config.messages import Messages
-import discord
-from discord.ext import commands
+import disnake
+from disnake.ext import commands
 
 import utils
 
@@ -18,13 +18,13 @@ class Pet(commands.Cog):
 
     @cooldowns.short_cooldown
     @commands.command()
-    async def pet(self, ctx, user: discord.Member = None):
+    async def pet(self, ctx, user: disnake.Member = None):
         if user is None:
             user = ctx.author
         if not user.avatar:
             await ctx.send(Messages.unsupported_image)
             return
-        url = user.avatar_url_as(format='jpg')
+        url = user.display_avatar.with_format('jpg')
         response = requests.get(url)
         avatarFull = Image.open(BytesIO(response.content))
 
@@ -54,7 +54,7 @@ class Pet(commands.Cog):
                            append_images=frames[1:], duration=40,
                            loop=0, transparency=0, disposal=2, optimize=False)
             image_binary.seek(0)
-            await ctx.send(file=discord.File(fp=image_binary, filename="pet.gif"))
+            await ctx.send(file=disnake.File(fp=image_binary, filename="pet.gif"))
 
     @pet.error
     async def pet_error(self, ctx, error):

@@ -1,4 +1,4 @@
-discord.py >= 1.6.0
+disnake
 emoji
 gitpython
 sqlalchemy
@@ -9,7 +9,6 @@ dhash
 toml
 beautifulsoup4
 lxml
-git+https://github.com/Rapptz/discord-ext-menus
+disnake-ext-menus
 python-dateutil
-discord-py-slash-command
 CairoSVG>=2.5.2
