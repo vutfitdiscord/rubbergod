@@ -13,10 +13,10 @@ bot used on VUT FEKT discord server.
 
 Before first run of bot you need to create discord application.
 Guide for creating new application and adding bot to your server can be found at
-discord.py [documentation](https://discordpy.readthedocs.io/en/latest/discord.html)
+disnake [documentation](https://docs.disnake.dev/en/latest/discord.html)
 
 While creating discord appilication one more step is required.
-Since `discord.py` v. 1.5 you will also need to enable `SERVER MEMBERS INTENT` in `Bot` tab.
+You will also need to enable `SERVER MEMBERS INTENT` in `Bot` tab.
 
 ## Installing and running the bot
 

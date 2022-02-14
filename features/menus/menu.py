@@ -1,9 +1,9 @@
 import asyncio
 
-import discord
-from discord import Message
-from discord.ext.commands import Bot, Context
-from discord.ext.menus import button, Last, First
+import disnake
+from disnake import Message
+from disnake.ext.commands import Bot, Context
+from disnake.ext.menus import button, Last, First
 
 from config.app_config import config
 from features.menus.base import BlockingPagedMenu, MemberLike
@@ -29,23 +29,23 @@ class AuthorOnlyPagedMenu(BlockingPagedMenu, inherit_buttons=False):
         await super().start(ctx, channel=channel, wait=wait)
 
     @staticmethod
-    def _is_add_event(payload: discord.RawReactionActionEvent) -> bool:
+    def _is_add_event(payload: disnake.RawReactionActionEvent) -> bool:
         return hasattr(payload, "event_type") and payload.event_type == "REACTION_ADD"
 
-    def _is_author_or_admin(self, payload: discord.RawReactionActionEvent) -> bool:
+    def _is_author_or_admin(self, payload: disnake.RawReactionActionEvent) -> bool:
         return hasattr(payload, "user_id") and (
                 payload.user_id == self.author.id or payload.user_id in config.admin_ids
         )
 
-    async def _try_remove_reaction(self, payload: discord.RawReactionActionEvent):
+    async def _try_remove_reaction(self, payload: disnake.RawReactionActionEvent):
         if self.ctx.message.guild and self.ctx.message.guild.me.guild_permissions.manage_messages:
             # try removing the reaction afterwards
             try:
                 await self.message.remove_reaction(payload.emoji, payload.member)
-            except (discord.DiscordException, AttributeError):
+            except (disnake.DiscordException, AttributeError):
                 pass
 
-    async def _checks(self, payload: discord.RawReactionActionEvent, remove_react_after=True) -> bool:
+    async def _checks(self, payload: disnake.RawReactionActionEvent, remove_react_after=True) -> bool:
         """Checks it's reaction ADD event and message ownership.
         Additionally allows for the users react removal.
         """

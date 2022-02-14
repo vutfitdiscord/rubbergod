@@ -1,5 +1,5 @@
-import discord
-from discord.ext import commands
+import disnake
+from disnake.ext import commands
 from repository.stream_links_repo import StreamLinksRepo
 from config import cooldowns
 from config.app_config import config
@@ -46,13 +46,13 @@ class StreamLinks(commands.Cog):
             return
 
         embed = self.create_embed_of_link(streamlinks[0], ctx.author, len(streamlinks), 1)
-        message: discord.Message = await ctx.reply(embed=embed)
+        message: disnake.Message = await ctx.reply(embed=embed)
         await utils.add_pagination_reactions(message, len(streamlinks))
 
     @commands.check(utils.helper_plus)
     @streamlinks.command(brief=Messages.streamlinks_add_brief)
     async def add(self, ctx: commands.Context, subject: str, link: str,
-                  user: Union[discord.User, discord.Member, str], *args):
+                  user: Union[disnake.User, disnake.Member, str], *args):
         try:
             await ctx.message.add_reaction(config.emote_loading)
 
@@ -108,7 +108,7 @@ class StreamLinks(commands.Cog):
         await send_list_of_messages(ctx, messages)
 
     async def log(self, stream, user):
-        embed = discord.Embed(title="Odkaz na stream byl smazán", color=0xEEE657)
+        embed = disnake.Embed(title="Odkaz na stream byl smazán", color=0xEEE657)
         embed.add_field(name="Provedl", value=user.name)
         embed.add_field(name="Předmět", value=stream.subject.upper())
         embed.add_field(name="Od", value=stream.member_name)
@@ -184,12 +184,12 @@ class StreamLinks(commands.Cog):
         try:
             await ctx.message.clear_reactions()
             await ctx.message.add_reaction(emoji)
-        except discord.HTTPException:
+        except disnake.HTTPException:
             pass
 
-    def create_embed_of_link(self, streamlink: StreamLink, author: Union[discord.User, discord.Member],
-                             links_count: int, current_pos: int) -> discord.Embed:
-        embed = discord.Embed(color=0xEEE657)
+    def create_embed_of_link(self, streamlink: StreamLink, author: Union[disnake.User, disnake.Member],
+                             links_count: int, current_pos: int) -> disnake.Embed:
+        embed = disnake.Embed(color=0xEEE657)
         embed.set_author(name="Streamlinks")
 
         if streamlink.thumbnail_url is not None:
@@ -215,7 +215,7 @@ class StreamLinks(commands.Cog):
                 await ctx.message.edit(content=Messages.streamlinks_missing_original, embed=None)
                 return
 
-            embed: discord.Embed = ctx.message.embeds[0]
+            embed: disnake.Embed = ctx.message.embeds[0]
             footer_text = embed.footer.text.split('|')[1].strip()
             match = pagination_regex.match(footer_text)
 
@@ -248,17 +248,17 @@ class StreamLinks(commands.Cog):
 
     @add.error
     async def streamlinks_add_error(self, ctx: commands.Context, error):
-        if isinstance(error, discord.ext.commands.MissingRequiredArgument):
+        if isinstance(error, disnake.ext.commands.MissingRequiredArgument):
             await ctx.reply(Messages.streamlinks_add_format)
 
     @remove.error
     async def streamlinks_remove_error(self, ctx: commands.Context, error):
-        if isinstance(error, discord.ext.commands.MissingRequiredArgument):
+        if isinstance(error, disnake.ext.commands.MissingRequiredArgument):
             await ctx.reply(Messages.streamlinks_remove_format)
 
     @list.error
     async def streamlinks_list_error(self, ctx: commands.Context, error):
-        if isinstance(error, discord.ext.commands.MissingRequiredArgument):
+        if isinstance(error, disnake.ext.commands.MissingRequiredArgument):
             await ctx.reply(f"{Messages.streamlinks_list_format}\n{ctx.command.brief}")
 
 

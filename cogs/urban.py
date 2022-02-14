@@ -3,8 +3,8 @@ import requests
 import asyncio
 from urllib import parse as url_parse
 
-import discord
-from discord.ext import commands
+import disnake
+from disnake.ext import commands
 
 import utils
 from config import cooldowns
@@ -30,7 +30,7 @@ class Urban(commands.Cog):
             if len(example) > 1024:
                 example = example[0:1021] + "`…`"
 
-            embed = discord.Embed(
+            embed = disnake.Embed(
                 title=item["word"],
                 url=item["permalink"],
             )
@@ -52,7 +52,7 @@ class Urban(commands.Cog):
         """Send message and handle pagination for 300 seconds"""
         try:
             message = await ctx.send(embed=embeds[0])
-        except discord.errors.HTTPException:
+        except disnake.errors.HTTPException:
             # not well formed url, API bug
             embeds[0].url = ""
             message = await ctx.send(embed=embeds[0])
@@ -84,12 +84,12 @@ class Urban(commands.Cog):
                     pagenum = 0
             try:
                 await message.remove_reaction(emoji, user)
-            except discord.errors.Forbidden:
+            except disnake.errors.Forbidden:
                 pass
 
             try:
                 await message.edit(embed=embeds[pagenum])
-            except discord.errors.HTTPException:
+            except disnake.errors.HTTPException:
                 # not well formed url, API bug
                 embeds[pagenum].url = ""
                 await message.edit(embed=embeds[pagenum])

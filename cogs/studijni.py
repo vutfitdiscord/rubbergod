@@ -1,5 +1,5 @@
-import discord
-from discord.ext import commands
+import disnake
+from disnake.ext import commands
 from lxml import etree
 import requests
 
@@ -8,7 +8,7 @@ from utils import add_author_footer
 
 class Studijni(commands.Cog):
 
-    @commands.command(aliases=["studijne", "študijné", "študijní"], brief=Messages.studijni_brief)
+    @commands.command(aliases=["studijne", "študijné", "studijní"], brief=Messages.studijni_brief)
     async def studijni(self, ctx):
         link = "https://www.fit.vut.cz/fit/room/C109/.cs"
         htmlparser = etree.HTMLParser()
@@ -16,7 +16,7 @@ class Studijni(commands.Cog):
         result = session.get(link)
         xDoc2 = etree.fromstring(result.text, htmlparser)
         hours_div = xDoc2.xpath("//*[b[contains(text(),'Úřední hodiny')]]//following-sibling::div")            
-        embed = discord.Embed(title=Messages.studijni_title, url=link)
+        embed = disnake.Embed(title=Messages.studijni_title, url=link)
         if hours_div:
             hours = etree.tostring(hours_div[0], encoding=str, method="text")
             additional_info = xDoc2.xpath("//main//section/p")

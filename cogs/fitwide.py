@@ -2,8 +2,8 @@ import datetime
 import subprocess
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 
-import discord
-from discord.ext import commands
+import disnake
+from disnake.ext import commands
 
 
 import utils
@@ -34,7 +34,7 @@ class FitWide(commands.Cog):
         if arcas_time + datetime.timedelta(hours=config.arcas_delay) <\
            when and config.arcas_id == user.id:
             arcas_time = when
-            gif = discord.Embed()
+            gif = disnake.Embed()
             gif.set_image(url="https://i.imgur.com/v2ueHcl.gif")
             await channel.send(embed=gif)
 
@@ -78,14 +78,14 @@ class FitWide(commands.Cog):
         guild = self.bot.get_guild(config.guild_id)
         members = guild.members
 
-        verify = discord.utils.get(guild.roles, name="Verify")
-        host = discord.utils.get(guild.roles, name="Host")
-        bot = discord.utils.get(guild.roles, name="Bot")
-        poradce = discord.utils.get(guild.roles, name="Poradce")
-        dropout = discord.utils.get(guild.roles, name="Dropout")
-        survivor = discord.utils.get(guild.roles, name="Survivor")
-        king = discord.utils.get(guild.roles, name="King")
-        vut = discord.utils.get(guild.roles, name="VUT")
+        verify = disnake.utils.get(guild.roles, name="Verify")
+        host = disnake.utils.get(guild.roles, name="Host")
+        bot = disnake.utils.get(guild.roles, name="Bot")
+        poradce = disnake.utils.get(guild.roles, name="Poradce")
+        dropout = disnake.utils.get(guild.roles, name="Dropout")
+        survivor = disnake.utils.get(guild.roles, name="Survivor")
+        king = disnake.utils.get(guild.roles, name="King")
+        vut = disnake.utils.get(guild.roles, name="VUT")
 
         dropout_alternatives = [survivor, king]
 
@@ -102,7 +102,7 @@ class FitWide(commands.Cog):
         years = ["0BIT", "1BIT", "2BIT", "3BIT", "4BIT+",
                  "0MIT", "1MIT", "2MIT", "3MIT+", "PhD+", "Dropout"]
 
-        year_roles = {year: discord.utils.get(guild.roles, name=year) for year in years}
+        year_roles = {year: disnake.utils.get(guild.roles, name=year) for year in years}
 
         weird_members = {year_y: {year_x: [] for year_x in year_roles.values()}
                          for year_y in year_roles.values()}
@@ -134,7 +134,7 @@ class FitWide(commands.Cog):
                 if year is None:
                     year = "Dropout"
 
-                correct_role = discord.utils.get(guild.roles, name=year)
+                correct_role = disnake.utils.get(guild.roles, name=year)
 
                 if correct_role not in member.roles:
                     for role_name, role in year_roles.items():
@@ -202,12 +202,12 @@ class FitWide(commands.Cog):
 
         BIT_names = [str(x) + "BIT" + ("+" if x == 4 else "")
                      for x in range(5)]
-        BIT = [discord.utils.get(guild.roles, name=role_name)
+        BIT = [disnake.utils.get(guild.roles, name=role_name)
                for role_name in BIT_names]
 
         MIT_names = [str(x) + "MIT" + ("+" if x == 3 else "")
                      for x in range(4)]
-        MIT = [discord.utils.get(guild.roles, name=role_name)
+        MIT = [disnake.utils.get(guild.roles, name=role_name)
                for role_name in MIT_names]
 
         for member in BIT[3].members:
@@ -232,10 +232,10 @@ class FitWide(commands.Cog):
 
         general_names = [str(x) + "bit-general" for x in range(4)]
         terminy_names = [str(x) + "bit-terminy" for x in range(1, 3)]
-        general_channels = [discord.utils.get(guild.channels,
+        general_channels = [disnake.utils.get(guild.channels,
                                               name=channel_name)
                             for channel_name in general_names]
-        terminy_channels = [discord.utils.get(guild.channels,
+        terminy_channels = [disnake.utils.get(guild.channels,
                                               name=channel_name)
                             for channel_name in terminy_names]
 
@@ -247,9 +247,9 @@ class FitWide(commands.Cog):
         # create 0bit-general
         overwrites = {
             guild.default_role:
-                discord.PermissionOverwrite(read_messages=False),
-            discord.utils.get(guild.roles, name="0BIT"):
-                discord.PermissionOverwrite(read_messages=True,
+                disnake.PermissionOverwrite(read_messages=False),
+            disnake.utils.get(guild.roles, name="0BIT"):
+                disnake.PermissionOverwrite(read_messages=True,
                                             send_messages=True)
         }
         await guild.create_text_channel(
@@ -258,21 +258,21 @@ class FitWide(commands.Cog):
             position=general_channels[0].position - 1
         )
         # give 0mit access to mit-general
-        mit_general = discord.utils.get(guild.channels,
+        mit_general = disnake.utils.get(guild.channels,
                                         name="mit-general")
         await mit_general.set_permissions(mit0, read_messages=True)
 
         # delete 3bit-terminy
-        await discord.utils.get(guild.channels, name="3bit-terminy").delete()
+        await disnake.utils.get(guild.channels, name="3bit-terminy").delete()
 
         await terminy_channels[1].edit(name="3bit-terminy")
         await terminy_channels[0].edit(name="2bit-terminy")
         # create 1bit-terminy
         overwrites = {
             guild.default_role:
-                discord.PermissionOverwrite(read_messages=False),
-            discord.utils.get(guild.roles, name="1BIT"):
-                discord.PermissionOverwrite(read_messages=True,
+                disnake.PermissionOverwrite(read_messages=False),
+            disnake.utils.get(guild.roles, name="1BIT"):
+                disnake.PermissionOverwrite(read_messages=True,
                                             send_messages=False)
         }
         await guild.create_text_channel(
@@ -283,39 +283,39 @@ class FitWide(commands.Cog):
 
         # give 4bit perms to the new 3bit terminy
         await terminy_channels[1].set_permissions(
-            discord.utils.get(guild.roles, name="4BIT+"),
+            disnake.utils.get(guild.roles, name="4BIT+"),
             read_messages=True, send_messages=False
         )
 
         # Give people the correct mandatory classes after increment
         semester_names = [str(x) + ". Semestr" for x in range(1, 6)]
-        semester = [discord.utils.get(guild.categories, name=semester_name)
+        semester = [disnake.utils.get(guild.categories, name=semester_name)
                     for semester_name in semester_names]
-        await semester[0].set_permissions(discord.utils.get(guild.roles,
+        await semester[0].set_permissions(disnake.utils.get(guild.roles,
                                                             name="1BIT"),
                                           read_messages=True)
-        await semester[0].set_permissions(discord.utils.get(guild.roles,
+        await semester[0].set_permissions(disnake.utils.get(guild.roles,
                                                             name="2BIT"),
                                           overwrite=None)
-        await semester[1].set_permissions(discord.utils.get(guild.roles,
+        await semester[1].set_permissions(disnake.utils.get(guild.roles,
                                                             name="1BIT"),
                                           read_messages=True)
-        await semester[1].set_permissions(discord.utils.get(guild.roles,
+        await semester[1].set_permissions(disnake.utils.get(guild.roles,
                                                             name="2BIT"),
                                           overwrite=None)
-        await semester[2].set_permissions(discord.utils.get(guild.roles,
-                                                            name="2BIT"),
-                                          read_messages=True)
-        await semester[2].set_permissions(discord.utils.get(guild.roles,
-                                                            name="3BIT"),
-                                          overwrite=None)
-        await semester[3].set_permissions(discord.utils.get(guild.roles,
+        await semester[2].set_permissions(disnake.utils.get(guild.roles,
                                                             name="2BIT"),
                                           read_messages=True)
-        await semester[3].set_permissions(discord.utils.get(guild.roles,
+        await semester[2].set_permissions(disnake.utils.get(guild.roles,
                                                             name="3BIT"),
                                           overwrite=None)
-        await semester[4].set_permissions(discord.utils.get(guild.roles,
+        await semester[3].set_permissions(disnake.utils.get(guild.roles,
+                                                            name="2BIT"),
+                                          read_messages=True)
+        await semester[3].set_permissions(disnake.utils.get(guild.roles,
+                                                            name="3BIT"),
+                                          overwrite=None)
+        await semester[4].set_permissions(disnake.utils.get(guild.roles,
                                                             name="3BIT"),
                                           read_messages=True)
 
@@ -326,41 +326,41 @@ class FitWide(commands.Cog):
                 await channel.edit(sync_permissions=True)
 
         # skolni-info override
-        skolni_info = discord.utils.get(guild.channels,
+        skolni_info = disnake.utils.get(guild.channels,
                                         name="skolni-info")
         await skolni_info.set_permissions(bit0, read_messages=True)
         await skolni_info.set_permissions(mit0, read_messages=True)
 
-        await discord.utils.get(guild.channels, name="cvicici-info").\
-                set_permissions(discord.utils.get(guild.roles,
+        await disnake.utils.get(guild.channels, name="cvicici-info").\
+                set_permissions(disnake.utils.get(guild.roles,
                                                   name="1BIT"),
                                 read_messages=True)
-        await discord.utils.get(guild.channels, name="cvicici-info").\
-                set_permissions(discord.utils.get(guild.roles,
+        await disnake.utils.get(guild.channels, name="cvicici-info").\
+                set_permissions(disnake.utils.get(guild.roles,
                                                   name="1MIT"),
                                 read_messages=True)
-        await discord.utils.get(guild.channels, name="1bit-info").\
-                set_permissions(discord.utils.get(guild.roles,
+        await disnake.utils.get(guild.channels, name="1bit-info").\
+                set_permissions(disnake.utils.get(guild.roles,
                                                   name="1BIT"),
                                 read_messages=True)
-        await discord.utils.get(guild.channels, name="1bit-info").\
-                set_permissions(discord.utils.get(guild.roles,
+        await disnake.utils.get(guild.channels, name="1bit-info").\
+                set_permissions(disnake.utils.get(guild.roles,
                                                   name="2BIT"),
                                 overwrite=None)
-        await discord.utils.get(guild.channels, name="2bit-info").\
-                set_permissions(discord.utils.get(guild.roles,
+        await disnake.utils.get(guild.channels, name="2bit-info").\
+                set_permissions(disnake.utils.get(guild.roles,
                                                   name="2BIT"),
                                 read_messages=True)
-        await discord.utils.get(guild.channels, name="2bit-info").\
-                set_permissions(discord.utils.get(guild.roles,
+        await disnake.utils.get(guild.channels, name="2bit-info").\
+                set_permissions(disnake.utils.get(guild.roles,
                                                   name="3BIT"),
                                 overwrite=None)
-        await discord.utils.get(guild.channels, name="3bit-info").\
-                set_permissions(discord.utils.get(guild.roles,
+        await disnake.utils.get(guild.channels, name="3bit-info").\
+                set_permissions(disnake.utils.get(guild.roles,
                                                   name="3BIT"),
                                 read_messages=True)
-        await discord.utils.get(guild.channels, name="mit-info").\
-                set_permissions(discord.utils.get(guild.roles,
+        await disnake.utils.get(guild.channels, name="mit-info").\
+                set_permissions(disnake.utils.get(guild.roles,
                                                   name="1MIT"),
                                 read_messages=True)
 
@@ -450,7 +450,7 @@ class FitWide(commands.Cog):
     @cooldowns.default_cooldown
     @commands.check(is_in_modroom)
     @commands.command()
-    async def get_users_login(self, ctx, member: discord.Member):
+    async def get_users_login(self, ctx, member: disnake.Member):
         result = session.query(Permit).\
             filter(Permit.discord_ID == str(member.id)).one_or_none()
 
@@ -506,7 +506,7 @@ class FitWide(commands.Cog):
     @cooldowns.default_cooldown
     @commands.check(is_in_modroom)
     @commands.command()
-    async def connect_login_to_user(self, ctx, login, member: discord.Member):
+    async def connect_login_to_user(self, ctx, login, member: disnake.Member):
 
         result = session.query(Valid_person).\
             filter(Valid_person.login == login).one_or_none()
@@ -521,14 +521,14 @@ class FitWide(commands.Cog):
     @commands.command()
     async def reverify(self, ctx):
         guild = self.bot.get_guild(config.guild_id)
-        if isinstance(ctx.author, discord.Member):
+        if isinstance(ctx.author, disnake.Member):
             member = ctx.author
         else:
             member = guild.get_member(ctx.author.id)
-        host = discord.utils.get(guild.roles, name="Host")
+        host = disnake.utils.get(guild.roles, name="Host")
         if host in member.roles:
-            verify = discord.utils.get(guild.roles, name="Verify")
-            zajemce = discord.utils.get(guild.roles, name="ZajemceoStudium")
+            verify = disnake.utils.get(guild.roles, name="Verify")
+            zajemce = disnake.utils.get(guild.roles, name="ZajemceoStudium")
             await member.remove_roles(host, verify, zajemce, reason="reverify")
             await ctx.send("Done")
         else:

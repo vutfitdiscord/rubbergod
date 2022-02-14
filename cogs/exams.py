@@ -1,5 +1,5 @@
-import discord
-from discord.ext import commands
+import disnake
+from disnake.ext import commands
 import datetime
 from typing import Union, List
 import re
@@ -21,8 +21,8 @@ class Exams(commands.Cog):
     @commands.command(brief=Messages.exams_brief, aliases=["zkousky"])
     async def exams(self, ctx:commands.Context, rocnik:Union[str, None]=None):
         if rocnik is None:
-            if isinstance(ctx.author, discord.Member):
-                user_roles: List[discord.Role] = ctx.author.roles
+            if isinstance(ctx.author, disnake.Member):
+                user_roles: List[disnake.Role] = ctx.author.roles
 
                 for role in user_roles:
                     match = re.match(rocnik_regex, role.name.upper())
@@ -89,8 +89,8 @@ class Exams(commands.Cog):
 
                 if body is None:
                     # There is no table so no terms
-                    embed = discord.Embed(title=title, description=description,
-                                          color=discord.Color.dark_blue())
+                    embed = disnake.Embed(title=title, description=description,
+                                          color=disnake.Color.dark_blue())
                     utils.add_author_footer(embed, ctx.author)
                     return await ctx.send(embed=embed)
 
@@ -103,7 +103,7 @@ class Exams(commands.Cog):
 
                 pages = []
                 for exam_batch in exam_batches:
-                    embed = discord.Embed(title=title, description=description, color=discord.Color.dark_blue())
+                    embed = disnake.Embed(title=title, description=description, color=disnake.Color.dark_blue())
                     utils.add_author_footer(embed, ctx.author)
 
                     for exam in exam_batch:
@@ -176,7 +176,7 @@ class Exams(commands.Cog):
                 if number_of_pages > 1:
                     page_sesstion = PaginatorSession(self.bot, ctx, timeout=config.exams_paginator_duration,
                                                      pages=pages,
-                                                     color=discord.Color.dark_blue(), delete_after=False)
+                                                     color=disnake.Color.dark_blue(), delete_after=False)
 
                     await page_sesstion.run()
                 elif number_of_pages == 1:
@@ -184,18 +184,18 @@ class Exams(commands.Cog):
                     await ctx.send(embed=pages[0])
                 else:
                     # No pages were parsed, so we will post only default embed
-                    embed = discord.Embed(title=title, description=description, color=discord.Color.dark_blue())
+                    embed = disnake.Embed(title=title, description=description, color=disnake.Color.dark_blue())
                     utils.add_author_footer(embed, ctx.author)
                     await ctx.send(embed=embed)
             except:
                 # Parsing failed
-                embed = discord.Embed(title=title, description=description, color=discord.Color.dark_blue())
+                embed = disnake.Embed(title=title, description=description, color=disnake.Color.dark_blue())
                 utils.add_author_footer(embed, ctx.author)
                 await ctx.send(embed=embed)
                 await ctx.send(Messages.exams_parsing_failed)
         else:
             # Site returned fail code
-            embed = discord.Embed(title=title, description=description, color=discord.Color.dark_blue())
+            embed = disnake.Embed(title=title, description=description, color=disnake.Color.dark_blue())
             utils.add_author_footer(embed, ctx.author)
             await ctx.send(embed=embed)
 

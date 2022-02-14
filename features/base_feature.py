@@ -1,5 +1,5 @@
-from discord.ext.commands import Bot
-from discord import TextChannel, Embed
+from disnake.ext.commands import Bot
+from disnake import TextChannel, Embed
 
 
 class BaseFeature:

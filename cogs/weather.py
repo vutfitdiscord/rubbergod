@@ -1,7 +1,7 @@
 import requests
 
-import discord
-from discord.ext import commands
+import disnake
+from disnake.ext import commands
 
 from config.app_config import config
 from config.messages import Messages as messages
@@ -30,7 +30,7 @@ class weather(commands.Cog):
 
         if str(res["cod"]) == "200":
             description = "Aktuální počasí v městě " + res["name"] + ", " + res["sys"]["country"]
-            embed = discord.Embed(title="Počasí", description=description)
+            embed = disnake.Embed(title="Počasí", description=description)
             image = "http://openweathermap.org/img/w/" + res["weather"][0]["icon"] + ".png"
             embed.set_thumbnail(url=image)
             weather = res["weather"][0]["main"] + " ( " + res["weather"][0]["description"] + " ) "

@@ -2,9 +2,8 @@ import traceback
 import argparse
 import logging
 
-from discord import Embed, TextChannel, AllowedMentions, Intents, Message
-from discord.ext import commands
-from discord_slash import SlashCommand
+from disnake import Embed, TextChannel, AllowedMentions, Intents, Message
+from disnake.ext import commands
 
 import utils
 from config.messages import Messages
@@ -57,7 +56,6 @@ bot = commands.Bot(
     allowed_mentions=AllowedMentions(roles=False, everyone=False, users=True),
     intents=intents,
 )
-slash = SlashCommand(bot, sync_commands=True, sync_on_cog_reload = True)
 
 presence = presence.Presence(bot)
 
@@ -90,6 +88,7 @@ async def on_error(event, *args, **kwargs):
     for arg in args:
         if event == "on_message":
             message = arg.content
+            message_id = arg.id
             channel = arg.channel
             user = arg.author
             if hasattr(arg, 'guild') and arg.guild:
@@ -99,7 +98,7 @@ async def on_error(event, *args, **kwargs):
                 event_guild = "DM"
 
         else: # on_raw_reaction_add/remove
-
+            message_id = arg.message_id
             if hasattr(arg, 'guild_id'):
                 guild = bot.get_guild(arg.guild_id)
                 event_guild = guild.name
@@ -145,7 +144,7 @@ async def on_error(event, *args, **kwargs):
             embed.add_field(name="Reaction", value=arg.emoji)
             embed.add_field(name="Typ", value=arg.event_type)
         if guild:
-            link = f"https://discord.com/channels/{guild.id}/{arg.channel_id}/{arg.message_id}"
+            link = f"https://discord.com/channels/{guild.id}/{channel.id}/{message_id}"
             embed.add_field(name="Link", value=link, inline=False)
         embeds.append(embed)
 

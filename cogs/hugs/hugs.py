@@ -1,8 +1,8 @@
 from functools import lru_cache
 from random import choice
 
-import discord
-from discord.ext import commands
+import disnake
+from disnake.ext import commands
 
 import utils
 from config.app_config import config
@@ -34,7 +34,7 @@ class Hugs(commands.Cog):
         """
         async with ctx.typing():
             menu = get_hugboard_menu(
-                base_embed=discord.Embed(
+                base_embed=disnake.Embed(
                     title="{0} HUGBOARD {0}".format(
                         self.get_default_emoji("peepoHugger") or ""
                     )
@@ -52,7 +52,7 @@ class Hugs(commands.Cog):
         """
         async with ctx.typing():
             menu = get_top_huggers_menu(
-                base_embed=discord.Embed(
+                base_embed=disnake.Embed(
                     title="{0} TOP HUGGERS {0} ".format(
                         self.get_default_emoji("peepoHugger") or ""
                     )
@@ -69,7 +69,7 @@ class Hugs(commands.Cog):
         """
         async with ctx.typing():
             menu = get_top_hugged_menu(
-                base_embed=discord.Embed(
+                base_embed=disnake.Embed(
                     title="{0} TOP HUGGED {0} ".format(
                         self.get_default_emoji("peepoHugger") or ""
                     )
@@ -81,7 +81,7 @@ class Hugs(commands.Cog):
 
     @cooldowns.long_cooldown
     @commands.command()
-    async def hugs(self, ctx: commands.Context, user: discord.Member = None):
+    async def hugs(self, ctx: commands.Context, user: disnake.Member = None):
         """
         Get your lovely hug stats.
         """
@@ -98,7 +98,7 @@ class Hugs(commands.Cog):
             positions = self.hugs_repo.get_member_position(stats)
             avg_position = int((positions[0] + positions[1]) // 2)
 
-            embed = discord.Embed(
+            embed = disnake.Embed(
                 title=title.format(
                     self.get_default_emoji("peepoHugger") or ""
                 ),
@@ -112,7 +112,7 @@ class Hugs(commands.Cog):
                 ),
             )
 
-            embed.set_author(name=user_str, icon_url=user.avatar_url)
+            embed.set_author(name=user_str, icon_url=user.avatar.url)
             utils.add_author_footer(embed, ctx.author)
 
             given_emoji = self.get_default_emoji("peepohugs") or ""
@@ -126,7 +126,7 @@ class Hugs(commands.Cog):
 
     @cooldowns.short_cooldown
     @commands.command()
-    async def hug(self, ctx: commands.Context, user: discord.Member = None, intensity: int = 0):
+    async def hug(self, ctx: commands.Context, user: disnake.Member = None, intensity: int = 0):
         """Because everyone likes hugs"""
         if user is None:
             user = ctx.author

@@ -1,5 +1,5 @@
-import discord
-from discord.ext import commands
+import disnake
+from disnake.ext import commands
 import re
 import os
 import toml
@@ -83,7 +83,7 @@ class DynamicConfig(commands.Cog):
             await ctx.send(Messages.config_wrong_key)
             return
         value = getattr(config, key)
-        embed = discord.Embed(title=key, description=str(value))
+        embed = disnake.Embed(title=key, description=str(value))
         await ctx.send(embed=embed)
 
     @config.command(brief=Messages.config_backup_brief)

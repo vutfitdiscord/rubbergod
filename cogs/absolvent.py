@@ -1,5 +1,5 @@
-import discord
-from discord.ext import commands
+import disnake
+from disnake.ext import commands
 
 import unicodedata
 import requests
@@ -26,7 +26,7 @@ class Absolvent(commands.Cog):
     async def diplom(self, ctx, degree, name, surname, diploma_number, thesis_web_id):
         """Command for diploma verification and honourable role addition
 
-        :param ctx: discord context
+        :param ctx: disnake context
         :param name: first name (case-sensitive)
         :param surname: last name (case-sensitive)
         :param degree: strictly either "Bc." or "Ing." (case-sensitive)
@@ -183,9 +183,9 @@ class Absolvent(commands.Cog):
         guild = self.bot.get_guild(config.guild_id)
         role = None
         if degree == "Bc.":
-            role = discord.utils.get(guild.roles, id=config.bc_role_id)
+            role = disnake.utils.get(guild.roles, id=config.bc_role_id)
         if degree == "Ing.":
-            role = discord.utils.get(guild.roles, id=config.ing_role_id)
+            role = disnake.utils.get(guild.roles, id=config.ing_role_id)
         if role:
             member = guild.get_member(ctx.author.id)
             for drop_role in member.roles:

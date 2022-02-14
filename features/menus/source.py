@@ -1,21 +1,21 @@
 """
 Custom data sources for menus
 
-This builds on what discord-ext-menus does but for our usage.
+This builds on what disnake-ext-menus does but for our usage.
 Which is - getting data from database, where the pagination info
 goes directly down to the used database query (with .offset, .limit),
 whereas the already implemented ones only work with iterables/generators of the data.
 
-We also need the command ctx to populate some values (member_ID) from discord.
+We also need the command ctx to populate some values (member_ID) from disnake.
 """
 
 import math
 from functools import cached_property
 from typing import Iterable, Union, Callable
 
-import discord
-from discord.ext.commands import Context
-from discord.ext.menus import PageSource, Menu
+import disnake
+from disnake.ext.commands import Context
+from disnake.ext.menus import PageSource, Menu
 from sqlalchemy.orm.query import Query
 from sqlalchemy.schema import Table
 
@@ -69,7 +69,7 @@ class DatabaseIteratorPageSource(PageSource):
         # Do not show pagination controls if there is only one page
         return (self.current_page + 1) < self.get_max_pages()
 
-    def format_page(self, menu: Menu, page: DatabasePage) -> Union[str, discord.Embed, dict]:
+    def format_page(self, menu: Menu, page: DatabasePage) -> Union[str, disnake.Embed, dict]:
         raise NotImplemented
 
 
@@ -83,7 +83,7 @@ class LeaderboardPageSource(DatabaseIteratorPageSource):
     as most of the possible leaderboard params can be supplied as
     init args.
     """
-    base_embed: discord.Embed = None
+    base_embed: disnake.Embed = None
     member_id_col_name: str = None
 
     def __init__(
@@ -91,7 +91,7 @@ class LeaderboardPageSource(DatabaseIteratorPageSource):
             row_formatter: Union[str, Callable],
             query: Query,
             per_page=10,
-            base_embed: discord.Embed = None,
+            base_embed: disnake.Embed = None,
             member_id_col_name="member_id",
     ):
         """
@@ -103,7 +103,7 @@ class LeaderboardPageSource(DatabaseIteratorPageSource):
                 - ``member_name`` :class:`str`
                 - ``entry`` :class:`Table`
 
-        base_embed: :class:`discord.Embed` defaults to empty Embed.
+        base_embed: :class:`disnake.Embed` defaults to empty Embed.
             The embed that will be used as a foundation for the message,
             it's ``.description`` and ``.footer`` will be used
             for the pagination purposes.
@@ -120,7 +120,7 @@ class LeaderboardPageSource(DatabaseIteratorPageSource):
         else:
             raise Exception("row_formatter has invalid type, should be str or callable.")
 
-        self.base_embed = base_embed if base_embed else discord.Embed()
+        self.base_embed = base_embed if base_embed else disnake.Embed()
         self.member_id_col_name = member_id_col_name
         super().__init__(query=query, per_page=per_page)
 
@@ -133,7 +133,7 @@ class LeaderboardPageSource(DatabaseIteratorPageSource):
             member = guild.get_member(member_id)
         if not member:
             return "_User left_"
-        return discord.utils.escape_markdown(str(member))
+        return disnake.utils.escape_markdown(str(member))
 
     async def _format_row(self, entry: Table, position: int, ctx: Context) -> str:
         """
@@ -154,7 +154,7 @@ class LeaderboardPageSource(DatabaseIteratorPageSource):
         kwargs = {"position": position, "member_name": member_name, "entry": entry}
         return self.row_formatter(**kwargs)
 
-    async def format_page(self, menu, page: DatabasePage) -> Union[str, discord.Embed, dict]:
+    async def format_page(self, menu, page: DatabasePage) -> Union[str, disnake.Embed, dict]:
         board_lines = []
 
         for i, entry in enumerate(page):  # type: int, Table

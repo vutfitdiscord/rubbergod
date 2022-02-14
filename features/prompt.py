@@ -1,12 +1,12 @@
-import discord
-from discord.ext import commands
+import disnake
+from disnake.ext import commands
 from collections import OrderedDict
 import asyncio
 
 
 class PromptSession:
     def __init__(self, bot: commands.Bot, ctx: commands.Context, message: str, timeout=60,
-                 color=discord.Color.orange()):
+                 color=disnake.Color.orange()):
         self.bot = bot
         self.ctx = ctx
 
@@ -27,7 +27,7 @@ class PromptSession:
     async def __show_prompt(self):
         if self.__running: return False
 
-        em = discord.Embed(title="Potvrzení", color=self.color)
+        em = disnake.Embed(title="Potvrzení", color=self.color)
         em.description = self.message
 
         self.__running = True

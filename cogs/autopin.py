@@ -1,9 +1,9 @@
 from typing import List
 
 import datetime
-import discord
+import disnake
 import utils
-from discord.ext import commands
+from disnake.ext import commands
 from repository import pin_repo
 from repository.database.pin_map import PinMap
 
@@ -33,7 +33,7 @@ class AutoPin(commands.Cog):
     async def add(self, ctx: commands.Context, message_url: str):
         try:
             converter = commands.MessageConverter()
-            message: discord.Message = await converter.convert(ctx, message_url)
+            message: disnake.Message = await converter.convert(ctx, message_url)
 
             self.repo.add_or_update_channel(str(message.channel.id), str(message.id))
 
@@ -46,7 +46,7 @@ class AutoPin(commands.Cog):
             return
 
     @pin.command(brief=Messages.autopin_remove_brief)
-    async def remove(self, ctx: commands.Context, channel: discord.TextChannel = None):
+    async def remove(self, ctx: commands.Context, channel: disnake.TextChannel = None):
         if channel is None:
             channel = ctx.channel
 
@@ -67,12 +67,12 @@ class AutoPin(commands.Cog):
 
         lines: List[str] = []
         for item in mappings:
-            channel: discord.TextChannel = await self.bot.fetch_channel(int(item.channel_id))
+            channel: disnake.TextChannel = await self.bot.fetch_channel(int(item.channel_id))
 
             if channel is None:
                 lines.append(utils.fill_message("autopin_list_unknown_channel", channel_id=item.channel_id))
             else:
-                message: discord.Message = await channel.fetch_message(int(item.message_id))
+                message: disnake.Message = await channel.fetch_message(int(item.message_id))
                 if message is None:
                     msg: str = utils.fill_message("autopin_list_unknown_message", channel=channel.mention)
                     lines.append(msg)
@@ -85,21 +85,21 @@ class AutoPin(commands.Cog):
             await ctx.send("\n".join(part))
 
     @commands.Cog.listener()
-    async def on_guild_channel_pins_update(self, channel: discord.TextChannel, last_pin):
+    async def on_guild_channel_pins_update(self, channel: disnake.TextChannel, last_pin):
         pin_map: PinMap = self.repo.find_channel_by_id(str(channel.id))
 
         if pin_map is None:
             # This channel is not used to check pins.
             return
 
-        pins: List[discord.Message] = await channel.pins()
+        pins: List[disnake.Message] = await channel.pins()
 
         if not any(x.id == int(pin_map.message_id) for x in pins):
             # Mapped pin was removed. Remove from map.
             self.repo.remove_channel(str(channel.id))
             print(f"INFO:\tRemoved {channel.id} from PIN mapping. (on_guild_channel_pins_update)")
         elif pins[0].id != int(pin_map.message_id):
-            message: discord.Message = await channel.fetch_message(int(pin_map.message_id))
+            message: disnake.Message = await channel.fetch_message(int(pin_map.message_id))
 
             if message is None:
                 # Message not exists. Remove from map.
@@ -111,7 +111,7 @@ class AutoPin(commands.Cog):
             print(f"INFO:\tMessage: {message.id} was repinned. (on_guild_channel_pins_update)")
 
     @commands.Cog.listener()
-    async def on_raw_message_delete(self, payload: discord.RawMessageDeleteEvent):
+    async def on_raw_message_delete(self, payload: disnake.RawMessageDeleteEvent):
         pin_map: PinMap = self.repo.find_channel_by_id(str(payload.channel_id))
 
         if pin_map is None or pin_map.message_id != str(payload.message_id):
@@ -134,7 +134,7 @@ class AutoPin(commands.Cog):
                 reaction.emoji == "📌"
                 and reaction.count >= config.autopin_count
                 and not message.pinned
-                and message.type == discord.MessageType.default
+                and message.type == disnake.MessageType.default
                 and message.channel.id not in config.autopin_banned_channels
             ):
                 pin_count = await channel.pins()
@@ -156,7 +156,7 @@ class AutoPin(commands.Cog):
         """
         Logging message link and users that pinned message
         """
-        embed = discord.Embed(title="📌 Auto pin message log", color=0xEEE657)
+        embed = disnake.Embed(title="📌 Auto pin message log", color=0xEEE657)
         user_names = ", ".join([user.name for user in users])
         message_link = message.jump_url
         embed.add_field(name="Users", value=user_names if len(user_names) > 0 else "**Missing users**")

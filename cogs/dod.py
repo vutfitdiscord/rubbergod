@@ -1,10 +1,10 @@
-from discord import Member
-from discord.ext import commands
+from disnake import Member
+from disnake.ext import commands
 from config.app_config import config
 from config.messages import Messages
 from features import verification
 from repository import user_repo
-import discord
+import disnake
 import utils
 
 
@@ -29,29 +29,29 @@ class Dod(commands.Cog):
     async def dod(self, ctx):
         # Check if the user doesn't have the verify role
         if not await self.has_role(ctx.author, config.verification_role):
-            embed = discord.Embed(title="DOD verify",
+            embed = disnake.Embed(title="DOD verify",
                                   color=0xeee657)
             embed.add_field(name="User", value=utils.generate_mention(ctx.author.id))
             channel = self.bot.get_channel(config.log_channel)
             await channel.send(embed=embed)
             try:
                 # Get server verify role
-                verify = discord.utils.get(
+                verify = disnake.utils.get(
                     ctx.message.guild.roles,
                     name=config.verification_role)
-                DOD = discord.utils.get(ctx.message.guild.roles, name="DOD")
-                host = discord.utils.get(ctx.message.guild.roles, name="Host")
-                zajemce = discord.utils.get(ctx.message.guild.roles, name="ZajemceoStudium")
+                DOD = disnake.utils.get(ctx.message.guild.roles, name="DOD")
+                host = disnake.utils.get(ctx.message.guild.roles, name="Host")
+                zajemce = disnake.utils.get(ctx.message.guild.roles, name="ZajemceoStudium")
                 member = ctx.author
             except AttributeError:
                 # jsme v PM
                 guild = self.bot.get_guild(config.guild_id)
-                verify = discord.utils.get(
+                verify = disnake.utils.get(
                     guild.roles,
                     name=config.verification_role)
-                DOD = discord.utils.get(ctx.message.guild.roles, name="DOD")
-                host = discord.utils.get(ctx.message.guild.roles, name="Host")
-                zajemce = discord.utils.get(ctx.message.guild.roles, name="ZajemceoStudium")
+                DOD = disnake.utils.get(ctx.message.guild.roles, name="DOD")
+                host = disnake.utils.get(ctx.message.guild.roles, name="Host")
+                zajemce = disnake.utils.get(ctx.message.guild.roles, name="ZajemceoStudium")
                 member = guild.get_member(ctx.author.id)
 
             await member.add_roles(verify)
@@ -64,7 +64,7 @@ class Dod(commands.Cog):
 
             await member.send(Messages.verify_post_verify_info)
 
-            if ctx.message.channel.type is not discord.ChannelType.private:
+            if ctx.message.channel.type is not disnake.ChannelType.private:
                 await ctx.message.channel.send(utils.fill_message("verify_verify_success",
                                                user=ctx.author.id))
         else:
@@ -72,7 +72,7 @@ class Dod(commands.Cog):
                                        user=ctx.author.id, admin=config.admin_ids[0]))
         try:
             await ctx.message.delete()
-        except discord.errors.Forbidden:
+        except disnake.errors.Forbidden:
             return
 
 

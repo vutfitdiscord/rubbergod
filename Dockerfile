@@ -5,7 +5,7 @@ ENV PYTHONUNBUFFERED 1
 ENV TZ=Europe/Prague
 
 RUN apk update && apk add gcc git postgresql-dev musl-dev tzdata libxml2-dev libxslt-dev g++
-RUN apk add jpeg-dev zlib-dev freetype-dev lcms2-dev openjpeg-dev tiff-dev tk-dev tcl-dev libwebp-dev libffi-dev
+RUN apk add jpeg-dev zlib-dev freetype-dev lcms2-dev openjpeg-dev tiff-dev tk-dev tcl-dev libwebp-dev libffi-dev cairo
 
 VOLUME /rubbergod
 WORKDIR /rubbergod

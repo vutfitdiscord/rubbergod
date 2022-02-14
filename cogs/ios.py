@@ -1,5 +1,5 @@
-import discord
-from discord.ext import commands, tasks
+import disnake
+from disnake.ext import commands, tasks
 from config import cooldowns
 from config.app_config import config
 from repository.database import session
@@ -236,7 +236,7 @@ class IOS(commands.Cog):
         self.ios_body.cancel()
 
     @tasks.loop(minutes=config.ios_looptime_minutes)
-    async def ios_body(self, channel=discord.Object(id='534431057001316362')):
+    async def ios_body(self, channel=disnake.Object(id='534431057001316362')):
         process = subprocess.Popen(["ssh", "merlin"], stdout=subprocess.PIPE)
         output, _ = process.communicate()
         memory, rest = output.decode('utf-8').split("semafory:\n")

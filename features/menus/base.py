@@ -1,8 +1,8 @@
 import asyncio
 from typing import Union
 
-from discord import User, Member
-from discord.ext.menus import MenuPages
+from disnake import User, Member
+from disnake.ext.menus import MenuPages
 
 
 class MenuInnerException(Exception):
@@ -16,7 +16,7 @@ class BlockingPagedMenu(MenuPages):
     """
     Handles some very much unexpected things with discord.ext.menu's.
 
-        - Setting an emoji on button that discord does not recognise would
+        - Setting an emoji on button that Discord does not recognise would
           make pagination silently fail. This class hacks it so these
           exceptions are raised in start() call and thus propagated
           into command caller.

@@ -1,5 +1,5 @@
-import discord
-from discord.ext import commands
+import disnake
+from disnake.ext import commands
 from typing import Union, Optional, List
 
 from config.app_config import config
@@ -15,17 +15,17 @@ class Subscriptions(commands.Cog):
         self.bot = bot
 
     @commands.Cog.listener()
-    async def on_message(self, message: discord.Message):
+    async def on_message(self, message: disnake.Message):
         if message.channel.id not in config.subscribable_channels:
             return
         subscribers: List[Subscription] = repo.get_channel_subscribers(message.channel.id)
         if not len(subscribers):
             return
 
-        embed = discord.Embed(description=message.content[:2048])
+        embed = disnake.Embed(description=message.content[:2048])
         embed.set_author(
             name=message.author.name,
-            icon_url=message.author.avatar_url_as(size=128),
+            icon_url=message.author.avatar.with_size(128).url,
         )
         embed.add_field(
             name=messages.subscriptions_message_link,
@@ -46,10 +46,10 @@ class Subscriptions(commands.Cog):
 
             try:
                 await member.send(embed=embed)
-            except discord.errors.HTTPException:
+            except disnake.errors.HTTPException:
                 continue
 
-    def phone_or_offline(self, member: discord.Member) -> bool:
+    def phone_or_offline(self, member: disnake.Member) -> bool:
         """This helper function returns 'True' only if the member is not active
         on desktop or web; they have to be on mobile or offline."""
         if str(member.desktop_status) != "offline":
@@ -60,7 +60,7 @@ class Subscriptions(commands.Cog):
 
     @commands.guild_only()
     @commands.command(brief=messages.subscribe_brief)
-    async def subscribe(self, ctx: commands.Context, channel: discord.TextChannel):
+    async def subscribe(self, ctx: commands.Context, channel: disnake.TextChannel):
         if channel.id not in config.subscribable_channels:
             await ctx.reply(messages.subscriptions_unsubscribable)
             return
@@ -73,7 +73,7 @@ class Subscriptions(commands.Cog):
 
     @commands.guild_only()
     @commands.command(brief=messages.unsubscribe_brief)
-    async def unsubscribe(self, ctx: commands.Context, channel: discord.TextChannel):
+    async def unsubscribe(self, ctx: commands.Context, channel: disnake.TextChannel):
         removed: int = repo.remove_subscription(ctx.author.id, channel.id)
         if removed == 0:
             await ctx.reply(messages.subscriptions_not_subscribed)
@@ -95,7 +95,7 @@ class Subscriptions(commands.Cog):
 
     @commands.guild_only()
     @commands.command(brief=messages.subscriptions_brief)
-    async def subscriptions(self, ctx, *, target: Union[discord.User, discord.TextChannel] = None):
+    async def subscriptions(self, ctx, *, target: Union[disnake.User, disnake.TextChannel] = None):
         if target is None:
             user_ids = set()
             user_subscriptions: dict = dict()
@@ -126,15 +126,15 @@ class Subscriptions(commands.Cog):
             return
 
         subs: set = set()
-        if type(target) == discord.TextChannel:
+        if type(target) == disnake.TextChannel:
             users = repo.get_channel_subscribers(target.id)
             for entry in users:
-                user: Optional[discord.User] = self.bot.get_user(entry.user_id)
+                user: Optional[disnake.User] = self.bot.get_user(entry.user_id)
                 subs.add(str(user) if user is not None else str(entry.user_id))
-        elif type(target) == discord.User:
+        elif type(target) == disnake.User:
             channels = repo.get_user_subscriptions(target.id)
             for entry in channels:
-                channel: Optional[discord.TextChannel] = ctx.guild.get_channel(entry.channel_id)
+                channel: Optional[disnake.TextChannel] = ctx.guild.get_channel(entry.channel_id)
                 subs.add(f"#{channel}" if channel is not None else str(entry.channel_id))
 
         if not len(subs):
