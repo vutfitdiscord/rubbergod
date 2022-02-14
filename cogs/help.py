@@ -7,6 +7,7 @@ import json
 
 from config.app_config import config
 from config import cooldowns
+from config.messages import Messages
 from features.git import Git
 import utils
 
@@ -74,7 +75,11 @@ class Help(commands.Cog):
         return pages
 
     def generate_embed(self, page):
-        embed = discord.Embed(title="Nápověda", color=0xeee657)
+        embed = discord.Embed(
+            title=Messages.help_title,
+            description=Messages.help_description,
+            color=0xeee657
+        )
         embed.set_thumbnail(url=self.bot.user.avatar_url)
         self.add_fields(embed, page["commands"])
         return embed
@@ -138,14 +143,14 @@ class Help(commands.Cog):
             await message.reply(file=discord.File(fp=file_binary, filename="help.json"))
 
     @cooldowns.default_cooldown
-    @commands.command(aliases=['god'], brief="Nápověda")
+    @commands.command(aliases=['god'], brief=Messages.help_title)
     async def help(self, ctx: commands.Context, *command):
         # Subcommand help
         command = ' '.join(command)
         if command:
             command_obj = self.bot.get_command(command)
             if not command_obj:
-                await ctx.send(f"Žádný příkaz jako `{command}` neexistuje.")
+                await ctx.send(utils.fill_message('help_command_not_found', command=command))
             else:
                 # if command group, show all possible subcommands
                 if type(command_obj) == commands.Group:
