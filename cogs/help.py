@@ -117,8 +117,11 @@ class Help(commands.Cog):
         param = request["parameters"]
         # mock ctx
         mock_message = copy.copy(message)
+        mock_view = commands.view.StringView("")
         mock_message.author = self.bot.get_user(param["user_id"])
         ctx = commands.Context(
+            bot=self.bot,
+            view=mock_view,
             prefix=config.default_prefix,
             message=mock_message,
         )
