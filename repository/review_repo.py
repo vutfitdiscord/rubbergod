@@ -147,18 +147,7 @@ class ReviewRepository(BaseRepository):
         session.merge(subject)
         session.commit()
 
-    def update_subject_type(self, shortcut, type, for_year):
-        subject = Subject_details(shortcut=shortcut, type=type, year=for_year)
-        session.merge(subject)
-        session.commit()
-
-    def update_subject_degree(self, shortcut, degree):
-        subject = Subject_details(shortcut=shortcut, degree=degree)
-        session.merge(subject)
-        session.commit()
-
-    def update_subject_sem(self, shortcut, sem):
-        subject = Subject_details(shortcut=shortcut, semester=sem)
+    def update_subject(self, subject: Subject_details):
         session.merge(subject)
         session.commit()
 

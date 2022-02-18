@@ -205,6 +205,8 @@ class Review(commands.Cog):
                 embed.add_field(name="Ročník", value=subject.year)
             embed.add_field(name="Kredity", value=subject.credits)
             embed.add_field(name="Ukončení", value=subject.end)
+            if "*" in subject.name:
+                embed.add_field(name="Upozornění", value="Předmět není v tomto roce otevřen", inline=False)
             if subject.shortcut.startswith("TV-"):
                 embed.add_field(
                     name="Rozvrh předmětu v IS",
@@ -587,6 +589,7 @@ class Review_helper:
                 if not review_repo.get_subject(shortcut.lower()).first():
                     review_repo.add_subject(shortcut.lower())
                 columns = row.find_all("td")
+                name = columns[0].get_text()
                 type = columns[2].get_text()
                 degree = "BIT"
                 for_year = "VBIT"
@@ -605,18 +608,11 @@ class Review_helper:
                 semester = "Z"
                 if sem == 2:
                     semester = "L"
-                if detail:
-                    type_list = detail.type.split(", ")
-                    # remove duplicated types -> bug fix
-                    if type_list.count(type) != 1:
-                        type_list.append(type)
-                        type_list = list(dict.fromkeys(type_list))
-                        review_repo.update_subject_type(shortcut, ", ".join(type_list), detail.year)
                 if not detail:
                     # subject not in DB
                     review_repo.set_subject_details(
                         shortcut,
-                        columns[0].get_text(),  # name
+                        name,
                         columns[1].get_text(),  # credits
                         semester,
                         columns[3].get_text(),  # end
@@ -625,21 +621,29 @@ class Review_helper:
                         for_year,
                         degree,
                     )
-                elif for_year not in detail.year.split(", "):
-                    # subject already in DB with different year (applicable mainly for MIT)
-                    if type not in type_list:
-                        type += f", {detail.type}"
-                    if detail.year:
-                        for_year += f", {detail.year}"
-                    review_repo.update_subject_type(shortcut, type, for_year)
-                elif semester not in detail.semester.split(", "):
-                    # subject already in DB with different semester (e.g. RET)
-                    semester += f", {detail.semester}"
-                    review_repo.update_subject_sem(shortcut, semester)
-                elif degree not in detail.degree.split(", "):
-                    # subject already in DB with different degree (e.g. RET)
-                    degree += f", {detail.degree}"
-                    review_repo.update_subject_degree(shortcut, degree)
+                else:
+                    changed = False
+                    if name != detail.name:
+                        # Update name mainly for courses that are not opened
+                        detail.name = name
+                        changed = True
+                    if for_year not in detail.year.split(", "):
+                        # subject already in DB with different year (applicable mainly for MIT)
+                        if type not in detail.type.split(", "):
+                            detail.type += f", {type}"
+                        if detail.year:
+                            detail.year += f", {for_year}"
+                        changed = True
+                    if semester not in detail.semester.split(", "):
+                        # subject already in DB with different semester (e.g. RET)
+                        detail.semester += f", {semester}"
+                        changed = True
+                    if degree not in detail.degree.split(", "):
+                        # subject already in DB with different degree (e.g. RET)
+                        detail.degree += f", {degree}"
+                        changed = True
+                    if changed:
+                        review_repo.update_subject(detail)
             sem += 1
             if sem == 3:
                 year += 1
