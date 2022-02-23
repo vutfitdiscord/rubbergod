@@ -10,7 +10,7 @@ from PIL import Image
 
 import utils
 from config.app_config import config
-from config.messages import Messages as messages
+from config.messages import Messages
 from repository import image_repo
 
 dhash.force_pil()
@@ -111,7 +111,7 @@ class Warden(commands.Cog):
     @commands.guild_only()
     @commands.max_concurrency(1, per=commands.BucketType.default, wait=False)
     @commands.bot_has_permissions(read_message_history=True)
-    @scan.command(name="history", brief=messages.warden_scan_brief)
+    @scan.command(name="history", brief=Messages.warden_scan_brief)
     async def scan_history(self, ctx, limit):
         """Scan current channel for images and save them as hashes
         limit: [all | <int>]
@@ -227,7 +227,7 @@ class Warden(commands.Cog):
         embed.add_field(name=f"**{author}**, {timestamp}", value=link, inline=False)
 
         embed.add_field(
-            name=messages.Messages.repost_title,
+            name=Messages.repost_title,
             value="_" + utils.fill_message("repost_content", limit=config.duplicate_limit) + "_",
         )
         embed.set_footer(text=message.id)
