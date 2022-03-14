@@ -167,6 +167,10 @@ class Vote(commands.Cog):
                     e = vote.options[opt].emoji
                 else:
                     e = self.bot.get_emoji(int(vote.options[opt].emoji))
+                if e is None:
+                    raise Exception(
+                        f"Emoji(unicode={vote.options[opt].is_unicode}, name=\"{vote.options[opt].emoji}\") not found"
+                    )
                 await message.add_reaction(e)
 
         if vote.end_date is not None:
