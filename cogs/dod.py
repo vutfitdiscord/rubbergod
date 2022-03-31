@@ -49,9 +49,9 @@ class Dod(commands.Cog):
                 verify = disnake.utils.get(
                     guild.roles,
                     name=config.verification_role)
-                DOD = disnake.utils.get(ctx.message.guild.roles, name="DOD")
-                host = disnake.utils.get(ctx.message.guild.roles, name="Host")
-                zajemce = disnake.utils.get(ctx.message.guild.roles, name="ZajemceoStudium")
+                DOD = disnake.utils.get(guild.roles, name="DOD")
+                host = disnake.utils.get(guild.roles, name="Host")
+                zajemce = disnake.utils.get(guild.roles, name="ZajemceoStudium")
                 member = guild.get_member(ctx.author.id)
 
             await member.add_roles(verify)
