@@ -76,7 +76,7 @@ class Messages:
                       "**{minimum}**."
     karma_vote_result = "Výsledek hlasování o emotu {emote} " \
                         "je {result}."
-    karma_vote_notpassed = "Hlasovani o emotu {emote} neprošlo.\n" \
+    karma_vote_notpassed = "Hlasování o emotu {emote} neprošlo.\n" \
                            "Bylo třeba aspoň {minimum} hlasů."
     karma_vote_allvoted = "Už se hlasovalo o všech emotech."
     karma_revote_format = "Očekávám pouze formát " \
@@ -95,8 +95,8 @@ class Messages:
                                f"`{prefix}karma give " \
                                "[number, jakože číslo, " \
                                "ne {input}] [user(s)]` "
-    karma_give_success = "Karma byla úspěšně přidaná."
-    karma_give_negative_success = "Karma byla úspěšně odebraná."
+    karma_give_success = "Karma byla úspěšně přidána."
+    karma_give_negative_success = "Karma byla úspěšně odebrána."
     karma_message_format = f"{prefix}karma message [url]"
     member_not_found = "{user} Nikoho takového jsem nenašel."
     karma_lederboard_offser_error = "{user} Špatný offset, zadej kladné číslo"
@@ -115,7 +115,7 @@ class Messages:
     role_not_on_server = "Nepíšeš na serveru, takže předpokládám, že myslíš role VUT FIT serveru."
     role_not_role = "{user}, {not_role} není role."
     role_invalid_emote = "{user}, {not_emote} pro roli {role} není emote."
-    role_channel_copy_brief = 'Zkopíruje opravnení z jednoho kanálu na druhý'
+    role_channel_copy_brief = 'Zkopíruje opravnění z jednoho kanálu na druhý'
     role_channel_clone_brief = 'Naklonuje kanál'
 
     random_diceroll_brief = 'Všechno možné házení kostkami'
@@ -130,11 +130,11 @@ class Messages:
                            "je považováno za 0."
     rng_generator_format_number = "{user}, zadej dvě celá čísla, **integers**."
 
-    rd_too_many_dice_in_group = "Příliš moc kostek v jedné " \
+    rd_too_many_dice_in_group = "Příliš kostek v jedné " \
                                 "skupině, maximum je {maximum}."
-    rd_too_many_dice_sides = "Příliš moc stěn na kostkách, " \
+    rd_too_many_dice_sides = "Příliš stěn na kostkách, " \
                              "maximum je {maximum}."
-    rd_too_many_dice_groups = "Příliš moc skupin kostek, " \
+    rd_too_many_dice_groups = "Příliš skupin kostek, " \
                               "maximum je {maximum}."
     rd_format = "Chybná syntaxe hodu ve skupině {group}."
     rd_help = "Formát naleznete na " \
@@ -168,13 +168,13 @@ class Messages:
                            "jsi shady (Year: {year})"
     verify_verify_success = "{user} Gratuluji, byl jsi verifikován!"
     verify_post_verify_info = "Podívej se do kanálů:\n" \
-                              "<#591384273051975683> Pro pridani roli\n" \
+                              "<#591384273051975683> Pro přidání rolí\n" \
                               "<#489461089432633346> Pro pravidla a další info"
     server_link = "https://discord.com/channels/461541385204400138/"
-    verify_verify_success_mail = "Gratuluji, byl jsi verifikovan!"
+    verify_verify_success_mail = "Gratuluji, byl jsi verifikován!"
     verify_post_verify_info_mail = "Podivej se do kanalu:\n" \
-                              f"#add-roles - Pro pridani roli ({server_link}591384273051975683) \n" \
-                              f"#server-info - Pro pravidla a dalsi info ({server_link}489461089432633346)"
+                              f"#add-roles - Pro přidání rolí ({server_link}591384273051975683) \n" \
+                              f"#server-info - Pro pravidla a další info ({server_link}489461089432633346)"
 
     verify_verify_not_found = "{user} Login nenalezen nebo jsi neprošel krokem !getcode. Přečti si prosím <#591386755547136020>. ({admin} pls)."
     verify_verify_wrong_code = "{user} Špatný kód."
@@ -208,8 +208,8 @@ class Messages:
     review_add_brief = 'Přidá recenzi na předmět'
     review_get_brief = 'Vypíše recenze na vybraný předmět'
     review_remove_brief = 'Odstraní hodnocení'
-    subject_add_biref = 'Manuálne přidá předmět/y do reviews databáze'
-    subject_remove_biref = 'Manuálne odebere předmět/y z reviews databáze'
+    subject_add_biref = 'Manuálně přidá předmět/y do reviews databáze'
+    subject_remove_biref = 'Manuálně odebere předmět/y z reviews databáze'
     subject_update_biref = 'Automaticky vyhledá a přidá předměty do reviews i subject databáze'
 
     review_format = f"{prefix}reviews [add, remove, zkratka předmětu]"
@@ -312,7 +312,7 @@ class Messages:
     config_get_brief = "Získa hodnotu z konfigurace"
     config_set_brief = "Nastaví hodnotu v konfiguraci"
     config_append_brief = "Přidá hodnotu do pole v konfiguraci"
-    config_load_brief = "Znovu načíta třídu zo souboru. Pro aplikováni změn je potřeba znovu načíst i cog"
+    config_load_brief = "Znovu načíta třídu ze souboru. Pro aplikováni změn je potřeba znovu načíst i cog"
     config_list_brief = "Vypíše klíče konfigurace"
     config_updated = 'Config updated'
     config_loaded = 'Config loaded'
@@ -326,7 +326,7 @@ class Messages:
 
     channel_help = f"{prefix}channel [clone, copy]"
     channel_copy_help = f"{prefix}channel copy [source] [destination]"
-    channel_copy_done = "Práva byla skopírována."
+    channel_copy_done = "Práva byla zkopírována."
     channel_clone_help = f"{prefix}channel clone [source] [jméno]"
     channel_clone_done = "Kanál <#{id}> byl vytvořen."
 
