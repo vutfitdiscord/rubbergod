@@ -280,7 +280,7 @@ class Messages:
     urban_help = f"`{prefix}urban výraz`\nPříklad:\n`{prefix}urban sure`"
     urban_not_found = "Pro daný výraz neexistuje záznam <:sadcat:576171980118687754>"
 
-    autopin_max_pins_error = "Byl dosažen maximální počet připnutých správ."
+    autopin_max_pins_error = "Byl dosažen maximální počet připnutých zpráv."
     autopin_add_brief = "Začne sledovat zprávu jako prioritní pin.\n"
     autopin_add_unknown_message = "Očekáváno URL zprávy"
     autopin_add_done = "Priorita pinu nastavena."
