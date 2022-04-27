@@ -386,7 +386,8 @@ class FitWide(commands.Cog):
             login = line[0]
             name = line[4].split(",", 1)[0]
             try:
-                year = line[4].split(",")[1]
+                year_fields = line[4].split(',')[1].split(' ')
+                year = ' '.join(year_fields if not 'mail=' in year_fields[-1] else year_fields[-1])
             except IndexError:
                 continue
 
