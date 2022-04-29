@@ -130,7 +130,7 @@ class FitWide(commands.Cog):
                         await ctx.send("Status nesedí u: " + login)
 
                 year = self.verification.transform_year(person.year)
-                
+
                 if year is None:
                     year = "Dropout"
 
@@ -387,7 +387,8 @@ class FitWide(commands.Cog):
             name = line[4].split(",", 1)[0]
             try:
                 year_fields = line[4].split(',')[1].split(' ')
-                year = ' '.join(year_fields if not 'mail=' in year_fields[-1] else year_fields[-1])
+                year = ' '.join(year_fields if 'mail=' not in year_fields[-1] else year_fields[:-1])
+                mail = year_fields[-1].replace('mail=', '') if 'mail=' in year_fields[-1] else None
             except IndexError:
                 continue
 
@@ -399,7 +400,7 @@ class FitWide(commands.Cog):
                     year = year.replace("1r", "0r")
 
             found_people.append(Valid_person(login=login, year=year,
-                                             name=name))
+                                             name=name, mail=mail))
             found_logins.append(login)
 
         for login in found_logins:

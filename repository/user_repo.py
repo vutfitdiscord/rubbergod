@@ -50,12 +50,14 @@ class UserRepository(BaseRepository):
             .one_or_none()
         )
 
-    def add_user(self, login: str, year: str, status: int = 1):
+    def add_user(self, login: str, year: str, status: int = 1) -> Valid_person:
         """Add user to database"""
-        session.add(Valid_person(login=login, year=year, status=status))
+        person = Valid_person(login=login, year=year, status=status)
+        session.add(person)
         session.commit()
+        return person
 
-    def get_user_by_login(self, login: str):
+    def get_user_by_login(self, login: str) -> Valid_person:
         """Finds login from DB (without status check)"""
         user = (
             session.query(Valid_person).filter(Valid_person.login == login).one_or_none()

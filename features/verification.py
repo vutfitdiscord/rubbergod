@@ -13,6 +13,7 @@ from config.app_config import config
 from config.messages import Messages
 from features.base_feature import BaseFeature
 from repository.user_repo import UserRepository, VerifyStatus
+from repository.database.verification import Valid_person
 
 
 class Verification(BaseFeature):
@@ -57,20 +58,27 @@ class Verification(BaseFeature):
             member = await guild.fetch_member(user.id)
             return utils.has_role(member, role_name)
 
-    async def gen_code_and_send_mail(self, message, login, mail_postfix):
+    async def gen_code_and_send_mail(self, message, user: Valid_person, mail_postfix: str):
         # Generate a verification code
         code = ''.join(random.choices(string.ascii_uppercase + string.digits, k=20))
 
         email_message = config.default_prefix + "verify "
-        email_message += login + " " + code
+        email_message += user.login + " " + code
 
-        self.send_mail(login + mail_postfix, email_message)
+        mail_address = self.get_user_mail(user, mail_postfix)
+        self.send_mail(mail_address, email_message)
 
         # Save the newly generated code into the database
-        self.repo.save_sent_code(login, code)
+        self.repo.save_sent_code(user.login, code)
 
         await message.channel.send(utils.fill_message("verify_send_success",
                                                       user=message.author.id, mail=mail_postfix))
+
+    def get_user_mail(self, user: Valid_person, mail_postfix: str) -> str:
+        if user.mail is not None and len(user.mail) > 0:
+            return user.mail
+
+        return f'{user.login}@{mail_postfix}'  # fallback
 
     async def send_code(self, message):
         if len(str(message.content).split(" ")) != 2:
@@ -102,7 +110,7 @@ class Verification(BaseFeature):
                     await message.channel.send(msg)
                     await self.log_verify_fail(message, 'getcode (xlogin) - Invalid verify state')
                 else:
-                    await self.gen_code_and_send_mail(message, login, "@stud.fit.vutbr.cz")
+                    await self.gen_code_and_send_mail(message, user, "@stud.fit.vutbr.cz")
             else:
                 # MUNI
                 try:
@@ -128,9 +136,10 @@ class Verification(BaseFeature):
                     await self.log_verify_fail(message, 'getcode (MUNI) - Verified')
                     return
 
-                if self.repo.get_user(login, status=VerifyStatus.Unverified.value) is None:
-                    self.repo.add_user(login, "MUNI", status=VerifyStatus.Unverified.value)
-                await self.gen_code_and_send_mail(message, login, "@mail.muni.cz")
+                user = self.repo.get_user(login, status=VerifyStatus.Unverified.value)
+                if user is None:
+                    user = self.repo.add_user(login, "MUNI", status=VerifyStatus.Unverified.value)
+                await self.gen_code_and_send_mail(message, user, "@mail.muni.cz")
         else:
             await message.channel.send(utils.fill_message("verify_already_verified",
                                                           user=message.author.id, admin=config.admin_ids[0]))
@@ -239,7 +248,7 @@ class Verification(BaseFeature):
 
                 try:
                     await member.send(utils.fill_message("verify_verify_success",
-                                                        user=message.author.id))
+                                                         user=message.author.id))
 
                     await member.send(Messages.verify_post_verify_info)
                 except disnake.errors.Forbidden:
