@@ -1,4 +1,3 @@
-from curses.panel import bottom_panel
 import random
 
 import disnake
