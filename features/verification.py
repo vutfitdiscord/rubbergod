@@ -63,7 +63,7 @@ class Verification(BaseFeature):
         code = ''.join(random.choices(string.ascii_uppercase + string.digits, k=20))
 
         email_message = config.default_prefix + "verify "
-        email_message += user.login + " " + code
+        email_message += f"{user.login} {code}"
 
         mail_address = self.get_user_mail(user, mail_postfix)
         self.send_mail(mail_address, email_message)
