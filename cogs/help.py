@@ -1,9 +1,7 @@
 import asyncio
 import copy
-from io import BytesIO
 import disnake
 from disnake.ext import commands
-import json
 
 from config.app_config import config
 from config import cooldowns
@@ -99,37 +97,21 @@ class Help(commands.Cog):
             value += item["description"] if item["description"] else ''
             embed.add_field(name=name, value=value if value else None, inline=False)
 
-    @commands.Cog.listener()
-    async def on_message(self, message: disnake.Message):
+    def api(self, message: commands.Context, params: list):
         """Sending commands help to grillbot"""
-        if message.author.id not in config.grillbot_ids:
-            return
-
-        lines = message.content.split('\n')
-        if not (lines[0] == '```json' and lines[-1] == '```'):
-            return
-        lines = lines[1:-1]
-        content = '\n'.join(lines)
-        request = json.loads(content)
-        if "method" not in request or request["method"] != "help":
-            await message.reply("Unsupported method")
-            return
-        param = request["parameters"]
-        # mock ctx
         mock_message = copy.copy(message)
         mock_view = commands.view.StringView("")
-        mock_message.author = self.bot.get_user(param["user_id"])
+        mock_message.author = self.bot.get_user(params["user_id"])
         ctx = commands.Context(
             bot=self.bot,
             view=mock_view,
             prefix=config.default_prefix,
             message=mock_message,
         )
-        if "command" in param and param["command"] != None:
-            command = self.bot.get_command(param["command"])
+        if "command" in params and params["command"] != None:
+            command = self.bot.get_command(params["command"])
             if not command:
-                await message.reply("Command not found")
-                return
+                return 1, "Command not found"
             help = {}
             for check in command.checks:
                 try:
@@ -141,9 +123,7 @@ class Help(commands.Cog):
                 help = self.command_help(ctx, command)
         else: # return help for all commands
             help = self.generate_pages(ctx)
-        help_json = json.dumps(help)
-        with BytesIO(bytes(help_json, 'utf-8')) as file_binary:
-            await message.reply(file=disnake.File(fp=file_binary, filename="help.json"))
+        return 0, help
 
     @cooldowns.default_cooldown
     @commands.command(aliases=['god'], brief=Messages.help_title)

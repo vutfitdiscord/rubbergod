@@ -11,6 +11,7 @@ from features import karma
 from repository import karma_repo
 from cogs import room_check
 from features.reaction_context import ReactionContext
+from repository.database.karma import Karma as Database_karma
 
 
 karma_r = karma_repo.KarmaRepository()
@@ -120,6 +121,31 @@ class Karma(commands.Cog):
                 karma_r.karma_emoji_remove(ctx.message.author, ctx.member, ctx.emoji)
             else:
                 karma_r.karma_emoji_remove(ctx.message.author, ctx.member, ctx.emoji.id)
+    
+    def api(self, message: disnake.Message, params: list) -> dict:
+        """Sending karma boards to grillbot"""
+        if params["order"] not in ["asc", "desc"]:
+            return 1, "Unsuported order"
+        if params["board"] not in ["karma", "positive", "negative"]:
+            return 1, "Unsuported board"
+        start = config.karma_grillbot_leaderboard_size * (params["page"] - 1)
+        attribute = getattr(getattr(Database_karma, params["board"]), params["order"])()
+        board = karma_r.get_leaderboard(attribute, start, config.karma_grillbot_leaderboard_size)
+
+        output = []
+        for user in board:
+            dump = user.__dict__
+            del dump['_sa_instance_state']
+            output.append(dump)
+
+        total_pages = math.ceil(karma_r.get_leaderboard_max() / config.karma_grillbot_leaderboard_size)
+        meta = {
+            "page": params["page"],
+            "total_pages": total_pages
+        }
+
+        return 0, {"meta": meta, "content": output}
+
 
     @cooldowns.default_cooldown
     @commands.group(brief=messages.karma_brief, usage=' ')
