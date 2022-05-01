@@ -127,6 +127,7 @@ class Config:
 
     # grillbot
     grillbot_ids: List[int] = get_attr(toml_dict, "grillbot", "ids")
+    grillbot_api_supported_methods: List[str] = get_attr(toml_dict, "grillbot", "api_supported_methods")
 
     # weather token to openweather API
     weather_token: str = get_attr(toml_dict, "weather", "token")

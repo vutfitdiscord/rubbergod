@@ -150,6 +150,7 @@ default_limit = 10
 [grillbot]
 #      Production,         Development
 ids = [902678773307174943, 599119578811072523]
+api_supported_methods = ["Karma", "Help"]
 
 [weather]
 token = "678a5932f6dd92ac668b20e9f89c0318"
