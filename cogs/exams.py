@@ -68,7 +68,7 @@ class Exams(commands.Cog):
             semester = "LS"
 
         cal_year = date.year
-        if semester == "ZS":
+        if date.month < 9:
             cal_year -= 1
 
         all_url = f"https://minerva3.fit.vutbr.cz/rozvrhis/{semester}{cal_year}/zkousky"
