@@ -5,6 +5,7 @@ from typing import Union, List
 import re
 import requests
 from bs4 import BeautifulSoup
+from bs4.element import NavigableString
 import math
 
 from features.paginator import PaginatorSession
@@ -13,6 +14,8 @@ from config.messages import Messages
 import utils
 
 rocnik_regex = "[1-4][BM]IT"
+CLEANR = re.compile('<.*?>|&([a-z0-9]+|#[0-9]{1,6}|#x[0-9a-f]{1,6});')
+
 
 class Exams(commands.Cog):
     def __init__(self, bot:commands.Bot):
@@ -107,68 +110,83 @@ class Exams(commands.Cog):
                     utils.add_author_footer(embed, ctx.author)
 
                     for exam in exam_batch:
-                        tag = exam.find("a")
+                        # Every exams row start with link tag
+                        tag = exam.find("a") \
+                            if str(exam).startswith("<tr><td><a") else None
                         cols = exam.find_all("td")
-                        del cols[0]
 
-                        subject_tag = tag.find("strong").contents[0]
+                        # Check if tag is not None and get strong and normal subject tag
+                        subject_tag = (tag.find("strong") or tag.contents[
+                            0]) if tag is not None else None
 
-                        col_count = len(cols)
-                        if col_count == 1:
-                            # Support for credits
-                            col = cols[0]
-                            strong_tag = col.find("strong")
-
-                            if strong_tag is None:
-                                # There is no term - Only text
-                                embed.add_field(name=subject_tag, value=col.contents[0], inline=False)
-                            else:
-                                term = str(strong_tag.contents[0]).replace(" ", "")
-
-                                date_splits = term.split(".")
-                                term_date = datetime.date(int(date_splits[2]), int(date_splits[1]),
-                                                          int(date_splits[0]))
-
-                                name = f"{subject_tag}"
-                                term_time = f"{col.contents[0]}\n{term}"
-                                if term_date < datetime.date.today():
-                                    name = f"~~{name}~~"
-                                    term_time = f"~~{term_time}~~"
-
-                                embed.add_field(name=name, value=term_time, inline=False)
+                        if subject_tag is None:
+                            content = re.sub(CLEANR, "", str(cols[0]))
+                            embed.add_field(name="Poznámka", value=content, inline=False)
                         else:
-                            # Classic terms
-                            whole_term_count = 0
-                            for idx, col in enumerate(cols):
-                                terms = col.find_all("strong")
-                                times = col.find_all("em")
+                            del cols[0]
 
-                                number_of_terms = len(terms)
-                                whole_term_count += number_of_terms
+                            if not isinstance(subject_tag, NavigableString):
+                                subject_tag = subject_tag.contents[0]
 
-                                for idx2, (term, time) in enumerate(zip(terms, times)):
-                                    term = str(term.contents[0]).replace(" ", "")
-                                    time_cont = ""
-                                    for c in time.contents: time_cont += str(c)
-                                    time_cont = time_cont.replace("<sup>", ":").replace("</sup>", "")
+                            col_count = len(cols)
+                            if col_count == 1:
+                                # Support for credits
+                                col = cols[0]
+                                strong_tag = col.find("strong")
+
+                                if strong_tag is None:
+                                    # There is no term - Only text
+                                    embed.add_field(name=subject_tag, value=col.contents[0],
+                                                    inline=False)
+                                else:
+                                    term = str(strong_tag.contents[0]).replace(" ", "")
 
                                     date_splits = term.split(".")
-                                    term_date = datetime.date(int(date_splits[2]), int(date_splits[1]),
+                                    term_date = datetime.date(int(date_splits[2]),
+                                                              int(date_splits[1]),
                                                               int(date_splits[0]))
 
-                                    name = f"{idx + 1}. {subject_tag}" if number_of_terms == 1 else \
-                                        f"{idx + 1}.{idx2 + 1} {subject_tag}"
-
-                                    term_time = f"{term}\n{time_cont}"
+                                    name = f"{subject_tag}"
+                                    term_time = f"{col.contents[0]}\n{term}"
                                     if term_date < datetime.date.today():
-                                        name = f"~~{name}~~"
-                                        term_time = f"~~{term_time}~~"
+                                        name = "~~" + name + "~~"
+                                        term_time = "~~" + term_time + "~~"
 
-                                    embed.add_field(name=name, value=term_time)
+                                    embed.add_field(name=name, value=term_time, inline=False)
+                            else:
+                                # Classic terms
+                                whole_term_count = 0
+                                for idx, col in enumerate(cols):
+                                    terms = col.find_all("strong")
+                                    times = col.find_all("em")
 
-                            to_add = math.ceil(whole_term_count / 3) * 3 - whole_term_count
-                            for _ in range(to_add):
-                                embed.add_field(name='\u200b', value='\u200b')
+                                    number_of_terms = len(terms)
+                                    whole_term_count += number_of_terms
+
+                                    for idx2, (term, time) in enumerate(zip(terms, times)):
+                                        term = str(term.contents[0]).replace(" ", "")
+                                        time_cont = ""
+                                        for c in time.contents: time_cont += str(c)
+                                        time_cont = time_cont.replace("<sup>", ":").replace("</sup>", "")
+
+                                        date_splits = term.split(".")
+                                        term_date = datetime.date(int(date_splits[2]),
+                                                                  int(date_splits[1]),
+                                                                  int(date_splits[0]))
+
+                                        name = f"{idx + 1}. {subject_tag}" if number_of_terms == 1 \
+                                            else f"{idx + 1}.{idx2 + 1} {subject_tag}"
+
+                                        term_time = f"{term}\n{time_cont}"
+                                        if term_date < datetime.date.today():
+                                            name = f"~~{name}~~"
+                                            term_time = f"~~{term_time}~~"
+
+                                        embed.add_field(name=name, value=term_time)
+
+                                to_add = math.ceil(whole_term_count / 3) * 3 - whole_term_count
+                                for _ in range(to_add):
+                                    embed.add_field(name='\u200b', value='\u200b')
 
                     pages.append(embed)
 
@@ -198,6 +216,7 @@ class Exams(commands.Cog):
             embed = disnake.Embed(title=title, description=description, color=disnake.Color.dark_blue())
             utils.add_author_footer(embed, ctx.author)
             await ctx.send(embed=embed)
+
 
 def setup(bot):
     bot.add_cog(Exams(bot))
