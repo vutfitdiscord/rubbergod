@@ -155,7 +155,9 @@ class Config:
 
     # exams
     exams_page_size:int = get_attr(toml_dict, "exams", "page_size")
-    exams_paginator_duration = get_attr(toml_dict, "exams", "paginator_duration")
+    exams_paginator_duration:int = get_attr(toml_dict, "exams", "paginator_duration")
+    exams_term_channels:List[str] = get_attr(toml_dict, "exams", "term_channels")
+    exams_terms_update_interval:int = get_attr(toml_dict, "exams", "terms_update_interval")
 
 config = Config()
 
