@@ -1,5 +1,5 @@
 import disnake
-from disnake.ext import commands
+from disnake.ext import commands, tasks
 import datetime
 from typing import Union, List, Optional
 import re
@@ -11,6 +11,7 @@ import math
 from repository.exams_repo import ExamsTermsMessageRepo
 from features.paginator import PaginatorSession
 from config.app_config import config
+from config import cooldowns
 from config.messages import Messages
 import utils
 
@@ -22,12 +23,55 @@ class Exams(commands.Cog):
     def __init__(self, bot:commands.Bot):
         self.bot = bot
 
-        self.subscribed_guilds:List[disnake.Guild] = []
+        self.subscribed_guilds:List[int] = []
         self.exams_repo = ExamsTermsMessageRepo()
 
+    def cog_unload(self):
+        if self.update_terms_task.is_running():
+            self.update_terms_task.cancel()
+        self.subscribed_guilds = []
+
+    def __del__(self):
+        if self.update_terms_task.is_running():
+            self.update_terms_task.cancel()
+
+    @cooldowns.default_cooldown
+    @commands.check(utils.helper_plus)
     @commands.command()
     async def update_terminy(self, ctx:commands.Context):
         await self.update_exam_terms(ctx.guild, ctx.author)
+
+    @commands.check(utils.is_bot_admin)
+    @commands.command()
+    async def terminy_start(self, ctx: commands.Context):
+        self.subscribed_guilds.append(ctx.guild.id)
+
+        if not self.update_terms_task.is_running():
+            self.update_terms_task.start()
+        else:
+            # If task is already running update terms now
+            await self.update_exam_terms(ctx.guild)
+
+        await ctx.send(f"`Zapnuto updatovani terminu pro server: {ctx.guild.name}`")
+
+    @commands.check(utils.is_bot_admin)
+    @commands.command()
+    async def terminy_stop(self, ctx: commands.Context):
+        if ctx.guild in self.subscribed_guilds:
+            self.subscribed_guilds.remove(ctx.guild.id)
+
+        # If there are no subscribed guilds terminate whole task
+        if not self.subscribed_guilds:
+            self.update_terms_task.cancel()
+
+        await ctx.send(f"`Zastaveno updatovani terminu pro server: {ctx.guild.name}`")
+
+    @tasks.loop(hours=int(config.exams_terms_update_interval * 24))
+    async def update_terms_task(self):
+        for guild in self.subscribed_guilds:
+            guild = disnake.utils.get(self.bot.guilds, id=guild)
+            if guild is not None:
+                await self.update_exam_terms(guild)
 
     @staticmethod
     def process_match(match):
@@ -39,10 +83,12 @@ class Exams(commands.Cog):
             return None
         return year
 
-    def get_message_destination(self, channel:disnake.TextChannel):
-        saved_message = self.exams_repo.get_message_from_channel(channel.id)
-        if saved_message is not None:
-            message_id = int(saved_message.message_id)
+    async def get_message_destination(self, channel:disnake.TextChannel, message_index:int=0):
+        saved_messages = self.exams_repo.get_message_from_channel(channel.id)
+        if saved_messages and message_index < len(saved_messages):
+            if message_index < 0:
+                message_index = 0
+            message_id = int(saved_messages[message_index].message_id)
 
             dest = None
             try:
@@ -63,18 +109,19 @@ class Exams(commands.Cog):
                     continue
 
                 if channel_name.lower() == channel.name.lower():
-                    if not channel_name[-1].isdigit():
-                        if channel_name.lower() == "mit":
-                            dest = self.get_message_destination(channel)
+                    if not channel_name[0].isdigit():
+                        if channel_name[:3].lower() == "mit":
+                            dest1 = await self.get_message_destination(channel, 0)
+                            dest2 = await self.get_message_destination(channel, 1)
 
-                            await self.process_exams(dest, "MIT1", author)
-                            await self.process_exams(dest, "MIT2", author)
+                            await self.process_exams(dest1, "1MIT", author)
+                            await self.process_exams(dest2, "2MIT", author)
                     else:
                         match = re.match(year_regex, channel_name[:4].upper())
                         if match is not None:
                             year = self.process_match(match)
                             if year is not None:
-                                dest = self.get_message_destination(channel)
+                                dest = await self.get_message_destination(channel)
 
                                 await self.process_exams(dest, year, author)
 

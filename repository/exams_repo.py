@@ -1,7 +1,7 @@
-from typing import Optional, List
+from typing import List
 
 from repository.database import session
-from database.exams import ExamsTermsMessage
+from repository.database.exams import ExamsTermsMessage
 
 class ExamsTermsMessageRepo:
     @staticmethod
@@ -12,8 +12,8 @@ class ExamsTermsMessageRepo:
         return item
 
     @staticmethod
-    def get_message_from_channel(channel_id:int) -> Optional[ExamsTermsMessage]:
-        return session.query(ExamsTermsMessage).filter(ExamsTermsMessage.channel_id == str(channel_id)).one_or_none()
+    def get_message_from_channel(channel_id:int) -> List[ExamsTermsMessage]:
+        return session.query(ExamsTermsMessage).filter(ExamsTermsMessage.channel_id == str(channel_id)).all()
 
     @staticmethod
     def remove_term_message(message_id:int):
