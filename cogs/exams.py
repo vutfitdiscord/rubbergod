@@ -1,19 +1,20 @@
 import disnake
 from disnake.ext import commands
 import datetime
-from typing import Union, List
+from typing import Union, List, Optional
 import re
 import requests
 from bs4 import BeautifulSoup
 from bs4.element import NavigableString
 import math
 
+from repository.exams_repo import ExamsTermsMessageRepo
 from features.paginator import PaginatorSession
 from config.app_config import config
 from config.messages import Messages
 import utils
 
-rocnik_regex = "[1-4][BM]IT"
+year_regex = "[1-4][BM]IT"
 CLEANR = re.compile('<.*?>|&([a-z0-9]+|#[0-9]{1,6}|#x[0-9a-f]{1,6});')
 
 
@@ -21,37 +22,12 @@ class Exams(commands.Cog):
     def __init__(self, bot:commands.Bot):
         self.bot = bot
 
-    @commands.command(brief=Messages.exams_brief, aliases=["zkousky"])
-    async def exams(self, ctx:commands.Context, rocnik:Union[str, None]=None):
-        if rocnik is None:
-            if isinstance(ctx.author, disnake.Member):
-                user_roles: List[disnake.Role] = ctx.author.roles
+        self.subscribed_guilds:List[disnake.Guild] = []
+        self.exams_repo = ExamsTermsMessageRepo()
 
-                for role in user_roles:
-                    match = re.match(rocnik_regex, role.name.upper())
-
-                    if match is not None:
-                        rocnik = self.process_match(match)
-                        if rocnik is None:
-                            return await ctx.send(Messages.exams_no_valid_year)
-                        return await self.process_exams(ctx, rocnik)
-
-                await ctx.send(Messages.exams_no_valid_role)
-            else:
-                try:
-                    await ctx.send(Messages.exams_specify_year)
-                except:
-                    pass
-        else:
-            match = re.match(rocnik_regex, rocnik.upper())
-
-            if match is not None:
-                rocnik = self.process_match(match)
-                if rocnik is None:
-                    return await ctx.send(Messages.exams_no_valid_year)
-                await self.process_exams(ctx, rocnik)
-            else:
-                await ctx.send(Messages.exams_no_valid_year)
+    @commands.command()
+    async def update_terminy(self, ctx:commands.Context):
+        await self.update_exam_terms(ctx.guild, ctx.author)
 
     @staticmethod
     def process_match(match):
@@ -63,7 +39,80 @@ class Exams(commands.Cog):
             return None
         return year
 
-    async def process_exams(self, ctx:commands.Context, year:Union[str, None]):
+    def get_message_destination(self, channel:disnake.TextChannel):
+        saved_message = self.exams_repo.get_message_from_channel(channel.id)
+        if saved_message is not None:
+            message_id = int(saved_message.message_id)
+
+            dest = None
+            try:
+                dest = await channel.fetch_message(message_id)
+            except:
+                self.exams_repo.remove_term_message(message_id)
+
+            if dest is None: dest = channel
+        else:
+            dest = channel
+
+        return dest
+
+    async def update_exam_terms(self, guild:disnake.Guild, author:Optional[disnake.User]=None):
+        for channel_name in config.exams_term_channels:
+            for channel in guild.channels:
+                if not isinstance(channel, disnake.TextChannel):
+                    continue
+
+                if channel_name.lower() == channel.name.lower():
+                    if not channel_name[-1].isdigit():
+                        if channel_name.lower() == "mit":
+                            dest = self.get_message_destination(channel)
+
+                            await self.process_exams(dest, "MIT1", author)
+                            await self.process_exams(dest, "MIT2", author)
+                    else:
+                        match = re.match(year_regex, channel_name[:4].upper())
+                        if match is not None:
+                            year = self.process_match(match)
+                            if year is not None:
+                                dest = self.get_message_destination(channel)
+
+                                await self.process_exams(dest, year, author)
+
+    @commands.command(brief=Messages.exams_brief, aliases=["zkousky"])
+    async def exams(self, ctx:commands.Context, rocnik:Union[str, None]=None):
+        if rocnik is None:
+            if isinstance(ctx.author, disnake.Member):
+                user_roles: List[disnake.Role] = ctx.author.roles
+
+                for role in user_roles:
+                    match = re.match(year_regex, role.name.upper())
+
+                    if match is not None:
+                        rocnik = self.process_match(match)
+                        if rocnik is None:
+                            return await ctx.send(Messages.exams_no_valid_year)
+                        return await self.process_exams(ctx, rocnik, ctx.author)
+
+                await ctx.send(Messages.exams_no_valid_role)
+            else:
+                try:
+                    await ctx.send(Messages.exams_specify_year)
+                except:
+                    pass
+        else:
+            match = re.match(year_regex, rocnik.upper())
+
+            if match is not None:
+                rocnik = self.process_match(match)
+                if rocnik is None:
+                    return await ctx.send(Messages.exams_no_valid_year)
+                await self.process_exams(ctx, rocnik, ctx.author)
+            else:
+                await ctx.send(Messages.exams_no_valid_year)
+
+    async def process_exams(self, ctx:Union[commands.Context, disnake.TextChannel, disnake.Message],
+                            year:Union[str, None],
+                            author:Optional[disnake.User]=None):
         date = datetime.date.today()
 
         semester = "ZS"
@@ -94,8 +143,13 @@ class Exams(commands.Cog):
                     # There is no table so no terms
                     embed = disnake.Embed(title=title, description=description,
                                           color=disnake.Color.dark_blue())
-                    utils.add_author_footer(embed, ctx.author)
-                    return await ctx.send(embed=embed)
+                    utils.add_author_footer(embed, author if author is not None else self.bot.user)
+
+                    if isinstance(ctx, commands.Context):
+                        return await ctx.send(embed=embed)
+                    else:
+                        # If its not context then its mass call or auto task and need to check messages in database
+                        await self.handle_exams_with_database_access(embed, ctx)
 
                 exams = body.find_all("tr")
 
@@ -107,7 +161,7 @@ class Exams(commands.Cog):
                 pages = []
                 for exam_batch in exam_batches:
                     embed = disnake.Embed(title=title, description=description, color=disnake.Color.dark_blue())
-                    utils.add_author_footer(embed, ctx.author)
+                    utils.add_author_footer(embed, author if author is not None else self.bot.user)
 
                     for exam in exam_batch:
                         # Every exams row start with link tag
@@ -192,30 +246,59 @@ class Exams(commands.Cog):
 
                 number_of_pages = len(pages)
                 if number_of_pages > 1:
-                    page_sesstion = PaginatorSession(self.bot, ctx, timeout=config.exams_paginator_duration,
-                                                     pages=pages,
-                                                     color=disnake.Color.dark_blue(), delete_after=False)
-
-                    await page_sesstion.run()
+                    if isinstance(ctx, commands.Context):
+                        await PaginatorSession(self.bot, ctx,
+                                               timeout=config.exams_paginator_duration,
+                                               pages=pages,
+                                               color=disnake.Color.dark_blue(),
+                                               delete_after=False).run()
+                    else:
+                        await self.handle_exams_with_database_access(pages, ctx)
                 elif number_of_pages == 1:
                     # Only one page, no need paginator
-                    await ctx.send(embed=pages[0])
+                    if isinstance(ctx, commands.Context):
+                        await ctx.send(embed=pages[0])
+                    else:
+                        await self.handle_exams_with_database_access(pages, ctx)
                 else:
                     # No pages were parsed, so we will post only default embed
                     embed = disnake.Embed(title=title, description=description, color=disnake.Color.dark_blue())
-                    utils.add_author_footer(embed, ctx.author)
-                    await ctx.send(embed=embed)
+                    utils.add_author_footer(embed, author if author is not None else self.bot.user)
+                    if isinstance(ctx, commands.Context):
+                        await ctx.send(embed=embed)
+                    else:
+                        await self.handle_exams_with_database_access(embed, ctx)
             except:
                 # Parsing failed
                 embed = disnake.Embed(title=title, description=description, color=disnake.Color.dark_blue())
-                utils.add_author_footer(embed, ctx.author)
-                await ctx.send(embed=embed)
-                await ctx.send(Messages.exams_parsing_failed)
+                utils.add_author_footer(embed, author if author is not None else self.bot.user)
+                if isinstance(ctx, commands.Context):
+                    await ctx.send(embed=embed)
+                    await ctx.send(Messages.exams_parsing_failed)
+                else:
+                    await self.handle_exams_with_database_access(embed, ctx)
         else:
             # Site returned fail code
             embed = disnake.Embed(title=title, description=description, color=disnake.Color.dark_blue())
-            utils.add_author_footer(embed, ctx.author)
-            await ctx.send(embed=embed)
+            utils.add_author_footer(embed, author if author is not None else self.bot.user)
+            if isinstance(ctx, commands.Context):
+                await ctx.send(embed=embed)
+            else:
+                await self.handle_exams_with_database_access(embed, ctx)
+
+    async def handle_exams_with_database_access(self, src_data:Union[disnake.Embed, List[disnake.Embed]],
+                                                dest:Union[disnake.TextChannel, disnake.Message]):
+        if isinstance(src_data, disnake.Embed):
+            src_data = [src_data]
+
+        if isinstance(dest, disnake.TextChannel):
+            # No previous message in channel
+
+            send_message = await dest.send(embeds=src_data)
+            if send_message is not None:
+                self.exams_repo.create_term_message(send_message.id, send_message.channel.id)
+        else:
+            await dest.edit(embeds=src_data)
 
 
 def setup(bot):
