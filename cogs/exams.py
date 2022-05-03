@@ -94,8 +94,10 @@ class Exams(commands.Cog):
             try:
                 dest = await channel.fetch_message(message_id)
             except:
+                # If cant find message then remove it from database
                 self.exams_repo.remove_term_message(message_id)
 
+            # If message is not found then set it to channel itself
             if dest is None: dest = channel
         else:
             dest = channel
@@ -345,6 +347,7 @@ class Exams(commands.Cog):
             if send_message is not None:
                 self.exams_repo.create_term_message(send_message.id, send_message.channel.id)
         else:
+            # Message already exists
             await dest.edit(embeds=src_data)
 
 
