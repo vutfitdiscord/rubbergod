@@ -110,18 +110,17 @@ class MemeRepost(commands.Cog):
 
             # Get all attachments of original post
             main_image = None
-            more_images = False
-            attachment_urls = []
+            other_attachments = []
             for attachment in ctx.message.attachments:
                 content_type = attachment.content_type
-                if content_type is not None and content_type.split("/")[0] == "image":
-                    if main_image is None:
-                        main_image = await attachment.to_file()
-                    else:
-                        more_images = True
+                if content_type is not None and content_type.split("/")[0] == "image" and main_image is None:
+                    # Set main image if its image and main image is not set
+                    main_image = await attachment.to_file()
                 else:
-                    if len(attachment.proxy_url) < 1023:
-                        attachment_urls.append(attachment.proxy_url)
+                    # Other attachments convert to file and append to list of attachments
+                    attachment_file = await attachment.to_file()
+                    if attachment_file is not None:
+                        other_attachments.append(attachment_file)
 
             # Set content from original message if present
             if ctx.message.content:
@@ -135,17 +134,13 @@ class MemeRepost(commands.Cog):
                                 if main_image is None:
                                     main_image = content_split
                                 else:
-                                    more_images = True
+                                    other_attachments.append(content_split)
                                 break
                         else:
-                            attachment_urls.append(content_split)
+                            other_attachments.append(content_split)
 
                 content = ctx.message.content[:900]
-                if more_images:
-                    content += "\n\nVíce obrázků v původním postu"
                 embed.add_field(name="Obsah", value=content)
-            elif more_images:
-                embed.add_field(name="Obsah", value="Více obrázků v původním postu")
 
             # Set main image if present
             if main_image is not None:
@@ -160,12 +155,19 @@ class MemeRepost(commands.Cog):
             repost_message_id = -1
             secondary_message_id = None
             if len(embed) < 6000:
-                attachment_message = attachment_urls[0] if len(attachment_urls) > 0 else None
                 repost_message = await self.repost_channel.send(embed=embed, file=main_image)
                 repost_message_id = repost_message.id
 
-                if attachment_message is not None:
-                    secondary_message = await self.repost_channel.send(attachment_message)
+                if len(other_attachments) > 0:
+                    # Files are getting send as files
+                    files = [file for file in other_attachments if isinstance(file, disnake.File)]
+                    files = files[:10] if files else None
+
+                    # And urls as string in separated message
+                    urls = [file for file in other_attachments if isinstance(file, str)]
+                    urls = "\n".join(urls) if urls else None
+
+                    secondary_message = await self.repost_channel.send(urls, files=files)
                     secondary_message_id = secondary_message.id
 
             self.repost_repo.create_repost(ctx.message.id,
