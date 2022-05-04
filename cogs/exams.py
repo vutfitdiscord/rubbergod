@@ -324,16 +324,12 @@ class Exams(commands.Cog):
                 if isinstance(ctx, commands.Context):
                     await ctx.send(embed=embed)
                     await ctx.send(Messages.exams_parsing_failed)
-                else:
-                    await self.handle_exams_with_database_access(embed, ctx)
         else:
             # Site returned fail code
             embed = disnake.Embed(title=title, description=description, color=disnake.Color.dark_blue())
             utils.add_author_footer(embed, author if author is not None else self.bot.user)
             if isinstance(ctx, commands.Context):
                 await ctx.send(embed=embed)
-            else:
-                await self.handle_exams_with_database_access(embed, ctx)
 
     async def handle_exams_with_database_access(self, src_data:Union[disnake.Embed, List[disnake.Embed]],
                                                 dest:Union[disnake.TextChannel, disnake.Message]):
