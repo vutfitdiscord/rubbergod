@@ -138,10 +138,11 @@ class Karma(commands.Cog):
             del dump['_sa_instance_state']
             output.append(dump)
 
-        total_pages = math.ceil(karma_r.get_leaderboard_max() / config.karma_grillbot_leaderboard_size)
+        items_count = karma_r.get_leaderboard_max()
         meta = {
             "page": params["page"],
-            "total_pages": total_pages
+            "items_count": items_count,
+            "total_pages": math.ceil(items_count / config.karma_grillbot_leaderboard_size),
         }
 
         return 0, {"meta": meta, "content": output}
