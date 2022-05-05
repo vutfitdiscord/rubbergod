@@ -21,6 +21,12 @@ class ExamsTermsMessageRepo:
         session.commit()
 
     @staticmethod
-    def remove_from_channel(channel_id: int):
-        session.query(ExamsTermsMessage).filter(ExamsTermsMessage.channel_id == str(channel_id)).delete()
-        session.commit()
+    def remove_from_channel(channel_id: int) -> List[int]:
+        messages = ExamsTermsMessageRepo.get_message_from_channel(channel_id)
+        message_ids = [int(m.message_id) for m in messages]
+
+        if message_ids:
+            session.query(ExamsTermsMessage).filter(ExamsTermsMessage.channel_id == str(channel_id)).delete()
+            session.commit()
+
+        return message_ids

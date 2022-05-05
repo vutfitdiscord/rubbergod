@@ -42,13 +42,52 @@ class Exams(commands.Cog):
     @cooldowns.default_cooldown
     @commands.check(utils.helper_plus)
     @commands.command()
-    async def update_terminy(self, ctx:commands.Context):
+    async def update_terms(self, ctx:commands.Context):
         await self.update_exam_terms(ctx.guild, ctx.author)
         await ctx.send("`Termíny aktualizovány`")
 
+    @cooldowns.default_cooldown
     @commands.check(utils.is_bot_admin)
     @commands.command()
-    async def start_terminy(self, ctx: commands.Context):
+    async def remove_all_terms(self, ctx: commands.Context):
+        for channel in ctx.guild.channels:
+            if not isinstance(channel, disnake.TextChannel):
+                continue
+
+            for channel_name in config.exams_term_channels:
+                if channel_name.lower() == channel.name.lower():
+                    message_ids = self.exams_repo.remove_from_channel(channel.id)
+                    for message_id in message_ids:
+                        try:
+                            message = await channel.fetch_message(message_id)
+                            await message.delete()
+                        except:
+                            pass
+        await ctx.send("`Termíny odstraněny`")
+
+    @cooldowns.default_cooldown
+    @commands.check(utils.is_bot_admin)
+    @commands.command()
+    async def remove_terms(self, ctx: commands.Context, *, channel:disnake.TextChannel):
+        if not isinstance(channel, disnake.TextChannel):
+            return await ctx.send(f"`Channel {channel.name} není textový kanál`")
+
+        message_ids = self.exams_repo.remove_from_channel(channel.id)
+        for message_id in message_ids:
+            try:
+                message = await channel.fetch_message(message_id)
+                await message.delete()
+            except:
+                pass
+
+        if message_ids:
+            await ctx.send(f"`Termíny odstraněny z kanálu {channel.name}`")
+        else:
+            await ctx.send(f"`Nenalezeny žádné termíny v kanálu {channel.name}`")
+
+    @commands.check(utils.is_bot_admin)
+    @commands.command()
+    async def start_terms(self, ctx: commands.Context):
         self.subscribed_guilds.append(ctx.guild.id)
 
         if not self.update_terms_task.is_running():
@@ -61,7 +100,7 @@ class Exams(commands.Cog):
 
     @commands.check(utils.is_bot_admin)
     @commands.command()
-    async def stop_terminy(self, ctx: commands.Context):
+    async def stop_terms(self, ctx: commands.Context):
         if ctx.guild in self.subscribed_guilds:
             self.subscribed_guilds.remove(ctx.guild.id)
 
@@ -110,11 +149,11 @@ class Exams(commands.Cog):
         return dest
 
     async def update_exam_terms(self, guild:disnake.Guild, author:Optional[disnake.User]=None):
-        for channel_name in config.exams_term_channels:
-            for channel in guild.channels:
-                if not isinstance(channel, disnake.TextChannel):
-                    continue
+        for channel in guild.channels:
+            if not isinstance(channel, disnake.TextChannel):
+                continue
 
+            for channel_name in config.exams_term_channels:
                 if channel_name.lower() == channel.name.lower():
                     if not channel_name[0].isdigit():
                         if channel_name[:3].lower() == "mit":
