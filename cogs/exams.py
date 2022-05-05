@@ -249,6 +249,7 @@ class Exams(commands.Cog):
                                     term = strong_tag.contents[0].replace(u'\xa0', '').replace(" ", "")
 
                                     date_splits = term.split(".")
+                                    # Without actual time set time to end of the day
                                     term_datetime = datetime.datetime(int(date_splits[2]),
                                                                       int(date_splits[1]),
                                                                       int(date_splits[0]),
@@ -259,22 +260,22 @@ class Exams(commands.Cog):
                                                               int(date_splits[1]),
                                                               int(date_splits[0]))
 
-                                    name = f"{subject_tag}"
                                     term_time = f"{term}\n{col.contents[0]}"
 
-                                    date_offset = " " * (DATE_OFFSET - len(name))
-                                    time_offset = " " * (TIME_OFFSET - len(term))
-                                    term_string = f"{name}{date_offset}{term}{time_offset}{col.contents[0]}"
+                                    # Calculate character offsets
+                                    date_offset = " " * (DATE_OFFSET - len(subject_tag))
+                                    time_offset = " " * (TIME_OFFSET - len(term)) # Here used aas data offset
+                                    term_string = f"{subject_tag}{date_offset}{term}{time_offset}{col.contents[0]}"
 
                                     if term_date == datetime.date.today():
                                         term_strings_dict[term_datetime] = f"- {term_string}"
                                     elif term_datetime < datetime.datetime.now():
-                                        name = f"~~{name}~~"
+                                        subject_tag = f"~~{subject_tag}~~"
                                         term_time = f"~~{term_time}~~"
                                     else:
                                         term_strings_dict[term_datetime] = f"+ {term_string}"
 
-                                    embed.add_field(name=name, value=term_time, inline=False)
+                                    embed.add_field(name=subject_tag, value=term_time, inline=False)
                             else:
                                 # Classic terms
                                 whole_term_count = 0
@@ -318,6 +319,7 @@ class Exams(commands.Cog):
 
                                         term_time = f"{term} {time_cont}"
 
+                                        # Calculate character offsets
                                         date_offset = " " * (DATE_OFFSET - len(name))
                                         time_offset = " " * (TIME_OFFSET - len(term))
                                         term_string = f"{name}{date_offset}{term}{time_offset}{time_cont}"
