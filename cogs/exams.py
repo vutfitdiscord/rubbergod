@@ -7,6 +7,7 @@ import requests
 from bs4 import BeautifulSoup
 from bs4.element import NavigableString
 import math
+import collections
 
 from repository.exams_repo import ExamsTermsMessageRepo
 from features.paginator import PaginatorSession
@@ -14,10 +15,13 @@ from config.app_config import config
 from config import cooldowns
 from config.messages import Messages
 import utils
+from features.list_message_sender import merge_messages
 
 year_regex = "[1-4][BM]IT"
 CLEANR = re.compile('<.*?>|&([a-z0-9]+|#[0-9]{1,6}|#x[0-9a-f]{1,6});')
 
+DATE_OFFSET = 14
+TIME_OFFSET = 14
 
 class Exams(commands.Cog):
     def __init__(self, bot:commands.Bot):
@@ -40,10 +44,11 @@ class Exams(commands.Cog):
     @commands.command()
     async def update_terminy(self, ctx:commands.Context):
         await self.update_exam_terms(ctx.guild, ctx.author)
+        await ctx.send("`Termíny aktualizovány`")
 
     @commands.check(utils.is_bot_admin)
     @commands.command()
-    async def terminy_start(self, ctx: commands.Context):
+    async def start_terminy(self, ctx: commands.Context):
         self.subscribed_guilds.append(ctx.guild.id)
 
         if not self.update_terms_task.is_running():
@@ -52,11 +57,11 @@ class Exams(commands.Cog):
             # If task is already running update terms now
             await self.update_exam_terms(ctx.guild)
 
-        await ctx.send(f"`Zapnuto updatovani terminu pro server: {ctx.guild.name}`")
+        await ctx.send(f"`Zapnuta automatická aktualizace termínů pro server: {ctx.guild.name}`")
 
     @commands.check(utils.is_bot_admin)
     @commands.command()
-    async def terminy_stop(self, ctx: commands.Context):
+    async def stop_terminy(self, ctx: commands.Context):
         if ctx.guild in self.subscribed_guilds:
             self.subscribed_guilds.remove(ctx.guild.id)
 
@@ -64,7 +69,7 @@ class Exams(commands.Cog):
         if not self.subscribed_guilds:
             self.update_terms_task.cancel()
 
-        await ctx.send(f"`Zastaveno updatovani terminu pro server: {ctx.guild.name}`")
+        await ctx.send(f"`Zastavena automatická aktualizace termínů pro server: {ctx.guild.name}`")
 
     @tasks.loop(hours=int(config.exams_terms_update_interval * 24))
     async def update_terms_task(self):
@@ -196,10 +201,8 @@ class Exams(commands.Cog):
 
                     if isinstance(ctx, commands.Context):
                         return await ctx.send(embed=embed)
-                    else:
-                        # If its not context then its mass call or auto task and need to check messages in database
-                        await self.handle_exams_with_database_access(embed, ctx)
 
+                # There is body so start parsing table
                 exams = body.find_all("tr")
 
                 number_of_exams = len(exams)
@@ -207,6 +210,7 @@ class Exams(commands.Cog):
                 number_of_batches = math.ceil(number_of_exams / bs)
                 exam_batches = [exams[i * bs:bs + i * bs] for i in range(number_of_batches)]
 
+                term_strings_dict = {}
                 pages = []
                 for exam_batch in exam_batches:
                     embed = disnake.Embed(title=title, description=description, color=disnake.Color.dark_blue())
@@ -219,8 +223,7 @@ class Exams(commands.Cog):
                         cols = exam.find_all("td")
 
                         # Check if tag is not None and get strong and normal subject tag
-                        subject_tag = (tag.find("strong") or tag.contents[
-                            0]) if tag is not None else None
+                        subject_tag = (tag.find("strong") or tag.contents[0]) if tag is not None else None
 
                         if subject_tag is None:
                             content = re.sub(CLEANR, "", str(cols[0]))
@@ -242,18 +245,34 @@ class Exams(commands.Cog):
                                     embed.add_field(name=subject_tag, value=col.contents[0],
                                                     inline=False)
                                 else:
-                                    term = str(strong_tag.contents[0]).replace(" ", "")
+                                    # Mainly for terms without specified time
+                                    term = strong_tag.contents[0].replace(u'\xa0', '').replace(" ", "")
 
                                     date_splits = term.split(".")
+                                    term_datetime = datetime.datetime(int(date_splits[2]),
+                                                                      int(date_splits[1]),
+                                                                      int(date_splits[0]),
+                                                                      23,
+                                                                      59)
+
                                     term_date = datetime.date(int(date_splits[2]),
                                                               int(date_splits[1]),
                                                               int(date_splits[0]))
 
                                     name = f"{subject_tag}"
-                                    term_time = f"{col.contents[0]}\n{term}"
-                                    if term_date < datetime.date.today():
+                                    term_time = f"{term}\n{col.contents[0]}"
+
+                                    date_offset = " " * (DATE_OFFSET - len(name))
+                                    time_offset = " " * (TIME_OFFSET - len(term))
+                                    term_string = f"{name}{date_offset}{term}{time_offset}{col.contents[0]}"
+
+                                    if term_date == datetime.date.today():
+                                        term_strings_dict[term_datetime] = f"- {term_string}"
+                                    elif term_datetime < datetime.datetime.now():
                                         name = f"~~{name}~~"
                                         term_time = f"~~{term_time}~~"
+                                    else:
+                                        term_strings_dict[term_datetime] = f"+ {term_string}"
 
                                     embed.add_field(name=name, value=term_time, inline=False)
                             else:
@@ -267,23 +286,49 @@ class Exams(commands.Cog):
                                     whole_term_count += number_of_terms
 
                                     for idx2, (term, time) in enumerate(zip(terms, times)):
-                                        term = str(term.contents[0]).replace(" ", "")
+                                        term = term.contents[0].replace(u'\xa0', '').replace(" ", "")
                                         time_cont = ""
                                         for c in time.contents: time_cont += str(c)
                                         time_cont = time_cont.replace("<sup>", ":").replace("</sup>", "")
 
                                         date_splits = term.split(".")
+
+                                        try:
+                                            # Try to get start time
+                                            start_time = time_cont.split("-")[0].replace(" ", "").split(":")
+                                            term_datetime = datetime.datetime(int(date_splits[2]),
+                                                                              int(date_splits[1]),
+                                                                              int(date_splits[0]),
+                                                                              int(start_time[0]),
+                                                                              int(start_time[1]))
+                                        except:
+                                            # Failed to get start time so use only date
+                                            term_datetime = datetime.datetime(int(date_splits[2]),
+                                                                              int(date_splits[1]),
+                                                                              int(date_splits[0]),
+                                                                              23,
+                                                                              59)
+
                                         term_date = datetime.date(int(date_splits[2]),
                                                                   int(date_splits[1]),
                                                                   int(date_splits[0]))
 
-                                        name = f"{idx + 1}. {subject_tag}" if number_of_terms == 1 \
+                                        name = f"{idx + 1}.  {subject_tag}" if number_of_terms == 1 \
                                             else f"{idx + 1}.{idx2 + 1} {subject_tag}"
 
-                                        term_time = f"{term}\n{time_cont}"
-                                        if term_date < datetime.date.today():
+                                        term_time = f"{term} {time_cont}"
+
+                                        date_offset = " " * (DATE_OFFSET - len(name))
+                                        time_offset = " " * (TIME_OFFSET - len(term))
+                                        term_string = f"{name}{date_offset}{term}{time_offset}{time_cont}"
+
+                                        if term_date == datetime.date.today():
+                                            term_strings_dict[term_datetime] = f"- {term_string}"
+                                        elif term_datetime < datetime.datetime.now():
                                             name = f"~~{name}~~"
                                             term_time = f"~~{term_time}~~"
+                                        else:
+                                            term_strings_dict[term_datetime] = f"+ {term_string}"
 
                                         embed.add_field(name=name, value=term_time)
 
@@ -302,21 +347,21 @@ class Exams(commands.Cog):
                                                color=disnake.Color.dark_blue(),
                                                delete_after=False).run()
                     else:
-                        await self.handle_exams_with_database_access(pages, ctx)
+                        header = disnake.Embed(title=title, description=description, color=disnake.Color.dark_blue())
+                        await self.handle_exams_with_database_access(term_strings_dict, header, ctx)
                 elif number_of_pages == 1:
                     # Only one page, no need paginator
                     if isinstance(ctx, commands.Context):
                         await ctx.send(embed=pages[0])
                     else:
-                        await self.handle_exams_with_database_access(pages, ctx)
+                        header = disnake.Embed(title=title, description=description, color=disnake.Color.dark_blue())
+                        await self.handle_exams_with_database_access(term_strings_dict, header, ctx)
                 else:
                     # No pages were parsed, so we will post only default embed
                     embed = disnake.Embed(title=title, description=description, color=disnake.Color.dark_blue())
                     utils.add_author_footer(embed, author if author is not None else self.bot.user)
                     if isinstance(ctx, commands.Context):
                         await ctx.send(embed=embed)
-                    else:
-                        await self.handle_exams_with_database_access(embed, ctx)
             except:
                 # Parsing failed
                 embed = disnake.Embed(title=title, description=description, color=disnake.Color.dark_blue())
@@ -331,20 +376,27 @@ class Exams(commands.Cog):
             if isinstance(ctx, commands.Context):
                 await ctx.send(embed=embed)
 
-    async def handle_exams_with_database_access(self, src_data:Union[disnake.Embed, List[disnake.Embed]],
+    async def handle_exams_with_database_access(self, src_data:dict, header:disnake.Embed,
                                                 dest:Union[disnake.TextChannel, disnake.Message]):
-        if isinstance(src_data, disnake.Embed):
-            src_data = [src_data]
+        sorted_src_data = collections.OrderedDict(sorted(src_data.items()))
+        messages = merge_messages(sorted_src_data.values(), 1900)
+
+        if messages:
+            message = messages[0]
+            if len(messages) > 1:
+                message = f"{message}\n\nZbytek termínu v odkazu"
+            src_data_string = f"```diff\n{message}\n```"
+        else:
+            src_data_string = None
 
         if isinstance(dest, disnake.TextChannel):
             # No previous message in channel
-
-            send_message = await dest.send(embeds=src_data)
+            send_message = await dest.send(content=src_data_string, embed=header)
             if send_message is not None:
                 self.exams_repo.create_term_message(send_message.id, send_message.channel.id)
         else:
             # Message already exists
-            await dest.edit(embeds=src_data)
+            await dest.edit(content=src_data_string, embed=header)
 
 
 def setup(bot):
