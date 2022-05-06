@@ -40,14 +40,14 @@ class Exams(commands.Cog):
 
     @cooldowns.default_cooldown
     @commands.check(utils.helper_plus)
-    @commands.command()
+    @commands.command(brief=Messages.exams_update_term_brief)
     async def update_terms(self, ctx:commands.Context):
         await self.update_exam_terms(ctx.guild, ctx.author)
         await ctx.send("`Termíny aktualizovány`")
 
     @cooldowns.default_cooldown
     @commands.check(utils.is_bot_admin)
-    @commands.command()
+    @commands.command(brief=Messages.exams_remove_all_terms_brief)
     async def remove_all_terms(self, ctx: commands.Context):
         for channel in ctx.guild.channels:
             if not isinstance(channel, disnake.TextChannel):
@@ -66,7 +66,7 @@ class Exams(commands.Cog):
 
     @cooldowns.default_cooldown
     @commands.check(utils.is_bot_admin)
-    @commands.command()
+    @commands.command(brief=Messages.exams_remove_terms_brief)
     async def remove_terms(self, ctx: commands.Context, *, channel:disnake.TextChannel):
         if not isinstance(channel, disnake.TextChannel):
             return await ctx.send(f"`Channel {channel.name} není textový kanál`")
@@ -85,7 +85,7 @@ class Exams(commands.Cog):
             await ctx.send(f"`Nenalezeny žádné termíny v kanálu {channel.name}`")
 
     @commands.check(utils.is_bot_admin)
-    @commands.command()
+    @commands.command(brief=Messages.exams_start_terms_brief)
     async def start_terms(self, ctx: commands.Context):
         self.subscribed_guilds.append(ctx.guild.id)
 
@@ -98,7 +98,7 @@ class Exams(commands.Cog):
         await ctx.send(f"`Zapnuta automatická aktualizace termínů pro server: {ctx.guild.name}`")
 
     @commands.check(utils.is_bot_admin)
-    @commands.command()
+    @commands.command(brief=Messages.exams_stop_terms_brief)
     async def stop_terms(self, ctx: commands.Context):
         if ctx.guild in self.subscribed_guilds:
             self.subscribed_guilds.remove(ctx.guild.id)

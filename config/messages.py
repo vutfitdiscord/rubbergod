@@ -399,3 +399,8 @@ class Messages:
     exams_specify_year = "Specifikuj ročník"
     exams_no_valid_year = "Byl zadán neplatný ročník"
     exams_parsing_failed = "Parsing stránky selhal, nahlaš chybu správci bota"
+    exams_update_term_brief = "Aktualizuje termíny v kanálech termínů"
+    exams_remove_all_terms_brief = "Odstraní termíny ze všech kanálů termínů"
+    exams_remove_terms_brief = "Odstraní termíny ze zadaného kanálu"
+    exams_start_terms_brief = "Zapne automatickou aktualizaci termínů"
+    exams_stop_terms_brief = "Vypne automatickou aktualizaci termínů"
