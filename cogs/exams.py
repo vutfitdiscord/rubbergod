@@ -15,7 +15,6 @@ from config.app_config import config
 from config import cooldowns
 from config.messages import Messages
 import utils
-from features.list_message_sender import merge_messages
 
 year_regex = "[1-4][BM]IT"
 CLEANR = re.compile('<.*?>|&([a-z0-9]+|#[0-9]{1,6}|#x[0-9a-f]{1,6});')
@@ -435,12 +434,12 @@ class Exams(commands.Cog):
                 current_week_number = date.isocalendar().week
                 if last_week_number != current_week_number:
                     last_week_number = current_week_number
-                    data_by_weeks.append(merge_messages(current_week_data, 1900)[0])
+                    data_by_weeks.append("\n".join(current_week_data))
                     current_week_data.clear()
                 current_week_data.append(term_string)
 
             if current_week_data:
-                data_by_weeks.append(merge_messages(current_week_data, 1900)[0])
+                data_by_weeks.append("\n".join(current_week_data))
 
             src_data_string = ""
             for week_string in data_by_weeks:
