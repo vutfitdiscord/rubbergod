@@ -420,15 +420,46 @@ class Exams(commands.Cog):
     async def handle_exams_with_database_access(self, src_data:dict, header:disnake.Embed,
                                                 dest:Union[disnake.TextChannel, disnake.Message]):
         sorted_src_data = collections.OrderedDict(sorted(src_data.items()))
-        messages = merge_messages(sorted_src_data.values(), 1900)
 
-        if messages:
-            message = messages[0]
-            if len(messages) > 1:
-                message = f"{message}\n\nZbytek termínu v odkazu"
-            src_data_string = f"```diff\n{message}\n```"
+        too_much_terms = False
+
+        if sorted_src_data:
+            dates = list(sorted_src_data.keys())
+            first_date = dates[0]
+            last_week_number = first_date.isocalendar().week
+
+            data_by_weeks = []
+            current_week_data = []
+            for date in dates:
+                term_string = sorted_src_data.get(date)
+                current_week_number = date.isocalendar().week
+                if last_week_number != current_week_number:
+                    last_week_number = current_week_number
+                    data_by_weeks.append(merge_messages(current_week_data, 1900)[0])
+                    current_week_data.clear()
+                current_week_data.append(term_string)
+
+            if current_week_data:
+                data_by_weeks.append(merge_messages(current_week_data, 1900)[0])
+
+            src_data_string = ""
+            for week_string in data_by_weeks:
+                if (len(src_data_string) + len(week_string) + 2) > 1900:
+                    too_much_terms = True
+                    break
+
+                if src_data_string:
+                    src_data_string = f"{src_data_string}\n\n{week_string}"
+                else:
+                    src_data_string = week_string
+
         else:
             src_data_string = None
+
+        if src_data_string is not None:
+            if too_much_terms:
+                src_data_string = f"{src_data_string}\n\nZbytek termínu v odkazu"
+            src_data_string = f"```diff\n{src_data_string}\n```"
 
         if isinstance(dest, disnake.TextChannel):
             # No previous message in channel
