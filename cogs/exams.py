@@ -298,7 +298,7 @@ class Exams(commands.Cog):
                                                               int(date_splits[1]),
                                                               int(date_splits[0]))
 
-                                    term_time = f"{term_date_string}\n{col.contents[0]}"
+                                    term_content = f"{term_date_string}\n{col.contents[0]}"
 
                                     # Calculate character offsets
                                     padded_term_date = datetime.date.strftime(term_date, "%d.%m.%y")
@@ -310,11 +310,11 @@ class Exams(commands.Cog):
                                         term_strings_dict[term_datetime] = f"- {term_string}"
                                     elif term_datetime < datetime.datetime.now():
                                         subject_tag = f"~~{subject_tag}~~"
-                                        term_time = f"~~{term_time}~~"
+                                        term_content = f"~~{term_content}~~"
                                     else:
                                         term_strings_dict[term_datetime] = f"+ {term_string}"
 
-                                    embed.add_field(name=subject_tag, value=term_time, inline=False)
+                                    embed.add_field(name=subject_tag, value=term_content, inline=False)
                             else:
                                 # Classic terms
                                 whole_term_count = 0
@@ -369,10 +369,10 @@ class Exams(commands.Cog):
                                           except:
                                             pass
 
-                                        term_time = f"{term_date_string} {term_time_string}"
+                                        padded_term_date = datetime.date.strftime(term_date, "%d.%m.%y")
+                                        term_date_time_string = f"{padded_term_date} {term_time_string}"
 
                                         # Calculate character offsets
-                                        padded_term_date = datetime.date.strftime(term_date, "%d.%m.%y")
                                         date_offset = " " * (DATE_OFFSET - len(name))
                                         time_offset = " " * (TIME_OFFSET - len(padded_term_date))
                                         term_string = f"{name}{date_offset}{padded_term_date}{time_offset}{term_time_string}"
@@ -381,11 +381,11 @@ class Exams(commands.Cog):
                                             term_strings_dict[term_datetime] = f"- {term_string}"
                                         elif term_datetime < datetime.datetime.now():
                                             name = f"~~{name}~~"
-                                            term_time = f"~~{term_time}~~"
+                                            term_time = f"~~{term_date_time_string}~~"
                                         else:
                                             term_strings_dict[term_datetime] = f"+ {term_string}"
 
-                                        embed.add_field(name=name, value=term_time)
+                                        embed.add_field(name=name, value=term_date_time_string)
 
                                 to_add = math.ceil(whole_term_count / 3) * 3 - whole_term_count
                                 for _ in range(to_add):
