@@ -284,9 +284,9 @@ class Exams(commands.Cog):
                                                     inline=False)
                                 else:
                                     # Mainly for terms without specified time
-                                    term = strong_tag.contents[0].replace(u'\xa0', '').replace(" ", "")
+                                    term_date_string = strong_tag.contents[0].replace(u'\xa0', '').replace(" ", "")
 
-                                    date_splits = term.split(".")
+                                    date_splits = term_date_string.split(".")
                                     # Without actual time set time to end of the day
                                     term_datetime = datetime.datetime(int(date_splits[2]),
                                                                       int(date_splits[1]),
@@ -298,12 +298,13 @@ class Exams(commands.Cog):
                                                               int(date_splits[1]),
                                                               int(date_splits[0]))
 
-                                    term_time = f"{term}\n{col.contents[0]}"
+                                    term_time = f"{term_date_string}\n{col.contents[0]}"
 
                                     # Calculate character offsets
+                                    padded_term_date = datetime.date.strftime(term_date, "%d.%m.%y")
                                     date_offset = " " * (DATE_OFFSET - len(subject_tag))
-                                    time_offset = " " * (TIME_OFFSET - len(term)) # Here used aas data offset
-                                    term_string = f"{subject_tag}{date_offset}{term}{time_offset}{col.contents[0]}"
+                                    time_offset = " " * (TIME_OFFSET - len(padded_term_date)) # Here used aas data offset
+                                    term_string = f"{subject_tag}{date_offset}{padded_term_date}{time_offset}{col.contents[0]}"
 
                                     if term_date == datetime.date.today():
                                         term_strings_dict[term_datetime] = f"- {term_string}"
@@ -324,22 +325,25 @@ class Exams(commands.Cog):
                                     number_of_terms = len(terms)
                                     whole_term_count += number_of_terms
 
-                                    for idx2, (term, time) in enumerate(zip(terms, times)):
-                                        term = term.contents[0].replace(u'\xa0', '').replace(" ", "")
-                                        time_cont = ""
-                                        for c in time.contents: time_cont += str(c)
-                                        time_cont = time_cont.replace("<sup>", ":").replace("</sup>", "")
+                                    for idx2, (term_date_string, time) in enumerate(zip(terms, times)):
+                                        term_date_string = term_date_string.contents[0].replace(u'\xa0', '').replace(" ", "")
+                                        term_time_string = ""
+                                        for c in time.contents: term_time_string += str(c)
+                                        term_time_string = term_time_string.replace("<sup>", ":").replace("</sup>", "")
 
-                                        date_splits = term.split(".")
+                                        date_splits = term_date_string.split(".")
 
+                                        start_time_string = None
+                                        end_time_string = None
                                         try:
                                             # Try to get start time
-                                            start_time = time_cont.split("-")[0].replace(" ", "").split(":")
+                                            start_time_string = term_time_string.split("-")[0].replace(" ", "").split(":")
+                                            end_time_string = term_time_string.split("-")[1].replace(" ", "").split(":")
                                             term_datetime = datetime.datetime(int(date_splits[2]),
                                                                               int(date_splits[1]),
                                                                               int(date_splits[0]),
-                                                                              int(start_time[0]),
-                                                                              int(start_time[1]))
+                                                                              int(start_time_string[0]),
+                                                                              int(start_time_string[1]))
                                         except:
                                             # Failed to get start time so use only date
                                             term_datetime = datetime.datetime(int(date_splits[2]),
@@ -355,12 +359,23 @@ class Exams(commands.Cog):
                                         name = f"{idx + 1}.  {subject_tag}" if number_of_terms == 1 \
                                             else f"{idx + 1}.{idx2 + 1} {subject_tag}"
 
-                                        term_time = f"{term} {time_cont}"
+                                        if start_time_string is not None and end_time_string is not None:
+                                          try:
+                                            start_time = datetime.time(int(start_time_string[0]), int(start_time_string[1]))
+                                            start_time_string = datetime.time.strftime(start_time, '%H:%M')
+                                            end_time = datetime.time(int(end_time_string[0]), int(end_time_string[1]))
+                                            end_time_string = datetime.time.strftime(end_time, '%H:%M')
+                                            term_time_string = f"{start_time_string} - {end_time_string}"
+                                          except:
+                                            pass
+
+                                        term_time = f"{term_date_string} {term_time_string}"
 
                                         # Calculate character offsets
+                                        padded_term_date = datetime.date.strftime(term_date, "%d.%m.%y")
                                         date_offset = " " * (DATE_OFFSET - len(name))
-                                        time_offset = " " * (TIME_OFFSET - len(term))
-                                        term_string = f"{name}{date_offset}{term}{time_offset}{time_cont}"
+                                        time_offset = " " * (TIME_OFFSET - len(padded_term_date))
+                                        term_string = f"{name}{date_offset}{padded_term_date}{time_offset}{term_time_string}"
 
                                         if term_date == datetime.date.today():
                                             term_strings_dict[term_datetime] = f"- {term_string}"
