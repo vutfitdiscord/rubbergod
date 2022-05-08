@@ -301,7 +301,7 @@ class Exams(commands.Cog):
                                     term_content = f"{term_date_string}\n{col.contents[0]}"
 
                                     # Calculate character offsets
-                                    padded_term_date = datetime.date.strftime(term_date, "%d.%m.%y")
+                                    padded_term_date = datetime.date.strftime(term_date, "%d.%m.%Y")
                                     date_offset = " " * (DATE_OFFSET - len(subject_tag))
                                     time_offset = " " * (TIME_OFFSET - len(padded_term_date)) # Here used aas data offset
                                     term_string = f"{subject_tag}{date_offset}{padded_term_date}{time_offset}{col.contents[0]}"
@@ -369,7 +369,7 @@ class Exams(commands.Cog):
                                           except:
                                             pass
 
-                                        padded_term_date = datetime.date.strftime(term_date, "%d.%m.%y")
+                                        padded_term_date = datetime.date.strftime(term_date, "%d.%m.%Y")
                                         term_date_time_string = f"{padded_term_date} {term_time_string}"
 
                                         # Calculate character offsets
@@ -381,7 +381,7 @@ class Exams(commands.Cog):
                                             term_strings_dict[term_datetime] = f"- {term_string}"
                                         elif term_datetime < datetime.datetime.now():
                                             name = f"~~{name}~~"
-                                            term_time = f"~~{term_date_time_string}~~"
+                                            term_date_time_string = f"~~{term_date_time_string}~~"
                                         else:
                                             term_strings_dict[term_datetime] = f"+ {term_string}"
 
