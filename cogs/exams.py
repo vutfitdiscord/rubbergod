@@ -69,7 +69,7 @@ class Exams(commands.Cog):
     @commands.command(brief=Messages.exams_remove_terms_brief)
     async def remove_terms(self, ctx: commands.Context, *, channel:disnake.TextChannel):
         if not isinstance(channel, disnake.TextChannel):
-            return await ctx.send(utils.fill_message(Messages.exams_channel_is_not_text_channel, name=channel.name))
+            return await ctx.send(utils.fill_message("exams_channel_is_not_text_channel", chan_name=channel.name))
 
         message_ids = self.exams_repo.remove_from_channel(channel.id)
         for message_id in message_ids:
@@ -82,7 +82,7 @@ class Exams(commands.Cog):
         if message_ids:
             await ctx.send(Messages.exams_terms_removed)
         else:
-            await ctx.send(utils.fill_message(Messages.exams_nothing_to_remove, name=channel.name))
+            await ctx.send(utils.fill_message("exams_nothing_to_remove", chan_name=channel.name))
 
     @commands.check(utils.is_bot_admin)
     @commands.command(brief=Messages.exams_start_terms_brief)
@@ -96,7 +96,7 @@ class Exams(commands.Cog):
             # If task is already running update terms now
             await self.update_exam_terms(ctx.guild)
 
-        await ctx.send(utils.fill_message(Messages.exams_automatic_update_started, name=ctx.guild.name))
+        await ctx.send(utils.fill_message("exams_automatic_update_started", guild_name=ctx.guild.name))
 
     @commands.check(utils.is_bot_admin)
     @commands.command(brief=Messages.exams_stop_terms_brief)
@@ -108,7 +108,7 @@ class Exams(commands.Cog):
         if not self.subscribed_guilds:
             self.update_terms_task.cancel()
 
-        await ctx.send(utils.fill_message(Messages.exams_automatic_update_stopped, name=ctx.guild.name))
+        await ctx.send(utils.fill_message("exams_automatic_update_stopped", guild_name=ctx.guild.name))
 
     @tasks.loop(hours=int(config.exams_terms_update_interval * 24))
     async def update_terms_task(self):
