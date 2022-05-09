@@ -42,8 +42,8 @@ class Exams(commands.Cog):
     @commands.check(utils.helper_plus)
     @commands.command(brief=Messages.exams_update_term_brief)
     async def update_terms(self, ctx:commands.Context):
-        await self.update_exam_terms(ctx.guild, ctx.author)
-        await ctx.send(Messages.exams_terms_updated)
+        updated_chans = await self.update_exam_terms(ctx.guild, ctx.author)
+        await ctx.send(utils.fill_message("exams_terms_updated", num_chan=updated_chans))
 
     @cooldowns.default_cooldown
     @commands.check(utils.is_bot_admin)
@@ -149,6 +149,8 @@ class Exams(commands.Cog):
         return dest
 
     async def update_exam_terms(self, guild:disnake.Guild, author:Optional[disnake.User]=None):
+        updated = 0
+
         for channel in guild.channels:
             if not isinstance(channel, disnake.TextChannel):
                 continue
@@ -162,6 +164,7 @@ class Exams(commands.Cog):
 
                             await self.process_exams(dest1, "1MIT", author)
                             await self.process_exams(dest2, "2MIT", author)
+                            updated += 1
                     else:
                         match = re.match(year_regex, channel_name[:4].upper())
                         if match is not None:
@@ -170,6 +173,9 @@ class Exams(commands.Cog):
                                 dest = await self.get_message_destination(channel)
 
                                 await self.process_exams(dest, year, author)
+                                updated += 1
+
+        return updated
 
     @commands.command(brief=Messages.exams_brief, aliases=["zkousky"])
     async def exams(self, ctx:commands.Context, rocnik:Union[str, None]=None):

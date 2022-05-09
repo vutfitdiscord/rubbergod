@@ -404,7 +404,7 @@ class Messages:
     exams_remove_terms_brief = "Odstraní termíny ze zadaného kanálu"
     exams_start_terms_brief = "Zapne automatickou aktualizaci termínů"
     exams_stop_terms_brief = "Vypne automatickou aktualizaci termínů"
-    exams_terms_updated = "`Termíny aktualizovány`"
+    exams_terms_updated = "`Termíny aktualizovány v {num_chan} kanálech`"
     exams_terms_removed = "`Termíny odstraněny`"
     exams_nothing_to_remove = "`Nenalezeny žádné termíny v kanálu {chan_name}`"
     exams_channel_is_not_text_channel = "`Nenalezeny žádné termíny v kanálu {chan_name}`"
