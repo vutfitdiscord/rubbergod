@@ -43,7 +43,7 @@ class Exams(commands.Cog):
     @commands.command(brief=Messages.exams_update_term_brief)
     async def update_terms(self, ctx:commands.Context):
         await self.update_exam_terms(ctx.guild, ctx.author)
-        await ctx.send("`Termíny aktualizovány`")
+        await ctx.send(Messages.exams_terms_updated)
 
     @cooldowns.default_cooldown
     @commands.check(utils.is_bot_admin)
@@ -62,14 +62,14 @@ class Exams(commands.Cog):
                             await message.delete()
                         except:
                             pass
-        await ctx.send("`Termíny odstraněny`")
+        await ctx.send(Messages.exams_terms_removed)
 
     @cooldowns.default_cooldown
     @commands.check(utils.is_bot_admin)
     @commands.command(brief=Messages.exams_remove_terms_brief)
     async def remove_terms(self, ctx: commands.Context, *, channel:disnake.TextChannel):
         if not isinstance(channel, disnake.TextChannel):
-            return await ctx.send(f"`Channel {channel.name} není textový kanál`")
+            return await ctx.send(utils.fill_message(Messages.exams_channel_is_not_text_channel, name=channel.name))
 
         message_ids = self.exams_repo.remove_from_channel(channel.id)
         for message_id in message_ids:
@@ -80,14 +80,15 @@ class Exams(commands.Cog):
                 pass
 
         if message_ids:
-            await ctx.send(f"`Termíny odstraněny z kanálu {channel.name}`")
+            await ctx.send(Messages.exams_terms_removed)
         else:
-            await ctx.send(f"`Nenalezeny žádné termíny v kanálu {channel.name}`")
+            await ctx.send(utils.fill_message(Messages.exams_nothing_to_remove, name=channel.name))
 
     @commands.check(utils.is_bot_admin)
     @commands.command(brief=Messages.exams_start_terms_brief)
     async def start_terms(self, ctx: commands.Context):
-        self.subscribed_guilds.append(ctx.guild.id)
+        if ctx.guild.id not in self.subscribed_guilds:
+            self.subscribed_guilds.append(ctx.guild.id)
 
         if not self.update_terms_task.is_running():
             self.update_terms_task.start()
@@ -95,7 +96,7 @@ class Exams(commands.Cog):
             # If task is already running update terms now
             await self.update_exam_terms(ctx.guild)
 
-        await ctx.send(f"`Zapnuta automatická aktualizace termínů pro server: {ctx.guild.name}`")
+        await ctx.send(utils.fill_message(Messages.exams_automatic_update_started, name=ctx.guild.name))
 
     @commands.check(utils.is_bot_admin)
     @commands.command(brief=Messages.exams_stop_terms_brief)
@@ -107,7 +108,7 @@ class Exams(commands.Cog):
         if not self.subscribed_guilds:
             self.update_terms_task.cancel()
 
-        await ctx.send(f"`Zastavena automatická aktualizace termínů pro server: {ctx.guild.name}`")
+        await ctx.send(utils.fill_message(Messages.exams_automatic_update_stopped, name=ctx.guild.name))
 
     @tasks.loop(hours=int(config.exams_terms_update_interval * 24))
     async def update_terms_task(self):
