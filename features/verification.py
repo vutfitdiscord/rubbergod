@@ -110,7 +110,7 @@ class Verification(BaseFeature):
                     await message.channel.send(msg)
                     await self.log_verify_fail(message, 'getcode (xlogin) - Invalid verify state')
                 else:
-                    await self.gen_code_and_send_mail(message, user, "@stud.fit.vutbr.cz")
+                    await self.gen_code_and_send_mail(message, user, "stud.fit.vutbr.cz")
             else:
                 # MUNI
                 try:
@@ -139,7 +139,7 @@ class Verification(BaseFeature):
                 user = self.repo.get_user(login, status=VerifyStatus.Unverified.value)
                 if user is None:
                     user = self.repo.add_user(login, "MUNI", status=VerifyStatus.Unverified.value)
-                await self.gen_code_and_send_mail(message, user, "@mail.muni.cz")
+                await self.gen_code_and_send_mail(message, user, "mail.muni.cz")
         else:
             await message.channel.send(utils.fill_message("verify_already_verified",
                                                           user=message.author.id, admin=config.admin_ids[0]))
