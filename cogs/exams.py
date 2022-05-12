@@ -449,13 +449,13 @@ class Exams(commands.Cog):
         if sorted_src_data:
             dates = list(sorted_src_data.keys())
             first_date = dates[0]
-            last_week_number = first_date.isocalendar().week
+            last_week_number = first_date.isocalendar()[1]
 
             data_by_weeks = []
             current_week_data = []
             for date in dates:
                 term_string = sorted_src_data.get(date)
-                current_week_number = date.isocalendar().week
+                current_week_number = date.isocalendar()[1]
                 if last_week_number != current_week_number:
                     last_week_number = current_week_number
                     data_by_weeks.append("\n".join(current_week_data))
