@@ -60,7 +60,7 @@ class Exams(commands.Cog):
                         try:
                             message = await channel.fetch_message(message_id)
                             await message.delete()
-                        except:
+                        except disnake.NotFound:
                             pass
         await ctx.send(Messages.exams_terms_removed)
 
@@ -76,7 +76,7 @@ class Exams(commands.Cog):
             try:
                 message = await channel.fetch_message(message_id)
                 await message.delete()
-            except:
+            except disnake.NotFound:
                 pass
 
         if message_ids:
@@ -137,7 +137,7 @@ class Exams(commands.Cog):
             dest = None
             try:
                 dest = await channel.fetch_message(message_id)
-            except:
+            except disnake.NotFound:
                 # If cant find message then remove it from database
                 self.exams_repo.remove_term_message(message_id)
 
@@ -194,10 +194,7 @@ class Exams(commands.Cog):
 
                 await ctx.send(Messages.exams_no_valid_role)
             else:
-                try:
-                    await ctx.send(Messages.exams_specify_year)
-                except:
-                    pass
+                await ctx.send(Messages.exams_specify_year)
         else:
             match = re.match(year_regex, rocnik.upper())
 
@@ -342,26 +339,13 @@ class Exams(commands.Cog):
 
                                     date_splits = term_date_string.split(".")
 
-                                    start_time_string = None
-                                    end_time_string = None
-                                    try:
-                                        # Try to get start time
-                                        start_time_string = term_time_string.split("-")[0].replace(
-                                            " ", "").split(":")
-                                        end_time_string = term_time_string.split("-")[1].replace(
-                                            " ", "").split(":")
-                                        term_datetime = datetime.datetime(int(date_splits[2]),
-                                                                          int(date_splits[1]),
-                                                                          int(date_splits[0]),
-                                                                          int(start_time_string[0]),
-                                                                          int(start_time_string[1]))
-                                    except:
-                                        # Failed to get start time so use only date
-                                        term_datetime = datetime.datetime(int(date_splits[2]),
-                                                                          int(date_splits[1]),
-                                                                          int(date_splits[0]),
-                                                                          23,
-                                                                          59)
+                                    start_time_string_parts = term_time_string.split("-")[0].replace(" ", "").split(":")
+                                    end_time_string_parts = term_time_string.split("-")[1].replace(" ","").split(":")
+                                    term_datetime = datetime.datetime(int(date_splits[2]),
+                                                                      int(date_splits[1]),
+                                                                      int(date_splits[0]),
+                                                                      int(start_time_string_parts[0]),
+                                                                      int(start_time_string_parts[1]))
 
                                     term_date = datetime.date(int(date_splits[2]),
                                                               int(date_splits[1]),
@@ -370,17 +354,14 @@ class Exams(commands.Cog):
                                     name = f"{idx + 1}.  {subject_tag}" if number_of_terms == 1 \
                                         else f"{idx + 1}.{idx2 + 1} {subject_tag}"
 
-                                    if start_time_string is not None and end_time_string is not None:
-                                        try:
-                                            start_time = datetime.time(int(start_time_string[0]),
-                                                                       int(start_time_string[1]))
-                                            start_time_string = datetime.time.strftime(start_time,'%H:%M')
-                                            end_time = datetime.time(int(end_time_string[0]),
-                                                                     int(end_time_string[1]))
-                                            end_time_string = datetime.time.strftime(end_time, '%H:%M')
-                                            term_time_string = f"{start_time_string} - {end_time_string}"
-                                        except:
-                                            pass
+                                    if start_time_string_parts is not None and end_time_string_parts is not None:
+                                        start_time = datetime.time(int(start_time_string_parts[0]),
+                                                                   int(start_time_string_parts[1]))
+                                        start_time_string = datetime.time.strftime(start_time, '%H:%M')
+                                        end_time = datetime.time(int(end_time_string_parts[0]),
+                                                                 int(end_time_string_parts[1]))
+                                        end_time_string = datetime.time.strftime(end_time, '%H:%M')
+                                        term_time_string = f"{start_time_string} - {end_time_string}"
 
                                     padded_term_date = datetime.date.strftime(term_date, "%d.%m.%Y")
                                     term_date_time_string = f"{padded_term_date} {term_time_string}"
