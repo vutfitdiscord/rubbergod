@@ -234,203 +234,205 @@ class Exams(commands.Cog):
         if r.status_code == 200:
             soup = BeautifulSoup(r.content, 'html.parser')
 
-            try:
-                table = soup.find("table", {"class": "exam"})
-                body = table.find("tbody")
+            table = soup.find("table", {"class": "exam"})
+            body = table.find("tbody")
 
-                if body is None:
-                    # There is no table so no terms
-                    embed = disnake.Embed(title=title, description=description,
-                                          color=disnake.Color.dark_blue())
-                    utils.add_author_footer(embed, author if author is not None else self.bot.user)
+            if body is None:
+                # There is no table so no terms
+                embed = disnake.Embed(title=title, description=description,
+                                      color=disnake.Color.dark_blue())
+                utils.add_author_footer(embed, author if author is not None else self.bot.user)
 
-                    if isinstance(ctx, commands.Context):
-                        return await ctx.send(embed=embed)
+                if isinstance(ctx, commands.Context):
+                    return await ctx.send(embed=embed)
 
-                # There is body so start parsing table
-                exams = body.find_all("tr")
+            # There is body so start parsing table
+            exams = body.find_all("tr")
 
-                number_of_exams = len(exams)
-                bs = config.exams_page_size
-                number_of_batches = math.ceil(number_of_exams / bs)
-                exam_batches = [exams[i * bs:bs + i * bs] for i in range(number_of_batches)]
+            number_of_exams = len(exams)
+            bs = config.exams_page_size
+            number_of_batches = math.ceil(number_of_exams / bs)
+            exam_batches = [exams[i * bs:bs + i * bs] for i in range(number_of_batches)]
 
-                term_strings_dict = {}
-                pages = []
-                for exam_batch in exam_batches:
-                    embed = disnake.Embed(title=title, description=description, color=disnake.Color.dark_blue())
-                    utils.add_author_footer(embed, author if author is not None else self.bot.user)
+            term_strings_dict = {}
+            pages = []
+            for exam_batch in exam_batches:
+                embed = disnake.Embed(title=title, description=description,
+                                      color=disnake.Color.dark_blue())
+                utils.add_author_footer(embed, author if author is not None else self.bot.user)
 
-                    for exam in exam_batch:
-                        # Every exams row start with link tag
-                        tag = exam.find("a") \
-                            if str(exam).startswith("<tr><td><a") else None
-                        cols = exam.find_all("td")
+                for exam in exam_batch:
+                    # Every exams row start with link tag
+                    tag = exam.find("a") \
+                        if str(exam).startswith("<tr><td><a") else None
+                    cols = exam.find_all("td")
 
-                        # Check if tag is not None and get strong and normal subject tag
-                        subject_tag = (tag.find("strong") or tag.contents[0]) if tag is not None else None
+                    # Check if tag is not None and get strong and normal subject tag
+                    subject_tag = (
+                                tag.find("strong") or tag.contents[0]) if tag is not None else None
 
-                        if subject_tag is None:
-                            content = re.sub(CLEANR, "", str(cols[0]))
-                            embed.add_field(name="Poznámka", value=content, inline=False)
-                        else:
-                            del cols[0]
+                    if subject_tag is None:
+                        content = re.sub(CLEANR, "", str(cols[0]))
+                        embed.add_field(name="Poznámka", value=content, inline=False)
+                    else:
+                        del cols[0]
 
-                            if not isinstance(subject_tag, NavigableString):
-                                subject_tag = subject_tag.contents[0]
+                        if not isinstance(subject_tag, NavigableString):
+                            subject_tag = subject_tag.contents[0]
 
-                            col_count = len(cols)
-                            if col_count == 1:
-                                # Support for credits
-                                col = cols[0]
-                                strong_tag = col.find("strong")
+                        col_count = len(cols)
+                        if col_count == 1:
+                            # Support for credits
+                            col = cols[0]
+                            strong_tag = col.find("strong")
 
-                                if strong_tag is None:
-                                    # There is no term - Only text
-                                    embed.add_field(name=subject_tag, value=col.contents[0],
-                                                    inline=False)
+                            if strong_tag is None:
+                                # There is no term - Only text
+                                embed.add_field(name=subject_tag, value=col.contents[0],
+                                                inline=False)
+                            else:
+                                # Mainly for terms without specified time
+                                term_date_string = strong_tag.contents[0].replace(u'\xa0', '').replace(" ", "")
+
+                                date_splits = term_date_string.split(".")
+                                # Without actual time set time to end of the day
+                                term_datetime = datetime.datetime(int(date_splits[2]),
+                                                                  int(date_splits[1]),
+                                                                  int(date_splits[0]),
+                                                                  23,
+                                                                  59)
+
+                                term_date = datetime.date(int(date_splits[2]),
+                                                          int(date_splits[1]),
+                                                          int(date_splits[0]))
+
+                                term_content = f"{term_date_string}\n{col.contents[0]}"
+
+                                # Calculate character offsets
+                                padded_term_date = datetime.date.strftime(term_date, "%d.%m.%Y")
+                                date_offset = " " * (DATE_OFFSET - len(subject_tag))
+                                time_offset = " " * (TIME_OFFSET - len(
+                                    padded_term_date))  # Here used aas data offset
+                                term_string = f"{subject_tag}{date_offset}{padded_term_date}{time_offset}{col.contents[0]}"
+
+                                if term_date == datetime.date.today():
+                                    term_strings_dict[term_datetime] = f"- {term_string}"
+                                elif term_datetime < datetime.datetime.now():
+                                    subject_tag = f"~~{subject_tag}~~"
+                                    term_content = f"~~{term_content}~~"
                                 else:
-                                    # Mainly for terms without specified time
-                                    term_date_string = strong_tag.contents[0].replace(u'\xa0', '').replace(" ", "")
+                                    term_strings_dict[term_datetime] = f"+ {term_string}"
+
+                                embed.add_field(name=subject_tag, value=term_content, inline=False)
+                        else:
+                            # Classic terms
+                            whole_term_count = 0
+                            for idx, col in enumerate(cols):
+                                terms = col.find_all("strong")
+                                times = col.find_all("em")
+
+                                number_of_terms = len(terms)
+                                whole_term_count += number_of_terms
+
+                                for idx2, (term_date_string, time) in enumerate(zip(terms, times)):
+                                    term_date_string = term_date_string.contents[0].replace(u'\xa0', '').replace(" ", "")
+                                    term_time_string = ""
+                                    for c in time.contents: term_time_string += str(c)
+                                    term_time_string = term_time_string.replace("<sup>", ":").replace("</sup>", "")
 
                                     date_splits = term_date_string.split(".")
-                                    # Without actual time set time to end of the day
-                                    term_datetime = datetime.datetime(int(date_splits[2]),
-                                                                      int(date_splits[1]),
-                                                                      int(date_splits[0]),
-                                                                      23,
-                                                                      59)
+
+                                    start_time_string = None
+                                    end_time_string = None
+                                    try:
+                                        # Try to get start time
+                                        start_time_string = term_time_string.split("-")[0].replace(
+                                            " ", "").split(":")
+                                        end_time_string = term_time_string.split("-")[1].replace(
+                                            " ", "").split(":")
+                                        term_datetime = datetime.datetime(int(date_splits[2]),
+                                                                          int(date_splits[1]),
+                                                                          int(date_splits[0]),
+                                                                          int(start_time_string[0]),
+                                                                          int(start_time_string[1]))
+                                    except:
+                                        # Failed to get start time so use only date
+                                        term_datetime = datetime.datetime(int(date_splits[2]),
+                                                                          int(date_splits[1]),
+                                                                          int(date_splits[0]),
+                                                                          23,
+                                                                          59)
 
                                     term_date = datetime.date(int(date_splits[2]),
                                                               int(date_splits[1]),
                                                               int(date_splits[0]))
 
-                                    term_content = f"{term_date_string}\n{col.contents[0]}"
+                                    name = f"{idx + 1}.  {subject_tag}" if number_of_terms == 1 \
+                                        else f"{idx + 1}.{idx2 + 1} {subject_tag}"
+
+                                    if start_time_string is not None and end_time_string is not None:
+                                        try:
+                                            start_time = datetime.time(int(start_time_string[0]),
+                                                                       int(start_time_string[1]))
+                                            start_time_string = datetime.time.strftime(start_time,'%H:%M')
+                                            end_time = datetime.time(int(end_time_string[0]),
+                                                                     int(end_time_string[1]))
+                                            end_time_string = datetime.time.strftime(end_time, '%H:%M')
+                                            term_time_string = f"{start_time_string} - {end_time_string}"
+                                        except:
+                                            pass
+
+                                    padded_term_date = datetime.date.strftime(term_date, "%d.%m.%Y")
+                                    term_date_time_string = f"{padded_term_date} {term_time_string}"
 
                                     # Calculate character offsets
-                                    padded_term_date = datetime.date.strftime(term_date, "%d.%m.%Y")
-                                    date_offset = " " * (DATE_OFFSET - len(subject_tag))
-                                    time_offset = " " * (TIME_OFFSET - len(padded_term_date)) # Here used aas data offset
-                                    term_string = f"{subject_tag}{date_offset}{padded_term_date}{time_offset}{col.contents[0]}"
+                                    date_offset = " " * (DATE_OFFSET - len(name))
+                                    time_offset = " " * (TIME_OFFSET - len(padded_term_date))
+                                    term_string = f"{name}{date_offset}{padded_term_date}{time_offset}{term_time_string}"
 
                                     if term_date == datetime.date.today():
                                         term_strings_dict[term_datetime] = f"- {term_string}"
                                     elif term_datetime < datetime.datetime.now():
-                                        subject_tag = f"~~{subject_tag}~~"
-                                        term_content = f"~~{term_content}~~"
+                                        name = f"~~{name}~~"
+                                        term_date_time_string = f"~~{term_date_time_string}~~"
                                     else:
                                         term_strings_dict[term_datetime] = f"+ {term_string}"
 
-                                    embed.add_field(name=subject_tag, value=term_content, inline=False)
-                            else:
-                                # Classic terms
-                                whole_term_count = 0
-                                for idx, col in enumerate(cols):
-                                    terms = col.find_all("strong")
-                                    times = col.find_all("em")
+                                    embed.add_field(name=name, value=term_date_time_string)
 
-                                    number_of_terms = len(terms)
-                                    whole_term_count += number_of_terms
+                            to_add = math.ceil(whole_term_count / 3) * 3 - whole_term_count
+                            for _ in range(to_add):
+                                embed.add_field(name='\u200b', value='\u200b')
 
-                                    for idx2, (term_date_string, time) in enumerate(zip(terms, times)):
-                                        term_date_string = term_date_string.contents[0].replace(u'\xa0', '').replace(" ", "")
-                                        term_time_string = ""
-                                        for c in time.contents: term_time_string += str(c)
-                                        term_time_string = term_time_string.replace("<sup>", ":").replace("</sup>", "")
+                pages.append(embed)
 
-                                        date_splits = term_date_string.split(".")
-
-                                        start_time_string = None
-                                        end_time_string = None
-                                        try:
-                                            # Try to get start time
-                                            start_time_string = term_time_string.split("-")[0].replace(" ", "").split(":")
-                                            end_time_string = term_time_string.split("-")[1].replace(" ", "").split(":")
-                                            term_datetime = datetime.datetime(int(date_splits[2]),
-                                                                              int(date_splits[1]),
-                                                                              int(date_splits[0]),
-                                                                              int(start_time_string[0]),
-                                                                              int(start_time_string[1]))
-                                        except:
-                                            # Failed to get start time so use only date
-                                            term_datetime = datetime.datetime(int(date_splits[2]),
-                                                                              int(date_splits[1]),
-                                                                              int(date_splits[0]),
-                                                                              23,
-                                                                              59)
-
-                                        term_date = datetime.date(int(date_splits[2]),
-                                                                  int(date_splits[1]),
-                                                                  int(date_splits[0]))
-
-                                        name = f"{idx + 1}.  {subject_tag}" if number_of_terms == 1 \
-                                            else f"{idx + 1}.{idx2 + 1} {subject_tag}"
-
-                                        if start_time_string is not None and end_time_string is not None:
-                                          try:
-                                            start_time = datetime.time(int(start_time_string[0]), int(start_time_string[1]))
-                                            start_time_string = datetime.time.strftime(start_time, '%H:%M')
-                                            end_time = datetime.time(int(end_time_string[0]), int(end_time_string[1]))
-                                            end_time_string = datetime.time.strftime(end_time, '%H:%M')
-                                            term_time_string = f"{start_time_string} - {end_time_string}"
-                                          except:
-                                            pass
-
-                                        padded_term_date = datetime.date.strftime(term_date, "%d.%m.%Y")
-                                        term_date_time_string = f"{padded_term_date} {term_time_string}"
-
-                                        # Calculate character offsets
-                                        date_offset = " " * (DATE_OFFSET - len(name))
-                                        time_offset = " " * (TIME_OFFSET - len(padded_term_date))
-                                        term_string = f"{name}{date_offset}{padded_term_date}{time_offset}{term_time_string}"
-
-                                        if term_date == datetime.date.today():
-                                            term_strings_dict[term_datetime] = f"- {term_string}"
-                                        elif term_datetime < datetime.datetime.now():
-                                            name = f"~~{name}~~"
-                                            term_date_time_string = f"~~{term_date_time_string}~~"
-                                        else:
-                                            term_strings_dict[term_datetime] = f"+ {term_string}"
-
-                                        embed.add_field(name=name, value=term_date_time_string)
-
-                                to_add = math.ceil(whole_term_count / 3) * 3 - whole_term_count
-                                for _ in range(to_add):
-                                    embed.add_field(name='\u200b', value='\u200b')
-
-                    pages.append(embed)
-
-                number_of_pages = len(pages)
-                if number_of_pages > 1:
-                    if isinstance(ctx, commands.Context):
-                        await PaginatorSession(self.bot, ctx,
-                                               timeout=config.exams_paginator_duration,
-                                               pages=pages,
-                                               color=disnake.Color.dark_blue(),
-                                               delete_after=False).run()
-                    else:
-                        header = disnake.Embed(title=title, description=description, color=disnake.Color.dark_blue())
-                        await self.handle_exams_with_database_access(term_strings_dict, header, ctx)
-                elif number_of_pages == 1:
-                    # Only one page, no need paginator
-                    if isinstance(ctx, commands.Context):
-                        await ctx.send(embed=pages[0])
-                    else:
-                        header = disnake.Embed(title=title, description=description, color=disnake.Color.dark_blue())
-                        await self.handle_exams_with_database_access(term_strings_dict, header, ctx)
+            number_of_pages = len(pages)
+            if number_of_pages > 1:
+                if isinstance(ctx, commands.Context):
+                    await PaginatorSession(self.bot, ctx,
+                                           timeout=config.exams_paginator_duration,
+                                           pages=pages,
+                                           color=disnake.Color.dark_blue(),
+                                           delete_after=False).run()
                 else:
-                    # No pages were parsed, so we will post only default embed
-                    embed = disnake.Embed(title=title, description=description, color=disnake.Color.dark_blue())
-                    utils.add_author_footer(embed, author if author is not None else self.bot.user)
-                    if isinstance(ctx, commands.Context):
-                        await ctx.send(embed=embed)
-            except:
-                # Parsing failed
-                embed = disnake.Embed(title=title, description=description, color=disnake.Color.dark_blue())
+                    header = disnake.Embed(title=title, description=description,
+                                           color=disnake.Color.dark_blue())
+                    await self.handle_exams_with_database_access(term_strings_dict, header, ctx)
+            elif number_of_pages == 1:
+                # Only one page, no need paginator
+                if isinstance(ctx, commands.Context):
+                    await ctx.send(embed=pages[0])
+                else:
+                    header = disnake.Embed(title=title, description=description,
+                                           color=disnake.Color.dark_blue())
+                    await self.handle_exams_with_database_access(term_strings_dict, header, ctx)
+            else:
+                # No pages were parsed, so we will post only default embed
+                embed = disnake.Embed(title=title, description=description,
+                                      color=disnake.Color.dark_blue())
                 utils.add_author_footer(embed, author if author is not None else self.bot.user)
                 if isinstance(ctx, commands.Context):
                     await ctx.send(embed=embed)
-                    await ctx.send(Messages.exams_parsing_failed)
         else:
             # Site returned fail code
             embed = disnake.Embed(title=title, description=description, color=disnake.Color.dark_blue())
@@ -479,7 +481,7 @@ class Exams(commands.Cog):
 
         if src_data_string is not None:
             if too_much_terms:
-                src_data_string = f"{src_data_string}\n\nZbytek termínu v odkazu"
+                src_data_string = f"{src_data_string}\n\nZbytek termínů v odkazu"
             src_data_string = f"```diff\n{src_data_string}\n```"
 
         if isinstance(dest, disnake.TextChannel):
