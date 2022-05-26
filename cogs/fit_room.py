@@ -30,7 +30,7 @@ class FitRoom(commands.Cog):
                 floor_list = main_body.find("ul", {"class": "pagination__list"})
                 active_floor = floor_list.find("a", {"aria-current": "page"})
                 image = main_body.find("svg")
-                cursor = image.find("polygon", {"class": "arrow"})
+                cursor = image.find("polygon", {"id": "arrow"})
             except:
                 return await ctx.send(Messages.fit_room_parsing_failed)
 
