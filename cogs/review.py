@@ -1,31 +1,30 @@
-from bs4 import BeautifulSoup
 import disnake
 import datetime
 from disnake.ext import commands
-import requests
-import asyncio
+import copy
 
 from config.app_config import config
 from config.messages import Messages as messages
 from config import cooldowns
 from repository import review_repo
 import utils
-from features import sports
-
-review_repo = review_repo.ReviewRepository()
+from features.review import ReviewManager
+from buttons.review import ReviewView
+from buttons.embed import EmbedView
 
 
 class Review(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.rev = Review_helper(bot)
+        self.manager = ReviewManager(bot)
+        self.repo = review_repo.ReviewRepository()
 
     async def check_member(self, ctx):
         """Check if user is allowed to add/remove new review."""
         guild = self.bot.get_guild(config.guild_id)
         member = guild.get_member(ctx.message.author.id)
         if member is None:
-            await ctx.send(utils.fill_message("review_not_on_server", user=ctx.message.author.mention))
+            await ctx.reply(utils.fill_message("review_not_on_server", user=ctx.message.author.mention))
             return False
         roles = member.roles
         verify = False
@@ -33,10 +32,10 @@ class Review(commands.Cog):
             if config.verification_role_id == role.id:
                 verify = True
             if role.id in config.review_forbidden_roles:
-                await ctx.send(utils.fill_message("review_add_denied", user=ctx.message.author.id))
+                await ctx.reply(utils.fill_message("review_add_denied", user=ctx.message.author.id))
                 return False
         if not verify:
-            await ctx.send(utils.fill_message("review_add_denied", user=ctx.message.author.id))
+            await ctx.reply(utils.fill_message("review_add_denied", user=ctx.message.author.id))
             return False
         return True
 
@@ -54,26 +53,14 @@ class Review(commands.Cog):
             # show reviews
             args = ctx.message.content.split()[1:]
             if not args:
-                await ctx.send(messages.review_format)
+                await ctx.reply(messages.review_format)
                 return
             subject = args[0]
-            embed = self.rev.list_reviews(ctx.author, subject.lower())
-            if not embed:
-                await ctx.send(messages.review_wrong_subject)
+            embeds = self.manager.list_reviews(ctx.author, subject.lower())
+            if len(embeds) == 0:
+                await ctx.reply(messages.review_wrong_subject)
                 return
-            msg = await ctx.send(embed=embed)
-            footer = msg.embeds[0].footer.text.split("|")[0]
-            if msg.embeds[0].description[-1].isnumeric():
-                if footer != "Review: 1/1 ":
-                    await msg.add_reaction("⏪")
-                    await msg.add_reaction("◀")
-                    await msg.add_reaction("▶")
-                await msg.add_reaction("👍")
-                await msg.add_reaction("🛑")
-                await msg.add_reaction("👎")
-                if msg.embeds[0].fields[3].name == "Text page":
-                    await msg.add_reaction("🔼")
-                    await msg.add_reaction("🔽")
+            await ctx.reply(embed=embeds[0], view=ReviewView(self.bot, embeds))
 
     @reviews.command(brief=messages.review_add_brief)
     async def add(self, ctx, subject=None, tier: int = None, *args):
@@ -81,10 +68,10 @@ class Review(commands.Cog):
         if not await self.check_member(ctx):
             return
         if subject is None or tier is None:
-            await ctx.send(messages.review_add_format)
+            await ctx.reply(messages.review_add_format)
             return
         if tier < 0 or tier > 4:
-            await ctx.send(messages.review_tier)
+            await ctx.reply(messages.review_tier)
             return
         author = ctx.message.author.id
         anonym = False
@@ -95,10 +82,10 @@ class Review(commands.Cog):
         args_len = len(args)
         if args_len == 0:
             args = None
-        if not self.rev.add_review(author, subject.lower(), tier, anonym, args):
-            await ctx.send(messages.review_wrong_subject)
+        if not self.manager.add_review(author, subject.lower(), tier, anonym, args):
+            await ctx.reply(messages.review_wrong_subject)
         else:
-            await ctx.send(messages.review_added)
+            await ctx.reply(messages.review_added)
 
     @reviews.command(brief=messages.review_remove_brief)
     async def remove(self, ctx, subject=None, id: int = None):
@@ -109,24 +96,24 @@ class Review(commands.Cog):
             return
         if subject is None:
             if utils.is_bot_admin(ctx):
-                await ctx.send(messages.review_remove_format_admin)
+                await ctx.reply(messages.review_remove_format_admin)
             else:
-                await ctx.send(messages.review_remove_format)
+                await ctx.reply(messages.review_remove_format)
         elif subject == "id":
             if utils.is_bot_admin(ctx):
                 if id is None:
-                    await ctx.send(messages.review_remove_id_format)
+                    await ctx.reply(messages.review_remove_id_format)
                 else:
-                    review_repo.remove(id)
-                    await ctx.send(messages.review_remove_success)
+                    self.repo.remove(id)
+                    await ctx.reply(messages.review_remove_success)
             else:
-                await ctx.send(utils.fill_message("insufficient_rights", user=ctx.author.id))
+                await ctx.reply(utils.fill_message("insufficient_rights", user=ctx.author.id))
         else:
             subject = subject.lower()
-            if self.rev.remove(str(ctx.message.author.id), subject):
-                await ctx.send(messages.review_remove_success)
+            if self.manager.remove(str(ctx.message.author.id), subject):
+                await ctx.reply(messages.review_remove_success)
             else:
-                await ctx.send(messages.review_remove_error)
+                await ctx.reply(messages.review_remove_error)
 
     @cooldowns.short_cooldown
     @commands.group()
@@ -134,24 +121,8 @@ class Review(commands.Cog):
     async def subject(self, ctx):
         """Group of commands for managing subjects in DB"""
         if ctx.invoked_subcommand is None:
-            await ctx.send(messages.subject_format)
+            await ctx.reply(messages.subject_format)
             return
-
-    @subject.command(name="add", brief=messages.subject_add_biref)
-    async def subject_add(self, ctx, *subjects):
-        """Manually adding subjects to DB"""
-        for subject in subjects:
-            subject = subject.lower()
-            review_repo.add_subject(subject)
-        await ctx.send(f"Zkratky `{subjects}` byli přidány.")
-
-    @subject.command(name="remove", brief=messages.subject_remove_biref)
-    async def subject_remove(self, ctx, *subjects):
-        """Manually removing subjects to DB"""
-        for subject in subjects:
-            subject = subject.lower()
-            review_repo.get_subject(subject).delete()
-        await ctx.send(f"Zkratky `{subjects}` byli odebrány.")
 
     @subject.command(brief=messages.subject_update_biref)
     async def update(self, ctx):
@@ -159,38 +130,38 @@ class Review(commands.Cog):
         programme_details_link = "https://www.fit.vut.cz/study/field/"
         async with ctx.channel.typing():
             # bachelor
-            if not self.rev.update_subject_types(f"{programme_details_link}14451/.cs", False):
-                await ctx.send(messages.subject_update_error)
+            if not self.manager.update_subject_types(f"{programme_details_link}14451/.cs", False):
+                await ctx.reply(messages.subject_update_error)
                 return
             # engineer
             for id in range(66, 82):
-                if not self.rev.update_subject_types(f"{programme_details_link}144{id}/.cs", True):
-                    await ctx.send(messages.subject_update_error)
+                if not self.manager.update_subject_types(f"{programme_details_link}144{id}/.cs", True):
+                    await ctx.reply(messages.subject_update_error)
                     return
             # NISY with random ID
-            if not self.rev.update_subject_types(f"{programme_details_link}15340/.cs", True):
-                await ctx.send(messages.subject_update_error)
+            if not self.manager.update_subject_types(f"{programme_details_link}15340/.cs", True):
+                await ctx.reply(messages.subject_update_error)
                 return
             # sports
-            self.rev.update_sport_subjects()
-            await ctx.send(messages.subject_update_success)
+            self.manager.update_sport_subjects()
+            await ctx.reply(messages.subject_update_success)
 
     @commands.command(aliases=["skratka", "zkratka", "wtf"], brief=messages.shorcut_brief)
     async def shortcut(self, ctx, shortcut=None):
         """Informations about subject specified by its shorcut"""
         if not shortcut:
-            await ctx.send(utils.fill_message("shorcut_format", command=ctx.invoked_with))
+            await ctx.reply(utils.fill_message("shorcut_format", command=ctx.invoked_with))
             return
-        programme = review_repo.get_programme(shortcut.upper())
+        programme = self.repo.get_programme(shortcut.upper())
         if programme:
             embed = disnake.Embed(title=programme.shortcut, description=programme.name)
             embed.add_field(name="Link", value=programme.link)
         else:
-            subject = review_repo.get_subject_details(shortcut)
+            subject = self.repo.get_subject_details(shortcut)
             if not subject:
-                subject = review_repo.get_subject_details(f"TV-{shortcut}")
+                subject = self.repo.get_subject_details(f"TV-{shortcut}")
                 if not subject:
-                    await ctx.send(messages.review_wrong_subject)
+                    await ctx.reply(messages.review_wrong_subject)
                     return
             embed = disnake.Embed(title=subject.shortcut, description=subject.name)
             if subject.semester == "L":
@@ -226,7 +197,7 @@ class Review(commands.Cog):
                 )
 
         utils.add_author_footer(embed, ctx.author)
-        await ctx.send(embed=embed)
+        await ctx.reply(embed=embed)
 
     @commands.command(brief=messages.tierboard_brief, description=messages.tierboard_help)
     async def tierboard(self, ctx, type="V", sem="Z", year=""):
@@ -236,11 +207,11 @@ class Review(commands.Cog):
         type = type.upper()
         sem = sem.upper()
         if type == "HELP" or sem not in ['Z', 'L'] or type not in ['P', 'PVT', 'PVA', 'V']:
-            await ctx.send(f"`{utils.get_command_signature(ctx)}`\n{messages.tierboard_help}")
+            await ctx.reply(f"`{utils.get_command_signature(ctx)}`\n{messages.tierboard_help}")
             return
 
         author = ctx.author
-        if not ctx.message.guild: # DM
+        if not ctx.message.guild:  # DM
             guild = self.bot.get_guild(config.guild_id)
             author = guild.get_member(author.id)
         for role in author.roles:
@@ -261,15 +232,10 @@ class Review(commands.Cog):
                     # TODO get programme from DB? or find all MIT P?
                 break
         if not degree and not year:
-            await ctx.send(messages.tierboard_missing_year)
+            await ctx.reply(messages.tierboard_missing_year)
             return
-        board = review_repo.get_tierboard(type, sem, degree, year)
-        output = ""
-        cnt = 1
-        for line in board:
-            output += f"{cnt} - **{line.shortcut}**: {round(line.avg_tier, 1)}\n"
-            cnt += 1
-        embed = disnake.Embed(title="Tierboard", description=output)
+        embeds = []
+        embed = disnake.Embed(title="Tierboard")
         embed.timestamp = datetime.datetime.now(tz=datetime.timezone.utc)
         embed.add_field(name="Typ", value=type)
         embed.add_field(name="Semestr", value="Letní" if sem == "L" else "Zimní")
@@ -278,394 +244,31 @@ class Review(commands.Cog):
         embed.add_field(name="Program", value=degree)
 
         utils.add_author_footer(embed, ctx.author, additional_text=("?tierboard help",))
-        msg = await ctx.send(embed=embed)
 
-        page_num = 0
-        pages_total = review_repo.get_tierboard_page_count(type, sem, degree, year)
+        pages_total = self.repo.get_tierboard_page_count(type, sem, degree, year)
+        for page in range(pages_total):
+            board = self.repo.get_tierboard(type, sem, degree, year, page*10)
+            output = ""
+            cnt = 1
+            for line in board:
+                output += f"{cnt} - **{line.shortcut}**: {round(line.avg_tier, 1)}\n"
+                cnt += 1
+            embed.description = output
+            embeds.append(copy.copy(embed))
 
         if pages_total == 0:
-            return
+            embed.description = ""
+            embeds.append(embed)
 
-        await msg.add_reaction("⏪")
-        await msg.add_reaction("◀")
-        await msg.add_reaction("▶")
-
-        while True:
-
-            def check(reaction, user):
-                return reaction.message.id == msg.id and not user.bot
-
-            try:
-                reaction, user = await self.bot.wait_for("reaction_add", check=check, timeout=300.0)
-            except asyncio.TimeoutError:
-                return
-            emoji = str(reaction.emoji)
-            if emoji in ["⏪", "◀", "▶"] and user.id == ctx.author.id:
-                if emoji == "⏪":
-                    page_num = 0
-                elif emoji == "◀":
-                    page_num -= 1
-                    if page_num < 0:
-                        page_num = pages_total - 1
-                elif emoji == "▶":
-                    page_num += 1
-                    if page_num >= pages_total:
-                        page_num = 0
-
-                offset = page_num * 10
-                board = review_repo.get_tierboard(type, sem, degree, year, offset)
-                output = ""
-                cnt = 1 + offset
-                for line in board:
-                    output += f"{cnt} - **{line.shortcut}**: {round(line.avg_tier, 1)}\n"
-                    cnt += 1
-                embed.description = output
-                await msg.edit(embed=embed)
-            try:
-                await msg.remove_reaction(emoji, user)
-            except disnake.errors.Forbidden:
-                pass
+        await ctx.reply(embed=embeds[0], view=EmbedView(embeds))
 
     @reviews.error
     @subject.error
     async def review_error(self, ctx, error):
         if isinstance(error, commands.BadArgument):
-            await ctx.send(messages.review_add_format)
+            await ctx.reply(messages.review_add_format)
         if isinstance(error, commands.CheckFailure):
-            await ctx.send(utils.fill_message("insufficient_rights", user=ctx.author.id))
-
-    async def handle_reaction(self, ctx):
-        subject = ctx.message.embeds[0].title.split(" ", 1)[0].lower()
-        footer = ctx.message.embeds[0].footer.text.split("|")
-        # don't track old reviews as they are not compatible
-        if len(footer) != 3:
-            return
-        review_id = footer[2][5:]
-        pages = footer[1].split(":")[1].split("/")
-        try:
-            page = int(pages[0])
-            max_page = int(pages[1])
-        except ValueError:
-            await ctx.message.edit(content=messages.reviews_page_e, embed=None)
-            return
-        except IndexError:  # handle legacy embed reviews
-            try:
-                await ctx.member.send(messages.review_legacy_clicked)
-            except disnake.HTTPException as e:
-                if e.code != 50007:
-                    raise
-            return
-        if ctx.emoji in ["◀", "▶", "⏪"]:
-            next_page = utils.pagination_next(ctx.emoji, page, max_page)
-            if next_page:
-                review = review_repo.get_subject_reviews(subject)
-                if review.count() >= next_page:
-                    review = review.all()[next_page - 1].Review
-                    next_page = f"{next_page}/{max_page}"
-                    embed = self.rev.update_embed(ctx.message.embeds[0], review, next_page)
-                    if embed.fields[3].name == "Text page":
-                        await ctx.message.add_reaction("🔼")
-                        await ctx.message.add_reaction("🔽")
-                    else:
-                        for emote in ctx.message.reactions:
-                            if emote.emoji == "🔼":
-                                await ctx.message.remove_reaction("🔼", self.bot.user)
-                                await ctx.message.remove_reaction("🔽", self.bot.user)
-                                break
-                    await ctx.message.edit(embed=embed)
-        elif ctx.emoji in ["👍", "👎", "🛑"]:
-            review = review_repo.get_review_by_id(review_id)
-            member_id = str(ctx.member.id)
-            if review and member_id != review.member_ID:
-                if ctx.emoji == "👍":
-                    self.rev.add_vote(review_id, True, member_id)
-                elif ctx.emoji == "👎":
-                    self.rev.add_vote(review_id, False, member_id)
-                elif ctx.emoji == "🛑":
-                    review_repo.remove_vote(review_id, member_id)
-                page = f"{page}/{max_page}"
-                embed = self.rev.update_embed(ctx.message.embeds[0], review, page)
-                await ctx.message.edit(embed=embed)
-        elif ctx.emoji in ["🔼", "🔽"]:
-            if ctx.message.embeds[0].fields[3].name == "Text page":
-                review = review_repo.get_review_by_id(review_id)
-                if review:
-                    pages = ctx.message.embeds[0].fields[3].value.split("/")
-                    text_page = int(pages[0])
-                    max_text_page = int(pages[1])
-                    next_text_page = utils.pagination_next(ctx.emoji, text_page, max_text_page)
-                    if next_text_page:
-                        page = f"{page}/{max_page}"
-                        embed = self.rev.update_embed(
-                            ctx.message.embeds[0], review, page, next_text_page
-                        )
-                        await ctx.message.edit(embed=embed)
-        if ctx.message.guild:  # cannot remove reaction in DM
-            await ctx.message.remove_reaction(ctx.emoji, ctx.member)
-
-
-class Review_helper:
-    """Helper class for reviews"""
-
-    def __init__(self, bot: commands.Bot):
-        self.bot = bot
-
-    def make_embed(self, msg_author, review, subject, description, page):
-        """Create new embed for reviews"""
-        embed = disnake.Embed(title=f"{subject.upper()} reviews", description=description)
-        colour = 0x6D6A69
-        id = 0
-        if review:
-            id = review.id
-            if review.anonym:
-                author = "Anonym"
-            else:
-                guild = self.bot.get_guild(config.guild_id)
-                author = guild.get_member(int(review.member_ID))
-            embed.add_field(name="Author", value=author)
-            embed.add_field(name="Tier", value=review.tier)
-            embed.add_field(name="Date", value=review.date)
-            text = review.text_review
-            if text is not None:
-                text_len = len(text)
-                if text_len > 1024:
-                    pages = text_len // 1024 + (text_len % 1024 > 0)
-                    text = text[:1024]
-                    embed.add_field(name="Text page", value=f"1/{pages}", inline=False)
-                embed.add_field(name="Text", value=text, inline=False)
-            likes = review_repo.get_votes_count(review.id, True)
-            embed.add_field(name="Likes", value=f"👍{likes}")
-            dislikes = review_repo.get_votes_count(review.id, False)
-            embed.add_field(name="Dislikes", value=f"👎{dislikes}")
-            diff = likes - dislikes
-            if diff > 0:
-                colour = 0x34CB0B
-            elif diff < 0:
-                colour = 0xCB410B
-            embed.add_field(name="Help", value=messages.reviews_reaction_help, inline=False)
-        embed.colour = colour
-        utils.add_author_footer(embed, msg_author, additional_text=[f"Review: {page} | ID: {id}"])
-        return embed
-
-    def update_embed(self, embed, review, page, text_page=1):
-        """Update embed fields"""
-        colour = 0x6D6A69
-        if review.anonym:
-            author = "Anonym"
-        else:
-            guild = self.bot.get_guild(config.guild_id)
-            author = guild.get_member(int(review.member_ID))
-        embed.set_field_at(0, name="Author", value=author)
-        embed.set_field_at(1, name="Tier", value=review.tier)
-        embed.set_field_at(2, name="Date", value=review.date)
-        text = review.text_review
-        idx = 3
-        add_new_field = False
-        fields_cnt = len(embed.fields)
-        if text is not None:
-            text_len = len(text)
-            if text_len > 1024:
-                pages = text_len // 1024 + (text_len % 1024 > 0)
-                text_index = 1024 * (text_page - 1)
-                if len(review.text_review) < 1024 * text_page:
-                    text = review.text_review[text_index:]
-                else:
-                    text = review.text_review[text_index:1024 * text_page]
-                embed.set_field_at(idx, name="Text page", value=f"{text_page}/{pages}", inline=False)
-                idx += 1
-            embed.set_field_at(idx, name="Text", value=text, inline=False)
-            idx += 1
-        likes = review_repo.get_votes_count(review.id, True)
-        embed.set_field_at(idx, name="Likes", value=f"👍{likes}")
-        dislikes = review_repo.get_votes_count(review.id, False)
-        idx += 1
-        if add_new_field or fields_cnt <= idx:
-            embed.add_field(name="Dislikes", value=f"👎{dislikes}")
-            add_new_field = True
-        else:
-            embed.set_field_at(idx, name="Dislikes", value=f"👎{dislikes}")
-        idx += 1
-        if add_new_field or fields_cnt <= idx:
-            embed.add_field(name="Help", value=messages.reviews_reaction_help, inline=False)
-        else:
-            embed.set_field_at(idx, name="Help", value=messages.reviews_reaction_help, inline=False)
-        idx += 1
-        for _ in range(fields_cnt - idx):
-            embed.remove_field(idx)
-        diff = likes - dislikes
-        if diff > 0:
-            colour = 0x34CB0B
-        elif diff < 0:
-            colour = 0xCB410B
-        embed.colour = colour
-        footer = f"Review: {page} | ID: {review.id}"
-        embed.set_footer(
-            text=f"{embed.footer.text.split(' | ')[0]} | {footer}", icon_url=embed.footer.icon_url
-        )
-        return embed
-
-    def add_review(self, author_id, subject, tier, anonym, text):
-        """Add new review, if review with same author and subject exists -> update"""
-        if not review_repo.get_subject(subject).first():
-            return False
-        update = review_repo.get_review_by_author_subject(author_id, subject)
-        if update:
-            review_repo.update_review(update.id, tier, anonym, text)
-        else:
-            review_repo.add_review(author_id, subject, tier, anonym, text)
-        return True
-
-    def list_reviews(self, author, subject):
-        result = review_repo.get_subject(subject).first()
-        if not result:
-            result = review_repo.get_subject(f"tv-{subject}").first()
-            if not result:
-                return None
-        reviews = review_repo.get_subject_reviews(result.shortcut)
-        tier_cnt = reviews.count()
-        name = review_repo.get_subject_details(result.shortcut)
-        if tier_cnt == 0:
-            if name:
-                description = f"{name.name}\n*No reviews*"
-            else:
-                description = "*No reviews*"
-            review = None
-            page = "1/1"
-        else:
-            review = reviews[0].Review
-            if name:
-                description = f"{name.name}\n**Average tier:** {round(reviews[0].avg_tier)}"
-            else:
-                description = f"**Average tier:** {round(reviews[0].avg_tier)}"
-            page = f"1/{tier_cnt}"
-        return self.make_embed(author, review, result.shortcut, description, page)
-
-    def remove(self, author, subject):
-        """Remove review from DB"""
-        result = review_repo.get_review_by_author_subject(author, subject)
-        if result:
-            review_repo.remove(result.id)
-            return True
-        else:
-            return False
-
-    def add_vote(self, review_id, vote: bool, author):
-        """Add/update vote for review"""
-        relevance = review_repo.get_vote_by_author(review_id, author)
-        if not relevance or relevance.vote != vote:
-            review_repo.add_vote(review_id, vote, author)
-
-    def update_subject_types(self, link, MIT):
-        """Send request to `link`, parse page and find all subjects.
-        Add new subjects to DB, if subject already exists update its years.
-        For MITAI links please set `MIT` to True.
-        If update succeeded return True, otherwise False
-        """
-        response = requests.get(link)
-        if response.status_code != 200:
-            return False
-        soup = BeautifulSoup(response.content, "html.parser")
-        tables = soup.select("table")
-
-        # remove last table with information about PVT and PVA subjects (applicable mainly for BIT)
-        if len(tables) % 2:
-            tables = tables[:-1]
-
-        # specialization shortcut for correct year definition in DB
-        specialization = soup.select("main p strong")[0].get_text()
-        full_specialization = soup.select("h1")[0].get_text()
-
-        programmme_db = review_repo.get_programme(specialization)
-        if not programmme_db or programmme_db.link != link:
-            review_repo.set_programme(specialization, full_specialization, link)
-
-        sem = 1
-        year = 1
-        for table in tables:
-            rows = table.select("tbody tr")
-            for row in rows:
-                shortcut = row.find_all("th")[0].get_text()
-                # update subject DB
-                if not review_repo.get_subject(shortcut.lower()).first():
-                    review_repo.add_subject(shortcut.lower())
-                columns = row.find_all("td")
-                name = columns[0].get_text()
-                type = columns[2].get_text()
-                degree = "BIT"
-                for_year = "VBIT"
-                if type == "P":
-                    if MIT and year > 2:
-                        # any year
-                        for_year = f"L{specialization}"
-                    else:
-                        for_year = f"{year}{specialization}"
-                else:
-                    if MIT:
-                        for_year = "VMIT"
-                if MIT:
-                    degree = "MIT"
-                detail = review_repo.get_subject_details(shortcut)
-                semester = "Z"
-                if sem == 2:
-                    semester = "L"
-                if not detail:
-                    # subject not in DB
-                    review_repo.set_subject_details(
-                        shortcut,
-                        name,
-                        columns[1].get_text(),  # credits
-                        semester,
-                        columns[3].get_text(),  # end
-                        columns[0].find("a").attrs["href"],  # link
-                        type,
-                        for_year,
-                        degree,
-                    )
-                else:
-                    changed = False
-                    if name != detail.name:
-                        # Update name mainly for courses that are not opened
-                        detail.name = name
-                        changed = True
-                    if for_year not in detail.year.split(", "):
-                        # subject already in DB with different year (applicable mainly for MIT)
-                        if type not in detail.type.split(", "):
-                            detail.type += f", {type}"
-                        if detail.year:
-                            detail.year += f", {for_year}"
-                        changed = True
-                    if semester not in detail.semester.split(", "):
-                        # subject already in DB with different semester (e.g. RET)
-                        detail.semester += f", {semester}"
-                        changed = True
-                    if degree not in detail.degree.split(", "):
-                        # subject already in DB with different degree (e.g. RET)
-                        detail.degree += f", {degree}"
-                        changed = True
-                    if changed:
-                        review_repo.update_subject(detail)
-            sem += 1
-            if sem == 3:
-                year += 1
-                sem = 1
-        return True
-
-    def update_sport_subjects(self):
-        sports_list = sports.VutSports().get_sports()
-        for item in sports_list:
-            if not review_repo.get_subject(item.shortcut.lower()).first():
-                review_repo.add_subject(item.shortcut.lower())
-                review_repo.set_subject_details(
-                    item.shortcut,
-                    item.name,
-                    1,
-                    item.semester.value,
-                    "Za",
-                    item.subject_id,
-                    "V",
-                    "VBIT, VMIT",
-                    "BIT, MIT"
-                )
+            await ctx.reply(utils.fill_message("insufficient_rights", user=ctx.author.id))
 
 
 def setup(bot):

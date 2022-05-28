@@ -225,6 +225,7 @@ class Messages:
                             "Použijte reakce ◀️ a ▶️ pro navigaci mezi recenzemi.\n" \
                             "Pro navigaci v textu delších recenzí použijte 🔼 a 🔽.\n"
 
+    review_vote_own = "Nemůžeš hlasovat pro vlastní recenzi"
     review_get_format = f"{prefix}reviews [zkratka předmětu]"
     review_remove_format = f"{prefix}reviews remove [zkratka předmětu]"
     review_remove_format_admin = f"{prefix}reviews remove [zkratka předmětu, id + číslo]"
@@ -409,3 +410,5 @@ class Messages:
     exams_channel_is_not_text_channel = "`Nenalezeny žádné termíny v kanálu {chan_name}`"
     exams_automatic_update_started = "`Zapnuta automatická aktualizace termínů pro server: {guild_name}`"
     exams_automatic_update_stopped = "`Zastavena automatická aktualizace termínů pro server: {guild_name}`"
+
+    embed_not_author = "Hraj si na svém písečku s tebou zavolanými příkazy. <:pepeGun:826943455032901643>"

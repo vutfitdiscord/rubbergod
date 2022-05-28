@@ -29,12 +29,6 @@ class Reaction(commands.Cog):
 
         cogs = []
 
-        if (
-            ctx.message.embeds
-            and ctx.message.embeds[0].title is not disnake.Embed.Empty
-            and "reviews" in ctx.message.embeds[0].title
-        ):
-            cogs.append(self.bot.get_cog("Review"))
         if ctx.emoji == "📌":
             cogs.append(self.bot.get_cog("AutoPin"))
         if ctx.channel.id not in config.role_channels:
@@ -48,12 +42,6 @@ class Reaction(commands.Cog):
             and ctx.message.author.bot
         ):
             cogs.append(self.bot.get_cog("Warden"))
-        if(
-            ctx.message.embeds
-            and ctx.message.embeds[0].author.name is not disnake.Embed.Empty
-            and "streamlinks" in ctx.message.embeds[0].author.name.lower()
-        ):
-            cogs.append(self.bot.get_cog("StreamLinks"))
 
         if (ctx.channel.id == config.meme_room or ctx.channel.id == config.meme_repost_room) and \
                 ctx.message.author.id != ctx.member.id:

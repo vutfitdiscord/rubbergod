@@ -2,8 +2,6 @@ import disnake
 from disnake.ext import commands
 
 import utils
-import re
-import datetime
 import math
 from config.app_config import config
 from config import messages, cooldowns
@@ -41,8 +39,9 @@ class Karma(commands.Cog):
                 if users.count(ctx.member) > 1:
                     await ctx.message.remove_reaction(ctx.emoji, ctx.member)
         # reeval karma message
-        elif (ctx.message.embeds 
-            and ctx.message.embeds[0].title is not disnake.Embed.Empty 
+        elif (
+            ctx.message.embeds
+            and ctx.message.embeds[0].title is not disnake.Embed.Empty
             and ctx.message.embeds[0].title == "Karma zprávy"
             and ctx.emoji == "🔁"
         ):
@@ -56,41 +55,6 @@ class Karma(commands.Cog):
                     return
                 embed = await self.karma.message_karma(ctx.member, message)
                 await ctx.message.edit(embed=embed)
-        # leaderboard pagination
-        elif (
-            ctx.message.embeds
-            and ctx.message.embeds[0].title is not disnake.Embed.Empty
-            and re.match(r".* (LEADER|BAJKAR|ISHA|GIVING)BOARD .*", ctx.message.embeds[0].title)
-            and ctx.emoji in ["◀", "▶", "⏪"]
-        ):
-            embed = ctx.message.embeds[0]
-            column, attribute, max_page = self.karma.get_db_from_title(embed.title)
-            if column is None:
-                return
-
-            if embed.description is not disnake.Embed.Empty:
-                current_page = int(embed.description.split(" – ")[0])
-            else:
-                current_page = max_page
-            if ctx.emoji == "▶":
-                next_page = current_page + 10
-                if next_page > max_page - 9:
-                    next_page = max_page - 9
-            elif ctx.emoji == "◀":
-                next_page = current_page - 10
-                if next_page <= 0:
-                    next_page = 1
-            elif ctx.emoji == "⏪":
-                next_page = 1
-            embed.description = self.karma.gen_leaderboard_content(attribute, next_page, column)
-            embed.timestamp = datetime.datetime.now(tz=datetime.timezone.utc)
-            if "LEADERBOARD" in embed.title:
-                value_num = math.ceil(next_page / config.karma_grillbot_leaderboard_size)
-                value = messages.karma_web if value_num == 1 else f"{messages.karma_web}{value_num}"
-                embed.set_field_at(index=0, name=messages.karma_web_title, value=value)
-            await ctx.message.edit(embed=embed)
-            if ctx.message.guild:
-                await ctx.message.remove_reaction(ctx.emoji, ctx.member)
         # handle karma
         elif (
             ctx.member.id != ctx.message.author.id
@@ -121,7 +85,7 @@ class Karma(commands.Cog):
                 karma_r.karma_emoji_remove(ctx.message.author, ctx.member, ctx.emoji)
             else:
                 karma_r.karma_emoji_remove(ctx.message.author, ctx.member, ctx.emoji.id)
-    
+
     def api(self, message: disnake.Message, params: list) -> dict:
         """Sending karma boards to grillbot"""
         if params["order"] not in ["asc", "desc"]:
@@ -147,7 +111,6 @@ class Karma(commands.Cog):
 
         return 0, {"meta": meta, "content": output}
 
-
     @cooldowns.default_cooldown
     @commands.group(brief=messages.karma_brief, usage=' ')
     async def karma(self, ctx: commands.Context):
@@ -155,21 +118,21 @@ class Karma(commands.Cog):
             args = ctx.message.content.split()[1:]
 
             if len(args) == 0:
-                await ctx.send(self.karma.karma_get(ctx.author))
+                await ctx.reply(self.karma.karma_get(ctx.author))
                 await self.check.botroom_check(ctx.message)
             else:
-                await ctx.send(utils.fill_message("karma_invalid_command", user=ctx.author.id))
+                await ctx.reply(utils.fill_message("karma_invalid_command", user=ctx.author.id))
 
     @karma.command(brief=messages.karma_stalk_brief)
     async def stalk(self, ctx, user: disnake.Member):
-        await ctx.send(self.karma.karma_get(ctx.author, user))
+        await ctx.reply(self.karma.karma_get(ctx.author, user))
         await self.check.botroom_check(ctx.message)
 
     @karma.command(brief=messages.karma_getall_brief)
     @commands.cooldown(rate=1, per=300.0, type=commands.BucketType.guild)
     async def getall(self, ctx):
         if not await self.check.guild_check(ctx.message):
-            await ctx.send(messages.server_warning)
+            await ctx.reply(messages.server_warning)
         else:
             try:
                 await self.karma.emoji_list_all_values(ctx.channel)
@@ -181,7 +144,7 @@ class Karma(commands.Cog):
     @cooldowns.default_cooldown
     async def get(self, ctx, *args):
         if not await self.check.guild_check(ctx.message):
-            await ctx.send(messages.server_warning)
+            await ctx.reply(messages.server_warning)
         else:
             try:
                 await self.karma.emoji_get_value(ctx.message)
@@ -193,7 +156,7 @@ class Karma(commands.Cog):
     @commands.check(utils.is_bot_admin)
     async def revote(self, ctx, *args):
         if not await self.check.guild_check(ctx.message):
-            await ctx.send(messages.server_warning)
+            await ctx.reply(messages.server_warning)
         else:
             if ctx.message.channel.id == config.vote_room:
                 try:
@@ -203,13 +166,13 @@ class Karma(commands.Cog):
                     return
             else:
                 dc_vote_room = disnake.utils.get(ctx.guild.channels, id=config.vote_room)
-                await ctx.send(utils.fill_message("vote_room_only", room=dc_vote_room))
+                await ctx.reply(utils.fill_message("vote_room_only", room=dc_vote_room))
 
     @karma.command(brief=messages.karma_vote_brief)
     @commands.check(utils.is_bot_admin)
     async def vote(self, ctx, *args):
         if not await self.check.guild_check(ctx.message):
-            await ctx.send(messages.server_warning)
+            await ctx.reply(messages.server_warning)
         else:
             if ctx.message.channel.id == config.vote_room:
                 try:
@@ -219,7 +182,7 @@ class Karma(commands.Cog):
                     return
             else:
                 dc_vote_room = disnake.utils.get(ctx.guild.channels, id=config.vote_room)
-                await ctx.send(utils.fill_message("vote_room_only", room=dc_vote_room))
+                await ctx.reply(utils.fill_message("vote_room_only", room=dc_vote_room))
 
     @karma.command(brief=messages.karma_give_brief)
     @commands.check(utils.is_bot_admin)
@@ -230,7 +193,7 @@ class Karma(commands.Cog):
     async def message(self, ctx, message: disnake.Message):
         async with ctx.channel.typing():
             embed = await self.karma.message_karma(ctx.author, message)
-            response = await ctx.send(embed=embed)
+            response = await ctx.reply(embed=embed)
             await response.add_reaction("🔁")
 
     @karma.command(brief=messages.karma_transfer_brief)
@@ -280,7 +243,7 @@ class Karma(commands.Cog):
     @ishaboard.error
     async def leaderboard_error(self, ctx, error):
         if isinstance(error, commands.BadArgument):
-            await ctx.send(utils.fill_message("karma_lederboard_offser_error", user=ctx.author.id))
+            await ctx.reply(utils.fill_message("karma_lederboard_offser_error", user=ctx.author.id))
 
     @revote.error
     @vote.error
@@ -291,17 +254,17 @@ class Karma(commands.Cog):
     async def karma_error(self, ctx, error):
         if isinstance(error, commands.BadArgument):
             if ctx.invoked_subcommand.name == 'stalk':
-                await ctx.send(utils.fill_message("member_not_found", user=ctx.author.id))
+                await ctx.reply(utils.fill_message("member_not_found", user=ctx.author.id))
             elif ctx.invoked_subcommand.name == 'message':
-                await ctx.send(utils.fill_message("karma_message_format", user=ctx.author.id))
+                await ctx.reply(utils.fill_message("karma_message_format", user=ctx.author.id))
         if isinstance(error, commands.CheckFailure):
-            await ctx.send(utils.fill_message("insufficient_rights", user=ctx.author.id))
+            await ctx.reply(utils.fill_message("insufficient_rights", user=ctx.author.id))
 
     async def validate_leaderboard_offset(self, offset: int, ctx: commands.Context) -> bool:
         if not 0 < offset < 100000000:  # Any value larger than the server
             # user cnt and lower than 32bit
             # int max will do
-            await ctx.send(utils.fill_message("karma_lederboard_offser_error", user=ctx.author.id))
+            await ctx.reply(utils.fill_message("karma_lederboard_offser_error", user=ctx.author.id))
             return False
 
         return True

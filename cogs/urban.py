@@ -1,10 +1,10 @@
 """Inspired by https://github.com/Czechbol/Amadeus/blob/master/cogs/urban.py"""
 import requests
-import asyncio
 from urllib import parse as url_parse
 
 import disnake
 from disnake.ext import commands
+from buttons.embed import EmbedView
 
 import utils
 from config import cooldowns
@@ -50,55 +50,13 @@ class Urban(commands.Cog):
 
     async def urban_pages(self, ctx, embeds):
         """Send message and handle pagination for 300 seconds"""
-        try:
-            message = await ctx.send(embed=embeds[0])
-        except disnake.errors.HTTPException:
-            # not well formed url, API bug
-            embeds[0].url = ""
-            message = await ctx.send(embed=embeds[0])
-
-        pagenum = 0
-        await message.add_reaction("◀️")
-        await message.add_reaction("▶️")
-        while True:
-
-            def check(reaction, user):
-                return (
-                    reaction.message.id == message.id
-                    and (str(reaction.emoji) == "◀️" or str(reaction.emoji) == "▶️")
-                    and user != self.bot.user
-                )
-
-            try:
-                reaction, user = await self.bot.wait_for("reaction_add", check=check, timeout=300.0)
-            except asyncio.TimeoutError:
-                return
-            emoji = str(reaction.emoji)
-            if emoji == "◀️":
-                pagenum -= 1
-                if pagenum < 0:
-                    pagenum = len(embeds) - 1
-            elif emoji == "▶️":
-                pagenum += 1
-                if pagenum >= len(embeds):
-                    pagenum = 0
-            try:
-                await message.remove_reaction(emoji, user)
-            except disnake.errors.Forbidden:
-                pass
-
-            try:
-                await message.edit(embed=embeds[pagenum])
-            except disnake.errors.HTTPException:
-                # not well formed url, API bug
-                embeds[pagenum].url = ""
-                await message.edit(embed=embeds[pagenum])
+        await ctx.reply(embed=embeds[0], view=EmbedView(embeds))
 
     @cooldowns.short_cooldown
     @commands.command(brief=Messages.urban_brief)
     async def urban(self, ctx, *expression):
         if not len(expression):
-            await ctx.send(Messages.urban_help)
+            await ctx.reply(Messages.urban_help)
             return
         term = url_parse.quote(" ".join(expression))
         embeds = None
@@ -108,9 +66,9 @@ class Urban(commands.Cog):
             response.raise_for_status()
 
         except requests.HTTPError as http_err:
-            await ctx.send(f"HTTP error occurred: {http_err}")
+            await ctx.reply(f"HTTP error occurred: {http_err}")
         except Exception as err:
-            await ctx.send(f"Error occurred: {err}")
+            await ctx.reply(f"Error occurred: {err}")
         else:
             # Request was successful
             embeds = self.urban_embeds(ctx.author, dict)
@@ -118,7 +76,7 @@ class Urban(commands.Cog):
         if embeds:
             await self.urban_pages(ctx, embeds)
         else:
-            await ctx.send(Messages.urban_not_found)
+            await ctx.reply(Messages.urban_not_found)
         return
 
 

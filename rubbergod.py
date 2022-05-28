@@ -2,7 +2,7 @@ import traceback
 import argparse
 import logging
 
-from disnake import Embed, TextChannel, AllowedMentions, Intents, Message
+from disnake import Embed, TextChannel, AllowedMentions, Intents
 from disnake.ext import commands
 
 import utils
@@ -97,7 +97,7 @@ async def on_error(event, *args, **kwargs):
             else:
                 event_guild = "DM"
 
-        else: # on_raw_reaction_add/remove
+        else:  # on_raw_reaction_add/remove
             message_id = arg.message_id
             if hasattr(arg, 'guild_id'):
                 guild = bot.get_guild(arg.guild_id)

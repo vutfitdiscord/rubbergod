@@ -1,7 +1,7 @@
-import asyncio
 import copy
 import disnake
 from disnake.ext import commands
+from buttons.embed import EmbedView
 
 from config.app_config import config
 from config import cooldowns
@@ -48,7 +48,6 @@ class Help(commands.Cog):
             current_page.append(self.command_details(prefix, command))
         return current_page
 
-
     def generate_pages(self, ctx: commands.Context):
         """Generate pages for help. Page per cog. Including subcommands and applying commands checks"""
         pages = list()
@@ -83,8 +82,8 @@ class Help(commands.Cog):
         return embed
 
     def add_fields(self, embed, items):
-        """Add fields to embed help. 
-        
+        """Add fields to embed help.
+
         param: items: List of dict with commands
         """
         for item in items:
@@ -108,7 +107,7 @@ class Help(commands.Cog):
             prefix=config.default_prefix,
             message=mock_message,
         )
-        if "command" in params and params["command"] != None:
+        if "command" in params and params["command"] is not None:
             command = self.bot.get_command(params["command"])
             if not command:
                 return 1, "Command not found"
@@ -121,7 +120,7 @@ class Help(commands.Cog):
                     break
             else:
                 help = self.command_help(ctx, command)
-        else: # return help for all commands
+        else:  # return help for all commands
             help = self.generate_pages(ctx)
         return 0, help
 
@@ -152,43 +151,19 @@ class Help(commands.Cog):
             return
 
         # General help
-        page_num = 1
-
+        footer_text = commit = f"Commit {self.git.hash()}"
         pages = self.generate_pages(ctx)
-        embed = self.generate_embed(pages[0])
-
         pages_total = len(pages)
 
-        commit = f"Commit {self.git.hash()}"
-        footer_text = commit
-        if pages_total > 1:
-            footer_text = f"Strana {page_num}/{pages_total} | {commit}"
-        embed.set_footer(text=footer_text, icon_url=ctx.author.display_avatar.url)
+        embeds = []
+        for idx, page in enumerate(pages):
+            embed = self.generate_embed(page)
+            if pages_total > 1:
+                footer_text = f"Strana {idx+1}/{pages_total} | {commit}"
+            embed.set_footer(text=footer_text, icon_url=ctx.author.display_avatar.url)
+            embeds.append(embed)
 
-        message = await ctx.reply(embed=embed)
-
-        await utils.add_pagination_reactions(message, pages_total)
-
-        while True:
-
-            def check(reaction, user):
-                return reaction.message.id == message.id and not user.bot
-
-            try:
-                reaction, user = await self.bot.wait_for("reaction_add", check=check, timeout=300.0)
-            except asyncio.TimeoutError:
-                return
-            emoji = str(reaction.emoji)
-            if emoji in ["⏪", "◀", "▶", "⏩"] and user.id == ctx.author.id:
-                page_num = utils.pagination_next(emoji, page_num, pages_total)
-                embed.clear_fields()
-                self.add_fields(embed, pages[page_num - 1]["commands"])
-                embed.set_footer(text=f"Strana {page_num}/{pages_total} | {commit}")
-                await message.edit(embed=embed)
-            try:
-                await message.remove_reaction(emoji, user)
-            except disnake.errors.Forbidden:
-                pass
+        await ctx.reply(embed=embeds[0], view=EmbedView(embeds, author=ctx.author.id))
 
 
 def setup(bot):

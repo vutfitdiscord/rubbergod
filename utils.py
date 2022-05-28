@@ -67,14 +67,14 @@ def fill_message(message_name, *args, **kwargs):
         raise ValueError("Invalid template {}".format(message_name))
 
 
-def pagination_next(emoji, page, max_page, roll_around=True):
-    if emoji in ["▶", "🔽"]:
+def pagination_next(id: str, page: int, max_page: int, roll_around: bool = True):
+    if 'next' in id:
         next_page = page + 1
-    elif emoji in ["◀", "🔼"]:
+    elif 'prev' in id:
         next_page = page - 1
-    elif emoji == "⏪":
+    elif 'start' in id:
         next_page = 1
-    elif emoji == "⏩":
+    elif 'end' in id:
         next_page = max_page
     if 1 <= next_page <= max_page:
         return next_page
@@ -188,22 +188,6 @@ def clear_link_escape(link: str):
         link = link[:-1]
 
     return link
-
-
-async def add_pagination_reactions(message: disnake.Message, items_count: int):
-    """Common method to add pagination reactions to message."""
-
-    if items_count <= 1:
-        return
-
-    if items_count > 2:
-        await message.add_reaction("⏪")
-
-    await message.add_reaction("◀")
-    await message.add_reaction("▶")
-
-    if items_count > 2:
-        await message.add_reaction("⏩")
 
 
 def is_valid_datetime_format(dt: str, fmt: str) -> bool:
