@@ -8,6 +8,7 @@ from typing import List, Union
 import utils
 import asyncio
 
+
 class MemeRepost(commands.Cog):
     def __init__(self, bot):
         self.bot: commands.Bot = bot

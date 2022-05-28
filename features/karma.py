@@ -13,6 +13,7 @@ from config.messages import Messages as msg
 from features.base_feature import BaseFeature
 from repository.karma_repo import KarmaRepository
 from repository.database.karma import Karma as Database_karma
+from buttons.embed import EmbedView
 
 
 def test_emoji(db_emoji: bytearray, server_emoji: Emoji):
@@ -330,6 +331,26 @@ class Karma(BaseFeature):
         utils.add_author_footer(embed, author)
         return embed
 
+    def update_embed(self, page, embed):
+        start = 10 * (page - 1) + 1
+        if "GIVINGBOARD" in embed.title:
+            column = 'positive'
+            attribute = Database_karma.positive.desc()
+        elif "ISHABOARD" in embed.title:
+            column = 'negative'
+            attribute = Database_karma.negative.desc()
+        elif "LEADERBOARD" in embed.title:
+            column = 'karma'
+            attribute = Database_karma.karma.desc()
+            value_num = math.ceil(start / cfg.karma_grillbot_leaderboard_size)
+            embed.fields[0].value = msg.karma_web if value_num == 1 else f"{msg.karma_web}{value_num}"
+        elif "BAJKARBOARD" in embed.title:
+            column = 'column'
+            attribute = Database_karma.karma
+        output = self.gen_leaderboard_content(attribute, start, column)
+        embed.description = output
+        return embed
+
     async def leaderboard(self, ctx: disnake.ext.commands.Context, action, order, start=1):
         if action == 'give':
             if order == "DESC":
@@ -365,11 +386,8 @@ class Karma(BaseFeature):
             value = msg.karma_web if value_num == 1 else f"{msg.karma_web}{value_num}"
             embed.add_field(name=msg.karma_web_title, value=value)
 
-        message = await ctx.send(embed=embed)
-
-        await message.add_reaction("⏪")
-        await message.add_reaction("◀")
-        await message.add_reaction("▶")
+        view = EmbedView([embed], roll_arroud=False, end_arrow=False, callback=self.update_embed)
+        await ctx.send(embed=embed, view=view)
 
     def gen_leaderboard_content(self, attribute, start, column):
         board = self.repo.get_leaderboard(attribute, start-1)

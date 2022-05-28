@@ -13,9 +13,9 @@ from datetime import datetime
 import re
 from requests.packages.urllib3.util.retry import Retry
 from requests.adapters import HTTPAdapter
-from features.reaction_context import ReactionContext
 from features.prompt import PromptSession
 from features.list_message_sender import send_list_of_messages
+from buttons.embed import EmbedView
 
 # Pattern: "AnyText | [Subject] Page: CurrentPage / {TotalPages}"
 pagination_regex = re.compile(r'^\[([^\]]*)\]\s*Page:\s*(\d*)\s*\/\s*(\d*)')
@@ -45,9 +45,10 @@ class StreamLinks(commands.Cog):
             await ctx.reply(content=Messages.streamlinks_no_stream)
             return
 
-        embed = self.create_embed_of_link(streamlinks[0], ctx.author, len(streamlinks), 1)
-        message: disnake.Message = await ctx.reply(embed=embed)
-        await utils.add_pagination_reactions(message, len(streamlinks))
+        embeds = []
+        for idx, link in enumerate(streamlinks):
+            embeds.append(self.create_embed_of_link(link, ctx.author, len(streamlinks), idx+1))
+        await ctx.reply(embed=embeds[0], view=EmbedView(embeds, timeout=180))
 
     @commands.check(utils.helper_plus)
     @streamlinks.command(brief=Messages.streamlinks_add_brief)
@@ -160,7 +161,7 @@ class StreamLinks(commands.Cog):
         form = soup.select('form', {'action': 'https://consent.youtube.com/s'})
         if len(form) > 0:
             # Consent check detected. Will try to pass...
-            params = form[0].select('input', {'type' : 'hidden'})
+            params = form[0].select('input', {'type': 'hidden'})
             pars = {}
             for par in params:
                 if 'name' in par.attrs:
@@ -206,45 +207,6 @@ class StreamLinks(commands.Cog):
                                 f" (#{streamlink.id})"])
 
         return embed
-
-    async def handle_reaction(self, ctx: ReactionContext):
-        if ctx.emoji not in ["⏪", "◀", "▶", "⏩"]:
-            return
-        try:
-            if ctx.reply_to is None:  # Reply is required to render embed.
-                await ctx.message.edit(content=Messages.streamlinks_missing_original, embed=None)
-                return
-
-            embed: disnake.Embed = ctx.message.embeds[0]
-            footer_text = embed.footer.text.split('|')[1].strip()
-            match = pagination_regex.match(footer_text)
-
-            if match is None:
-                await ctx.message.edit(content=Messages.streamlinks_unsupported_embed, embed=None)
-                return  # Invalid or unsupported embed.
-
-            groups = match.groups()
-            subject = str(groups[0]).lower()
-            current_page = int(groups[1])
-            pages_count = int(groups[2])
-
-            streamlinks = self.repo.get_streamlinks_of_subject(subject)
-
-            if len(streamlinks) != pages_count:  # New streamlink was added, but removed.
-                await ctx.message.edit(content=Messages.streamlinks_not_actual, embed=None)
-                return
-
-            new_page = utils.pagination_next(ctx.emoji, current_page, pages_count)
-            if new_page <= 0 or new_page == current_page:
-                return  # Pagination to same page. We can ignore.
-
-            # Index - 1, because index position.
-            streamlink: StreamLink = streamlinks[new_page - 1]
-            embed = self.create_embed_of_link(streamlink, ctx.reply_to.author, len(streamlinks), new_page)
-            await ctx.message.edit(embed=embed)
-        finally:
-            if ctx.message.guild:  # cannot remove reaction in DM
-                await ctx.message.remove_reaction(ctx.emoji, ctx.member)
 
     @add.error
     async def streamlinks_add_error(self, ctx: commands.Context, error):

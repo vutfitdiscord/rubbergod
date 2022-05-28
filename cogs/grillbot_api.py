@@ -41,6 +41,5 @@ class GrillbotApi(commands.Cog):
             await message.reply("Extension not loaded")
 
 
-
 def setup(bot):
     bot.add_cog(GrillbotApi(bot))
