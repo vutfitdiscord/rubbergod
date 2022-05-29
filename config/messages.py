@@ -338,7 +338,7 @@ class Messages:
 
     warden_scan_brief = "Prohledá obrázky v aktuálním kanále a uloží je jako hash pro detekci repostu.\nlimit: [all | <int>]"
 
-    weather_brief = "Vypíše informace o počasí ve zvoleném městě. Defaultní hodnota je vybrané Brno."
+    weather_brief = "Vypíše informace o počasí ve zvoleném městě. Výchozí město je Brno."
 
     week_brief = "Vypíše, kolikátý je zrovna týden a jestli je sudý nebo lichý"
     week_warning = "Pro sudý/lichý se využívá kalendářní týden"
