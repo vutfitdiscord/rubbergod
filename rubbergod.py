@@ -46,6 +46,7 @@ intents.guilds = True
 intents.members = True
 intents.emojis = True
 intents.messages = True
+intents.message_content = True
 intents.reactions = True
 intents.presences = True
 
