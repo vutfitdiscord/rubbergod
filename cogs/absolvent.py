@@ -24,10 +24,10 @@ class Absolvent(commands.Cog):
 
     @commands.slash_command(name="diplom", description=Messages.absolvent_brief)
     async def diplom(self, inter: disnake.ApplicationCommandInteraction, 
-                           degree, 
-                           name, 
-                           surname, 
-                           diploma_number, 
+                           degree: str, 
+                           name: str, 
+                           surname: str, 
+                           diploma_number: str, 
                            thesis_web_id: int
                            ):
         """Command for diploma verification and honourable role addition
