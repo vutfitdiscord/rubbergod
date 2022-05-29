@@ -204,7 +204,7 @@ class Karma(commands.Cog):
 
     @cooldowns.long_cooldown
     @commands.slash_command(name="leaderboard", description=messages.karma_leaderboard_brief)
-    async def leaderboard(self, inter, start : int = 1):
+    async def leaderboard(self, inter: disnake.ApplicationCommandInteraction, start : int = 1):
         if not await self.validate_leaderboard_offset(start, inter):
             return
         await self.karma.leaderboard(inter, "get", "DESC", start)
@@ -212,7 +212,7 @@ class Karma(commands.Cog):
 
     @cooldowns.long_cooldown
     @commands.slash_command(name="bajkarboard", description=messages.karma_bajkarboard_brief)
-    async def bajkarboard(self, inter, start : int = 1):
+    async def bajkarboard(self, inter: disnake.ApplicationCommandInteraction, start : int = 1):
         if not await self.validate_leaderboard_offset(start, inter):
             return
 
@@ -221,7 +221,7 @@ class Karma(commands.Cog):
 
     @cooldowns.long_cooldown
     @commands.slash_command(name="givingboard", description=messages.karma_givingboard_brief)
-    async def givingboard(self, inter, start : int = 1):
+    async def givingboard(self, inter: disnake.ApplicationCommandInteraction, start : int = 1):
         if not await self.validate_leaderboard_offset(start, inter):
             return
 
@@ -230,7 +230,7 @@ class Karma(commands.Cog):
 
     @cooldowns.long_cooldown
     @commands.slash_command(name="ishaboard", description=messages.karma_ishaboard_brief)
-    async def ishaboard(self, inter, start : int = 1):
+    async def ishaboard(self, inter: disnake.ApplicationCommandInteraction, start : int = 1):
         if not await self.validate_leaderboard_offset(start, inter):
             return
 
@@ -243,7 +243,7 @@ class Karma(commands.Cog):
     @transfer.error
     @stalk.error
     @message.error
-    async def karma_error(self, inter, error):
+    async def karma_error(self, inter: disnake.ApplicationCommandInteraction, error):
         if isinstance(error, commands.MemberNotFound):
             await inter.response.send_message(utils.fill_message("member_not_found", user=inter.author.id))
         if isinstance(error, commands.MessageNotFound):

@@ -8,7 +8,7 @@ from utils import add_author_footer
 
 class Studijni(commands.Cog):
 
-    @commands.slash_command(name="studijne", description=Messages.studijni_brief)
+    @commands.slash_command(name="studijni", description=Messages.studijni_brief)
     async def studijni(self, inter: disnake.ApplicationCommandInteraction):
         link = "https://www.fit.vut.cz/fit/room/C109/.cs"
         htmlparser = etree.HTMLParser()
