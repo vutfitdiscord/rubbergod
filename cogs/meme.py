@@ -10,7 +10,7 @@ from disnake.ext import commands
 
 import utils
 from config.app_config import config
-from config.messages import Messages as messages
+from config.messages import Messages
 from config import cooldowns
 
 uhoh_counter = 0
@@ -40,7 +40,7 @@ class Meme(commands.Cog):
             await message.channel.send("uh oh")
             uhoh_counter += 1
         elif message.content == "PR":
-            await message.channel.send(messages.pr_meme)
+            await message.channel.send(Messages.pr_meme)
         elif (
             storno_time + datetime.timedelta(hours=config.storno_delay)
             < message.created_at
@@ -54,17 +54,17 @@ class Meme(commands.Cog):
                 file=disnake.File(f"images/{image}", filename=image),
             )
 
-    @commands.command(brief=messages.uhoh_brief)
+    @commands.command(brief=Messages.uhoh_brief)
     async def uhoh(self, ctx):
         await ctx.send(utils.fill_message("uhoh_counter", uhohs=uhoh_counter))
 
     @cooldowns.short_cooldown
     @commands.command(name="??", brief="???")
     async def question(self, ctx):
-        await ctx.send(choice(messages.question))
+        await ctx.send(choice(Messages.question))
 
     @cooldowns.short_cooldown
-    @commands.command(brief=messages.bonk_brief)
+    @commands.command(brief=Messages.bonk_brief)
     async def bonk(self, ctx, member: disnake.Member = None):
         """Bonk someone
         member: disnake user. If none, the bot will bonk you.
@@ -75,7 +75,7 @@ class Meme(commands.Cog):
             bonked = member
 
         if not bonked.avatar:
-            await ctx.send(messages.unsupported_image)
+            await ctx.send(Messages.unsupported_image)
             return
 
         async with ctx.typing():

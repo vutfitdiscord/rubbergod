@@ -9,7 +9,7 @@ from emoji import demojize
 
 import utils
 from config.app_config import config as cfg
-from config.messages import Messages as msg
+from config.messages import Messages
 from features.base_feature import BaseFeature
 from repository.karma_repo import KarmaRepository
 from repository.database.karma import Karma as Database_karma
@@ -76,7 +76,7 @@ class Karma(BaseFeature):
     async def emoji_vote_value(self, message):
         if len(message.content.split()) != 2:
             await message.channel.send(
-                msg.karma_vote_format)
+                Messages.karma_vote_format)
             return
 
         emojis = self.repo.get_all_emojis()
@@ -95,7 +95,7 @@ class Karma(BaseFeature):
                     emoji = server_emoji  # Save for use outside loop
                     break
         else:
-            await message.channel.send(msg.karma_vote_allvoted)
+            await message.channel.send(Messages.karma_vote_allvoted)
             return
 
         if vote_value is None:
@@ -111,7 +111,7 @@ class Karma(BaseFeature):
     async def emoji_revote_value(self, message):
         content = message.content.split()
         if len(content) != 3:
-            await message.channel.send(msg.karma_revote_format)
+            await message.channel.send(Messages.karma_revote_format)
             return
 
         emoji = content[2]
@@ -120,10 +120,10 @@ class Karma(BaseFeature):
                 emoji_id = int(emoji.split(':')[2][:-1])
                 emoji = await message.channel.guild.fetch_emoji(emoji_id)
             except (ValueError, IndexError):
-                await message.channel.send(msg.karma_revote_format)
+                await message.channel.send(Messages.karma_revote_format)
                 return
             except disnake.NotFound:
-                await message.channel.send(msg.karma_emote_not_found)
+                await message.channel.send(Messages.karma_emote_not_found)
                 return
 
         vote_value = await self.emoji_process_vote(message.channel, emoji)
@@ -136,30 +136,24 @@ class Karma(BaseFeature):
             await message.channel.send(utils.fill_message("karma_vote_notpassed",
                                        emote=str(emoji), minimum=str(cfg.vote_minimum)))
 
-    async def emoji_get_value(self, message):
-        content = message.content.split()
-        if len(content) != 3:
-            await message.channel.send(msg.karma_get_format)
-            return
-
-        emoji = content[2]
+    async def emoji_get_value(self, inter, emoji):
         if not is_unicode(emoji):
             try:
                 emoji_id = int(emoji.split(':')[2][:-1])
-                emoji = await message.channel.guild.fetch_emoji(emoji_id)
+                emoji = await inter.channel.guild.fetch_emoji(emoji_id)
             except (ValueError, IndexError):
-                await message.channel.send(msg.karma_get_format)
+                await inter.response.send_message(Messages.karma_get_format)
                 return
             except disnake.NotFound:
-                await message.channel.send(msg.karma_emote_not_found)
+                await inter.response.send_message(Messages.karma_emote_not_found)
                 return
 
         val = self.repo.emoji_value_raw(emoji)
 
         if val is not None:
-            await message.channel.send(utils.fill_message("karma_get", emote=str(emoji), value=str(val)))
+            await inter.response.send_message(utils.fill_message("karma_get", emote=str(emoji), value=str(val)))
         else:
-            await message.channel.send(utils.fill_message("karma_get_emote_not_voted", emote=str(emoji)))
+            await inter.response.send_message(utils.fill_message("karma_get_emote_not_voted", emote=str(emoji)))
 
     async def __make_emoji_list(self, guild, emojis):
         message = []
@@ -226,12 +220,12 @@ class Karma(BaseFeature):
 
         if error:
             channel = await self.bot.fetch_channel(cfg.bot_dev_channel)
-            await channel.send(msg.karma_get_missing)
+            await channel.send(Messages.karma_get_missing)
 
     async def karma_give(self, message):
         input_string = message.content.split()
         if len(input_string) < 4:
-            await message.channel.send(msg.karma_give_format)
+            await message.channel.send(Messages.karma_give_format)
         else:
             try:
                 number = int(input_string[2])
@@ -242,16 +236,16 @@ class Karma(BaseFeature):
             for member in message.mentions:
                 self.repo.update_karma(member, message.author, number)
             if number >= 0:
-                await message.channel.send(msg.karma_give_success)
+                await message.channel.send(Messages.karma_give_success)
             else:
                 await message.channel.send(
-                    msg.karma_give_negative_success
+                    Messages.karma_give_negative_success
                 )
 
     async def karma_transfer(self, message: TextChannel):
         input_string = message.content.split()
         if len(input_string) < 4 or len(message.mentions) < 2:
-            await message.channel.send(msg.karma_transfer_format)
+            await message.channel.send(Messages.karma_transfer_format)
             return
 
         try:
@@ -265,7 +259,7 @@ class Karma(BaseFeature):
 
             await self.reply_to_channel(message.channel, formated_message)
         except ValueError:
-            await self.reply_to_channel(message.channel, msg.karma_transfer_format)
+            await self.reply_to_channel(message.channel, Messages.karma_transfer_format)
             return
 
     def karma_get(self, author, target=None):
@@ -343,7 +337,7 @@ class Karma(BaseFeature):
             column = 'karma'
             attribute = Database_karma.karma.desc()
             value_num = math.ceil(start / cfg.karma_grillbot_leaderboard_size)
-            embed.fields[0].value = msg.karma_web if value_num == 1 else f"{msg.karma_web}{value_num}"
+            embed.fields[0].value = Messages.karma_web if value_num == 1 else f"{Messages.karma_web}{value_num}"
         elif "BAJKARBOARD" in embed.title:
             column = 'column'
             attribute = Database_karma.karma
@@ -383,8 +377,8 @@ class Karma(BaseFeature):
 
         if action == "get" and order == "DESC":
             value_num = math.ceil(start / cfg.karma_grillbot_leaderboard_size)
-            value = msg.karma_web if value_num == 1 else f"{msg.karma_web}{value_num}"
-            embed.add_field(name=msg.karma_web_title, value=value)
+            value = Messages.karma_web if value_num == 1 else f"{Messages.karma_web}{value_num}"
+            embed.add_field(name=Messages.karma_web_title, value=value)
 
         view = EmbedView([embed], roll_arroud=False, end_arrow=False, callback=self.update_embed)
         await ctx.send(embed=embed, view=view)
