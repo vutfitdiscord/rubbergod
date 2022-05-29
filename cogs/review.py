@@ -57,7 +57,7 @@ class Review(commands.Cog):
                 return
             subject = args[0]
             embeds = self.manager.list_reviews(ctx.author, subject.lower())
-            if len(embeds) == 0:
+            if embeds is None or len(embeds) == 0:
                 await ctx.reply(messages.review_wrong_subject)
                 return
             await ctx.reply(embed=embeds[0], view=ReviewView(self.bot, embeds))
