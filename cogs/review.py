@@ -147,7 +147,7 @@ class Review(commands.Cog):
             await ctx.reply(Messages.subject_update_success)
 
     @commands.slash_command(name="wtf", description=Messages.shortcut_brief)
-    async def shortcut(self, inter, shortcut):
+    async def shortcut(self, inter: disnake.ApplicationCommandInteraction, shortcut):
         """Informations about subject specified by its shortcut"""
         programme = self.repo.get_programme(shortcut.upper())
         if programme:

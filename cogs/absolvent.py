@@ -19,7 +19,7 @@ class Absolvent(commands.Cog):
         self.bot = bot
 
     @commands.slash_command(name="diplom_help", description=Messages.absolvent_help_brief)
-    async def diplom_help(self, inter):
+    async def diplom_help(self, inter: disnake.ApplicationCommandInteraction):
         await inter.response.send_message(Messages.absolvent_help)
 
     @commands.slash_command(name="diplom", description=Messages.absolvent_brief)

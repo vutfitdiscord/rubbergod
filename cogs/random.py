@@ -38,30 +38,24 @@ class Random(commands.Cog):
         if option:
             await ctx.send(f"{option} {ctx.author.mention}")
     
-    async def flip_func(self, inter):
-        await inter.response.send_message(random.choice(["True", "False"]))
-
     @cooldowns.short_cooldown
     @commands.slash_command(name="flip", description=Messages.random_flip_brief)
-    async def flip_slash(self, inter: disnake.ApplicationCommandInteraction):
-        await self.flip_func(inter)
-
-    async def roll_func(self, inter, first, second):
+    async def flip(self, inter: disnake.ApplicationCommandInteraction):
+        await inter.response.send_message(random.choice(["True", "False"]))
+    
+    @cooldowns.short_cooldown
+    @commands.slash_command(name="roll", description=Messages.rng_generator_format)
+    async def roll(self, inter: disnake.ApplicationCommandInteraction, first: int, second: int = 0):
         if first > second:
             first, second = second, first
 
         option = str(random.randint(first, second))
         await inter.response.send_message(option)
-    
-    @cooldowns.short_cooldown
-    @commands.slash_command(name="roll", description=Messages.rng_generator_format)
-    async def roll_slash(self, inter: disnake.ApplicationCommandInteraction, first: int, second: int = 0):
-        await self.roll_func(inter, first, second)
 
     @diceroll.error
     @pick.error
-    @roll_slash.error
-    @flip_slash.error
+    @roll.error
+    @flip.error
     async def command_error(self, ctx, error):
         if isinstance(error, (commands.MissingRequiredArgument, commands.BadArgument)):
             await ctx.send(utils.get_command_signature(ctx))
