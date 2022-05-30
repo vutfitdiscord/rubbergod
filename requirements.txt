@@ -1,4 +1,4 @@
-disnake
+disnake>=2.5.1
 emoji
 gitpython
 sqlalchemy

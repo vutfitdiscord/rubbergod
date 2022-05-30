@@ -56,11 +56,6 @@ class Pet(commands.Cog):
             image_binary.seek(0)
             await inter.response.send_message(file=disnake.File(fp=image_binary, filename="pet.gif"))
 
-    @pet.error
-    async def pet_error(self, inter: disnake.ApplicationCommandInteraction, error):
-        if isinstance(error, commands.BadArgument):
-            await inter.response.send_message(utils.fill_message("member_not_found", user=inter.author.id))
-
 
 def setup(bot):
     bot.add_cog(Pet(bot))
