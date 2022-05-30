@@ -249,6 +249,7 @@ class Karma(commands.Cog):
             return True
         if isinstance(error, commands.CheckFailure):
             await inter.reply(utils.fill_message("insufficient_rights", user=inter.author.id))
+            return True
 
     async def validate_leaderboard_offset(self, offset: int, inter) -> bool:
         if not 0 < offset < 100000000:  # Any value larger than the server
