@@ -112,48 +112,56 @@ class Karma(commands.Cog):
         return 0, {"meta": meta, "content": output}
 
     @cooldowns.default_cooldown
+    @commands.slash_command(name="karma")
+    async def _karma(self, inter):
+        pass
+    
+    @cooldowns.default_cooldown
+    @_karma.sub_command(description=messages.karma_brief)
+    async def me(self, inter: disnake.ApplicationCommandInteraction):
+        await inter.response.send_message(self.karma.karma_get(inter.author))
+        await self.check.botroom_check(inter)
+
+    @_karma.sub_command(description=messages.karma_stalk_brief)
+    async def stalk(self, inter: disnake.ApplicationCommandInteraction, user: disnake.Member):
+        await inter.response.send_message(self.karma.karma_get(inter.author, user))
+        await self.check.botroom_check(inter)
+
+    @commands.cooldown(rate=1, per=300.0, type=commands.BucketType.guild)
+    @_karma.sub_command(description=messages.karma_getall_brief, guild_ids=config.guild_id)
+    async def getall(self, inter: disnake.ApplicationCommandInteraction):
+        try:
+            await inter.response.send_message(messages.karma_getall_response)
+            await self.karma.emoji_list_all_values(inter.channel)
+            await self.check.botroom_check(inter)
+        except disnake.errors.Forbidden:
+            return
+
+    @cooldowns.default_cooldown
+    @_karma.sub_command(description=messages.karma_get_brief, guild_ids=config.guild_id)
+    async def get(self, inter: disnake.ApplicationCommandInteraction, emoji):
+        try:
+           await self.karma.emoji_get_value(inter, emoji)
+           await self.check.botroom_check(inter)
+        except disnake.errors.Forbidden:
+           return
+           
+    @cooldowns.long_cooldown
+    @_karma.sub_command(description=messages.karma_message_brief)
+    async def message(self, inter: disnake.ApplicationCommandInteraction, message: disnake.Message):
+        await inter.response.defer(with_message=True)
+        embed = await self.karma.message_karma(inter.author, message)
+        await inter.edit_original_message(embed=embed)
+        msg = await inter.original_message()
+        await msg.add_reaction("🔁")
+
+    @cooldowns.default_cooldown
     @commands.group(brief=messages.karma_brief, usage=' ')
     async def karma(self, ctx: commands.Context):
-        if ctx.invoked_subcommand is None:
-            args = ctx.message.content.split()[1:]
+        pass
 
-            if len(args) == 0:
-                await ctx.reply(self.karma.karma_get(ctx.author))
-                await self.check.botroom_check(ctx.message)
-            else:
-                await ctx.reply(utils.fill_message("karma_invalid_command", user=ctx.author.id))
-
-    @karma.command(brief=messages.karma_stalk_brief)
-    async def stalk(self, ctx, user: disnake.Member):
-        await ctx.reply(self.karma.karma_get(ctx.author, user))
-        await self.check.botroom_check(ctx.message)
-
-    @karma.command(brief=messages.karma_getall_brief)
-    @commands.cooldown(rate=1, per=300.0, type=commands.BucketType.guild)
-    async def getall(self, ctx):
-        if not await self.check.guild_check(ctx.message):
-            await ctx.reply(messages.server_warning)
-        else:
-            try:
-                await self.karma.emoji_list_all_values(ctx.channel)
-                await self.check.botroom_check(ctx.message)
-            except disnake.errors.Forbidden:
-                return
-
-    @karma.command(brief=messages.karma_get_brief)
-    @cooldowns.default_cooldown
-    async def get(self, ctx, *args):
-        if not await self.check.guild_check(ctx.message):
-            await ctx.reply(messages.server_warning)
-        else:
-            try:
-                await self.karma.emoji_get_value(ctx.message)
-                await self.check.botroom_check(ctx.message)
-            except disnake.errors.Forbidden:
-                return
-
-    @karma.command(brief=messages.karma_revote_brief)
     @commands.check(utils.is_bot_admin)
+    @karma.command(brief=messages.karma_revote_brief)
     async def revote(self, ctx, *args):
         if not await self.check.guild_check(ctx.message):
             await ctx.reply(messages.server_warning)
@@ -168,8 +176,8 @@ class Karma(commands.Cog):
                 dc_vote_room = disnake.utils.get(ctx.guild.channels, id=config.vote_room)
                 await ctx.reply(utils.fill_message("vote_room_only", room=dc_vote_room))
 
-    @karma.command(brief=messages.karma_vote_brief)
     @commands.check(utils.is_bot_admin)
+    @karma.command(brief=messages.karma_vote_brief)
     async def vote(self, ctx, *args):
         if not await self.check.guild_check(ctx.message):
             await ctx.reply(messages.server_warning)
@@ -184,66 +192,50 @@ class Karma(commands.Cog):
                 dc_vote_room = disnake.utils.get(ctx.guild.channels, id=config.vote_room)
                 await ctx.reply(utils.fill_message("vote_room_only", room=dc_vote_room))
 
-    @karma.command(brief=messages.karma_give_brief)
     @commands.check(utils.is_bot_admin)
+    @karma.command(brief=messages.karma_give_brief)
     async def give(self, ctx, *args):
         await self.karma.karma_give(ctx.message)
-
-    @karma.command(brief=messages.karma_message_brief)
-    async def message(self, ctx, message: disnake.Message):
-        async with ctx.channel.typing():
-            embed = await self.karma.message_karma(ctx.author, message)
-            response = await ctx.reply(embed=embed)
-            await response.add_reaction("🔁")
-
-    @karma.command(brief=messages.karma_transfer_brief)
+    
     @commands.check(utils.is_bot_admin)
+    @karma.command(brief=messages.karma_transfer_brief)
     async def transfer(self, ctx, *args):
         await self.karma.karma_transfer(ctx.message)
 
     @cooldowns.long_cooldown
-    @commands.command(brief=messages.karma_leaderboard_brief)
-    async def leaderboard(self, ctx, start=1):
-        if not await self.validate_leaderboard_offset(start, ctx):
+    @commands.slash_command(name="leaderboard", description=messages.karma_leaderboard_brief)
+    async def leaderboard(self, inter: disnake.ApplicationCommandInteraction, start : int = 1):
+        if not await self.validate_leaderboard_offset(start, inter):
             return
-
-        await self.karma.leaderboard(ctx, "get", "DESC", start)
-        await self.check.botroom_check(ctx.message)
+        await self.karma.leaderboard(inter, "get", "DESC", start)
+        await self.check.botroom_check(inter)
 
     @cooldowns.long_cooldown
-    @commands.command(brief=messages.karma_bajkarboard_brief)
-    async def bajkarboard(self, ctx, start=1):
-        if not await self.validate_leaderboard_offset(start, ctx):
+    @commands.slash_command(name="bajkarboard", description=messages.karma_bajkarboard_brief)
+    async def bajkarboard(self, inter: disnake.ApplicationCommandInteraction, start : int = 1):
+        if not await self.validate_leaderboard_offset(start, inter):
             return
 
-        await self.karma.leaderboard(ctx, "get", "ASC", start)
-        await self.check.botroom_check(ctx.message)
+        await self.karma.leaderboard(inter, "get", "ASC", start)
+        await self.check.botroom_check(inter)
 
     @cooldowns.long_cooldown
-    @commands.command(brief=messages.karma_givingboard_brief)
-    async def givingboard(self, ctx, start=1):
-        if not await self.validate_leaderboard_offset(start, ctx):
+    @commands.slash_command(name="givingboard", description=messages.karma_givingboard_brief)
+    async def givingboard(self, inter: disnake.ApplicationCommandInteraction, start : int = 1):
+        if not await self.validate_leaderboard_offset(start, inter):
             return
 
-        await self.karma.leaderboard(ctx, "give", "DESC", start)
-        await self.check.botroom_check(ctx.message)
+        await self.karma.leaderboard(inter, "give", "DESC", start)
+        await self.check.botroom_check(inter)
 
     @cooldowns.long_cooldown
-    @commands.command(brief=messages.karma_ishaboard_brief)
-    async def ishaboard(self, ctx, start=1):
-        if not await self.validate_leaderboard_offset(start, ctx):
+    @commands.slash_command(name="ishaboard", description=messages.karma_ishaboard_brief)
+    async def ishaboard(self, inter: disnake.ApplicationCommandInteraction, start : int = 1):
+        if not await self.validate_leaderboard_offset(start, inter):
             return
 
-        await self.karma.leaderboard(ctx, "give", "ASC", start)
-        await self.check.botroom_check(ctx.message)
-
-    @leaderboard.error
-    @bajkarboard.error
-    @givingboard.error
-    @ishaboard.error
-    async def leaderboard_error(self, ctx, error):
-        if isinstance(error, commands.BadArgument):
-            await ctx.reply(utils.fill_message("karma_lederboard_offser_error", user=ctx.author.id))
+        await self.karma.leaderboard(inter, "give", "ASC", start)
+        await self.check.botroom_check(inter)
 
     @revote.error
     @vote.error
@@ -251,20 +243,19 @@ class Karma(commands.Cog):
     @transfer.error
     @stalk.error
     @message.error
-    async def karma_error(self, ctx, error):
-        if isinstance(error, commands.BadArgument):
-            if ctx.invoked_subcommand.name == 'stalk':
-                await ctx.reply(utils.fill_message("member_not_found", user=ctx.author.id))
-            elif ctx.invoked_subcommand.name == 'message':
-                await ctx.reply(utils.fill_message("karma_message_format", user=ctx.author.id))
+    async def karma_error(self, inter: disnake.ApplicationCommandInteraction, error):
+        if isinstance(error, commands.MemberNotFound):
+            await inter.response.send_message(utils.fill_message("member_not_found", user=inter.author.id))
+        if isinstance(error, commands.MessageNotFound):
+            await inter.response.send_message(utils.fill_message("karma_message_format", user=inter.author.id))
         if isinstance(error, commands.CheckFailure):
-            await ctx.reply(utils.fill_message("insufficient_rights", user=ctx.author.id))
+            await inter.response.send_message(utils.fill_message("insufficient_rights", user=inter.author.id))
 
-    async def validate_leaderboard_offset(self, offset: int, ctx: commands.Context) -> bool:
+    async def validate_leaderboard_offset(self, offset: int, inter) -> bool:
         if not 0 < offset < 100000000:  # Any value larger than the server
             # user cnt and lower than 32bit
             # int max will do
-            await ctx.reply(utils.fill_message("karma_lederboard_offser_error", user=ctx.author.id))
+            await inter.response.send_message(utils.fill_message("karma_leaderboard_offset_error", user=inter.author.id))
             return False
 
         return True

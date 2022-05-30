@@ -38,39 +38,19 @@ class Random(commands.Cog):
         if option:
             await ctx.send(f"{option} {ctx.author.mention}")
     
-    async def flip_func(self, ctx):
-        await ctx.send(random.choice(["True", "False"]))
-
-    @cooldowns.short_cooldown
-    @commands.command(brief=Messages.random_flip_brief)
-    async def flip(self, ctx):
-        await self.flip_func(ctx)
-
     @cooldowns.short_cooldown
     @commands.slash_command(name="flip", description=Messages.random_flip_brief)
-    async def flip_slash(self, inter):
-        await self.flip_func(inter)
-
-    async def roll_func(self, ctx, first, second):
+    async def flip(self, inter: disnake.ApplicationCommandInteraction):
+        await inter.response.send_message(random.choice(["True", "False"]))
+    
+    @cooldowns.short_cooldown
+    @commands.slash_command(name="roll", description=Messages.rng_generator_format)
+    async def roll(self, inter: disnake.ApplicationCommandInteraction, first: int, second: int = 0):
         if first > second:
             first, second = second, first
 
         option = str(random.randint(first, second))
-        await ctx.send(option)
-    
-    @cooldowns.short_cooldown
-    @commands.command(
-        aliases=["random", "randint"],
-        brief=Messages.random_roll_brief,
-        description=Messages.rng_generator_format,
-    )
-    async def roll(self, ctx, first: int, second: int = 0):
-        await self.roll_func(ctx, first, second)
-    
-    @cooldowns.short_cooldown
-    @commands.slash_command(name="roll", description=Messages.rng_generator_format)
-    async def roll_slash(self, ctx, first: int, second: int = 0):
-        await self.roll_func(ctx, first, second)
+        await inter.response.send_message(option)
 
     @diceroll.error
     @pick.error

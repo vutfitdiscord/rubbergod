@@ -4,7 +4,7 @@ import disnake
 from disnake.ext import commands
 
 from config.app_config import config
-from config.messages import Messages as messages
+from config.messages import Messages
 import utils
 
 
@@ -12,13 +12,13 @@ class weather(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command(aliases=["pocasi", "pocasie", "počasí", "počasie"], brief=messages.weather_brief)
-    async def weather(self, ctx, *, place: str = "Brno"):
+    @commands.slash_command(name="pocasi", description=Messages.weather_brief)
+    async def weather(self, inter: disnake.ApplicationCommandInteraction, place: str = "Brno"):
         token = config.weather_token
 
         place = place[:100]
         if "&" in place:
-            return await ctx.send("Takhle se žádné město určitě nejmenuje.")
+            return await inter.response.send_message("Takhle se žádné město určitě nejmenuje.")
 
         url = (
             "http://api.openweathermap.org/data/2.5/weather?q="
@@ -48,16 +48,16 @@ class weather(commands.Cog):
             embed.add_field(name="Oblačnost", value=clouds, inline=True)
             embed.add_field(name="Viditelnost", value=visibility, inline=True)
 
-            utils.add_author_footer(embed, ctx.author)
+            utils.add_author_footer(embed, inter.author)
 
-            await ctx.send(embed=embed)
+            await inter.response.send_message(embed=embed)
 
         elif str(res["cod"]) == "404":
-            await ctx.send("Město nenalezeno")
+            await inter.response.send_message("Město nenalezeno")
         elif str(res["cod"]) == "401":
-            await ctx.send("Rip token -> Rebel pls fix")
+            await inter.response.send_message("Rip token -> Rebel pls fix")
         else:
-            await ctx.send(
+            await inter.response.send_message(
                 "Město nenalezeno! <:pepeGun:484470874246742018> (" + res["message"] + ")"
             )
 

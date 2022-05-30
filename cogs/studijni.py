@@ -8,8 +8,8 @@ from utils import add_author_footer
 
 class Studijni(commands.Cog):
 
-    @commands.command(aliases=["studijne", "študijné", "studijní"], brief=Messages.studijni_brief)
-    async def studijni(self, ctx):
+    @commands.slash_command(name="studijni", description=Messages.studijni_brief)
+    async def studijni(self, inter: disnake.ApplicationCommandInteraction):
         link = "https://www.fit.vut.cz/fit/room/C109/.cs"
         htmlparser = etree.HTMLParser()
         session = requests.session()
@@ -32,8 +32,8 @@ class Studijni(commands.Cog):
             else:
                 hours = Messages.studijni_web_error
         embed.add_field(name=Messages.studijni_office_hours, value=hours, inline=False)
-        add_author_footer(embed, ctx.message.author)
-        await ctx.send(embed=embed)
+        add_author_footer(embed, inter.author)
+        await inter.response.send_message(embed=embed)
 
 
 def setup(bot):

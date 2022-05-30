@@ -29,6 +29,7 @@ class Messages:
     acl_add_user = "Výjimka pro uživatele přidána."
     acl_edit_user = "Výjimka pro uživatele upravena."
     acl_del_user = "Výjimka pro uživatele smazána."
+    moved_command = "Tento příkaz již není v textové formě podporován. Příkaz byl nahrazen příkazem /{invoked}"
     no_such_command = "Takový příkaz neznám. <:sadcat:576171980118687754>"
     spamming = "{user} Nespamuj tolik <:sadcat:576171980118687754>"
     insufficient_rights = "{user}, na použití tohoto příkazu nemáš právo."
@@ -83,11 +84,12 @@ class Messages:
                           f"`{prefix}karma revote [emote]`"
     karma_emote_not_found = "Emote jsem na serveru nenašel."
     karma_get_format = "Použití:\n" \
-                       f"`{prefix}karma getall`: " \
+                       "`/karma getall`: " \
                        "vypíše všechny emoty s hodnotou.\n" \
-                       f"`{prefix}karma get [emote]`: " \
+                       "`/karma get [emote]`: " \
                        "zobrazí hodnotu daného emotu."
     karma_get = "Hodnota {emote} je {value}."
+    karma_getall_response = "Ohodnocené emoji:"
     karma_get_emote_not_voted = "{emote} není ohodnocen."
     karma_give_format = "Toaster pls, formát je " \
                         f"`{prefix}karma give [number] [user(s)]`"
@@ -99,7 +101,7 @@ class Messages:
     karma_give_negative_success = "Karma byla úspěšně odebrána."
     karma_message_format = f"{prefix}karma message [url]"
     member_not_found = "{user} Nikoho takového jsem nenašel."
-    karma_lederboard_offser_error = "{user} Špatný offset, zadej kladné číslo"
+    karma_leaderboard_offset_error = "{user} Špatný offset, zadej kladné číslo"
     karma_web_title = "Celý leaderboard"
     karma_web = "https://karma.grillbot.cloud/"
     karma_transfer_format = f"Správný formát je `{prefix} karma transfer [od koho] [komu]`"
@@ -107,6 +109,8 @@ class Messages:
                               "Množství karmy: **{karma}**\n" \
                               "Množství pozitivně rozdané karmy: **{positive}** \n" \
                               "Množství negativně rozdané karmy: **{negative}**"
+
+    pet_brief = "Vytvoří gif z uživatele."
 
     role_add_denied = "{user}, na přidání role {role} nemáš právo."
     role_remove_denied = "{user}, na odebrání role {role} nemáš právo."
@@ -238,8 +242,8 @@ class Messages:
     subject_format = f"{prefix}subject [add, remove, update] [zkratka předmětu]"
     subject_update_error = "Aktualizace se nezdařila."
     subject_update_success = "Předměty byly úspěšně aktualizovány."
-    shorcut_brief = "Vrací stručné informace o předmětu"
-    shorcut_format = f"{prefix}{{command}} [zkratka předmětu]"
+    shortcut_brief = "Vrací stručné informace o předmětu"
+    shortcut_format = f"{prefix}{{command}} [zkratka předmětu]"
     tierboard_brief = "Založeno na `reviews` z průměru tier hodnot"
     tierboard_help = "Založeno na `reviews` z průměru tier hodnot.\n"\
                      "typ -> P, V, PVT, PVA\n"\
@@ -271,8 +275,9 @@ class Messages:
     absolvent_success = "Diplom byl úspěšne ověřen."
     absolvent_id_from_help = "Zadej svoje ID práce."
     absolvent_brief = "Příkaz pro ověření absolvování studia na FIT VUT"
+    absolvent_help_brief = "Vypíše help k příkazu /diplom"
     absolvent_help = f"{absolvent_brief} - zadejte CASE-SENSITIVE údaje ve formátu:\n" \
-        f"{prefix}{{command}} <Titul.> <Jméno> <Příjmení> <Číslo diplomu> <ID kvalifikační práce z URL na webu knihovny VUT <https://dspace.vutbr.cz/handle/11012/19121> >\n" \
+        "/diplom <Titul.> <Jméno> <Příjmení> <Číslo diplomu> <ID kvalifikační práce z URL na webu knihovny VUT <https://dspace.vutbr.cz/handle/11012/19121> >\n" \
         "např: Bc. Josef Novák 123456/2019 99999\n" \
         "(při <https://dspace.vutbr.cz/handle/11012/99999>)\n" \
         "Údaje slouží k jednorázovému ověření a nejsou nikam ukládány."
@@ -333,7 +338,7 @@ class Messages:
 
     warden_scan_brief = "Prohledá obrázky v aktuálním kanále a uloží je jako hash pro detekci repostu.\nlimit: [all | <int>]"
 
-    weather_brief = "Vypíše informace o počasí ve zvoleném městě"
+    weather_brief = "Vypíše informace o počasí ve zvoleném městě. Výchozí město je Brno."
 
     week_brief = "Vypíše, kolikátý je zrovna týden a jestli je sudý nebo lichý"
     week_warning = "Pro sudý/lichý se využívá kalendářní týden"

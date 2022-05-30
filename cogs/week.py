@@ -5,7 +5,7 @@ from disnake.ext import commands
 
 import utils
 from config.app_config import config
-from config.messages import Messages as messages
+from config.messages import Messages
 from config import cooldowns
 
 
@@ -14,8 +14,8 @@ class week(commands.Cog):
         self.bot = bot
 
     @cooldowns.default_cooldown
-    @commands.command(aliases=["tyden", "týden", "tyzden", "týždeň"], brief=messages.week_brief)
-    async def week(self, ctx: commands.Context):
+    @commands.slash_command(name="week", description=Messages.week_brief)
+    async def week(self, inter: disnake.ApplicationCommandInteraction):
         """See if the current week is odd or even"""
         cal_week = date.today().isocalendar()[1]
         stud_week = cal_week - config.starting_week
@@ -25,11 +25,11 @@ class week(commands.Cog):
         embed = disnake.Embed(title="Týden", color=0xE5DC37)
         embed.add_field(name="Studijní", value=stud_week)
         embed.add_field(name="Kalendářní", value=f"{cal_type} ({cal_week})")
-        embed.add_field(name="Poznámka", value=messages.week_warning, inline=False)
+        embed.add_field(name="Poznámka", value=Messages.week_warning, inline=False)
 
-        utils.add_author_footer(embed, ctx.author)
+        utils.add_author_footer(embed, inter.author)
 
-        await ctx.send(embed=embed)
+        await inter.response.send_message(embed=embed)
 
 
 def setup(bot):

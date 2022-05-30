@@ -18,30 +18,37 @@ class Absolvent(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command(
-        aliases=["absolvent"],
-        brief=Messages.absolvent_brief,
-        description=utils.fill_message("absolvent_help", command="diplom")
-    )
-    async def diplom(self, ctx, degree, name, surname, diploma_number, thesis_web_id):
+    @commands.slash_command(name="diplom_help", description=Messages.absolvent_help_brief)
+    async def diplom_help(self, inter: disnake.ApplicationCommandInteraction):
+        await inter.response.send_message(Messages.absolvent_help)
+
+    @commands.slash_command(name="diplom", description=Messages.absolvent_brief)
+    async def diplom(self, inter: disnake.ApplicationCommandInteraction, 
+                           degree: str, 
+                           name: str, 
+                           surname: str, 
+                           diploma_number: str, 
+                           thesis_web_id: int
+                           ):
         """Command for diploma verification and honourable role addition
 
-        :param ctx: disnake context
+        :param inter: disnake context
         :param name: first name (case-sensitive)
         :param surname: last name (case-sensitive)
         :param degree: strictly either "Bc." or "Ing." (case-sensitive)
         :param diploma_number: ID of diploma, in format NNNNNN/YYYY
         :param thesis_web_id: ID from URL https://dspace.vutbr.cz/handle/11012/<num> can be discovered via https://dspace.vutbr.cz/handle/11012/19121 
         """
+        await inter.response.defer(with_message=True, ephemeral=True)
         if thesis_web_id == "19121":
-            await ctx.send(Messages.absolvent_id_from_help)
+            await inter.edit_original_message(Messages.absolvent_id_from_help)
             return
 
         # prepare
         htmlparser = etree.HTMLParser()
         diploma_year = re.search(r"\d+/(\d+)", diploma_number)
         if not diploma_year:
-            await ctx.send(Messages.absolvent_wrong_diploma_format)
+            await inter.edit_original_message(Messages.absolvent_wrong_diploma_format)
             return
         diploma_year = diploma_year.group(1)
         full_name_without_degree = f"{name} {surname}"
@@ -55,15 +62,12 @@ class Absolvent(commands.Cog):
             return only_ascii
 
         # get "surname name" for bot database fot the current command caller
-        name_from_db = user_r.get_user_by_id(ctx.author.id).name
+        name_from_db = user_r.get_user_by_id(inter.author.id).name
         # remove diacritics from the user-supplied name
         name_from_user_without_diacritics = remove_accents(f"{surname} {name}")
 
-        if ctx.guild:
-            await ctx.message.delete()
-
         if name_from_db != name_from_user_without_diacritics:
-            await ctx.send(Messages.absolvent_wrong_name)
+            await inter.edit_original_message(Messages.absolvent_wrong_name)
             return
 
         # CHECK OWNERSHIP, TYPE AND YEAR OF THE QUALIFICATION WORK / THESIS
@@ -108,7 +112,7 @@ class Absolvent(commands.Cog):
             )
         )
         
-        #await ctx.send(f"""
+        #await inter.edit_original_message(f"""
         #DEBUG:
         #nf: {not_found}
         #mt: {master_thesis}
@@ -120,12 +124,12 @@ class Absolvent(commands.Cog):
         #""")
 
         if "Page cannot be found" in not_found:
-            await ctx.send(Messages.absolvent_thesis_not_found_error)
+            await inter.edit_original_message(Messages.absolvent_thesis_not_found_error)
             return
 
         habilitation_year = re.search(r"(\d+)-\d+-\d+", habilitation_date)
         if habilitation_year is None:
-            await ctx.send(Messages.absolvent_thesis_not_found_error)
+            await inter.edit_original_message(Messages.absolvent_thesis_not_found_error)
             return
         habilitation_year = habilitation_year.group(1)
 
@@ -136,7 +140,7 @@ class Absolvent(commands.Cog):
             and result == "práce byla úspěšně obhájena"
             and thesis_author_without_degree_surname_first == full_name_without_degree_surname_first
         ):
-            await ctx.send(Messages.absolvent_web_error)
+            await inter.edit_original_message(Messages.absolvent_web_error)
             return
         
         # DIPLOMA VALIDITY CHECK
@@ -177,7 +181,7 @@ class Absolvent(commands.Cog):
             and "úspěšně ověřen" in absolventText
             and absolventText.endswith(", Fakulta informačních technologií")
         ):
-            await ctx.send(Messages.absolvent_diploma_error)
+            await inter.edit_original_message(Messages.absolvent_diploma_error)
             return
 
         guild = self.bot.get_guild(config.guild_id)
@@ -187,16 +191,16 @@ class Absolvent(commands.Cog):
         if degree == "Ing.":
             role = disnake.utils.get(guild.roles, id=config.ing_role_id)
         if role:
-            member = guild.get_member(ctx.author.id)
+            member = guild.get_member(inter.author.id)
             for drop_role in member.roles:
                 if "Dropout" in drop_role.name:
                     await member.remove_roles(drop_role, reason="Diploma verification")
             await member.add_roles(role)
-            await ctx.send(Messages.absolvent_success)
+            await inter.edit_original_message(Messages.absolvent_success)
 
     @diplom.error
-    async def diplom_error(self, ctx, error):
-        await ctx.send(utils.fill_message("absolvent_help", command=ctx.invoked_with))
+    async def diplom_error(self, inter: disnake.ApplicationCommandInteraction, error):
+        await inter.edit_original_message(utils.fill_message("absolvent_help", command=inter.application_command))
 
 
 def setup(bot):

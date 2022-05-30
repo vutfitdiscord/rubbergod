@@ -17,12 +17,12 @@ class Pet(commands.Cog):
         self.bot = bot
 
     @cooldowns.short_cooldown
-    @commands.command()
-    async def pet(self, ctx, user: disnake.Member = None):
+    @commands.slash_command(name="pet", description=Messages.pet_brief)
+    async def pet(self, inter: disnake.ApplicationCommandInteraction, user: disnake.Member = None):
         if user is None:
-            user = ctx.author
+            user = inter.author
         if not user.avatar:
-            await ctx.send(Messages.unsupported_image)
+            await inter.response.send_message(Messages.unsupported_image)
             return
         url = user.display_avatar.with_format('jpg')
         response = requests.get(url)
@@ -54,12 +54,12 @@ class Pet(commands.Cog):
                            append_images=frames[1:], duration=40,
                            loop=0, transparency=0, disposal=2, optimize=False)
             image_binary.seek(0)
-            await ctx.send(file=disnake.File(fp=image_binary, filename="pet.gif"))
+            await inter.response.send_message(file=disnake.File(fp=image_binary, filename="pet.gif"))
 
     @pet.error
-    async def pet_error(self, ctx, error):
+    async def pet_error(self, inter: disnake.ApplicationCommandInteraction, error):
         if isinstance(error, commands.BadArgument):
-            await ctx.send(utils.fill_message("member_not_found", user=ctx.author.id))
+            await inter.response.send_message(utils.fill_message("member_not_found", user=inter.author.id))
 
 
 def setup(bot):
