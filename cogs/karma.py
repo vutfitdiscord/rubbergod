@@ -246,10 +246,13 @@ class Karma(commands.Cog):
     async def karma_error(self, inter: disnake.ApplicationCommandInteraction, error):
         if isinstance(error, commands.MemberNotFound):
             await inter.response.send_message(utils.fill_message("member_not_found", user=inter.author.id))
+            return
         if isinstance(error, commands.MessageNotFound):
             await inter.response.send_message(utils.fill_message("karma_message_format", user=inter.author.id))
+            return
         if isinstance(error, commands.CheckFailure):
             await inter.response.send_message(utils.fill_message("insufficient_rights", user=inter.author.id))
+            return
 
     async def validate_leaderboard_offset(self, offset: int, inter) -> bool:
         if not 0 < offset < 100000000:  # Any value larger than the server
