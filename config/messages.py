@@ -84,9 +84,9 @@ class Messages:
                           f"`{prefix}karma revote [emote]`"
     karma_emote_not_found = "Emote jsem na serveru nenašel."
     karma_get_format = "Použití:\n" \
-                       f"`/karma getall`: " \
+                       "`/karma getall`: " \
                        "vypíše všechny emoty s hodnotou.\n" \
-                       f"`/karma get [emote]`: " \
+                       "`/karma get [emote]`: " \
                        "zobrazí hodnotu daného emotu."
     karma_get = "Hodnota {emote} je {value}."
     karma_getall_response = "Ohodnocené emoji:"
@@ -99,7 +99,7 @@ class Messages:
                                "ne {input}] [user(s)]` "
     karma_give_success = "Karma byla úspěšně přidána."
     karma_give_negative_success = "Karma byla úspěšně odebrána."
-    karma_message_format = f"Zpráva nenalezena. Zkontroluj formát [url]"
+    karma_message_format = "Zpráva nenalezena. Zkontroluj formát [url]"
     member_not_found = "{user} Nikoho takového jsem nenašel."
     karma_leaderboard_offset_error = "{user} Špatný offset, zadej kladné číslo"
     karma_web_title = "Celý leaderboard"
@@ -277,7 +277,7 @@ class Messages:
     absolvent_brief = "Příkaz pro ověření absolvování studia na FIT VUT"
     absolvent_help_brief = "Vypíše help k příkazu /diplom"
     absolvent_help = f"{absolvent_brief} - zadejte CASE-SENSITIVE údaje ve formátu:\n" \
-        f"/diplom <Titul.> <Jméno> <Příjmení> <Číslo diplomu> <ID kvalifikační práce z URL na webu knihovny VUT <https://dspace.vutbr.cz/handle/11012/19121> >\n" \
+        "/diplom <Titul.> <Jméno> <Příjmení> <Číslo diplomu> <ID kvalifikační práce z URL na webu knihovny VUT <https://dspace.vutbr.cz/handle/11012/19121> >\n" \
         "např: Bc. Josef Novák 123456/2019 99999\n" \
         "(při <https://dspace.vutbr.cz/handle/11012/99999>)\n" \
         "Údaje slouží k jednorázovému ověření a nejsou nikam ukládány."
