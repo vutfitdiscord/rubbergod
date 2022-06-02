@@ -156,9 +156,10 @@ class Karma(commands.Cog):
         await msg.add_reaction("🔁")
 
     @cooldowns.default_cooldown
-    @commands.group(brief=messages.karma_brief, usage=' ')
+    @commands.group()
     async def karma(self, ctx: commands.Context):
-        pass
+        if ctx.invoked_subcommand is None:
+            await ctx.reply(utils.fill_message("moved_command", invoked="karma"))
 
     @commands.check(utils.is_bot_admin)
     @karma.command(brief=messages.karma_revote_brief)
