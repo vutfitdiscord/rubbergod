@@ -50,7 +50,8 @@ class Urban(commands.Cog):
 
     async def urban_pages(self, inter, embeds):
         """Send message and handle pagination for 300 seconds"""
-        await inter.response.send_message(embed=embeds[0], view=EmbedView(embeds))
+        view = EmbedView(embeds)
+        view.message = await inter.response.send_message(embed=embeds[0], view=view)
 
     @cooldowns.short_cooldown
     @commands.slash_command(name="urban", description=Messages.urban_brief)

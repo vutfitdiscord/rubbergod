@@ -60,7 +60,8 @@ class Review(commands.Cog):
             if embeds is None or len(embeds) == 0:
                 await ctx.reply(Messages.review_wrong_subject)
                 return
-            await ctx.reply(embed=embeds[0], view=ReviewView(self.bot, embeds))
+            view = ReviewView(self.bot, embeds)
+            view.message = await ctx.reply(embed=embeds[0], view=view)
 
     @reviews.command(brief=Messages.review_add_brief)
     async def add(self, ctx, subject=None, tier: int = None, *args):
@@ -257,7 +258,8 @@ class Review(commands.Cog):
             embed.description = ""
             embeds.append(embed)
 
-        await ctx.reply(embed=embeds[0], view=EmbedView(embeds))
+        view = EmbedView(embeds)
+        view.message = await ctx.reply(embed=embeds[0], view=view)
 
     @reviews.error
     @subject.error

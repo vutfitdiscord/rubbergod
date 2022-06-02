@@ -381,7 +381,7 @@ class Karma(BaseFeature):
             embed.add_field(name=Messages.karma_web_title, value=value)
 
         view = EmbedView([embed], roll_arroud=False, end_arrow=False, callback=self.update_embed)
-        await ctx.send(embed=embed, view=view)
+        view.message = await ctx.send(embed=embed, view=view)
 
     def gen_leaderboard_content(self, attribute, start, column):
         board = self.repo.get_leaderboard(attribute, start-1)

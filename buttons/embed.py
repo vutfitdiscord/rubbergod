@@ -1,7 +1,9 @@
+import traceback
 import disnake
 from typing import Callable, List
 
 from config.messages import Messages
+from config.app_config import config
 import utils
 
 
@@ -100,3 +102,28 @@ class EmbedView(disnake.ui.View):
             self.roll_arroud
         )
         await interaction.response.edit_message(embed=self.embed)
+
+    async def on_timeout(self):
+        self.clear_items()
+        await self.message.edit(view=self)
+
+    async def on_error(self, error, item: disnake.ui.Item, interaction: disnake.MessageInteraction):
+        channel_out = interaction.bot.get_channel(config.bot_dev_channel)
+        embed = disnake.Embed(
+            title=f"Ignoring exception in interacion '{interaction.data.custom_id}'",
+            color=0xFF0000
+        )
+        embed.add_field(name="Guild", value=interaction.guild)
+        embed.add_field(name="Autor", value=interaction.author.display_name)
+        embed.add_field(name="Expirace (UTC)", value=interaction.expires_at.strftime("%Y-%m-%d %H:%M:%S"))
+        embed.add_field(name="Exception", value=error)
+        embed.add_field(name="Zpráva", value=interaction.message.jump_url, inline=False)
+        await channel_out.send(embed=embed)
+        output = traceback.format_exc()
+        output = utils.cut_string(output, 1900)
+        for message in output:
+            await channel_out.send(f"```\n{message}```")
+        
+        # remove interactions because of error
+        self.clear_items()
+        await self.message.edit(view=self)
