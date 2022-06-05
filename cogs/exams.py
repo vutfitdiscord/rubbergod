@@ -27,8 +27,11 @@ class Exams(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
 
-        self.subscribed_guilds: List[int] = []
+        self.subscribed_guilds:List[int] = config.exams_default_subscribed_guilds
         self.exams_repo = ExamsTermsMessageRepo()
+
+        if self.subscribed_guilds:
+            self.update_terms_task.start()
 
     def cog_unload(self):
         if self.update_terms_task.is_running():
