@@ -62,6 +62,5 @@ class Pet(commands.Cog):
             await inter.response.send_message(utils.fill_message("member_not_found", user=inter.author.id))
             return True
 
-
 def setup(bot):
     bot.add_cog(Pet(bot))
