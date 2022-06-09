@@ -1,7 +1,6 @@
 from config.messages import Messages
 import disnake
 from disnake.ext import commands
-from typing import Union
 import utils
 
 from PIL import Image, ImageDraw
@@ -61,6 +60,7 @@ class Pet(commands.Cog):
         if isinstance(error, commands.MemberNotFound):
             await inter.response.send_message(utils.fill_message("member_not_found", user=inter.author.id))
             return True
+
 
 def setup(bot):
     bot.add_cog(Pet(bot))

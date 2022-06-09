@@ -204,12 +204,7 @@ class Karma(commands.Cog):
         await self.karma.karma_transfer(ctx.message)
 
     @cooldowns.long_cooldown
-    @commands.slash_command(name="boards", guild_ids=[config.guild_id])
-    async def boards(self, inter):
-        pass
-
-    @cooldowns.long_cooldown
-    @boards.sub_command(name="leaderboard", description=messages.karma_leaderboard_brief)
+    @_karma.sub_command(name="leaderboard", description=messages.karma_leaderboard_brief)
     async def leaderboard(self, inter: disnake.ApplicationCommandInteraction, start : int = 1):
         if not await self.validate_leaderboard_offset(start, inter):
             return
@@ -217,7 +212,7 @@ class Karma(commands.Cog):
         await self.check.botroom_check(inter)
 
     @cooldowns.long_cooldown
-    @boards.sub_command(name="bajkarboard", description=messages.karma_bajkarboard_brief)
+    @_karma.sub_command(name="bajkarboard", description=messages.karma_bajkarboard_brief)
     async def bajkarboard(self, inter: disnake.ApplicationCommandInteraction, start : int = 1):
         if not await self.validate_leaderboard_offset(start, inter):
             return
@@ -226,7 +221,7 @@ class Karma(commands.Cog):
         await self.check.botroom_check(inter)
 
     @cooldowns.long_cooldown
-    @boards.sub_command(name="givingboard", description=messages.karma_givingboard_brief)
+    @_karma.sub_command(name="givingboard", description=messages.karma_givingboard_brief)
     async def givingboard(self, inter: disnake.ApplicationCommandInteraction, start : int = 1):
         if not await self.validate_leaderboard_offset(start, inter):
             return
@@ -235,7 +230,7 @@ class Karma(commands.Cog):
         await self.check.botroom_check(inter)
 
     @cooldowns.long_cooldown
-    @boards.sub_command(name="ishaboard", description=messages.karma_ishaboard_brief)
+    @_karma.sub_command(name="ishaboard", description=messages.karma_ishaboard_brief)
     async def ishaboard(self, inter: disnake.ApplicationCommandInteraction, start : int = 1):
         if not await self.validate_leaderboard_offset(start, inter):
             return

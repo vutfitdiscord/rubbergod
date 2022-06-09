@@ -30,7 +30,7 @@ class Name_day(commands.Cog):
         for i in res:
             names.append(i["name"])
         await inter.edit_original_message(Messages.name_day_sk.format(name=", ".join(names)))
-    
+
 
 def setup(bot):
     bot.add_cog(Name_day(bot))

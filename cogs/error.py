@@ -110,5 +110,6 @@ class Error(commands.Cog):
             for message in output:
                 await channel.send(f"```\n{message}\n```")
 
+
 def setup(bot):
     bot.add_cog(Error(bot))
