@@ -77,6 +77,10 @@ class Error(commands.Cog):
         if isinstance(error, sqlalchemy.exc.InternalError):
             session.rollback()
             return
+        
+        if isinstance(error, disnake.InteractionTimedOut):
+            await inter.response.send_message(Messages.command_timed_out)
+            return
 
         if isinstance(error, commands.CommandOnCooldown):
             await inter.response.send_message(utils.fill_message("spamming", user=inter.author.id))

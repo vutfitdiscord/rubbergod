@@ -14,11 +14,12 @@ class weather(commands.Cog):
 
     @commands.slash_command(name="pocasi", description=Messages.weather_brief)
     async def weather(self, inter: disnake.ApplicationCommandInteraction, place: str = "Brno"):
+        await inter.response.defer()
         token = config.weather_token
 
         place = place[:100]
         if "&" in place:
-            return await inter.response.send_message("Takhle se žádné město určitě nejmenuje.")
+            return await inter.edit_original_message("Takhle se žádné město určitě nejmenuje.")
 
         url = (
             "http://api.openweathermap.org/data/2.5/weather?q="
@@ -26,7 +27,7 @@ class weather(commands.Cog):
             + "&units=metric&lang=cz&appid="
             + token
         )
-        res = requests.get(url).json()
+        res = requests.get(url, timeout=10).json()
 
         if str(res["cod"]) == "200":
             description = "Aktuální počasí v městě " + res["name"] + ", " + res["sys"]["country"]
@@ -50,14 +51,14 @@ class weather(commands.Cog):
 
             utils.add_author_footer(embed, inter.author)
 
-            await inter.response.send_message(embed=embed)
+            await inter.edit_original_message(embed=embed)
 
         elif str(res["cod"]) == "404":
-            await inter.response.send_message("Město nenalezeno")
+            await inter.edit_original_message("Město nenalezeno")
         elif str(res["cod"]) == "401":
-            await inter.response.send_message("Rip token -> Rebel pls fix")
+            await inter.edit_original_message("Rip token -> Rebel pls fix")
         else:
-            await inter.response.send_message(
+            await inter.edit_original_message(
                 "Město nenalezeno! <:pepeGun:484470874246742018> (" + res["message"] + ")"
             )
 

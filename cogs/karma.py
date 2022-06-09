@@ -112,7 +112,7 @@ class Karma(commands.Cog):
         return 0, {"meta": meta, "content": output}
 
     @cooldowns.default_cooldown
-    @commands.slash_command(name="karma")
+    @commands.slash_command(name="karma", guild_ids=[config.guild_id])
     async def _karma(self, inter):
         pass
     
@@ -128,7 +128,7 @@ class Karma(commands.Cog):
         await self.check.botroom_check(inter)
 
     @commands.cooldown(rate=1, per=300.0, type=commands.BucketType.guild)
-    @_karma.sub_command(description=messages.karma_getall_brief, guild_ids=config.guild_id)
+    @_karma.sub_command(description=messages.karma_getall_brief)
     async def getall(self, inter: disnake.ApplicationCommandInteraction):
         try:
             await inter.response.send_message(messages.karma_getall_response)
@@ -138,7 +138,7 @@ class Karma(commands.Cog):
             return
 
     @cooldowns.default_cooldown
-    @_karma.sub_command(description=messages.karma_get_brief, guild_ids=config.guild_id)
+    @_karma.sub_command(description=messages.karma_get_brief)
     async def get(self, inter: disnake.ApplicationCommandInteraction, emoji):
         try:
            await self.karma.emoji_get_value(inter, emoji)
@@ -204,7 +204,12 @@ class Karma(commands.Cog):
         await self.karma.karma_transfer(ctx.message)
 
     @cooldowns.long_cooldown
-    @commands.slash_command(name="leaderboard", description=messages.karma_leaderboard_brief)
+    @commands.slash_command(name="boards", guild_ids=[config.guild_id])
+    async def boards(self, inter):
+        pass
+
+    @cooldowns.long_cooldown
+    @boards.sub_command(name="leaderboard", description=messages.karma_leaderboard_brief)
     async def leaderboard(self, inter: disnake.ApplicationCommandInteraction, start : int = 1):
         if not await self.validate_leaderboard_offset(start, inter):
             return
@@ -212,7 +217,7 @@ class Karma(commands.Cog):
         await self.check.botroom_check(inter)
 
     @cooldowns.long_cooldown
-    @commands.slash_command(name="bajkarboard", description=messages.karma_bajkarboard_brief)
+    @boards.sub_command(name="bajkarboard", description=messages.karma_bajkarboard_brief)
     async def bajkarboard(self, inter: disnake.ApplicationCommandInteraction, start : int = 1):
         if not await self.validate_leaderboard_offset(start, inter):
             return
@@ -221,7 +226,7 @@ class Karma(commands.Cog):
         await self.check.botroom_check(inter)
 
     @cooldowns.long_cooldown
-    @commands.slash_command(name="givingboard", description=messages.karma_givingboard_brief)
+    @boards.sub_command(name="givingboard", description=messages.karma_givingboard_brief)
     async def givingboard(self, inter: disnake.ApplicationCommandInteraction, start : int = 1):
         if not await self.validate_leaderboard_offset(start, inter):
             return
@@ -230,7 +235,7 @@ class Karma(commands.Cog):
         await self.check.botroom_check(inter)
 
     @cooldowns.long_cooldown
-    @commands.slash_command(name="ishaboard", description=messages.karma_ishaboard_brief)
+    @boards.sub_command(name="ishaboard", description=messages.karma_ishaboard_brief)
     async def ishaboard(self, inter: disnake.ApplicationCommandInteraction, start : int = 1):
         if not await self.validate_leaderboard_offset(start, inter):
             return

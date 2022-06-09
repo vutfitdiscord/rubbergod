@@ -1,7 +1,7 @@
 from config.messages import Messages
 import disnake
 from disnake.ext import commands
-
+from typing import Union
 import utils
 
 from PIL import Image, ImageDraw
@@ -18,14 +18,14 @@ class Pet(commands.Cog):
 
     @cooldowns.short_cooldown
     @commands.slash_command(name="pet", description=Messages.pet_brief)
-    async def pet(self, inter: disnake.ApplicationCommandInteraction, user: disnake.Member = None):
+    async def pet(self, inter: disnake.ApplicationCommandInteraction, user: Union[disnake.User, disnake.Member] = None):
         if user is None:
             user = inter.author
         if not user.avatar:
             await inter.response.send_message(Messages.unsupported_image)
             return
         url = user.display_avatar.with_format('jpg')
-        response = requests.get(url)
+        response = requests.get(url, timeout=10)
         avatarFull = Image.open(BytesIO(response.content))
 
         frames = []
@@ -55,6 +55,12 @@ class Pet(commands.Cog):
                            loop=0, transparency=0, disposal=2, optimize=False)
             image_binary.seek(0)
             await inter.response.send_message(file=disnake.File(fp=image_binary, filename="pet.gif"))
+
+    @pet.error
+    async def pet_error(self, inter: disnake.ApplicationCommandInteraction, error):
+        if isinstance(error, commands.MemberNotFound):
+            await inter.response.send_message(utils.fill_message("member_not_found", user=inter.author.id))
+            return True
 
 
 def setup(bot):
