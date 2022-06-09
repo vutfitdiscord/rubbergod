@@ -18,7 +18,7 @@ class Pet(commands.Cog):
 
     @cooldowns.short_cooldown
     @commands.slash_command(name="pet", description=Messages.pet_brief)
-    async def pet(self, inter: disnake.ApplicationCommandInteraction, user: Union[disnake.User, disnake.Member] = None):
+    async def pet(self, inter: disnake.ApplicationCommandInteraction, user: disnake.User = None):
         if user is None:
             user = inter.author
         if not user.avatar:
