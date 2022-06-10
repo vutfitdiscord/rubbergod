@@ -31,6 +31,7 @@ class Messages:
     acl_del_user = "Výjimka pro uživatele smazána."
     moved_command = "Tento příkaz již není v textové formě podporován. Příkaz byl nahrazen příkazem /{invoked}"
     no_such_command = "Takový příkaz neznám. <:sadcat:576171980118687754>"
+    command_timed_out = "Příkaz nereagoval a byl nečekaně ukončen."
     spamming = "{user} Nespamuj tolik <:sadcat:576171980118687754>"
     insufficient_rights = "{user}, na použití tohoto příkazu nemáš právo."
     helper_plus_only = "Na tohle mají práva jen Helper+. <:KKomrade:484470873001164817>"

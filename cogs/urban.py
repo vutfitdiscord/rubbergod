@@ -51,21 +51,22 @@ class Urban(commands.Cog):
     async def urban_pages(self, inter, embeds):
         """Send message and handle pagination for 300 seconds"""
         view = EmbedView(embeds)
-        view.message = await inter.response.send_message(embed=embeds[0], view=view)
+        view.message = await inter.edit_original_message(embed=embeds[0], view=view)
 
     @cooldowns.short_cooldown
     @commands.slash_command(name="urban", description=Messages.urban_brief)
     async def urban(self, inter: disnake.ApplicationCommandInteraction, expression):
+        await inter.response.defer(with_message=True)
         embeds = None
         try:
-            response = requests.get(f"http://api.urbandictionary.com/v0/define?term={expression}")
+            response = requests.get(f"http://api.urbandictionary.com/v0/define?term={expression}", timeout=10)
             dict = response.json()
             response.raise_for_status()
 
         except requests.HTTPError as http_err:
-            await inter.response.send_message(f"HTTP error occurred: {http_err}")
+            await inter.edit_original_message(f"HTTP error occurred: {http_err}")
         except Exception as err:
-            await inter.response.send_message(f"Error occurred: {err}")
+            await inter.edit_original_message(f"Error occurred: {err}")
         else:
             # Request was successful
             embeds = self.urban_embeds(inter.author, dict)
@@ -73,7 +74,7 @@ class Urban(commands.Cog):
         if embeds:
             await self.urban_pages(inter, embeds)
         else:
-            await inter.response.send_message(Messages.urban_not_found)
+            await inter.edit_original_message(Messages.urban_not_found)
         return
 
 

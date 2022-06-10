@@ -10,10 +10,11 @@ class Studijni(commands.Cog):
 
     @commands.slash_command(name="studijni", description=Messages.studijni_brief)
     async def studijni(self, inter: disnake.ApplicationCommandInteraction):
+        await inter.response.defer(with_message=True)
         link = "https://www.fit.vut.cz/fit/room/C109/.cs"
         htmlparser = etree.HTMLParser()
         session = requests.session()
-        result = session.get(link)
+        result = session.get(link, timeout=10)
         xDoc2 = etree.fromstring(result.text, htmlparser)
         hours_div = xDoc2.xpath("//*[b[contains(text(),'Úřední hodiny')]]//following-sibling::div")            
         embed = disnake.Embed(title=Messages.studijni_title, url=link)
@@ -33,7 +34,7 @@ class Studijni(commands.Cog):
                 hours = Messages.studijni_web_error
         embed.add_field(name=Messages.studijni_office_hours, value=hours, inline=False)
         add_author_footer(embed, inter.author)
-        await inter.response.send_message(embed=embed)
+        await inter.edit_original_message(embed=embed)
 
 
 def setup(bot):
