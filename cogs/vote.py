@@ -247,13 +247,17 @@ class Vote(commands.Cog):
         if len(all_most_voted) == 1:
             option = all_most_voted[0]
 
-            return singularise(fill_message(
-                "vote_result" if final else "vote_winning",
-                winning_emoji=(option.emoji if option.is_unicode else str(self.bot.get_emoji(int(option.emoji)))),
-                winning_option=option.message,
-                votes=option.count,
-                question=vote.question
-            ))
+            return singularise(
+                fill_message(
+                    "vote_result" if final else "vote_winning",
+                    winning_emoji=(
+                        option.emoji if option.is_unicode else str(self.bot.get_emoji(int(option.emoji)))
+                    ),
+                    winning_option=option.message,
+                    votes=option.count,
+                    question=vote.question,
+                )
+            )
         else:
             emoji_str = ""
             for e in all_most_voted:

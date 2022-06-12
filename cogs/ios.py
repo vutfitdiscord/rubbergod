@@ -30,13 +30,14 @@ def unchanged_for(date, format_str):
     date = datetime.datetime.strptime(date, format_str)
     return (now - date.replace(year=now.year)).total_seconds() // 60
 
+
 # filter people and keep only those containing "BIT" or "FEKT" in person.year
 def filter_year(resources):
     # get unique logins and people objects from db
     logins = set(login for res_data in resources.values() for login in res_data.keys())
     people = {
         login: session.query(Valid_person).filter(Valid_person.login == login).one_or_none()
-            for login in logins
+        for login in logins
     }
 
     # keep only people with "BIT" or "FEKT" in their person.year
@@ -147,32 +148,40 @@ def format_time(minutes):
 
 
 class RESOURCE_TYPE:
-    MEMORY      = 'MEMORY'
-    SEMAPHORE   = 'SEMAPHORE'
-    PROCESS     = 'PROCESS'
-    FILE        = 'FILE'
+    MEMORY = 'MEMORY'
+    SEMAPHORE = 'SEMAPHORE'
+    PROCESS = 'PROCESS'
+    FILE = 'FILE'
+
 
 # inflected resource names to match the czech language
 _inflected_resources = {
-    RESOURCE_TYPE.MEMORY:   ('sdílená paměť', 'sdílené paměti', 'ztracené'),
-    RESOURCE_TYPE.SEMAPHORE:('semafory',      'semaforů',       'ležících'),
-    RESOURCE_TYPE.PROCESS:  ('procesy',       'procesů',        'běžících'),
+    RESOURCE_TYPE.MEMORY:    ('sdílená paměť', 'sdílené paměti', 'ztracené'),
+    RESOURCE_TYPE.SEMAPHORE: ('semafory',      'semaforů',       'ležících'),
+    RESOURCE_TYPE.PROCESS:   ('procesy',       'procesů',        'běžících'),
 }
+
+
 def insult_login(parsed_items, system, res_type):
     output_array = []
     for login, array in parsed_items.items():
         user = session.query(Permit).filter(Permit.login == login).one_or_none()
 
         if not user:
-            msg = f"Na {system} leží {_inflected_resources[res_type][0]} nějakého `{login}` co není na serveru."
+            msg = f"Na {system} leží {_inflected_resources[res_type][0]}" \
+                f"nějakého `{login}` co není na serveru."
         else:
             count = len(array)
             avg_time = int(sum(array) // count)
 
-            msg = (f"{utils.generate_mention(user.discord_ID)} máš na {system} `{count}` {_inflected_resources[res_type][1]}, "
-                   f"{_inflected_resources[res_type][2]} průměrně `{format_time(avg_time)}`, ty prase.")
+            msg = (
+                f"{utils.generate_mention(user.discord_ID)} máš na"
+                f"{system} `{count}` {_inflected_resources[res_type][1]}, "
+                f"{_inflected_resources[res_type][2]} průměrně `{format_time(avg_time)}`, ty prase."
+            )
         output_array += [msg]
     return output_array
+
 
 def insult_login_shm(parsed_files, system):
     output_array = []
@@ -195,6 +204,7 @@ def insult_login_shm(parsed_files, system):
                 msg += "\n\t\tNemáš v názvu tvůj login, takže můžeš mit kolize s ostatními, ty prase."
         output_array += [msg]
     return output_array
+
 
 async def print_output(bot, channel, system, resources):
     out_arr = []
@@ -246,10 +256,10 @@ class IOS(commands.Cog):
             parsed_semaphores, parsed_files = parse_semaphores(semaphores)
             parsed_processes = parse_processes(processes)
             parsed_resources = {
-                RESOURCE_TYPE.MEMORY:   parsed_memory,
-                RESOURCE_TYPE.SEMAPHORE:parsed_semaphores,
-                RESOURCE_TYPE.FILE:     parsed_files,
-                RESOURCE_TYPE.PROCESS:  parsed_processes,
+                RESOURCE_TYPE.MEMORY:    parsed_memory,
+                RESOURCE_TYPE.SEMAPHORE: parsed_semaphores,
+                RESOURCE_TYPE.FILE:      parsed_files,
+                RESOURCE_TYPE.PROCESS:   parsed_processes,
             }
             await print_output(self.bot, channel, "merlinovi", filter_year(parsed_resources))
         except IndexError:
@@ -267,9 +277,9 @@ class IOS(commands.Cog):
             parsed_semaphores, _ = parse_semaphores(semaphores)
             parsed_processes = parse_processes(processes)
             parsed_resources = {
-                RESOURCE_TYPE.MEMORY:   parsed_memory,
-                RESOURCE_TYPE.SEMAPHORE:parsed_semaphores,
-                RESOURCE_TYPE.PROCESS:  parsed_processes,
+                RESOURCE_TYPE.MEMORY:    parsed_memory,
+                RESOURCE_TYPE.SEMAPHORE: parsed_semaphores,
+                RESOURCE_TYPE.PROCESS:   parsed_processes,
             }
             await print_output(self.bot, channel, "evě", filter_year(parsed_resources))
         except IndexError:

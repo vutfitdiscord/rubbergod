@@ -39,7 +39,7 @@ class Error(commands.Cog):
             slash_comms = [command.name for command in self.bot.slash_commands]
             invoked = ctx.message.content.split(" ")[0][1:]
             prefix = ctx.message.content[:1]
-            
+
             if invoked in slash_comms:
                 await ctx.reply(utils.fill_message("moved_command", invoked=invoked))
             elif prefix not in config.ignored_prefixes:
@@ -61,7 +61,7 @@ class Error(commands.Cog):
         if ctx.guild and ctx.guild.id != config.guild_id:
             embed.add_field(name="Guild", value=ctx.guild.name)
         embed.add_field(name="Link", value=ctx.message.jump_url, inline=False)
-        
+
         channel = self.bot.get_channel(config.bot_dev_channel)
 
         output = utils.cut_string(output, 1900)
@@ -77,7 +77,7 @@ class Error(commands.Cog):
         if isinstance(error, sqlalchemy.exc.InternalError):
             session.rollback()
             return
-        
+
         if isinstance(error, disnake.InteractionTimedOut):
             await inter.response.send_message(Messages.command_timed_out)
             return
@@ -95,7 +95,7 @@ class Error(commands.Cog):
         if inter.guild and inter.guild.id != config.guild_id:
             embed.add_field(name="Guild", value=inter.guild.name)
         embed.add_field(name="Link", value=url, inline=False)
-        
+
         channel = self.bot.get_channel(config.bot_dev_channel)
 
         # send context of command with personal information to DM

@@ -27,7 +27,9 @@ class StreamLinks(commands.Cog):
         self.repo = StreamLinksRepo()
 
     @cooldowns.default_cooldown
-    @commands.group(brief=Messages.streamlinks_brief, usage="<subject>",
+    @commands.group(
+        brief=Messages.streamlinks_brief,
+        usage="<subject>",
         aliases=["streamlist", "steamlink", "streamlink", "steamlinks", "stream", "steam", "links", "sl"]
     )
     async def streamlinks(self, ctx: commands.Context):

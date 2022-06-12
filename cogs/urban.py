@@ -1,6 +1,5 @@
 """Inspired by https://github.com/Czechbol/Amadeus/blob/master/cogs/urban.py"""
 import requests
-from urllib import parse as url_parse
 
 import disnake
 from disnake.ext import commands

@@ -25,7 +25,8 @@ class PromptSession:
         )
 
     async def __show_prompt(self):
-        if self.__running: return False
+        if self.__running:
+            return False
 
         em = disnake.Embed(title="Potvrzení", color=self.color)
         em.description = self.message
@@ -47,7 +48,8 @@ class PromptSession:
             return True  # reaction was one of the pagination emojis
 
     async def run(self):
-        if not await self.__show_prompt(): return
+        if not await self.__show_prompt():
+            return
 
         try:
             # waits for reaction using react_check
@@ -61,7 +63,7 @@ class PromptSession:
         else:
             try:
                 await self.__prompt_instance.remove_reaction(reaction, user)
-            except:
+            except disnake.Forbidden:
                 pass
 
             await self.__close()
@@ -72,5 +74,5 @@ class PromptSession:
         try:
             await asyncio.sleep(1)
             await self.__prompt_instance.delete()
-        except:
+        except disnake.Forbidden:
             pass

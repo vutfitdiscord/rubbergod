@@ -19,8 +19,10 @@ class Reaction(commands.Cog):
         if ctx is None:
             return
 
-        if self.bot.get_cog("Vote") is not None and (is_command_message('vote', ctx.message.content)
-                or is_command_message('singlevote', ctx.message.content, False)):
+        if self.bot.get_cog("Vote") is not None and (
+            is_command_message("vote", ctx.message.content)
+            or is_command_message("singlevote", ctx.message.content, False)
+        ):
             try:
                 await self.bot.get_cog("Vote").handle_raw_reaction_add(payload)
             except sqlalchemy.exc.InternalError:

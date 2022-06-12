@@ -4,13 +4,13 @@ import disnake
 from disnake.ext import commands
 import io
 import urllib
-from PIL import Image
 
 from config import messages, cooldowns
 
 messages = messages.Messages
 
 PNG_HEADER = b'\x89PNG\r\n\x1a\n'
+
 
 class Latex(commands.Cog):
     @cooldowns.default_cooldown

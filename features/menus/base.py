@@ -59,7 +59,9 @@ class BlockingPagedMenu(MenuPages):
             self.stop()
 
     async def _wait_finish_or_exc(self):
-        await asyncio.wait([self.inner_error_ev.wait(), self._event.wait()], return_when=asyncio.FIRST_COMPLETED)
+        await asyncio.wait(
+            [self.inner_error_ev.wait(), self._event.wait()], return_when=asyncio.FIRST_COMPLETED
+        )
 
 
 MemberLike = Union[User, Member]

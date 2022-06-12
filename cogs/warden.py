@@ -56,7 +56,7 @@ class Warden(commands.Cog):
                 try:
                     if str(message.id) == mess.embeds[0].footer.text:
                         await mess.delete()
-                except:
+                except disnake.NotFound:
                     continue
 
     async def handle_reaction(self, ctx):
@@ -218,7 +218,7 @@ class Warden(commands.Cog):
             src_post = await src_chan.fetch_message(original.message_id)
             link = src_post.jump_url
             author = disnake.utils.escape_markdown(src_post.author.display_name)
-        except:
+        except disnake.NotFound:
             link = "404 <:sadcat:576171980118687754>"
             author = "_??? (404)_"
 

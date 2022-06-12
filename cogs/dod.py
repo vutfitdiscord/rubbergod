@@ -68,8 +68,13 @@ class Dod(commands.Cog):
                 await ctx.message.channel.send(utils.fill_message("verify_verify_success",
                                                user=ctx.author.id))
         else:
-            await ctx.send(utils.fill_message("verify_already_verified",
-                                       user=ctx.author.id, admin=config.admin_ids[0]))
+            await ctx.send(
+                utils.fill_message(
+                    "verify_already_verified",
+                    user=ctx.author.id,
+                    admin=config.admin_ids[0]
+                )
+            )
         try:
             await ctx.message.delete()
         except disnake.errors.Forbidden:

@@ -28,7 +28,7 @@ class Random(commands.Cog):
         """"Pick an option"""
         for i, arg in enumerate(args):
             if "?" in arg:
-                args = args[i + 1 :]
+                args = args[i + 1:]
                 break
         if not len(args):
             await ctx.send(utils.get_command_signature(ctx))
@@ -37,12 +37,12 @@ class Random(commands.Cog):
         option = disnake.utils.escape_mentions(random.choice(args))
         if option:
             await ctx.send(f"{option} {ctx.author.mention}")
-    
+
     @cooldowns.short_cooldown
     @commands.slash_command(name="flip", description=Messages.random_flip_brief)
     async def flip(self, inter: disnake.ApplicationCommandInteraction):
         await inter.response.send_message(random.choice(["True", "False"]))
-    
+
     @cooldowns.short_cooldown
     @commands.slash_command(name="roll", description=Messages.rng_generator_format)
     async def roll(self, inter: disnake.ApplicationCommandInteraction, first: int, second: int = 0):

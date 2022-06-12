@@ -161,7 +161,7 @@ class ReactToRole(commands.Cog):
                 continue  # User have administrator permission and it's useless do some operation.
 
             overwrite = channel.overwrites_for(member)
-            #if overwrite.is_empty():
+            # if overwrite.is_empty():
             #    continue  # Overwrite not found. User maybe have access from role.
 
             if overwrite != disnake.PermissionOverwrite(read_messages=True):

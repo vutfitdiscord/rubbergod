@@ -123,7 +123,7 @@ class EmbedView(disnake.ui.View):
         output = utils.cut_string(output, 1900)
         for message in output:
             await channel_out.send(f"```\n{message}```")
-        
+
         # remove interactions because of error
         self.clear_items()
         await self.message.edit(view=self)

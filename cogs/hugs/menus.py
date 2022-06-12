@@ -5,7 +5,6 @@ from repository.database.hugs import HugsTable
 from repository.hugs_repo import HugsRepository
 
 
-
 hugs_repo = HugsRepository()
 
 

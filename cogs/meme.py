@@ -139,6 +139,5 @@ class Meme(commands.Cog):
             await ctx.send(utils.fill_message("member_not_found", user=ctx.author.id))
 
 
-
 def setup(bot):
     bot.add_cog(Meme(bot))

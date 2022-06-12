@@ -151,9 +151,13 @@ class Karma(BaseFeature):
         val = self.repo.emoji_value_raw(emoji)
 
         if val is not None:
-            await inter.response.send_message(utils.fill_message("karma_get", emote=str(emoji), value=str(val)))
+            await inter.response.send_message(
+                utils.fill_message("karma_get", emote=str(emoji), value=str(val))
+            )
         else:
-            await inter.response.send_message(utils.fill_message("karma_get_emote_not_voted", emote=str(emoji)))
+            await inter.response.send_message(
+                utils.fill_message("karma_get_emote_not_voted", emote=str(emoji))
+            )
 
     async def __make_emoji_list(self, guild, emojis):
         message = []
@@ -336,8 +340,8 @@ class Karma(BaseFeature):
         elif "LEADERBOARD" in embed.title:
             column = 'karma'
             attribute = Database_karma.karma.desc()
-            value_num = math.ceil(start / cfg.karma_grillbot_leaderboard_size)
-            embed.fields[0].value = Messages.karma_web if value_num == 1 else f"{Messages.karma_web}{value_num}"
+            value = math.ceil(start / cfg.karma_grillbot_leaderboard_size)
+            embed.fields[0].value = Messages.karma_web if value == 1 else f"{Messages.karma_web}{value}"
         elif "BAJKARBOARD" in embed.title:
             column = 'column'
             attribute = Database_karma.karma

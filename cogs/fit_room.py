@@ -11,6 +11,7 @@ from config.messages import Messages
 kachnicka_path = "/img/su/logo-kachnicka-mapa.png"
 kachnicka_url = "https://www.fit.vut.cz/img/su/logo-kachnicka-mapa.png"
 
+
 class FitRoom(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
@@ -31,7 +32,7 @@ class FitRoom(commands.Cog):
                 active_floor = floor_list.find("a", {"aria-current": "page"})
                 image = main_body.find("svg")
                 cursor = image.find("polygon", {"id": "arrow"})
-            except:
+            except AttributeError:
                 return await ctx.send(Messages.fit_room_parsing_failed)
 
             if image is None or cursor is None:

@@ -1,5 +1,4 @@
 from disnake.ext import commands
-from config.app_config import config
 from config import cooldowns
 from features import verification
 from repository import user_repo

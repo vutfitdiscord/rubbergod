@@ -9,6 +9,7 @@ import utils
 from config.app_config import config, load_config
 from config.messages import Messages
 
+
 class DynamicConfig(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
@@ -113,7 +114,6 @@ class DynamicConfig(commands.Cog):
             toml.dump(config.toml_dict, fd)
         load_config()
         await ctx.send(Messages.config_synced)
-        
 
     async def change_value(self, ctx, key: str, value: list, append: bool):
         """
