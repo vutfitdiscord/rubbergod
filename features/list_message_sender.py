@@ -3,10 +3,12 @@ from disnake.ext import commands
 from typing import Union, Iterable
 import utils
 
+
 # Take care of single messages larger than message len limit
-def trim_messages(message_list:Iterable, max_msg_len:int):
+def trim_messages(message_list: Iterable, max_msg_len: int):
     assert isinstance(max_msg_len, int)
-    if max_msg_len < 1: return []
+    if max_msg_len < 1:
+        return []
 
     output_arr = []
     for it in message_list:
@@ -16,16 +18,19 @@ def trim_messages(message_list:Iterable, max_msg_len:int):
             output_arr.append(it)
     return output_arr
 
+
 # Merge messages and add newline char between them
-def merge_messages(message_list:Iterable, max_msg_len:int):
+def merge_messages(message_list: Iterable, max_msg_len: int):
     assert isinstance(max_msg_len, int)
-    if max_msg_len < 1: return []
+    if max_msg_len < 1:
+        return []
 
     messages = []
 
     output_message = ""
     for msg in message_list:
-        if len(msg) > max_msg_len: return []
+        if len(msg) > max_msg_len:
+            return []
         if output_message and output_message[-1] != "\n":
             output_message += "\n"
 
@@ -42,6 +47,7 @@ def merge_messages(message_list:Iterable, max_msg_len:int):
 
     return messages
 
+
 ##
 # @brief Send bunch of messages at once
 #
@@ -53,11 +59,13 @@ def merge_messages(message_list:Iterable, max_msg_len:int):
 # @param message_list list of messages to send
 # @param max_msg_len maximal length of message
 #
-async def send_list_of_messages(channel:Union[disnake.TextChannel, disnake.Object, commands.Context],
-                                message_list:Iterable, max_msg_len:int=1900):
+async def send_list_of_messages(channel: Union[disnake.TextChannel, disnake.Object, commands.Context],
+                                message_list: Iterable, max_msg_len: int = 1900):
     assert isinstance(max_msg_len, int)
-    if max_msg_len > 2000: max_msg_len = 2000
-    if max_msg_len < 2: max_msg_len = 2
+    if max_msg_len > 2000:
+        max_msg_len = 2000
+    if max_msg_len < 2:
+        max_msg_len = 2
 
     message_list = trim_messages(message_list, max_msg_len - 1)
     message_list = merge_messages(message_list, max_msg_len - 1)

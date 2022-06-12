@@ -4,9 +4,10 @@ from collections import OrderedDict
 import asyncio
 from typing import Union
 
+
 class PaginatorSession:
-    def __init__(self, bot, ctx:Context, timeout=60, pages=None, color=disnake.Color.green(),
-                 footer:Union[str, None]=None, bot_author:bool=False, delete_after:bool=True):
+    def __init__(self, bot, ctx: Context, timeout=60, pages=None, color=disnake.Color.green(),
+                 footer: Union[str, None] = None, bot_author: bool = False, delete_after: bool = True):
         self.bot = bot
 
         self.footer = footer  # footer message
@@ -82,7 +83,7 @@ class PaginatorSession:
                                                              timeout=self.timeout)
                 try:
                     await self.message.remove_reaction(reaction, user)
-                except:
+                except disnake.Forbidden:
                     pass
 
                 action = self.reactions[reaction.emoji]
@@ -93,11 +94,13 @@ class PaginatorSession:
                 break
 
     async def __first_page(self):
-        if self.current == 0: return
+        if self.current == 0:
+            return
         return await self.__show_page(0)
 
     async def __last_page(self):
-        if self.current == len(self.pages) - 1: return
+        if self.current == len(self.pages) - 1:
+            return
         return await self.__show_page(len(self.pages) - 1)
 
     async def __next_page(self):
@@ -113,5 +116,5 @@ class PaginatorSession:
                 await self.message.delete()
             else:
                 await self.message.clear_reactions()
-        except:
+        except disnake.Forbidden:
             pass

@@ -13,9 +13,11 @@ class VoteRepository(BaseRepository):
         super().__init__()
 
     def get_pending_votes(self) -> List[Vote]:
-        return session.query(Vote).filter(or_(Vote.ends_at == None, Vote.ends_at >= datetime.now()))
+        return session.query(Vote).filter(or_(Vote.ends_at is None, Vote.ends_at >= datetime.now()))
 
-    def add_vote(self, message_id: int, channel_id: int, ends_at: Optional[datetime], is_one_of: bool = False):
+    def add_vote(
+        self, message_id: int, channel_id: int, ends_at: Optional[datetime], is_one_of: bool = False
+    ):
         vote = Vote(message_id=message_id, channel_id=channel_id, ends_at=ends_at, is_one_of=is_one_of)
         session.add(vote)
         session.commit()

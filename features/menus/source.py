@@ -70,7 +70,7 @@ class DatabaseIteratorPageSource(PageSource):
         return (self.current_page + 1) < self.get_max_pages()
 
     def format_page(self, menu: Menu, page: DatabasePage) -> Union[str, disnake.Embed, dict]:
-        raise NotImplemented
+        raise NotImplementedError
 
 
 class LeaderboardPageSource(DatabaseIteratorPageSource):

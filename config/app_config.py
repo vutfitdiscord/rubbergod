@@ -1,7 +1,8 @@
 from typing import List
 import toml
 
-def get_attr(toml_dict:dict, section: str, attr_key: str):
+
+def get_attr(toml_dict: dict, section: str, attr_key: str):
     """
     Helper method for getting values from config override or config template.
     """
@@ -11,7 +12,7 @@ def get_attr(toml_dict:dict, section: str, attr_key: str):
         return toml.load("config/config.template.toml", _dict=dict)[section][attr_key]
 
 
-def eval_channels(toml_dict:dict, channels: list):
+def eval_channels(toml_dict: dict, channels: list):
     """
     Evaluate channel 'config variable name' to ID
     """
@@ -27,7 +28,7 @@ class Config:
     It checks value from config override and if not exists that will be take from config template.
     """
 
-    toml_dict:dict = toml.load("config/config.toml", _dict=dict)
+    toml_dict: dict = toml.load("config/config.toml", _dict=dict)
 
     # Authorization
     key: str = get_attr(toml_dict, "base", "key")
@@ -102,7 +103,9 @@ class Config:
     meme_repost_image_extensions: list = get_attr(toml_dict, "meme_repost", "image_extensions")
 
     # Bot rooms
-    allowed_channels: List[int] = eval_channels(toml_dict, get_attr(toml_dict, "channels", "allowed_channels"))
+    allowed_channels: List[int] = eval_channels(
+        toml_dict, get_attr(toml_dict, "channels", "allowed_channels")
+    )
 
     # Roles
     role_channels: List[int] = get_attr(toml_dict, "role", "channels")
@@ -154,12 +157,14 @@ class Config:
     subscribable_channels: list = get_attr(toml_dict, "subscriptions", "subscribable_channels")
 
     # exams
-    exams_page_size:int = get_attr(toml_dict, "exams", "page_size")
-    exams_paginator_duration:int = get_attr(toml_dict, "exams", "paginator_duration")
-    exams_term_channels:List[str] = get_attr(toml_dict, "exams", "term_channels")
-    exams_terms_update_interval:float = get_attr(toml_dict, "exams", "terms_update_interval")
+    exams_page_size: int = get_attr(toml_dict, "exams", "page_size")
+    exams_paginator_duration: int = get_attr(toml_dict, "exams", "paginator_duration")
+    exams_term_channels: List[str] = get_attr(toml_dict, "exams", "term_channels")
+    exams_terms_update_interval: float = get_attr(toml_dict, "exams", "terms_update_interval")
+
 
 config = Config()
+
 
 def load_config():
     global config

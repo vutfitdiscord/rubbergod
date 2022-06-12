@@ -6,6 +6,7 @@ import requests
 from config.messages import Messages
 from utils import add_author_footer
 
+
 class Studijni(commands.Cog):
 
     @commands.slash_command(name="studijni", description=Messages.studijni_brief)
@@ -16,14 +17,14 @@ class Studijni(commands.Cog):
         session = requests.session()
         result = session.get(link, timeout=10)
         xDoc2 = etree.fromstring(result.text, htmlparser)
-        hours_div = xDoc2.xpath("//*[b[contains(text(),'Úřední hodiny')]]//following-sibling::div")            
+        hours_div = xDoc2.xpath("//*[b[contains(text(),'Úřední hodiny')]]//following-sibling::div")
         embed = disnake.Embed(title=Messages.studijni_title, url=link)
         if hours_div:
             hours = etree.tostring(hours_div[0], encoding=str, method="text")
             additional_info = xDoc2.xpath("//main//section/p")
             if additional_info:
                 info = etree.tostring(additional_info[0], encoding=str, method="text").split(':', 1)
-                if len(info) > 1: 
+                if len(info) > 1:
                     embed.add_field(name=info[0], value=info[1], inline=False)
         else:
             hours_div = xDoc2.xpath("//main//section")

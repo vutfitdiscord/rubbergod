@@ -115,7 +115,7 @@ class Karma(commands.Cog):
     @commands.slash_command(name="karma", guild_ids=[config.guild_id])
     async def _karma(self, inter):
         pass
-    
+
     @cooldowns.default_cooldown
     @_karma.sub_command(description=messages.karma_brief)
     async def me(self, inter: disnake.ApplicationCommandInteraction):
@@ -141,11 +141,11 @@ class Karma(commands.Cog):
     @_karma.sub_command(description=messages.karma_get_brief)
     async def get(self, inter: disnake.ApplicationCommandInteraction, emoji):
         try:
-           await self.karma.emoji_get_value(inter, emoji)
-           await self.check.botroom_check(inter)
+            await self.karma.emoji_get_value(inter, emoji)
+            await self.check.botroom_check(inter)
         except disnake.errors.Forbidden:
-           return
-           
+            return
+
     @cooldowns.long_cooldown
     @_karma.sub_command(description=messages.karma_message_brief)
     async def message(self, inter: disnake.ApplicationCommandInteraction, message: disnake.Message):
@@ -197,7 +197,7 @@ class Karma(commands.Cog):
     @karma.command(brief=messages.karma_give_brief)
     async def give(self, ctx, *args):
         await self.karma.karma_give(ctx.message)
-    
+
     @commands.check(utils.is_bot_admin)
     @karma.command(brief=messages.karma_transfer_brief)
     async def transfer(self, ctx, *args):
@@ -205,7 +205,7 @@ class Karma(commands.Cog):
 
     @cooldowns.long_cooldown
     @_karma.sub_command(name="leaderboard", description=messages.karma_leaderboard_brief)
-    async def leaderboard(self, inter: disnake.ApplicationCommandInteraction, start : int = 1):
+    async def leaderboard(self, inter: disnake.ApplicationCommandInteraction, start: int = 1):
         if not await self.validate_leaderboard_offset(start, inter):
             return
         await self.karma.leaderboard(inter, "get", "DESC", start)
@@ -213,7 +213,7 @@ class Karma(commands.Cog):
 
     @cooldowns.long_cooldown
     @_karma.sub_command(name="bajkarboard", description=messages.karma_bajkarboard_brief)
-    async def bajkarboard(self, inter: disnake.ApplicationCommandInteraction, start : int = 1):
+    async def bajkarboard(self, inter: disnake.ApplicationCommandInteraction, start: int = 1):
         if not await self.validate_leaderboard_offset(start, inter):
             return
 
@@ -222,7 +222,7 @@ class Karma(commands.Cog):
 
     @cooldowns.long_cooldown
     @_karma.sub_command(name="givingboard", description=messages.karma_givingboard_brief)
-    async def givingboard(self, inter: disnake.ApplicationCommandInteraction, start : int = 1):
+    async def givingboard(self, inter: disnake.ApplicationCommandInteraction, start: int = 1):
         if not await self.validate_leaderboard_offset(start, inter):
             return
 
@@ -231,7 +231,7 @@ class Karma(commands.Cog):
 
     @cooldowns.long_cooldown
     @_karma.sub_command(name="ishaboard", description=messages.karma_ishaboard_brief)
-    async def ishaboard(self, inter: disnake.ApplicationCommandInteraction, start : int = 1):
+    async def ishaboard(self, inter: disnake.ApplicationCommandInteraction, start: int = 1):
         if not await self.validate_leaderboard_offset(start, inter):
             return
 
@@ -246,7 +246,9 @@ class Karma(commands.Cog):
     @message.error
     async def karma_error(self, inter: disnake.ApplicationCommandInteraction, error):
         if isinstance(error, commands.MessageNotFound):
-            await inter.response.send_message(utils.fill_message("karma_message_format", user=inter.author.id))
+            await inter.response.send_message(
+                utils.fill_message("karma_message_format", user=inter.author.id)
+            )
             return True
         if isinstance(error, commands.CheckFailure):
             await inter.reply(utils.fill_message("insufficient_rights", user=inter.author.id))
@@ -256,7 +258,9 @@ class Karma(commands.Cog):
         if not 0 < offset < 100000000:  # Any value larger than the server
             # user cnt and lower than 32bit
             # int max will do
-            await inter.response.send_message(utils.fill_message("karma_leaderboard_offset_error", user=inter.author.id))
+            await inter.response.send_message(
+                utils.fill_message("karma_leaderboard_offset_error", user=inter.author.id)
+            )
             return False
 
         return True

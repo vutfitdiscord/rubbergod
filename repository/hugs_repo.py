@@ -41,7 +41,8 @@ class HugsRepository(BaseRepository):
             give_position = self._get_count(order_by=HugsTable.given)
 
         if member_stats.received > 0:
-            recv_position = 1 + session.query(HugsTable).filter(HugsTable.received > member_stats.received).count()
+            recv_position = 1 + session.query(HugsTable).filter(
+                HugsTable.received > member_stats.received).count()
         else:
             recv_position = self._get_count(order_by=HugsTable.received)
 

@@ -145,7 +145,7 @@ class Subscriptions(commands.Cog):
 
     @subscribe.error
     @unsubscribe.error
-    async def subscription_no_argument(self, ctx, error):
+    async def subscribe_no_argument(self, ctx, error):
         if isinstance(error, commands.UserInputError):
             await ctx.send(Messages.subscriptions_missing_argument)
 

@@ -16,8 +16,7 @@ from repository.database.verification import Valid_person, Permit
 
 user_r = user_repo.UserRepository()
 
-arcas_time = (datetime.datetime.utcnow() -
-              datetime.timedelta(hours=config.arcas_delay))
+arcas_time = datetime.datetime.utcnow() - datetime.timedelta(hours=config.arcas_delay)
 
 
 class FitWide(commands.Cog):
@@ -31,8 +30,7 @@ class FitWide(commands.Cog):
     @commands.Cog.listener()
     async def on_typing(self, channel, user, when):
         global arcas_time
-        if arcas_time + datetime.timedelta(hours=config.arcas_delay) <\
-           when and config.arcas_id == user.id:
+        if arcas_time + datetime.timedelta(hours=config.arcas_delay) < when and config.arcas_id == user.id:
             arcas_time = when
             gif = disnake.Embed()
             gif.set_image(url="https://i.imgur.com/v2ueHcl.gif")
@@ -59,7 +57,7 @@ class FitWide(commands.Cog):
         else:
             found_members.sort(key=lambda x: x[1], reverse=True)
             for i, (member, role_count) in enumerate(found_members):
-                line = "{index}) <@{id}> - {count}\n".format(index=i+1, id=member.id, count=role_count)
+                line = "{index}) <@{id}> - {count}\n".format(index=i + 1, id=member.id, count=role_count)
                 if len(line) + len(msg) >= 2000:
                     await ctx.send(msg)
                     msg = line
@@ -71,10 +69,16 @@ class FitWide(commands.Cog):
     @cooldowns.default_cooldown
     @commands.check(utils.is_bot_admin)
     @commands.command()
-    async def role_check(self, ctx, p_verified: bool = True,
-                         p_move: bool = False, p_status: bool = True,
-                         p_role: bool = True, p_zapis: bool = False,
-                         p_debug: bool = True):
+    async def role_check(
+        self,
+        ctx,
+        p_verified: bool = True,
+        p_move: bool = False,
+        p_status: bool = True,
+        p_role: bool = True,
+        p_zapis: bool = False,
+        p_debug: bool = True,
+    ):
         guild = self.bot.get_guild(config.guild_id)
         members = guild.members
 
@@ -89,36 +93,36 @@ class FitWide(commands.Cog):
 
         dropout_alternatives = [survivor, king]
 
-        verified = [member for member in members
-                    if verify in member.roles and
-                    host not in member.roles and
-                    bot not in member.roles and
-                    poradce not in member.roles and
-                    vut not in member.roles]
+        verified = [
+            member
+            for member in members
+            if verify in member.roles
+            and host not in member.roles
+            and bot not in member.roles
+            and poradce not in member.roles
+            and vut not in member.roles
+        ]
 
         permited = session.query(Permit)
         permited_ids = [int(person.discord_ID) for person in permited]
 
-        years = ["0BIT", "1BIT", "2BIT", "3BIT", "4BIT+",
-                 "0MIT", "1MIT", "2MIT", "3MIT+", "PhD+", "Dropout"]
+        years = ["0BIT", "1BIT", "2BIT", "3BIT", "4BIT+", "0MIT", "1MIT", "2MIT", "3MIT+", "PhD+", "Dropout"]
 
         year_roles = {year: disnake.utils.get(guild.roles, name=year) for year in years}
 
-        weird_members = {year_y: {year_x: [] for year_x in year_roles.values()}
-                         for year_y in year_roles.values()}
+        weird_members = {
+            year_y: {year_x: [] for year_x in year_roles.values()} for year_y in year_roles.values()
+        }
 
         for member in verified:
             if member.id not in permited_ids:
                 if p_verified:
-                    await ctx.send("Ve verified databázi jsem nenašel: " +
-                                   utils.generate_mention(member.id))
+                    await ctx.send("Ve verified databázi jsem nenašel: " + utils.generate_mention(member.id))
             else:
                 try:
-                    login = session.query(Permit).\
-                        filter(Permit.discord_ID == str(member.id)).one().login
+                    login = session.query(Permit).filter(Permit.discord_ID == str(member.id)).one().login
 
-                    person = session.query(Valid_person).\
-                        filter(Valid_person.login == login).one()
+                    person = session.query(Valid_person).filter(Valid_person.login == login).one()
                 except NoResultFound:
                     continue
                 except MultipleResultsFound:
@@ -142,9 +146,12 @@ class FitWide(commands.Cog):
                             weird_members[role][correct_role].append(member)
                             break
                     else:
-                        if correct_role == dropout and not any(role in member.roles for role in dropout_alternatives):
-                            await ctx.send(f"{utils.generate_mention(member.id)} by mel "
-                                           f"mit prej `{year}`")
+                        if correct_role == dropout and not any(
+                            role in member.roles for role in dropout_alternatives
+                        ):
+                            await ctx.send(
+                                f"{utils.generate_mention(member.id)} by mel " f"mit prej `{year}`"
+                            )
 
         for source_role, target_data in weird_members.items():
             for target_role, target_members in target_data.items():
@@ -153,35 +160,47 @@ class FitWide(commands.Cog):
                 source_year = source_role.name
                 target_year = target_role.name
                 target_ids = [member.id for member in target_members]
-                if p_zapis and \
-                   (("BIT" in source_year and "BIT" in target_year) or \
-                   ("MIT" in source_year and "MIT" in target_year)) and \
-                   int(source_year[0]) == int(target_year[0]) + 1:
-                    message_prefix = f"Vypada ze do dalsiho rocniku se nezapsali (protoze na merlinovi maji {target_year}): "
+                if (
+                    p_zapis
+                    and (
+                        ("BIT" in source_year and "BIT" in target_year)
+                        or ("MIT" in source_year and "MIT" in target_year)
+                    )
+                    and int(source_year[0]) == int(target_year[0]) + 1
+                ):
+                    message_prefix = (
+                        "Vypada ze do dalsiho rocniku se nezapsali "
+                        f"(protoze na merlinovi maji {target_year}): "
+                    )
                     await self.send_masstag_messages(ctx, message_prefix, target_ids)
                 elif p_move and (
                     # presun bakalaru do 1MIT
-                    ("BIT" in source_year and target_year == "1MIT") or
-                    target_year == "Dropout"):
-                    await ctx.send(f"Přesouvám techle {len(target_members)} lidi z "
-                                   f"{source_year} do {target_year}:")
+                    ("BIT" in source_year and target_year == "1MIT")
+                    or target_year == "Dropout"
+                ):
+                    await ctx.send(
+                        f"Přesouvám techle {len(target_members)} lidi z " f"{source_year} do {target_year}:"
+                    )
                     await self.send_masstag_messages(ctx, "", target_ids)
                     if p_debug:
-                        await ctx.send(f"jk, debug mode")
+                        await ctx.send("jk, debug mode")
                     else:
                         for member in target_members:
-                            if target_role == dropout and not any(role in member.roles for role in dropout_alternatives):
+                            if target_role == dropout and not any(
+                                role in member.roles for role in dropout_alternatives
+                            ):
                                 await member.add_roles(target_role)
                             await member.remove_roles(source_role)
                 elif p_role:
-                    await ctx.send(f"Nasel jsem {len(target_members)} lidi kteri maji na merlinovi "
-                                   f"{target_year} ale roli {source_year}:")
+                    await ctx.send(
+                        f"Nasel jsem {len(target_members)} lidi kteri maji na merlinovi "
+                        f"{target_year} ale roli {source_year}:"
+                    )
                     await self.send_masstag_messages(ctx, "", target_ids)
 
         await ctx.send("Done")
 
     async def send_masstag_messages(self, ctx, prefix, target_ids):
-        messages = []
         message = prefix
         for index in range(len(target_ids)):
             # 35 sounds like a safe amount of tags per message
@@ -200,15 +219,11 @@ class FitWide(commands.Cog):
         # guild = self.bot.get_guild(config.guild_id)
         guild = ctx.guild
 
-        BIT_names = [str(x) + "BIT" + ("+" if x == 4 else "")
-                     for x in range(5)]
-        BIT = [disnake.utils.get(guild.roles, name=role_name)
-               for role_name in BIT_names]
+        BIT_names = [str(x) + "BIT" + ("+" if x == 4 else "") for x in range(5)]
+        BIT = [disnake.utils.get(guild.roles, name=role_name) for role_name in BIT_names]
 
-        MIT_names = [str(x) + "MIT" + ("+" if x == 3 else "")
-                     for x in range(4)]
-        MIT = [disnake.utils.get(guild.roles, name=role_name)
-               for role_name in MIT_names]
+        MIT_names = [str(x) + "MIT" + ("+" if x == 3 else "") for x in range(4)]
+        MIT = [disnake.utils.get(guild.roles, name=role_name) for role_name in MIT_names]
 
         for member in BIT[3].members:
             await member.add_roles(BIT[4])
@@ -220,24 +235,24 @@ class FitWide(commands.Cog):
         await BIT[2].edit(name="3BIT", color=BIT_colors[3])
         await BIT[1].edit(name="2BIT", color=BIT_colors[2])
         await BIT[0].edit(name="1BIT", color=BIT_colors[1])
-        bit0 = await guild.create_role(name='0BIT', color=BIT_colors[0])
+        bit0 = await guild.create_role(name="0BIT", color=BIT_colors[0])
         await bit0.edit(position=BIT[0].position - 1)
 
         MIT_colors = [role.color for role in MIT]
         await MIT[2].delete()
         await MIT[1].edit(name="2MIT", color=MIT_colors[2])
         await MIT[0].edit(name="1MIT", color=MIT_colors[1])
-        mit0 = await guild.create_role(name='0MIT', color=MIT_colors[0])
+        mit0 = await guild.create_role(name="0MIT", color=MIT_colors[0])
         await mit0.edit(position=MIT[0].position - 1)
 
         general_names = [str(x) + "bit-general" for x in range(4)]
         terminy_names = [str(x) + "bit-terminy" for x in range(1, 3)]
-        general_channels = [disnake.utils.get(guild.channels,
-                                              name=channel_name)
-                            for channel_name in general_names]
-        terminy_channels = [disnake.utils.get(guild.channels,
-                                              name=channel_name)
-                            for channel_name in terminy_names]
+        general_channels = [
+            disnake.utils.get(guild.channels, name=channel_name) for channel_name in general_names
+        ]
+        terminy_channels = [
+            disnake.utils.get(guild.channels, name=channel_name) for channel_name in terminy_names
+        ]
 
         # move names
         await general_channels[3].edit(name="4bit-general")
@@ -246,20 +261,19 @@ class FitWide(commands.Cog):
         await general_channels[0].edit(name="1bit-general")
         # create 0bit-general
         overwrites = {
-            guild.default_role:
-                disnake.PermissionOverwrite(read_messages=False),
-            disnake.utils.get(guild.roles, name="0BIT"):
-                disnake.PermissionOverwrite(read_messages=True,
-                                            send_messages=True)
+            guild.default_role: disnake.PermissionOverwrite(read_messages=False),
+            disnake.utils.get(guild.roles, name="0BIT"): disnake.PermissionOverwrite(
+                read_messages=True, send_messages=True
+            ),
         }
         await guild.create_text_channel(
-            '0bit-general', overwrites=overwrites,
+            "0bit-general",
+            overwrites=overwrites,
             category=general_channels[0].category,
-            position=general_channels[0].position - 1
+            position=general_channels[0].position - 1,
         )
         # give 0mit access to mit-general
-        mit_general = disnake.utils.get(guild.channels,
-                                        name="mit-general")
+        mit_general = disnake.utils.get(guild.channels, name="mit-general")
         await mit_general.set_permissions(mit0, read_messages=True)
 
         # delete 3bit-terminy
@@ -269,55 +283,37 @@ class FitWide(commands.Cog):
         await terminy_channels[0].edit(name="2bit-terminy")
         # create 1bit-terminy
         overwrites = {
-            guild.default_role:
-                disnake.PermissionOverwrite(read_messages=False),
-            disnake.utils.get(guild.roles, name="1BIT"):
-                disnake.PermissionOverwrite(read_messages=True,
-                                            send_messages=False)
+            guild.default_role: disnake.PermissionOverwrite(read_messages=False),
+            disnake.utils.get(guild.roles, name="1BIT"): disnake.PermissionOverwrite(
+                read_messages=True, send_messages=False
+            ),
         }
         await guild.create_text_channel(
-            '1bit-terminy', overwrites=overwrites,
+            "1bit-terminy",
+            overwrites=overwrites,
             category=terminy_channels[0].category,
-            position=terminy_channels[0].position - 1
+            position=terminy_channels[0].position - 1,
         )
 
         # give 4bit perms to the new 3bit terminy
         await terminy_channels[1].set_permissions(
-            disnake.utils.get(guild.roles, name="4BIT+"),
-            read_messages=True, send_messages=False
+            disnake.utils.get(guild.roles, name="4BIT+"), read_messages=True, send_messages=False
         )
 
         # Give people the correct mandatory classes after increment
         semester_names = [str(x) + ". Semestr" for x in range(1, 6)]
-        semester = [disnake.utils.get(guild.categories, name=semester_name)
-                    for semester_name in semester_names]
-        await semester[0].set_permissions(disnake.utils.get(guild.roles,
-                                                            name="1BIT"),
-                                          read_messages=True)
-        await semester[0].set_permissions(disnake.utils.get(guild.roles,
-                                                            name="2BIT"),
-                                          overwrite=None)
-        await semester[1].set_permissions(disnake.utils.get(guild.roles,
-                                                            name="1BIT"),
-                                          read_messages=True)
-        await semester[1].set_permissions(disnake.utils.get(guild.roles,
-                                                            name="2BIT"),
-                                          overwrite=None)
-        await semester[2].set_permissions(disnake.utils.get(guild.roles,
-                                                            name="2BIT"),
-                                          read_messages=True)
-        await semester[2].set_permissions(disnake.utils.get(guild.roles,
-                                                            name="3BIT"),
-                                          overwrite=None)
-        await semester[3].set_permissions(disnake.utils.get(guild.roles,
-                                                            name="2BIT"),
-                                          read_messages=True)
-        await semester[3].set_permissions(disnake.utils.get(guild.roles,
-                                                            name="3BIT"),
-                                          overwrite=None)
-        await semester[4].set_permissions(disnake.utils.get(guild.roles,
-                                                            name="3BIT"),
-                                          read_messages=True)
+        semester = [
+            disnake.utils.get(guild.categories, name=semester_name) for semester_name in semester_names
+        ]
+        await semester[0].set_permissions(disnake.utils.get(guild.roles, name="1BIT"), read_messages=True)
+        await semester[0].set_permissions(disnake.utils.get(guild.roles, name="2BIT"), overwrite=None)
+        await semester[1].set_permissions(disnake.utils.get(guild.roles, name="1BIT"), read_messages=True)
+        await semester[1].set_permissions(disnake.utils.get(guild.roles, name="2BIT"), overwrite=None)
+        await semester[2].set_permissions(disnake.utils.get(guild.roles, name="2BIT"), read_messages=True)
+        await semester[2].set_permissions(disnake.utils.get(guild.roles, name="3BIT"), overwrite=None)
+        await semester[3].set_permissions(disnake.utils.get(guild.roles, name="2BIT"), read_messages=True)
+        await semester[3].set_permissions(disnake.utils.get(guild.roles, name="3BIT"), overwrite=None)
+        await semester[4].set_permissions(disnake.utils.get(guild.roles, name="3BIT"), read_messages=True)
 
         # Warning: This was somehow ran before the semester permissions changed
         # So just keep in mind that weird shit happens
@@ -326,46 +322,36 @@ class FitWide(commands.Cog):
                 await channel.edit(sync_permissions=True)
 
         # skolni-info override
-        skolni_info = disnake.utils.get(guild.channels,
-                                        name="skolni-info")
+        skolni_info = disnake.utils.get(guild.channels, name="skolni-info")
         await skolni_info.set_permissions(bit0, read_messages=True)
         await skolni_info.set_permissions(mit0, read_messages=True)
 
-        await disnake.utils.get(guild.channels, name="cvicici-info").\
-                set_permissions(disnake.utils.get(guild.roles,
-                                                  name="1BIT"),
-                                read_messages=True)
-        await disnake.utils.get(guild.channels, name="cvicici-info").\
-                set_permissions(disnake.utils.get(guild.roles,
-                                                  name="1MIT"),
-                                read_messages=True)
-        await disnake.utils.get(guild.channels, name="1bit-info").\
-                set_permissions(disnake.utils.get(guild.roles,
-                                                  name="1BIT"),
-                                read_messages=True)
-        await disnake.utils.get(guild.channels, name="1bit-info").\
-                set_permissions(disnake.utils.get(guild.roles,
-                                                  name="2BIT"),
-                                overwrite=None)
-        await disnake.utils.get(guild.channels, name="2bit-info").\
-                set_permissions(disnake.utils.get(guild.roles,
-                                                  name="2BIT"),
-                                read_messages=True)
-        await disnake.utils.get(guild.channels, name="2bit-info").\
-                set_permissions(disnake.utils.get(guild.roles,
-                                                  name="3BIT"),
-                                overwrite=None)
-        await disnake.utils.get(guild.channels, name="3bit-info").\
-                set_permissions(disnake.utils.get(guild.roles,
-                                                  name="3BIT"),
-                                read_messages=True)
-        await disnake.utils.get(guild.channels, name="mit-info").\
-                set_permissions(disnake.utils.get(guild.roles,
-                                                  name="1MIT"),
-                                read_messages=True)
+        await disnake.utils.get(guild.channels, name="cvicici-info").set_permissions(
+            disnake.utils.get(guild.roles, name="1BIT"), read_messages=True
+        )
+        await disnake.utils.get(guild.channels, name="cvicici-info").set_permissions(
+            disnake.utils.get(guild.roles, name="1MIT"), read_messages=True
+        )
+        await disnake.utils.get(guild.channels, name="1bit-info").set_permissions(
+            disnake.utils.get(guild.roles, name="1BIT"), read_messages=True
+        )
+        await disnake.utils.get(guild.channels, name="1bit-info").set_permissions(
+            disnake.utils.get(guild.roles, name="2BIT"), overwrite=None
+        )
+        await disnake.utils.get(guild.channels, name="2bit-info").set_permissions(
+            disnake.utils.get(guild.roles, name="2BIT"), read_messages=True
+        )
+        await disnake.utils.get(guild.channels, name="2bit-info").set_permissions(
+            disnake.utils.get(guild.roles, name="3BIT"), overwrite=None
+        )
+        await disnake.utils.get(guild.channels, name="3bit-info").set_permissions(
+            disnake.utils.get(guild.roles, name="3BIT"), read_messages=True
+        )
+        await disnake.utils.get(guild.channels, name="mit-info").set_permissions(
+            disnake.utils.get(guild.roles, name="1MIT"), read_messages=True
+        )
 
-        await ctx.send('Holy fuck, všechno se povedlo, '
-                       'tak zase za rok <:Cauec:602052606210211850>')
+        await ctx.send("Holy fuck, všechno se povedlo, " "tak zase za rok <:Cauec:602052606210211850>")
 
     @cooldowns.default_cooldown
     @commands.check(is_in_modroom)
@@ -386,21 +372,18 @@ class FitWide(commands.Cog):
             login = line[0]
             name = line[4].split(",", 1)[0]
             try:
-                year_fields = line[4].split(',')[1].split(' ')
-                year = ' '.join(year_fields if 'mail=' not in year_fields[-1] else year_fields[:-1])
-                mail = year_fields[-1].replace('mail=', '') if 'mail=' in year_fields[-1] else None
+                year_fields = line[4].split(",")[1].split(" ")
+                year = " ".join(year_fields if "mail=" not in year_fields[-1] else year_fields[:-1])
+                mail = year_fields[-1].replace("mail=", "") if "mail=" in year_fields[-1] else None
             except IndexError:
                 continue
 
             if convert_0xit and year.endswith("1r"):
-                person = session.query(Valid_person).\
-                    filter(Valid_person.login == login).\
-                    one_or_none()
+                person = session.query(Valid_person).filter(Valid_person.login == login).one_or_none()
                 if person is not None and person.year.endswith("0r"):
                     year = year.replace("1r", "0r")
 
-            found_people.append(Valid_person(login=login, year=year,
-                                             name=name, mail=mail))
+            found_people.append(Valid_person(login=login, year=year, name=name, mail=mail))
             found_logins.append(login)
 
         for login in found_logins:
@@ -442,7 +425,7 @@ class FitWide(commands.Cog):
             if error:
                 await ctx.send("Stažené databáze nějak nefunguje.")
                 return
-        except TimeoutExpired:
+        except subprocess.TimeoutExpired:
             await ctx.send("Timeout při stahování databáze.")
             return
         with open("merlin-latest", "w") as f:
@@ -453,39 +436,36 @@ class FitWide(commands.Cog):
     @commands.check(is_in_modroom)
     @commands.command()
     async def get_users_login(self, ctx, member: disnake.Member):
-        result = session.query(Permit).\
-            filter(Permit.discord_ID == str(member.id)).one_or_none()
+        result = session.query(Permit).filter(Permit.discord_ID == str(member.id)).one_or_none()
 
         if result is None:
             await ctx.send("Uživatel není v databázi.")
             return
 
-        person = session.query(Valid_person).\
-            filter(Valid_person.login == result.login).one_or_none()
+        person = session.query(Valid_person).filter(Valid_person.login == result.login).one_or_none()
 
         if person is None:
             await ctx.send(result.login)
             return
 
-        await ctx.send(("Login: `{p.login}`\nJméno: `{p.name}`\n"
-                        "Ročník: `{p.year}`").format(p=person))
+        await ctx.send(("Login: `{p.login}`\nJméno: `{p.name}`\n" "Ročník: `{p.year}`").format(p=person))
 
     @cooldowns.default_cooldown
     @commands.check(is_in_modroom)
     @commands.command()
     async def get_logins_user(self, ctx, login):
-        result = session.query(Permit).\
-            filter(Permit.login == login).one_or_none()
+        result = session.query(Permit).filter(Permit.login == login).one_or_none()
 
         if result is None:
-            person = session.query(Valid_person).\
-                filter(Valid_person.login == login).one_or_none()
+            person = session.query(Valid_person).filter(Valid_person.login == login).one_or_none()
             if person is None:
                 await ctx.send("Uživatel není v databázi možných loginů.")
             else:
-                await ctx.send(("Login: `{p.login}`\nJméno: `{p.name}`\n"
-                                "Ročník: `{p.year}`\nNení na serveru."
-                                ).format(p=person))
+                await ctx.send(
+                    ("Login: `{p.login}`\nJméno: `{p.name}`\n" "Ročník: `{p.year}`\nNení na serveru.").format(
+                        p=person
+                    )
+                )
         else:
             await ctx.send(utils.generate_mention(result.discord_ID))
 
@@ -494,13 +474,11 @@ class FitWide(commands.Cog):
     @commands.command()
     async def reset_login(self, ctx, login):
 
-        result = session.query(Valid_person).\
-            filter(Valid_person.login == login).one_or_none()
+        result = session.query(Valid_person).filter(Valid_person.login == login).one_or_none()
         if result is None:
             await ctx.send("To není validní login.")
         else:
-            session.query(Permit).\
-                filter(Permit.login == login).delete()
+            session.query(Permit).filter(Permit.login == login).delete()
             result.status = 1
             session.commit()
             await ctx.send("Hotovo.")
@@ -510,8 +488,7 @@ class FitWide(commands.Cog):
     @commands.command()
     async def connect_login_to_user(self, ctx, login, member: disnake.Member):
 
-        result = session.query(Valid_person).\
-            filter(Valid_person.login == login).one_or_none()
+        result = session.query(Valid_person).filter(Valid_person.login == login).one_or_none()
         if result is None:
             await ctx.send("To není validní login.")
         else:
@@ -552,8 +529,7 @@ class FitWide(commands.Cog):
     @get_db.error
     async def fitwide_checks_error(self, ctx, error):
         if isinstance(error, commands.CheckFailure):
-            await ctx.send('Nothing to see here comrade. ' +
-                           '<:KKomrade:484470873001164817>')
+            await ctx.send("Nothing to see here comrade. " + "<:KKomrade:484470873001164817>")
 
 
 def setup(bot):

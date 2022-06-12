@@ -23,13 +23,15 @@ class Absolvent(commands.Cog):
         await inter.response.send_message(Messages.absolvent_help)
 
     @commands.slash_command(name="diplom", description=Messages.absolvent_brief)
-    async def diplom(self, inter: disnake.ApplicationCommandInteraction, 
-                           degree: str, 
-                           name: str, 
-                           surname: str, 
-                           diploma_number: str, 
-                           thesis_web_id: int
-                           ):
+    async def diplom(
+        self,
+        inter: disnake.ApplicationCommandInteraction,
+        degree: str,
+        name: str,
+        surname: str,
+        diploma_number: str,
+        thesis_web_id: int
+    ):
         """Command for diploma verification and honourable role addition
 
         :param inter: disnake context
@@ -37,7 +39,8 @@ class Absolvent(commands.Cog):
         :param surname: last name (case-sensitive)
         :param degree: strictly either "Bc." or "Ing." (case-sensitive)
         :param diploma_number: ID of diploma, in format NNNNNN/YYYY
-        :param thesis_web_id: ID from URL https://dspace.vutbr.cz/handle/11012/<num> can be discovered via https://dspace.vutbr.cz/handle/11012/19121 
+        :param thesis_web_id: ID from URL https://dspace.vutbr.cz/handle/11012/<num>
+            can be discovered via https://dspace.vutbr.cz/handle/11012/19121
         """
         await inter.response.defer(with_message=True, ephemeral=True)
         if thesis_web_id == "19121":
@@ -51,7 +54,6 @@ class Absolvent(commands.Cog):
             await inter.edit_original_message(Messages.absolvent_wrong_diploma_format)
             return
         diploma_year = diploma_year.group(1)
-        full_name_without_degree = f"{name} {surname}"
         full_name_without_degree_surname_first = f"{surname}, {name}"
 
         # CHECK WHETHER THE PROVIDED NAME MATCHES THE ONE STORED FOR FIT VUT VERIFICATION
@@ -83,45 +85,51 @@ class Absolvent(commands.Cog):
         )
         master_thesis = "".join(
             xDoc_thesis.xpath(
-               "/html/body/div[1]/div/div/div/ul[contains(@class,'breadcrumb')]/li[3]/a[.='diplomové práce']/text()"
+               "/html/body/div[1]/div/div/div/ul[contains(@class,'breadcrumb')]"
+               "/li[3]/a[.='diplomové práce']/text()"
             )
         )
         bachelor_thesis = "".join(
             xDoc_thesis.xpath(
-               "/html/body/div[1]/div/div/div/ul[contains(@class,'breadcrumb')]/li[3]/a[.='bakalářské práce']/text()"
+               "/html/body/div[1]/div/div/div/ul[contains(@class,'breadcrumb')]"
+               "/li[3]/a[.='bakalářské práce']/text()"
             )
         )
         thesis_author_without_degree_surname_first = "".join(
             xDoc_thesis.xpath(
-                '//*[@id="aspect_artifactbrowser_ItemViewer_div_item-view"]/div/div[2]/div[1]/div[./h5/b="Autor"]/div/a/text()'
+                '//*[@id="aspect_artifactbrowser_ItemViewer_div_item-view"]'
+                '/div/div[2]/div[1]/div[./h5/b="Autor"]/div/a/text()'
             )
         )
         habilitation_date = "".join(
             xDoc_thesis.xpath(
-                '//*[@id="aspect_artifactbrowser_ItemViewer_div_item-view"]/div/div[2]/div[2]/div[./h5="Termín obhajoby"]/span/text()'
+                '//*[@id="aspect_artifactbrowser_ItemViewer_div_item-view"]'
+                '/div/div[2]/div[2]/div[./h5="Termín obhajoby"]/span/text()'
             )
         )
         result = "".join(
             xDoc_thesis.xpath(
-                '//*[@id="aspect_artifactbrowser_ItemViewer_div_item-view"]/div/div[2]/div[2]/div[./h5="Výsledek obhajoby"]/span/text()'
+                '//*[@id="aspect_artifactbrowser_ItemViewer_div_item-view"]'
+                '/div/div[2]/div[2]/div[./h5="Výsledek obhajoby"]/span/text()'
             )
         )
         faculty = "".join(
             xDoc_thesis.xpath(
-               "/html/body/div[1]/div/div/div/ul[contains(@class,'breadcrumb')]/li[4]/a[.='Fakulta informačních technologií']/text()"
+               "/html/body/div[1]/div/div/div/ul[contains(@class,'breadcrumb')]/"
+               "li[4]/a[.='Fakulta informačních technologií']/text()"
             )
         )
-        
-        #await inter.edit_original_message(f"""
-        #DEBUG:
-        #nf: {not_found}
-        #mt: {master_thesis}
-        #bt: {bachelor_thesis}
-        #ta: {thesis_author_without_degree_surname_first}
-        #hd: {habilitation_date}
-        #re: {result}
-        #fa: {faculty}
-        #""")
+
+        # await inter.edit_original_message(f"""
+        # DEBUG:
+        # nf: {not_found}
+        # mt: {master_thesis}
+        # bt: {bachelor_thesis}
+        # ta: {thesis_author_without_degree_surname_first}
+        # hd: {habilitation_date}
+        # re: {result}
+        # fa: {faculty}
+        # """)
 
         if "Page cannot be found" in not_found:
             await inter.edit_original_message(Messages.absolvent_thesis_not_found_error)
@@ -142,7 +150,7 @@ class Absolvent(commands.Cog):
         ):
             await inter.edit_original_message(Messages.absolvent_web_error)
             return
-        
+
         # DIPLOMA VALIDITY CHECK
 
         diplom_url1 = "https://www.vut.cz/overeni-diplomu"
@@ -200,7 +208,9 @@ class Absolvent(commands.Cog):
 
     @diplom.error
     async def diplom_error(self, inter: disnake.ApplicationCommandInteraction, error):
-        await inter.edit_original_message(utils.fill_message("absolvent_help", command=inter.application_command))
+        await inter.edit_original_message(
+            utils.fill_message("absolvent_help", command=inter.application_command)
+        )
 
 
 def setup(bot):
