@@ -85,6 +85,9 @@ class ReviewRepository(BaseRepository):
     def get_subject(self, shortcut):
         return session.query(Subject).filter(Subject.shortcut == shortcut)
 
+    def get_all_subjects(self):
+        return session.query(Subject.shortcut).all()
+
     def get_subject_details(self, shortcut):
         return (
             session.query(Subject_details)
