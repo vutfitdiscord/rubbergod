@@ -223,6 +223,19 @@ class Messages:
                             "Použijte reakce ◀️ a ▶️ pro navigaci mezi recenzemi.\n" \
                             "Pro navigaci v textu delších recenzí použijte 🔼 a 🔽.\n"
 
+    # review modal
+    review_modal_title = "Přidat novou recenzi"
+    review_subject_label = "Vyberte předmět"
+    review_anonym_label = "Anonymní recenze"
+    review_signed_label = "Zobrazit nick"
+    review_tier_placeholder = "Hodnocení předmětu"
+    review_tier_0_desc = "Nejlepší, jednoduchý, naučí"
+    review_tier_1_desc = "Naučí, ale treba zapracovať"
+    review_tier_2_desc = "Priemerný predmet"
+    review_tier_3_desc = "Nič moc"
+    review_tier_4_desc = "Nejhorší, celé zle"
+    review_text_label = "Text recenze"
+
     review_vote_own = "Nemůžeš hlasovat pro vlastní recenzi"
     review_remove_success = "Hodnocení předmětu bylo odebráno."
     review_remove_error = "Hodnocení předmětu nebylo nalezeno."
