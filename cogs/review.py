@@ -55,7 +55,11 @@ class Review(commands.Cog):
         pass
 
     @reviews.sub_command(name='get', description=Messages.review_get_brief)
-    async def get(self, inter: disnake.ApplicationCommandInteraction, subject):
+    async def get(
+        self,
+        inter: disnake.ApplicationCommandInteraction,
+        subject: str = commands.Param(autocomplete=autocomp_subjects),
+    ):
         """Get reviews"""
         embeds = self.manager.list_reviews(inter.author, subject.lower())
         if embeds is None or len(embeds) == 0:
