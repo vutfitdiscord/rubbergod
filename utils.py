@@ -86,7 +86,7 @@ def pagination_next(id: str, page: int, max_page: int, roll_around: bool = True)
         return 0
 
 
-def is_bot_admin(ctx: commands.Context):
+def is_bot_admin(ctx: Union[commands.Context, disnake.ApplicationCommandInteraction]):
     return ctx.author.id in config.admin_ids
 
 
