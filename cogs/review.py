@@ -172,7 +172,8 @@ class Review(commands.Cog):
             if subject.shortcut.startswith("TV-"):
                 embed.add_field(
                     name="Rozvrh předmětu v IS",
-                    value=f"https://www.vut.cz/studis/student.phtml?sn=rozvrhy&action=gm_rozvrh_predmetu&operation=rozvrh&predmet_id={subject.card}&fakulta_id=814",  # noqa: E501
+                    value="https://www.vut.cz/studis/student.phtml?sn=rozvrhy&action=gm_rozvrh_predmetu"
+                    f"&operation=rozvrh&predmet_id={subject.card}&fakulta_id=814",
                     inline=False
                 )
             else:
