@@ -213,44 +213,27 @@ class Messages:
     review_add_brief = 'Přidá recenzi na předmět'
     review_get_brief = 'Vypíše recenze na vybraný předmět'
     review_remove_brief = 'Odstraní hodnocení'
-    subject_add_biref = 'Manuálně přidá předmět/y do reviews databáze'
-    subject_remove_biref = 'Manuálně odebere předmět/y z reviews databáze'
     subject_update_biref = 'Automaticky vyhledá a přidá předměty do reviews i subject databáze'
 
-    review_format = f"{prefix}reviews [add, remove, zkratka předmětu]"
-    review_add_format = f"{prefix}reviews add {{ZkratkaPredmetu}} {{Tier (0-4, 0 je TOP)}} (VolitelnyText)\n" \
-                        "Pro anonymní příspěvek použijte DM.\nNapříklad:\n`" \
-                        f"{prefix}reviews add IZP 2 text recenze`"
     review_wrong_subject = "Nesprávná zkratka předmětu."
     review_tier = "Tier je z rozsahu 0-4, kde 0 je nejlepší."
     review_added = "Hodnocení předmětu bylo přidáno."
-    reviews_page_e = "Zavolej reviews znovu pro aktualizaci."
     reviews_reaction_help = "Pokud byla recenze užitečná dejte 👍, jinak 👎.\n" \
                             "Pro odstranění hlasu je možné použit 🛑.\n" \
                             "Použijte reakce ◀️ a ▶️ pro navigaci mezi recenzemi.\n" \
                             "Pro navigaci v textu delších recenzí použijte 🔼 a 🔽.\n"
 
     review_vote_own = "Nemůžeš hlasovat pro vlastní recenzi"
-    review_get_format = f"{prefix}reviews [zkratka předmětu]"
-    review_remove_format = f"{prefix}reviews remove [zkratka předmětu]"
-    review_remove_format_admin = f"{prefix}reviews remove [zkratka předmětu, id + číslo]"
-    review_remove_id_format = "reviews remove id [id]"
     review_remove_success = "Hodnocení předmětu bylo odebráno."
     review_remove_error = "Hodnocení předmětu nebylo nalezeno."
     review_add_denied = "{user}, na přidání hodnocení předmětu nemáš právo."
     review_not_on_server = "{user}, na použití tohto příkazu musíš být na FITwide serveru."
-    review_legacy_clicked = "Toto review je zastaralé a již není podporováno"
-    subject_format = f"{prefix}subject [add, remove, update] [zkratka předmětu]"
+    subject_format = f"{prefix}subject [update]"
     subject_update_error = "Aktualizace se nezdařila."
     subject_update_success = "Předměty byly úspěšně aktualizovány."
     shortcut_brief = "Vrací stručné informace o předmětu"
-    shortcut_format = f"{prefix}{{command}} [zkratka předmětu]"
     tierboard_brief = "Založeno na `reviews` z průměru tier hodnot"
-    tierboard_help = "Založeno na `reviews` z průměru tier hodnot.\n"\
-                     "typ -> P, V, PVT, PVA\n"\
-                     "semestr -> Z, L\n"\
-                     "rok -> jen pro povinné předměty e.g 1BIT, 2NADE"
-    tierboard_missing_year = f"Nezadal jsi rok a nemáš školní roli\n{tierboard_help}"
+    tierboard_missing_year = f"Nezadal jsi ročník a nemáš školní roli"
 
     pr_meme = "https://github.com/Toaster192/rubbergod/pulls"
     uhoh = "uh oh"
