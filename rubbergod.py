@@ -12,7 +12,7 @@ from features import presence
 
 import repository.db_migrations as migrations
 
-logger = logging.getLogger('discord')
+logger = logging.getLogger('disnake')
 logger.setLevel(logging.WARNING)
 handler = logging.FileHandler(filename='discord.log', encoding='utf-8', mode='w')
 handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
