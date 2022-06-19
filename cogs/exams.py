@@ -9,11 +9,11 @@ from bs4.element import NavigableString
 import math
 import collections
 
-from repository.exams_repo import ExamsTermsMessageRepo
-from features.paginator import PaginatorSession
+from buttons.embed import EmbedView
 from config.app_config import config
 from config import cooldowns
 from config.messages import Messages
+from repository.exams_repo import ExamsTermsMessageRepo
 import utils
 
 year_regex = "[1-4][BM]IT"
@@ -418,37 +418,18 @@ class Exams(commands.Cog):
 
                 pages.append(embed)
 
-            number_of_pages = len(pages)
-            if number_of_pages > 1:
-                if isinstance(ctx, commands.Context):
-                    await PaginatorSession(
-                        self.bot,
-                        ctx,
-                        timeout=config.exams_paginator_duration,
-                        pages=pages,
-                        color=disnake.Color.dark_blue(),
-                        delete_after=False,
-                    ).run()
-                else:
-                    header = disnake.Embed(
-                        title=title, description=description, color=disnake.Color.dark_blue()
-                    )
-                    await self.handle_exams_with_database_access(term_strings_dict, header, ctx)
-            elif number_of_pages == 1:
-                # Only one page, no need paginator
-                if isinstance(ctx, commands.Context):
-                    await ctx.send(embed=pages[0])
-                else:
-                    header = disnake.Embed(
-                        title=title, description=description, color=disnake.Color.dark_blue()
-                    )
-                    await self.handle_exams_with_database_access(term_strings_dict, header, ctx)
-            else:
-                # No pages were parsed, so we will post only default embed
+            if len(pages) == 0:
                 embed = disnake.Embed(title=title, description=description, color=disnake.Color.dark_blue())
                 utils.add_author_footer(embed, author if author is not None else self.bot.user)
-                if isinstance(ctx, commands.Context):
-                    await ctx.send(embed=embed)
+                pages.append(embed)
+            if isinstance(ctx, commands.Context):
+                view = EmbedView(pages)
+                view.message = await ctx.reply(embed=pages[0], view=view)
+            else:
+                header = disnake.Embed(
+                    title=title, description=description, color=disnake.Color.dark_blue()
+                )
+                await self.handle_exams_with_database_access(term_strings_dict, header, ctx)
         else:
             # Site returned fail code
             embed = disnake.Embed(title=title, description=description, color=disnake.Color.dark_blue())
