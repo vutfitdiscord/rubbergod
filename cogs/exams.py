@@ -27,7 +27,7 @@ class Exams(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
 
-        self.subscribed_guilds:List[int] = []
+        self.subscribed_guilds: List[int] = []
         if config.exams_subscribe_default_guild:
             self.subscribed_guilds.append(config.guild_id)
 
