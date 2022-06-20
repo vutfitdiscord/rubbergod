@@ -161,7 +161,7 @@ class Config:
     exams_paginator_duration:int = get_attr(toml_dict, "exams", "paginator_duration")
     exams_term_channels:List[str] = get_attr(toml_dict, "exams", "term_channels")
     exams_terms_update_interval:float = get_attr(toml_dict, "exams", "terms_update_interval")
-    exams_default_subscribed_guilds:List[int] = get_attr(toml_dict, "exams", "default_subscribed_guilds")
+    exams_subscribe_default_guild:bool = get_attr(toml_dict, "exams", "subscribe_default_guild")
 
 
 config = Config()

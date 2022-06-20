@@ -183,4 +183,4 @@ page_size = 6
 paginator_duration = 60
 term_channels = ["1bit-terminy", "2bit-terminy", "3bit-terminy", "mit-terminy"]
 terms_update_interval = 0.5 # Update interval in days for automatic updating
-default_subscribed_guilds = [461541385204400138]
+subscribe_default_guild = true

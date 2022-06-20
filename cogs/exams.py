@@ -27,7 +27,10 @@ class Exams(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
 
-        self.subscribed_guilds:List[int] = config.exams_default_subscribed_guilds
+        self.subscribed_guilds:List[int] = []
+        if config.exams_subscribe_default_guild:
+            self.subscribed_guilds.append(config.guild_id)
+
         self.exams_repo = ExamsTermsMessageRepo()
 
         if self.subscribed_guilds:
