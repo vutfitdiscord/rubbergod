@@ -66,7 +66,7 @@ class Review(commands.Cog):
             await inter.send(Messages.review_wrong_subject)
             return
         view = ReviewView(self.bot, embeds)
-        view.message = await inter.send(embed=embeds[0], view=view)
+        view.message = await inter.response.send_message(embed=embeds[0], view=view)
 
     @reviews.sub_command(name='add', description=Messages.review_add_brief)
     async def add(
@@ -212,22 +212,24 @@ class Review(commands.Cog):
         if not inter.guild:  # DM
             guild = self.bot.get_guild(config.guild_id)
             author = guild.get_member(author.id)
-        for role in author.roles:
-            if "BIT" in role.name:
-                degree = "BIT"
-                if not year and type == "P":
+        if not year:
+            for role in author.roles:
+                if any(deg in role.name for deg in ["BIT", "MIT"]):
                     if role.name == "4BIT+":
                         year = "3BIT"
                     elif role.name == "0BIT":
                         year = "1BIT"
+                    elif role.name == "0MIT":
+                        year = "1MIT"
+                    elif role.name == "3MIT+":
+                        year = "2MIT"
                     else:
                         year = role.name
-                break
-            if "MIT" in role.name:
-                degree = "MIT"
-                if not year and type == "P":
-                    year = ""
-                break
+                    break
+        if "BIT" in year:
+            degree = "BIT"
+        if "MIT" in year:
+            degree = "MIT"
         if not degree and not year:
             await inter.send(Messages.tierboard_missing_year, ephemeral=True)
             return
@@ -236,11 +238,12 @@ class Review(commands.Cog):
         embed.timestamp = datetime.datetime.now(tz=datetime.timezone.utc)
         embed.add_field(name="Typ", value=type)
         embed.add_field(name="Semestr", value="Letní" if sem == "L" else "Zimní")
-        if year:
-            degree = year
-        embed.add_field(name="Program", value=degree)
-
-        utils.add_author_footer(embed, author, additional_text=("?tierboard help",))
+        if type != "P":
+            embed.add_field(name="Program", value=degree)
+            year = ""
+        else:
+            embed.add_field(name="Ročník", value=year)
+        utils.add_author_footer(embed, author)
 
         pages_total = self.repo.get_tierboard_page_count(type, sem, degree, year)
         for page in range(pages_total):
@@ -258,7 +261,7 @@ class Review(commands.Cog):
             embeds.append(embed)
 
         view = EmbedView(embeds)
-        view.message = await inter.send(embed=embeds[0], view=view)
+        view.message = await inter.response.send_message(embed=embeds[0], view=view)
 
 
 def setup(bot):

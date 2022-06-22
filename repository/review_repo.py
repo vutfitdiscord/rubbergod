@@ -119,7 +119,7 @@ class ReviewRepository(BaseRepository):
         subquery = self.gen_tierboard_subquery(type, sem, degree, year)
         return (
             session.query(subquery.c.shortcut, subquery.c.avg_tier)
-            .filter(subquery.c.avg_tier is not None)
+            .filter(subquery.c.avg_tier != None)  # noqa: E711
             .order_by(asc("avg_tier"))
             .offset(offset)
             .limit(10)
@@ -130,7 +130,7 @@ class ReviewRepository(BaseRepository):
         subquery = self.gen_tierboard_subquery(type, sem, degree, year)
         return math.ceil((
             session.query(subquery.c.shortcut, subquery.c.avg_tier)
-            .filter(subquery.c.avg_tier is not None)
+            .filter(subquery.c.avg_tier != None)  # noqa: E711
             .order_by(asc("avg_tier"))
             .count()
         )/10)
