@@ -1,11 +1,13 @@
 import disnake
 from disnake.ext import commands
+from buttons.embed import EmbedView
 
 import utils
 import math
 from config.app_config import config
 from config import messages, cooldowns
 from features import karma
+from features.leaderboard import LeaderboardPageSource
 from repository import karma_repo
 from cogs import room_check
 from features.reaction_context import ReactionContext
@@ -21,6 +23,9 @@ class Karma(commands.Cog):
         self.bot = bot
         self.karma = karma.Karma(bot, karma_r)
         self.check = room_check.RoomCheck(bot)
+        self._leaderboard_formatter = utils.make_pts_column_row_formatter(Database_karma.karma.name)
+        self._positive_formatter = utils.make_pts_column_row_formatter(Database_karma.positive.name)
+        self._negative_formatter = utils.make_pts_column_row_formatter(Database_karma.negative.name)
 
     async def handle_reaction(self, ctx: ReactionContext):
         # grillbot emoji for removing message causes errors
@@ -208,8 +213,27 @@ class Karma(commands.Cog):
     async def leaderboard(self, inter: disnake.ApplicationCommandInteraction, start: int = 1):
         if not await self.validate_leaderboard_offset(start, inter):
             return
-        await self.karma.leaderboard(inter, "get", "DESC", start)
+        embed = disnake.Embed()
+        value_num = math.ceil(start / config.karma_grillbot_leaderboard_size)
+        value = messages.karma_web if value_num == 1 else f"{messages.karma_web}{value_num}"
+        embed.add_field(name=messages.karma_web_title, value=value)
+        page_source = LeaderboardPageSource(
+            bot=self.bot,
+            author=inter.author,
+            query=karma_r.leaderboard_query(Database_karma.karma.desc()),
+            row_formatter=self._leaderboard_formatter,
+            base_embed=embed,
+            title='KARMA LEADERBOARD',
+            emote_name='trophy',
+            member_id_col_name='member_ID',
+        )
+        page_num = math.floor(start/page_source.per_page)
+        page = page_source.get_page(page_num)
+        embed = page_source.format_page(page)
+
         await self.check.botroom_check(inter)
+        view = EmbedView(embeds=[embed], page_source=page_source)
+        view.message = await inter.response.send_message(embed=embed, view=view)
 
     @cooldowns.long_cooldown
     @_karma.sub_command(name="bajkarboard", description=messages.karma_bajkarboard_brief)
@@ -217,8 +241,22 @@ class Karma(commands.Cog):
         if not await self.validate_leaderboard_offset(start, inter):
             return
 
-        await self.karma.leaderboard(inter, "get", "ASC", start)
+        page_source = LeaderboardPageSource(
+            bot=self.bot,
+            author=inter.author,
+            query=karma_r.leaderboard_query(Database_karma.karma),
+            row_formatter=self._leaderboard_formatter,
+            title='KARMA BAJKARBOARD',
+            emote_name='coolStoryBob',
+            member_id_col_name='member_ID',
+        )
+        page_num = math.floor(start/page_source.per_page)
+        page = page_source.get_page(page_num)
+        embed = page_source.format_page(page)
+
         await self.check.botroom_check(inter)
+        view = EmbedView(embeds=[embed], page_source=page_source)
+        view.message = await inter.response.send_message(embed=embed, view=view)
 
     @cooldowns.long_cooldown
     @_karma.sub_command(name="givingboard", description=messages.karma_givingboard_brief)
@@ -226,8 +264,22 @@ class Karma(commands.Cog):
         if not await self.validate_leaderboard_offset(start, inter):
             return
 
-        await self.karma.leaderboard(inter, "give", "DESC", start)
+        page_source = LeaderboardPageSource(
+            bot=self.bot,
+            author=inter.author,
+            query=karma_r.leaderboard_query(Database_karma.positive.desc()),
+            row_formatter=self._positive_formatter,
+            title='KARMA GIVINGBOARD',
+            emote_name='peepolove',
+            member_id_col_name='member_ID',
+        )
+        page_num = math.floor(start/page_source.per_page)
+        page = page_source.get_page(page_num)
+        embed = page_source.format_page(page)
+
         await self.check.botroom_check(inter)
+        view = EmbedView(embeds=[embed], page_source=page_source)
+        view.message = await inter.response.send_message(embed=embed, view=view)
 
     @cooldowns.long_cooldown
     @_karma.sub_command(name="ishaboard", description=messages.karma_ishaboard_brief)
@@ -235,8 +287,22 @@ class Karma(commands.Cog):
         if not await self.validate_leaderboard_offset(start, inter):
             return
 
-        await self.karma.leaderboard(inter, "give", "ASC", start)
+        page_source = LeaderboardPageSource(
+            bot=self.bot,
+            author=inter.author,
+            query=karma_r.leaderboard_query(Database_karma.negative.desc()),
+            row_formatter=self._negative_formatter,
+            title='KARMA ISHABOARD',
+            emote_name='ishagrin',
+            member_id_col_name='member_ID',
+        )
+        page_num = math.floor(start/page_source.per_page)
+        page = page_source.get_page(page_num)
+        embed = page_source.format_page(page)
+
         await self.check.botroom_check(inter)
+        view = EmbedView(embeds=[embed], page_source=page_source)
+        view.message = await inter.response.send_message(embed=embed, view=view)
 
     @revote.error
     @vote.error

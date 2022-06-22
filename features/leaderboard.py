@@ -116,14 +116,14 @@ class LeaderboardPageSource(DatabaseIteratorPageSource):
         return utils.get_emoji(self.bot.get_guild(config.guild_id), emoji)
 
     def set_leaderboard_title(self, board_name: str, emote_name: str):
-        return "{0} {1} {0}".format(self.get_default_emoji(emote_name) or "", board_name)
+        return "{0} {1} {0}".format(self.get_default_emoji(emote_name) or f":{emote_name}:", board_name)
 
     def _get_member_name(self, member_id: Union[str, int]) -> str:
         guild = self.bot.get_guild(config.guild_id)
-        member = guild.get_member(member_id)
+        member = guild.get_member(int(member_id))
         if not member:
             return "_User left_"
-        return disnake.utils.escape_markdown(str(member))
+        return disnake.utils.escape_markdown(member.display_name)
 
     def _format_row(self, entry: Table, position: int) -> str:
         """
