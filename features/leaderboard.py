@@ -1,31 +1,19 @@
-"""
-Custom data sources for menus
-
-This builds on what disnake-ext-menus does but for our usage.
-Which is - getting data from database, where the pagination info
-goes directly down to the used database query (with .offset, .limit),
-whereas the already implemented ones only work with iterables/generators of the data.
-
-We also need the command ctx to populate some values (member_ID) from disnake.
-"""
-
+from functools import lru_cache
 import math
 from functools import cached_property
 from typing import Iterable, Union, Callable
 
 import disnake
-from disnake.ext.commands import Context
-from disnake.ext.menus import PageSource, Menu
 from sqlalchemy.orm.query import Query
 from sqlalchemy.schema import Table
 
-import utils
 from config.app_config import config
+import utils
 
 DatabasePage = Iterable[Table]
 
 
-class DatabaseIteratorPageSource(PageSource):
+class DatabaseIteratorPageSource():
     """A data source from sqlalchemy database query.
 
     This page source does not handle any sort of formatting, leaving it up
@@ -44,11 +32,8 @@ class DatabaseIteratorPageSource(PageSource):
             How many rows to return per one page.
             Will be used on database query to poll for that amount.
         """
-
         self._query = query
-
         self.per_page = per_page
-        self.current_page = 0
 
     @cached_property
     def _get_max_pages(self):
@@ -60,17 +45,10 @@ class DatabaseIteratorPageSource(PageSource):
     def get_max_pages(self):
         return self._get_max_pages
 
-    async def get_page(self, page_number) -> DatabasePage:
+    def get_page(self, page_number) -> DatabasePage:
         # result of this is passed into format_page(..., page) arg
         self.current_page = page_number
         return self._query.limit(self.per_page).offset(self.current_page * self.per_page).all()
-
-    def is_paginating(self) -> bool:
-        # Do not show pagination controls if there is only one page
-        return (self.current_page + 1) < self.get_max_pages()
-
-    def format_page(self, menu: Menu, page: DatabasePage) -> Union[str, disnake.Embed, dict]:
-        raise NotImplementedError
 
 
 class LeaderboardPageSource(DatabaseIteratorPageSource):
@@ -87,12 +65,16 @@ class LeaderboardPageSource(DatabaseIteratorPageSource):
     member_id_col_name: str = None
 
     def __init__(
-            self,
-            row_formatter: Union[str, Callable],
-            query: Query,
-            per_page=10,
-            base_embed: disnake.Embed = None,
-            member_id_col_name="member_id",
+        self,
+        bot: disnake.Client,
+        author: Union[disnake.Member, disnake.User],
+        row_formatter: Union[str, Callable],
+        query: Query,
+        title: str,
+        emote_name: str = None,
+        per_page: int = 5,
+        base_embed: disnake.Embed = None,
+        member_id_col_name: str = "member_id",
     ):
         """
         Initialize this page source.
@@ -120,22 +102,30 @@ class LeaderboardPageSource(DatabaseIteratorPageSource):
         else:
             raise Exception("row_formatter has invalid type, should be str or callable.")
 
+        self.bot = bot
+        self.author = author
         self.base_embed = base_embed if base_embed else disnake.Embed()
+        self.base_embed.title = self.set_leaderboard_title(title, emote_name)
         self.member_id_col_name = member_id_col_name
+        self._query = query
+        self.per_page = per_page
         super().__init__(query=query, per_page=per_page)
 
-    @staticmethod
-    async def _get_member_name(ctx: Context, member_id: Union[str, int]) -> str:
-        if ctx.guild:
-            member = ctx.guild.get_member(member_id)
-        else:
-            guild = ctx.bot.get_guild(config.guild_id)
-            member = guild.get_member(member_id)
+    @lru_cache(5)
+    def get_default_emoji(self, emoji: str):
+        return utils.get_emoji(self.bot.get_guild(config.guild_id), emoji)
+
+    def set_leaderboard_title(self, board_name: str, emote_name: str):
+        return "{0} {1} {0}".format(self.get_default_emoji(emote_name) or "", board_name)
+
+    def _get_member_name(self, member_id: Union[str, int]) -> str:
+        guild = self.bot.get_guild(config.guild_id)
+        member = guild.get_member(member_id)
         if not member:
             return "_User left_"
         return disnake.utils.escape_markdown(str(member))
 
-    async def _format_row(self, entry: Table, position: int, ctx: Context) -> str:
+    def _format_row(self, entry: Table, position: int) -> str:
         """
         Applies current query results onto self.row_formatter.
         The entry's member id attribute is converted and available
@@ -149,17 +139,17 @@ class LeaderboardPageSource(DatabaseIteratorPageSource):
         member_id = getattr(entry, self.member_id_col_name, None)
         assert member_id, f"Table {entry} row does not contain '{self.member_id_col_name}'?"
 
-        member_name = await self._get_member_name(ctx, member_id)
+        member_name = self._get_member_name(member_id)
 
         kwargs = {"position": position, "member_name": member_name, "entry": entry}
         return self.row_formatter(**kwargs)
 
-    async def format_page(self, menu, page: DatabasePage) -> Union[str, disnake.Embed, dict]:
+    def format_page(self, page: DatabasePage) -> Union[str, disnake.Embed, dict]:
         board_lines = []
 
         for i, entry in enumerate(page):  # type: int, Table
-            board_lines.append(await self._format_row(
-                entry=entry, position=(self.current_page * self.per_page) + i + 1, ctx=menu.ctx
+            board_lines.append(self._format_row(
+                entry=entry, position=(self.current_page * self.per_page) + i + 1
             ))
 
         self.base_embed.description = "\n" + "\n".join(board_lines)
@@ -167,7 +157,7 @@ class LeaderboardPageSource(DatabaseIteratorPageSource):
         # possibility to optimize, author could be set only once
         utils.add_author_footer(
             self.base_embed,
-            menu.ctx.author,
+            self.author,
             additional_text=(f"{self.current_page + 1}/{self.get_max_pages()} pages.",),
         )
 

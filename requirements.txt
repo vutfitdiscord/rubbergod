@@ -9,6 +9,5 @@ dhash
 toml
 beautifulsoup4
 lxml
-disnake-ext-menus
 python-dateutil
 CairoSVG>=2.5.2

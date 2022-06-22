@@ -1,9 +1,10 @@
 import traceback
 import disnake
-from typing import Callable, List
+from typing import List
 
 from config.messages import Messages
 from config.app_config import config
+from features.leaderboard import LeaderboardPageSource
 import utils
 
 
@@ -16,7 +17,7 @@ class EmbedView(disnake.ui.View):
         author: int = 0,
         roll_arroud: bool = True,
         end_arrow: bool = True,
-        callback: Callable = None,
+        page_source: LeaderboardPageSource = None,
         timeout: int = 300
     ):
         """Embed pagination view
@@ -26,18 +27,17 @@ class EmbedView(disnake.ui.View):
         param int author: If presented allow just message autor to change pages
         param bool roll_arroud: After last page rollaround to first
         param bool end_arrow: If true use also '⏩' button
-        param Callable callback(page, embed): Use when there are a lot of embeds,
-            embeds should contain one embed, page number and embed are passed as parameters
+        param LeaderboardPageSource page_source: Use for long leaderboards, embeds should contain one embed
         param int timeout: Seconds until disabling interaction, use None for always enabled
         """
         self.page = 1
-        self.callback = callback
+        self.page_source = page_source
         self.roll_arroud = roll_arroud
         self.author = author
-        self.max_page = 1000
-        if self.callback is None:
+        if self.page_source is None:
             self.max_page = len(embeds)
         else:
+            self.max_page = page_source.get_max_pages()
             end_arrow = False
         self.embeds = embeds
         super().__init__(timeout=timeout)
@@ -79,10 +79,11 @@ class EmbedView(disnake.ui.View):
 
     @property
     def embed(self):
-        if self.callback is None:
-            return self.embeds[self.page-1]
+        if self.page_source is None:
+            return self.embeds[self.page - 1]
         else:
-            return self.callback(self.page, self.embeds[0])
+            page = self.page_source.get_page(self.page - 1)
+            return self.page_source.format_page(page)
 
     @embed.setter
     def embed(self, value):

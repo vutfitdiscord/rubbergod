@@ -414,3 +414,5 @@ class Messages:
     exams_automatic_update_stopped = "`Zastavena automatická aktualizace termínů pro server: {guild_name}`"
 
     embed_not_author = "Hraj si na svém písečku s tebou zavolanými příkazy. <:pepeGun:826943455032901643>"
+
+    base_leaderboard_format_str = "_{position}._ - **{member_name}**:"
