@@ -1,4 +1,3 @@
-from functools import lru_cache
 from random import choice
 
 import disnake
@@ -6,10 +5,21 @@ from disnake.ext import commands
 
 import utils
 from config.app_config import config
+from config.messages import Messages
 from config import cooldowns
 from repository.hugs_repo import HugsRepository
-from .menus import get_hugboard_menu, get_top_huggers_menu, get_top_hugged_menu
-from .. import room_check
+from features.leaderboard import LeaderboardPageSource
+from repository.database.hugs import HugsTable
+from cogs import room_check
+from buttons.embed import EmbedView
+from utils import make_pts_column_row_formatter
+
+
+def _tophugs_formatter(entry: HugsTable, **kwargs):
+    return (
+        Messages.base_leaderboard_format_str.format_map(kwargs)
+        + f" _Given:_ **{entry.given}** - _Received:_** {entry.received}**"
+    )
 
 
 class Hugs(commands.Cog):
@@ -21,10 +31,8 @@ class Hugs(commands.Cog):
         self.bot = bot
         self.hugs_repo = HugsRepository()
         self.check = room_check.RoomCheck(bot)
-
-    @lru_cache(5)
-    def get_default_emoji(self, emoji: str):
-        return utils.get_emoji(self.bot.get_guild(config.guild_id), emoji)
+        self._tophuggers_formatter = make_pts_column_row_formatter(HugsTable.given.name)
+        self._tophugged_formatter = make_pts_column_row_formatter(HugsTable.received.name)
 
     @cooldowns.long_cooldown
     @commands.command()
@@ -33,16 +41,20 @@ class Hugs(commands.Cog):
         Overall hugging stats.
         """
         async with ctx.typing():
-            menu = get_hugboard_menu(
-                base_embed=disnake.Embed(
-                    title="{0} HUGBOARD {0}".format(
-                        self.get_default_emoji("peepoHugger") or ""
-                    )
-                )
+            page_source = LeaderboardPageSource(
+                bot=self.bot,
+                author=ctx.author,
+                query=self.hugs_repo.get_top_all_query(),
+                row_formatter=_tophugs_formatter,
+                title='HUGBOARD',
+                emote_name='peepoHugger',
             )
+            page = page_source.get_page(0)
+            embed = page_source.format_page(page)
 
         await self.check.botroom_check(ctx.message)
-        await menu.start(ctx)
+        view = EmbedView(embeds=[embed], page_source=page_source)
+        view.message = await ctx.send(embed=embed, view=view)
 
     @cooldowns.long_cooldown
     @commands.command()
@@ -51,15 +63,21 @@ class Hugs(commands.Cog):
         Get the biggest huggers.
         """
         async with ctx.typing():
-            menu = get_top_huggers_menu(
-                base_embed=disnake.Embed(
-                    title="{0} TOP HUGGERS {0} ".format(
-                        self.get_default_emoji("peepoHugger") or ""
-                    )
-                )
+            page_source = LeaderboardPageSource(
+                bot=self.bot,
+                author=ctx.author,
+                query=self.hugs_repo.get_top_givers_query(),
+                row_formatter=self._tophuggers_formatter,
+                title='TOP HUGGERS',
+                emote_name='peepoHugger'
             )
+
+            page = page_source.get_page(0)
+            embed = page_source.format_page(page)
+
         await self.check.botroom_check(ctx.message)
-        await menu.start(ctx)
+        view = EmbedView(embeds=[embed], page_source=page_source)
+        view.message = await ctx.send(embed=embed, view=view)
 
     @cooldowns.long_cooldown
     @commands.command()
@@ -68,16 +86,21 @@ class Hugs(commands.Cog):
         Get the most hugged.
         """
         async with ctx.typing():
-            menu = get_top_hugged_menu(
-                base_embed=disnake.Embed(
-                    title="{0} TOP HUGGED {0} ".format(
-                        self.get_default_emoji("peepoHugger") or ""
-                    )
-                )
+            page_source = LeaderboardPageSource(
+                bot=self.bot,
+                author=ctx.author,
+                query=self.hugs_repo.get_top_receivers_query(),
+                row_formatter=self._tophugged_formatter,
+                title='TOP HUGGED',
+                emote_name='peepoHugger',
             )
 
+            page = page_source.get_page(0)
+            embed = page_source.format_page(page)
+
         await self.check.botroom_check(ctx.message)
-        await menu.start(ctx)
+        view = EmbedView(embeds=[embed], page_source=page_source)
+        view.message = await ctx.send(embed=embed, view=view)
 
     @cooldowns.long_cooldown
     @commands.command()

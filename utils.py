@@ -5,6 +5,7 @@ import disnake
 import math
 from disnake import Member, PartialEmoji, Emoji
 from disnake.ext import commands
+from sqlalchemy.schema import Table
 
 from config.app_config import config
 from config.messages import Messages
@@ -216,3 +217,13 @@ def is_command_message(cmd: str, msg: str, require_space=True) -> bool:
                 return True
 
     return False
+
+
+def make_pts_column_row_formatter(pts_column_name: str):
+    """For leaderboards with one column of points."""
+
+    def formatter(entry: Table, **kwargs):
+        return Messages.base_leaderboard_format_str.format_map(
+            kwargs) + " {} pts".format(getattr(entry, pts_column_name))
+
+    return formatter
