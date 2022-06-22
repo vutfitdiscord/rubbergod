@@ -176,3 +176,6 @@ class Hugs(commands.Cog):
             await ctx.send(utils.fill_message("member_not_found", user=ctx.author.id))
         else:
             print(error)
+
+def setup(bot):
+    bot.add_cog(Hugs(bot))
