@@ -13,40 +13,9 @@ from features.reaction_context import ReactionContext
 group_repo = role_group_repo.RoleGroupRepository()
 
 
-class ReactToRole(commands.Cog):
+class Roles(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-
-    @commands.Cog.listener()
-    async def on_message(self, message):
-        if message.author.bot:
-            return
-
-        if message.channel.id in config.role_channels:
-            role_data = await self.get_join_role_data(message)
-            await self.message_role_reactions(message, role_data)
-
-    async def handle_reaction(self, ctx: ReactionContext):
-        role_data = await self.get_join_role_data(ctx.message)
-        for line in role_data:
-            if str(ctx.emoji) == line[1]:
-                await self.add_perms(line[0], ctx.member, ctx.guild)
-                break
-        else:
-            await ctx.message.remove_reaction(ctx.emoji, ctx.member)
-
-    @commands.Cog.listener()
-    async def on_raw_reaction_remove(self, payload):
-        ctx: ReactionContext = await ReactionContext.from_payload(self.bot, payload)
-        if ctx is None:
-            return
-
-        if ctx.channel.id in config.role_channels:
-            role_data = await self.get_join_role_data(ctx.message)
-            for line in role_data:
-                if str(ctx.emoji) == line[1]:
-                    await self.remove_perms(line[0], ctx.member, ctx.guild)
-                    break
 
     # Returns list of role names and emotes that represent them
     async def get_join_role_data(self, message):
@@ -200,11 +169,6 @@ class ReactToRole(commands.Cog):
 
         return [role], [channel]
 
-
-class RolesGroupManager(commands.Cog):
-    def __init__(self, bot):
-        self.bot = bot
-
     @commands.check(utils.is_bot_admin)
     @commands.command()
     async def add_group(self, ctx, name: str):
@@ -249,11 +213,6 @@ class RolesGroupManager(commands.Cog):
         group_repo.group_reset_roles(name)
         await ctx.send("Done")
 
-
-class ChannelManager(commands.Cog):
-    def __init__(self, bot):
-        self.bot = bot
-
     @commands.check(utils.is_bot_admin)
     @commands.group()
     async def channel(self, ctx):
@@ -277,6 +236,37 @@ class ChannelManager(commands.Cog):
         new = await src.clone(name=name)
         await ctx.send(utils.fill_message("channel_clone_done", id=new.id))
 
+    @commands.Cog.listener()
+    async def on_message(self, message):
+        if message.author.bot:
+            return
+
+        if message.channel.id in config.role_channels:
+            role_data = await self.get_join_role_data(message)
+            await self.message_role_reactions(message, role_data)
+
+    async def handle_reaction(self, ctx: ReactionContext):
+        role_data = await self.get_join_role_data(ctx.message)
+        for line in role_data:
+            if str(ctx.emoji) == line[1]:
+                await self.add_perms(line[0], ctx.member, ctx.guild)
+                break
+        else:
+            await ctx.message.remove_reaction(ctx.emoji, ctx.member)
+
+    @commands.Cog.listener()
+    async def on_raw_reaction_remove(self, payload):
+        ctx: ReactionContext = await ReactionContext.from_payload(self.bot, payload)
+        if ctx is None:
+            return
+
+        if ctx.channel.id in config.role_channels:
+            role_data = await self.get_join_role_data(ctx.message)
+            for line in role_data:
+                if str(ctx.emoji) == line[1]:
+                    await self.remove_perms(line[0], ctx.member, ctx.guild)
+                    break
+
     @copy.error
     @clone.error
     async def error(self, ctx, error):
@@ -292,6 +282,4 @@ class ChannelManager(commands.Cog):
 
 
 def setup(bot):
-    bot.add_cog(ReactToRole(bot))
-    bot.add_cog(RolesGroupManager(bot))
-    bot.add_cog(ChannelManager(bot))
+    bot.add_cog(Roles(bot))

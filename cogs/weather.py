@@ -8,7 +8,7 @@ from config.messages import Messages
 import utils
 
 
-class weather(commands.Cog):
+class Weather(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
@@ -64,4 +64,4 @@ class weather(commands.Cog):
 
 
 def setup(bot):
-    bot.add_cog(weather(bot))
+    bot.add_cog(Weather(bot))
