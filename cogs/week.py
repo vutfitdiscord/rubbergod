@@ -9,7 +9,7 @@ from config.messages import Messages
 from config import cooldowns
 
 
-class week(commands.Cog):
+class Week(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
@@ -33,4 +33,4 @@ class week(commands.Cog):
 
 
 def setup(bot):
-    bot.add_cog(week(bot))
+    bot.add_cog(Week(bot))

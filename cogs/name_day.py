@@ -7,7 +7,7 @@ from disnake.ext import commands
 from config.messages import Messages
 
 
-class Name_day(commands.Cog):
+class Nameday(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
@@ -33,4 +33,4 @@ class Name_day(commands.Cog):
 
 
 def setup(bot):
-    bot.add_cog(Name_day(bot))
+    bot.add_cog(Nameday(bot))

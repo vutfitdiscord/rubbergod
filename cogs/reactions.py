@@ -8,7 +8,7 @@ from utils import is_command_message
 from repository.database import session
 
 
-class Reaction(commands.Cog):
+class Reactions(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
@@ -61,4 +61,4 @@ class Reaction(commands.Cog):
 
 
 def setup(bot):
-    bot.add_cog(Reaction(bot))
+    bot.add_cog(Reactions(bot))
