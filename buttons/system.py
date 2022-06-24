@@ -106,10 +106,9 @@ class Dropdown(disnake.ui.Select):
         loaded = []
         for value in class_list:
             if value in self.bot.cogs:
-                position = class_list.index(value)
-                loaded.append(file_list[position])
+                loaded.append(value)
 
-        unloaded = list(set(file_list) - set(loaded))
+        unloaded = list(set(class_list) - set(loaded))
 
         loaded.sort()
         unloaded.sort()
@@ -140,36 +139,41 @@ class Dropdown(disnake.ui.Select):
     async def callback(self, inter: disnake.MessageInteraction):
         """React to user selecting cog(s)."""
         await inter.response.defer()
+        if utils.is_bot_admin(inter):
+            unloaded = self.create_cog_lists()
 
-        unloaded = self.create_cog_lists()
+            for cog in self.unloadable_cogs:
+                if cog in self.values:
+                    await inter.send(utils.fill_message("cog_not_unloadable", cog=cog))
+                    self.options = self.create_select()
+                    self.values.remove(cog)
 
-        for cog in self.unloadable_cogs:
-            if cog in self.values:
-                await inter.send(utils.fill_message("cog_not_unloadable", cog=cog))
-                self.options = self.create_select()
-                self.values.remove(cog)
-
-        if not self.reload:
-            for cog in self.values:
-                if cog in unloaded:
+            if not self.reload:
+                for cog in self.values:
+                    if cog in unloaded:
+                        try:
+                            self.bot.load_extension(f"cogs.{cog}")
+                            print(utils.fill_message("cog_loaded", cog=cog))
+                            await inter.channel.send(utils.fill_message("cog_loaded", cog=cog))
+                        except Exception as e:
+                            await inter.send(f"Loading error\n`{e}`")
+                    else:
+                        try:
+                            self.bot.unload_extension(f"cogs.{cog}")
+                            print(utils.fill_message("cog_unloaded", cog=cog))
+                            await inter.channel.send(utils.fill_message("cog_unloaded", cog=cog))
+                        except Exception as e:
+                            await inter.send(f"Unloading error\n`{e}`")
+            else:
+                for cog in self.values:
                     try:
-                        self.bot.load_extension(f"cogs.{cog}")
-                        print(utils.fill_message("cog_loaded", cog=cog))
+                        self.bot.reload_extension(f"cogs.{cog}")
+                        print(utils.fill_message("cog_reloaded", cog=cog))
+                        await inter.channel.send(utils.fill_message("cog_reloaded", cog=cog))
                     except Exception as e:
-                        await inter.send(f"Loading error\n`{e}`")
-                else:
-                    try:
-                        self.bot.unload_extension(f"cogs.{cog}")
-                        print(utils.fill_message("cog_unloaded", cog=cog))
-                    except Exception as e:
-                        await inter.send(f"Unloading error\n`{e}`")
+                        await inter.send(f"Reloading error\n`{e}`")
+
+            self.options = self.create_select()
+            await self.msg.edit(embed=self.create_embed(inter.author.colour), view=self._view)
         else:
-            for cog in self.values:
-                try:
-                    self.bot.reload_extension(f"cogs.{cog}")
-                    print(utils.fill_message("cog_reloaded", cog=cog))
-                except Exception as e:
-                    await inter.send(f"Reloading error\n`{e}`")
-
-        self.options = self.create_select()
-        await self.msg.edit(embed=self.create_embed(inter.author.colour), view=self._view)
+            await inter.send(utils.fill_message("insufficient_rights", user=inter.author.id), ephemeral=True)
