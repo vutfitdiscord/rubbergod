@@ -100,7 +100,6 @@ class Dropdown(disnake.ui.Select):
         embed = disnake.Embed(title="Cogs information and loading", colour=author_colour)
 
         all_cogs = utils.get_all_cogs()
-        file_list = list(all_cogs.keys())
         class_list = list(all_cogs.values())
 
         loaded = []
@@ -154,14 +153,12 @@ class Dropdown(disnake.ui.Select):
                         try:
                             self.bot.load_extension(f"cogs.{cog}")
                             print(utils.fill_message("cog_loaded", cog=cog))
-                            await inter.channel.send(utils.fill_message("cog_loaded", cog=cog))
                         except Exception as e:
                             await inter.send(f"Loading error\n`{e}`")
                     else:
                         try:
                             self.bot.unload_extension(f"cogs.{cog}")
                             print(utils.fill_message("cog_unloaded", cog=cog))
-                            await inter.channel.send(utils.fill_message("cog_unloaded", cog=cog))
                         except Exception as e:
                             await inter.send(f"Unloading error\n`{e}`")
             else:
