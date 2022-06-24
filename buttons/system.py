@@ -80,7 +80,7 @@ class Dropdown(disnake.ui.Select):
         return options
 
     def create_cog_lists(self):
-        cog_files = utils.get_all_cogs().keys()
+        cog_files = list(utils.get_all_cogs().keys())
 
         # list out keys and values separately
         file_list = self.cogs[0]
@@ -91,8 +91,8 @@ class Dropdown(disnake.ui.Select):
             if value in self.bot.cogs:
                 position = class_list.index(value)
                 loaded.append(file_list[position])
-
-        unloaded = list(set([cog.lower() for cog in cog_files]) - set(loaded))
+        
+        unloaded = list(set(cog_files) - set(loaded))
         unloaded.sort()
         return unloaded
 
