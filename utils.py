@@ -8,7 +8,7 @@ from disnake.ext import commands
 from sqlalchemy.schema import Table
 import os
 import re
-from genericpath import isdir, isfile
+from genericpath import isfile
 
 from config.app_config import config
 from config.messages import Messages

@@ -223,7 +223,7 @@ class System(commands.Cog):
         return all_selects
 
     @commands.check(utils.is_bot_admin)
-    @commands.slash_command(name="cogs", description="Manipulate with cogs", guild_ids=[845678676530954271])
+    @commands.slash_command(name="cogs", description="Manipulate with cogs")
     async def cogs(self, inter: disnake.ApplicationCommandInteraction):
         """
         Creates embed with button and select(s) to load/unload/reload cogs.
