@@ -36,7 +36,7 @@ class Reactions(commands.Cog):
         if ctx.channel.id not in config.role_channels:
             cogs.append(self.bot.get_cog("Karma"))
         else:
-            cogs.append(self.bot.get_cog("ReactToRole"))
+            cogs.append(self.bot.get_cog("Roles"))
         if (
             ctx.emoji == "❎"
             and payload.channel_id in config.deduplication_channels
