@@ -49,7 +49,7 @@ class Dropdown(disnake.ui.Select):
             placeholder=self.get_initials(),
             min_values=1,
             max_values=len(self.cogs[0]),
-            options= self.create_select()
+            options=self.create_select()
         )
 
     def get_initials(self):
@@ -91,7 +91,7 @@ class Dropdown(disnake.ui.Select):
             if value in self.bot.cogs:
                 position = class_list.index(value)
                 loaded.append(file_list[position])
-        
+
         unloaded = list(set(cog_files) - set(loaded))
         unloaded.sort()
         return unloaded

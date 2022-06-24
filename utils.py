@@ -235,14 +235,14 @@ def make_pts_column_row_formatter(pts_column_name: str):
 def get_all_cogs():
     """Returns all available cogs with their class names as ordered dict."""
     all_cogs = {}
-    pattern = "class (.*)\(commands\.Cog\):"
+    pattern = r"class (.*)\(commands\.Cog\):"
     for name in os.listdir("./cogs"):
         filename = f"./cogs/{name}"
         if isfile(filename) and filename.endswith(".py"):
-            with open (filename, "r") as file:
+            with open(filename, "r") as file:
                 for line in file:
                     if re.search(pattern, line):
                         result = re.search(pattern, line)
                         all_cogs[name[:-3]] = result.group(1)
                         break
-    return {key:all_cogs[key] for key in sorted(all_cogs.keys())}
+    return {key: all_cogs[key] for key in sorted(all_cogs.keys())}
