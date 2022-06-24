@@ -32,10 +32,10 @@ class System(commands.Cog):
         for part in pull_parts[1:]:
             await ctx.send(f"```{part}```")
 
-    def split(self, array, n):
-        """Split a list into N parts of approximately equal length"""
-        k, m = divmod(len(array), n)
-        return (array[i*k+min(i, m):(i+1)*k+min(i+1, m)] for i in range(n))
+    def split(self, array, k):
+        n = len(array)
+        lists = [array[i * (n // k) + min(i, n % k):(i+1) * (n // k) + min(i+1, n % k)] for i in range(k)]
+        return lists 
 
     async def create_selects(self):
         """Slices dictionary of all cogs to chunks for select."""
