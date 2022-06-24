@@ -35,7 +35,7 @@ class System(commands.Cog):
     def split(self, array, k):
         n = len(array)
         lists = [array[i * (n // k) + min(i, n % k):(i+1) * (n // k) + min(i+1, n % k)] for i in range(k)]
-        return lists 
+        return lists
 
     async def create_selects(self):
         """Slices dictionary of all cogs to chunks for select."""
