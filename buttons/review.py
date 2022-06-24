@@ -57,7 +57,7 @@ class ReviewView(EmbedView):
 
     @property
     def review_id(self):
-        return self.embed.footer.text.split("|")[2][5:]
+        return self.embed.footer.text.split("|")[-1][5:]
 
     async def handle_vote(self, interaction: disnake.MessageInteraction, vote: bool = None):
         review = self.repo.get_review_by_id(self.review_id)
