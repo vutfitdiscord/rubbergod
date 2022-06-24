@@ -6,6 +6,9 @@ import math
 from disnake import Member, PartialEmoji, Emoji
 from disnake.ext import commands
 from sqlalchemy.schema import Table
+import os
+import re
+from genericpath import isdir, isfile
 
 from config.app_config import config
 from config.messages import Messages
@@ -227,3 +230,16 @@ def make_pts_column_row_formatter(pts_column_name: str):
             kwargs) + " {} pts".format(getattr(entry, pts_column_name))
 
     return formatter
+def get_all_cogs():
+    """Returns all available cogs with their class names as ordered dict."""
+    all_cogs = {}
+    pattern = "class (.*)\(commands\.Cog\):"
+    for name in os.listdir("./cogs"):
+        filename = f"./cogs/{name}"
+        if isfile(filename) and filename.endswith(".py"):
+            with open (filename, "r") as file:
+                for line in file:
+                    if re.search(pattern, line):
+                        result = re.search(pattern, line)
+                        all_cogs[name[:-3]] = result.group(1)
+    return {key:all_cogs[key] for key in sorted(all_cogs.keys())}

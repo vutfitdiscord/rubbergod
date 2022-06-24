@@ -11,3 +11,4 @@ beautifulsoup4
 lxml
 python-dateutil
 CairoSVG>=2.5.2
+numpy
