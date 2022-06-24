@@ -300,15 +300,12 @@ class Messages:
 
     git_pull_brief = 'Stáhne aktuálni změny z repa'
 
-    cogs_brief = 'Vypíše seznam načtených cogs'
-    cog_load_brief = 'Načte cog'
-    cog_unload_brief = 'Odebere cog'
-    cog_reload_brief = 'Znovu načte cog'
+    cogs_brief = 'Vypíše seznam všech cogs a jejich stav'
     cog_is_loaded = 'Toto rozšíření `{cog}` je již načtené.'
     cog_unloaded = 'Rozšíření `{cog}` odebráno.'
     cog_loaded = 'Rozšíření `{cog}` načteno.'
     cog_is_unloaded = 'Toto rozšíření `{cog}` není načteno'
-    cog_cannot_be_unloadable = 'Toto rozšíření `{cog}` je neodebratelné.'
+    cog_not_unloadable = 'Toto rozšíření `{cog}` je neodebratelné.'
     cog_reloaded = 'Rozšíření `{cog}` bylo načteno znovu.'
 
     config_backup_brief = "Vytvoří záložní kopii konfigurace v novém souboru"

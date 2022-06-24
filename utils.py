@@ -230,6 +230,8 @@ def make_pts_column_row_formatter(pts_column_name: str):
             kwargs) + " {} pts".format(getattr(entry, pts_column_name))
 
     return formatter
+
+
 def get_all_cogs():
     """Returns all available cogs with their class names as ordered dict."""
     all_cogs = {}
@@ -242,4 +244,5 @@ def get_all_cogs():
                     if re.search(pattern, line):
                         result = re.search(pattern, line)
                         all_cogs[name[:-3]] = result.group(1)
+                        break
     return {key:all_cogs[key] for key in sorted(all_cogs.keys())}
