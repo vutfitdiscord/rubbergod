@@ -3,6 +3,7 @@ from disnake.ext import commands
 import sqlalchemy
 
 from features.reaction_context import ReactionContext
+from config.messages import Messages
 from config.app_config import config
 from utils import is_command_message
 from repository.database import session
@@ -44,7 +45,10 @@ class Reactions(commands.Cog):
                 name="Channel",
                 value=f"[Jump to original message]({ctx.message.jump_url}) in {ctx.message.channel.mention}"
             )
-            await ctx.member.send(embed=embed)
+            try:
+                await ctx.member.send(embed=embed)
+            except disnake.Forbidden:
+                return
         if ctx.emoji == "📌":
             cogs.append(self.bot.get_cog("AutoPin"))
         if ctx.channel.id not in config.role_channels:

@@ -74,11 +74,11 @@ class Dropdown(disnake.ui.Select):
         loaded.sort()
         unloaded.sort()
 
-        for cog in dict_of_cogs:
-            if dict_of_cogs[cog] in loaded:
-                options.append(disnake.SelectOption(label=dict_of_cogs[cog], value=cog, emoji="✅"))
+        for file, cog in dict_of_cogs.items():
+            if cog in loaded:
+                options.append(disnake.SelectOption(label=cog, value=file, emoji="✅"))
             else:
-                options.append(disnake.SelectOption(label=dict_of_cogs[cog], value=cog, emoji="❌"))
+                options.append(disnake.SelectOption(label=cog, value=file, emoji="❌"))
         return options
 
     def create_cog_lists(self):
