@@ -30,7 +30,18 @@ class Reactions(commands.Cog):
             return
 
         cogs = []
-
+        # send embed to user where he left reading
+        if ctx.emoji == "🔖":
+            if ctx.message.embeds:
+                for embed in ctx.message.embeds:
+                    content = embed.to_dict()
+            else:
+                content = ctx.message.content
+            embed = disnake.Embed(title=f"Záložka na serveru VUT FIT", color=ctx.member.colour)
+            embed.set_author(name=ctx.message.author, icon_url=ctx.message.author.avatar)
+            embed.add_field(name="Zpráva", value=content, inline=False)
+            embed.add_field(name=f"Channel", value=f"[Jump to original message]({ctx.message.jump_url}) in {ctx.message.channel.mention}")
+            await ctx.member.send(embed=embed)
         if ctx.emoji == "📌":
             cogs.append(self.bot.get_cog("AutoPin"))
         if ctx.channel.id not in config.role_channels:
