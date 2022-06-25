@@ -3,7 +3,6 @@ from disnake.ext import commands
 import sqlalchemy
 
 from features.reaction_context import ReactionContext
-from config.messages import Messages
 from config.app_config import config
 from utils import is_command_message
 from repository.database import session
