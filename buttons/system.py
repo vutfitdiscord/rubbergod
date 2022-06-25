@@ -54,29 +54,31 @@ class Dropdown(disnake.ui.Select):
 
     def get_initials(self):
         """Creates placeholder for selects from names of cogs."""
-        first = self.cogs[0][0].capitalize()
-        last = self.cogs[0][len(self.cogs)-1].capitalize()
+        first = self.cogs[1][0]
+        last = self.cogs[1][len(self.cogs)-1]
         return f"{first} - {last}"
 
     def create_select(self):
         """Creates one singular select from cogs"""
         options = []
         dict_of_cogs = dict(zip(self.cogs[0], self.cogs[1]))
-        val_list = list(dict_of_cogs.values())
-        key_list = list(dict_of_cogs.keys())
+        class_list = list(dict_of_cogs.values())
 
         loaded = []
-        for value in val_list:
+        for value in class_list:
             if value in self.bot.cogs:
-                position = val_list.index(value)
-                loaded.append(key_list[position])
+                loaded.append(value)
+
+        unloaded = list(set(class_list) - set(loaded))
+
+        loaded.sort()
+        unloaded.sort()
 
         for cog in dict_of_cogs:
-            cogname = cog.capitalize()
-            if cog.lower() in loaded:
-                options.append(disnake.SelectOption(label=cogname, value=cog, emoji="✅"))
+            if dict_of_cogs[cog] in loaded:
+                options.append(disnake.SelectOption(label=dict_of_cogs[cog], value=cog, emoji="✅"))
             else:
-                options.append(disnake.SelectOption(label=cogname, value=cog, emoji="❌"))
+                options.append(disnake.SelectOption(label=dict_of_cogs[cog], value=cog, emoji="❌"))
         return options
 
     def create_cog_lists(self):
@@ -114,11 +116,11 @@ class Dropdown(disnake.ui.Select):
 
         cog_loaded = ""
         for cog in loaded:
-            cog_loaded += f"✅ {cog.capitalize()}\n\n"
+            cog_loaded += f"✅ {cog}\n\n"
 
         cog_unloaded = ""
         for cog in unloaded:
-            cog_unloaded += f"❌ {cog.capitalize()}\n\n"
+            cog_unloaded += f"❌ {cog}\n\n"
 
         cog_list = cog_loaded + cog_unloaded
         cog_sum = len(loaded) + len(unloaded)
