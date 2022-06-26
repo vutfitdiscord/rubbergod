@@ -163,7 +163,7 @@ class Help(commands.Cog):
             embed.set_footer(text=footer_text, icon_url=ctx.author.display_avatar.url)
             embeds.append(embed)
 
-        view = EmbedView(embeds, author=ctx.author.id)
+        view = EmbedView(embeds, perma_lock=True)
         view.message = await ctx.reply(embed=embeds[0], view=view)
 
 
