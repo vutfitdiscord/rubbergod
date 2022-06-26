@@ -138,7 +138,12 @@ class EmbedView(disnake.ui.View):
         embed.add_field(name="Autor", value=interaction.author.display_name)
         embed.add_field(name="Expirace (UTC)", value=interaction.expires_at.strftime("%Y-%m-%d %H:%M:%S"))
         embed.add_field(name="Exception", value=error)
+        embed.add_field(name="Item", value=item)
         embed.add_field(name="Zpráva", value=interaction.message.jump_url, inline=False)
+        output = utils.cut_string(str(vars(self)), 1900)
+        output[0] = f'View object dump:\n{output[0]}'
+        for message in output:
+            await channel_out.send(f"```\n{message}```")
         await channel_out.send(embed=embed)
         output = traceback.format_exc()
         output = utils.cut_string(output, 1900)
