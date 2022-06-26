@@ -1,3 +1,4 @@
+from typing import List
 import disnake
 
 from buttons.embed import EmbedView
@@ -9,11 +10,11 @@ import utils
 
 class ReviewView(EmbedView):
 
-    def __init__(self, bot, embeds):
+    def __init__(self, author: disnake.User, bot: disnake.Client, embeds: List[disnake.Embed]):
         self.manager = ReviewManager(bot)
         self.repo = review_repo.ReviewRepository()
         self.total_pages = len(embeds)
-        super().__init__(embeds, row=2, end_arrow=False, timeout=300)
+        super().__init__(author, embeds, row=2, end_arrow=False, timeout=300)
         self.check_text_pages()
         # if there aren't any reviews remove buttons
         if len(self.embed.fields) < 1:
@@ -88,18 +89,21 @@ class ReviewView(EmbedView):
     @disnake.ui.button(emoji="❔", custom_id="review:help", style=disnake.ButtonStyle.primary)
     async def help(self, button: disnake.ui.Button, interaction: disnake.MessageInteraction):
         await interaction.send(Messages.reviews_reaction_help, ephemeral=True)
-        return
 
     async def interaction_check(self, interaction: disnake.MessageInteraction) -> None:
-        if "review" not in interaction.data.custom_id:
-            # interaction from super class
+        if interaction.data.custom_id == "embed:lock":
             await super().interaction_check(interaction)
-            self.check_text_pages()
-            # update view
-            await interaction.edit_original_message(view=self)
             return False
-        if "text" in interaction.data.custom_id and self.embed.fields[3].name == "Text page":
-            if (self.perma_lock or self.locked) and interaction.author.id != self.message.author:
+        elif "review" not in interaction.data.custom_id:
+            # pagination interaction from super class
+            await super().interaction_check(interaction)
+            if not((self.perma_lock or self.locked) and interaction.author.id != self.author.id):
+                self.check_text_pages()
+                # update view
+                await interaction.edit_original_message(view=self)
+            return False
+        elif "text" in interaction.data.custom_id and self.embed.fields[3].name == "Text page":
+            if (self.perma_lock or self.locked) and interaction.author.id != self.author.id:
                 await interaction.send(Messages.embed_not_author, ephemeral=True)
                 return False
             # text page pagination

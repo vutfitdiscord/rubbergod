@@ -423,7 +423,7 @@ class Exams(commands.Cog):
                 utils.add_author_footer(embed, author if author is not None else self.bot.user)
                 pages.append(embed)
             if isinstance(ctx, commands.Context):
-                view = EmbedView(pages)
+                view = EmbedView(ctx.author, pages)
                 view.message = await ctx.reply(embed=pages[0], view=view)
             else:
                 header = disnake.Embed(
