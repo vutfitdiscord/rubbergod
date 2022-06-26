@@ -77,25 +77,14 @@ class EmbedView(disnake.ui.View):
                     style=disnake.ButtonStyle.primary
                 )
             )
-        if perma_lock:
+        if not perma_lock:
             # if permanent lock is applied, dynamic lock is removed from buttons
-            for child in self.children:
-                if "embed:lock" in child.custom_id:
-                    self.remove_item(child)
-                    break
-            
-
-    @disnake.ui.button(emoji="🔓", custom_id="embed:lock", style=disnake.ButtonStyle.grey)
-    async def dynamic_lock(self, button: disnake.ui.Button, interaction: disnake.MessageInteraction):
-        if self.locked:
-            button.style = disnake.ButtonStyle.red
-            button.emoji = "🔒"
-        else:
-            button.style = disnake.ButtonStyle.success
-            button.emoji = "🔓"
-        self.locked = not self.locked
-        await interaction.response.edit_message(view=self)
-
+            self.lock_button = disnake.ui.Button(
+                emoji="🔓",
+                custom_id="embed:lock",
+                style=disnake.ButtonStyle.success
+            )
+            self.add_item(self.lock_button)
 
     @property
     def embed(self):
@@ -109,13 +98,23 @@ class EmbedView(disnake.ui.View):
     def embed(self, value):
         self.embeds[self.page-1] = value
 
-    async def interaction_check(self, interaction: disnake.Interaction) -> None:
+    async def interaction_check(self, interaction: disnake.MessageInteraction) -> None:
+        if interaction.data.custom_id == "embed:lock":
+            self.locked = not self.locked
+            if self.locked:
+                self.lock_button.style = disnake.ButtonStyle.danger
+                self.lock_button.emoji = "🔒"
+            else:
+                self.lock_button.style = disnake.ButtonStyle.success
+                self.lock_button.emoji = "🔓"
+            await interaction.response.edit_message(view=self)
+            return False
         ids = ["embed:start_page", "embed:prev_page", "embed:next_page", "embed:end_page"]
         if interaction.data.custom_id not in ids or self.max_page <= 1:
             return
         if (self.perma_lock or self.locked) and interaction.author.id != self.message.author:
             await interaction.send(Messages.embed_not_author, ephemeral=True)
-            return
+            return False
         self.page = utils.pagination_next(
             interaction.data.custom_id,
             self.page,

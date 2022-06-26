@@ -90,7 +90,7 @@ class ReviewView(EmbedView):
         await interaction.send(Messages.reviews_reaction_help, ephemeral=True)
         return
 
-    async def interaction_check(self, interaction: disnake.Interaction) -> None:
+    async def interaction_check(self, interaction: disnake.MessageInteraction) -> None:
         if "review" not in interaction.data.custom_id:
             # interaction from super class
             await super().interaction_check(interaction)
@@ -99,6 +99,9 @@ class ReviewView(EmbedView):
             await interaction.edit_original_message(view=self)
             return False
         if "text" in interaction.data.custom_id and self.embed.fields[3].name == "Text page":
+            if (self.perma_lock or self.locked) and interaction.author.id != self.message.author:
+                await interaction.send(Messages.embed_not_author, ephemeral=True)
+                return False
             # text page pagination
             review = self.repo.get_review_by_id(self.review_id)
             if review:
