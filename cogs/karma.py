@@ -233,7 +233,8 @@ class Karma(commands.Cog):
 
         await self.check.botroom_check(inter)
         view = EmbedView(embeds=[embed], page_source=page_source)
-        view.message = await inter.response.send_message(embed=embed, view=view)
+        await inter.response.send_message(embed=embed, view=view)
+        view.message = await inter.original_message()
 
     @cooldowns.long_cooldown
     @_karma.sub_command(name="bajkarboard", description=messages.karma_bajkarboard_brief)
@@ -256,7 +257,8 @@ class Karma(commands.Cog):
 
         await self.check.botroom_check(inter)
         view = EmbedView(embeds=[embed], page_source=page_source)
-        view.message = await inter.response.send_message(embed=embed, view=view)
+        await inter.response.send_message(embed=embed, view=view)
+        view.message = await inter.original_message()
 
     @cooldowns.long_cooldown
     @_karma.sub_command(name="givingboard", description=messages.karma_givingboard_brief)
@@ -279,7 +281,8 @@ class Karma(commands.Cog):
 
         await self.check.botroom_check(inter)
         view = EmbedView(embeds=[embed], page_source=page_source)
-        view.message = await inter.response.send_message(embed=embed, view=view)
+        await inter.response.send_message(embed=embed, view=view)
+        view.message = await inter.original_message()
 
     @cooldowns.long_cooldown
     @_karma.sub_command(name="ishaboard", description=messages.karma_ishaboard_brief)
@@ -302,7 +305,8 @@ class Karma(commands.Cog):
 
         await self.check.botroom_check(inter)
         view = EmbedView(embeds=[embed], page_source=page_source)
-        view.message = await inter.response.send_message(embed=embed, view=view)
+        await inter.response.send_message(embed=embed, view=view)
+        view.message = await inter.original_message()
 
     @revote.error
     @vote.error
