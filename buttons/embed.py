@@ -12,6 +12,7 @@ class EmbedView(disnake.ui.View):
 
     def __init__(
         self,
+        author: disnake.User,
         embeds: List[disnake.Embed],
         row: int = 1,
         perma_lock: bool = False,
@@ -22,15 +23,17 @@ class EmbedView(disnake.ui.View):
     ):
         """Embed pagination view
 
+        param: disnake.User author: command author, used for locking pagination
         param: List[disnake.Embed] embeds: List of embed to be paginated
         param int row: On which row should be buttons added, defaults to first
-        param bool perma_lock: If true allow just message autor to change pages, withou dynamic lock button
+        param bool perma_lock: If true allow just message autor to change pages, without dynamic lock button
         param bool roll_arroud: After last page rollaround to first
         param bool end_arrow: If true use also '⏩' button
         param LeaderboardPageSource page_source: Use for long leaderboards, embeds should contain one embed
         param int timeout: Seconds until disabling interaction, use None for always enabled
         """
         self.page = 1
+        self.author = author
         self.locked = False
         self.page_source = page_source
         self.roll_arroud = roll_arroud
@@ -100,19 +103,22 @@ class EmbedView(disnake.ui.View):
 
     async def interaction_check(self, interaction: disnake.MessageInteraction) -> None:
         if interaction.data.custom_id == "embed:lock":
-            self.locked = not self.locked
-            if self.locked:
-                self.lock_button.style = disnake.ButtonStyle.danger
-                self.lock_button.emoji = "🔒"
+            if interaction.author.id == self.author.id:
+                self.locked = not self.locked
+                if self.locked:
+                    self.lock_button.style = disnake.ButtonStyle.danger
+                    self.lock_button.emoji = "🔒"
+                else:
+                    self.lock_button.style = disnake.ButtonStyle.success
+                    self.lock_button.emoji = "🔓"
+                await interaction.response.edit_message(view=self)
             else:
-                self.lock_button.style = disnake.ButtonStyle.success
-                self.lock_button.emoji = "🔓"
-            await interaction.response.edit_message(view=self)
+                await interaction.send(Messages.embed_not_author, ephemeral=True)
             return False
         ids = ["embed:start_page", "embed:prev_page", "embed:next_page", "embed:end_page"]
         if interaction.data.custom_id not in ids or self.max_page <= 1:
             return
-        if (self.perma_lock or self.locked) and interaction.author.id != self.message.author:
+        if (self.perma_lock or self.locked) and interaction.author.id != self.author.id:
             await interaction.send(Messages.embed_not_author, ephemeral=True)
             return False
         self.page = utils.pagination_next(

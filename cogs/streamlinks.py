@@ -50,7 +50,7 @@ class StreamLinks(commands.Cog):
         embeds = []
         for idx, link in enumerate(streamlinks):
             embeds.append(self.create_embed_of_link(link, ctx.author, len(streamlinks), idx+1))
-        view = EmbedView(embeds, timeout=180)
+        view = EmbedView(ctx.author, embeds, timeout=180)
         view.message = await ctx.reply(embed=embeds[0], view=view)
 
     @commands.check(utils.helper_plus)

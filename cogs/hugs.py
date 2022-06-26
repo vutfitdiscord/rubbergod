@@ -53,7 +53,7 @@ class Hugs(commands.Cog):
             embed = page_source.format_page(page)
 
         await self.check.botroom_check(ctx.message)
-        view = EmbedView(embeds=[embed], page_source=page_source)
+        view = EmbedView(ctx.author, embeds=[embed], page_source=page_source)
         view.message = await ctx.send(embed=embed, view=view)
 
     @cooldowns.long_cooldown
@@ -76,7 +76,7 @@ class Hugs(commands.Cog):
             embed = page_source.format_page(page)
 
         await self.check.botroom_check(ctx.message)
-        view = EmbedView(embeds=[embed], page_source=page_source)
+        view = EmbedView(ctx.author, embeds=[embed], page_source=page_source)
         view.message = await ctx.send(embed=embed, view=view)
 
     @cooldowns.long_cooldown
@@ -99,7 +99,7 @@ class Hugs(commands.Cog):
             embed = page_source.format_page(page)
 
         await self.check.botroom_check(ctx.message)
-        view = EmbedView(embeds=[embed], page_source=page_source)
+        view = EmbedView(ctx.author, embeds=[embed], page_source=page_source)
         view.message = await ctx.send(embed=embed, view=view)
 
     @cooldowns.long_cooldown

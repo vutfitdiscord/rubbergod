@@ -65,7 +65,7 @@ class Review(commands.Cog):
         if embeds is None or len(embeds) == 0:
             await inter.send(Messages.review_wrong_subject)
             return
-        view = ReviewView(self.bot, embeds)
+        view = ReviewView(inter.author, self.bot, embeds)
         await inter.response.send_message(embed=embeds[0], view=view)
         view.message = await inter.original_message()
 
@@ -261,7 +261,7 @@ class Review(commands.Cog):
             embed.description = ""
             embeds.append(embed)
 
-        view = EmbedView(embeds)
+        view = EmbedView(inter.author, embeds)
         await inter.response.send_message(embed=embeds[0], view=view)
         view.message = await inter.original_message()
 

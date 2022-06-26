@@ -232,7 +232,7 @@ class Karma(commands.Cog):
         embed = page_source.format_page(page)
 
         await self.check.botroom_check(inter)
-        view = EmbedView(embeds=[embed], page_source=page_source)
+        view = EmbedView(inter.author, embeds=[embed], page_source=page_source)
         await inter.response.send_message(embed=embed, view=view)
         view.message = await inter.original_message()
 
@@ -256,7 +256,7 @@ class Karma(commands.Cog):
         embed = page_source.format_page(page)
 
         await self.check.botroom_check(inter)
-        view = EmbedView(embeds=[embed], page_source=page_source)
+        view = EmbedView(inter.author, embeds=[embed], page_source=page_source)
         await inter.response.send_message(embed=embed, view=view)
         view.message = await inter.original_message()
 
@@ -280,7 +280,7 @@ class Karma(commands.Cog):
         embed = page_source.format_page(page)
 
         await self.check.botroom_check(inter)
-        view = EmbedView(embeds=[embed], page_source=page_source)
+        view = EmbedView(inter.author, embeds=[embed], page_source=page_source)
         await inter.response.send_message(embed=embed, view=view)
         view.message = await inter.original_message()
 
@@ -304,7 +304,7 @@ class Karma(commands.Cog):
         embed = page_source.format_page(page)
 
         await self.check.botroom_check(inter)
-        view = EmbedView(embeds=[embed], page_source=page_source)
+        view = EmbedView(inter.author, embeds=[embed], page_source=page_source)
         await inter.response.send_message(embed=embed, view=view)
         view.message = await inter.original_message()
 
