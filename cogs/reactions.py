@@ -3,11 +3,10 @@ from disnake.ext import commands
 import sqlalchemy
 
 from features.reaction_context import ReactionContext
-from config.messages import Messages
-from buttons.bookmark import BookmarkView
 from config.app_config import config
 from utils import is_command_message
 from repository.database import session
+from cogs.bookmark import Bookmark
 
 
 class Reactions(commands.Cog):
@@ -33,23 +32,7 @@ class Reactions(commands.Cog):
 
         # send embed to user where he left reading
         elif ctx.emoji == "🔖":
-            if ctx.message.embeds:
-                for embed in ctx.message.embeds:
-                    content = embed.to_dict()
-            else:
-                content = ctx.message.content
-            embed = disnake.Embed(title=Messages.bookmark_title, color=ctx.member.colour)
-            embed.set_author(name=ctx.message.author, icon_url=ctx.message.author.avatar)
-            embed.add_field(name="Zpráva", value=content, inline=False)
-            embed.add_field(
-                name="Channel",
-                value=f"[Jump to original message]({ctx.message.jump_url}) in {ctx.message.channel.mention}"
-            )
-            try:
-                await ctx.member.send(embed=embed, view=BookmarkView())
-                return
-            except disnake.HTTPException:
-                return
+            await Bookmark.bookmark_reaction(self, ctx)
 
         cogs = []
         if ctx.emoji == "📌":
