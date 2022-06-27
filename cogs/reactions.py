@@ -3,6 +3,8 @@ from disnake.ext import commands
 import sqlalchemy
 
 from features.reaction_context import ReactionContext
+from config.messages import Messages
+from buttons.bookmark import BookmarkView
 from config.app_config import config
 from utils import is_command_message
 from repository.database import session
@@ -29,15 +31,14 @@ class Reactions(commands.Cog):
                 session.rollback()
             return
 
-        cogs = []
         # send embed to user where he left reading
-        if ctx.emoji == "🔖":
+        elif ctx.emoji == "🔖":
             if ctx.message.embeds:
                 for embed in ctx.message.embeds:
                     content = embed.to_dict()
             else:
                 content = ctx.message.content
-            embed = disnake.Embed(title="Záložka na serveru VUT FIT", color=ctx.member.colour)
+            embed = disnake.Embed(title=Messages.bookmark_title, color=ctx.member.colour)
             embed.set_author(name=ctx.message.author, icon_url=ctx.message.author.avatar)
             embed.add_field(name="Zpráva", value=content, inline=False)
             embed.add_field(
@@ -45,9 +46,12 @@ class Reactions(commands.Cog):
                 value=f"[Jump to original message]({ctx.message.jump_url}) in {ctx.message.channel.mention}"
             )
             try:
-                await ctx.member.send(embed=embed)
-            except disnake.Forbidden:
+                await ctx.member.send(embed=embed, view=BookmarkView())
                 return
+            except disnake.HTTPException:
+                return
+
+        cogs = []
         if ctx.emoji == "📌":
             cogs.append(self.bot.get_cog("AutoPin"))
         if ctx.channel.id not in config.role_channels:
