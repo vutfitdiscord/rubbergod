@@ -29,7 +29,6 @@ class Bookmark(commands.Cog):
         )
         try:
             await ctx.member.send(embed=embed, view=BookmarkView())
-            return
         except disnake.HTTPException:
             return
 

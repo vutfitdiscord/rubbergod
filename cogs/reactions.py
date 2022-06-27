@@ -6,7 +6,6 @@ from features.reaction_context import ReactionContext
 from config.app_config import config
 from utils import is_command_message
 from repository.database import session
-from cogs.bookmark import Bookmark
 
 
 class Reactions(commands.Cog):
@@ -30,11 +29,12 @@ class Reactions(commands.Cog):
                 session.rollback()
             return
 
-        # send embed to user where he left reading
-        elif ctx.emoji == "🔖":
-            await Bookmark.bookmark_reaction(self, ctx)
-
         cogs = []
+        # send embed to user where he left reading
+        if ctx.emoji == "🔖":
+            await self.bot.get_cog("Bookmark").bookmark_reaction(ctx)
+            return
+
         if ctx.emoji == "📌":
             cogs.append(self.bot.get_cog("AutoPin"))
         if ctx.channel.id not in config.role_channels:
