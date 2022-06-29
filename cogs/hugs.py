@@ -120,11 +120,10 @@ class Hugs(commands.Cog):
             stats = self.hugs_repo.get_members_stats(user.id)
             positions = self.hugs_repo.get_member_position(stats)
             avg_position = int((positions[0] + positions[1]) // 2)
+            guild = self.bot.get_guild(config.guild_id)
 
             embed = disnake.Embed(
-                title=title.format(
-                    self.get_default_emoji("peepoHugger") or ""
-                ),
+                title=title.format(utils.get_emoji(guild, "peepoHugger") or ""),
                 description=" | ".join(
                     (
                         "**Ranks**",
@@ -138,8 +137,8 @@ class Hugs(commands.Cog):
             embed.set_author(name=user_str, icon_url=user.avatar.url)
             utils.add_author_footer(embed, ctx.author)
 
-            given_emoji = self.get_default_emoji("peepohugs") or ""
-            recv_emoji = self.get_default_emoji("huggers") or ""
+            given_emoji = utils.get_emoji(guild, "peepohugs") or ""
+            recv_emoji = utils.get_emoji(guild, "huggers") or ""
 
             embed.add_field(name=f"{given_emoji} Given", value=str(stats.given))
             embed.add_field(name=f"{recv_emoji} Received", value=str(stats.received))
@@ -154,7 +153,9 @@ class Hugs(commands.Cog):
         if user is None:
             user = ctx.author
         elif user.bot:
-            await ctx.send(self.get_default_emoji("huggers") or ":people_hugging:")
+            await ctx.send(
+                utils.get_emoji(self.bot.get_guild(config.guild_id), "huggers") or ":people_hugging:"
+            )
             return
 
         async with ctx.typing():
