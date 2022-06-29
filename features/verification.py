@@ -14,43 +14,35 @@ from config.messages import Messages
 from features.base_feature import BaseFeature
 from repository.user_repo import UserRepository, VerifyStatus
 from repository.database.verification import Valid_person
+from email.mime.text import MIMEText
 
 
 class Verification(BaseFeature):
-
     def __init__(self, bot: Bot, user_repository: UserRepository):
         super().__init__(bot)
         self.repo = user_repository
 
-    def send_mail(self, receiver_email, contents):
-        password = config.email_pass
-        port = config.email_smtp_port
-        context = ssl.create_default_context()
-        sender_email = config.email_addr
-        subject = "FIT Discord verifikace"
-        mail_content = 'Subject: {}\n\n{}'.format(subject,
-                                                  contents)
+    def send_mail(self, receiver_email: str, contents: str, subject: str = "") -> None:
+        msg = MIMEText(contents)
+        msg["Subject"] = subject
 
-        with smtplib.SMTP_SSL(config.email_smtp_server, port,
-                              context=context) as server:
-            server.login(config.email_name, password)
-            server.sendmail(sender_email, receiver_email, mail_content)
+        with smtplib.SMTP_SSL(
+            config.email_smtp_server,
+            config.email_smtp_port,
+            context=ssl.create_default_context(),
+        ) as server:
+            server.login(config.email_name, config.email_pass)
+            server.sendmail(config.email_addr, receiver_email, msg.as_string())
 
-    def send_mail_verified(self, receiver_email, user):
+    def send_mail_verified(self, receiver_email: str, user: str):
         """Send mail with instructions in case of blocked DMs"""
-        password = config.email_pass
-        port = config.email_smtp_port
-        context = ssl.create_default_context()
-        sender_email = config.email_addr
-        subject = f"{user} {Messages.verify_verify_success_mail}"
-        mail_content = f'Subject: {subject}\n\n{Messages.verify_post_verify_info_mail}'
+        self.send_mail(
+            receiver_email,
+            Messages.verify_post_verify_info_mail,
+            f"{user} {Messages.verify_verify_success_mail}",
+        )
 
-        with smtplib.SMTP_SSL(config.email_smtp_server, port,
-                              context=context) as server:
-            server.login(config.email_name, password)
-            server.sendmail(sender_email, receiver_email, mail_content)
-
-    async def has_role(self, user, role_name):
+    async def has_role(self, user, role_name: str) -> bool:
         if type(user) == Member:
             return utils.has_role(user, role_name)
         else:
@@ -58,95 +50,110 @@ class Verification(BaseFeature):
             member = await guild.fetch_member(user.id)
             return utils.has_role(member, role_name)
 
-    async def gen_code_and_send_mail(self, message, user: Valid_person, mail_postfix: str):
+    async def gen_code_and_send_mail(
+        self,
+        inter: disnake.ApplicationCommandInteraction,
+        user: Valid_person,
+        mail_postfix: str,
+    ):
         # Generate a verification code
-        code = ''.join(random.choices(string.ascii_uppercase + string.digits, k=20))
+        code = "".join(random.choices(string.ascii_uppercase + string.digits, k=20))
+        msg = f"{config.default_prefix}verify {user.login} {code}"
 
-        email_message = config.default_prefix + "verify "
-        email_message += f"{user.login} {code}"
-
-        mail_address = self.get_user_mail(user, mail_postfix)
-        self.send_mail(mail_address, email_message)
+        mail_address = user.get_mail(mail_postfix)
+        self.send_mail(mail_address, msg, "FIT Discord verifikace")
 
         # Save the newly generated code into the database
         self.repo.save_sent_code(user.login, code)
 
-        await message.channel.send(utils.fill_message("verify_send_success",
-                                                      user=message.author.id, mail=mail_postfix))
+        # TODO: Success. Send epheral message with buttons.
+        await message.channel.send(
+            utils.fill_message(
+                "verify_send_success", user=message.author.id, mail=mail_postfix
+            )
+        )
 
-    def get_user_mail(self, user: Valid_person, mail_postfix: str) -> str:
-        if user.mail is not None and len(user.mail) > 0:
-            return user.mail
-
-        return f'{user.login}@{mail_postfix}'  # fallback
-
-    async def send_code(self, message):
-        if len(str(message.content).split(" ")) != 2:
-            await message.channel.send(Messages.verify_send_format)
-            return
-
+    async def send_code(
+        self, login: str, inter: disnake.ApplicationCommandInteraction
+    ) -> None:
         # Check if the user doesn't have the verify role
-        if not await self.has_role(message.author, config.verification_role):
-            login = str(message.content).split(" ")[1]
-
-            # Some of them will use 'xlogin00' as stated in help,
-            # cuz they dumb
+        if not await self.has_role(inter.user, config.verification_role):
+            # Some of them will use 'xlogin00' as stated in help, cuz they dumb
             if login == "xlogin00":
-                await self.send_xlogin_info(message)
+                await self.send_xlogin_info(inter)
                 return
-            if login[0] == 'x':
+
+            if login[0] == "x":
                 # VUT
                 # Check if the login we got is in the database
                 user = self.repo.get_user_by_login(login)
 
                 if user is None:
-                    msg = utils.fill_message("verify_unknown_login",
-                                             user=message.author.id, admin=config.admin_ids[0])
-                    await message.channel.send(msg)
-                    await self.log_verify_fail(message, 'getcode (xlogin) - Unknown login')
+                    msg = utils.fill_message(
+                        "verify_unknown_login",
+                        user=inter.user.id,
+                        admin=config.admin_ids[0],
+                    )
+                    await inter.user.send(content=msg)
+                    await self.log_verify_fail(
+                        inter, "getcode (xlogin) - Unknown login", str({"login": login})
+                    )
                 elif user is not None and user.status != VerifyStatus.Unverified.value:
                     msg = utils.fill_message(
-                        "verify_step_done", user=message.author.id, admin=config.admin_ids[0])
-                    await message.channel.send(msg)
-                    await self.log_verify_fail(message, 'getcode (xlogin) - Invalid verify state')
+                        "verify_step_done",
+                        user=inter.user.id,
+                        admin=config.admin_ids[0],
+                    )
+                    await inter.send(content=msg)
+                    await self.log_verify_fail(
+                        inter,
+                        "getcode (xlogin) - Invalid verify state",
+                        str(user.__dict__),
+                    )
                 else:
-                    await self.gen_code_and_send_mail(message, user, "stud.fit.vutbr.cz")
+                    await self.gen_code_and_send_mail(inter, user, "stud.fit.vutbr.cz")
             else:
                 # MUNI
                 try:
                     int(login)
                 except ValueError:
-                    msg = utils.fill_message("invalid_login", user=message.author.id,
-                                             admin=config.admin_ids[0])
-                    await message.channel.send(msg)
-                    await self.log_verify_fail(message, 'getcode (MUNI)')
-
-                    try:
-                        await message.delete()
-                        return
-                    except disnake.errors.Forbidden:
-                        return
+                    msg = utils.fill_message(
+                        "invalid_login",
+                        user=inter.user.id,
+                        admin=config.admin_ids[0],
+                    )
+                    await inter.send(msg)
+                    await self.log_verify_fail(
+                        inter, "getcode (MUNI)", str({"login": login})
+                    )
 
                 user = self.repo.get_user_by_login(login)
 
                 if user is not None and user.status != VerifyStatus.Unverified.value:
                     msg = utils.fill_message(
-                        "verify_step_done", user=message.author.id, admin=config.admin_ids[0])
-                    await message.channel.send(msg)
-                    await self.log_verify_fail(message, 'getcode (MUNI) - Verified')
+                        "verify_step_done",
+                        user=inter.user.id,
+                        admin=config.admin_ids[0],
+                    )
+                    await inter.send(conetnt=msg)
+                    await self.log_verify_fail(
+                        inter,
+                        "getcode (MUNI) - Invalid verify state",
+                        str(user.__dict__),
+                    )
                     return
 
                 user = self.repo.get_user(login, status=VerifyStatus.Unverified.value)
                 if user is None:
-                    user = self.repo.add_user(login, "MUNI", status=VerifyStatus.Unverified.value)
-                await self.gen_code_and_send_mail(message, user, "mail.muni.cz")
+                    user = self.repo.add_user(
+                        login, "MUNI", status=VerifyStatus.Unverified.value
+                    )
+                await self.gen_code_and_send_mail(inter, user, "mail.muni.cz")
         else:
-            await message.channel.send(utils.fill_message("verify_already_verified",
-                                                          user=message.author.id, admin=config.admin_ids[0]))
-        try:
-            await message.delete()
-        except disnake.errors.HTTPException:
-            return
+            msg = utils.fill_message(
+                "verify_already_verified", user=inter.user.id, admin=config.admin_ids[0]
+            )
+            await inter.send(content=msg)
 
     @staticmethod
     def transform_year(raw_year: str):
@@ -162,20 +169,23 @@ class Verification(BaseFeature):
                 # ['FIT'], ['FIT', '1r'], .... Who knows. Other faculty students, dropouts, ...
                 return None
 
-            year_value_match = re.search(r'(\d*)r', year_parts[2])
+            year_value_match = re.search(r"(\d*)r", year_parts[2])
             year_value = int(year_value_match.group(1))
 
+            # fmt: off
             if year_parts[1] in ["BIT", "BITP"]:
                 return "4BIT+" if year_value >= 4 else f"{year_value}BIT"
             elif year_parts[1] in ["BCH", "CZV"]:
                 return "1BIT"  # TODO: fix erasmus students (BCH)
-            elif year_parts[1] in ["MBS", "MBI", "MIS", "MIN", "MMI", "MMM", "MGM", "MGMe",
-                                   "MPV", "MSK", "NADE", "NBIO", "NGRI", "NNET", "NVIZ", "NCPS",
-                                   "NSEC", "NEMB", "NHPC", "NISD", "NIDE", "NISY", "NMAL", "NMAT",
-                                   "NSEN", "NVER", "NSPE", "MGH"]:
-                return '3MIT+' if year_value >= 3 else f'{year_value}MIT'
+            elif year_parts[1] in [
+                "MBS", "MBI", "MIS", "MIN", "MMI", "MMM", "MGM", "MGMe", "MPV", "MSK",
+                "NADE", "NBIO", "NGRI", "NNET", "NVIZ", "NCPS", "NSEC", "NEMB", "NHPC",
+                "NISD", "NIDE", "NISY", "NMAL", "NMAT", "NSEN", "NVER", "NSPE", "MGH"
+            ]:
+                return "3MIT+" if year_value >= 3 else f"{year_value}MIT"
             elif year_parts[1] in ["DVI4", "DRH", "DITP"]:
-                return 'PhD+'
+                return "PhD+"
+            # fmt: on
         elif "FEKT" in year_parts:  # FEKT student
             return "VUT"
         elif len(year_parts) == 1 and year_parts[0] == "MUNI":  # Maybe MUNI?
@@ -183,8 +193,9 @@ class Verification(BaseFeature):
 
         return None
 
+    # Deprecated. TODO Refactor to interactions.
     async def verify(self, message):
-        """"Verify if VUT login is from database"""
+        """ "Verify if VUT login is from database"""
         if len(str(message.content).split(" ")) != 3:
             await message.channel.send(Messages.verify_verify_format)
             return
@@ -204,8 +215,11 @@ class Verification(BaseFeature):
             if code == "kód" or code == "[kód]":
                 guild = self.bot.get_guild(config.guild_id)
                 fp = await guild.fetch_emoji(585915845146968093)
-                await message.channel.send(utils.fill_message("verify_verify_dumbshit",
-                                                              user=message.author.id, emote=str(fp)))
+                await message.channel.send(
+                    utils.fill_message(
+                        "verify_verify_dumbshit", user=message.author.id, emote=str(fp)
+                    )
+                )
                 return
 
             new_user = self.repo.get_user(login)
@@ -213,32 +227,45 @@ class Verification(BaseFeature):
             if new_user is not None:
                 # Check the code
                 if code != new_user.code:
-                    await message.channel.send(utils.fill_message("verify_verify_wrong_code",
-                                                                  user=message.author.id))
+                    await message.channel.send(
+                        utils.fill_message(
+                            "verify_verify_wrong_code", user=message.author.id
+                        )
+                    )
 
-                    await self.log_verify_fail(message, 'Verify (with code)')
+                    await self.log_verify_fail(message, "Verify (with code)")
                     return
 
                 # Try and transform the year into the role name
                 year = self.transform_year(new_user.year)
 
                 if year is None:
-                    msg = utils.fill_message("verify_verify_manual", user=message.author.id,
-                                             admin=config.admin_ids[0], year=str(new_user.year))
+                    msg = utils.fill_message(
+                        "verify_verify_manual",
+                        user=message.author.id,
+                        admin=config.admin_ids[0],
+                        year=str(new_user.year),
+                    )
                     await message.channel.send(msg)
 
-                    await self.log_verify_fail(message, 'Verify (with code) (Invalid year)')
+                    await self.log_verify_fail(
+                        message, "Verify (with code) (Invalid year)"
+                    )
                     return
 
                 try:
                     # Get server verify role
-                    verify = disnake.utils.get(message.guild.roles, name=config.verification_role)
+                    verify = disnake.utils.get(
+                        message.guild.roles, name=config.verification_role
+                    )
                     year = disnake.utils.get(message.guild.roles, name=year)
                     member = message.author
                 except AttributeError:
                     # jsme v PM
                     guild = self.bot.get_guild(config.guild_id)
-                    verify = disnake.utils.get(guild.roles, name=config.verification_role)
+                    verify = disnake.utils.get(
+                        guild.roles, name=config.verification_role
+                    )
                     year = disnake.utils.get(guild.roles, name=year)
                     member = guild.get_member(message.author.id)
 
@@ -248,44 +275,64 @@ class Verification(BaseFeature):
                 self.repo.save_verified(login, message.author.id)
 
                 try:
-                    await member.send(utils.fill_message("verify_verify_success",
-                                                         user=message.author.id))
+                    await member.send(
+                        utils.fill_message(
+                            "verify_verify_success", user=message.author.id
+                        )
+                    )
 
                     await member.send(Messages.verify_post_verify_info)
                 except disnake.errors.Forbidden:
-                    if login[0] == 'x':
+                    if login[0] == "x":
                         self.send_mail_verified(f"{login}@stud.fit.vutbr.cz", member)
                     else:
                         self.send_mail_verified(f"{login}@mail.muni.cz", member)
 
                 if message.channel.type is not disnake.ChannelType.private:
-                    await message.channel.send(utils.fill_message("verify_verify_success",
-                                                                  user=message.author.id))
+                    await message.channel.send(
+                        utils.fill_message(
+                            "verify_verify_success", user=message.author.id
+                        )
+                    )
             else:
-                msg = utils.fill_message("verify_verify_not_found", user=message.author.id,
-                                         admin=config.admin_ids[0])
+                msg = utils.fill_message(
+                    "verify_verify_not_found",
+                    user=message.author.id,
+                    admin=config.admin_ids[0],
+                )
                 await message.channel.send(msg)
 
-                await self.log_verify_fail(message, 'Verify (with code) - Not exists in DB')
+                await self.log_verify_fail(
+                    message, "Verify (with code) - Not exists in DB"
+                )
         else:
-            await message.channel.send(utils.fill_message("verify_already_verified",
-                                                          user=message.author.id, admin=config.admin_ids[0]))
+            await message.channel.send(
+                utils.fill_message(
+                    "verify_already_verified",
+                    user=message.author.id,
+                    admin=config.admin_ids[0],
+                )
+            )
 
         try:
             await message.delete()
         except disnake.errors.Forbidden:
             return
 
-    async def log_verify_fail(self, message: disnake.Message, phase: str):
-        embed = disnake.Embed(title="Neúspěšný pokus o verify", color=0xeee657)
-        embed.add_field(name="User", value=utils.generate_mention(message.author.id))
-        embed.add_field(name='Verify phase', value=phase)
-        embed.add_field(name="Message", value=message.content, inline=False)
-        channel = self.bot.get_channel(config.log_channel)
-        await channel.send(embed=embed)
+    async def log_verify_fail(
+        self, inter: disnake.ApplicationCommand, phase: str, data: str
+    ):
+        embed = disnake.Embed(title="Neúspěšný pokus o verify", color=0xEEE657)
+        embed.add_field(name="User", value=utils.generate_mention(inter.user.id))
+        embed.add_field(name="Verify phase", value=phase)
+        embed.add_field(name="Data", value=data, inline=False)
+        await self.bot.get_channel(config.log_channel).send(embed=embed)
 
-    async def send_xlogin_info(self, message: disnake.Message):
+    async def send_xlogin_info(self, inter: disnake.ApplicationCommandInteraction):
         guild = self.bot.get_guild(config.guild_id)
         fp = await guild.fetch_emoji(585915845146968093)
-        await message.channel.send(utils.fill_message("verify_send_dumbshit",
-                                                      user=message.author.id, emote=str(fp)))
+        await inter.send(
+            content=utils.fill_message(
+                "verify_send_dumbshit", user=inter.user.id, emote=str(fp)
+            )
+        )

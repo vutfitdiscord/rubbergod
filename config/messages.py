@@ -186,6 +186,7 @@ class Messages:
     verify_verify_wrong_code = "{user} Špatný kód."
     verify_unknown_login = "{user} Tvůj login nebyl nalezen v databázi. ({admin} pls)"
     verify_step_done = "{user} Tímto krokem jsi už prošel. ({admin} pls)"
+    verify_invalid_channel = "Tento příkaz je možné spustit pouze v DMs nebo na VUT FIT serveru."
     invalid_login = "{user} Neplatný login. Přečti si prosím <#591386755547136020>. ({admin} pls)"
 
     vote_brief = "Zahájí hlasování, ve kterém je možné zvolit více možností"
