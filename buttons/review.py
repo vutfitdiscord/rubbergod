@@ -14,7 +14,7 @@ class ReviewView(EmbedView):
         self.manager = ReviewManager(bot)
         self.repo = review_repo.ReviewRepository()
         self.total_pages = len(embeds)
-        super().__init__(author, embeds, row=2, end_arrow=False, timeout=300)
+        super().__init__(author, embeds, row=1, end_arrow=False, timeout=300)
         self.check_text_pages()
         # if there aren't any reviews remove buttons
         if len(self.embed.fields) < 1:

@@ -14,7 +14,7 @@ class EmbedView(disnake.ui.View):
         self,
         author: disnake.User,
         embeds: List[disnake.Embed],
-        row: int = 1,
+        row: int = 0,
         perma_lock: bool = False,
         roll_arroud: bool = True,
         end_arrow: bool = True,
