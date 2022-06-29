@@ -151,9 +151,16 @@ class Karma(commands.Cog):
         except disnake.errors.Forbidden:
             return
 
+    @commands.message_command(name="Karma from message")
+    async def message_app(self, inter: disnake.ApplicationCommandInteraction, message: disnake.Message):
+        await self._message(inter, message)
+
     @cooldowns.long_cooldown
     @_karma.sub_command(description=messages.karma_message_brief)
     async def message(self, inter: disnake.ApplicationCommandInteraction, message: disnake.Message):
+        await self._message(inter, message)
+
+    async def _message(self, inter: disnake.ApplicationCommandInteraction, message: disnake.Message):
         await inter.response.defer(with_message=True)
         embed = await self.karma.message_karma(inter.author, message)
         await inter.edit_original_message(embed=embed)
