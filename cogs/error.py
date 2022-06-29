@@ -50,6 +50,10 @@ class Error(commands.Cog):
             await ctx.send(utils.fill_message("spamming", user=ctx.author.id))
             return
 
+        if isinstance(error, commands.NoPrivateMessage):
+            await ctx.send(Messages.guild_only)
+            return
+
         if isinstance(error, utils.NotHelperPlusError):
             await ctx.send(Messages.helper_plus_only)
             return
