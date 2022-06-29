@@ -127,6 +127,10 @@ class Karma(commands.Cog):
         await inter.response.send_message(self.karma.karma_get(inter.author))
         await self.check.botroom_check(inter)
 
+    @commands.user_command(name="Karma uživatele")
+    async def stalk_app(self, inter: disnake.UserCommandInteraction, user: disnake.Member):
+        await inter.response.send_message(self.karma.karma_get(inter.author, user))
+
     @_karma.sub_command(description=messages.karma_stalk_brief)
     async def stalk(self, inter: disnake.ApplicationCommandInteraction, user: disnake.Member):
         await inter.response.send_message(self.karma.karma_get(inter.author, user))
@@ -151,8 +155,8 @@ class Karma(commands.Cog):
         except disnake.errors.Forbidden:
             return
 
-    @commands.message_command(name="Karma from message")
-    async def message_app(self, inter: disnake.ApplicationCommandInteraction, message: disnake.Message):
+    @commands.message_command(name="Karma zprávy")
+    async def message_app(self, inter: disnake.MessageCommandInteraction, message: disnake.Message):
         await self._message(inter, message)
 
     @cooldowns.long_cooldown
