@@ -116,7 +116,11 @@ class LeaderboardPageSource(DatabaseIteratorPageSource):
         return utils.get_emoji(self.bot.get_guild(config.guild_id), emoji)
 
     def set_leaderboard_title(self, board_name: str, emote_name: str):
-        return "{0} {1} {0}".format(self.get_default_emoji(emote_name) or f":{emote_name}:", board_name)
+        if emote_name.startswith('<') and emote_name.endswith('>'):
+            emote = emote_name
+        else:
+            emote = self.get_default_emoji(emote_name) or f":{emote_name}:"
+        return f"{emote} {board_name} {emote}"
 
     def _get_member_name(self, member_id: Union[str, int]) -> str:
         guild = self.bot.get_guild(config.guild_id)
