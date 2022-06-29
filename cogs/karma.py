@@ -296,7 +296,7 @@ class Karma(commands.Cog):
             query=karma_r.leaderboard_query(Database_karma.negative.desc()),
             row_formatter=self._negative_formatter,
             title='KARMA ISHABOARD',
-            emote_name='ishagrin',
+            emote_name='<:ishagrin:638277508651024394>',
             member_id_col_name='member_ID',
         )
         page_num = math.floor(start/page_source.per_page)
