@@ -36,6 +36,7 @@ class Messages:
     insufficient_rights = "{user}, na použití tohoto příkazu nemáš právo."
     helper_plus_only = "Na tohle mají práva jen Helper+. <:KKomrade:484470873001164817>"
     vote_room_only = "Tohle funguje jen v {room}."
+    guild_only = "Tohle funguje jen na serveru"
     bot_room_redirect = "{user} <:sadcat:576171980118687754> 👉 " \
                         "<#{bot_room}>\n"
     covid_storno = "{user} <:WeirdChamp:680711174802899007>"
