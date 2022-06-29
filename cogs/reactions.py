@@ -32,7 +32,10 @@ class Reactions(commands.Cog):
         cogs = []
         # send embed to user where he left reading
         if ctx.emoji == "🔖":
-            await self.bot.get_cog("Bookmark").bookmark_reaction(ctx)
+            try:
+                await self.bot.get_cog("Bookmark").bookmark_reaction(ctx)
+            except AttributeError:
+                pass  # cog not loaded
             return
 
         if ctx.emoji == "📌":
