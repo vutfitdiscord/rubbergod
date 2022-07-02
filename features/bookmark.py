@@ -56,4 +56,4 @@ class BookmarkFeatures():
             name="Channel",
             value=f"[Jump to original message]({inter.message.jump_url}) in {inter.message.channel.mention}"
         )
-        return (embed, images, files_attached)
+        return ([embed], images, files_attached)
