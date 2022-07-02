@@ -131,14 +131,14 @@ class Dropdown(disnake.ui.Select):
         cog_lists = list(utils.split(cog_loaded, chunks))
         for cog_list in cog_lists:
             if cog_list:
-                embed.add_field(name="‎", value="".join(cog_list), inline=True)
+                embed.add_field(name="\u200b", value="".join(cog_list), inline=True)
 
         if cog_unloaded:
-            embed.add_field(name="‎", value="‎", inline=False)
+            embed.add_field(name="\u200b", value="\u200b", inline=False)
             cog_lists = list(utils.split(cog_unloaded, chunks))
             for cog_list in cog_lists:
                 if cog_list:
-                    embed.add_field(name="‎", value="".join(cog_list), inline=True)
+                    embed.add_field(name="\u200b", value="".join(cog_list), inline=True)
 
         embed.set_footer(text="Bold items are overrides of config.extension")
         return embed
