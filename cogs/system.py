@@ -32,11 +32,6 @@ class System(commands.Cog):
         for part in pull_parts[1:]:
             await ctx.send(f"```{part}```")
 
-    def split(self, array, k):
-        n = len(array)
-        lists = [array[i * (n // k) + min(i, n % k):(i+1) * (n // k) + min(i+1, n % k)] for i in range(k)]
-        return lists
-
     async def create_selects(self):
         """Slices dictionary of all cogs to chunks for select."""
         cog_files = list(utils.get_all_cogs().keys())
@@ -45,8 +40,8 @@ class System(commands.Cog):
 
         # 25 is max number of options for one select
         chunks = math.ceil(len(cog_files)/25)
-        cog_files = list(self.split(cog_files, chunks))
-        cog_names = list(self.split(cog_names, chunks))
+        cog_files = list(utils.split(cog_files, chunks))
+        cog_names = list(utils.split(cog_names, chunks))
         for i in range(0, chunks):
             all_selects.append([cog_files[i], cog_names[i]])
 

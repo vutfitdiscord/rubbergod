@@ -1,7 +1,7 @@
 import disnake
 from disnake.ext import commands
+from features.bookmark import BookmarkFeatures
 from modals.bookmark import BookmarkModal
-from config.messages import Messages
 from buttons.bookmark import BookmarkView
 
 
@@ -15,20 +15,16 @@ class Bookmark(commands.Cog):
         await inter.response.send_modal(modal=BookmarkModal(message))
 
     async def bookmark_reaction(self, ctx):
-        if ctx.message.embeds:
-            for embed in ctx.message.embeds:
-                content = embed.to_dict()
-        else:
-            content = ctx.message.content
-        embed = disnake.Embed(title=Messages.bookmark_title, color=ctx.member.colour)
-        embed.set_author(name=ctx.message.author, icon_url=ctx.message.author.avatar)
-        embed.add_field(name="Zpráva", value=content, inline=False)
-        embed.add_field(
-            name="Channel",
-            value=f"[Jump to original message]({ctx.message.jump_url}) in {ctx.message.channel.mention}"
-        )
+        embed, images, files_attached = await BookmarkFeatures.create_bookmark_embed(self, ctx)
         try:
-            await ctx.member.send(embed=embed, view=BookmarkView())
+            await ctx.member.send(embed=embed, view=BookmarkView(), files=files_attached)
+            if images:
+                for image in images:
+                    await ctx.member.send(
+                        embed=await BookmarkFeatures.create_image_embed(self, ctx, image),
+                        view=BookmarkView()
+                        )
+            return
         except disnake.HTTPException:
             return
 

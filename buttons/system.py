@@ -1,5 +1,7 @@
 import disnake
 import utils
+import math
+from config.app_config import config
 
 
 class SystemView(disnake.ui.View):
@@ -55,7 +57,7 @@ class Dropdown(disnake.ui.Select):
     def get_initials(self):
         """Creates placeholder for selects from names of cogs."""
         first = self.cogs[1][0]
-        last = self.cogs[1][len(self.cogs)-1]
+        last = self.cogs[1][len(self.cogs[0])-1]
         return f"{first} - {last}"
 
     def create_select(self):
@@ -100,41 +102,45 @@ class Dropdown(disnake.ui.Select):
 
     def create_embed(self, author_colour):
         embed = disnake.Embed(title="Cogs information and loading", colour=author_colour)
-
         all_cogs = utils.get_all_cogs()
-        class_list = list(all_cogs.values())
 
-        loaded = []
-        for value in class_list:
-            if value in self.bot.cogs:
-                loaded.append(value)
-
-        unloaded = list(set(class_list) - set(loaded))
-
-        loaded.sort()
-        unloaded.sort()
-
-        cog_loaded = ""
-        for cog in loaded:
-            cog_loaded += f"✅ {cog}\n\n"
-
-        cog_unloaded = ""
-        for cog in unloaded:
-            cog_unloaded += f"❌ {cog}\n\n"
+        cog_loaded = []
+        cog_unloaded = []
+        for file, class_cog in all_cogs.items():
+            if class_cog in self.bot.cogs:
+                if file not in config.extensions:
+                    cog_loaded.append(f"✅ **{class_cog}**\n\n")
+                else:
+                    cog_loaded.append(f"✅ {class_cog}\n\n")
+            else:
+                if file in config.extensions:
+                    cog_unloaded.append(f"❌ **{class_cog}**\n\n")
+                else:
+                    cog_unloaded.append(f"❌ {class_cog}\n\n")
 
         cog_list = cog_loaded + cog_unloaded
-        cog_sum = len(loaded) + len(unloaded)
+        cog_sum = len(cog_loaded) + len(cog_unloaded)
 
         embed.add_field(
             name="Loaded/Unloaded/All",
-            value=f"**{len(loaded)} / {len(unloaded)} / {cog_sum}**",
+            value=f"**{len(cog_loaded)} / {len(cog_unloaded)} / {cog_sum}**",
             inline=False
         )
-        embed.add_field(
-            name="Cog list:",
-            value=cog_list,
-            inline=False
-        )
+
+        chunks = math.ceil(len(cog_list)/20)
+        cog_lists = list(utils.split(cog_loaded, chunks))
+        for cog_list in cog_lists:
+            if cog_list:
+                embed.add_field(name="‎", value="".join(cog_list), inline=True)
+
+        if cog_unloaded:
+            embed.add_field(name="‎", value="‎", inline=False)
+            cog_lists = list(utils.split(cog_unloaded, chunks))
+            for cog_list in cog_lists:
+                if cog_list:
+                    embed.add_field(name="‎", value="".join(cog_list), inline=True)
+
+        embed.set_footer(text="Bold items are not in config.extensions.")
         return embed
 
     async def callback(self, inter: disnake.MessageInteraction):
