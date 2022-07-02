@@ -17,14 +17,10 @@ class Bookmark(commands.Cog):
     async def bookmark_reaction(self, ctx):
         embed, images, files_attached = await BookmarkFeatures.create_bookmark_embed(self, ctx)
         try:
-            await ctx.member.send(embed=embed, view=BookmarkView(), files=files_attached)
             if images:
                 for image in images:
-                    await ctx.member.send(
-                        embed=await BookmarkFeatures.create_image_embed(self, ctx, image),
-                        view=BookmarkView()
-                        )
-            return
+                    embed.append(await BookmarkFeatures.create_image_embed(self, ctx, image))
+            await ctx.member.send(embeds=embed, view=BookmarkView(), files=files_attached)
         except disnake.HTTPException:
             return
 
