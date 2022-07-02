@@ -246,3 +246,10 @@ def get_all_cogs():
                         all_cogs[name[:-3]] = result.group(1)
                         break
     return {key: all_cogs[key] for key in sorted(all_cogs.keys())}
+
+
+def split(array, k):
+    """Splits list into K parts"""
+    n = len(array)
+    lists = [array[i * (n // k) + min(i, n % k):(i+1) * (n // k) + min(i+1, n % k)] for i in range(k)]
+    return lists
