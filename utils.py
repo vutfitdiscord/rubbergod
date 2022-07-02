@@ -249,7 +249,7 @@ def get_all_cogs():
 
 
 def split(array, k):
-    """Splits list into K parts"""
+    """Splits list into K parts of approximate equal length"""
     n = len(array)
     lists = [array[i * (n // k) + min(i, n % k):(i+1) * (n // k) + min(i+1, n % k)] for i in range(k)]
     return lists

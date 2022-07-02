@@ -57,7 +57,7 @@ class Dropdown(disnake.ui.Select):
     def get_initials(self):
         """Creates placeholder for selects from names of cogs."""
         first = self.cogs[1][0]
-        last = self.cogs[1][len(self.cogs[0])-1]
+        last = self.cogs[1][-1]
         return f"{first} - {last}"
 
     def create_select(self):
@@ -140,7 +140,7 @@ class Dropdown(disnake.ui.Select):
                 if cog_list:
                     embed.add_field(name="‎", value="".join(cog_list), inline=True)
 
-        embed.set_footer(text="Bold items are not in config.extensions.")
+        embed.set_footer(text="Bold items are overrides of config.extension")
         return embed
 
     async def callback(self, inter: disnake.MessageInteraction):
