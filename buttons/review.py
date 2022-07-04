@@ -31,7 +31,7 @@ class ReviewView(EmbedView):
                     emoji="🔽",
                     custom_id="review:next_text",
                     style=disnake.ButtonStyle.primary,
-                    row=2
+                    row=1
                 )
             )
             self.add_item(
@@ -39,7 +39,7 @@ class ReviewView(EmbedView):
                     emoji="🔼",
                     custom_id="review:prev_text",
                     style=disnake.ButtonStyle.primary,
-                    row=2
+                    row=1
                 )
             )
         else:
@@ -52,7 +52,7 @@ class ReviewView(EmbedView):
 
     def add_item(self, item: disnake.ui.Item) -> None:
         for child in self.children:
-            if item.custom_id in child.custom_id:
+            if item.emoji == child.emoji:
                 return
         return super().add_item(item)
 
