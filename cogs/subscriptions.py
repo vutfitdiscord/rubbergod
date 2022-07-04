@@ -25,7 +25,7 @@ class Subscriptions(commands.Cog):
         embed = disnake.Embed(description=message.content[:2048])
         embed.set_author(
             name=message.author.name,
-            icon_url=message.author.avatar.with_size(128).url,
+            icon_url=message.author.display_avatar.with_size(128).url,
         )
         embed.add_field(
             name=Messages.subscriptions_message_link,
