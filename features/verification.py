@@ -61,13 +61,17 @@ class Verification(BaseFeature):
         user: Valid_person,
         mail_postfix: str,
         is_resend: bool = False,
+        dry_run: bool = False,
     ):
-        # Generate a verification code
-        code = "".join(random.choices(string.ascii_uppercase + string.digits, k=20))
-        mail_content = utils.fill_message("verify_mail_content", code=code)
         mail_address = user.get_mail(mail_postfix)
-        self.repo.save_sent_code(user.login, code) # Save the newly generated code into the database
-        self.send_mail(mail_address, mail_content, Messages.verify_subject)
+
+        if not dry_run:
+            # Generate a verification code
+            code = "".join(random.choices(string.ascii_uppercase + string.digits, k=20))
+            mail_content = utils.fill_message("verify_mail_content", code=code)
+            # Save the newly generated code into the database
+            self.repo.save_sent_code(user.login, code)
+            self.send_mail(mail_address, mail_content, Messages.verify_subject)
 
         success_message = utils.fill_message(
             "verify_resend_success" if is_resend else "verify_send_success",
@@ -77,19 +81,13 @@ class Verification(BaseFeature):
         )
 
         if not is_resend:
-            await inter.send(
-                content=success_message,
-                view=VerifyWithResendButtonView(user.login),
-                ephemeral=True,
-            )
+            view = VerifyWithResendButtonView(user.login)
+            await inter.send(content=success_message, view=view, ephemeral=True)
         else:
-            await inter.response.edit_message(
-                content=success_message, view=VerifyView(user.login)
-            )
+            view = VerifyView(user.login)
+            await inter.response.edit_message(content=success_message, view=view)
 
-    async def send_code(
-        self, login: str, inter: disnake.ApplicationCommandInteraction
-    ) -> None:
+    async def send_code(self, login: str, inter: disnake.ApplicationCommandInteraction) -> None:
         # Check if the user doesn't have the verify role
         if not await self.has_role(inter.user, config.verification_role):
             # Some of them will use 'xlogin00' as stated in help, cuz they dumb
@@ -113,6 +111,9 @@ class Verification(BaseFeature):
                         inter, "getcode (xlogin) - Unknown login", str({"login": login})
                     )
                 elif user is not None and user.status != VerifyStatus.Unverified.value:
+                    if user.status == VerifyStatus.InProcess.value:
+                        await self.gen_code_and_send_mail(inter, user, "stud.fit.vutbr.cz", dry_run=True)
+                        return
                     msg = utils.fill_message(
                         "verify_step_done",
                         user=inter.user.id,
@@ -131,19 +132,16 @@ class Verification(BaseFeature):
                 try:
                     int(login)
                 except ValueError:
-                    msg = utils.fill_message(
-                        "invalid_login",
-                        user=inter.user.id,
-                        admin=config.admin_ids[0],
-                    )
+                    msg = utils.fill_message("invalid_login", user=inter.user.id, admin=config.admin_ids[0])
                     await inter.send(msg)
-                    await self.log_verify_fail(
-                        inter, "getcode (MUNI)", str({"login": login})
-                    )
+                    await self.log_verify_fail(inter, "getcode (MUNI)", str({"login": login}))
 
                 user = self.repo.get_user_by_login(login)
 
                 if user is not None and user.status != VerifyStatus.Unverified.value:
+                    if user.status == VerifyStatus.InProcess.value:
+                        await self.gen_code_and_send_mail(inter, user, "mail.muni.cz", dry_run=True)
+                        return
                     msg = utils.fill_message(
                         "verify_step_done",
                         user=inter.user.id,
@@ -159,19 +157,13 @@ class Verification(BaseFeature):
 
                 user = self.repo.get_user(login, status=VerifyStatus.Unverified.value)
                 if user is None:
-                    user = self.repo.add_user(
-                        login, "MUNI", status=VerifyStatus.Unverified.value
-                    )
+                    user = self.repo.add_user(login, "MUNI", status=VerifyStatus.Unverified.value)
                 await self.gen_code_and_send_mail(inter, user, "mail.muni.cz")
         else:
-            msg = utils.fill_message(
-                "verify_already_verified", user=inter.user.id, admin=config.admin_ids[0]
-            )
+            msg = utils.fill_message("verify_already_verified", user=inter.user.id, admin=config.admin_ids[0])
             await inter.send(content=msg)
 
-    async def resend_code(
-        self, login: str, inter: disnake.ApplicationCommandInteraction
-    ) -> None:
+    async def resend_code(self, login: str, inter: disnake.ApplicationCommandInteraction) -> None:
         if await self.has_role(inter.user, config.verification_role):
             return  # User is now verified.
 
@@ -181,11 +173,7 @@ class Verification(BaseFeature):
                 "The user requested to resend the verification code, but it does not exist in the DB."
             )
 
-        mail_postfix = (
-            "mail.muni.cz"
-            if login[0] != "x" and login.isnumeric()
-            else "stud.fit.vutbr.cz"
-        )
+        mail_postfix = self.get_mail_postfix(login)
         await self.gen_code_and_send_mail(inter, user, mail_postfix, True)
 
     @staticmethod
@@ -226,6 +214,10 @@ class Verification(BaseFeature):
 
         return None
 
+    @staticmethod
+    def get_mail_postfix(login: str):
+        return "mail.muni.cz" if login[0] != "x" and login.isnumeric() else "stud.fit.vutbr.cz"
+
     # Deprecated. TODO Refactor to interactions.
     async def verify(self, message):
         """ "Verify if VUT login is from database"""
@@ -249,9 +241,7 @@ class Verification(BaseFeature):
                 guild = self.bot.get_guild(config.guild_id)
                 fp = await guild.fetch_emoji(585915845146968093)
                 await message.channel.send(
-                    utils.fill_message(
-                        "verify_verify_dumbshit", user=message.author.id, emote=str(fp)
-                    )
+                    utils.fill_message("verify_verify_dumbshit", user=message.author.id, emote=str(fp))
                 )
                 return
 
@@ -261,9 +251,7 @@ class Verification(BaseFeature):
                 # Check the code
                 if code != new_user.code:
                     await message.channel.send(
-                        utils.fill_message(
-                            "verify_verify_wrong_code", user=message.author.id
-                        )
+                        utils.fill_message("verify_verify_wrong_code", user=message.author.id)
                     )
 
                     await self.log_verify_fail(message, "Verify (with code)")
@@ -281,24 +269,18 @@ class Verification(BaseFeature):
                     )
                     await message.channel.send(msg)
 
-                    await self.log_verify_fail(
-                        message, "Verify (with code) (Invalid year)"
-                    )
+                    await self.log_verify_fail(message, "Verify (with code) (Invalid year)")
                     return
 
                 try:
                     # Get server verify role
-                    verify = disnake.utils.get(
-                        message.guild.roles, name=config.verification_role
-                    )
+                    verify = disnake.utils.get(message.guild.roles, name=config.verification_role)
                     year = disnake.utils.get(message.guild.roles, name=year)
                     member = message.author
                 except AttributeError:
                     # jsme v PM
                     guild = self.bot.get_guild(config.guild_id)
-                    verify = disnake.utils.get(
-                        guild.roles, name=config.verification_role
-                    )
+                    verify = disnake.utils.get(guild.roles, name=config.verification_role)
                     year = disnake.utils.get(guild.roles, name=year)
                     member = guild.get_member(message.author.id)
 
@@ -308,11 +290,7 @@ class Verification(BaseFeature):
                 self.repo.save_verified(login, message.author.id)
 
                 try:
-                    await member.send(
-                        utils.fill_message(
-                            "verify_verify_success", user=message.author.id
-                        )
-                    )
+                    await member.send(utils.fill_message("verify_verify_success", user=message.author.id))
 
                     await member.send(Messages.verify_post_verify_info)
                 except disnake.errors.Forbidden:
@@ -323,9 +301,7 @@ class Verification(BaseFeature):
 
                 if message.channel.type is not disnake.ChannelType.private:
                     await message.channel.send(
-                        utils.fill_message(
-                            "verify_verify_success", user=message.author.id
-                        )
+                        utils.fill_message("verify_verify_success", user=message.author.id)
                     )
             else:
                 msg = utils.fill_message(
@@ -335,9 +311,7 @@ class Verification(BaseFeature):
                 )
                 await message.channel.send(msg)
 
-                await self.log_verify_fail(
-                    message, "Verify (with code) - Not exists in DB"
-                )
+                await self.log_verify_fail(message, "Verify (with code) - Not exists in DB")
         else:
             await message.channel.send(
                 utils.fill_message(
@@ -352,9 +326,7 @@ class Verification(BaseFeature):
         except disnake.errors.Forbidden:
             return
 
-    async def log_verify_fail(
-        self, inter: disnake.ApplicationCommand, phase: str, data: str
-    ):
+    async def log_verify_fail(self, inter: disnake.ApplicationCommand, phase: str, data: str):
         embed = disnake.Embed(title="Neúspěšný pokus o verify", color=0xEEE657)
         embed.add_field(name="User", value=utils.generate_mention(inter.user.id))
         embed.add_field(name="Verify phase", value=phase)
@@ -365,7 +337,5 @@ class Verification(BaseFeature):
         guild = self.bot.get_guild(config.guild_id)
         fp = await guild.fetch_emoji(585915845146968093)
         await inter.send(
-            content=utils.fill_message(
-                "verify_send_dumbshit", user=inter.user.id, emote=str(fp)
-            )
+            content=utils.fill_message("verify_send_dumbshit", user=inter.user.id, emote=str(fp))
         )
