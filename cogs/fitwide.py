@@ -10,11 +10,8 @@ import utils
 from config.app_config import config
 from config import cooldowns
 from features import verification
-from repository import user_repo
 from repository.database import session
 from repository.database.verification import Valid_person, Permit
-
-user_r = user_repo.UserRepository()
 
 arcas_time = datetime.datetime.utcnow() - datetime.timedelta(hours=config.arcas_delay)
 
@@ -22,7 +19,7 @@ arcas_time = datetime.datetime.utcnow() - datetime.timedelta(hours=config.arcas_
 class FitWide(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.verification = verification.Verification(bot, user_r)
+        self.verification = verification.Verification(bot)
 
     def is_in_modroom(ctx):
         return ctx.message.channel.id == config.mod_room

@@ -148,6 +148,7 @@ class Messages:
               "Implementovány featury podle obsahu: **8. Drop/Keep**"
 
     get_code_brief = "Příkaz na získaní kódu pro verifikaci"
+    get_code_login_parameter = "Přihlašovací FIT login (nebo MUNI UČO). FIT login ve formátu `xlogin00`"
     verify_brief = "Verifikace studenta"
     verify_already_verified = "{user} Už jsi byl verifikován " \
                               "({admin} pls)."
@@ -156,10 +157,9 @@ class Messages:
                          f"`{prefix}getcode FIT login, " \
                          "ve tvaru xlogin00, nebo MUNI UCO`"
     verify_send_dumbshit = "{user} Tvůj login. {emote}"
-    verify_send_success = "{user} Kód byl odeslán na tvůj mail " \
-                          "({mail})!\n" \
-                          "Pro verifikaci použij: " \
-                          f"`{prefix}verify [login] [kód]`"
+    verify_send_success = "Kód byl odeslán na tvůj mail (`{mail}`). " \
+                          "Pokud kód do 10 minut nedorazí, tak si jej nech znovu zaslat. " \
+                          "Hledej zprávu s předmětem `{subject}` (může být i ve SPAMu)."
     verify_verify_format = "Očekávám dva argumenty. " \
                            "Správný formát:\n" \
                            f"`{prefix}verify [FIT login nebo " \
@@ -188,6 +188,7 @@ class Messages:
     verify_step_done = "{user} Tímto krokem jsi už prošel. ({admin} pls)"
     verify_invalid_channel = "Tento příkaz je možné spustit pouze v DMs nebo na VUT FIT serveru."
     invalid_login = "{user} Neplatný login. Přečti si prosím <#591386755547136020>. ({admin} pls)"
+    verify_subject = "FIT Discord verifikace"
 
     vote_brief = "Zahájí hlasování, ve kterém je možné zvolit více možností"
     vote_one_of_brief = "Zahájí hlasování, ve kterém je možné zvolit pouze jednu možnost"

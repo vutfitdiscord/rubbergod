@@ -15,16 +15,21 @@ from features.base_feature import BaseFeature
 from repository.user_repo import UserRepository, VerifyStatus
 from repository.database.verification import Valid_person
 from email.mime.text import MIMEText
+from buttons.verify import VerifyWithResendButtonView
+from datetime import datetime
 
 
 class Verification(BaseFeature):
-    def __init__(self, bot: Bot, user_repository: UserRepository):
+    def __init__(self, bot: Bot):
         super().__init__(bot)
-        self.repo = user_repository
+        self.repo = UserRepository()
 
     def send_mail(self, receiver_email: str, contents: str, subject: str = "") -> None:
         msg = MIMEText(contents)
         msg["Subject"] = subject
+        msg["To"] = receiver_email
+        msg["Date"] = datetime.now().isoformat()
+        msg["From"] = config.email_addr
 
         with smtplib.SMTP_SSL(
             config.email_smtp_server,
@@ -61,17 +66,20 @@ class Verification(BaseFeature):
         msg = f"{config.default_prefix}verify {user.login} {code}"
 
         mail_address = user.get_mail(mail_postfix)
-        self.send_mail(mail_address, msg, "FIT Discord verifikace")
+        self.send_mail(mail_address, msg, Messages.verify_subject)
 
         # Save the newly generated code into the database
         self.repo.save_sent_code(user.login, code)
 
-        # TODO: Success. Send epheral message with buttons.
-        await message.channel.send(
-            utils.fill_message(
-                "verify_send_success", user=message.author.id, mail=mail_postfix
-            )
+        success_message = utils.fill_message(
+            "verify_send_success",
+            user=inter.user.id,
+            mail=mail_address,
+            subject=Messages.verify_subject,
         )
+
+        view = VerifyWithResendButtonView()
+        await inter.send(content=success_message, view=view, ephemeral=True)
 
     async def send_code(
         self, login: str, inter: disnake.ApplicationCommandInteraction
