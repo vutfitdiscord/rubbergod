@@ -16,9 +16,7 @@ class Verify(commands.Cog):
 
     @cooldowns.default_cooldown
     @commands.check(is_valid_guild)
-    @commands.slash_command(
-        name="verify", description=Messages.verify_brief, dm_permission=True
-    )
+    @commands.slash_command(name="verify", description=Messages.verify_brief, dm_permission=True)
     async def verify(
         self,
         inter: disnake.ApplicationCommandInteraction,
@@ -27,9 +25,7 @@ class Verify(commands.Cog):
         await self.verification.send_code(login, inter)
 
     @verify.error
-    async def on_verification_error(
-        self, inter: disnake.ApplicationCommandInteraction, error
-    ):
+    async def on_verification_error(self, inter: disnake.ApplicationCommandInteraction, error):
         if isinstance(error, commands.CheckFailure):
             await inter.send(Messages.verify_invalid_channel, ephemeral=True)
             return True
