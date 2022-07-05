@@ -1,9 +1,10 @@
 import disnake
-
+from features import verification
 
 class VerifyView(disnake.ui.View):
-    def __init__(self):
+    def __init__(self, login: str):
         super().__init__(timeout=None)
+        self.login = login
 
     @disnake.ui.button(
         label="Zadat kód",
@@ -17,8 +18,8 @@ class VerifyView(disnake.ui.View):
 
 
 class VerifyWithResendButtonView(VerifyView):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, login: str):
+        super().__init__(login)
 
     @disnake.ui.button(
         label="Znovu odeslat kód",
@@ -28,4 +29,6 @@ class VerifyWithResendButtonView(VerifyView):
     async def missing_code(
         self, button: disnake.ui.Button, inter: disnake.MessageInteraction
     ):
-        print("Kód nedorazil")
+        service = verification.Verification(inter.bot)
+        await service.resend_code(self.login, inter)
+
