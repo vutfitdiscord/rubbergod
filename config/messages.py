@@ -147,15 +147,10 @@ class Messages:
               "https://wiki.roll20.net/Dice_Reference\n" \
               "Implementovány featury podle obsahu: **8. Drop/Keep**"
 
-    get_code_brief = "Příkaz na získaní kódu pro verifikaci"
-    get_code_login_parameter = "Přihlašovací FIT login (nebo MUNI UČO). FIT login ve formátu `xlogin00`"
-    verify_brief = "Verifikace studenta"
+    verify_brief = "Ověření studenta pro přístup na server."
+    verify_login_parameter = "Přihlašovací FIT login (nebo MUNI UČO). FIT login ve formátu `xlogin00`"
     verify_already_verified = "{user} Už jsi byl verifikován " \
                               "({admin} pls)."
-    verify_send_format = "Očekávám jeden argument. " \
-                         "Správný formát: " \
-                         f"`{prefix}getcode FIT login, " \
-                         "ve tvaru xlogin00, nebo MUNI UCO`"
     verify_send_dumbshit = "{user} Tvůj login. {emote}"
     verify_send_success = "Kód byl odeslán na tvůj mail (`{mail}`). " \
                           "Pokud kód do 10 minut nedorazí, tak si jej nech znovu zaslat. " \

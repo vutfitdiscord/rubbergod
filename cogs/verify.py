@@ -17,16 +17,16 @@ class Verify(commands.Cog):
     @cooldowns.default_cooldown
     @commands.check(is_valid_guild)
     @commands.slash_command(
-        name="verify", description=Messages.get_code_brief, dm_permission=True
+        name="verify", description=Messages.verify_brief, dm_permission=True
     )
-    async def get_code(
+    async def verify(
         self,
         inter: disnake.ApplicationCommandInteraction,
-        login: str = commands.Param(description=Messages.get_code_login_parameter),
+        login: str = commands.Param(description=Messages.verify_login_parameter),
     ):
         await self.verification.send_code(login, inter)
 
-    @get_code.error
+    @verify.error
     async def on_verification_error(
         self, inter: disnake.ApplicationCommandInteraction, error
     ):
