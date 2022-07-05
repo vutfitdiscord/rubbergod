@@ -179,6 +179,9 @@ class Messages:
     verify_post_verify_info_mail = "Podivej se do kanalu:\n" \
                               f"#add-roles - Pro přidání rolí ({server_link}591384273051975683) \n" \
                               f"#server-info - Pro pravidla a další info ({server_link}489461089432633346)"
+    verify_mail_content = "Obdržel/a jsi kód pro ověření se k přístup na server VUT FIT.\n" \
+                          "Po stisknutí na tlačítko \"Zadat kód\" vyplň pole přesně podle podkladů níže. Předvyplněná pole neměň.\n\n" \
+                          "Ověřovací kód: {code}"
 
     verify_verify_not_found = "{user} Login nenalezen nebo jsi neprošel krokem !getcode. Přečti si prosím <#591386755547136020>. ({admin} pls)."
     verify_verify_wrong_code = "{user} Špatný kód."

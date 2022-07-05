@@ -64,13 +64,10 @@ class Verification(BaseFeature):
     ):
         # Generate a verification code
         code = "".join(random.choices(string.ascii_uppercase + string.digits, k=20))
-        msg = f"{config.default_prefix}verify {user.login} {code}"
-
+        mail_content = utils.fill_message("verify_mail_content", code=code)
         mail_address = user.get_mail(mail_postfix)
-        self.send_mail(mail_address, msg, Messages.verify_subject)
-
-        # Save the newly generated code into the database
-        self.repo.save_sent_code(user.login, code)
+        self.repo.save_sent_code(user.login, code) # Save the newly generated code into the database
+        self.send_mail(mail_address, mail_content, Messages.verify_subject)
 
         success_message = utils.fill_message(
             "verify_resend_success" if is_resend else "verify_send_success",
@@ -80,9 +77,15 @@ class Verification(BaseFeature):
         )
 
         if not is_resend:
-            await inter.send(content=success_message, view=VerifyWithResendButtonView(user.login), ephemeral=True)
+            await inter.send(
+                content=success_message,
+                view=VerifyWithResendButtonView(user.login),
+                ephemeral=True,
+            )
         else:
-            await inter.response.edit_message(content=success_message, view=VerifyView(user.login))
+            await inter.response.edit_message(
+                content=success_message, view=VerifyView(user.login)
+            )
 
     async def send_code(
         self, login: str, inter: disnake.ApplicationCommandInteraction
