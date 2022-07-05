@@ -15,7 +15,7 @@ from features.base_feature import BaseFeature
 from repository.user_repo import UserRepository, VerifyStatus
 from repository.database.verification import Valid_person
 from email.mime.text import MIMEText
-from buttons.verify import VerifyWithResendButtonView
+from buttons.verify import VerifyWithResendButtonView, VerifyView
 from datetime import datetime
 
 
@@ -60,6 +60,7 @@ class Verification(BaseFeature):
         inter: disnake.ApplicationCommandInteraction,
         user: Valid_person,
         mail_postfix: str,
+        is_resend: bool = False,
     ):
         # Generate a verification code
         code = "".join(random.choices(string.ascii_uppercase + string.digits, k=20))
@@ -72,14 +73,16 @@ class Verification(BaseFeature):
         self.repo.save_sent_code(user.login, code)
 
         success_message = utils.fill_message(
-            "verify_send_success",
+            "verify_resend_success" if is_resend else "verify_send_success",
             user=inter.user.id,
             mail=mail_address,
             subject=Messages.verify_subject,
         )
 
-        view = VerifyWithResendButtonView()
-        await inter.send(content=success_message, view=view, ephemeral=True)
+        if not is_resend:
+            await inter.send(content=success_message, view=VerifyWithResendButtonView(user.login), ephemeral=True)
+        else:
+            await inter.response.edit_message(content=success_message, view=VerifyView(user.login))
 
     async def send_code(
         self, login: str, inter: disnake.ApplicationCommandInteraction
@@ -162,6 +165,25 @@ class Verification(BaseFeature):
                 "verify_already_verified", user=inter.user.id, admin=config.admin_ids[0]
             )
             await inter.send(content=msg)
+
+    async def resend_code(
+        self, login: str, inter: disnake.ApplicationCommandInteraction
+    ) -> None:
+        if await self.has_role(inter.user, config.verification_role):
+            return  # User is now verified.
+
+        user = self.repo.get_user_by_login(login)
+        if user is None:
+            raise Exception(
+                "The user requested to resend the verification code, but it does not exist in the DB."
+            )
+
+        mail_postfix = (
+            "mail.muni.cz"
+            if login[0] != "x" and login.isnumeric()
+            else "stud.fit.vutbr.cz"
+        )
+        await self.gen_code_and_send_mail(inter, user, mail_postfix, True)
 
     @staticmethod
     def transform_year(raw_year: str):

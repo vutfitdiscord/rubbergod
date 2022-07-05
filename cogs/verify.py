@@ -15,14 +15,9 @@ class Verify(commands.Cog):
         return ctx.guild_id is None or ctx.guild_id == config.guild_id
 
     @cooldowns.default_cooldown
-    @commands.command(brief=Messages.verify_brief)
-    async def verify(self, ctx):
-        await self.verification.verify(ctx.message)
-
-    @cooldowns.default_cooldown
     @commands.check(is_valid_guild)
     @commands.slash_command(
-        name="getcode", description=Messages.get_code_brief, dm_permission=True
+        name="verify", description=Messages.get_code_brief, dm_permission=True
     )
     async def get_code(
         self,

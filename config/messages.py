@@ -160,6 +160,9 @@ class Messages:
     verify_send_success = "Kód byl odeslán na tvůj mail (`{mail}`). " \
                           "Pokud kód do 10 minut nedorazí, tak si jej nech znovu zaslat. " \
                           "Hledej zprávu s předmětem `{subject}` (může být i ve SPAMu)."
+    verify_resend_success = "Kód byl znovuodeslán na tvůj mail (`{mail}`). " \
+                          "Pokud kód do 10 minut nedorazí, tak tagni někoho z Mod týmu." \
+                          "Hledej zprávu s předmětem `{subject}` (může být i ve SPAMu)."
     verify_verify_format = "Očekávám dva argumenty. " \
                            "Správný formát:\n" \
                            f"`{prefix}verify [FIT login nebo " \
