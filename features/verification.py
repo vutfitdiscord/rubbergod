@@ -218,116 +218,71 @@ class Verification(BaseFeature):
     def get_mail_postfix(login: str):
         return "mail.muni.cz" if login[0] != "x" and login.isnumeric() else "stud.fit.vutbr.cz"
 
-    async def finish_verify(self, inter: disnake.ModalInteraction, code: str, login: str):
-        pass
-
-    # Deprecated. TODO Refactor to interactions.
-    async def verify(self, message):
-        """ "Verify if VUT login is from database"""
-        if len(str(message.content).split(" ")) != 3:
-            await message.channel.send(Messages.verify_verify_format)
-            return
-
-        login = str(message.content).split(" ")[1]
-        code = str(message.content).split(" ")[2]
-
-        # Check if the user doesn't have the verify role
-        # otherwise they wouldn't need to verify, right?
-        if not await self.has_role(message.author, config.verification_role):
-            # Some of them will use 'xlogin00' as stated in help
-            # yet again, cuz they dumb
-            if login == "xlogin00":
-                await self.send_xlogin_info(message)
-                return
-            # Same here
-            if code == "kód" or code == "[kód]":
-                guild = self.bot.get_guild(config.guild_id)
-                fp = await guild.fetch_emoji(585915845146968093)
-                await message.channel.send(
-                    utils.fill_message("verify_verify_dumbshit", user=message.author.id, emote=str(fp))
-                )
-                return
-
-            new_user = self.repo.get_user(login)
-
-            if new_user is not None:
-                # Check the code
-                if code != new_user.code:
-                    await message.channel.send(
-                        utils.fill_message("verify_verify_wrong_code", user=message.author.id)
-                    )
-
-                    await self.log_verify_fail(message, "Verify (with code)")
-                    return
-
-                # Try and transform the year into the role name
-                year = self.transform_year(new_user.year)
-
-                if year is None:
-                    msg = utils.fill_message(
-                        "verify_verify_manual",
-                        user=message.author.id,
-                        admin=config.admin_ids[0],
-                        year=str(new_user.year),
-                    )
-                    await message.channel.send(msg)
-
-                    await self.log_verify_fail(message, "Verify (with code) (Invalid year)")
-                    return
-
-                try:
-                    # Get server verify role
-                    verify = disnake.utils.get(message.guild.roles, name=config.verification_role)
-                    year = disnake.utils.get(message.guild.roles, name=year)
-                    member = message.author
-                except AttributeError:
-                    # jsme v PM
-                    guild = self.bot.get_guild(config.guild_id)
-                    verify = disnake.utils.get(guild.roles, name=config.verification_role)
-                    year = disnake.utils.get(guild.roles, name=year)
-                    member = guild.get_member(message.author.id)
-
-                await member.add_roles(verify)
-                await member.add_roles(year)
-
-                self.repo.save_verified(login, message.author.id)
-
-                try:
-                    await member.send(utils.fill_message("verify_verify_success", user=message.author.id))
-
-                    await member.send(Messages.verify_post_verify_info)
-                except disnake.errors.Forbidden:
-                    if login[0] == "x":
-                        self.send_mail_verified(f"{login}@stud.fit.vutbr.cz", member)
-                    else:
-                        self.send_mail_verified(f"{login}@mail.muni.cz", member)
-
-                if message.channel.type is not disnake.ChannelType.private:
-                    await message.channel.send(
-                        utils.fill_message("verify_verify_success", user=message.author.id)
-                    )
-            else:
-                msg = utils.fill_message(
-                    "verify_verify_not_found",
-                    user=message.author.id,
-                    admin=config.admin_ids[0],
-                )
-                await message.channel.send(msg)
-
-                await self.log_verify_fail(message, "Verify (with code) - Not exists in DB")
-        else:
-            await message.channel.send(
-                utils.fill_message(
-                    "verify_already_verified",
-                    user=message.author.id,
-                    admin=config.admin_ids[0],
-                )
+    async def finish_verify(self, inter: disnake.ModalInteraction, code: str, login: str) -> None:
+        if await self.has_role(inter.user, config.verification_role):
+            inter.response.send_message(
+                utils.fill_message("verify_already_verified", user=inter.user.id, admin=config.admin_ids[0])
             )
-
-        try:
-            await message.delete()
-        except disnake.errors.Forbidden:
             return
+
+        new_user: Valid_person = self.repo.get_user(login)
+        if new_user is not None:
+            if code != new_user.code:
+                await inter.response.send_message(
+                    utils.fill_message("verify_verify_wrong_code", user=inter.user.id), ephemeral=True
+                )
+                await self.log_verify_fail(
+                    inter,
+                    "Verify (with code) - Wrong code",
+                    str({"login": login, "code(Input)": code, "code(DB)": new_user.code}),
+                )
+                return
+
+            # Try and transform the year into the role name
+            year = self.transform_year(new_user.year)
+
+            if year is None:
+                msg = utils.fill_message(
+                    "verify_verify_manual",
+                    user=inter.user.id,
+                    admin=config.admin_ids[0],
+                    year=str(new_user.year),
+                )
+                await inter.response.send_message(msg)
+                await self.log_verify_fail(
+                    inter, "Verify (with code) (Invalid year)", str({"login": login, "year": new_user.year})
+                )
+                return
+
+            try:
+                # Get server verify role
+                verify = disnake.utils.get(inter.guild.roles, name=config.verification_role)
+                year = disnake.utils.get(inter.guild.roles, name=year)
+                member = inter.user
+            except AttributeError:
+                # jsme v PM
+                guild = self.bot.get_guild(config.guild_id)
+                verify = disnake.utils.get(guild.roles, name=config.verification_role)
+                year = disnake.utils.get(guild.roles, name=year)
+                member = guild.get_member(inter.user.id)
+
+            await member.add_roles(verify)
+            await member.add_roles(year)
+
+            self.repo.save_verified(login, inter.user.id)
+
+            try:
+                await member.send(utils.fill_message("verify_verify_success", user=inter.user.id))
+                await member.send(Messages.verify_post_verify_info)
+            except disnake.errors.Forbidden:
+                mail = new_user.get_mail(self.get_mail_postfix(login))
+                self.send_mail_verified(mail, member)
+        else:
+            msg = utils.fill_message("verify_verify_not_found", user=inter.user.id, admin=config.admin_ids[0])
+            await inter.response.send_message(msg)
+            await self.log_verify_fail(
+                inter, "Verify (with code) - Not exists in DB", str({"login": login, "code": code})
+            )
 
     async def log_verify_fail(self, inter: disnake.ApplicationCommand, phase: str, data: str):
         embed = disnake.Embed(title="Neúspěšný pokus o verify", color=0xEEE657)
