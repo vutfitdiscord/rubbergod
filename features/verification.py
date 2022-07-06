@@ -218,6 +218,9 @@ class Verification(BaseFeature):
     def get_mail_postfix(login: str):
         return "mail.muni.cz" if login[0] != "x" and login.isnumeric() else "stud.fit.vutbr.cz"
 
+    async def finish_verify(self, inter: disnake.ModalInteraction, code: str, login: str):
+        pass
+
     # Deprecated. TODO Refactor to interactions.
     async def verify(self, message):
         """ "Verify if VUT login is from database"""
