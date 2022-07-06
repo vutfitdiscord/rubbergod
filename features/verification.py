@@ -297,3 +297,16 @@ class Verification(BaseFeature):
         await inter.send(
             content=utils.fill_message("verify_send_dumbshit", user=inter.user.id, emote=str(fp))
         )
+
+    async def clear_host_roles(self, inter: disnake.ApplicationCommandInteraction):
+        """Removes host roles (Host, Zajemce o studium, Verify)"""
+        guild = self.bot.get_guild(config.guild_id)
+        member = inter.user if isinstance(inter.user, disnake.Member) else guild.get_member(inter.user.id)
+        host = disnake.utils.get(guild.roles, name="Host")
+
+        if host not in member.roles:
+            return
+
+        verify = disnake.utils.get(guild.roles, name="Verify")
+        zajemce = disnake.utils.get(guild.roles, name="ZajemceoStudium")
+        await member.remove_roles(host, verify, zajemce, reason="Reverify user")
