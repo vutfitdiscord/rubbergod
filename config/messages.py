@@ -158,17 +158,7 @@ class Messages:
     verify_resend_success = "Kód byl znovuodeslán na tvůj mail (`{mail}`). " \
                           "Pokud kód do 10 minut nedorazí, tak tagni někoho z Mod týmu." \
                           "Hledej zprávu s předmětem `{subject}` (může být i ve SPAMu)."
-    verify_verify_format = "Očekávám dva argumenty. " \
-                           "Správný formát:\n" \
-                           f"`{prefix}verify [FIT login nebo " \
-                           "MUNI UCO] [kód]`\n" \
-                           "Pro získání kódu použij\n" \
-                           f"`{prefix}getcode [FIT login, ve tvaru " \
-                           "xlogin00, nebo MUNI UCO]`"
-    verify_verify_dumbshit = "{user} Kód, " \
-                             "který ti přišel na mail. {emote}"
-    verify_verify_manual = "Čauec {user}, nechám {admin}, " \
-                           "aby to udělal manuálně, " \
+    verify_verify_manual = "Čauec {user}, nechám {admin}, aby to udělal manuálně, " \
                            "jsi shady (Year: {year})"
     verify_verify_success = "{user} Gratuluji, byl jsi verifikován!"
     verify_post_verify_info = "Podívej se do kanálů:\n" \
@@ -183,7 +173,7 @@ class Messages:
                           "Po stisknutí na tlačítko \"Zadat kód\" vyplň ověřovací kód přesně tak jak je uveden níže.\n\n" \
                           "Ověřovací kód: {code}"
 
-    verify_verify_not_found = "{user} Login nenalezen nebo jsi neprošel krokem !getcode. Přečti si prosím <#591386755547136020>. ({admin} pls)."
+    verify_verify_not_found = "{user} Login nenalezen nebo jsi neprošel krokem `/verify`. Přečti si prosím <#591386755547136020>. ({admin} pls)."
     verify_verify_wrong_code = "{user} Špatný kód."
     verify_unknown_login = "{user} Tvůj login nebyl nalezen v databázi. ({admin} pls)"
     verify_step_done = "{user} Tímto krokem jsi už prošel. ({admin} pls)"
