@@ -22,6 +22,7 @@ class Verify(commands.Cog):
         inter: disnake.ApplicationCommandInteraction,
         login: str = commands.Param(description=Messages.verify_login_parameter),
     ):
+        await self.verification.clear_host_roles(inter)
         await self.verification.send_code(login, inter)
 
     @verify.error
