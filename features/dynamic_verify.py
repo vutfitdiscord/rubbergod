@@ -9,7 +9,7 @@ from repository.verify_repo import VerifyRepository
 from typing import Union
 from config.app_config import config
 from config.messages import Messages
-from buttons import verify as verify_buttons
+from buttons.dynamic_verify import DynamicVerifyRequestView
 
 
 class DynamicVerifyManager(BaseFeature):
@@ -60,7 +60,7 @@ class DynamicVerifyManager(BaseFeature):
         )
 
         channel = self.bot.get_channel(config.mod_room)
-        view = verify_buttons.DynamicVerifyRequestView(rule.id, inter.user.id)
+        view = DynamicVerifyRequestView(rule.id, inter.user.id)
         await channel.send(embed=embed, view=view)
 
     async def log_attempt(
