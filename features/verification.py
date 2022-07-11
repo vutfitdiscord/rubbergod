@@ -193,20 +193,20 @@ class Verification(BaseFeature):
             year_value_match = re.search(r"(\d*)r", year_parts[2])
             year_value = int(year_value_match.group(1))
 
-            # fmt: off
             if year_parts[1] in ["BIT", "BITP"]:
                 return "4BIT+" if year_value >= 4 else f"{year_value}BIT"
             elif year_parts[1] in ["BCH", "CZV"]:
                 return "1BIT"  # TODO: fix erasmus students (BCH)
             elif year_parts[1] in [
-                "MBS", "MBI", "MIS", "MIN", "MMI", "MMM", "MGM", "MGMe", "MPV", "MSK",
-                "NADE", "NBIO", "NGRI", "NNET", "NVIZ", "NCPS", "NSEC", "NEMB", "NHPC",
-                "NISD", "NIDE", "NISY", "NMAL", "NMAT", "NSEN", "NVER", "NSPE", "MGH"
+                "MBS", "MBI", "MIS", "MIN", "MMI", "MMM", "MGM", "MGMe",
+                "MPV", "MSK", "NADE",
+                "NBIO", "NGRI", "NNET", "NVIZ", "NCPS", "NSEC", "NEMB",
+                "NHPC", "NISD", "NIDE", "NISY", "NMAL", "NMAT",
+                "NSEN", "NVER", "NSPE", "MGH",
             ]:
                 return "3MIT+" if year_value >= 3 else f"{year_value}MIT"
             elif year_parts[1] in ["DVI4", "DRH", "DITP"]:
                 return "PhD+"
-            # fmt: on
         elif "FEKT" in year_parts:  # FEKT student
             return "VUT"
         elif len(year_parts) == 1 and year_parts[0] == "MUNI":  # Maybe MUNI?
@@ -258,7 +258,7 @@ class Verification(BaseFeature):
                 year = disnake.utils.get(inter.guild.roles, name=year)
                 member = inter.user
             except AttributeError:
-                # jsme v PM
+                # DMs
                 guild = self.bot.get_guild(config.guild_id)
                 verify = disnake.utils.get(guild.roles, name=config.verification_role)
                 year = disnake.utils.get(guild.roles, name=year)
