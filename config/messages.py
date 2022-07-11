@@ -174,7 +174,7 @@ class Messages:
                           "Ověřovací kód: {code}"
 
     verify_verify_not_found = "{user} Login nenalezen nebo jsi neprošel krokem `/verify`. Přečti si prosím <#591386755547136020>. ({admin} pls)."
-    verify_verify_wrong_code = "{user} Špatný kód."
+    verify_verify_wrong_code = "Špatný kód."
     verify_unknown_login = "{user} Tvůj login nebyl nalezen v databázi. ({admin} pls)"
     verify_step_done = "{user} Tímto krokem jsi už prošel. ({admin} pls)"
     verify_invalid_channel = "Tento příkaz je možné spustit pouze v DMs nebo na VUT FIT serveru."

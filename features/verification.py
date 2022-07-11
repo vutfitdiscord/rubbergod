@@ -67,7 +67,7 @@ class Verification(BaseFeature):
 
         if not dry_run:
             # Generate a verification code
-            code = "".join(random.choices(string.ascii_uppercase + string.digits, k=20))
+            code = "".join(random.choices(string.ascii_uppercase + string.digits, k=6))
             mail_content = utils.fill_message("verify_mail_content", code=code)
             # Save the newly generated code into the database
             self.repo.save_sent_code(user.login, code)
@@ -228,9 +228,7 @@ class Verification(BaseFeature):
         new_user: Valid_person = self.repo.get_user(login)
         if new_user is not None:
             if code != new_user.code:
-                await inter.response.send_message(
-                    utils.fill_message("verify_verify_wrong_code", user=inter.user.id), ephemeral=True
-                )
+                await inter.response.send_message(Messages.verify_verify_wrong_code)
                 await self.log_verify_fail(
                     inter,
                     "Verify (with code) - Wrong code",
