@@ -11,3 +11,7 @@ class VerifyRepository(BaseRepository):
 
     def get_rule(self, rule: str) -> Union[DynamicVerifyRule, None]:
         return session.query(DynamicVerifyRule).filter(DynamicVerifyRule.id == rule).one_or_none()
+
+    def increment_rule_use(self, rule: DynamicVerifyRule):
+        rule.use_count += 1
+        session.commit()

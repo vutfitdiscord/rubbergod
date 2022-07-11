@@ -25,7 +25,7 @@ class Verify(commands.Cog):
         login: str = commands.Param(description=Messages.verify_login_parameter),
     ):
         if await self.dynamic_verify.can_apply_rule(inter.user, login):
-            await self.dynamic_verify.apply_rule(login, inter)
+            await self.dynamic_verify.request_access(login, inter)
             return
         await self.verification.clear_host_roles(inter)
         await self.verification.send_code(login, inter)
