@@ -182,6 +182,9 @@ class Messages:
     verify_subject = "FIT Discord verifikace"
     dynamic_verify_requested = "Byla zaslána žádost o verifikaci. Vyčkej prosím než ji někdo z oprávněných osob schválí."
     dynamic_verify_declined = "Tvá žádost o verifikaci byla zamítnuta."
+    dynamic_verify_create = "Vytvoření pravidla pro verifikaci"
+    dynamic_verify_edit = "Vytvoření pravidla pro verifikaci"
+    dynamic_verify_edit_rule_id = "Pravidlo k editaci"
 
     vote_brief = "Zahájí hlasování, ve kterém je možné zvolit více možností"
     vote_one_of_brief = "Zahájí hlasování, ve kterém je možné zvolit pouze jednu možnost"

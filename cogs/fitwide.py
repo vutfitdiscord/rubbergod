@@ -21,9 +21,6 @@ class FitWide(commands.Cog):
         self.bot = bot
         self.verification = verification.Verification(bot)
 
-    def is_in_modroom(ctx):
-        return ctx.message.channel.id == config.mod_room
-
     @commands.Cog.listener()
     async def on_typing(self, channel, user, when):
         global arcas_time
@@ -351,7 +348,7 @@ class FitWide(commands.Cog):
         await ctx.send("Holy fuck, všechno se povedlo, " "tak zase za rok <:Cauec:602052606210211850>")
 
     @cooldowns.default_cooldown
-    @commands.check(is_in_modroom)
+    @commands.check(utils.is_in_modroom)
     @commands.command()
     async def update_db(self, ctx, convert_0xit: bool = False):
         with open("merlin-latest", "r") as f:
@@ -413,7 +410,7 @@ class FitWide(commands.Cog):
             await ctx.send(f"Debug: Našel jsem {cnt_new} nových prvaků.")
 
     @cooldowns.default_cooldown
-    @commands.check(is_in_modroom)
+    @commands.check(utils.is_in_modroom)
     @commands.command()
     async def get_db(self, ctx):
         process = subprocess.Popen(["ssh", "merlin"], stdout=subprocess.PIPE)
@@ -430,7 +427,7 @@ class FitWide(commands.Cog):
         await ctx.send("Stažení databáze proběhlo úspěšně.")
 
     @cooldowns.default_cooldown
-    @commands.check(is_in_modroom)
+    @commands.check(utils.is_in_modroom)
     @commands.command()
     async def get_users_login(self, ctx, member: disnake.Member):
         result = session.query(Permit).filter(Permit.discord_ID == str(member.id)).one_or_none()
@@ -448,7 +445,7 @@ class FitWide(commands.Cog):
         await ctx.send(("Login: `{p.login}`\nJméno: `{p.name}`\n" "Ročník: `{p.year}`").format(p=person))
 
     @cooldowns.default_cooldown
-    @commands.check(is_in_modroom)
+    @commands.check(utils.is_in_modroom)
     @commands.command()
     async def get_logins_user(self, ctx, login):
         result = session.query(Permit).filter(Permit.login == login).one_or_none()
@@ -467,7 +464,7 @@ class FitWide(commands.Cog):
             await ctx.send(utils.generate_mention(result.discord_ID))
 
     @cooldowns.default_cooldown
-    @commands.check(is_in_modroom)
+    @commands.check(utils.is_in_modroom)
     @commands.command()
     async def reset_login(self, ctx, login):
 
@@ -481,7 +478,7 @@ class FitWide(commands.Cog):
             await ctx.send("Hotovo.")
 
     @cooldowns.default_cooldown
-    @commands.check(is_in_modroom)
+    @commands.check(utils.is_in_modroom)
     @commands.command()
     async def connect_login_to_user(self, ctx, login, member: disnake.Member):
 
