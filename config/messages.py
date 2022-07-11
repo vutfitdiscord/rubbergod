@@ -180,6 +180,8 @@ class Messages:
     verify_invalid_channel = "Tento příkaz je možné spustit pouze v DMs nebo na VUT FIT serveru."
     invalid_login = "{user} Neplatný login. Přečti si prosím <#591386755547136020>. ({admin} pls)"
     verify_subject = "FIT Discord verifikace"
+    dynamic_verify_requested = "Byla zaslána žádost o verifikaci. Vyčkej prosím než ji někdo z oprávněných osob schválí."
+    dynamic_verify_declined = "Tvá žádost o verifikaci byla zamítnuta."
 
     vote_brief = "Zahájí hlasování, ve kterém je možné zvolit více možností"
     vote_one_of_brief = "Zahájí hlasování, ve kterém je možné zvolit pouze jednu možnost"

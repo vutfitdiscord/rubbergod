@@ -17,12 +17,14 @@ from repository.database.verification import Valid_person
 from email.mime.text import MIMEText
 from buttons.verify import VerifyWithResendButtonView, VerifyView
 from datetime import datetime
+from features.verify_helper import VerifyHelper
 
 
 class Verification(BaseFeature):
     def __init__(self, bot: Bot):
         super().__init__(bot)
         self.repo = UserRepository()
+        self.helper = VerifyHelper()
 
     def send_mail(self, receiver_email: str, contents: str, subject: str = "") -> None:
         msg = MIMEText(contents)
@@ -46,14 +48,6 @@ class Verification(BaseFeature):
             Messages.verify_post_verify_info_mail,
             f"{user} {Messages.verify_verify_success_mail}",
         )
-
-    async def has_role(self, user, role_name: str) -> bool:
-        if type(user) == Member:
-            return utils.has_role(user, role_name)
-        else:
-            guild = await self.bot.fetch_guild(config.guild_id)
-            member = await guild.fetch_member(user.id)
-            return utils.has_role(member, role_name)
 
     async def gen_code_and_send_mail(
         self,
@@ -89,7 +83,7 @@ class Verification(BaseFeature):
 
     async def send_code(self, login: str, inter: disnake.ApplicationCommandInteraction) -> None:
         # Check if the user doesn't have the verify role
-        if not await self.has_role(inter.user, config.verification_role):
+        if not await self.helper.has_role(inter.user, config.verification_role):
             # Some of them will use 'xlogin00' as stated in help, cuz they dumb
             if login == "xlogin00":
                 await self.send_xlogin_info(inter)
@@ -164,7 +158,7 @@ class Verification(BaseFeature):
             await inter.send(content=msg)
 
     async def resend_code(self, login: str, inter: disnake.ApplicationCommandInteraction) -> None:
-        if await self.has_role(inter.user, config.verification_role):
+        if await self.helper.has_role(inter.user, config.verification_role):
             return  # User is now verified.
 
         user = self.repo.get_user_by_login(login)
@@ -219,7 +213,7 @@ class Verification(BaseFeature):
         return "mail.muni.cz" if login[0] != "x" and login.isnumeric() else "stud.fit.vutbr.cz"
 
     async def finish_verify(self, inter: disnake.ModalInteraction, code: str, login: str) -> None:
-        if await self.has_role(inter.user, config.verification_role):
+        if await self.helper.has_role(inter.user, config.verification_role):
             inter.response.send_message(
                 utils.fill_message("verify_already_verified", user=inter.user.id, admin=config.admin_ids[0])
             )
