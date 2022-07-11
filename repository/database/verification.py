@@ -1,5 +1,7 @@
-from sqlalchemy import Column, String, Integer
+from sqlalchemy import Column, String, Integer, Boolean
 from repository.database import database
+from typing import List
+import json
 
 
 class Permit(database.base):
@@ -30,3 +32,20 @@ class Valid_person(database.base):
             )
 
         return f"{self.login}@{fallback_domain}"  # fallback
+
+
+class DynamicVerifyRule(database.base):
+    __tablename__ = "dynamic_verify_rules"
+
+    id = Column(String, primary_key=True)
+    name = Column(String, index=True, nullable=False)
+    enabled = Column(Boolean, default=True, nullable=False)
+    role_ids = Column(String, nullable=False, default="[]")
+    use_count = Column(Integer, nullable=False, default=0)
+
+    def get_role_ids(self) -> List[int]:
+        data = json.loads(self.role_ids)
+        return [int(item) for item in data]
+
+    def set_role_ids(self, roles: List[int]) -> None:
+        self.role_ids = json.dumps(roles)
