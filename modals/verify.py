@@ -14,8 +14,8 @@ class VerifyModal(disnake.ui.Modal):
                 custom_id="code",
                 style=disnake.TextInputStyle.short,
                 required=True,
-                min_length=20,
-                max_length=20,
+                min_length=6,
+                max_length=10
             )
         ]
         super().__init__(
@@ -23,6 +23,6 @@ class VerifyModal(disnake.ui.Modal):
         )
 
     async def callback(self, inter: disnake.ModalInteraction) -> None:
-        code = inter.text_values["code"].upper()
+        code = inter.text_values["code"].strip().upper()
         service = verification.Verification(inter.bot)
         await service.finish_verify(inter, code, self.login)
