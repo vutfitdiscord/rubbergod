@@ -1,8 +1,9 @@
 from repository.base_repository import BaseRepository
 from sqlalchemy.sql import exists
+from sqlalchemy import asc
 from repository.database import session
 from repository.database.verification import DynamicVerifyRule
-from typing import Union
+from typing import List, Union
 
 
 class VerifyRepository(BaseRepository):
@@ -15,3 +16,6 @@ class VerifyRepository(BaseRepository):
     def increment_rule_use(self, rule: DynamicVerifyRule):
         rule.use_count += 1
         session.commit()
+
+    def get_rules(self, limit: int) -> List[DynamicVerifyRule]:
+        return session.query(DynamicVerifyRule).order_by(asc("id")).limit(limit).all()
