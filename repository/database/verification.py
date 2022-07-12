@@ -41,7 +41,6 @@ class DynamicVerifyRule(database.base):
     name = Column(String, index=True, nullable=False)
     enabled = Column(Boolean, default=True, nullable=False)
     role_ids = Column(String, nullable=False, default="[]")
-    use_count = Column(Integer, nullable=False, default=0)
 
     def get_role_ids(self) -> List[int]:
         data = json.loads(self.role_ids)

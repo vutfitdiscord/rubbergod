@@ -49,18 +49,18 @@ class Verify(commands.Cog):
         pass
 
     @dynamic_verify.sub_command(name="create", description=Messages.dynamic_verify_create)
-    async def create_dynamic_verify_rule(self, inter: disnake.ApplicationCommandInteraction):
-        await self.dynamic_verify_manager.create_form_modal(inter)
+    async def dynamic_verify_create(self, inter: disnake.ApplicationCommandInteraction):
+        await self.dynamic_verify_manager.get_modal(inter)
 
     @dynamic_verify.sub_command(name="edit", description=Messages.dynamic_verify_edit)
-    async def edit_dynamic_verify_rule(
+    async def dynamic_verify_edit(
         self,
         inter: disnake.ApplicationCommandInteraction,
         rule_id: str = commands.Param(
             autocomplete=dynamic_verify_rules_autocomplete, description=Messages.dynamic_verify_edit_rule_id
         ),
     ):
-        await self.dynamic_verify_manager.create_edit_form_modal(rule_id, inter)
+        await self.dynamic_verify_manager.get_modal(inter, rule_id)
 
 
 def setup(bot):
