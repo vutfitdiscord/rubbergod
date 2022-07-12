@@ -10,6 +10,7 @@ from typing import List, Union, Dict
 from config.app_config import config
 from config.messages import Messages
 from buttons.dynamic_verify import DynamicVerifyRequestView
+from modals.dynamic_verify import DynamicVerifyEditModal
 
 
 class DynamicVerifyManager(BaseFeature):
@@ -38,7 +39,6 @@ class DynamicVerifyManager(BaseFeature):
         member = await guild.get_or_fetch_member(user_id)
         for role in list(filter(lambda x: x is not None, roles)):
             await member.add_roles(role, reason="Rubbergod dynamic verification")
-        self.verify_repo.increment_rule_use(rule)
 
         try:
             await member.send(utils.fill_message("verify_verify_success", user=inter.user.id))
@@ -76,13 +76,12 @@ class DynamicVerifyManager(BaseFeature):
         channel = self.bot.get_channel(config.log_channel)
         await channel.send(embed=embed)
 
-    async def create_form_modal(self, inter: disnake.ApplicationCommandInteraction) -> None:
-        pass
-
-    async def create_edit_form_modal(
-        self, rule_id: str, inter: disnake.ApplicationCommandInteraction
+    async def get_modal(
+        self, inter: disnake.ApplicationCommandInteraction, rule_id: Union[str, None] = None
     ) -> None:
-        pass
+        rule = self.verify_repo.get_rule(rule_id) if rule_id is not None else None
+        view = DynamicVerifyEditModal(inter.guild, rule)
+        await inter.response.send_modal(view)
 
     def get_rules_list(self) -> Dict[str, str]:
         rules = self.verify_repo.get_rules(25)
