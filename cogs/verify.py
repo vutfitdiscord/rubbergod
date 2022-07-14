@@ -44,16 +44,16 @@ class Verify(commands.Cog):
             return True
 
     @commands.check(utils.is_in_modroom)
-    #@commands.slash_command(name="dynamic_verify")
+    # @commands.slash_command(name="dynamic_verify")
     async def dynamic_verify(self, inter: disnake.ApplicationCommandInteraction):
         """ This method is only group for another commands. This function does nothing. """
         pass
 
-    #@dynamic_verify.sub_command(name="create", description=Messages.dynamic_verify_create)
+    # @dynamic_verify.sub_command(name="create", description=Messages.dynamic_verify_create)
     async def dynamic_verify_create(self, inter: disnake.ApplicationCommandInteraction):
         await self.dynamic_verify_manager.get_modal(inter)
 
-    #@dynamic_verify.sub_command(name="edit", description=Messages.dynamic_verify_edit)
+    # @dynamic_verify.sub_command(name="edit", description=Messages.dynamic_verify_edit)
     async def dynamic_verify_edit(
         self,
         inter: disnake.ApplicationCommandInteraction,
