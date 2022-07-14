@@ -5,7 +5,6 @@ import string
 import re
 
 import disnake
-from disnake import Member
 from disnake.ext.commands import Bot
 
 import utils

@@ -77,8 +77,8 @@ class DynamicVerifyEditModal(disnake.ui.Modal):
         return self.rule is not None
 
     async def callback(self, inter: disnake.ModalInteraction) -> None:
-        raise NotImplemented("Dynamic verification modal is not currently supported.")
+        raise NotImplemented("Dynamic verification modal is not currently supported.") # noqa
 
-        rule_id = str(inter.text_values["id"]).strip()
-        name = str(inter.text_values["name"]).strip()
-        await inter.response.send_message("Hotovo") # TODO Vhodnější text.
+        rule_id = str(inter.text_values["id"]).strip() # noqa
+        name = str(inter.text_values["name"]).strip() # noqa
+        await inter.response.send_message("Hotovo") # TODO Vhodnější text. # noqa
