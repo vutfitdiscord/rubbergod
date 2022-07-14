@@ -44,10 +44,11 @@ class DynamicVerifyEditModal(disnake.ui.Modal):
             components[2].options[0].default = False
             components[2].options[1].default = True
 
-        for role_group in guild_role_groups:
+        for i in range(0, len(guild_role_groups)):
+            role_group = guild_role_groups[i]
             components.append(
                 disnake.ui.Select(
-                    custom_id="roles",
+                    custom_id=f"roles:{i}",
                     placeholder="Výběr rolí",
                     options=[
                         disnake.SelectOption(
@@ -76,4 +77,8 @@ class DynamicVerifyEditModal(disnake.ui.Modal):
         return self.rule is not None
 
     async def callback(self, inter: disnake.ModalInteraction) -> None:
-        pass  # TODO
+        raise NotImplemented("Dynamic verification modal is not currently supported.")
+
+        rule_id = str(inter.text_values["id"]).strip()
+        name = str(inter.text_values["name"]).strip()
+        await inter.response.send_message("Hotovo") # TODO Vhodnější text.
