@@ -6,7 +6,7 @@ from disnake.ext.commands import Bot
 from repository.database.verification import DynamicVerifyRule
 from repository.user_repo import UserRepository
 from repository.verify_repo import VerifyRepository
-from typing import Union, Dict, List
+from typing import Union, Dict
 from config.app_config import config
 from config.messages import Messages
 from buttons.dynamic_verify import DynamicVerifyRequestView

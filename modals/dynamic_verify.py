@@ -136,7 +136,6 @@ class DynamicVerifyEditModal(disnake.ui.Modal):
 
         # TODO: Messages
 
-
     async def get_rule_id(
         self, inter: disnake.ModalInteraction, manager: DynamicVerifyManager
     ) -> Union[str, None]:
