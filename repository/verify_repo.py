@@ -23,3 +23,7 @@ class VerifyRepository(BaseRepository):
 
     def get_rules(self, limit: int) -> List[DynamicVerifyRule]:
         return session.query(DynamicVerifyRule).order_by(asc("id")).limit(limit).all()
+
+    def update_rule(self, rule: DynamicVerifyRule) -> None:
+        session.merge(rule)
+        session.commit()
