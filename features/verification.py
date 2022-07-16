@@ -26,7 +26,7 @@ class Verification(BaseFeature):
         self.helper = VerifyHelper()
 
     def send_mail(self, receiver_email: str, contents: str, subject: str = "") -> None:
-        msg = MIMEText(contents)
+        msg = MIMEText(contents, "plain", "utf-8")
         msg["Subject"] = subject
         msg["To"] = receiver_email
         msg["Date"] = datetime.now().isoformat()
