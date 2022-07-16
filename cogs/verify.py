@@ -7,6 +7,7 @@ from config.messages import Messages
 import disnake
 from config.app_config import config
 from features.dynamic_verify import DynamicVerifyManager
+from modals.dynamic_verify import DynamicVerifyEditModal
 
 
 async def dynamic_verify_rules_autocomplete(inter: disnake.ApplicationCommandInteraction, user_input: str):
@@ -44,16 +45,17 @@ class Verify(commands.Cog):
             return True
 
     @commands.check(utils.is_in_modroom)
-    # @commands.slash_command(name="dynamic_verify")
+    @commands.slash_command(name="dynamic_verify")
     async def dynamic_verify(self, inter: disnake.ApplicationCommandInteraction):
         """ This method is only group for another commands. This function does nothing. """
         pass
 
-    # @dynamic_verify.sub_command(name="create", description=Messages.dynamic_verify_create)
+    @dynamic_verify.sub_command(name="create", description=Messages.dynamic_verify_create)
     async def dynamic_verify_create(self, inter: disnake.ApplicationCommandInteraction):
-        await self.dynamic_verify_manager.get_modal(inter)
+        modal = DynamicVerifyEditModal(inter.guild, None)
+        await inter.response.send_modal(modal)
 
-    # @dynamic_verify.sub_command(name="edit", description=Messages.dynamic_verify_edit)
+    @dynamic_verify.sub_command(name="edit", description=Messages.dynamic_verify_edit)
     async def dynamic_verify_edit(
         self,
         inter: disnake.ApplicationCommandInteraction,
@@ -61,7 +63,12 @@ class Verify(commands.Cog):
             autocomplete=dynamic_verify_rules_autocomplete, description=Messages.dynamic_verify_edit_rule_id
         ),
     ):
-        await self.dynamic_verify_manager.get_modal(inter, rule_id)
+        rule = self.dynamic_verify_manager.get_rule(rule_id)
+        if rule is None:
+            await inter.response.send_message(f"Toto pravidlo (`{rule_id}`) neexistuje.") # TODO: Messages
+            return
+        modal = DynamicVerifyEditModal(inter.guild, rule)
+        await inter.response.send_modal(modal)
 
 
 def setup(bot):

@@ -6,11 +6,10 @@ from disnake.ext.commands import Bot
 from repository.database.verification import DynamicVerifyRule
 from repository.user_repo import UserRepository
 from repository.verify_repo import VerifyRepository
-from typing import Union, Dict
+from typing import Union, Dict, List
 from config.app_config import config
 from config.messages import Messages
 from buttons.dynamic_verify import DynamicVerifyRequestView
-from modals.dynamic_verify import DynamicVerifyEditModal
 
 
 class DynamicVerifyManager(BaseFeature):
@@ -76,13 +75,9 @@ class DynamicVerifyManager(BaseFeature):
         channel = self.bot.get_channel(config.log_channel)
         await channel.send(embed=embed)
 
-    async def get_modal(
-        self, inter: disnake.ApplicationCommandInteraction, rule_id: Union[str, None] = None
-    ) -> None:
-        rule = self.verify_repo.get_rule(rule_id) if rule_id is not None else None
-        view = DynamicVerifyEditModal(inter.guild, rule)
-        await inter.response.send_modal(view)
-
     def get_rules_list(self) -> Dict[str, str]:
         rules = self.verify_repo.get_rules(25)
         return {rule.name: rule.id for rule in rules}
+
+    def get_rule(self, rule_id: str) -> Union[DynamicVerifyRule, None]:
+        return self.verify_repo.get_rule(rule_id)
