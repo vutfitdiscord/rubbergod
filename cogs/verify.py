@@ -47,7 +47,7 @@ class Verify(commands.Cog):
     @commands.check(utils.is_in_modroom)
     @commands.slash_command(name="dynamic_verify")
     async def dynamic_verify(self, inter: disnake.ApplicationCommandInteraction):
-        """ This method is only group for another commands. This function does nothing. """
+        """This method is only group for another commands. This function does nothing."""
         pass
 
     @dynamic_verify.sub_command(name="create", description=Messages.dynamic_verify_create)
@@ -65,7 +65,9 @@ class Verify(commands.Cog):
     ):
         rule = self.dynamic_verify_manager.get_rule(rule_id)
         if rule is None:
-            await inter.response.send_message(f"Toto pravidlo (`{rule_id}`) neexistuje.") # TODO: Messages
+            await inter.response.send_message(
+                utils.fill_message("dynamic_verify_missing_rule", rule_id=rule_id)
+            )
             return
         modal = DynamicVerifyEditModal(inter.guild, rule)
         await inter.response.send_modal(modal)
