@@ -1,22 +1,17 @@
 import disnake
+from config.messages import Messages
 from repository.database.verification import DynamicVerifyRule
 from typing import Union, List
 from features.dynamic_verify import DynamicVerifyManager
-
-# TODO: Prepared for modal select menus
-# import utils
+import utils
 
 
 class DynamicVerifyEditModal(disnake.ui.Modal):
-    def __init__(
-        self, guild: disnake.Guild, rule: Union[DynamicVerifyRule, None] = None
-    ):
+    def __init__(self, guild: disnake.Guild, rule: Union[DynamicVerifyRule, None] = None):
         self.rule = rule
 
         selected_roles = rule.get_role_ids() if self.is_edit() else []
-        guild_roles = list(
-            filter(lambda x: x.name != "@everyone" and x.is_assignable(), guild.roles)
-        )
+        guild_roles = list(filter(lambda x: x.name != "@everyone" and x.is_assignable(), guild.roles))
 
         selected_roles_data = list(
             map(
@@ -132,9 +127,9 @@ class DynamicVerifyEditModal(disnake.ui.Modal):
         rule.set_role_ids([role.id for role in roles])
 
         manager.verify_repo.update_rule(rule)
-        await inter.response.send_message("Hotovo")  # TODO Vhodnější text. # noqa
-
-        # TODO: Messages
+        await inter.response.send_message(
+            Messages.dynamic_verify_edit_success if self.is_edit() else Messages.dynamic_verify_create_success
+        )
 
     async def get_rule_id(
         self, inter: disnake.ModalInteraction, manager: DynamicVerifyManager
@@ -142,21 +137,19 @@ class DynamicVerifyEditModal(disnake.ui.Modal):
         rule_id = str(inter.text_values["id"]).strip()
 
         if rule_id == "None":
-            await inter.response.send_message("Nebylo zadáno platné ID pravidla.")
+            await inter.response.send_message(Messages.dynamic_verify_rule_missing)
             return None
 
         rule = manager.get_rule(rule_id)
         if rule is not None:
             if self.is_edit() and self.rule.id == rule_id:
                 return rule_id  # Same rule ID in edit mode is valid.
-            await inter.response.send_message("ID s tímto pravidlem již existuje.")
+            await inter.response.send_message(Messages.dynamic_verify_rule_exists)
             return None
 
         return rule_id
 
-    async def get_enable_state(
-        self, inter: disnake.ModalInteraction
-    ) -> Union[bool, None]:
+    async def get_enable_state(self, inter: disnake.ModalInteraction) -> Union[bool, None]:
         enabled = str(inter.text_values["enabled"]).strip()
 
         if enabled.lower() == "true":
@@ -164,14 +157,10 @@ class DynamicVerifyEditModal(disnake.ui.Modal):
         elif enabled.lower() == "false":
             return False
         else:
-            await inter.response.send_message(
-                "Nepovolený stav. Lze zadat pouze True/False"
-            )
+            await inter.response.send_message(Messages.dynamic_verify_invalid_state)
             return None
 
-    async def get_roles(
-        self, inter: disnake.ModalInteraction
-    ) -> Union[List[disnake.Role], None]:
+    async def get_roles(self, inter: disnake.ModalInteraction) -> Union[List[disnake.Role], None]:
         role_data = str(inter.text_values["roles"]).strip().split(",")
         role_data = [role.strip() for role in role_data]
         roles = []
@@ -181,7 +170,9 @@ class DynamicVerifyEditModal(disnake.ui.Modal):
                 # Search by Role ID
                 role = inter.guild.get_role(int(item))
                 if role is None:
-                    await inter.response.send_message(f"Role s ID `{item}` neexistuje")
+                    await inter.response.send_message(
+                        utils.fill_message("dynamic_verify_role_not_exists", role=item)
+                    )
                     return None
                 roles.append(role)
             else:
@@ -189,12 +180,12 @@ class DynamicVerifyEditModal(disnake.ui.Modal):
                 role = disnake.utils.get(inter.guild.roles, name=item)
                 if role is None:
                     await inter.response.send_message(
-                        f"Role s názvem `{item}` neexistuje"
+                        utils.fill_message("dynamic_verify_role_not_exists", role=item)
                     )
                     return None
                 roles.append(role)
 
         if len(roles) == 0:
-            await inter.response.send_message("Nebyla nalezena žádná role.")
+            await inter.response.send_message(Messages.dynamic_verify_no_roles)
             return None
         return list(set(roles))
