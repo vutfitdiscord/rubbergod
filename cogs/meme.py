@@ -74,14 +74,16 @@ class Meme(commands.Cog):
         else:
             bonked = member
 
-        if not bonked.avatar:
-            await ctx.send(Messages.unsupported_image)
-            return
-
         async with ctx.typing():
-            url = bonked.display_avatar.with_format("jpg")
+            if not bonked.avatar:
+                url = bonked.display_avatar.with_format("png")
+            else:
+                url = bonked.display_avatar.with_format("jpg")
             response = requests.get(url)
             avatar = Image.open(BytesIO(response.content))
+
+            if not bonked.avatar:
+                avatar = avatar.convert('RGB')
 
             frames = self.get_bonk_frames(avatar)
 
