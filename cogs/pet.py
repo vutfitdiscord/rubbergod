@@ -20,12 +20,16 @@ class Pet(commands.Cog):
     async def pet(self, inter: disnake.ApplicationCommandInteraction, user: disnake.User = None):
         if user is None:
             user = inter.author
+
         if not user.avatar:
-            await inter.response.send_message(Messages.unsupported_image)
-            return
-        url = user.display_avatar.with_format('jpg')
+            url = user.display_avatar.with_format('png')
+        else:
+            url = user.display_avatar.with_format('jpg')
         response = requests.get(url, timeout=10)
         avatarFull = Image.open(BytesIO(response.content))
+
+        if not user.avatar:
+            avatarFull = avatarFull.convert("RGB")
 
         frames = []
         deformWidth = [-1, -2, 1, 2, 1]
