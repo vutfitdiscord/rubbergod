@@ -26,7 +26,7 @@ db_string = "postgresql://postgres:postgres@db:5432/postgres"
 
 [cogs]
 extensions = ['base', 'karma', 'meme', 'random', 'verify', 'fitwide', 'autopin', 'urban', 'help',
-    'acl', 'review', 'vote', 'kachna', 'name_day', 'week', 'weather', 'roles', 'error', 'absolvent', 'pet', 'reactions',
+    'acl', 'review', 'vote', 'name_day', 'week', 'weather', 'roles', 'error', 'absolvent', 'pet', 'reactions',
     'streamlinks', 'bookmark']
 
 [config]
