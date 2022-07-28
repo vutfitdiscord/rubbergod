@@ -2,6 +2,7 @@ import disnake
 from buttons.bookmark import BookmarkView
 from config.messages import Messages
 from features.bookmark import BookmarkFeatures
+import utils
 
 
 class BookmarkModal(disnake.ui.Modal):
@@ -33,5 +34,9 @@ class BookmarkModal(disnake.ui.Modal):
                     embed.append(await BookmarkFeatures.create_image_embed(self, inter, image, title_name))
             await inter.author.send(embeds=embed, view=BookmarkView(), files=files_attached)
             await inter.response.send_message(f"Záložka **{title_name}** vytvořena", ephemeral=True)
-        except disnake.HTTPException:
-            return
+        except disnake.HTTPException as e:
+            if e.code == 50007:
+                await inter.response.send_message(utils.fill_message("blocked_bot",
+                                                  author=inter.author.mention), ephemeral=True)
+            else:
+                raise(e)

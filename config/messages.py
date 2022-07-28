@@ -416,3 +416,4 @@ class Messages:
     base_leaderboard_format_str = "_{position}._ - **{member_name}**:"
 
     bookmark_title = "Záložka na serveru VUT FIT"
+    blocked_bot = "I can't send you messages {author}"
