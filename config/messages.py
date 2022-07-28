@@ -46,9 +46,6 @@ class Messages:
     uptime_brief = "Vypíše čas spuštění a čas uplynulý od spuštění"
     uptime_message = "Up since:  `{boottime}`\nUptime:\t`{uptime}`"
 
-    kachna_grillbot = "O Kachnu se teď stará Grillbot " \
-                      "<:feelsWowMan:493152294712377354> Použij $kachna."
-
     karma = "{user} Karma uživatele `{target}` je: **{karma}** " \
             "(**{order}.**)\nA rozdal:\n" \
             "**{karma_pos}** pozitivní karmy " \
