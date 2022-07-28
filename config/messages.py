@@ -98,7 +98,7 @@ class Messages:
                                "ne {input}] [user(s)]` "
     karma_give_success = "Karma byla úspěšně přidána."
     karma_give_negative_success = "Karma byla úspěšně odebrána."
-    karma_message_format = f"{prefix}karma message [url]"
+    karma_message_format = "Musíš zadat url zprávy"
     member_not_found = "{user} Nikoho takového jsem nenašel."
     karma_leaderboard_offset_error = "{user} Špatný offset, zadej kladné číslo"
     karma_web_title = "Celý leaderboard"
