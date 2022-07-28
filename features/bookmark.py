@@ -8,19 +8,11 @@ class BookmarkFeatures():
     def __init__(self, bot):
         self.bot = bot
 
-    def check_profile_picture(self, inter, embed):
-        if inter.message.author.avatar:
-            return embed.set_author(name=inter.message.author, icon_url=inter.message.author.avatar)
-        else:
-            return embed.set_author(name=inter.message.author)
-
     async def create_image_embed(self, inter, image, title_name=Messages.bookmark_title):
         """Create embed from image only"""
-        embed = disnake.Embed(title=title_name, color=inter.message.author.colour)
-        if inter.message.author.avatar:
-            embed.set_author(name=inter.message.author, icon_url=inter.message.author.avatar)
-        else:
-            embed.set_author(name=inter.message.author)
+        author = inter.message.author
+        embed = disnake.Embed(title=title_name, color=author.colour)
+        embed.set_author(name=author, icon_url=author.display_avatar.url)
         embed.set_image(image)
         embed.add_field(
             name="Channel",
@@ -29,20 +21,15 @@ class BookmarkFeatures():
         return embed
 
     async def create_bookmark_embed(self, inter, title_name=Messages.bookmark_title):
-        embed = disnake.Embed(title=title_name, colour=inter.message.author.colour)
-        if inter.message.author.avatar:
-            embed.set_author(name=inter.message.author, icon_url=inter.message.author.avatar)
-        else:
-            embed.set_author(name=inter.message.author)
+        author = inter.message.author
+        embed = disnake.Embed(title=title_name, colour=author.colour)
+        embed.set_author(name=author, icon_url=author.display_avatar.url)
 
         content = ""
         if inter.message.embeds:
             for embed in inter.message.embeds:
-                embed.title, embed.colour = title_name, inter.message.author.colour
-                if inter.message.author.avatar:
-                    embed.set_author(name=inter.message.author, icon_url=inter.message.author.avatar)
-                else:
-                    embed.set_author(name=inter.message.author)
+                embed.title, embed.colour = title_name, author.colour
+                embed.set_author(name=author, icon_url=author.display_avatar.url)
 
         if inter.message.content:
             content = inter.message.content
