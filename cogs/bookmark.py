@@ -3,6 +3,7 @@ from disnake.ext import commands
 from features.bookmark import BookmarkFeatures
 from modals.bookmark import BookmarkModal
 from buttons.bookmark import BookmarkView
+import utils
 
 
 class Bookmark(commands.Cog):
@@ -21,8 +22,11 @@ class Bookmark(commands.Cog):
                 for image in images:
                     embed.append(await BookmarkFeatures.create_image_embed(self, ctx, image))
             await ctx.member.send(embeds=embed, view=BookmarkView(), files=files_attached)
-        except disnake.HTTPException:
-            return
+        except disnake.HTTPException as e:
+            if e.code == 50007:
+                await ctx.channel.send(utils.fill_message("blocked_bot", author=ctx.member.mention))
+            else:
+                raise(e)
 
     @commands.Cog.listener()
     async def on_button_click(self, inter: disnake.MessageInteraction):
