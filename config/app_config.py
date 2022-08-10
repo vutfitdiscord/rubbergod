@@ -111,7 +111,6 @@ class Config:
     role_channels: List[int] = get_attr(toml_dict, "role", "channels")
 
     # Subjects shortcuts
-    subjects: List[str] = get_attr(toml_dict, "review", "subjects")
     review_forbidden_roles: List[int] = get_attr(toml_dict, "review", "forbidden_roles")
 
     # How many roles a user needs to have to be considered a rolehoarder
