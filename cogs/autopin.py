@@ -37,6 +37,10 @@ class AutoPin(commands.Cog):
 
             self.repo.add_or_update_channel(str(message.channel.id), str(message.id))
 
+            if len(await message.channel.pins()) == 50:
+                await ctx.send(Messages.autopin_max_pins_error)
+                return
+
             if not message.pinned:
                 await message.pin()
 
@@ -67,19 +71,22 @@ class AutoPin(commands.Cog):
 
         lines: List[str] = []
         for item in mappings:
-            channel: disnake.TextChannel = await self.bot.fetch_channel(int(item.channel_id))
 
-            if channel is None:
+            try:
+                channel: disnake.TextChannel = await self.bot.fetch_channel(int(item.channel_id))
+            except disnake.errors.NotFound:
                 lines.append(utils.fill_message("autopin_list_unknown_channel", channel_id=item.channel_id))
-            else:
+                self.repo.remove_channel(str(item.channel_id))
+                continue
+
+            try:
                 message: disnake.Message = await channel.fetch_message(int(item.message_id))
-                if message is None:
-                    msg: str = utils.fill_message("autopin_list_unknown_message", channel=channel.mention)
-                    lines.append(msg)
-                else:
-                    jump_url: str = message.jump_url
-                    msg: str = utils.fill_message("autopin_list_item", channel=channel.mention, url=jump_url)
-                    lines.append(msg)
+                jump_url: str = message.jump_url
+                msg: str = utils.fill_message("autopin_list_item", channel=channel.mention, url=jump_url)
+            except disnake.errors.NotFound:
+                msg: str = utils.fill_message("autopin_list_unknown_message", channel=channel.mention)
+            finally:
+                lines.append(msg)
 
         for part in utils.split_to_parts(lines, 10):
             await ctx.send("\n".join(part))
