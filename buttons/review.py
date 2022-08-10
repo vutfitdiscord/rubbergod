@@ -17,7 +17,7 @@ class ReviewView(EmbedView):
         super().__init__(author, embeds, row=1, end_arrow=False, timeout=300)
         self.check_text_pages()
         # if there aren't any reviews remove buttons
-        if len(self.embed.fields) < 1:
+        if len(self.embed.fields) < 2:
             to_remove = []
             for child in self.children:
                 to_remove.append(child)
