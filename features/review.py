@@ -39,9 +39,9 @@ class ReviewManager:
                     embed.add_field(name="Text page", value=f"1/{pages}", inline=False)
                 embed.add_field(name="Text", value=text, inline=False)
             likes = self.repo.get_votes_count(review.id, True)
-            embed.add_field(name="Likes", value=f"👍{likes}")
+            embed.add_field(name="👍", value=f"{likes}")
             dislikes = self.repo.get_votes_count(review.id, False)
-            embed.add_field(name="Dislikes", value=f"👎{dislikes}")
+            embed.add_field(name="👎", value=f"{dislikes}")
             diff = likes - dislikes
             if diff > 0:
                 embed.colour = 0x34CB0B
@@ -71,14 +71,14 @@ class ReviewManager:
             embed.set_field_at(idx, name="Text", value=text, inline=False)
             idx += 1
         likes = self.repo.get_votes_count(review.id, True)
-        embed.set_field_at(idx, name="Likes", value=f"👍{likes}")
+        embed.set_field_at(idx, name="👍", value=f"{likes}")
         dislikes = self.repo.get_votes_count(review.id, False)
         idx += 1
         if add_new_field or fields_cnt <= idx:
-            embed.add_field(name="Dislikes", value=f"👎{dislikes}")
+            embed.add_field(name="👎", value=f"{dislikes}")
             add_new_field = True
         else:
-            embed.set_field_at(idx, name="Dislikes", value=f"👎{dislikes}")
+            embed.set_field_at(idx, name="👎", value=f"{dislikes}")
         idx += 1
         for _ in range(fields_cnt - idx):
             embed.remove_field(idx)
