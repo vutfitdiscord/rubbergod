@@ -1,26 +1,32 @@
 import disnake
 import re
 from utils import split_to_parts
-from config.messages import Messages
+import utils
 
 
 class BookmarkFeatures():
     def __init__(self, bot):
         self.bot = bot
 
-    async def create_image_embed(self, inter, image, title_name=Messages.bookmark_title):
+    async def create_image_embed(self, inter, image, title_name=None):
         """Create embed from image only"""
+        if not title_name:
+            title_name = utils.fill_message("bookmark_title", server=inter.guild.name)
+
         author = inter.message.author
         embed = disnake.Embed(title=title_name, color=author.colour)
         embed.set_author(name=author, icon_url=author.display_avatar.url)
         embed.set_image(image)
         embed.add_field(
             name="Channel",
-            value=f"[Jump to original message]({inter.message.jump_url}) in {inter.message.channel.mention}"
+            value=f"[Přejít na původní zpráv]({inter.message.jump_url}) v {inter.message.channel.mention}"
         )
         return embed
 
-    async def create_bookmark_embed(self, inter, title_name=Messages.bookmark_title):
+    async def create_bookmark_embed(self, inter, title_name=None):
+        if not title_name:
+            title_name = utils.fill_message("bookmark_title", server=inter.guild.name)
+
         author = inter.message.author
         embed = disnake.Embed(title=title_name, colour=author.colour)
         embed.set_author(name=author, icon_url=author.display_avatar.url)
@@ -57,6 +63,6 @@ class BookmarkFeatures():
             embed.add_field(name="Původní zpráva", value=content, inline=False)
         embed.add_field(
             name="Channel",
-            value=f"[Jump to original message]({inter.message.jump_url}) in {inter.message.channel.mention}"
+            value=f"[Přejít na původní zprávu]({inter.message.jump_url}) v {inter.message.channel.mention}"
         )
         return ([embed], images, files_attached)

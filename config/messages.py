@@ -412,5 +412,6 @@ class Messages:
 
     base_leaderboard_format_str = "_{position}._ - **{member_name}**:"
 
-    bookmark_title = "Záložka na serveru VUT FIT"
+    bookmark_title = "Záložka na serveru {server}"
     blocked_bot = "Nemůžu ti posílat zprávy {author}"
+    bookmark_created = "Záložka **{title_name}** vytvořena"
