@@ -97,7 +97,7 @@ class ReviewView(EmbedView):
         elif "review" not in interaction.data.custom_id:
             # pagination interaction from super class
             await super().interaction_check(interaction)
-            if not((self.perma_lock or self.locked) and interaction.author.id != self.author.id):
+            if not ((self.perma_lock or self.locked) and interaction.author.id != self.author.id):
                 self.check_text_pages()
                 # update view
                 await interaction.edit_original_message(view=self)

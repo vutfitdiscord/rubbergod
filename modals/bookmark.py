@@ -41,4 +41,4 @@ class BookmarkModal(disnake.ui.Modal):
                 await inter.response.send_message(utils.fill_message("blocked_bot",
                                                   author=inter.author.mention), ephemeral=True)
             else:
-                raise(e)
+                raise e
