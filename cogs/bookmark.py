@@ -26,7 +26,7 @@ class Bookmark(commands.Cog):
             if e.code == 50007:
                 await ctx.channel.send(utils.fill_message("blocked_bot", author=ctx.member.mention))
             else:
-                raise(e)
+                raise e
 
     @commands.Cog.listener()
     async def on_button_click(self, inter: disnake.MessageInteraction):
