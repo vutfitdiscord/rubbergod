@@ -4,15 +4,17 @@ import disnake
 from disnake.ext import commands
 import sqlalchemy
 
-from repository.database import session
 from config.app_config import config
 from config.messages import Messages
+from features.error import ErrorLogger
+from repository.database import session
 import utils
 
 
 class Error(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+        self.logger = ErrorLogger()
 
     @commands.Cog.listener()
     async def on_command_error(self, ctx, error):
@@ -59,19 +61,18 @@ class Error(commands.Cog):
             return
 
         output = "".join(traceback.format_exception(type(error), error, error.__traceback__))
-        embed = disnake.Embed(title=f"Ignoring exception in command {ctx.command}", color=0xFF0000)
-        embed.add_field(name="Zpráva", value=ctx.message.content[:1000])
-        embed.add_field(name="Autor", value=str(ctx.author))
-        if ctx.guild and ctx.guild.id != config.guild_id:
-            embed.add_field(name="Guild", value=ctx.guild.name)
-        embed.add_field(name="Link", value=ctx.message.jump_url, inline=False)
+        embed = self.logger.create_embed(
+            ctx.command,
+            ctx.message.content[:1000],
+            ctx.author,
+            ctx.guild,
+            ctx.message.jump_url
+        )
 
         channel = self.bot.get_channel(config.bot_dev_channel)
+        await channel.send(embed=embed)
 
-        output = utils.cut_string(output, 1900)
-        if channel is not None:
-            for message in output:
-                await channel.send(f"```\n{message}\n```")
+        await self.logger.send_output(output, channel)
 
     @commands.Cog.listener()
     async def on_slash_command_error(self, inter: disnake.ApplicationCommandInteraction, error):
@@ -90,15 +91,13 @@ class Error(commands.Cog):
             await inter.response.send_message(utils.fill_message("spamming", user=inter.author.id))
             return
 
-        url = f"https://discord.com/channels/{inter.guild_id}/{inter.channel_id}/{inter.id}"
-
-        output = "".join(traceback.format_exception(type(error), error, error.__traceback__))
-        embed = disnake.Embed(title=f"Ignoring exception in command {inter.data.name}", color=0xFF0000)
-        embed.add_field(name="Zpráva", value=inter.filled_options)
-        embed.add_field(name="Autor", value=str(inter.author))
-        if inter.guild and inter.guild.id != config.guild_id:
-            embed.add_field(name="Guild", value=inter.guild.name)
-        embed.add_field(name="Link", value=url, inline=False)
+        embed = self.logger.create_embed(
+            inter.data.name,
+            inter.filled_options,
+            inter.author,
+            inter.guild,
+            f"https://discord.com/channels/{inter.guild_id}/{inter.channel_id}/{inter.id}",
+        )
 
         channel = self.bot.get_channel(config.bot_dev_channel)
 
@@ -109,10 +108,8 @@ class Error(commands.Cog):
             channel_ctx = channel
         await channel_ctx.send(embed=embed)
 
-        output = utils.cut_string(output, 1900)
-        if channel is not None:
-            for message in output:
-                await channel.send(f"```\n{message}\n```")
+        output = "".join(traceback.format_exception(type(error), error, error.__traceback__))
+        await self.logger.send_output(output, channel)
 
 
 def setup(bot):
