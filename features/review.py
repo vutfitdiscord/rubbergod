@@ -17,7 +17,7 @@ class ReviewManager:
         self.repo = review_repo.ReviewRepository()
 
     def make_embed(
-        self, 
+        self,
         msg_author: disnake.User,
         review: Review,
         subject: Subject_details,
@@ -58,10 +58,10 @@ class ReviewManager:
         if not subject.shortcut.lower().startswith("tv"):
             sem = 1 if subject.semester == "L" else 2
             subject_id = subject.card.split("/")[-2]
-            vutis_link = f"https://www.vut.cz/studis/student.phtml?script_name=anketa_statistiky"
+            vutis_link = "https://www.vut.cz/studis/student.phtml?script_name=anketa_statistiky"
             embed.add_field(
-                name="Hodnocení na VUT IS",
-                value=f"[Link]({vutis_link}&apid={subject_id}&typ_semestru_id={sem})",
+                name="Další hodnocení",
+                value=f"[VUT IS]({vutis_link}&apid={subject_id}&typ_semestru_id={sem})",
                 inline=False,
             )
         utils.add_author_footer(embed, msg_author, additional_text=[f"Review: {page} | ID: {id}"])
@@ -82,7 +82,7 @@ class ReviewManager:
                 if len(review.text_review) < 1024 * text_page:
                     text = review.text_review[text_index:]
                 else:
-                    text = review.text_review[text_index : 1024 * text_page]
+                    text = review.text_review[text_index: 1024 * text_page]
                 embed.set_field_at(idx, name="Text page", value=f"{text_page}/{pages}", inline=False)
                 idx += 1
             embed.set_field_at(idx, name="Text", value=text, inline=False)

@@ -35,11 +35,11 @@ class AutoPin(commands.Cog):
             converter = commands.MessageConverter()
             message: disnake.Message = await converter.convert(ctx, message_url)
 
-            self.repo.add_or_update_channel(str(message.channel.id), str(message.id))
-
             if len(await message.channel.pins()) == 50:
                 await ctx.send(Messages.autopin_max_pins_error)
                 return
+
+            self.repo.add_or_update_channel(str(message.channel.id), str(message.id))
 
             if not message.pinned:
                 await message.pin()
