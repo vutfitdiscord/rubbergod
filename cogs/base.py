@@ -1,10 +1,11 @@
 import datetime
 
 from disnake.ext import commands
+import disnake
 
-import utils
 from config import cooldowns
 from config.messages import Messages
+from features.error import ErrorLogger
 
 
 boottime = datetime.datetime.now().replace(microsecond=0)
@@ -13,13 +14,23 @@ boottime = datetime.datetime.now().replace(microsecond=0)
 class Base(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+        self.error_log = ErrorLogger()
 
     @cooldowns.default_cooldown
     @commands.command(brief=Messages.uptime_brief)
     async def uptime(self, ctx):
         now = datetime.datetime.now().replace(microsecond=0)
         delta = now - boottime
-        await ctx.send(utils.fill_message("uptime_message", boottime=str(boottime), uptime=str(delta)))
+        count = self.error_log.log_error_date(set=False)
+        embed = disnake.Embed(
+            title="Uptime",
+            description=f"{count} days without an accident.",
+            color=0xeee657,
+        )
+        embed.add_field(name=Messages.upsince_title, value=str(boottime))
+        embed.add_field(name=Messages.uptime_title, value=str(delta))
+        self.error_log.set_image(embed)
+        await ctx.send(embed=embed)
 
 
 def setup(bot):

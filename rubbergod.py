@@ -4,8 +4,8 @@ import logging
 
 from disnake import Embed, TextChannel, AllowedMentions, Intents
 from disnake.ext import commands
+from features.error import ErrorLogger
 
-import utils
 from config.messages import Messages
 from config.app_config import config
 from features import presence
@@ -59,6 +59,7 @@ bot = commands.Bot(
 )
 
 presence = presence.Presence(bot)
+err_logger = ErrorLogger()
 
 
 @bot.event
@@ -131,7 +132,11 @@ async def on_error(event, *args, **kwargs):
                     message = arg.message_id
                 user = str(user)
 
-        embed = Embed(title=f"Ignoring exception in event '{event}'", color=0xFF0000)
+        count = err_logger.log_error_date()
+        embed = Embed(
+            title=f"{count} days without an accident.\nIgnoring exception in event '{event}'",
+            color=0xFF0000,
+        )
         embed.add_field(name="Zpráva", value=message, inline=False)
         if not guild or guild.id != config.guild_id:
             embed.add_field(name="Guild", value=event_guild)
@@ -147,14 +152,13 @@ async def on_error(event, *args, **kwargs):
         if guild:
             link = f"https://discord.com/channels/{guild.id}/{channel.id}/{message_id}"
             embed.add_field(name="Link", value=link, inline=False)
+        err_logger.set_image(embed)
         embeds.append(embed)
 
     if channel_out is not None:
-        output = utils.cut_string(output, 1900)
         for embed in embeds:
             await channel_out.send(embed=embed)
-        for message in output:
-            await channel_out.send(f"```\n{message}```")
+        await err_logger.send_output(output, channel_out)
 
 
 # Create missing tables at start

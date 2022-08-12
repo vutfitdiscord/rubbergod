@@ -44,7 +44,8 @@ class Messages:
     uhoh_brief = "Vypíše počet uh ohs od spuštění"
 
     uptime_brief = "Vypíše čas spuštění a čas uplynulý od spuštění"
-    uptime_message = "Up since:  `{boottime}`\nUptime:\t`{uptime}`"
+    uptime_title = "Uptime"
+    upsince_title = "Up since"
 
     karma = "{user} Karma uživatele `{target}` je: **{karma}** " \
             "(**{order}.**)\nA rozdal:\n" \
