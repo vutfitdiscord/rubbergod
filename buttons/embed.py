@@ -5,6 +5,7 @@ from typing import List
 from config.messages import Messages
 from config.app_config import config
 from features.leaderboard import LeaderboardPageSource
+from features.error import ErrorLogger
 import utils
 
 
@@ -38,6 +39,7 @@ class EmbedView(disnake.ui.View):
         self.page_source = page_source
         self.roll_arroud = roll_arroud
         self.perma_lock = perma_lock
+        self.log_error = ErrorLogger()
         if self.page_source is None:
             self.max_page = len(embeds)
         else:
@@ -135,25 +137,21 @@ class EmbedView(disnake.ui.View):
 
     async def on_error(self, error, item: disnake.ui.Item, interaction: disnake.MessageInteraction):
         channel_out = interaction.bot.get_channel(config.bot_dev_channel)
-        embed = disnake.Embed(
-            title=f"Ignoring exception in interacion '{interaction.data.custom_id}'",
-            color=0xFF0000
+        embed = self.log_error.create_embed(
+            interaction.data.custom_id,
+            interaction.author,
+            interaction.guild,
+            interaction.message.jump_url,
         )
-        embed.add_field(name="Guild", value=interaction.guild)
-        embed.add_field(name="Autor", value=interaction.author.display_name)
         embed.add_field(name="Expirace (UTC)", value=interaction.expires_at.strftime("%Y-%m-%d %H:%M:%S"))
         embed.add_field(name="Exception", value=error)
         embed.add_field(name="Item", value=item)
-        embed.add_field(name="Zpráva", value=interaction.message.jump_url, inline=False)
         output = utils.cut_string(str(vars(self)), 1900)
         output[0] = f'View object dump:\n{output[0]}'
         for message in output:
             await channel_out.send(f"```\n{message}```")
         await channel_out.send(embed=embed)
-        output = traceback.format_exc()
-        output = utils.cut_string(output, 1900)
-        for message in output:
-            await channel_out.send(f"```\n{message}```")
+        self.log_error.send_output(traceback.format_exc(), channel_out)
 
         # remove interactions because of error
         self.clear_items()
