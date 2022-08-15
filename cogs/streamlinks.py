@@ -116,7 +116,7 @@ class StreamLinks(commands.Cog):
         embed.add_field(name="Provedl", value=user.name)
         embed.add_field(name="Předmět", value=stream.subject.upper())
         embed.add_field(name="Od", value=stream.member_name)
-        embed.add_field(name="Popis", value=stream.description)
+        embed.add_field(name="Popis", value=stream.description[:1024])
         embed.add_field(name="Odkaz", value=f"[{stream.link}]({stream.link})", inline=False)
         embed.timestamp = datetime.utcnow()
         channel = self.bot.get_channel(config.log_channel)
@@ -203,7 +203,7 @@ class StreamLinks(commands.Cog):
         embed.add_field(name="Od", value=streamlink.member_name, inline=True)
         embed.add_field(name="Datum vydání", value=streamlink.created_at.strftime("%d. %m. %Y"), inline=True)
         embed.add_field(name="Odkaz", value=f"[{streamlink.link}]({streamlink.link})", inline=False)
-        embed.add_field(name="Popis", value=streamlink.description, inline=False)
+        embed.add_field(name="Popis", value=streamlink.description[:1024], inline=False)
         embed.timestamp = datetime.utcnow()
         utils.add_author_footer(embed, author, additional_text=[
                                 f"[{streamlink.subject.upper()}] Page: {current_pos} / {links_count}"
