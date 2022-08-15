@@ -132,7 +132,7 @@ class Help(commands.Cog):
         if command:
             command_obj = self.bot.get_command(command)
             if not command_obj:
-                await ctx.send(utils.fill_message('help_command_not_found', command=command))
+                await ctx.send(utils.fill_message('help_command_not_found', command=command[:1024]))
             else:
                 # if command group, show all possible subcommands
                 if type(command_obj) == commands.Group:

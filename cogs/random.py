@@ -1,4 +1,5 @@
 import random
+from threading import Thread
 
 import disnake
 from disnake.ext import commands
@@ -20,6 +21,9 @@ class Random(commands.Cog):
     @cooldowns.short_cooldown
     @commands.command(brief=Messages.random_diceroll_brief, description=Messages.rd_help)
     async def diceroll(self, ctx, *, arg=""):
+        if len(arg) > 2000:
+            await ctx.send(Messages.input_too_long)
+            return
         await ctx.send(roll_dice.roll_dice(arg))
 
     @cooldowns.short_cooldown
@@ -36,7 +40,7 @@ class Random(commands.Cog):
 
         option = disnake.utils.escape_mentions(random.choice(args))
         if option:
-            await ctx.send(f"{option} {ctx.author.mention}")
+            await ctx.send(f"{option[:2000]} {ctx.author.mention}")
 
     @cooldowns.short_cooldown
     @commands.slash_command(name="flip", description=Messages.random_flip_brief)
@@ -64,8 +68,12 @@ class Random(commands.Cog):
                 utils.fill_message("bot_room_redirect", user=ctx.message.author.id, bot_room=config.bot_room)
             )
 
+    def _channel_id(self, ctx):
+        return ctx.channel.parent_id if type(ctx.channel) == disnake.Thread else ctx.channel.id
+
     async def cog_after_invoke(self, ctx):
-        if ctx.channel.id not in config.allowed_channels:
+        channel_id = self._channel_id(ctx)
+        if channel_id not in config.allowed_channels:
             await ctx.message.channel.send(
                 utils.fill_message("bot_room_redirect", user=ctx.message.author.id, bot_room=config.bot_room)
             )
@@ -75,7 +83,7 @@ class Random(commands.Cog):
             return True
         if not ctx.guild:
             return True
-        return ctx.channel.id in config.allowed_channels
+        return self._channel_id(ctx) in config.allowed_channels
 
 
 def setup(bot):

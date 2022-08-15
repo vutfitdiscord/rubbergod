@@ -5,6 +5,7 @@ class Messages:
     prefix = config.default_prefix
 
     server_warning = "Tohle funguje jen na VUT FIT serveru."
+    input_too_long = "Vstup obsahuje příliš mnoho znaků"
 
     help_title = "Nápověda"
     help_description = "Kompletní seznam lze také najít ve veřejné administraci bota (https://public.grillbot.cloud/)"
