@@ -36,7 +36,7 @@ class FitRoom(commands.Cog):
                 return await ctx.send(Messages.fit_room_parsing_failed)
 
             if image is None or cursor is None:
-                return await ctx.send(utils.fill_message("fit_room_room_not_on_plan", room=room))
+                return await ctx.send(utils.fill_message("fit_room_room_not_on_plan", room=room[:1024]))
 
             image_bytes = BytesIO()
             image_bytestring = str(image).replace(kachnicka_path, kachnicka_url).encode("utf-8")
