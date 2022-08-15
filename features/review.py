@@ -97,7 +97,7 @@ class ReviewManager:
         else:
             embed.set_field_at(idx, name="👎", value=f"{dislikes}")
         idx += 1
-        if not review.shortcut.lower().startswith("tv"):
+        if not review.subject.lower().startswith("tv"):
             # don't remove IS link field on fit courses
             idx += 1
         for _ in range(fields_cnt - idx):
