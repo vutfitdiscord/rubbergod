@@ -1,5 +1,4 @@
 import random
-from threading import Thread
 
 import disnake
 from disnake.ext import commands
