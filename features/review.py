@@ -247,6 +247,10 @@ class ReviewManager:
                         # subject already in DB with different degree (e.g. RET)
                         detail.degree += f", {degree}"
                         changed = True
+                    if detail.card != columns[0].find("a").attrs["href"]:
+                        # ID was updated
+                        detail.card = columns[0].find("a").attrs["href"]
+                        changed = True
                     if changed:
                         self.repo.update_subject(detail)
             sem += 1
