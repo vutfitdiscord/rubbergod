@@ -20,7 +20,7 @@ class Random(commands.Cog):
     @cooldowns.short_cooldown
     @commands.command(brief=Messages.random_diceroll_brief, description=Messages.rd_help)
     async def diceroll(self, ctx, *, arg=""):
-        if len(arg) > 2000:
+        if len(arg) > 1000:
             await ctx.send(Messages.input_too_long)
             return
         await ctx.send(roll_dice.roll_dice(arg))
@@ -39,7 +39,7 @@ class Random(commands.Cog):
 
         option = disnake.utils.escape_mentions(random.choice(args))
         if option:
-            await ctx.send(f"{option[:2000]} {ctx.author.mention}")
+            await ctx.send(f"{option[:1900]} {ctx.author.mention}")
 
     @cooldowns.short_cooldown
     @commands.slash_command(name="flip", description=Messages.random_flip_brief)
