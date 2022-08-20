@@ -187,10 +187,13 @@ class ReviewManager:
             rows = table.select("tbody tr")
             for row in rows:
                 shortcut = row.find_all("th")[0].get_text()
+                # not a subject table
+                columns = row.find_all("td")
+                if len(columns) != 5:
+                    continue
                 # update subject DB
                 if not self.repo.get_subject(shortcut.lower()).first():
                     self.repo.add_subject(shortcut.lower())
-                columns = row.find_all("td")
                 name = columns[0].get_text()
                 type = columns[2].get_text()
                 degree = "BIT"
