@@ -20,15 +20,18 @@ class ErrorLogger:
 
     def log_error_date(self, set=True) -> int:
         """Log date of last exception and return number of days since last exception"""
-        today = datetime.date.today()
-        last_exception = ErrorLog.get()
-        if last_exception:
-            count = (today - last_exception.date).days
-        else:
-            count = 0
-        if set:
-            ErrorLog.set()
-        return count
+        try:
+            today = datetime.date.today()
+            last_exception = ErrorLog.get()
+            if last_exception:
+                count = (today - last_exception.date).days
+            else:
+                count = 0
+            if set:
+                ErrorLog.set()
+            return count
+        except Exception:
+            return None
 
     def create_embed(
         self, command: str, message: str, author: disnake.User, guild: disnake.Guild, jump_url: str
