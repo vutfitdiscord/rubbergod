@@ -31,7 +31,11 @@ class BookmarkModal(disnake.ui.Modal):
             if images:
                 for image in images:
                     embed.append(await BookmarkFeatures.create_image_embed(self, inter, image, title_name))
-            await inter.author.send(embeds=embed, view=BookmarkView(), files=files_attached)
+            await inter.author.send(
+                embeds=embed,
+                view=BookmarkView(inter.message.jump_url),
+                files=files_attached
+                )
             await inter.response.send_message(
                 utils.fill_message("bookmark_created", title_name=title_name),
                 ephemeral=True
