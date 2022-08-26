@@ -2,14 +2,16 @@ import disnake
 
 
 class BookmarkView(disnake.ui.View):
-    def __init__(self):
+    def __init__(self, link):
         super().__init__(timeout=None)
-
-    @disnake.ui.button(
-        emoji="🗑",
-        label="Smazat záložku",
-        style=disnake.ButtonStyle.danger,
-        custom_id="bookmark:delete"
-        )
-    async def delete_button(self, button: disnake.ui.Button, inter: disnake.MessageInteraction):
-        pass
+        self.add_item(disnake.ui.Button(
+            label="Původní zpráva",
+            style=disnake.ButtonStyle.primary,
+            url=link)
+            )
+        self.add_item(disnake.ui.Button(
+            emoji="🗑",
+            label="Smazat záložku",
+            style=disnake.ButtonStyle.danger,
+            custom_id="bookmark:delete")
+            )

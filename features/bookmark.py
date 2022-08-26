@@ -2,6 +2,7 @@ import disnake
 import re
 from utils import split_to_parts
 import utils
+from config.messages import Messages
 
 
 class BookmarkFeatures():
@@ -19,7 +20,7 @@ class BookmarkFeatures():
         embed.set_image(image)
         embed.add_field(
             name="Channel",
-            value=f"[Přejít na původní zpráv]({inter.message.jump_url}) v {inter.message.channel.mention}"
+            value=f"{inter.message.channel.mention}"
         )
         return embed
 
@@ -43,10 +44,14 @@ class BookmarkFeatures():
             content += "*Empty*"
 
         # create list of attachments
+        upload_limit = False
         images = []
         files_attached = []
         if inter.message.attachments:
             for attachment in inter.message.attachments:
+                if attachment.size > 8388608:
+                    upload_limit = True
+                    continue
                 if re.search(r"\.png|\.jpg|\.jpeg|\.gif$", str(attachment)):
                     images.append(attachment)
                 else:
@@ -55,14 +60,18 @@ class BookmarkFeatures():
         if images:
             embed.set_image(images[0])
             del images[0]
+
         if len(content) > 1024:
             parts = split_to_parts(content, 1024)
             for msg in parts:
                 embed.add_field(name="Původní zpráva", value=msg, inline=False)
         else:
             embed.add_field(name="Původní zpráva", value=content, inline=False)
+
+        if upload_limit:
+            embed.add_field(name="Poznámka", value=Messages.bookmark_upload_limit, inline=False)
         embed.add_field(
             name="Channel",
-            value=f"[Přejít na původní zprávu]({inter.message.jump_url}) v {inter.message.channel.mention}"
+            value=f"{inter.message.channel.mention}"
         )
         return ([embed], images, files_attached)

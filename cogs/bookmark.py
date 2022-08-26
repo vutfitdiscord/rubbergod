@@ -21,7 +21,7 @@ class Bookmark(commands.Cog):
             if images:
                 for image in images:
                     embed.append(await BookmarkFeatures.create_image_embed(self, ctx, image))
-            await ctx.member.send(embeds=embed, view=BookmarkView(), files=files_attached)
+            await ctx.member.send(embeds=embed, view=BookmarkView(ctx.message.jump_url), files=files_attached)
         except disnake.HTTPException as e:
             if e.code == 50007:
                 await ctx.channel.send(utils.fill_message("blocked_bot", author=ctx.member.mention))
