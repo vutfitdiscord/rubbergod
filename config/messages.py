@@ -418,3 +418,6 @@ class Messages:
     blocked_bot = "Nemůžu ti posílat zprávy {author}"
     bookmark_created = "Záložka **{title_name}** vytvořena"
     bookmark_upload_limit = "Zpráva obsahuje přílohu přesahující upload limit, doporučuji si tuto přílohu stáhnout. V připadě smazání původní zprávy nebude příloha dostupná."
+
+    override_brief = "Vytvoří privátní kanál pro uživatele z konkrétní role."
+    override_success = "Override byl úspěšný, kanál {channel} vytvořen s přístupem pro roli **{role}**."
