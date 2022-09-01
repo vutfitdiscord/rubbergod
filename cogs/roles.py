@@ -246,7 +246,7 @@ class Roles(commands.Cog):
         category: disnake.CategoryChannel = None
     ):
 
-        await inter.response.defer()
+        await inter.send(Messages.override_start)
         guild = inter.guild
         overwrites = {guild.default_role: disnake.PermissionOverwrite(view_channel=False)}
         for member in role.members:
