@@ -421,3 +421,4 @@ class Messages:
 
     override_brief = "Vytvoří privátní kanál pro uživatele z konkrétní role."
     override_success = "Override byl úspěšný, kanál {channel} vytvořen s přístupem pro roli **{role}**."
+    override_start = "Override started"
