@@ -4,7 +4,6 @@ from typing import List
 from buttons.base import BaseView
 from config.messages import Messages
 from features.leaderboard import LeaderboardPageSource
-from features.error import ErrorLogger
 import utils
 
 
@@ -38,7 +37,6 @@ class EmbedView(BaseView):
         self.page_source = page_source
         self.roll_arroud = roll_arroud
         self.perma_lock = perma_lock
-        self.log_error = ErrorLogger()
         if self.page_source is None:
             self.max_page = len(embeds)
         else:

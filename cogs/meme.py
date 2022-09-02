@@ -111,7 +111,7 @@ class Meme(commands.Cog):
         width, height = 200, 170
         deformation = (0, 0, 0, 5, 10, 20, 15, 5)
 
-        avatar = self.round_image(avatar.resize((100, 100)))
+        avatar = utils.round_image(avatar.resize((100, 100)))
 
         for i in range(8):
             img = "%02d" % (i + 1)
@@ -125,15 +125,6 @@ class Meme(commands.Cog):
             frames.append(frame)
 
         return frames
-
-    @staticmethod
-    def round_image(frame_avatar: Image.Image) -> Image.Image:
-        """Convert square avatar to circle"""
-        frame_mask = Image.new("1", frame_avatar.size, 0)
-        draw = ImageDraw.Draw(frame_mask)
-        draw.ellipse((0, 0) + frame_avatar.size, fill=255)
-        frame_avatar.putalpha(frame_mask)
-        return frame_avatar
 
     @bonk.error
     async def bonk_error(self, ctx, error):

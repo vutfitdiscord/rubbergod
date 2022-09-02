@@ -43,10 +43,7 @@ class Pet(commands.Cog):
             width = width - deformWidth[i]
             height = height - deformHeight[i]
             avatar = avatarFull.resize((width, height))
-            avatarMask = Image.new('1', avatar.size, 0)
-            draw = ImageDraw.Draw(avatarMask)
-            draw.ellipse((0, 0) + avatar.size, fill=255)
-            avatar.putalpha(avatarMask)
+            avatar = utils.round_image(avatar)
 
             frame.paste(avatar, (112 - width, 112 - height), avatar)
             frame.paste(hand, (0, 0), hand)
