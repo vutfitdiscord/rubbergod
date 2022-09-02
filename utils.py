@@ -272,6 +272,7 @@ def create_bar(value, total) -> str:
     prog_bar_str = prog_bar_str + f" {round(percentage * 100)}%"
     return prog_bar_str
 
+
 def round_image(frame_avatar: Image.Image) -> Image.Image:
     """Convert square avatar to circle"""
     frame_mask = Image.new("1", frame_avatar.size, 0)
