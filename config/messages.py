@@ -122,6 +122,7 @@ class Messages:
     role_invalid_emote = "{user}, {not_emote} pro roli {role} není emote."
     role_channel_copy_brief = 'Zkopíruje opravnění z jednoho kanálu na druhý'
     role_channel_clone_brief = 'Naklonuje kanál'
+    role_channel_create_brief = "Vytvoří privátní text kanál pro uživatele z konkrétní role."
 
     random_diceroll_brief = 'Všechno možné házení kostkami'
     random_roll_brief = 'Vygeneruje náhodné celé číslo z intervalu <**first**, **second**>'
@@ -324,11 +325,13 @@ class Messages:
     config_sync_template_brief = 'Synchronizuje config s template, přidá chybějíci klíče'
     config_synced = 'Config byl synchronizován'
 
-    channel_help = f"{prefix}channel [clone, copy]"
-    channel_copy_help = f"{prefix}channel copy [source] [destination]"
+    channel_copy_start = "Probíhá kopírování kanálu"
     channel_copy_done = "Práva byla zkopírována."
-    channel_clone_help = f"{prefix}channel clone [source] [jméno]"
+    channel_clone_start = "Probíhá klonování kanálu"
     channel_clone_done = "Kanál <#{id}> byl vytvořen."
+    channel_create_start = "Probíhá vytváření kanálu"
+    channel_create_done = "Vytvoření kanálu bylo úspěšné, kanál {channel} vytvořen s přístupem pro roli **{role}**.\n • Počet overwrites: **{perms}**"
+    channel_create_rate = "Po kolika perms updatovat progress bar."
 
     warden_scan_brief = "Prohledá obrázky v aktuálním kanále a uloží je jako hash pro detekci repostu.\nlimit: [all | <int>]"
 
@@ -418,7 +421,3 @@ class Messages:
     blocked_bot = "Nemůžu ti posílat zprávy {author}"
     bookmark_created = "Záložka **{title_name}** vytvořena"
     bookmark_upload_limit = "Zpráva obsahuje přílohu přesahující upload limit, doporučuji si tuto přílohu stáhnout. V připadě smazání původní zprávy nebude příloha dostupná."
-
-    override_brief = "Vytvoří privátní kanál pro uživatele z konkrétní role."
-    override_success = "Override byl úspěšný, kanál {channel} vytvořen s přístupem pro roli **{role}**."
-    override_start = "Override started"

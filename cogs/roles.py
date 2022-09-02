@@ -214,50 +214,57 @@ class Roles(commands.Cog):
         await ctx.send("Done")
 
     @commands.check(utils.is_bot_admin)
-    @commands.group()
+    @commands.slash_command(name="channel")
     async def channel(self, ctx):
-        if ctx.invoked_subcommand is None:
-            await ctx.send(Messages.channel_help)
+        pass
 
-    @channel.command(aliases=["cp"], brief=Messages.role_channel_copy_brief)
-    async def copy(self, ctx, src: Union[disnake.TextChannel, disnake.VoiceChannel],
+    @channel.sub_command(name="copy", description=Messages.role_channel_copy_brief)
+    async def copy(self, inter, src: Union[disnake.TextChannel, disnake.VoiceChannel],
                    dst: Union[disnake.TextChannel, disnake.VoiceChannel]):
         """
         Copy permissions from src channel to dst.
         Both channels are expected as tags or IDs
         """
+        await inter.send(Messages.channel_copy_start)
         for key in src.overwrites:
             await dst.set_permissions(key, overwrite=src.overwrites[key])
-        await ctx.send(Messages.channel_copy_done)
+        await inter.edit_original_message(Messages.channel_copy_done)
 
-    @channel.command(brief=Messages.role_channel_clone_brief)
-    async def clone(self, ctx, src: Union[disnake.TextChannel, disnake.VoiceChannel], name):
+    @channel.sub_command(name="clone", description=Messages.role_channel_clone_brief)
+    async def clone(self, inter, src: Union[disnake.TextChannel, disnake.VoiceChannel], name):
         """Clone channel with same permissions as src."""
+        await inter.send(Messages.channel_clone_start)
         new = await src.clone(name=name)
-        await ctx.send(utils.fill_message("channel_clone_done", id=new.id))
+        await inter.edit_original_message(utils.fill_message("channel_clone_done", id=new.id))
 
-    @commands.check(utils.is_bot_admin)
-    @commands.slash_command(name="override", description=Messages.override_brief)
-    async def override(
+    @channel.sub_command(name="create", description=Messages.role_channel_create_brief)
+    async def create(
         self,
         inter: disnake.ApplicationCommandInteraction,
         channel_name,
         role: disnake.Role,
+        rate: int = commands.Param(ge=1, description=Messages.channel_create_rate),
         category: disnake.CategoryChannel = None
     ):
 
-        await inter.send(Messages.override_start)
+        await inter.send(Messages.channel_create_start)
         guild = inter.guild
         overwrites = {guild.default_role: disnake.PermissionOverwrite(view_channel=False)}
-        for member in role.members:
-            overwrites[guild.get_member(member.id)] = disnake.PermissionOverwrite(view_channel=True)
-
         channel = await guild.create_text_channel(channel_name, category=category, overwrites=overwrites)
+
+        for index, member in enumerate(role.members):
+            await channel.set_permissions(member, view_channel=True)
+            if (index % rate == 0):
+                await inter.edit_original_message(
+                    f"• uživatelů: {len(role.members)}\n" + utils.create_bar(index+1, len(role.members))
+                )
+
         await inter.edit_original_message(
             utils.fill_message(
-                "override_success",
+                "channel_create_done",
                 channel=channel.mention,
-                role=role.name
+                role=role.name,
+                perms=len(role.members)
             )
         )
 
