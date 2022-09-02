@@ -79,7 +79,7 @@ class Error(commands.Cog):
         if isinstance(error, disnake.errors.DiscordServerError):
             return
 
-        if isinstance(error, sqlalchemy.exc):
+        if isinstance(error, sqlalchemy.exc.InternalError):
             session.rollback()
             return
 
