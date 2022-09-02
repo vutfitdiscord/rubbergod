@@ -117,7 +117,7 @@ class Karma(commands.Cog):
         return 0, {"meta": meta, "content": output}
 
     @cooldowns.default_cooldown
-    @commands.slash_command(name="karma", guild_ids=[config.guild_id])
+    @commands.slash_command(name="karma")
     async def _karma(self, inter):
         pass
 

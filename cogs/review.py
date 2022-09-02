@@ -49,7 +49,7 @@ class Review(commands.Cog):
         return True
 
     @cooldowns.short_cooldown
-    @commands.slash_command(name="review", guild_ids=[config.guild_id])
+    @commands.slash_command(name="review")
     async def reviews(self, inter: disnake.ApplicationCommandInteraction):
         """Group of commands for reviews."""
         pass
