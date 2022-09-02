@@ -1,12 +1,18 @@
 import traceback
+from typing import Optional
 
 import disnake
 
 from config.app_config import config
+from features.error import ErrorLogger
 import utils
 
 
 class BaseView(disnake.ui.View):
+
+    def __init__(self, *, timeout: Optional[float] = 180):
+        self.log_error = ErrorLogger()
+        super().__init__(timeout=timeout)
 
     async def on_error(self, error, item: disnake.ui.Item, interaction: disnake.MessageInteraction):
         channel_out = interaction.bot.get_channel(config.bot_dev_channel)
@@ -20,7 +26,7 @@ class BaseView(disnake.ui.View):
         embed.add_field(name="Exception", value=error)
         embed.add_field(name="Item", value=item)
         output = utils.cut_string(str(vars(self)), 1900)
-        output[0] = f'View object dump:\n{output[0]}'
+        output[0] = f"View object dump:\n{output[0]}"
         for message in output:
             await channel_out.send(f"```\n{message}```")
         await channel_out.send(embed=embed)
@@ -29,4 +35,3 @@ class BaseView(disnake.ui.View):
         # remove interactions because of error
         self.clear_items()
         await self.message.edit(view=self)
-

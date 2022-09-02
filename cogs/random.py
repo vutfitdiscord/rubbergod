@@ -20,7 +20,7 @@ class Random(commands.Cog):
     @cooldowns.short_cooldown
     @commands.command(brief=Messages.random_diceroll_brief, description=Messages.rd_help)
     async def diceroll(self, ctx, *, arg=""):
-        if len(arg) > 1000:
+        if len(arg) > 998:
             await ctx.send(Messages.input_too_long)
             return
         await ctx.send(roll_dice.roll_dice(arg))
