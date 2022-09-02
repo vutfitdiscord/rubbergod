@@ -495,7 +495,7 @@ class FitWide(commands.Cog):
     @commands.command()
     async def shutdown(self, ctx):
         await ctx.send("shutting down")
-        self.bot.close()
+        await self.bot.close()
         exit(0)
 
     @get_users_login.error

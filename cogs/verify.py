@@ -32,6 +32,7 @@ class Verify(commands.Cog):
         inter: disnake.ApplicationCommandInteraction,
         login: str = commands.Param(description=Messages.verify_login_parameter),
     ):
+        await inter.response.defer(ephemeral=True)
         if await self.dynamic_verify_manager.can_apply_rule(inter.user, login):
             await self.dynamic_verify_manager.request_access(login, inter)
             return
