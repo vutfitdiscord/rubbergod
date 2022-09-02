@@ -1,10 +1,12 @@
 import disnake
 import utils
 import math
+
 from config.app_config import config
+from buttons.base import BaseView
 
 
-class SystemView(disnake.ui.View):
+class SystemView(BaseView):
     def __init__(self, bot, count, cogs):
         super().__init__()
         self.bot = bot

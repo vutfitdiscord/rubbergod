@@ -1,6 +1,8 @@
 import datetime
+import requests
 from io import BytesIO
 from pathlib import Path
+from PIL import Image, ImageDraw, ImageFont
 
 import disnake
 
@@ -11,11 +13,39 @@ import utils
 
 class ErrorLogger:
 
-    def set_image(self, embed):
-        image_path = Path(__file__).parent.parent / "images/accident.jpg"
-        with image_path.open("rb") as handle:
-            data = BytesIO(handle.read())
-        file = disnake.File(fp=data, filename="accident.jpg")
+    def set_image(self, embed: disnake.Embed, user: disnake.User, count: int):
+        image_path = Path(__file__).parent.parent / "images/accident"
+        background = Image.open(image_path / "xDaysBackground.png")
+        head = Image.open(image_path / "xDaysHead.png")
+        pliers = Image.open(image_path / "xDaysPliers.png")
+
+        # add avatar
+        url = user.display_avatar.with_format('png')
+        response = requests.get(url, timeout=10)
+        avatarFull = Image.open(BytesIO(response.content))
+
+        if not user.avatar:
+            avatarFull = avatarFull.convert("RGB")
+
+        avatarFull.resize((230, 230))
+        avatarFull.crop((230, 220))
+        background.paste(avatarFull, (560, 270), avatarFull)
+
+        # set number
+        font = ImageFont.truetype(image_path / "openSans-Regular.ttf", 80)
+        draw = ImageDraw.Draw(background)
+        draw.text((1090, 280), count, font=font)
+
+        # add upper layers
+        background.paste(head, (0,0), head)
+        background.paste(pliers, (0,0), pliers)
+
+        # add image to embed
+        with BytesIO() as image_binary:
+            background.save(image_binary, format='png')
+            image_binary.seek(0)
+            file = disnake.File(fp=image_binary, filename="accident.jpg")
+
         embed.set_image(file=file)
 
     def log_error_date(self, set=True) -> int:
@@ -46,7 +76,7 @@ class ErrorLogger:
         if guild and guild.id != config.guild_id:
             embed.add_field(name="Guild", value=guild.name)
         embed.add_field(name="Link", value=jump_url, inline=False)
-        self.set_image(embed)
+        self.set_image(embed, author, count)
         return embed
 
     async def send_output(self, output: str, channel: disnake.TextChannel):
