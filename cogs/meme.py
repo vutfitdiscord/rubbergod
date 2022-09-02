@@ -1,6 +1,6 @@
 import datetime
 from io import BytesIO
-from PIL import Image, ImageDraw
+from PIL import Image
 from random import choice
 import requests
 from typing import List

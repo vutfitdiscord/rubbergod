@@ -3,7 +3,7 @@ import disnake
 from disnake.ext import commands
 import utils
 
-from PIL import Image, ImageDraw
+from PIL import Image
 
 from io import BytesIO
 import requests
