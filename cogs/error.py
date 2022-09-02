@@ -79,6 +79,10 @@ class Error(commands.Cog):
         if isinstance(error, disnake.errors.DiscordServerError):
             return
 
+        if isinstance(error, commands.errors.CheckFailure):
+            await inter.response.send_message(utils.fill_message("missing_perms", user=inter.author.id))
+            return
+
         if isinstance(error, sqlalchemy.exc.InternalError):
             session.rollback()
             return
