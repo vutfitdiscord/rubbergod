@@ -87,6 +87,7 @@ async def on_error(event, *args, **kwargs):
 
     embeds = []
     guild = None
+    user = bot.user
     for arg in args:
         if event == "on_message":
             message = arg.content
@@ -152,7 +153,7 @@ async def on_error(event, *args, **kwargs):
         if guild:
             link = f"https://discord.com/channels/{guild.id}/{channel.id}/{message_id}"
             embed.add_field(name="Link", value=link, inline=False)
-        err_logger.set_image(embed)
+        err_logger.set_image(embed, user, count)
         embeds.append(embed)
 
     if channel_out is not None:

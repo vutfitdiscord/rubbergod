@@ -29,7 +29,7 @@ class Base(commands.Cog):
         )
         embed.add_field(name=Messages.upsince_title, value=str(boottime))
         embed.add_field(name=Messages.uptime_title, value=str(delta))
-        self.error_log.set_image(embed)
+        self.error_log.set_image(embed, self.bot, count)
         await ctx.send(embed=embed)
 
 

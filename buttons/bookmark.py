@@ -1,7 +1,9 @@
 import disnake
 
+from buttons.base import BaseView
 
-class BookmarkView(disnake.ui.View):
+
+class BookmarkView(BaseView):
     def __init__(self, link):
         super().__init__(timeout=None)
         self.add_item(disnake.ui.Button(
