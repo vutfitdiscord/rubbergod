@@ -17,7 +17,7 @@ class DynamicVerifyManager(BaseFeature):
         super().__init__(bot)
         self.user_repo = UserRepository()
         self.verify_repo = VerifyRepository()
-        self.helper = VerifyHelper()
+        self.helper = VerifyHelper(bot)
 
     async def can_apply_rule(self, user: Union[disnake.User, disnake.Member], rule_id: str) -> bool:
         return self.verify_repo.exists_rule(rule_id) and not await self.helper.has_role(
