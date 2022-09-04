@@ -23,7 +23,7 @@ class Verification(BaseFeature):
     def __init__(self, bot: Bot):
         super().__init__(bot)
         self.repo = UserRepository()
-        self.helper = VerifyHelper()
+        self.helper = VerifyHelper(bot)
 
     def send_mail(self, receiver_email: str, contents: str, subject: str = "") -> None:
         msg = MIMEText(contents, "plain", "utf-8")
@@ -262,12 +262,14 @@ class Verification(BaseFeature):
 
             self.repo.save_verified(login, inter.user.id)
 
+            verify_success_msg = utils.fill_message("verify_verify_success", user=inter.user.id)
             try:
-                await member.send(utils.fill_message("verify_verify_success", user=inter.user.id))
+                await member.send(verify_success_msg)
                 await member.send(Messages.verify_post_verify_info)
             except disnake.errors.Forbidden:
                 mail = new_user.get_mail(self.get_mail_postfix(login))
                 self.send_mail_verified(mail, member)
+            await inter.response.send_message(verify_success_msg)
         else:
             msg = utils.fill_message("verify_verify_not_found", user=inter.user.id, admin=config.admin_ids[0])
             await inter.response.send_message(msg)

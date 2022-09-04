@@ -96,7 +96,7 @@ def is_bot_admin(ctx: Union[commands.Context, disnake.ApplicationCommandInteract
 
 
 def is_in_modroom(ctx: Union[commands.Context, disnake.ApplicationCommandInteraction]):
-    return ctx.channel_id == config.mod_room
+    return ctx.channel.id == config.mod_room
 
 
 def cut_string(string: str, part_len: int):
