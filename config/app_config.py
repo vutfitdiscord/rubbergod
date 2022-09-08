@@ -67,13 +67,6 @@ class Config:
     # Config: static values -> cannot be got/set by command
     config_static: List[str] = get_attr(toml_dict, "config", "static")
 
-    # Roll dice
-    max_dice_at_once: int = get_attr(toml_dict, "random", "max_dice_at_once")
-    dice_before_collation: int = get_attr(toml_dict, "random", "dice_before_collation")
-    max_dice_groups: int = get_attr(toml_dict, "random", "max_dice_groups")
-    max_dice_sides: int = get_attr(toml_dict, "random", "max_dice_sides")
-    enable_room_check: bool = get_attr(toml_dict, "random", "enable_room_check")
-
     # Karma
     karma_ban_role_id: int = get_attr(toml_dict, "karma", "ban_role_id")
     karma_banned_channels: List[int] = get_attr(toml_dict, "karma", "banned_channels")

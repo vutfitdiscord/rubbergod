@@ -4,26 +4,14 @@ import disnake
 from disnake.ext import commands
 
 from config import cooldowns
-from logic import roll_dice
 from config.app_config import config
 from config.messages import Messages
 import utils
-
-# Logic (functionality used by features or rubbergod directly)
-roll_dice = roll_dice.Roll()
 
 
 class Random(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-
-    @cooldowns.short_cooldown
-    @commands.command(brief=Messages.random_diceroll_brief, description=Messages.rd_help)
-    async def diceroll(self, ctx, *, arg=""):
-        if len(arg) > 998:
-            await ctx.send(Messages.input_too_long)
-            return
-        await ctx.send(roll_dice.roll_dice(arg))
 
     @cooldowns.short_cooldown
     @commands.command(brief=Messages.random_pick_brief, usage=Messages.random_pick_usage)
@@ -55,7 +43,6 @@ class Random(commands.Cog):
         option = str(random.randint(first, second))
         await inter.response.send_message(option)
 
-    @diceroll.error
     @pick.error
     @roll.error
     @flip.error
