@@ -424,6 +424,6 @@ class Messages:
     base_leaderboard_format_str = "_{position}._ - **{member_name}**:"
 
     bookmark_title = "Záložka na serveru {server}"
-    blocked_bot = "Nemůžu ti posílat zprávy {author}"
+    blocked_bot = "Nemůžu ti posílat zprávy {user}"
     bookmark_created = "Záložka **{title_name}** vytvořena"
     bookmark_upload_limit = "Zpráva obsahuje přílohu přesahující upload limit, doporučuji si tuto přílohu stáhnout. V připadě smazání původní zprávy nebude příloha dostupná."

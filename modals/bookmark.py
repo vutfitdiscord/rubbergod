@@ -43,6 +43,6 @@ class BookmarkModal(disnake.ui.Modal):
         except disnake.HTTPException as e:
             if e.code == 50007:
                 await inter.response.send_message(utils.fill_message("blocked_bot",
-                                                  author=inter.author.mention), ephemeral=True)
+                                                  user=inter.author.id), ephemeral=True)
             else:
                 raise e
