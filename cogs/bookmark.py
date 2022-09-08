@@ -24,7 +24,7 @@ class Bookmark(commands.Cog):
             await ctx.member.send(embeds=embed, view=BookmarkView(ctx.message.jump_url), files=files_attached)
         except disnake.HTTPException as e:
             if e.code == 50007:
-                await ctx.channel.send(utils.fill_message("blocked_bot", author=ctx.member.mention))
+                await ctx.channel.send(utils.fill_message("blocked_bot", user=ctx.author.id))
             else:
                 raise e
 
