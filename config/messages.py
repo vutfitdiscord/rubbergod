@@ -124,7 +124,6 @@ class Messages:
     role_channel_clone_brief = 'Naklonuje kanál'
     role_channel_create_brief = "Vytvoří privátní text kanál pro uživatele z konkrétní role."
 
-    random_diceroll_brief = 'Všechno možné házení kostkami'
     random_roll_brief = 'Vygeneruje náhodné celé číslo z intervalu <**first**, **second**>'
     random_flip_brief = 'Hodí mincí'
     random_pick_brief = 'Vybere jedno ze slov za otazníkem'
@@ -135,17 +134,6 @@ class Messages:
                            "pokud y není specifikováno, " \
                            "je považováno za 0."
     rng_generator_format_number = "{user}, zadej dvě celá čísla, **integers**."
-
-    rd_too_many_dice_in_group = "Příliš kostek v jedné " \
-                                "skupině, maximum je {maximum}."
-    rd_too_many_dice_sides = "Příliš stěn na kostkách, " \
-                             "maximum je {maximum}."
-    rd_too_many_dice_groups = "Příliš skupin kostek, " \
-                              "maximum je {maximum}."
-    rd_format = "Chybná syntaxe hodu ve skupině {group}."
-    rd_help = "Formát naleznete na " \
-              "https://wiki.roll20.net/Dice_Reference\n" \
-              "Implementovány featury podle obsahu: **8. Drop/Keep**"
 
     verify_brief = "Ověření studenta pro přístup na server."
     verify_login_parameter = "Přihlašovací FIT login (nebo MUNI UČO). FIT login ve formátu `xlogin00`"

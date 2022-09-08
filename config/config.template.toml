@@ -33,10 +33,6 @@ extensions = ['base', 'karma', 'meme', 'random', 'verify', 'fitwide', 'autopin',
 static = ['config_static', 'toml_dict', 'key', 'weather_token', 'db_string']
 
 [random]
-max_dice_at_once = 1000
-dice_before_collation = 20
-max_dice_groups = 10
-max_dice_sides = 10000
 enable_room_check = false
 
 [karma]
