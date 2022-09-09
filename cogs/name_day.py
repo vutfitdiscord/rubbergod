@@ -44,8 +44,10 @@ class Nameday(commands.Cog):
     async def send_names(self):
         svatek = await self._svatek()
         meniny = await self._meniny()
+        headers = {"ApiKey": config.grillbot_api_key}
+        birthday = requests.get("https://grillbot.cloud/api/user/birthday/today", headers=headers)
         bot_room = self.bot.get_channel(config.bot_room)
-        await bot_room.send(f"{svatek}\n{meniny}")
+        await bot_room.send(f"{svatek}\n{meniny}\n{birthday.json()['message']}")
 
 
 def setup(bot):
