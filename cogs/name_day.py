@@ -13,7 +13,7 @@ class Nameday(commands.Cog):
         self.bot = bot
         self.send_names.start()
 
-    async def _svatek(self):
+    async def _name_day_cz(self):
         async with aiohttp.ClientSession(timeout=aiohttp.ClientTimeout(total=10)) as session:
             try:
                 url = f"http://svatky.adresa.info/json?date={date.today().strftime('%d%m')}"
@@ -26,7 +26,7 @@ class Nameday(commands.Cog):
             except (asyncio.exceptions.TimeoutError, aiohttp.client_exceptions.ClientConnectorError):
                 return "Website unreachable"
 
-    async def _meniny(self):
+    async def _name_day_sk(self):
         async with aiohttp.ClientSession(timeout=aiohttp.ClientTimeout(total=10)) as session:
             try:
                 url = f"http://svatky.adresa.info/json?lang=sk&date={date.today().strftime('%d%m')}"
@@ -39,7 +39,7 @@ class Nameday(commands.Cog):
             except (asyncio.exceptions.TimeoutError, aiohttp.client_exceptions.ClientConnectorError):
                 return "Website unreachable"
 
-    async def _narozeniny(self):
+    async def _birthday(self):
         headers = {"ApiKey": config.grillbot_api_key}
         async with aiohttp.ClientSession(timeout=aiohttp.ClientTimeout(total=10), headers=headers) as session:
             try:
@@ -51,25 +51,25 @@ class Nameday(commands.Cog):
                 return "Website unreachable"
 
     @commands.slash_command(name="svatek", description=Messages.name_day_cz_brief)
-    async def svatek(self, inter: disnake.ApplicationCommandInteraction):
+    async def name_day_cz(self, inter: disnake.ApplicationCommandInteraction):
         await inter.response.defer()
-        svatek = await self._svatek()
-        await inter.edit_original_message(svatek)
+        name_day_cz = await self._name_day_cz()
+        await inter.edit_original_message(name_day_cz)
 
     @commands.slash_command(name="meniny", description=Messages.name_day_sk_brief)
-    async def meniny(self, inter: disnake.ApplicationCommandInteraction):
+    async def name_day_sk(self, inter: disnake.ApplicationCommandInteraction):
         await inter.response.defer()
-        meniny = await self._meniny()
-        await inter.edit_original_message(meniny)
+        name_day_sk = await self._name_day_sk()
+        await inter.edit_original_message(name_day_sk)
 
     @tasks.loop(time=time(22, 00, 1))       # UTC time
     async def send_names(self):
-        svatek = await self._svatek()
-        meniny = await self._meniny()
-        narozeniny = await self._narozeniny()
+        name_day_cz = await self._name_day_cz()
+        name_day_sk = await self._name_day_sk()
+        birthday = await self._birthday()
 
         bot_room = self.bot.get_channel(config.bot_room)
-        await bot_room.send(f"{svatek}\n{meniny}\n{narozeniny}")
+        await bot_room.send(f"{name_day_cz}\n{name_day_sk}\n{birthday}")
 
 
 def setup(bot):
