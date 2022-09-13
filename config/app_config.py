@@ -159,6 +159,7 @@ class Config:
     # room check
     enable_room_check: bool = get_attr(toml_dict, "random", "enable_room_check")
 
+
 config = Config()
 
 
