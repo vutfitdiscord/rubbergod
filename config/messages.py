@@ -365,7 +365,8 @@ class Messages:
     subscribe_brief = "Přihlášení k odběru zpráv kanálu do DM"
     unsubscribe_brief = "Odhlášení odběru zpráv do DM"
     subscribeable_brief = "Výpis kanálů které je možné sledovat"
-    subscriptions_brief = "Výpis odběrů zpráv uživatele nebo kanálu"
+    subscriptions_user_brief = "Výpis odběrů zpráv uživatele"
+    subscriptions_channel_brief = "Výpis odběrů zpráv kanálu"
     subscriptions_embed_name = "Informace o zprávě"
     subscriptions_embed_value = "Zpráva obsahuje přílohy."
     subscriptions_message_link = "Odkaz na zprávu"
@@ -375,8 +376,6 @@ class Messages:
     subscriptions_not_subscribed = "Tuto místnost neodebíráš."
     subscriptions_unsubscribed = "Nová upozornění na zprávy ti už posílat nebudu."
     subscriptions_none = "Nebyly nalezeny žádné výsledky."
-    subscriptions_missing_argument = "Musíš specifikovat kanál."
-    subscriptions_bad_argument = "Musíš specifikovat kanál nebo uživatele."
 
     studijni_brief = "Úřední hodiny studijního Oddělení"
     studijni_web_error = "Chyba při parsování webu"

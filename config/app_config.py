@@ -156,6 +156,8 @@ class Config:
     exams_terms_update_interval: float = get_attr(toml_dict, "exams", "terms_update_interval")
     exams_subscribe_default_guild: bool = get_attr(toml_dict, "exams", "subscribe_default_guild")
 
+    # room check
+    enable_room_check: bool = get_attr(toml_dict, "random", "enable_room_check")
 
 config = Config()
 
