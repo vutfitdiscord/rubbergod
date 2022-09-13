@@ -1,6 +1,6 @@
 import disnake
 from disnake.ext import commands
-from typing import Union, Optional, List
+from typing import Optional, List
 
 from config.app_config import config
 from config.messages import Messages
@@ -9,10 +9,22 @@ from repository.database.subscription import Subscription
 
 repo = subscription_repo.SubscriptionRepository()
 
+rooms = []
+
+
+async def autocomplete_rooms(inter, string: str) -> List[str]:
+    return [room.name for room in rooms if string.lower() in room.name.lower()]
+
 
 class Subscriptions(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+        global rooms
+
+    @commands.Cog.listener()
+    async def on_ready(self):
+        for room in config.subscribable_channels:
+            rooms.append(self.bot.get_channel(room))
 
     @commands.Cog.listener()
     async def on_message(self, message: disnake.Message):
@@ -59,43 +71,46 @@ class Subscriptions(commands.Cog):
         return True
 
     @commands.guild_only()
-    @commands.command(brief=Messages.subscribe_brief)
-    async def subscribe(self, ctx: commands.Context, channel: disnake.TextChannel):
-        if channel.id not in config.subscribable_channels:
-            await ctx.reply(Messages.subscriptions_unsubscribable)
+    @commands.slash_command(name="subscription", description=Messages.subscribe_brief)
+    async def _subscription(self, inter):
+        pass
+
+    @_subscription.sub_command(name="subscribe", description=Messages.subscribe_brief)
+    async def subscribe(self, inter, channel=commands.Param(autocomplete=autocomplete_rooms)):
+        for room in rooms:
+            if room.name == channel:
+                subscription = repo.add_subscription(inter.author.id, room.id)
+                break
+        else:
+            await inter.send(Messages.subscriptions_unsubscribable)
             return
 
-        subscription = repo.add_subscription(ctx.author.id, channel.id)
         if subscription is None:
-            await ctx.reply(Messages.subscriptions_already_subscribed)
+            await inter.send(Messages.subscriptions_already_subscribed)
             return
-        await ctx.reply(Messages.subscriptions_new_subscription)
+        await inter.send(Messages.subscriptions_new_subscription)
 
-    @commands.guild_only()
-    @commands.command(brief=Messages.unsubscribe_brief)
-    async def unsubscribe(self, ctx: commands.Context, channel: disnake.TextChannel):
-        removed: int = repo.remove_subscription(ctx.author.id, channel.id)
-        if removed == 0:
-            await ctx.reply(Messages.subscriptions_not_subscribed)
-            return
-        await ctx.reply(Messages.subscriptions_unsubscribed)
+    @_subscription.sub_command(name="unsubscribe", description=Messages.unsubscribe_brief)
+    async def unsubscribe(self, inter, channel=commands.Param(autocomplete=autocomplete_rooms)):
+        for room in rooms:
+            if room.name == channel:
+                removed: int = repo.remove_subscription(inter.author.id, room.id)
+                if removed == 0:
+                    await inter.send(Messages.subscriptions_not_subscribed)
+                    return
+        await inter.send(Messages.subscriptions_unsubscribed)
 
-    @commands.guild_only()
-    @commands.command(brief=Messages.subscribeable_brief)
-    async def subscribeable(self, ctx):
-        channel_names = [
-            getattr(ctx.guild.get_channel(channel_id), "name", str(channel_id))
-            for channel_id in config.subscribable_channels
-        ]
-        if not len(channel_names):
-            await ctx.reply(Messages.subscriptions_none)
+    @_subscription.sub_command(name="list", description=Messages.subscribeable_brief)
+    async def subscribeable(self, inter):
+        channels = [self.bot.get_channel(channel).mention for channel in config.subscribable_channels]
+        if not len(channels):
+            await inter.send(Messages.subscriptions_none)
             return
 
-        await ctx.reply(", ".join(f"#{name}" for name in channel_names))
+        await inter.send(" ".join(channels))
 
-    @commands.guild_only()
-    @commands.command(brief=Messages.subscriptions_brief)
-    async def subscriptions(self, ctx, *, target: Union[disnake.User, disnake.TextChannel] = None):
+    @_subscription.sub_command(name="user", description=Messages.subscriptions_user_brief)
+    async def user_subscriptions(self, inter, *, target: disnake.User = None):
         if target is None:
             user_ids = set()
             user_subscriptions: dict = dict()
@@ -113,46 +128,83 @@ class Subscriptions(commands.Cog):
             result: list = list()
             for user in users:
                 user_channels = [
-                    f"#{getattr(ctx.guild.get_channel(cid), 'name', '???')}"
+                    f"#{getattr(inter.guild.get_channel(cid), 'name', '???')}"
                     for cid in user_subscriptions[user.id]
                 ]
                 result.append(f"> {user.name}: {', '.join(user_channels)}")
 
             if not len(result):
-                await ctx.reply(Messages.subscriptions_none)
+                await inter.send(Messages.subscriptions_none)
                 return
 
-            await ctx.reply("\n".join(result))
+            await inter.send("\n".join(result))
             return
 
         subs: set = set()
-        if type(target) == disnake.TextChannel:
-            users = repo.get_channel_subscribers(target.id)
-            for entry in users:
-                user: Optional[disnake.User] = self.bot.get_user(entry.user_id)
-                subs.add(str(user) if user is not None else str(entry.user_id))
-        elif type(target) == disnake.User:
+        if type(target) == disnake.User:
             channels = repo.get_user_subscriptions(target.id)
             for entry in channels:
-                channel: Optional[disnake.TextChannel] = ctx.guild.get_channel(entry.channel_id)
+                channel: Optional[disnake.TextChannel] = inter.guild.get_channel(entry.channel_id)
                 subs.add(f"#{channel}" if channel is not None else str(entry.channel_id))
 
         if not len(subs):
-            await ctx.reply(Messages.subscriptions_none)
+            await inter.send(Messages.subscriptions_none)
             return
 
-        await ctx.reply("> " + ", ".join(subs))
+        await inter.send("> " + ", ".join(subs))
 
-    @subscribe.error
-    @unsubscribe.error
-    async def subscribe_no_argument(self, ctx, error):
-        if isinstance(error, commands.UserInputError):
-            await ctx.send(Messages.subscriptions_missing_argument)
+    @_subscription.sub_command(name="channel", description=Messages.subscriptions_channel_brief)
+    async def channel_subscriptions(
+            self,
+            inter,
+            *,
+            channel=commands.Param(default=None, autocomplete=autocomplete_rooms)):
 
-    @subscriptions.error
-    async def subscription_no_argument(self, ctx, error):
-        if isinstance(error, commands.UserInputError):
-            await ctx.send(Messages.subscriptions_bad_argument)
+        if channel is None:
+            user_ids = set()
+            user_subscriptions: dict = dict()
+            for item in repo.get_all():
+                user_ids.add(item.user_id)
+                if item.user_id not in user_subscriptions.keys():
+                    user_subscriptions[item.user_id] = [
+                        item.channel_id,
+                    ]
+                else:
+                    user_subscriptions[item.user_id].append(item.channel_id)
+
+            users = [self.bot.get_user(user_id) for user_id in user_ids]
+
+            result: list = list()
+            for user in users:
+                user_channels = [
+                    f"#{getattr(inter.guild.get_channel(cid), 'name', '???')}"
+                    for cid in user_subscriptions[user.id]
+                ]
+                result.append(f"> {user.name}: {', '.join(user_channels)}")
+
+            if not len(result):
+                await inter.send(Messages.subscriptions_none)
+                return
+
+            await inter.send("\n".join(result))
+            return
+
+        subs: set = set()
+        if channel is not None:
+            for room in rooms:
+                if room.name == channel:
+                    users = repo.get_channel_subscribers(room.id)
+                    break
+
+            for entry in users:
+                user: Optional[disnake.User] = self.bot.get_user(entry.user_id)
+                subs.add(str(user) if user is not None else str(entry.user_id))
+
+        if not len(subs):
+            await inter.send(Messages.subscriptions_none)
+            return
+
+        await inter.send("> " + ", ".join(subs))
 
 
 def setup(bot):
