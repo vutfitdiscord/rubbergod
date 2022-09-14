@@ -110,7 +110,7 @@ class Subscriptions(commands.Cog):
         await inter.send(" ".join(channels))
 
     @_subscription.sub_command(name="user", description=Messages.subscriptions_user_brief)
-    async def user_subscriptions(self, inter, *, target: disnake.User = None):
+    async def user_subscriptions(self, inter, *, target: disnake.Member = None):
         if target is None:
             user_ids = set()
             user_subscriptions: dict = dict()
@@ -128,7 +128,7 @@ class Subscriptions(commands.Cog):
             result: list = list()
             for user in users:
                 user_channels = [
-                    f"#{getattr(inter.guild.get_channel(cid), 'name', '???')}"
+                    inter.guild.get_channel(cid).mention
                     for cid in user_subscriptions[user.id]
                 ]
                 result.append(f"> {user.name}: {', '.join(user_channels)}")
@@ -141,11 +141,11 @@ class Subscriptions(commands.Cog):
             return
 
         subs: set = set()
-        if type(target) == disnake.User:
+        if type(target) == disnake.Member:
             channels = repo.get_user_subscriptions(target.id)
             for entry in channels:
                 channel: Optional[disnake.TextChannel] = inter.guild.get_channel(entry.channel_id)
-                subs.add(f"#{channel}" if channel is not None else str(entry.channel_id))
+                subs.add(f"{channel.mention}" if channel is not None else f"#{str(entry.channel_id)}")
 
         if not len(subs):
             await inter.send(Messages.subscriptions_none)
@@ -177,7 +177,7 @@ class Subscriptions(commands.Cog):
             result: list = list()
             for user in users:
                 user_channels = [
-                    f"#{getattr(inter.guild.get_channel(cid), 'name', '???')}"
+                    inter.guild.get_channel(cid).mention
                     for cid in user_subscriptions[user.id]
                 ]
                 result.append(f"> {user.name}: {', '.join(user_channels)}")
