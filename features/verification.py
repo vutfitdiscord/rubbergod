@@ -99,11 +99,12 @@ class Verification(BaseFeature):
                         user=inter.user.id,
                         admin=config.admin_ids[0],
                     )
-                    await inter.send(content=msg)
+                    await inter.edit_original_message(content=msg)
+                    await inter.followup.send(content=msg)
                     await self.log_verify_fail(
                         inter, "getcode (xlogin) - Unknown login", str({"login": login})
                     )
-                elif user is not None and user.status != VerifyStatus.Unverified.value:
+                elif user.status != VerifyStatus.Unverified.value:
                     if user.status == VerifyStatus.InProcess.value:
                         await self.gen_code_and_send_mail(inter, user, "stud.fit.vutbr.cz", dry_run=True)
                         return
