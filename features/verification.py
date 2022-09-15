@@ -99,7 +99,7 @@ class Verification(BaseFeature):
                         user=inter.user.id,
                         admin=config.admin_ids[0],
                     )
-                    await inter.user.send(content=msg)
+                    await inter.response.send(content=msg)
                     await self.log_verify_fail(
                         inter, "getcode (xlogin) - Unknown login", str({"login": login})
                     )
