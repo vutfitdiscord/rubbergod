@@ -39,6 +39,13 @@ class SystemView(BaseView):
             self.remove_item(self.children[0])
         await self.message.edit(view=self)
 
+    async def interaction_check(self, inter: disnake.Interaction):
+        if utils.is_bot_admin(inter):
+            return True
+        else:
+            await inter.send(utils.fill_message("insufficient_rights", user=inter.author.id), ephemeral=True)
+            return False
+
 
 class Dropdown(disnake.ui.Select):
     def __init__(self, bot, view, cogs):
