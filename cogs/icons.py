@@ -49,6 +49,7 @@ class IconSelect(disnake.ui.Select):
             return
         user = inter.user
         if await can_assign(icon, user):
+            await inter.edit_original_message(Messages.icon_set_success.format(user=inter.user, icon=icon), view=None)
             await do_set_icon(icon, user)
         else:
             await inter.edit_original_message(Messages.icon_ui_no_permission)
@@ -78,7 +79,7 @@ class Icons(commands.Cog):
     ):
         icon_roles = get_icon_roles(inter.guild)
         try:
-            icon = next(role for role in icon_roles if icon_s == icon_name(icon))
+            icon = next(role for role in icon_roles if icon_s == icon_s.removeprefix(config.icon_role_prefix))
         except StopIteration:
             embed = disnake.Embed(title=Messages.icon_set_no_role)
         else:
@@ -89,6 +90,7 @@ class Icons(commands.Cog):
 
         await inter.response.send_message(embed=embed, ephemeral=True)
 
+    @commands.cooldown(1, config.icon_ui_cooldown)
     @icon.sub_command(description=Messages.icon_ui)
     async def ui(self, inter: disnake.ApplicationCommandInteraction):
         await inter.response.defer(ephemeral=True)
@@ -105,19 +107,12 @@ class Icons(commands.Cog):
         component = IconSelect(placeholder=Messages.icon_ui_choose, options=options)
         view = BaseView()
         view.add_item(component)
-        await inter.edit_original_message("A", view=view)
+        await inter.edit_original_message(view=view)
 
-    async def on_command_error(self, ctx: commands.Context, error):
-        if isinstance(error, commands.errors.CheckFailure):
-            await ctx.send(utils.fill_message("insufficient_rights", user=ctx.author.id))
+    async def cog_slash_command_error(self, inter: disnake.ApplicationCommandInteraction, error: Exception) -> None:
+        if isinstance(error, commands.CommandOnCooldown):
+            await inter.response.send_message(str(error), ephemeral=True)
             return True
-        if isinstance(error, commands.errors.CommandInvokeError):
-            if isinstance(error.__cause__, commands.errors.ExtensionAlreadyLoaded):
-                await ctx.send(utils.fill_message("cog_is_loaded", cog=error.__cause__.name))
-                return True
-            elif isinstance(error.__cause__, commands.errors.ExtensionNotLoaded):
-                await ctx.send(utils.fill_message("cog_is_unloaded", cog=error.__cause__.name))
-                return True
 
 
 def setup(bot):
