@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Dict
 import toml
 
 
@@ -158,6 +158,11 @@ class Config:
 
     # room check
     enable_room_check: bool = get_attr(toml_dict, "random", "enable_room_check")
+
+    # icons
+    icon_roles: List[int] = get_attr(toml_dict, "icons", "icon_roles")
+    icon_role_prefix: str = get_attr(toml_dict, "icons", "role_prefix")
+    icon_rules: Dict[int, Dict[str, List[int]]] = {int(k): v for k, v in get_attr(toml_dict, "icons", "rule").items()}
 
 
 config = Config()

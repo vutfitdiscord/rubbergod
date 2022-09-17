@@ -146,3 +146,11 @@ paginator_duration = 60
 term_channels = ["1bit-terminy", "2bit-terminy", "3bit-terminy", "mit-terminy"]
 terms_update_interval = 0.5 # Update interval in days for automatic updating
 subscribe_default_guild = true
+
+[icons]
+icon_roles = [0,1]
+role_prefix = "Ikona: "
+[icons.rule.0]
+allow=[] # prevent anyone from self-assigning this role
+[icons.rule.1]
+deny=[461550034668748800] # prevent mods from self-assigning this role (they can use modset to bypass)
