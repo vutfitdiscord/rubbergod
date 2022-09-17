@@ -150,6 +150,7 @@ subscribe_default_guild = true
 [icons]
 icon_roles = [0,1]
 role_prefix = "Ikona: "
+ui_cooldown = 10.0
 [icons.rule.0]
 allow=[] # prevent anyone from self-assigning this role
 [icons.rule.1]
