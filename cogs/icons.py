@@ -49,7 +49,9 @@ class IconSelect(disnake.ui.Select):
             return
         user = inter.user
         if await can_assign(icon, user):
-            await inter.edit_original_message(Messages.icon_set_success.format(user=inter.user, icon=icon), view=None)
+            await inter.edit_original_message(
+                Messages.icon_set_success.format(user=inter.user, icon=icon), view=None
+            )
             await do_set_icon(icon, user)
         else:
             await inter.edit_original_message(Messages.icon_ui_no_permission)
@@ -105,11 +107,15 @@ class Icons(commands.Cog):
         ]
         view = BaseView()
         for start_i in range(0, len(options), 25):
-            component = IconSelect(placeholder=Messages.icon_ui_choose, options=options[start_i:start_i+25])
+            component = IconSelect(
+                placeholder=Messages.icon_ui_choose, options=options[start_i: start_i + 25]
+            )
             view.add_item(component)
         await inter.edit_original_message(view=view)
 
-    async def cog_slash_command_error(self, inter: disnake.ApplicationCommandInteraction, error: Exception) -> None:
+    async def cog_slash_command_error(
+        self, inter: disnake.ApplicationCommandInteraction, error: Exception
+    ) -> None:
         if isinstance(error, commands.CommandOnCooldown):
             await inter.response.send_message(str(error), ephemeral=True)
             return True
