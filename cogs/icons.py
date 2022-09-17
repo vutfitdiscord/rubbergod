@@ -103,10 +103,10 @@ class Icons(commands.Cog):
             for icon in icon_roles
             if await can_assign(icon, user)
         ]
-        assert len(options) <= 25  # TODO: remove this limit
-        component = IconSelect(placeholder=Messages.icon_ui_choose, options=options)
         view = BaseView()
-        view.add_item(component)
+        for start_i in range(0, len(options), 25):
+            component = IconSelect(placeholder=Messages.icon_ui_choose, options=options[start_i:start_i+25])
+            view.add_item(component)
         await inter.edit_original_message(view=view)
 
     async def cog_slash_command_error(self, inter: disnake.ApplicationCommandInteraction, error: Exception) -> None:
