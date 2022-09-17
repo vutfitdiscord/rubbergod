@@ -420,3 +420,6 @@ class Messages:
     icon_ui = "UI pro přiřazení ikony"
     icon_set_success = "Užiteli {user} nastavena ikona {icon}"
     icon_set_no_role = "Vstup neodpovídá žádné možné ikoně"
+    icon_ui_choose = "Vyber si ikonu"
+    icon_ui_fail = "Nastavit ikonu se nepodařilo"
+    icon_ui_no_permission = "Na tuto ikonu nemáš právo"
