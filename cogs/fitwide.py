@@ -100,7 +100,7 @@ class FitWide(commands.Cog):
         permited = session.query(Permit)
         permited_ids = [int(person.discord_ID) for person in permited]
 
-        years = ["0BIT", "1BIT", "2BIT", "3BIT", "4BIT+", "0MIT", "1MIT", "2MIT", "3MIT+", "PhD+", "Dropout"]
+        years = ["0BIT", "1BIT", "2BIT", "3BIT+", "0MIT", "1MIT", "2MIT+", "PhD+", "VUT", "Dropout"]
 
         year_roles = {year: disnake.utils.get(guild.roles, name=year) for year in years}
 
@@ -134,18 +134,17 @@ class FitWide(commands.Cog):
 
                 correct_role = disnake.utils.get(guild.roles, name=year)
 
+
                 if correct_role not in member.roles:
                     for role_name, role in year_roles.items():
                         if role in member.roles and correct_role in weird_members[role].keys():
                             weird_members[role][correct_role].append(member)
                             break
                     else:
-                        if correct_role == dropout and not any(
+                        if not (correct_role == dropout and any(
                             role in member.roles for role in dropout_alternatives
-                        ):
-                            await ctx.send(
-                                f"{utils.generate_mention(member.id)} by mel " f"mit prej `{year}`"
-                            )
+                        )):
+                            weird_members[dropout][correct_role].append(member)
 
         for source_role, target_data in weird_members.items():
             for target_role, target_members in target_data.items():
@@ -173,16 +172,16 @@ class FitWide(commands.Cog):
                     or target_year == "Dropout"
                 ):
                     await ctx.send(
-                        f"Přesouvám techle {len(target_members)} lidi z " f"{source_year} do {target_year}:"
+                        f"Přesouvám techle {len(target_members)} lidi z {source_year} do {target_year}:"
                     )
                     await self.send_masstag_messages(ctx, "", target_ids)
                     if p_debug:
                         await ctx.send("jk, debug mode")
                     else:
                         for member in target_members:
-                            if target_role == dropout and not any(
+                            if not (target_role == dropout and any(
                                 role in member.roles for role in dropout_alternatives
-                            ):
+                            )):
                                 await member.add_roles(target_role)
                             await member.remove_roles(source_role)
                 elif p_role:
@@ -226,7 +225,7 @@ class FitWide(commands.Cog):
 
         BIT_colors = [role.color for role in BIT]
         await BIT[3].delete()
-        await BIT[2].edit(name="3BIT", color=BIT_colors[3])
+        await BIT[2].edit(name="3BIT+", color=BIT_colors[3])
         await BIT[1].edit(name="2BIT", color=BIT_colors[2])
         await BIT[0].edit(name="1BIT", color=BIT_colors[1])
         bit0 = await guild.create_role(name="0BIT", color=BIT_colors[0])
@@ -234,7 +233,7 @@ class FitWide(commands.Cog):
 
         MIT_colors = [role.color for role in MIT]
         await MIT[2].delete()
-        await MIT[1].edit(name="2MIT", color=MIT_colors[2])
+        await MIT[1].edit(name="2MIT+", color=MIT_colors[2])
         await MIT[0].edit(name="1MIT", color=MIT_colors[1])
         mit0 = await guild.create_role(name="0MIT", color=MIT_colors[0])
         await mit0.edit(position=MIT[0].position - 1)
@@ -289,11 +288,6 @@ class FitWide(commands.Cog):
             position=terminy_channels[0].position - 1,
         )
 
-        # give 4bit perms to the new 3bit terminy
-        await terminy_channels[1].set_permissions(
-            disnake.utils.get(guild.roles, name="4BIT+"), read_messages=True, send_messages=False
-        )
-
         # Give people the correct mandatory classes after increment
         semester_names = [str(x) + ". Semestr" for x in range(1, 6)]
         semester = [
@@ -304,10 +298,10 @@ class FitWide(commands.Cog):
         await semester[1].set_permissions(disnake.utils.get(guild.roles, name="1BIT"), read_messages=True)
         await semester[1].set_permissions(disnake.utils.get(guild.roles, name="2BIT"), overwrite=None)
         await semester[2].set_permissions(disnake.utils.get(guild.roles, name="2BIT"), read_messages=True)
-        await semester[2].set_permissions(disnake.utils.get(guild.roles, name="3BIT"), overwrite=None)
+        await semester[2].set_permissions(disnake.utils.get(guild.roles, name="3BIT+"), overwrite=None)
         await semester[3].set_permissions(disnake.utils.get(guild.roles, name="2BIT"), read_messages=True)
-        await semester[3].set_permissions(disnake.utils.get(guild.roles, name="3BIT"), overwrite=None)
-        await semester[4].set_permissions(disnake.utils.get(guild.roles, name="3BIT"), read_messages=True)
+        await semester[3].set_permissions(disnake.utils.get(guild.roles, name="3BIT+"), overwrite=None)
+        await semester[4].set_permissions(disnake.utils.get(guild.roles, name="3BIT+"), read_messages=True)
 
         # Warning: This was somehow ran before the semester permissions changed
         # So just keep in mind that weird shit happens
@@ -336,10 +330,10 @@ class FitWide(commands.Cog):
             disnake.utils.get(guild.roles, name="2BIT"), read_messages=True
         )
         await disnake.utils.get(guild.channels, name="2bit-info").set_permissions(
-            disnake.utils.get(guild.roles, name="3BIT"), overwrite=None
+            disnake.utils.get(guild.roles, name="3BIT+"), overwrite=None
         )
         await disnake.utils.get(guild.channels, name="3bit-info").set_permissions(
-            disnake.utils.get(guild.roles, name="3BIT"), read_messages=True
+            disnake.utils.get(guild.roles, name="3BIT+"), read_messages=True
         )
         await disnake.utils.get(guild.channels, name="mit-info").set_permissions(
             disnake.utils.get(guild.roles, name="1MIT"), read_messages=True

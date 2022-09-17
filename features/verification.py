@@ -188,7 +188,7 @@ class Verification(BaseFeature):
             year_value = int(year_value_match.group(1))
 
             if year_parts[1] in ["BIT", "BITP"]:
-                return "4BIT+" if year_value >= 4 else f"{year_value}BIT"
+                return "3BIT+" if year_value >= 3 else f"{year_value}BIT"
             elif year_parts[1] in ["BCH", "CZV"]:
                 return "1BIT"  # TODO: fix erasmus students (BCH)
             elif year_parts[1] in [
@@ -198,7 +198,7 @@ class Verification(BaseFeature):
                 "NHPC", "NISD", "NIDE", "NISY", "NMAL", "NMAT",
                 "NSEN", "NVER", "NSPE", "MGH",
             ]:
-                return "3MIT+" if year_value >= 3 else f"{year_value}MIT"
+                return "2MIT+" if year_value >= 2 else f"{year_value}MIT"
             elif year_parts[1] in ["DVI4", "DRH", "DITP"]:
                 return "PhD+"
         elif "FEKT" in year_parts:  # FEKT student
