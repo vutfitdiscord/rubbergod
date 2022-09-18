@@ -1,5 +1,7 @@
 from datetime import datetime, timezone
-from typing import Iterable, Optional, Union
+from typing import Callable, Iterable, Optional, Union
+from repository.database import session, cooldown
+import time
 
 import disnake
 import math
@@ -284,3 +286,39 @@ def round_image(frame_avatar: Image.Image) -> Image.Image:
     draw.ellipse((0, 0) + frame_avatar.size, fill=255)
     frame_avatar.putalpha(frame_mask)
     return frame_avatar
+
+
+class PCommandOnCooldown(commands.CommandError):
+    """commands.CommandOnCooldown requires usage of disnake for cooldowns, so we use a custom exception"""
+
+    pass
+
+
+class PersistentCooldown:
+    def __init__(self, command_name: str, limit: float) -> None:
+        self.command_name = command_name
+        self.limit = limit * 1000  # convert to ms
+
+    async def check_cooldown(self, inter: disnake.ApplicationCommandInteraction) -> None:
+        current_cooldown = session.query(cooldown.Cooldown).get(
+            dict(command_name=self.command_name, user_id=str(inter.user.id))
+        )
+        now = int(time.time() * 1000)
+        if current_cooldown is None:
+            session.add(
+                cooldown.Cooldown(
+                    command_name=self.command_name,
+                    user_id=str(inter.user.id),
+                    timestamp=now,
+                )
+            )
+        elif (time_passed := now - current_cooldown.timestamp) < self.limit:
+            raise PCommandOnCooldown(Messages.cooldown.format((self.limit - time_passed) / 1000))
+        else:
+            current_cooldown.timestamp = now
+        session.commit()
+        return True
+
+    def __call__(self, f: commands.InvokableApplicationCommand) -> Callable:
+        f.add_check(self.check_cooldown)
+        return f

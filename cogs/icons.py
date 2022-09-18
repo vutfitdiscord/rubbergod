@@ -50,7 +50,7 @@ class IconSelect(disnake.ui.Select):
         user = inter.user
         if await can_assign(icon, user):
             await inter.edit_original_message(
-                Messages.icon_set_success.format(user=inter.user, icon=icon), view=None
+                Messages.icon_set_success.format(user=inter.user, icon=icon_name(icon)), view=None
             )
             await do_set_icon(icon, user)
         else:
@@ -92,7 +92,7 @@ class Icons(commands.Cog):
 
         await inter.response.send_message(embed=embed, ephemeral=True)
 
-    @commands.cooldown(1, config.icon_ui_cooldown)
+    @utils.PersistentCooldown(command_name="icon ui", limit=config.icon_ui_cooldown)
     @icon.sub_command(description=Messages.icon_ui)
     async def ui(self, inter: disnake.ApplicationCommandInteraction):
         await inter.response.defer(ephemeral=True)
@@ -116,7 +116,7 @@ class Icons(commands.Cog):
     async def cog_slash_command_error(
         self, inter: disnake.ApplicationCommandInteraction, error: Exception
     ) -> None:
-        if isinstance(error, commands.CommandOnCooldown):
+        if isinstance(error, utils.PCommandOnCooldown):
             await inter.response.send_message(str(error), ephemeral=True)
             return True
 
