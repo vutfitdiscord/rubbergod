@@ -67,34 +67,9 @@ class Icons(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.slash_command(description=Messages.icon_description)
+    @utils.PersistentCooldown(command_name="icon", limit=config.icon_ui_cooldown)
+    @commands.slash_command(description=Messages.icon_ui)
     async def icon(self, inter: disnake.ApplicationCommandInteraction):
-        pass
-
-    @commands.check(utils.helper_plus)
-    @icon.sub_command(description=Messages.icon_modset)
-    async def modset(
-        self,
-        inter: disnake.ApplicationCommandInteraction,
-        user: disnake.Member,
-        icon_s: str = commands.Param(autocomplete=icon_autocomp),
-    ):
-        icon_roles = get_icon_roles(inter.guild)
-        try:
-            icon = next(role for role in icon_roles if icon_s == icon_s.removeprefix(config.icon_role_prefix))
-        except StopIteration:
-            embed = disnake.Embed(title=Messages.icon_set_no_role)
-        else:
-            await self.do_set_icon(icon, user)
-            embed = disnake.Embed(
-                title=Messages.icon_set_success.format(user=user, icon=icon_name(icon)),
-            )
-
-        await inter.response.send_message(embed=embed, ephemeral=True)
-
-    @utils.PersistentCooldown(command_name="icon ui", limit=config.icon_ui_cooldown)
-    @icon.sub_command(description=Messages.icon_ui)
-    async def ui(self, inter: disnake.ApplicationCommandInteraction):
         await inter.response.defer(ephemeral=True)
         icon_roles = get_icon_roles(inter.guild)
         user = inter.user
