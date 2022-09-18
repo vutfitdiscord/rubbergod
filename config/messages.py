@@ -415,8 +415,6 @@ class Messages:
     bookmark_created = "Záložka **{title_name}** vytvořena"
     bookmark_upload_limit = "Zpráva obsahuje přílohu přesahující upload limit, doporučuji si tuto přílohu stáhnout. V připadě smazání původní zprávy nebude příloha dostupná."
 
-    icon_description = "Příkazy pro práci s ikonami"
-    icon_modset = "Přidání ikony uživateli, jen pro helper+, ignoruje podmínky"
     icon_ui = "UI pro přiřazení ikony"
     icon_set_success = "Užiteli {user} nastavena ikona {icon}"
     icon_set_no_role = "Vstup neodpovídá žádné možné ikoně"
