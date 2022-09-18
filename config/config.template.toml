@@ -154,4 +154,4 @@ ui_cooldown = 10.0
 [icons.rule.0]
 allow=[] # prevent anyone from self-assigning this role
 [icons.rule.1]
-deny=[461550034668748800] # prevent mods from self-assigning this role (they can use modset to bypass)
+deny=[461550034668748800, 140547421733126145] # prevent mods and the user arcasCZ from self-assigning this icon via the UI.

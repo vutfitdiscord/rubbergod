@@ -20,7 +20,8 @@ async def can_assign(icon: disnake.Role, user: disnake.Member):
     user_roles = {role.id for role in user.roles}
     allow = rules.get("allow")
     deny = rules.get("deny", [])
-    return (allow is None or not user_roles.isdisjoint(allow)) and user_roles.isdisjoint(deny)
+    allowed_by_role = (allow is None or not user_roles.isdisjoint(allow)) and user_roles.isdisjoint(deny)
+    return allowed_by_role and user.id not in deny
 
 
 async def do_set_icon(icon: disnake.Role, user: disnake.Member):
