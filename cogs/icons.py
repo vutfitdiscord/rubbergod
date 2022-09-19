@@ -6,8 +6,14 @@ from config.app_config import config
 from config.messages import Messages
 
 
+def remove_prefix(text, prefix):
+    if text.startswith(prefix):
+        return text[len(prefix):]
+    return text
+
+
 def icon_name(icon: disnake.Role):
-    return icon.name.removeprefix(config.icon_role_prefix)
+    return remove_prefix(icon.name, config.icon_role_prefix)
 
 
 def get_icon_roles(guild: disnake.Guild):
