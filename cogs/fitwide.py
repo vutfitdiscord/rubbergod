@@ -134,7 +134,6 @@ class FitWide(commands.Cog):
 
                 correct_role = disnake.utils.get(guild.roles, name=year)
 
-
                 if correct_role not in member.roles:
                     for role_name, role in year_roles.items():
                         if role in member.roles and correct_role in weird_members[role].keys():
