@@ -75,7 +75,7 @@ class Icons(commands.Cog):
         self.bot = bot
 
     @utils.PersistentCooldown(command_name="icon", limit=config.icon_ui_cooldown)
-    @commands.slash_command(description=Messages.icon_ui)
+    @commands.slash_command(description=Messages.icon_ui, guild_ids=[config.guild_id])
     async def icon(self, inter: disnake.ApplicationCommandInteraction):
         await inter.response.defer(ephemeral=True)
         icon_roles = get_icon_roles(inter.guild)
