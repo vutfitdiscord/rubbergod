@@ -129,7 +129,8 @@ class Karma(commands.Cog):
 
     @commands.user_command(name="Karma uživatele")
     async def stalk_app(self, inter: disnake.UserCommandInteraction, user: disnake.Member):
-        await inter.response.send_message(self.karma.karma_get(inter.author, user))
+        ephemeral = inter.channel_id != config.bot_room
+        await inter.response.send_message(self.karma.karma_get(inter.author, user), ephemeral=ephemeral)
 
     @_karma.sub_command(description=messages.karma_stalk_brief)
     async def stalk(self, inter: disnake.ApplicationCommandInteraction, user: disnake.Member):
@@ -157,19 +158,25 @@ class Karma(commands.Cog):
 
     @commands.message_command(name="Karma zprávy")
     async def message_app(self, inter: disnake.MessageCommandInteraction, message: disnake.Message):
-        await self._message(inter, message)
+        ephemeral = inter.channel_id != config.bot_room
+        await self._message(inter, message, ephemeral=ephemeral)
 
     @cooldowns.long_cooldown
     @_karma.sub_command(description=messages.karma_message_brief)
     async def message(self, inter: disnake.ApplicationCommandInteraction, message: disnake.Message):
         await self._message(inter, message)
 
-    async def _message(self, inter: disnake.ApplicationCommandInteraction, message: disnake.Message):
-        await inter.response.defer(with_message=True)
+    async def _message(
+        self, inter: disnake.ApplicationCommandInteraction,
+        message: disnake.Message,
+        ephemeral: bool = False
+    ):
+        await inter.response.defer(with_message=True, ephemeral=ephemeral)
         embed = await self.karma.message_karma(inter.author, message)
         await inter.edit_original_message(embed=embed)
         msg = await inter.original_message()
-        await msg.add_reaction("🔁")
+        if not ephemeral:
+            await msg.add_reaction("🔁")
 
     @cooldowns.default_cooldown
     @commands.group()
