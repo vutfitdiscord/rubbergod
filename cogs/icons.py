@@ -82,7 +82,7 @@ class Icons(commands.Cog):
         user = inter.user
         options = [
             disnake.SelectOption(
-                label=icon_name(icon), value=str(icon.id), emoji=getattr(icon, "_icon", None)
+                label=icon_name(icon), value=str(icon.id), emoji=None
             )
             for icon in icon_roles
             if await can_assign(icon, user)
