@@ -96,7 +96,7 @@ class Error(commands.Cog):
             return
 
         embed = self.logger.create_embed(
-            inter.data.name,
+            f"/{inter.application_command.qualified_name}",
             inter.filled_options,
             inter.author,
             inter.guild,
