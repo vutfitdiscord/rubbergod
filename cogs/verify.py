@@ -46,7 +46,7 @@ class Verify(commands.Cog):
             return True
 
     @commands.check(utils.is_in_modroom)
-    @commands.slash_command(name="dynamic_verify")
+    @commands.slash_command(name="dynamic_verify", guild_ids=[config.guild_id])
     async def dynamic_verify(self, inter: disnake.ApplicationCommandInteraction):
         """This method is only group for another commands. This function does nothing."""
         pass

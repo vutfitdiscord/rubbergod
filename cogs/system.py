@@ -4,6 +4,7 @@ from disnake.message import Message
 import utils
 import disnake
 import math
+from config.app_config import config
 from buttons.system import SystemView, Dropdown
 from config.messages import Messages
 
@@ -48,7 +49,7 @@ class System(commands.Cog):
         return all_selects
 
     @commands.check(utils.is_bot_admin)
-    @commands.slash_command(name="cogs", description=Messages.cogs_brief)
+    @commands.slash_command(name="cogs", description=Messages.cogs_brief, guild_ids=[config.guild_id])
     async def cogs(self, inter: disnake.ApplicationCommandInteraction):
         """
         Creates embed with button and select(s) to load/unload/reload cogs.

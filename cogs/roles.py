@@ -214,7 +214,7 @@ class Roles(commands.Cog):
         await ctx.send("Done")
 
     @commands.check(utils.is_bot_admin)
-    @commands.slash_command(name="channel")
+    @commands.slash_command(name="channel", guild_ids=[config.guild_id])
     async def channel(self, ctx):
         pass
 
