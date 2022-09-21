@@ -15,7 +15,7 @@ from repository.database.subscription import Subscription  # noqa: F401
 from repository.database.meme_repost import MemeRepost  # noqa: F401
 from repository.database.exams import ExamsTermsMessage  # noqa: F401
 from repository.database.error import ErrorLog  # noqa: F401
-from repository.database.cooldown import Cooldown  #noqa: F401
+from repository.database.cooldown import Cooldown  # noqa: F401
 
 from config.app_config import config
 
