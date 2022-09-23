@@ -73,7 +73,7 @@ class ErrorLogger:
                 ErrorLog.set()
             return count
         except Exception:
-            return None
+            return 0
 
     def create_embed(
         self, command: str, message: str, author: disnake.User, guild: disnake.Guild, jump_url: str

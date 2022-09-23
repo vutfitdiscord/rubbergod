@@ -101,37 +101,44 @@ async def on_error(event, *args, **kwargs):
                 event_guild = "DM"
 
         else:  # on_raw_reaction_add/remove
-            message_id = arg.message_id
+            message_id = getattr(arg, 'message_id', None)
+            channel_id = getattr(arg, 'channel_id', None)
+            user_id = getattr(arg, 'user_id', None)
             if hasattr(arg, 'guild_id'):
                 guild = bot.get_guild(arg.guild_id)
                 event_guild = guild.name
-                channel = guild.get_channel(arg.channel_id)
-                message = await channel.fetch_message(arg.message_id)
-                message = message.content[:1000]
+                if channel_id:
+                    channel = guild.get_channel(channel_id)
+                    if message_id and channel:
+                        message = await channel.fetch_message(message_id)
+                        if message is not None:
+                            message = message.content[:1000]
             else:
                 event_guild = "DM"
-                message = arg.message_id
+                message = message_id
 
-            user = bot.get_user(arg.user_id)
+            if user_id:
+                user = bot.get_user(arg.user_id)
             if not user:
                 user = arg.user_id
             else:
-                channel = bot.get_channel(arg.channel_id)
-                if channel:
-                    message = await channel.fetch_message(arg.message_id)
-                    if message.content:
-                        message = message.content[:1000]
-                    elif message.embeds:
-                        embeds.extend(message.embeds)
-                        message = "Embed v předchozí zprávě"
-                    elif message.attachments:
-                        message_out = ""
-                        for attachment in message.attachments:
-                            message_out += f"{attachment.url}\n"
-                        message = message_out
-                else:
-                    message = arg.message_id
-                user = str(user)
+                if channel_id:
+                    channel = bot.get_channel(channel_id)
+                    if channel and message_id:
+                        message = await channel.fetch_message(message_id)
+                        if message:
+                            if message.content:
+                                message = message.content[:1000]
+                            elif message.embeds:
+                                embeds.extend(message.embeds)
+                                message = "Embed v předchozí zprávě"
+                            elif message.attachments:
+                                message_out = ""
+                                for attachment in message.attachments:
+                                    message_out += f"{attachment.url}\n"
+                                message = message_out
+                    else:
+                        message = message_id
 
         count = err_logger.log_error_date()
         embed = Embed(
@@ -143,13 +150,13 @@ async def on_error(event, *args, **kwargs):
             embed.add_field(name="Guild", value=event_guild)
 
         if event != "on_message":
-            if arg.member:
+            if hasattr(arg, 'member'):
                 reaction_from = str(arg.member)
             else:
                 reaction_from = user
             embed.add_field(name="Reakce od", value=reaction_from)
-            embed.add_field(name="Reaction", value=arg.emoji)
-            embed.add_field(name="Typ", value=arg.event_type)
+            embed.add_field(name="Reaction", value= getattr(arg, 'emoji', None))
+            embed.add_field(name="Typ", value=getattr(arg, 'event_type', None))
         if guild:
             link = f"https://discord.com/channels/{guild.id}/{channel.id}/{message_id}"
             embed.add_field(name="Link", value=link, inline=False)
