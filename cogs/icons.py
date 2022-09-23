@@ -104,14 +104,12 @@ class Icons(commands.Cog):
             view.add_item(component)
         await inter.edit_original_message(view=view)
 
-
     @commands.Cog.listener()
     async def on_button_click(self, inter: disnake.MessageInteraction):
         if inter.component.custom_id != "icon:delete":
             return
         await do_set_icon(None, inter.author)
         await inter.response.send_message(content=Messages.icon_removed, ephemeral=True)
-
 
     async def cog_slash_command_error(
         self, inter: disnake.ApplicationCommandInteraction, error: Exception
