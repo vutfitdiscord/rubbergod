@@ -421,5 +421,6 @@ class Messages:
     icon_ui_choose = "Vyber si ikonu"
     icon_ui_fail = "Nastavit ikonu se nepodařilo"
     icon_ui_no_permission = "Na tuto ikonu nemáš právo"
+    icon_removed = "Ikona byla odstraněna"
 
     cooldown = "Příliš rychle, zkus to znovu za {:.3}s"
