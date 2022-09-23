@@ -1,9 +1,10 @@
-from disnake.ext import commands
-from buttons.base import BaseView
-import utils
 import disnake
+from disnake.ext import commands
+
+from buttons.icon import IconView
 from config.app_config import config
 from config.messages import Messages
+import utils
 
 
 def remove_prefix(text, prefix):
@@ -40,7 +41,8 @@ async def do_set_icon(icon: disnake.Role, user: disnake.Member):
         return
     if current_roles:
         await user.remove_roles(*current_roles)
-    await user.add_roles(icon)
+    if icon:
+        await user.add_roles(icon)
 
 
 class IconSelect(disnake.ui.Select):
@@ -70,6 +72,13 @@ async def icon_autocomp(inter: disnake.ApplicationCommandInteraction, partial: s
     return [name for name in names if partial.casefold() in name.casefold()]
 
 
+def get_icon_emoji(icon: disnake.Role):
+    emoji = getattr(icon, "_icon", None)
+    if type(emoji) not in [str, disnake.Emoji, disnake.PartialEmoji]:
+        emoji = None
+    return emoji
+
+
 class Icons(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
@@ -82,18 +91,27 @@ class Icons(commands.Cog):
         user = inter.user
         options = [
             disnake.SelectOption(
-                label=icon_name(icon), value=str(icon.id), emoji=None
+                label=icon_name(icon), value=str(icon.id), emoji=get_icon_emoji(icon)
             )
             for icon in icon_roles
             if await can_assign(icon, user)
         ]
-        view = BaseView()
+        view = IconView()
         for start_i in range(0, len(options), 25):
             component = IconSelect(
-                placeholder=Messages.icon_ui_choose, options=options[start_i: start_i + 25]
+                placeholder=Messages.icon_ui_choose, options=options[start_i: start_i + 25], row=0,
             )
             view.add_item(component)
         await inter.edit_original_message(view=view)
+
+
+    @commands.Cog.listener()
+    async def on_button_click(self, inter: disnake.MessageInteraction):
+        if inter.component.custom_id != "icon:delete":
+            return
+        await do_set_icon(None, inter.author)
+        await inter.response.send_message(content=Messages.icon_removed, ephemeral=True)
+
 
     async def cog_slash_command_error(
         self, inter: disnake.ApplicationCommandInteraction, error: Exception
