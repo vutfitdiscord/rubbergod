@@ -155,7 +155,7 @@ async def on_error(event, *args, **kwargs):
             else:
                 reaction_from = user
             embed.add_field(name="Reakce od", value=reaction_from)
-            embed.add_field(name="Reaction", value= getattr(arg, 'emoji', None))
+            embed.add_field(name="Reaction", value=getattr(arg, 'emoji', None))
             embed.add_field(name="Typ", value=getattr(arg, 'event_type', None))
         if guild:
             link = f"https://discord.com/channels/{guild.id}/{channel.id}/{message_id}"
