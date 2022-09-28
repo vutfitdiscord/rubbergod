@@ -103,8 +103,12 @@ class Config:
     # Roles
     role_channels: List[int] = get_attr(toml_dict, "role", "channels")
 
-    # Subjects shortcuts
+    # Subjects and reviews
     review_forbidden_roles: List[int] = get_attr(toml_dict, "review", "forbidden_roles")
+    subject_bit_id: int = get_attr(toml_dict, "review", "bit_id")
+    subject_mit_id_start: int = get_attr(toml_dict, "review", "mit_id_start")
+    subject_mit_id_end: int = get_attr(toml_dict, "review", "mit_id_end")
+    subject_mit_id_rnd: List[int] = get_attr(toml_dict, "review", "mit_id_rnd")
 
     # How many roles a user needs to have to be considered a rolehoarder
     rolehoarder_default_limit: int = get_attr(toml_dict, "rolehoarder", "default_limit")

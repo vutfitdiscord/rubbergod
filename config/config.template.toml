@@ -103,6 +103,10 @@ hug_emojis = ["<:peepoHug:600435649786544151>",
 [review]
 #                  MUNI                Host
 forbidden_roles = [600047283509264384, 603673568051462144]
+bit_id = 7886
+mit_id_start = 14967
+mit_id_end = 14983
+mit_id_rnd = [15220]
 
 [rolehoarder]
 # How many people to print if the limit argument is not specified
