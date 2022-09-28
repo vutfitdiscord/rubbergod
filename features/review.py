@@ -1,3 +1,4 @@
+from typing import Union
 from bs4 import BeautifulSoup
 import disnake
 import requests
@@ -20,12 +21,16 @@ class ReviewManager:
         self,
         msg_author: disnake.User,
         review: Review,
-        subject: Subject_details,
+        subject: Union[Subject_details, str],
         description: str,
         page: str
     ):
         """Create new embed for reviews"""
-        embed = disnake.Embed(title=f"{subject.shortcut.upper()} reviews", description=description)
+        if type(subject) == Subject_details:
+            shortcut = getattr(subject, "shortcut", review.subject.upper())
+        else:
+            shortcut = subject
+        embed = disnake.Embed(title=f"{shortcut} reviews", description=description)
         embed.colour = 0x6D6A69
         id = 0
         if review:
@@ -55,7 +60,7 @@ class ReviewManager:
                 embed.colour = 0x34CB0B
             elif diff < 0:
                 embed.colour = 0xCB410B
-        if not subject.shortcut.lower().startswith("tv"):
+        if type(subject) == Subject_details and not subject.shortcut.lower().startswith("tv"):
             sem = 1 if subject.semester == "L" else 2
             subject_id = subject.card.split("/")[-2]
             vutis_link = "https://www.vut.cz/studis/student.phtml?script_name=anketa_statistiky"
@@ -128,15 +133,16 @@ class ReviewManager:
                 return None
         reviews = self.repo.get_subject_reviews(subject_obj.shortcut)
         reviews_cnt = reviews.count()
-        subject_details = self.repo.get_subject_details(subject_obj.shortcut)
+        subject_details = self.repo.get_subject_details(subject_obj.shortcut) or subject_obj.shortcut
+        name = getattr(subject_details, "name",  "")
         if reviews_cnt == 0:
-            description = f"{subject_details.name}\n*No reviews*"
+            description = f"{name}\n*No reviews*"
             return [self.make_embed(author, None, subject_details, description, "1/1")]
         else:
             embeds = []
             for idx in range(reviews_cnt):
                 review = reviews[idx].Review
-                description = f"{subject_details.name}\n**Average tier:** {round(reviews[idx].avg_tier)}"
+                description = f"{name}\n**Average tier:** {round(reviews[idx].avg_tier)}"
                 page = f"{idx+1}/{reviews_cnt}"
 
                 embeds.append(self.make_embed(author, review, subject_details, description, page))
