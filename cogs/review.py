@@ -122,24 +122,23 @@ class Review(commands.Cog):
         """Updates subjects from web"""
         global subjects
         programme_details_link = "https://www.fit.vut.cz/study/"
+        reply = ""
         async with ctx.channel.typing():
             # bachelor
-            if not self.manager.update_subject_types(f"{programme_details_link}program/7611/.cs", False):
-                await ctx.reply(Messages.subject_update_error)
-                return
+            url = f"{programme_details_link}program/{config.subject_bit_id}/.cs"
+            if not self.manager.update_subject_types(url, False):
+                reply += Messages.subject_update_error.format(url=url)
             # engineer
-            for id in range(66, 82):
-                if not self.manager.update_subject_types(f"{programme_details_link}field/144{id}/.cs", True):
-                    await ctx.reply(Messages.subject_update_error)
-                    return
-            # NISY with random ID
-            if not self.manager.update_subject_types(f"{programme_details_link}field/15340/.cs", True):
-                await ctx.reply(Messages.subject_update_error)
-                return
+            ids_list = list(range(config.subject_mit_id_start, config.subject_mit_id_end))
+            for id in ids_list + config.subject_mit_id_rnd:
+                url = f"{programme_details_link}field/{id}/.cs"
+                if not self.manager.update_subject_types(url, True):
+                    reply += Messages.subject_update_error.format(url=url)
             # sports
             self.manager.update_sport_subjects()
             subjects = self.repo.get_all_subjects()
-            await ctx.reply(Messages.subject_update_success)
+            reply += Messages.subject_update_success
+            await ctx.reply(reply)
 
     @commands.slash_command(name="wtf", description=Messages.shortcut_brief)
     async def shortcut(
