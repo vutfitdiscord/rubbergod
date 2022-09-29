@@ -237,7 +237,7 @@ class Messages:
     review_add_denied = "{user}, na přidání hodnocení předmětu nemáš právo."
     review_not_on_server = "{user}, na použití tohto příkazu musíš být na FITwide serveru."
     subject_format = f"{prefix}subject [update]"
-    subject_update_error = "Aktualizace se nezdařila pro {url}\n"
+    subject_update_error = "Aktualizace se nezdařila pro <{url}>\n"
     subject_update_success = "Předměty byly aktualizovány."
     shortcut_brief = "Vrací stručné informace o předmětu"
     tierboard_brief = "Založeno na `reviews` z průměru tier hodnot"
