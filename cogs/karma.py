@@ -182,7 +182,8 @@ class Karma(commands.Cog):
     @commands.group()
     async def karma(self, ctx: commands.Context):
         if ctx.invoked_subcommand is None:
-            await ctx.reply(utils.fill_message("moved_command", invoked="karma"))
+            command_id = utils.get_command_id(self, "karma")
+            await ctx.reply(utils.fill_message("moved_command", name="karma", id=command_id))
 
     @commands.check(utils.is_bot_admin)
     @karma.command(brief=messages.karma_revote_brief)

@@ -30,7 +30,7 @@ class Messages:
     acl_add_user = "Výjimka pro uživatele přidána."
     acl_edit_user = "Výjimka pro uživatele upravena."
     acl_del_user = "Výjimka pro uživatele smazána."
-    moved_command = "Tento příkaz již není v textové formě podporován. Příkaz byl nahrazen příkazem /{invoked}"
+    moved_command = "Tento příkaz již není v textové formě podporován. Příkaz byl nahrazen příkazem </{name}:{id}>"
     no_such_command = "Takový příkaz neznám. <:sadcat:576171980118687754>"
     command_timed_out = "Příkaz nereagoval a byl nečekaně ukončen."
     spamming = "{user} Nespamuj tolik <:sadcat:576171980118687754>"
