@@ -43,7 +43,8 @@ class Error(commands.Cog):
             prefix = ctx.message.content[:1]
 
             if invoked in slash_comms:
-                await ctx.reply(utils.fill_message("moved_command", invoked=invoked))
+                command_id = utils.get_command_id(self, invoked)
+                await ctx.reply(utils.fill_message("moved_command", name=invoked, id=command_id))
             elif prefix not in config.ignored_prefixes:
                 await ctx.send(Messages.no_such_command)
             return

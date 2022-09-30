@@ -322,3 +322,12 @@ class PersistentCooldown:
     def __call__(self, f: commands.InvokableApplicationCommand) -> Callable:
         f.add_check(self.check_cooldown)
         return f
+
+
+def get_command_id(self, name):
+    """get slash command ID by name"""
+    command = self.bot.get_global_command_named(name)
+    if command is None:
+        guild = self.bot.get_guild(config.guild_id)
+        command = guild.get_command_named(name)
+    return command.id
