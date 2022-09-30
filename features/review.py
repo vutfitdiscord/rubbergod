@@ -27,7 +27,7 @@ class ReviewManager:
     ):
         """Create new embed for reviews"""
         if type(subject) == Subject_details:
-            shortcut = getattr(subject, "shortcut", review.subject.upper())
+            shortcut = getattr(subject, "shortcut")
         else:
             shortcut = subject
         embed = disnake.Embed(title=f"{shortcut} reviews", description=description)
