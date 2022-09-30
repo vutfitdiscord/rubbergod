@@ -43,7 +43,7 @@ class VutSports:
             title = subject.find("a", {"class": "b-subject__link"})
             title_splits = str(title.get_text()).split(" – ")
             name = title_splits[0]
-            shortcut = title_splits[1]
+            shortcut = title_splits[-1]
 
             annotation = subject.find("p", {"class": "b-subject__annot"})
             annotation_items = annotation.find_all("span")
