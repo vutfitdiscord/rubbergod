@@ -65,7 +65,7 @@ err_logger = ErrorLogger()
 @bot.event
 async def on_ready():
     """If RubberGod is ready"""
-    # Inspirated from https://github.com/sinus-x/rubbergoddess/blob/master/rubbergoddess.py
+    # Inspired from https://github.com/sinus-x/rubbergoddess/blob/master/rubbergoddess.py
     global is_initialized
     if is_initialized:
         return
