@@ -1,7 +1,7 @@
 import disnake
 import aiohttp
 import asyncio
-from datetime import date, time
+from datetime import date, time, datetime
 from disnake.ext import commands, tasks
 
 from config.app_config import config
@@ -12,6 +12,8 @@ class Nameday(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.send_names.start()
+
+    local_tz = datetime.now().astimezone().tzinfo
 
     async def _name_day_cz(self):
         async with aiohttp.ClientSession(timeout=aiohttp.ClientTimeout(total=10)) as session:
@@ -62,7 +64,7 @@ class Nameday(commands.Cog):
         name_day_sk = await self._name_day_sk()
         await inter.edit_original_message(name_day_sk)
 
-    @tasks.loop(time=time(22, 00, 1))       # UTC time
+    @tasks.loop(time=time(0, 0, 1, tzinfo=local_tz))
     async def send_names(self):
         name_day_cz = await self._name_day_cz()
         name_day_sk = await self._name_day_sk()
