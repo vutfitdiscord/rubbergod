@@ -151,7 +151,6 @@ class Help(commands.Cog):
             return
 
         # General help
-        footer_text = commit = f"Commit {self.git.hash()}"
         pages = self.generate_pages(ctx)
         pages_total = len(pages)
 
@@ -159,7 +158,7 @@ class Help(commands.Cog):
         for idx, page in enumerate(pages):
             embed = self.generate_embed(page)
             if pages_total > 1:
-                footer_text = f"Strana {idx+1}/{pages_total} | {commit}"
+                footer_text = f"Strana {idx+1}/{pages_total}"
             embed.set_footer(text=footer_text, icon_url=ctx.author.display_avatar.url)
             embeds.append(embed)
 
