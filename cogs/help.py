@@ -13,7 +13,7 @@ import utils
 class Help(commands.Cog):
     """Help command"""
 
-    def __init__(self, bot):
+    def __init__(self, bot: commands.Bot):
         self.bot = bot
         self.git = Git()
 
@@ -100,7 +100,7 @@ class Help(commands.Cog):
         """Sending commands help to grillbot"""
         mock_message = copy.copy(message)
         mock_view = commands.view.StringView("")
-        mock_message.author = self.bot.get_user(params["user_id"])
+        mock_message.author = self.bot.get_user(params.get("user_id"))
         ctx = commands.Context(
             bot=self.bot,
             view=mock_view,
@@ -108,6 +108,8 @@ class Help(commands.Cog):
             message=mock_message,
         )
         if "command" in params and params["command"] is not None:
+            if params["command"] == "slash_commands":
+                return 0, [slash.name for slash in self.bot.slash_commands]
             command = self.bot.get_command(params["command"])
             if not command:
                 return 1, "Command not found"
