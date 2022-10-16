@@ -124,6 +124,10 @@ class Messages:
     role_channel_clone_brief = 'Naklonuje kanál'
     role_channel_create_brief = "Vytvoří privátní text kanál pro uživatele z konkrétní role."
 
+    role_create_start = "Migrace overwrites na rolu pro **{role}**"
+    role_create_progress = "• uživatelů: {perms} {progress}"
+    role_create_done = "Migrace overwrites na rolu **{role}** dokončena. Počet overwrites: {perms}"
+
     random_roll_brief = 'Vygeneruje náhodné celé číslo z intervalu <**first**, **second**>'
     random_flip_brief = 'Hodí mincí'
     random_pick_brief = 'Vybere jedno ze slov za otazníkem'
