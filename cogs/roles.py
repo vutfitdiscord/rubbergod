@@ -14,7 +14,7 @@ group_repo = role_group_repo.RoleGroupRepository()
 
 
 class Roles(commands.Cog):
-    def __init__(self, bot):
+    def __init__(self, bot: commands.Bot):
         self.bot = bot
 
     # Returns list of role names and emotes that represent them
@@ -107,13 +107,55 @@ class Roles(commands.Cog):
                 if perms_for.administrator or perms_for.view_channel:  # Is mod, or now have access. Ignore
                     continue
 
-                current_perms = channel.permissions_for(member)
-                if not current_perms.read_messages:
-                    if not perms.is_empty():
-                        perms.read_messages = True
-                        await channel.set_permissions(member, overwrite=perms)
-                    else:
-                        await channel.set_permissions(member, read_messages=True)
+                total_overwrites = len(channel.overwrites)
+                if total_overwrites >= 490:
+                    role = await self.create_role(channel)
+                    await member.add_roles(role)
+                else:
+                    current_perms = channel.permissions_for(member)
+                    if not current_perms.read_messages:
+                        if not perms.is_empty():
+                            perms.read_messages = True
+                            await channel.set_permissions(member, overwrite=perms)
+                        else:
+                            await channel.set_permissions(member, read_messages=True)
+
+    async def create_role(self, channel: disnake.abc.GuildChannel, ignore: disnake.Member = None):
+        """Create a new role with the same name as channel name and transfer permissions"""
+        total_overwrites = len(channel.overwrites)
+        rate = total_overwrites/100 * 5
+        guild = self.bot.get_guild(config.guild_id)
+        bot_dev = guild.get_channel(config.bot_dev_channel)
+        role = await guild.create_role(name=channel.name)
+        message = await bot_dev.send(utils.fill_message("role_create_start", role=role.name))
+        for idx, item in enumerate(channel.overwrites):
+            if type(item) == disnake.Member:
+                if ignore and ignore.id == item.id:
+                    continue
+                await item.add_roles(role)
+
+            if (idx % rate == 0):
+                await message.edit(
+                    utils.fill_message(
+                        "role_create_progress",
+                        perms=total_overwrites,
+                        progress=utils.create_bar(idx + 1, total_overwrites),
+                    )
+                )
+
+        await message.edit(
+            utils.fill_message(
+                "role_create_done",
+                role=role.name,
+                perms=len(role.members)
+            )
+        )
+
+        # remove permission
+        await channel.edit(sync_permissions=True)
+        # add role
+        await channel.set_permissions(role, read_messages=True)
+        return role
 
     async def remove_perms(self, target, member: disnake.Member, guild):
         """Remove a target role / channel from a member."""
@@ -133,18 +175,22 @@ class Roles(commands.Cog):
             # if overwrite.is_empty():
             #    continue  # Overwrite not found. User maybe have access from role.
 
-            if overwrite != disnake.PermissionOverwrite(read_messages=True):
-                # Member have extra permissions and we don't want remove it.
-                # Instead of remove permission we set only read messages permission to deny.
-                overwrite.update(read_messages=False)
-                await channel.set_permissions(member, overwrite=overwrite)
-                continue
+            total_overwrites = len(channel.overwrites)
+            if total_overwrites >= 490:
+                role = await self.create_role(channel, ignore=member)
+            else:
+                if overwrite != disnake.PermissionOverwrite(read_messages=True):
+                    # Member have extra permissions and we don't want remove it.
+                    # Instead of remove permission we set only read messages permission to deny.
+                    overwrite.update(read_messages=False)
+                    await channel.set_permissions(member, overwrite=overwrite)
+                    continue
 
-            await channel.set_permissions(member, overwrite=None)
-            perms = channel.permissions_for(member)
-            if perms.read_messages:
-                # The user still sees the channel. You need to create special permissions.
-                await channel.set_permissions(member, read_messages=False)
+                await channel.set_permissions(member, overwrite=None)
+                perms = channel.permissions_for(member)
+                if perms.read_messages:
+                    # The user still sees the channel. You need to create special permissions.
+                    await channel.set_permissions(member, read_messages=False)
 
     def get_target(self, target, guild) -> Tuple[List[disnake.Role], List[disnake.abc.GuildChannel]]:
         """Detect if target is a channel a role or a group."""
@@ -162,10 +208,13 @@ class Roles(commands.Cog):
         if isinstance(target, int) or target.isdigit():
             role = disnake.utils.get(guild.roles, id=int(target))
             channel = disnake.utils.get(guild.channels, id=int(target))
+            if not role:
+                role = disnake.utils.get(guild.roles, name=channel.name)
         # else if name of role / #channel
         else:
+            target = target[1:] if target[0] == "#" else target
             role = disnake.utils.get(guild.roles, name=target)
-            channel = disnake.utils.get(guild.channels, name=target[1:].lower())
+            channel = disnake.utils.get(guild.channels, name=target.lower())
 
         return [role], [channel]
 
