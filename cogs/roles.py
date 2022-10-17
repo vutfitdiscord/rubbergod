@@ -201,7 +201,12 @@ class Roles(commands.Cog):
             for role_id in group.role_ids:
                 roles.append(disnake.utils.get(guild.roles, id=int(role_id)))
             for channel_id in group.channel_ids:
-                channels.append(disnake.utils.get(guild.channels, id=int(channel_id)))
+                channel = disnake.utils.get(guild.channels, id=int(channel_id))
+                role = disnake.utils.get(guild.roles, name=channel.name)
+                if role:
+                    roles.append(role)
+                else:
+                    channels.append(channel)
             return roles, channels
 
         # if ID
