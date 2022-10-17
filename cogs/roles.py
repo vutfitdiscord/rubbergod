@@ -108,7 +108,7 @@ class Roles(commands.Cog):
                     continue
 
                 total_overwrites = len(channel.overwrites)
-                if total_overwrites >= 1:
+                if total_overwrites >= 490:
                     role = await self.create_role(channel)
                     await member.add_roles(role)
                 else:
