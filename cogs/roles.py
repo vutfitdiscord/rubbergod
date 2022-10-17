@@ -108,7 +108,7 @@ class Roles(commands.Cog):
                     continue
 
                 total_overwrites = len(channel.overwrites)
-                if total_overwrites >= 490:
+                if total_overwrites >= 1:
                     role = await self.create_role(channel)
                     await member.add_roles(role)
                 else:
@@ -122,8 +122,12 @@ class Roles(commands.Cog):
 
     async def create_role(self, channel: disnake.abc.GuildChannel, ignore: disnake.Member = None):
         """Create a new role with the same name as channel name and transfer permissions"""
+        keep = {}  # users and roles with special permission other then default read
+        # prepare default permission for comparison
+        default_perm = disnake.Permissions()
+        default_perm.view_channel = True
         total_overwrites = len(channel.overwrites)
-        rate = total_overwrites/100 * 5
+        rate = total_overwrites/100 * 5  # rate of progress bar update
         guild = self.bot.get_guild(config.guild_id)
         bot_dev = guild.get_channel(config.bot_dev_channel)
         role = await guild.create_role(name=channel.name)
@@ -131,8 +135,13 @@ class Roles(commands.Cog):
         for idx, item in enumerate(channel.overwrites):
             if type(item) == disnake.Member:
                 if ignore and ignore.id == item.id:
-                    continue
-                await item.add_roles(role)
+                    pass
+                elif channel.overwrites[item] != default_perm:
+                    keep[item] = channel.overwrites[item]
+                else:
+                    await item.add_roles(role)
+            else:
+                keep[item] = channel.overwrites[item]
 
             if (idx % rate == 0):
                 await message.edit(
@@ -155,6 +164,9 @@ class Roles(commands.Cog):
         await channel.edit(sync_permissions=True)
         # add role
         await channel.set_permissions(role, read_messages=True)
+        # restore special permissions
+        for item in keep:
+            await channel.set_permissions(item, overwrite=keep[item])
         return role
 
     async def remove_perms(self, target, member: disnake.Member, guild):
