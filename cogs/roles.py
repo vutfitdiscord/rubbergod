@@ -124,10 +124,10 @@ class Roles(commands.Cog):
         """Create a new role with the same name as channel name and transfer permissions"""
         keep = {}  # users and roles with special permission other then default read
         # prepare default permission for comparison
-        default_perm = disnake.Permissions()
+        default_perm = disnake.PermissionOverwrite()
         default_perm.view_channel = True
         total_overwrites = len(channel.overwrites)
-        rate = total_overwrites/100 * 5  # rate of progress bar update
+        rate = 50
         guild = self.bot.get_guild(config.guild_id)
         bot_dev = guild.get_channel(config.bot_dev_channel)
         role = await guild.create_role(name=channel.name)
@@ -147,10 +147,21 @@ class Roles(commands.Cog):
                 await message.edit(
                     utils.fill_message(
                         "role_create_progress",
+                        channel=channel.name,
                         perms=total_overwrites,
                         progress=utils.create_bar(idx + 1, total_overwrites),
                     )
                 )
+
+        # remove permission
+        await channel.edit(sync_permissions=True)
+        for item in channel.overwrites:
+            await channel.set_permissions(item, overwrite=None)
+        # add role
+        await channel.set_permissions(role, read_messages=True)
+        # restore special permissions
+        for item in keep:
+            await channel.set_permissions(item, overwrite=keep[item])
 
         await message.edit(
             utils.fill_message(
@@ -159,14 +170,6 @@ class Roles(commands.Cog):
                 perms=len(role.members)
             )
         )
-
-        # remove permission
-        await channel.edit(sync_permissions=True)
-        # add role
-        await channel.set_permissions(role, read_messages=True)
-        # restore special permissions
-        for item in keep:
-            await channel.set_permissions(item, overwrite=keep[item])
         return role
 
     async def remove_perms(self, target, member: disnake.Member, guild):
