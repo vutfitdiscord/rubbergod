@@ -127,6 +127,8 @@ class Messages:
     role_create_start = "Migrace oprávnění na roli pro **{role}**"
     role_create_progress = "Migrace pro #{channel} • uživatelů: {perms} {progress}"
     role_create_done = "Migrace oprávnění na roli **{role}** dokončena. Počet oprávnění: {perms}"
+    role_migration_allert = "Přidání/Odebrání **{channel}** bude trvat déle než je obvyklé (až 30 min)." \
+                            "Prosím o strpení. Opakované klikání na reakce nemá vliv na dobu zpracování přístupu."
 
     random_roll_brief = 'Vygeneruje náhodné celé číslo z intervalu <**first**, **second**>'
     random_flip_brief = 'Hodí mincí'
