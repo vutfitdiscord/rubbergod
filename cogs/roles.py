@@ -1,3 +1,4 @@
+import asyncio
 import disnake
 from disnake.ext import commands
 from typing import Tuple, Union, List
@@ -16,6 +17,7 @@ group_repo = role_group_repo.RoleGroupRepository()
 class Roles(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
+        self.lock = asyncio.Lock()
 
     # Returns list of role names and emotes that represent them
     async def get_join_role_data(self, message):
@@ -109,8 +111,12 @@ class Roles(commands.Cog):
 
                 total_overwrites = len(channel.overwrites)
                 if total_overwrites >= 490:
-                    role = await self.create_role(channel)
-                    await member.add_roles(role)
+                    await member.send(utils.fill_message("role_migration_allert", channel=channel))
+                    async with self.lock:
+                        role = disnake.utils.get(guild.roles, name=channel.name)
+                        if not role:
+                            role = await self.create_role(channel)
+                        await member.add_roles(role)
                 else:
                     current_perms = channel.permissions_for(member)
                     if not current_perms.read_messages:
@@ -192,7 +198,11 @@ class Roles(commands.Cog):
 
             total_overwrites = len(channel.overwrites)
             if total_overwrites >= 490:
-                role = await self.create_role(channel, ignore=member)
+                await member.send(utils.fill_message("role_migration_allert", channel=channel))
+                async with self.lock:
+                    role = disnake.utils.get(guild.roles, name=channel.name)
+                    if not role:
+                        role = await self.create_role(channel, ignore=member)
             else:
                 if overwrite != disnake.PermissionOverwrite(read_messages=True):
                     # Member have extra permissions and we don't want remove it.
