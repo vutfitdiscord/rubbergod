@@ -263,6 +263,12 @@ class Roles(commands.Cog):
 
     @commands.check(utils.is_bot_admin)
     @commands.command()
+    async def delete_group(self, ctx, name: str):
+        group_repo.group_delete(name)
+        await ctx.send(f"Odebral jsem groupu {name}")
+
+    @commands.check(utils.is_bot_admin)
+    @commands.command()
     async def groups(self, ctx):
         names = group_repo.group_names()
         for name in names:
