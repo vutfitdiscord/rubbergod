@@ -46,3 +46,6 @@ class RoleGroupRepository(BaseRepository):
         if group is not None:
             group.role_ids = []
             session.commit()
+
+    def group_delete(self, name):
+        session.query(RoleGroup).filter(RoleGroup.name == str(name)).delete()
