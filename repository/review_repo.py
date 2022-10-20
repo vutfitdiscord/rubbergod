@@ -157,6 +157,9 @@ class ReviewRepository(BaseRepository):
     def get_programme(self, shortcut):
         return session.query(Programme).filter(Programme.shortcut == shortcut).first()
 
+    def get_all_programmes(self):
+        return session.query(Programme.shortcut).all()
+
     def set_programme(self, shortcut, name, link):
         programme = Programme(
             shortcut=shortcut,
