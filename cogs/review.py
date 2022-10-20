@@ -12,21 +12,35 @@ from features.review import ReviewManager
 from buttons.review import ReviewView
 from buttons.embed import EmbedView
 
-
 subjects = []
+programmes = []
+subjects_programmes = []
+
+
+async def autocomp_subjects_programmes(inter: disnake.ApplicationCommandInteraction, user_input: str):
+    return [item for item in subjects_programmes if user_input.lower() in item][:25]
 
 
 async def autocomp_subjects(inter: disnake.ApplicationCommandInteraction, user_input: str):
-    return [subject[0] for subject in subjects if user_input.lower() in subject[0]][:25]
+    return [subject for subject in subjects if user_input.lower() in subject][:25]
 
 
 class Review(commands.Cog):
     def __init__(self, bot):
-        global subjects
+        global subjects, programmes
         self.bot = bot
         self.manager = ReviewManager(bot)
         self.repo = review_repo.ReviewRepository()
         subjects = self.repo.get_all_subjects()
+        programmes = self.repo.get_all_programmes()
+        self.get_all_options()
+
+    def get_all_options(self):
+        global subjects, programmes, subjects_programmes
+        subjects = [subject[0] for subject in subjects]
+        programmes = [programme[0] for programme in programmes]
+        programmes = [programme.lower() for programme in programmes]
+        subjects_programmes = subjects + programmes
 
     async def check_member(self, inter: disnake.ApplicationCommandInteraction):
         """Check if user is allowed to add/remove new review."""
@@ -144,7 +158,7 @@ class Review(commands.Cog):
     async def shortcut(
         self,
         inter: disnake.ApplicationCommandInteraction,
-        shortcut: str = commands.Param(autocomplete=autocomp_subjects),
+        shortcut: str = commands.Param(autocomplete=autocomp_subjects_programmes),
     ):
         """Informations about subject specified by its shortcut"""
         programme = self.repo.get_programme(shortcut.upper())
