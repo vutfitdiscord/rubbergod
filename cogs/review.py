@@ -41,6 +41,7 @@ class Review(commands.Cog):
         programmes = [programme[0] for programme in programmes]
         programmes = [programme.lower() for programme in programmes]
         subjects_programmes = subjects + programmes
+        subjects_programmes.sort()
 
     async def check_member(self, inter: disnake.ApplicationCommandInteraction):
         """Check if user is allowed to add/remove new review."""
