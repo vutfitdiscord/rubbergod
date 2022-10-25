@@ -298,9 +298,9 @@ class Roles(commands.Cog):
         group_repo.group_reset_roles(name)
         await ctx.send("Done")
 
-    @commands.check(utils.is_bot_admin)
+    @commands.check(utils.is_bot_admin_or_mod)
     @commands.slash_command(name="channel", guild_ids=[config.guild_id])
-    async def channel(self, ctx):
+    async def channel(self, inter):
         pass
 
     @channel.sub_command(name="copy", description=Messages.role_channel_copy_brief)
