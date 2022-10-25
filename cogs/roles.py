@@ -248,55 +248,52 @@ class Roles(commands.Cog):
 
         return [role], [channel]
 
-    @commands.check(utils.is_bot_admin)
-    @commands.command()
-    async def add_group(self, ctx, name: str):
-        group_repo.add_group(name)
-        await ctx.send(f"Pridal jsem groupu {name}")
+    @commands.check(utils.is_bot_admin_or_mod)
+    @commands.slash_command(name="group", guild_ids=[config.guild_id])
+    async def group(self, inter):
+        pass
 
-    @commands.check(utils.is_bot_admin)
-    @commands.command()
-    async def get_group(self, ctx, name: str):
+    @group.sub_command(name="add", description=Messages.group_add)
+    async def add_group(self, inter, name: str):
+        group_repo.add_group(name)
+        await inter.send(f"Pridal jsem groupu {name}")
+
+    @group.sub_command(name="get", description=Messages.group_get)
+    async def get_group(self, inter, name: str):
         group = group_repo.get_group(name)
         channels = ", ".join([f"<#{channel_id}>" for channel_id in group.channel_ids])
-        await ctx.send(f"Jmeno: {group.name}\n" f"Channel IDs: {channels}\n" f"Role IDs:{group.role_ids}")
+        await inter.send(f"Jmeno: {group.name}\n" f"Channel IDs: {channels}\n" f"Role IDs:{group.role_ids}")
 
-    @commands.check(utils.is_bot_admin)
-    @commands.command()
-    async def delete_group(self, ctx, name: str):
+    @group.sub_command(name="delete", description=Messages.group_delete)
+    async def delete_group(self, inter, name: str):
         group_repo.group_delete(name)
-        await ctx.send(f"Odebral jsem groupu {name}")
+        await inter.send(f"Odebral jsem groupu {name}")
 
-    @commands.check(utils.is_bot_admin)
-    @commands.command()
-    async def groups(self, ctx):
+    @group.sub_command(name="list", description=Messages.group_list)
+    async def groups(self, inter):
         names = group_repo.group_names()
         for name in names:
-            await ctx.send(name)
+            await inter.send(name)
 
-    @commands.check(utils.is_bot_admin)
-    @commands.command()
-    async def add_channel_id(self, ctx, name: str, channel_id: int):
+    @group.sub_command(name="add_channel_id", description=Messages.group_add_channel_id)
+    async def add_channel_id(self, inter, name: str, channel_id: int):
         group_repo.group_add_channel_id(name, channel_id)
-        await ctx.send("Done")
+        await inter.send("Done")
 
-    @commands.check(utils.is_bot_admin)
-    @commands.command()
-    async def add_role_id(self, ctx, name: str, role_id: int):
+    @group.sub_command(name="add_role_id", description=Messages.group_add_role_id)
+    async def add_role_id(self, inter, name: str, role_id: int):
         group_repo.group_add_role_id(name, role_id)
-        await ctx.send("Done")
+        await inter.send("Done")
 
-    @commands.check(utils.is_bot_admin)
-    @commands.command()
-    async def group_reset_channels(self, ctx, name: str):
+    @group.sub_command(name="reset_channels", description=Messages.group_reset_channels)
+    async def group_reset_channels(self, inter, name: str):
         group_repo.group_reset_channels(name)
-        await ctx.send("Done")
+        await inter.send("Done")
 
-    @commands.check(utils.is_bot_admin)
-    @commands.command()
-    async def group_reset_roles(self, ctx, name: str):
+    @group.sub_command(name="reset_roles", description=Messages.group_reset_roles)
+    async def group_reset_roles(self, inter, name: str):
         group_repo.group_reset_roles(name)
-        await ctx.send("Done")
+        await inter.send("Done")
 
     @commands.check(utils.is_bot_admin_or_mod)
     @commands.slash_command(name="channel", guild_ids=[config.guild_id])

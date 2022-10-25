@@ -130,6 +130,15 @@ class Messages:
     role_migration_allert = "Přidání/Odebrání **{channel}** bude trvat déle než je obvyklé (až 30 min)." \
                             "Prosím o strpení. Opakované klikání na reakce nemá vliv na dobu zpracování přístupu."
 
+    group_add = "Přidá skupinu"
+    group_get = "Vypíše informace o skupině"
+    group_delete = "Smaže skupinu"
+    group_list = "Vypíše všechny skupiny"
+    group_add_channel_id = "Přidá místnost do skupiny"
+    group_add_role_id = "Přidá roli do skupiny"
+    group_reset_channels = "Resetuje kanály pro skupinu"
+    group_reset_roles = "Resetuje role pro skupinu"
+
     random_roll_brief = 'Vygeneruje náhodné celé číslo z intervalu <**first**, **second**>'
     random_flip_brief = 'Hodí mincí'
     random_pick_brief = 'Vybere jedno ze slov za otazníkem'
