@@ -96,8 +96,10 @@ def pagination_next(id: str, page: int, max_page: int, roll_around: bool = True)
 def is_bot_admin(ctx: Union[commands.Context, disnake.ApplicationCommandInteraction]):
     return ctx.author.id in config.admin_ids
 
+
 def is_bot_admin_or_mod(ctx: Union[commands.Context, disnake.ApplicationCommandInteraction]):
     return ctx.author.id in config.admin_ids or ctx.author.guild_permissions.administrator
+
 
 def is_in_modroom(ctx: Union[commands.Context, disnake.ApplicationCommandInteraction]):
     return ctx.channel.id == config.mod_room
