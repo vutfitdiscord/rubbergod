@@ -64,7 +64,7 @@ class Nameday(commands.Cog):
         name_day_sk = await self._name_day_sk()
         await inter.edit_original_message(name_day_sk)
 
-    @tasks.loop(time=time(0, 0, 1, tzinfo=local_tz))
+    @tasks.loop(time=time(7, 0, tzinfo=local_tz))
     async def send_names(self):
         name_day_cz = await self._name_day_cz()
         name_day_sk = await self._name_day_sk()
