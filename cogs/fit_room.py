@@ -21,7 +21,6 @@ class FitRoom(commands.Cog):
     async def room(
         self,
         inter,
-        *,
         room: str = commands.Param(description=Messages.fit_room_help)
     ):
         await inter.response.defer()
