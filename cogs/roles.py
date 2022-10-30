@@ -240,11 +240,12 @@ class Roles(commands.Cog):
             channel = disnake.utils.get(guild.channels, id=int(target))
             if not role:
                 role = disnake.utils.get(guild.roles, name=channel.name)
+                channel = None if role else channel
         # else if name of role / #channel
         else:
             target = target[1:] if target[0] == "#" else target
             role = disnake.utils.get(guild.roles, name=target)
-            channel = disnake.utils.get(guild.channels, name=target.lower())
+            channel = None if role else disnake.utils.get(guild.channels, name=target.lower())
 
         return [role], [channel]
 
