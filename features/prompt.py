@@ -5,8 +5,14 @@ import asyncio
 
 
 class PromptSession:
-    def __init__(self, bot: commands.Bot, inter, message: str, timeout=60,
-                 color=disnake.Color.orange()):
+    def __init__(
+        self,
+        bot: commands.Bot,
+        inter: disnake.ApplicationCommandInteraction,
+        message: str,
+        timeout=60,
+        color=disnake.Color.orange()
+    ):
         self.bot = bot
         self.inter = inter
 
