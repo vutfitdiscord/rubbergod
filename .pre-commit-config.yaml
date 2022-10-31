@@ -1,0 +1,7 @@
+repos:
+- repo: https://github.com/PyCQA/flake8
+  rev: 5.0.4
+  hooks:
+    - id: flake8
+      name: Flake8
+      description: This hook runs flake8 within our project's environment.
