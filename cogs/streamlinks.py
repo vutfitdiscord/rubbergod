@@ -27,81 +27,81 @@ class StreamLinks(commands.Cog):
         self.repo = StreamLinksRepo()
 
     @cooldowns.default_cooldown
-    @commands.group(
-        brief=Messages.streamlinks_brief,
-        usage="<subject>",
-        aliases=["streamlist", "steamlink", "streamlink", "steamlinks", "stream", "steam", "links", "sl"]
-    )
+    @commands.group(aliases=[
+        "streamlist", "steamlink", "streamlink", "steamlinks", "stream", "steam", "links", "sl"]
+        )
     async def streamlinks(self, ctx: commands.Context):
         if ctx.invoked_subcommand is None:
-            parameters = ctx.message.content.split()
-            if len(parameters) == 2:
-                await self.get_streamlinks(ctx, parameters[1])
-            else:
-                await ctx.reply(f"{utils.get_command_group_signature(ctx)}\n{ctx.command.brief}")
+            command_id = utils.get_command_id(self, "streamlinks")
+            await ctx.reply(utils.fill_message("moved_command", name="streamlinks", id=command_id))
 
-    async def get_streamlinks(self, ctx: commands.Context, subject: str):
+    @cooldowns.default_cooldown
+    @commands.slash_command(name="streamlinks", brief=Messages.streamlinks_brief)
+    async def _streamlinks(self, inter):
+        pass
+
+    @_streamlinks.sub_command(name="get", description=Messages.streamlinks_brief)
+    async def streamlinks_get(self, inter, subject: str):
+        await inter.response.defer()
+
         streamlinks = self.repo.get_streamlinks_of_subject(subject.lower())
 
         if len(streamlinks) == 0:
-            await ctx.reply(content=Messages.streamlinks_no_stream)
+            await inter.edit_original_message(content=Messages.streamlinks_no_stream)
             return
 
         embeds = []
         for idx, link in enumerate(streamlinks):
-            embeds.append(self.create_embed_of_link(link, ctx.author, len(streamlinks), idx+1))
-        view = EmbedView(ctx.author, embeds, timeout=180)
-        view.message = await ctx.reply(embed=embeds[0], view=view)
+            embeds.append(self.create_embed_of_link(link, inter.author, len(streamlinks), idx+1))
+        view = EmbedView(inter.author, embeds, timeout=180)
+        view.message = await inter.edit_original_message(embed=embeds[0], view=view)
 
     @commands.check(utils.helper_plus)
-    @streamlinks.command(brief=Messages.streamlinks_add_brief)
-    async def add(self, ctx: commands.Context, subject: str, link: str,
-                  user: Union[disnake.User, disnake.Member, str], *args):
+    @_streamlinks.sub_command(name="add", description=Messages.streamlinks_add_brief)
+    async def streamlinks_add(
+                self,
+                inter,
+                subject: str,
+                link: str,
+                description: str,
+                user: str = None,
+                date: str = None):
         try:
-            await ctx.message.add_reaction(config.emote_loading)
+            await inter.response.defer()
 
-            username = user if type(user) == str else user.display_name
             link = utils.clear_link_escape(link)
-            args = list(args)
 
             if self.repo.exists_link(link):
-                await self.replace_reaction(ctx, "❌")
-                await ctx.reply(utils.fill_message('streamlinks_add_link_exists', user=ctx.author.id))
+                await inter.edit_original_message(
+                    utils.fill_message('streamlinks_add_link_exists', user=inter.author.id)
+                )
                 return
 
             link_data = self.get_link_data(link)
             if link_data['upload_date'] is None:
                 try:
-                    if len(args) != 0:
-                        link_data['upload_date'] = datetime.strptime(args[0], '%Y-%m-%d')
-                        del args[0]
+                    if len(date) is not None:
+                        link_data['upload_date'] = datetime.strptime(date, '%Y-%m-%d')
                     else:
                         link_data['upload_date'] = datetime.utcnow()
                 except ValueError:
                     link_data['upload_date'] = datetime.utcnow()
             else:
-                if len(args) != 0 and utils.is_valid_datetime_format(args[0], '%Y-%m-%d'):
-                    link_data['upload_date'] = datetime.strptime(args[0], '%Y-%m-%d')
-                    del args[0]
+                if len(date) is not None and utils.is_valid_datetime_format(date, '%Y-%m-%d'):
+                    link_data['upload_date'] = datetime.strptime(date, '%Y-%m-%d')
 
-            if len(args) == 0:
-                await ctx.reply(utils.fill_message('streamlinks_missing_description'))
-                return
-
-            self.repo.create(subject.lower(), link, username,
-                             " ".join(args), link_data['image'], link_data['upload_date'])
-            await ctx.reply(content=Messages.streamlinks_add_success)
-            await self.replace_reaction(ctx, "✅")
-        except:  # noqa: E722
-            await self.replace_reaction(ctx, "❌")
+            self.repo.create(subject.lower(), link, user,
+                             description, link_data['image'], link_data['upload_date'])
+            await inter.edit_original_message(content=Messages.streamlinks_add_success)
+        except: # noqa E722
             raise
 
-    @streamlinks.command(brief=Messages.streamlinks_list_brief)
-    async def list(self, ctx: commands.Context, subject: str):
+    @_streamlinks.sub_command(name="list", description=Messages.streamlinks_list_brief)
+    async def streamlinks_list(self, inter, subject: str):
         streamlinks: List[StreamLink] = self.repo.get_streamlinks_of_subject(subject.lower())
 
         if len(streamlinks) == 0:
-            await ctx.reply(content=Messages.streamlinks_no_stream)
+            await inter.send(content=Messages.streamlinks_no_stream)
             return
 
         messages = []
@@ -109,7 +109,7 @@ class StreamLinks(commands.Cog):
             at = stream.created_at.strftime("%d. %m. %Y")
             messages.append(f"**{stream.member_name}** ({at}): <{stream.link}> - {stream.description}\n")
 
-        await send_list_of_messages(ctx, messages)
+        await send_list_of_messages(inter, messages)
 
     async def log(self, stream, user):
         embed = disnake.Embed(title="Odkaz na stream byl smazán", color=0xEEE657)
@@ -123,22 +123,23 @@ class StreamLinks(commands.Cog):
         await channel.send(embed=embed)
 
     @commands.check(utils.helper_plus)
-    @streamlinks.command(brief=Messages.streamlinks_remove_brief)
-    async def remove(self, ctx: commands.Context, id: int):
+    @_streamlinks.sub_command(name="remove", description=Messages.streamlinks_remove_brief)
+    async def streamlinks_remove(self, inter, id: int):
+        await inter.response.defer()
         if not self.repo.exists(id):
-            await ctx.reply(Messages.streamlinks_not_exists)
+            await inter.edit_original_message(Messages.streamlinks_not_exists)
             return
 
         stream = self.repo.get_stream_by_id(id)
         link = stream.link
 
         prompt_message = utils.fill_message('streamlinks_remove_prompt', link=link)
-        result = await PromptSession(self.bot, ctx, prompt_message, 60).run()
+        result = await PromptSession(self.bot, inter, prompt_message, 60).run()
 
         if result:
-            await self.log(stream, ctx.author)
+            await self.log(stream, inter.author)
             self.repo.remove(id)
-            await ctx.reply(utils.fill_message('streamlinks_remove_success', link=link))
+            await inter.channel.send(utils.fill_message('streamlinks_remove_success', link=link))
 
     def get_link_data(self, link: str):
         """
@@ -184,13 +185,6 @@ class StreamLinks(commands.Cog):
 
         return data
 
-    async def replace_reaction(self, ctx: commands.Context, emoji: str):
-        try:
-            await ctx.message.clear_reactions()
-            await ctx.message.add_reaction(emoji)
-        except disnake.HTTPException:
-            pass
-
     def create_embed_of_link(self, streamlink: StreamLink, author: Union[disnake.User, disnake.Member],
                              links_count: int, current_pos: int) -> disnake.Embed:
         embed = disnake.Embed(color=0xEEE657)
@@ -210,21 +204,6 @@ class StreamLinks(commands.Cog):
                                 f" (#{streamlink.id})"])
 
         return embed
-
-    @add.error
-    async def streamlinks_add_error(self, ctx: commands.Context, error):
-        if isinstance(error, disnake.ext.commands.MissingRequiredArgument):
-            await ctx.reply(Messages.streamlinks_add_format)
-
-    @remove.error
-    async def streamlinks_remove_error(self, ctx: commands.Context, error):
-        if isinstance(error, disnake.ext.commands.MissingRequiredArgument):
-            await ctx.reply(Messages.streamlinks_remove_format)
-
-    @list.error
-    async def streamlinks_list_error(self, ctx: commands.Context, error):
-        if isinstance(error, disnake.ext.commands.MissingRequiredArgument):
-            await ctx.reply(f"{Messages.streamlinks_list_format}\n{ctx.command.brief}")
 
 
 def setup(bot):
