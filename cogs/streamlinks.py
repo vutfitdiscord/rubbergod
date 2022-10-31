@@ -37,11 +37,11 @@ class StreamLinks(commands.Cog):
 
     @cooldowns.default_cooldown
     @commands.slash_command(name="streamlinks", brief=Messages.streamlinks_brief)
-    async def _streamlinks(self, inter):
+    async def _streamlinks(self, inter: disnake.ApplicationCommandInteraction):
         pass
 
     @_streamlinks.sub_command(name="get", description=Messages.streamlinks_brief)
-    async def streamlinks_get(self, inter, subject: str):
+    async def streamlinks_get(self, inter: disnake.ApplicationCommandInteraction, subject: str):
         await inter.response.defer()
 
         streamlinks = self.repo.get_streamlinks_of_subject(subject.lower())
@@ -60,11 +60,11 @@ class StreamLinks(commands.Cog):
     @_streamlinks.sub_command(name="add", description=Messages.streamlinks_add_brief)
     async def streamlinks_add(
                 self,
-                inter,
+                inter: disnake.ApplicationCommandInteraction,
                 subject: str,
                 link: str,
+                user: str,
                 description: str,
-                user: str = None,
                 date: str = None):
         try:
             await inter.response.defer()
@@ -97,7 +97,7 @@ class StreamLinks(commands.Cog):
             raise
 
     @_streamlinks.sub_command(name="list", description=Messages.streamlinks_list_brief)
-    async def streamlinks_list(self, inter, subject: str):
+    async def streamlinks_list(self, inter: disnake.ApplicationCommandInteraction, subject: str):
         streamlinks: List[StreamLink] = self.repo.get_streamlinks_of_subject(subject.lower())
 
         if len(streamlinks) == 0:
@@ -124,7 +124,7 @@ class StreamLinks(commands.Cog):
 
     @commands.check(utils.helper_plus)
     @_streamlinks.sub_command(name="remove", description=Messages.streamlinks_remove_brief)
-    async def streamlinks_remove(self, inter, id: int):
+    async def streamlinks_remove(self, inter: disnake.ApplicationCommandInteraction, id: int):
         await inter.response.defer()
         if not self.repo.exists(id):
             await inter.edit_original_message(Messages.streamlinks_not_exists)
