@@ -5,10 +5,10 @@ import asyncio
 
 
 class PromptSession:
-    def __init__(self, bot: commands.Bot, ctx: commands.Context, message: str, timeout=60,
+    def __init__(self, bot: commands.Bot, inter, message: str, timeout=60,
                  color=disnake.Color.orange()):
         self.bot = bot
-        self.ctx = ctx
+        self.inter = inter
 
         self.message = message
         self.color = color
@@ -32,7 +32,8 @@ class PromptSession:
         em.description = self.message
 
         self.__running = True
-        self.__prompt_instance = await self.ctx.send(embed=em)
+        await self.inter.send(embed=em)
+        self.__prompt_instance = await self.inter.original_message()
 
         for react in self.reactions.keys():
             await self.__prompt_instance.add_reaction(react)
@@ -42,7 +43,7 @@ class PromptSession:
     def __react_check(self, reaction, user):
         if reaction.message.id != self.__prompt_instance.id:
             return False  # not the same message
-        if user.id != self.ctx.author.id:
+        if user.id != self.inter.author.id:
             return False  # not the same user
         if reaction.emoji in self.reactions.keys():
             return True  # reaction was one of the pagination emojis
@@ -53,8 +54,10 @@ class PromptSession:
 
         try:
             # waits for reaction using react_check
-            reaction, user = await self.ctx.bot.wait_for('reaction_add', check=self.__react_check,
-                                                         timeout=self.timeout)
+            reaction, user = await self.inter.bot.wait_for(
+                'reaction_add',
+                check=self.__react_check,
+                timeout=self.timeout)
         except asyncio.TimeoutError:
             try:
                 await self.__close()

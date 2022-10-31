@@ -45,4 +45,5 @@ class StreamLinksRepo(BaseRepository):
                     )
 
     def remove(self, id: int):
-        return session.query(StreamLink).filter(StreamLink.id == id).delete()
+        session.query(StreamLink).filter(StreamLink.id == id).delete()
+        session.commit()
