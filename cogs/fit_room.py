@@ -8,9 +8,6 @@ import utils
 from config import cooldowns
 from config.messages import Messages
 
-kachnicka_path = "/img/su/logo-kachnicka-mapa.png"
-kachnicka_url = "https://www.fit.vut.cz/img/su/logo-kachnicka-mapa.png"
-
 
 class FitRoom(commands.Cog):
     def __init__(self, bot):
@@ -45,12 +42,12 @@ class FitRoom(commands.Cog):
                 )
 
         image_bytes = BytesIO()
-        image_bytestring = str(image).replace(kachnicka_path, kachnicka_url).encode("utf-8")
+        image_bytestring = str(image).replace("/img", "https://www.fit.vut.cz/img").encode("utf-8")
         svg2png(bytestring=image_bytestring, write_to=image_bytes, parent_width=720,
                 parent_height=1000, background_color="white", dpi=300)
         image_bytes.seek(0)
 
-        embed = disnake.Embed(title=f"Místnost: {room}", color=disnake.Color.dark_blue())
+        embed = disnake.Embed(title=f"Místnost: {room.upper()}", color=disnake.Color.dark_blue())
         embed.set_image(url="attachment://plan.png")
         embed.description = f"[Odkaz na plánek]({url})"
         utils.add_author_footer(embed, inter.author, additional_text=[str(active_floor.text)])
