@@ -21,10 +21,12 @@ You will also need to enable `SERVER MEMBERS INTENT` in `Bot` tab.
 ## Installing and running the bot
 
 Prerequisites:
+
 * Postgresql
 * Python3.8+
 
 Start by cloning the repo:
+
 ```bash
 git clone https://github.com/toaster192/rubbergod.git
 cd rubbergod
@@ -37,31 +39,33 @@ and run `docker` (`systemctl start docker.service`)
 
 To run docker user needs to be in `docker` group. (eg. `sudo usermod -aG docker $USER`).
 
-```
+```bash
 docker build .
 ```
 
 and then everytime you want to run the app
 
-```
+```bash
 docker-compose down && docker-compose up --build
 ```
 
 ## Local setup (not recommended)
 
 Install the required python modules (`venv` / `--user` flag recommended):
+
 ```bash
 pip3 install -r requirements.txt
 ```
 
 Run the bot (might want to use `nohup` or something):
+
 ```bash
 python3 rubbergod.py
 ```
 
-#### Required/recommended packages (apt)
+### Required/recommended packages (apt)
 
-```
+```bash
 git
 python3.8
 python3.8-dev
@@ -71,9 +75,14 @@ postgresql-contrib
 libpq-dev
 ```
 
-## Auto help generation
+## Pre-commit (useful for dev)
 
-We are using custom auto help function for our commands. Help is generated from command brief (used in help summary) and command description (used in command help). If group of commands is working without invoked subcommand, command usage should be specified to include in help function. (e.g. karma, reviews)
+We have setup pre-commit in this repository. To use it use these commands:
+
+```bash
+pip install -r requirements-dev.txt
+pre-commit install
+```
 
 ## Authors
 
@@ -84,6 +93,7 @@ We are using custom auto help function for our commands. Help is generated from 
 * [Urumasi](https://github.com/Urumasi)
 * [Leo](https://github.com/ondryaso)
 * [sinus-x](https://github.com/sinus-x)
+* [Solumath](https://github.com/solumath)
 
 **Pull requests, issues or tips for new features are very much welcome!**
 
