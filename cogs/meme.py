@@ -54,9 +54,9 @@ class Meme(commands.Cog):
                 file=disnake.File(f"images/{image}", filename=image),
             )
 
-    @commands.command(brief=Messages.uhoh_brief)
-    async def uhoh(self, ctx):
-        await ctx.send(utils.fill_message("uhoh_counter", uhohs=uhoh_counter))
+    @commands.slash_command(name="uhoh", description=Messages.uhoh_brief)
+    async def uhoh(self, inter):
+        await inter.send(utils.fill_message("uhoh_counter", uhohs=uhoh_counter))
 
     @cooldowns.short_cooldown
     @commands.command(name="??", brief="???")
@@ -64,46 +64,43 @@ class Meme(commands.Cog):
         await ctx.send(choice(Messages.question))
 
     @cooldowns.short_cooldown
-    @commands.command(brief=Messages.bonk_brief)
-    async def bonk(self, ctx, member: disnake.Member = None):
+    @commands.slash_command(name="bonk", description=Messages.bonk_brief)
+    async def bonk(self, inter, user: disnake.User = None):
         """Bonk someone
-        member: disnake user. If none, the bot will bonk you.
+        user: disnake.User. If none, the bot will bonk you.
         """
-        if member is None:
-            bonked = ctx.author
+        await inter.response.defer()
+        if user is None:
+            bonked = inter.author
         else:
-            bonked = member
+            bonked = user
 
-        async with ctx.typing():
-            if not bonked.avatar:
-                url = bonked.display_avatar.with_format("png")
-            else:
-                url = bonked.display_avatar.with_format("jpg")
-            response = requests.get(url)
-            avatar = Image.open(BytesIO(response.content))
+        if not bonked.avatar:
+            url = bonked.display_avatar.with_format("png")
+        else:
+            url = bonked.display_avatar.with_format("jpg")
+        response = requests.get(url)
+        avatar = Image.open(BytesIO(response.content))
 
-            if not bonked.avatar:
-                avatar = avatar.convert('RGB')
+        if not bonked.avatar:
+            avatar = avatar.convert('RGB')
 
-            frames = self.get_bonk_frames(avatar)
+        frames = self.get_bonk_frames(avatar)
 
-            with BytesIO() as image_binary:
-                frames[0].save(
-                    image_binary,
-                    format="GIF",
-                    save_all=True,
-                    append_images=frames[1:],
-                    duration=30,
-                    loop=0,
-                    transparency=0,
-                    disposal=2,
-                    optimize=False,
-                )
-                image_binary.seek(0)
-                await ctx.reply(
-                    file=disnake.File(fp=image_binary, filename="bonk.gif"),
-                    mention_author=False,
-                )
+        with BytesIO() as image_binary:
+            frames[0].save(
+                image_binary,
+                format="GIF",
+                save_all=True,
+                append_images=frames[1:],
+                duration=30,
+                loop=0,
+                transparency=0,
+                disposal=2,
+                optimize=False,
+            )
+            image_binary.seek(0)
+            await inter.send(file=disnake.File(fp=image_binary, filename="bonk.gif"))
 
     def get_bonk_frames(self, avatar: Image.Image) -> List[Image.Image]:
         """Get frames for the bonk"""
@@ -125,11 +122,6 @@ class Meme(commands.Cog):
             frames.append(frame)
 
         return frames
-
-    @bonk.error
-    async def bonk_error(self, ctx, error):
-        if isinstance(error, commands.BadArgument):
-            await ctx.send(utils.fill_message("member_not_found", user=ctx.author.id))
 
 
 def setup(bot):

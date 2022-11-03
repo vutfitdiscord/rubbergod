@@ -18,7 +18,7 @@ class FitRoom(commands.Cog):
     async def room(
         self,
         inter,
-        room: str = commands.Param(description=Messages.fit_room_help)
+        room: str
     ):
         await inter.response.defer()
         url = f"https://www.fit.vut.cz/fit/map/.cs?show={room.upper()}&big=1"
