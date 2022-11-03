@@ -17,8 +17,8 @@ class Base(commands.Cog):
         self.error_log = ErrorLogger()
 
     @cooldowns.default_cooldown
-    @commands.command(brief=Messages.uptime_brief)
-    async def uptime(self, ctx):
+    @commands.slash_command(name="uptime", description=Messages.uptime_brief)
+    async def uptime(self, inter: disnake.ApplicationCommandInteraction):
         now = datetime.datetime.now().replace(microsecond=0)
         delta = now - boottime
         count = self.error_log.log_error_date(set=False)
@@ -30,7 +30,7 @@ class Base(commands.Cog):
         embed.add_field(name=Messages.upsince_title, value=str(boottime))
         embed.add_field(name=Messages.uptime_title, value=str(delta))
         self.error_log.set_image(embed, self.bot.user, count)
-        await ctx.send(embed=embed)
+        await inter.send(embed=embed)
 
 
 def setup(bot):

@@ -59,13 +59,14 @@ class StreamLinks(commands.Cog):
     @commands.check(utils.helper_plus)
     @_streamlinks.sub_command(name="add", description=Messages.streamlinks_add_brief)
     async def streamlinks_add(
-                self,
-                inter: disnake.ApplicationCommandInteraction,
-                subject: str,
-                link: str,
-                user: str,
-                description: str,
-                date: str = None):
+        self,
+        inter: disnake.ApplicationCommandInteraction,
+        subject: str,
+        link: str,
+        user: str,
+        description: str,
+        date: str = None
+    ):
         try:
             await inter.response.defer()
 
@@ -124,7 +125,12 @@ class StreamLinks(commands.Cog):
 
     @commands.check(utils.helper_plus)
     @_streamlinks.sub_command(name="remove", description=Messages.streamlinks_remove_brief)
-    async def streamlinks_remove(self, inter: disnake.ApplicationCommandInteraction, id: int):
+    async def streamlinks_remove(
+        self,
+        inter: disnake.ApplicationCommandInteraction,
+        id: int = commands.Param(description=Messages.streamlinks_remove_ID)
+    ):
+
         await inter.response.defer()
         if not self.repo.exists(id):
             await inter.edit_original_message(Messages.streamlinks_not_exists)

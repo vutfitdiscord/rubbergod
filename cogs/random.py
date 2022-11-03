@@ -4,9 +4,8 @@ import disnake
 from disnake.ext import commands
 
 from config import cooldowns
-from config.app_config import config
 from config.messages import Messages
-import utils
+import shlex
 
 
 class Random(commands.Cog):
@@ -14,20 +13,17 @@ class Random(commands.Cog):
         self.bot = bot
 
     @cooldowns.short_cooldown
-    @commands.command(brief=Messages.random_pick_brief, usage=Messages.random_pick_usage)
-    async def pick(self, ctx, *args):
+    @commands.slash_command(name="pick", description=Messages.random_pick_brief)
+    async def pick(
+        self,
+        inter: disnake.ApplicationCommandInteraction,
+        args: str = commands.Param(max_length=1900)
+    ):
         """"Pick an option"""
-        for i, arg in enumerate(args):
-            if "?" in arg:
-                args = args[i + 1:]
-                break
-        if not len(args):
-            await ctx.send(utils.get_command_signature(ctx))
-            return
+        args = shlex.split(args)
 
         option = disnake.utils.escape_mentions(random.choice(args))
-        if option:
-            await ctx.send(f"{option[:1900]} {ctx.author.mention}")
+        await inter.send(f"{option} {inter.author.mention}")
 
     @cooldowns.short_cooldown
     @commands.slash_command(name="flip", description=Messages.random_flip_brief)
@@ -42,34 +38,6 @@ class Random(commands.Cog):
 
         option = str(random.randint(first, second))
         await inter.response.send_message(option)
-
-    @pick.error
-    @roll.error
-    @flip.error
-    async def command_error(self, ctx, error):
-        if isinstance(error, (commands.MissingRequiredArgument, commands.BadArgument)):
-            await ctx.send(utils.get_command_signature(ctx))
-        if isinstance(error, commands.CheckFailure):
-            await ctx.message.channel.send(
-                utils.fill_message("bot_room_redirect", user=ctx.message.author.id, bot_room=config.bot_room)
-            )
-
-    def _channel_id(self, ctx):
-        return ctx.channel.parent_id if type(ctx.channel) == disnake.Thread else ctx.channel.id
-
-    async def cog_after_invoke(self, ctx):
-        channel_id = self._channel_id(ctx)
-        if channel_id not in config.allowed_channels:
-            await ctx.message.channel.send(
-                utils.fill_message("bot_room_redirect", user=ctx.message.author.id, bot_room=config.bot_room)
-            )
-
-    async def cog_check(self, ctx):
-        if not config.enable_room_check:
-            return True
-        if not ctx.guild:
-            return True
-        return self._channel_id(ctx) in config.allowed_channels
 
 
 def setup(bot):

@@ -5,7 +5,6 @@ class Messages:
     prefix = config.default_prefix
 
     server_warning = "Tohle funguje jen na VUT FIT serveru."
-    input_too_long = "Vstup obsahuje příliš mnoho znaků"
 
     help_title = "Nápověda"
     help_description = "Kompletní seznam lze také najít ve veřejné administraci bota (https://public.grillbot.cloud/)"
@@ -43,6 +42,7 @@ class Messages:
     covid_storno = "{user} <:WeirdChamp:680711174802899007>"
     uhoh_counter = "{uhohs} uh ohs od spuštění."
     uhoh_brief = "Vypíše počet uh ohs od spuštění"
+    uhoh = "uh oh"
 
     uptime_brief = "Vypíše čas spuštění a čas uplynulý od spuštění"
     uptime_title = "Uptime"
@@ -142,13 +142,11 @@ class Messages:
     random_roll_brief = 'Vygeneruje náhodné celé číslo z intervalu <**first**, **second**>'
     random_flip_brief = 'Hodí mincí'
     random_pick_brief = 'Vybere jedno ze slov za otazníkem'
-    random_pick_usage = '*Is foo bar? Yes No Maybe*'
 
     rng_generator_format = f"Použití: `{prefix}roll x [y]`\n" \
                            "rozmezí x, y jsou celá čísla,\n" \
                            "pokud y není specifikováno, " \
                            "je považováno za 0."
-    rng_generator_format_number = "{user}, zadej dvě celá čísla, **integers**."
 
     verify_brief = "Ověření studenta pro přístup na server."
     verify_login_parameter = "Přihlašovací FIT login (nebo MUNI UČO). FIT login ve formátu `xlogin00`"
@@ -259,7 +257,6 @@ class Messages:
     tierboard_missing_year = f"Nezadal jsi ročník a nemáš školní roli"
 
     pr_meme = "https://github.com/Toaster192/rubbergod/pulls"
-    uhoh = "uh oh"
     question = ["<:what:638277508541710337>",
                 "<:wuuut:484470874003472394>",
                 "nech mě <:sadcat:576171980118687754>"]
@@ -353,20 +350,12 @@ class Messages:
     streamlinks_add_brief = "Zapíše nový stream k předmětu"
     streamlinks_add_link_exists = "Tento stream již existuje."
     streamlinks_add_success = "Stream byl úspěšně vytvořen <:HYPERS:493154327318233088>"
-    streamlinks_add_format = f"`{prefix}streamlinks add [zkratka předmětu] [link] [Kdo (Jméno, nebo Tag)] [Datum nahrání(Volitelně)] [Popis]`\n\n"\
-        "Datum nahrání se bere následovně. Nejdříve se pokusí získat automaticky ze služby, odkud odkaz pochází (youtube, ...), "\
-        "pokud ze služby, kde je video nahráno nepůjde získat datum, tak bot zjistí, zda nebyl zadán jako volitelný parametr před popisem. "\
-        "Datum se zadává ve formátu `{Rok}-{Měsíc}-{Den}`. Pokud ani tam nebude zadán datum, tak se jako datum nahrání bere aktuální datum.\n\n"\
-        f"Příklad volání:\n`{prefix}streamlinks add izp https://youtu.be/randomlink Rubbergod Ten nejlepší stream ever kappa.`"
-    streamlinks_unsupported_embed = "Tento seznam již není podporován. Zavolej znovu příkaz pro aktualizaci."
     streamlinks_not_actual = "Tento seznam již není aktuální. Zavolej znovu příkaz pro aktualizaci."
-    streamlinks_missing_original = "Originální zpráva s příkazem byla smazána. Zavolej znovu příkaz a nemaž originální zprávu."
     streamlinks_list_brief = "Vypíše zjednodušený seznam všech streamů k daném předmětu."
-    streamlinks_list_format = f"`{prefix}streamlinks list [zkratka předmětu]`"
     streamlinks_no_stream = "K tomuto předmětu ještě neexistuje žádný stream."
     streamlinks_missing_description = "Nebyl zadán popis linku."
     streamlinks_remove_brief = "Smazání streamu z předmětu."
-    streamlinks_remove_format = f"`{prefix}streamlinks remove [id]`\n\nID se nachází v patičce embedu. Na konci v textu v závorce, kde je # (Jen to číslo je ID)."
+    streamlinks_remove_ID = "ID se nachází v patičce embedu. Na konci v textu v závorce, kde je # (Jen to číslo je ID)."
     streamlinks_not_exists = "Stream s tímto ID nebyl nalezen."
     streamlinks_remove_prompt = "Opravdu chceš tento stream odstranit ({link})?"
     streamlinks_remove_success = "Stream <{link}> byl úspěšně smazán."
@@ -398,7 +387,6 @@ class Messages:
     studijni_title = "C109 Studijní oddělení"
 
     fit_room_brief = "Zobrazení místnosti na plánku fakulty."
-    fit_room_help = f"{prefix}room <místnost>"
     fit_room_unreach = "Stránka s plánkem je nedostupná."
     fit_room_parsing_failed = "Načtení stránky s plánkem se nezdařilo. Nahlaš prosím tuto chybu správci bota."
     fit_room_room_not_on_plan = "Zadaná místnost {room} není na plánku nebo neexistuje."
