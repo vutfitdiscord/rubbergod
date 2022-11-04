@@ -81,14 +81,14 @@ class StreamLinks(commands.Cog):
             link_data = self.get_link_data(link)
             if link_data['upload_date'] is None:
                 try:
-                    if len(date) is not None:
+                    if date is not None:
                         link_data['upload_date'] = datetime.strptime(date, '%Y-%m-%d')
                     else:
                         link_data['upload_date'] = datetime.utcnow()
                 except ValueError:
                     link_data['upload_date'] = datetime.utcnow()
             else:
-                if len(date) is not None and utils.is_valid_datetime_format(date, '%Y-%m-%d'):
+                if date is not None and utils.is_valid_datetime_format(date, '%Y-%m-%d'):
                     link_data['upload_date'] = datetime.strptime(date, '%Y-%m-%d')
 
             self.repo.create(subject.lower(), link, user,
