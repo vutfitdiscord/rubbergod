@@ -46,7 +46,7 @@ class Karma(commands.Cog):
         # reeval karma message
         elif (
             ctx.message.embeds
-            and ctx.message.embeds[0].title is not disnake.Embed.Empty
+            and ctx.message.embeds[0].title is not None
             and ctx.message.embeds[0].title == "Karma zprávy"
             and ctx.emoji == "🔁"
         ):
