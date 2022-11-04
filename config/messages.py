@@ -139,9 +139,10 @@ class Messages:
     group_reset_channels = "Resetuje kanály pro skupinu"
     group_reset_roles = "Resetuje role pro skupinu"
 
-    random_roll_brief = 'Vygeneruje náhodné celé číslo z intervalu <**first**, **second**>'
-    random_flip_brief = 'Hodí mincí'
-    random_pick_brief = 'Vybere jedno ze slov za otazníkem'
+    random_roll_brief = "Vygeneruje náhodné celé číslo z intervalu <**first**, **second**>"
+    random_flip_brief = "Hodí mincí"
+    random_pick_brief = "Vybere jedno ze slov za otazníkem."
+    random_pick_format = "*Is foo bar? Yes No Maybe*"
 
     rng_generator_format = f"Použití: `{prefix}roll x [y]`\n" \
                            "rozmezí x, y jsou celá čísla,\n" \
@@ -359,6 +360,7 @@ class Messages:
     streamlinks_not_exists = "Stream s tímto ID nebyl nalezen."
     streamlinks_remove_prompt = "Opravdu chceš tento stream odstranit ({link})?"
     streamlinks_remove_success = "Stream <{link}> byl úspěšně smazán."
+    streamlinks_date_format = "Formát `dd.mm.yyyy`. Bez zadání se bere datum u videa případně dnešní datum."
 
     latex_help = f"Příklad:\n`{prefix}latex x^n + y^n = z^n`"
     latex_desc = "Vykreslí LaTeX výraz"
