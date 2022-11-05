@@ -20,11 +20,19 @@ from buttons.embed import EmbedView
 # Pattern: "AnyText | [Subject] Page: CurrentPage / {TotalPages}"
 pagination_regex = re.compile(r'^\[([^\]]*)\]\s*Page:\s*(\d*)\s*\/\s*(\d*)')
 
+subjects = []
+
+
+async def autocomp_subjects(inter: disnake.ApplicationCommandInteraction, user_input: str):
+    return [subject[0] for subject in subjects if user_input.lower() in subject[0]][:25]
+
 
 class StreamLinks(commands.Cog):
     def __init__(self, bot):
+        global subjects
         self.bot = bot
         self.repo = StreamLinksRepo()
+        subjects = self.repo.get_subjects_with_stream()
 
     @cooldowns.default_cooldown
     @commands.group(aliases=[
@@ -41,7 +49,11 @@ class StreamLinks(commands.Cog):
         pass
 
     @_streamlinks.sub_command(name="get", description=Messages.streamlinks_brief)
-    async def streamlinks_get(self, inter: disnake.ApplicationCommandInteraction, subject: str):
+    async def streamlinks_get(
+        self,
+        inter: disnake.ApplicationCommandInteraction,
+        subject: str = commands.Param(autocomplete=autocomp_subjects)
+    ):
         await inter.response.defer()
 
         streamlinks = self.repo.get_streamlinks_of_subject(subject.lower())
@@ -61,8 +73,8 @@ class StreamLinks(commands.Cog):
     async def streamlinks_add(
         self,
         inter: disnake.ApplicationCommandInteraction,
-        subject: str,
         link: str,
+        subject: str,
         user: str,
         description: str,
         date: str = commands.Param(default=None, description=Messages.streamlinks_date_format)
@@ -94,7 +106,11 @@ class StreamLinks(commands.Cog):
         await inter.edit_original_message(content=Messages.streamlinks_add_success)
 
     @_streamlinks.sub_command(name="list", description=Messages.streamlinks_list_brief)
-    async def streamlinks_list(self, inter: disnake.ApplicationCommandInteraction, subject: str):
+    async def streamlinks_list(
+        self,
+        inter: disnake.ApplicationCommandInteraction,
+        subject: str = commands.Param(autocomplete=autocomp_subjects)
+    ):
         streamlinks: List[StreamLink] = self.repo.get_streamlinks_of_subject(subject.lower())
 
         if len(streamlinks) == 0:

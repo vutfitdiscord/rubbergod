@@ -47,3 +47,6 @@ class StreamLinksRepo(BaseRepository):
     def remove(self, id: int):
         session.query(StreamLink).filter(StreamLink.id == id).delete()
         session.commit()
+
+    def get_subjects_with_stream(self):
+        return session.query(StreamLink.subject).distinct().all()
