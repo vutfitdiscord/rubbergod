@@ -362,8 +362,16 @@ class Messages:
     streamlinks_remove_success = "Stream <{link}> byl úspěšně smazán."
     streamlinks_date_format = "Formát `dd.mm.yyyy`. Bez zadání se bere datum u videa případně dnešní datum."
 
-    latex_help = f"Příklad:\n`{prefix}latex x^n + y^n = z^n`"
+    latex_help = f"Příklad:\n`{prefix}latex [?fg=blue] x^n + y^n = z^n`"
     latex_desc = "Vykreslí LaTeX výraz"
+    latex_colors = """**Možné barvy textu:**
+    Transparent White Black Blue Cyan Green Magenta Red Yellow Orange Maroon NavyBlue RoyalBlue
+    ProcessBlue SkyBlue Turquoise TealBlue Aquamarine BlueGreen Sepia Brown Tan Gray Fuchsia
+    Lavender Purple Plum Violet GreenYellow Goldenrod Dandelion Apricot Peach Melon YellowOrange
+    BurntOrange Bittersweet RedOrange Mahogany BrickRed OrangeRed RubineRed WildStrawberry Salmon
+    CarnationPink VioletRed Rhodamine Mulberry RedViolet Thistle Orchid DarkOrchid RoyalPurple BlueViolet
+    Periwinkle CadetBlue CornflowerBlue MidnightBlue Cerulean Emerald JungleGreen SeaGreen ForestGreen
+    PineGreen LimeGreen YellowGreen SpringGreen OliveGreen RawSienna"""
 
     bonk_brief = "Bonk na uživatele"
     unsupported_image = "Tento avatar aktuálne není podporovaný <:sadcat:576171980118687754>"
