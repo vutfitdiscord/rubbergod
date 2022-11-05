@@ -337,8 +337,11 @@ def get_command_id(self, name):
     return command.id
 
 
-async def get_user_from_tag(self, tag):
-    user_id = re.findall(r'\d+', tag)[0]
-    user = await self.bot.get_or_fetch_user(user_id)
-    user = user.name
-    return user
+async def get_username_from_tag(self, tag):
+    """get user name from tag, return list of name(s)"""
+    user_names = []
+    user_ids = re.findall(r'\d+', tag)
+    for user in user_ids:
+        user = await self.bot.get_or_fetch_user(int(user))
+        user_names.append(user.name)
+    return user_names
