@@ -5,21 +5,29 @@ from disnake.ext import commands
 import io
 import urllib
 
-from config import messages, cooldowns
-
-messages = messages.Messages
+from config import cooldowns
+from config.messages import Messages
 
 PNG_HEADER = b'\x89PNG\r\n\x1a\n'
 
 
 class Latex(commands.Cog):
     @cooldowns.default_cooldown
-    @commands.command(brief=messages.latex_desc, description=messages.latex_help)
-    async def latex(self, ctx, *, equation):
+    @commands.command(brief=Messages.latex_desc, description=Messages.latex_help)
+    async def latex(self, ctx, *args):
+        foreground = "White"
+
+        if len(args) < 1:
+            return await ctx.send(f"{Messages.latex_help}\n{Messages.latex_colors}")
+        if "?fg=" in args[0]:
+            foreground = args[0][4:]
+            args = args[1:]
+
+        eq = " ".join(args)
         channel = ctx.channel
         async with ctx.typing():
-            eq = urllib.parse.quote(equation)
-            imgURL = f"http://www.sciweavers.org/tex2img.php?eq={eq}&fc=White&im=png&fs=25&edit=0"
+            eq = urllib.parse.quote(eq)
+            imgURL = f"http://www.sciweavers.org/tex2img.php?eq={eq}&fc={foreground}&im=png&fs=25&edit=0"
 
             async with aiohttp.ClientSession(timeout=aiohttp.ClientTimeout(total=10)) as session:
                 try:
