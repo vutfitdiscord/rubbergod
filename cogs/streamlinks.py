@@ -79,7 +79,8 @@ class StreamLinks(commands.Cog):
 
         # str is discord tag so fetch user and get his name
         if "@" in user:
-            user = await utils.get_user_from_tag(self, user)
+            user = await utils.get_username_from_tag(self, user)
+            user = " & ".join(user)
 
         link_data = self.get_link_data(link)
         if date is not None:
@@ -100,7 +101,7 @@ class StreamLinks(commands.Cog):
             await inter.send(content=Messages.streamlinks_no_stream)
             return
 
-        messages = []
+        messages = [f"Streamy k **{subject.upper()}**:"]
         for stream in streamlinks:
             at = stream.created_at.strftime("%d. %m. %Y")
             messages.append(f"**{stream.member_name}** ({at}): <{stream.link}> - {stream.description}\n")
