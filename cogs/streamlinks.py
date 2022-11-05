@@ -65,37 +65,32 @@ class StreamLinks(commands.Cog):
         link: str,
         user: str,
         description: str,
-        date: str = None
+        date: str = commands.Param(default=None, description=Messages.streamlinks_date_format)
     ):
-        try:
-            await inter.response.defer()
+        await inter.response.defer()
 
-            link = utils.clear_link_escape(link)
+        link = utils.clear_link_escape(link)
 
-            if self.repo.exists_link(link):
-                await inter.edit_original_message(
-                    utils.fill_message('streamlinks_add_link_exists', user=inter.author.id)
-                )
-                return
+        if self.repo.exists_link(link):
+            await inter.edit_original_message(
+                utils.fill_message('streamlinks_add_link_exists', user=inter.author.id)
+            )
+            return
 
-            link_data = self.get_link_data(link)
+        # str is discord tag so fetch user and get his name
+        if "@" in user:
+            user = await utils.get_user_from_tag(self, user)
+
+        link_data = self.get_link_data(link)
+        if date is not None:
+            link_data['upload_date'] = datetime.strptime(date, '%d.%m.%Y')
+        else:
             if link_data['upload_date'] is None:
-                try:
-                    if date is not None:
-                        link_data['upload_date'] = datetime.strptime(date, '%Y-%m-%d')
-                    else:
-                        link_data['upload_date'] = datetime.utcnow()
-                except ValueError:
-                    link_data['upload_date'] = datetime.utcnow()
-            else:
-                if date is not None and utils.is_valid_datetime_format(date, '%Y-%m-%d'):
-                    link_data['upload_date'] = datetime.strptime(date, '%Y-%m-%d')
+                link_data['upload_date'] = datetime.utcnow()
 
-            self.repo.create(subject.lower(), link, user,
-                             description, link_data['image'], link_data['upload_date'])
-            await inter.edit_original_message(content=Messages.streamlinks_add_success)
-        except: # noqa E722
-            raise
+        self.repo.create(subject.lower(), link, user,
+                         description, link_data['image'], link_data['upload_date'])
+        await inter.edit_original_message(content=Messages.streamlinks_add_success)
 
     @_streamlinks.sub_command(name="list", description=Messages.streamlinks_list_brief)
     async def streamlinks_list(self, inter: disnake.ApplicationCommandInteraction, subject: str):
