@@ -335,3 +335,10 @@ def get_command_id(self, name):
         guild = self.bot.get_guild(config.guild_id)
         command = guild.get_command_named(name)
     return command.id
+
+
+async def get_user_from_tag(self, tag):
+    user_id = re.findall(r'\d+', tag)[0]
+    user = await self.bot.get_or_fetch_user(user_id)
+    user = user.name
+    return user
