@@ -1,6 +1,7 @@
 import disnake
 from disnake.ext import commands
 from repository.stream_links_repo import StreamLinksRepo
+from repository.review_repo import ReviewRepository
 from config import cooldowns
 from config.app_config import config
 from config.messages import Messages
@@ -21,18 +22,25 @@ from buttons.embed import EmbedView
 pagination_regex = re.compile(r'^\[([^\]]*)\]\s*Page:\s*(\d*)\s*\/\s*(\d*)')
 
 subjects = []
+subjects_with_stream = []
 
 
 async def autocomp_subjects(inter: disnake.ApplicationCommandInteraction, user_input: str):
     return [subject[0] for subject in subjects if user_input.lower() in subject[0]][:25]
 
 
+async def autocomp_subjects_with_stream(inter: disnake.ApplicationCommandInteraction, user_input: str):
+    return [subject[0] for subject in subjects_with_stream if user_input.lower() in subject[0]][:25]
+
+
 class StreamLinks(commands.Cog):
     def __init__(self, bot):
-        global subjects
+        global subjects, subjects_with_stream
         self.bot = bot
-        self.repo = StreamLinksRepo()
-        subjects = self.repo.get_subjects_with_stream()
+        self.review_repo = ReviewRepository()
+        self.streamlinks_repo = StreamLinksRepo()
+        subjects = self.review_repo.get_all_subjects()
+        subjects_with_stream = self.streamlinks_repo.get_subjects_with_stream()
 
     @cooldowns.default_cooldown
     @commands.group(aliases=[
@@ -52,11 +60,11 @@ class StreamLinks(commands.Cog):
     async def streamlinks_get(
         self,
         inter: disnake.ApplicationCommandInteraction,
-        subject: str = commands.Param(autocomplete=autocomp_subjects)
+        subject: str = commands.Param(autocomplete=autocomp_subjects_with_stream)
     ):
         await inter.response.defer()
 
-        streamlinks = self.repo.get_streamlinks_of_subject(subject.lower())
+        streamlinks = self.streamlinks_repo.get_streamlinks_of_subject(subject.lower())
 
         if len(streamlinks) == 0:
             await inter.edit_original_message(content=Messages.streamlinks_no_stream)
@@ -74,16 +82,16 @@ class StreamLinks(commands.Cog):
         self,
         inter: disnake.ApplicationCommandInteraction,
         link: str,
-        subject: str,
-        user: str,
-        description: str,
+        subject: str = commands.Param(autocomplete=autocomp_subjects),
+        user: str = commands.Param(),
+        description: str = commands.Param(max_length=1024),
         date: str = commands.Param(default=None, description=Messages.streamlinks_date_format)
     ):
         await inter.response.defer()
 
         link = utils.clear_link_escape(link)
 
-        if self.repo.exists_link(link):
+        if self.streamlinks_repo.exists_link(link):
             await inter.edit_original_message(
                 utils.fill_message('streamlinks_add_link_exists', user=inter.author.id)
             )
@@ -101,17 +109,23 @@ class StreamLinks(commands.Cog):
             if link_data['upload_date'] is None:
                 link_data['upload_date'] = datetime.utcnow()
 
-        self.repo.create(subject.lower(), link, user,
-                         description, link_data['image'], link_data['upload_date'])
+        self.streamlinks_repo.create(
+            subject.lower(),
+            link,
+            user,
+            description,
+            link_data['image'],
+            link_data['upload_date']
+        )
         await inter.edit_original_message(content=Messages.streamlinks_add_success)
 
     @_streamlinks.sub_command(name="list", description=Messages.streamlinks_list_brief)
     async def streamlinks_list(
         self,
         inter: disnake.ApplicationCommandInteraction,
-        subject: str = commands.Param(autocomplete=autocomp_subjects)
+        subject: str = commands.Param(autocomplete=autocomp_subjects_with_stream)
     ):
-        streamlinks: List[StreamLink] = self.repo.get_streamlinks_of_subject(subject.lower())
+        streamlinks: List[StreamLink] = self.streamlinks_repo.get_streamlinks_of_subject(subject.lower())
 
         if len(streamlinks) == 0:
             await inter.send(content=Messages.streamlinks_no_stream)
@@ -144,11 +158,11 @@ class StreamLinks(commands.Cog):
     ):
 
         await inter.response.defer()
-        if not self.repo.exists(id):
+        if not self.streamlinks_repo.exists(id):
             await inter.edit_original_message(Messages.streamlinks_not_exists)
             return
 
-        stream = self.repo.get_stream_by_id(id)
+        stream = self.streamlinks_repo.get_stream_by_id(id)
         link = stream.link
 
         prompt_message = utils.fill_message('streamlinks_remove_prompt', link=link)
@@ -156,7 +170,7 @@ class StreamLinks(commands.Cog):
 
         if result:
             await self.log(stream, inter.author)
-            self.repo.remove(id)
+            self.streamlinks_repo.remove(id)
             await inter.channel.send(utils.fill_message('streamlinks_remove_success', link=link))
 
     def get_link_data(self, link: str):
