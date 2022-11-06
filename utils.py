@@ -123,6 +123,8 @@ class NotHelperPlusError(commands.CommandError):
     a command that is available only to helpers, submods and mods.
     """
 
+    pass
+
 
 def helper_plus(ctx):
     allowed_roles = {config.mod_role, config.submod_role, config.helper_role}
