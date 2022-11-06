@@ -25,9 +25,11 @@ class Error(commands.Cog):
         if isinstance(error, sqlalchemy.exc.InternalError):
             session.rollback()
             return
+        if isinstance(error, commands.errors.CheckFailure):
+            await ctx.reply(utils.fill_message("insufficient_rights", user=ctx.author.id))
+            return
         if (
             isinstance(error, commands.BadArgument)
-            or isinstance(error, commands.errors.CheckFailure)
             or isinstance(error, commands.errors.MissingAnyRole)
             or isinstance(error, commands.errors.MissingRequiredArgument)
         ) and hasattr(ctx.command, "on_error"):
@@ -94,6 +96,10 @@ class Error(commands.Cog):
 
         if isinstance(error, commands.CommandOnCooldown):
             await inter.response.send_message(utils.fill_message("spamming", user=inter.author.id))
+            return
+
+        if isinstance(error, utils.NotHelperPlusError):
+            await inter.response.send_message.send(Messages.helper_plus_only)
             return
 
         embed = self.logger.create_embed(
