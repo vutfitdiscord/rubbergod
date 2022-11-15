@@ -31,8 +31,8 @@ class FitRoom(commands.Cog):
             main_body = soup.find("main", {"id": "main"})
             floor_list = main_body.find("ul", {"class": "pagination__list"})
             active_floor = floor_list.find("a", {"aria-current": "page"})
-            image = main_body.find("svg")
-            cursor = image.find("polygon", {"id": "arrow"})
+            image = main_body.find("svg", {"id": "map"})
+            cursor = main_body.find("polygon", {"id": "arrow"})
         except AttributeError:
             return await inter.edit_original_message(Messages.fit_room_parsing_failed)
 
@@ -47,7 +47,11 @@ class FitRoom(commands.Cog):
                 parent_height=1000, background_color="white", dpi=300)
         image_bytes.seek(0)
 
-        embed = disnake.Embed(title=f"Místnost: {room.upper()}", color=disnake.Color.dark_blue())
+        embed = disnake.Embed(
+            title=f"Místnost: {room.upper()}",
+            url=f"https://www.fit.vut.cz/fit/room/{room.upper()}/.cs",
+            color=disnake.Color.dark_blue()
+        )
         embed.set_image(url="attachment://plan.png")
         embed.description = f"[Odkaz na plánek]({url})"
         utils.add_author_footer(embed, inter.author, additional_text=[str(active_floor.text)])
