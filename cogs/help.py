@@ -109,7 +109,13 @@ class Help(commands.Cog):
         )
         if "command" in params and params["command"] is not None:
             if params["command"] == "slash_commands":
-                return 0, [slash.name for slash in self.bot.slash_commands]
+                res = {}
+                for slash in self.bot.slash_commands:
+                    res[slash.name] = {
+                        "id": utils.get_command_id(self, slash.name),
+                        "children": list(slash.children.keys())
+                    }
+                return 0, res
             command = self.bot.get_command(params["command"])
             if not command:
                 return 1, "Command not found"

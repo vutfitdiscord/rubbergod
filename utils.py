@@ -336,7 +336,7 @@ def get_command_id(self, name):
     if command is None:
         guild = self.bot.get_guild(config.guild_id)
         command = guild.get_command_named(name)
-    return command.id
+    return getattr(command, "id", None)
 
 
 async def get_username_from_tag(self, tag):
