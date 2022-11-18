@@ -42,7 +42,7 @@ class FitRoom(commands.Cog):
                 )
 
         image_bytes = BytesIO()
-        image_bytestring = str(image).replace("/img", "https://www.fit.vut.cz/img").encode("utf-8")
+        image_bytestring = str(image).encode("utf-8")
         svg2png(bytestring=image_bytestring, write_to=image_bytes, parent_width=720,
                 parent_height=1000, background_color="white", dpi=300)
         image_bytes.seek(0)
