@@ -277,12 +277,12 @@ class Roles(commands.Cog):
             await inter.send(name)
 
     @group.sub_command(name="add_channel_id", description=Messages.group_add_channel_id)
-    async def add_channel_id(self, inter, name: str, channel_id: int):
+    async def add_channel_id(self, inter, name: str, channel_id: str):
         group_repo.group_add_channel_id(name, channel_id)
         await inter.send("Done")
 
     @group.sub_command(name="add_role_id", description=Messages.group_add_role_id)
-    async def add_role_id(self, inter, name: str, role_id: int):
+    async def add_role_id(self, inter, name: str, role_id: str):
         group_repo.group_add_role_id(name, role_id)
         await inter.send("Done")
 
