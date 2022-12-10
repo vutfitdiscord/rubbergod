@@ -14,6 +14,8 @@ class DynamicVerifyRequestView(disnake.ui.View):
     async def accept_access(self, button: disnake.ui.Button, inter: disnake.MessageInteraction):
         service = dynamic_verify.DynamicVerifyManager(inter.bot)
         await service.apply_rule(self.rule_id, self.user_id, inter)
+        self.clear_items()
+        await self.message.edit(view=self)
 
     @disnake.ui.button(
         label="Zamítnout", style=disnake.ButtonStyle.danger, custom_id="dynamic_verify:decline"
