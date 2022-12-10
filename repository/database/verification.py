@@ -40,6 +40,7 @@ class DynamicVerifyRule(database.base):
     id = Column(String, primary_key=True)
     name = Column(String, index=True, nullable=False)
     enabled = Column(Boolean, default=True, nullable=False)
+    mod_check = Column(Boolean, default=True, nullable=False)
     role_ids = Column(String, nullable=False, default="[]")
 
     def get_role_ids(self) -> List[int]:
