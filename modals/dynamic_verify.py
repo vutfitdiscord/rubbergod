@@ -62,6 +62,17 @@ class DynamicVerifyEditModal(disnake.ui.Modal):
                 required=True,
                 value=str(rule.enabled) if self.is_edit() else str(True),
             ),
+            # TODO: switch to select when supported
+            disnake.ui.TextInput(
+                label="Vyžaduje potvrzení (True/False)",
+                placeholder="Stav (True/False = Zapnuto/Vypnuto)",
+                custom_id="mod_check",
+                style=disnake.TextInputStyle.short,
+                min_length=4,
+                max_length=5,
+                required=True,
+                value=str(rule.mod_check) if self.is_edit() else str(True),
+            ),
             disnake.ui.TextInput(
                 label="Role (zadávej názvy, nebo ID; odděluj čárkou)",
                 placeholder="Zadej role (zadávej názvy, nebo ID; odděluj čárkou)",
@@ -113,7 +124,7 @@ class DynamicVerifyEditModal(disnake.ui.Modal):
         manager = DynamicVerifyManager(inter.bot)
         rule_id = await self.get_rule_id(inter, manager)
         name = str(inter.text_values["name"]).strip()
-        enabled = await self.get_enable_state(inter)
+        enabled = await self.get_bool_state(inter, "enabled")
         roles = await self.get_roles(inter)
 
         if rule_id is None or enabled is None or roles is None:
@@ -124,6 +135,7 @@ class DynamicVerifyEditModal(disnake.ui.Modal):
         rule.id = rule_id
         rule.name = name
         rule.enabled = enabled
+        rule.mod_check = await self.get_bool_state(inter, "mod_check")
         rule.set_role_ids([role.id for role in roles])
 
         manager.verify_repo.update_rule(rule)
@@ -149,12 +161,12 @@ class DynamicVerifyEditModal(disnake.ui.Modal):
 
         return rule_id
 
-    async def get_enable_state(self, inter: disnake.ModalInteraction) -> Union[bool, None]:
-        enabled = str(inter.text_values["enabled"]).strip()
+    async def get_bool_state(self, inter: disnake.ModalInteraction, state_id: str) -> Union[bool, None]:
+        state = str(inter.text_values[state_id]).strip()
 
-        if enabled.lower() == "true":
+        if state.lower() == "true":
             return True
-        elif enabled.lower() == "false":
+        elif state.lower() == "false":
             return False
         else:
             await inter.response.send_message(Messages.dynamic_verify_invalid_state)
