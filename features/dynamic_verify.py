@@ -34,19 +34,19 @@ class DynamicVerifyManager(BaseFeature):
         rule = self.verify_repo.get_rule(rule_id)
         role_ids = rule.get_role_ids()
         roles = [guild.get_role(role_id) for role_id in role_ids]
-        await self.log_attempt(rule, inter)
+        await self.log_attempt(rule, inter, user_id)
         member = await guild.get_or_fetch_member(user_id)
         for role in list(filter(lambda x: x is not None, roles)):
             await member.add_roles(role, reason="Rubbergod dynamic verification")
 
         try:
-            await member.send(utils.fill_message("verify_verify_success", user=inter.user.id))
+            await member.send(utils.fill_message("verify_verify_success", user=user_id))
             await member.send(Messages.verify_post_verify_info)
         except disnake.HTTPException:
             pass  # User maybe have disabled communication with bots.
 
         if inter.channel.type is not disnake.ChannelType.private:
-            await inter.send(utils.fill_message("verify_verify_success", user=inter.user.id))
+            await inter.send(utils.fill_message("verify_verify_success", user=user_id))
 
     async def request_verification(
         self, rule: DynamicVerifyRule, inter: disnake.ApplicationCommandInteraction
@@ -60,17 +60,15 @@ class DynamicVerifyManager(BaseFeature):
 
         channel = self.bot.get_channel(config.mod_room)
         view = DynamicVerifyRequestView(rule.id, inter.user.id)
-        await channel.send(embed=embed, view=view)
+        view.message = await channel.send(embed=embed, view=view)
 
     async def log_attempt(
-        self, rule: DynamicVerifyRule, inter: disnake.ApplicationCommandInteraction
+        self, rule: DynamicVerifyRule, inter: disnake.ApplicationCommandInteraction, target_id: int,
     ) -> None:
         embed = disnake.Embed(title="Dynamická verifikace", color=0xEEE657)
         embed.add_field("Pravidlo", f"{rule.name} ({rule.id})")
-        embed.add_field(
-            "Uživatel",
-            f"{inter.user.name}#{inter.user.discriminator} ({utils.generate_mention(inter.user.id)})",
-        )
+        embed.add_field("Potvrdil", utils.generate_mention(inter.user.id))
+        embed.add_field("Uživatel", utils.generate_mention(target_id))
 
         channel = self.bot.get_channel(config.log_channel)
         await channel.send(embed=embed)
