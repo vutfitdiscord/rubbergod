@@ -99,7 +99,7 @@ class Error(commands.Cog):
             return
 
         if isinstance(error, utils.NotHelperPlusError):
-            await inter.response.send_message.send(Messages.helper_plus_only)
+            await inter.response.send_message(Messages.helper_plus_only)
             return
 
         embed = self.logger.create_embed(

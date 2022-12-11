@@ -56,6 +56,11 @@ class StreamLinks(commands.Cog):
     async def _streamlinks(self, inter: disnake.ApplicationCommandInteraction):
         pass
 
+    @cooldowns.default_cooldown
+    @commands.slash_command(name="streamlinks_mod", brief=Messages.streamlinks_brief)
+    async def _streamlinks_mod(self, inter: disnake.ApplicationCommandInteraction):
+        pass
+
     @_streamlinks.sub_command(name="get", description=Messages.streamlinks_brief)
     async def streamlinks_get(
         self,
@@ -77,7 +82,7 @@ class StreamLinks(commands.Cog):
         view.message = await inter.edit_original_message(embed=embeds[0], view=view)
 
     @commands.check(utils.helper_plus)
-    @_streamlinks.sub_command(name="add", description=Messages.streamlinks_add_brief)
+    @_streamlinks_mod.sub_command(name="add", description=Messages.streamlinks_add_brief)
     async def streamlinks_add(
         self,
         inter: disnake.ApplicationCommandInteraction,
@@ -150,7 +155,7 @@ class StreamLinks(commands.Cog):
         await channel.send(embed=embed)
 
     @commands.check(utils.helper_plus)
-    @_streamlinks.sub_command(name="remove", description=Messages.streamlinks_remove_brief)
+    @_streamlinks_mod.sub_command(name="remove", description=Messages.streamlinks_remove_brief)
     async def streamlinks_remove(
         self,
         inter: disnake.ApplicationCommandInteraction,
