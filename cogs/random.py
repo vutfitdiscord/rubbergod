@@ -27,7 +27,9 @@ class Random(commands.Cog):
             if "?" in arg:
                 args = args[i + 1:]
                 break
-
+        if not args:
+            await inter.send(Messages.random_pick_empty)
+            return
         option = disnake.utils.escape_mentions(random.choice(args))
         await inter.send(f"{option} {inter.author.mention}")
 

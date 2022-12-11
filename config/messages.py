@@ -143,6 +143,7 @@ class Messages:
     random_flip_brief = "Hodí mincí"
     random_pick_brief = "Vybere jedno ze slov za otazníkem."
     random_pick_format = "*Is foo bar? Yes No Maybe*"
+    random_pick_empty = "Nenapsal jsi žádné možnosti k otázce."
 
     rng_generator_format = f"Použití: `{prefix}roll x [y]`\n" \
                            "rozmezí x, y jsou celá čísla,\n" \
