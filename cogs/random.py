@@ -21,12 +21,22 @@ class Random(commands.Cog):
         inter: disnake.ApplicationCommandInteraction,
         args: str = commands.Param(max_length=1900, description=Messages.random_pick_format)
     ):
-        """"Pick an option"""
-        args = shlex.split(args)
+        """
+        Pick option from given argument.
+        Question can be given before options, but must be ended with "?".
+        """
+
+        try:
+            args = shlex.split(args)
+        except Exception as e:
+            await inter.send(e)
+            return
+
         for i, arg in enumerate(args):
             if "?" in arg:
                 args = args[i + 1:]
                 break
+
         if not args:
             await inter.send(Messages.random_pick_empty)
             return

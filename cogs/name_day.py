@@ -50,7 +50,7 @@ class Nameday(commands.Cog):
                     birthday = await resp.json()
                     return birthday['message']
             except (asyncio.exceptions.TimeoutError, aiohttp.client_exceptions.ClientConnectorError):
-                return "Website unreachable"
+                return Messages.birthday_api_error
 
     @commands.slash_command(name="svatek", description=Messages.name_day_cz_brief)
     async def name_day_cz(self, inter: disnake.ApplicationCommandInteraction):
