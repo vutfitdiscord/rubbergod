@@ -1,7 +1,7 @@
 [base]
 command_prefix = ['?', '!']
 default_prefix = '?'
-ignored_prefixes = ['!']
+ignored_prefixes = ['?', '!']
 key = ''
 admin_ids = [0]  # first ID is used for mention in case of false verification
 guild_id = 0
