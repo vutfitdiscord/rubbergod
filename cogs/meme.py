@@ -58,6 +58,11 @@ class Meme(commands.Cog):
     async def uhoh(self, inter):
         await inter.send(utils.fill_message("uhoh_counter", uhohs=uhoh_counter))
 
+    # Ignore '??'
+    @commands.command(name="?")
+    async def ignore_questionmark(self, ctx):
+        pass
+
     @cooldowns.short_cooldown
     @commands.command(name="??", brief="???")
     async def question(self, ctx):
