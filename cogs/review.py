@@ -67,7 +67,7 @@ class Review(commands.Cog):
     @commands.slash_command(name="review")
     async def reviews(self, inter: disnake.ApplicationCommandInteraction):
         """Group of commands for reviews."""
-        pass
+        await inter.response.defer()
 
     @reviews.sub_command(name='get', description=Messages.review_get_brief)
     async def get(
@@ -81,7 +81,7 @@ class Review(commands.Cog):
             await inter.send(Messages.review_wrong_subject)
             return
         view = ReviewView(inter.author, self.bot, embeds)
-        await inter.response.send_message(embed=embeds[0], view=view)
+        await inter.response.edit_message(embed=embeds[0], view=view)
         view.message = await inter.original_message()
 
     @reviews.sub_command(name='add', description=Messages.review_add_brief)
@@ -93,7 +93,7 @@ class Review(commands.Cog):
         text: str = None
     ):
         """Add new review for `subject`"""
-        # TODO: use modal in future when disnake 2.6 released
+        # TODO: use modal in future when disnake 2.8?? released
         # await inter.response.send_modal(modal=ReviewModal(self.bot))
         if not await self.check_member(inter):
             return
