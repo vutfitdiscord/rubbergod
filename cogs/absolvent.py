@@ -44,14 +44,14 @@ class Absolvent(commands.Cog):
         """
         await inter.response.defer(with_message=True, ephemeral=True)
         if thesis_web_id == "19121":
-            await inter.edit_original_message(Messages.absolvent_id_from_help)
+            await inter.edit_original_response(Messages.absolvent_id_from_help)
             return
 
         # prepare
         htmlparser = etree.HTMLParser()
         diploma_year = re.search(r"\d+/(\d+)", diploma_number)
         if not diploma_year:
-            await inter.edit_original_message(Messages.absolvent_wrong_diploma_format)
+            await inter.edit_original_response(Messages.absolvent_wrong_diploma_format)
             return
         diploma_year = diploma_year.group(1)
         full_name_without_degree_surname_first = f"{surname}, {name}"
@@ -69,7 +69,7 @@ class Absolvent(commands.Cog):
         name_from_user_without_diacritics = remove_accents(f"{surname} {name}")
 
         if name_from_db != name_from_user_without_diacritics:
-            await inter.edit_original_message(Messages.absolvent_wrong_name)
+            await inter.edit_original_response(Messages.absolvent_wrong_name)
             return
 
         # CHECK OWNERSHIP, TYPE AND YEAR OF THE QUALIFICATION WORK / THESIS
@@ -120,7 +120,7 @@ class Absolvent(commands.Cog):
             )
         )
 
-        # await inter.edit_original_message(f"""
+        # await inter.edit_original_response(f"""
         # DEBUG:
         # nf: {not_found}
         # mt: {master_thesis}
@@ -132,12 +132,12 @@ class Absolvent(commands.Cog):
         # """)
 
         if "Page cannot be found" in not_found:
-            await inter.edit_original_message(Messages.absolvent_thesis_not_found_error)
+            await inter.edit_original_response(Messages.absolvent_thesis_not_found_error)
             return
 
         habilitation_year = re.search(r"(\d+)-\d+-\d+", habilitation_date)
         if habilitation_year is None:
-            await inter.edit_original_message(Messages.absolvent_thesis_not_found_error)
+            await inter.edit_original_response(Messages.absolvent_thesis_not_found_error)
             return
         habilitation_year = habilitation_year.group(1)
 
@@ -148,7 +148,7 @@ class Absolvent(commands.Cog):
             and result == "práce byla úspěšně obhájena"
             and thesis_author_without_degree_surname_first == full_name_without_degree_surname_first
         ):
-            await inter.edit_original_message(Messages.absolvent_web_error)
+            await inter.edit_original_response(Messages.absolvent_web_error)
             return
 
         # DIPLOMA VALIDITY CHECK
@@ -189,7 +189,7 @@ class Absolvent(commands.Cog):
             and "úspěšně ověřen" in absolventText
             and absolventText.endswith(", Fakulta informačních technologií")
         ):
-            await inter.edit_original_message(Messages.absolvent_diploma_error)
+            await inter.edit_original_response(Messages.absolvent_diploma_error)
             return
 
         guild = self.bot.get_guild(config.guild_id)
@@ -204,11 +204,11 @@ class Absolvent(commands.Cog):
                 if "Dropout" in drop_role.name:
                     await member.remove_roles(drop_role, reason="Diploma verification")
             await member.add_roles(role)
-            await inter.edit_original_message(Messages.absolvent_success)
+            await inter.edit_original_response(Messages.absolvent_success)
 
     @diplom.error
     async def diplom_error(self, inter: disnake.ApplicationCommandInteraction, error):
-        await inter.edit_original_message(
+        await inter.edit_original_response(
             utils.fill_message("absolvent_help", command=inter.application_command)
         )
 

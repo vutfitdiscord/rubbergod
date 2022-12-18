@@ -100,7 +100,7 @@ class ReviewView(EmbedView):
             if not ((self.perma_lock or self.locked) and interaction.author.id != self.author.id):
                 self.check_text_pages()
                 # update view
-                await interaction.edit_original_message(view=self)
+                await interaction.edit_original_response(view=self)
             return False
         elif "text" in interaction.data.custom_id and self.embed.fields[3].name == "Text page":
             if (self.perma_lock or self.locked) and interaction.author.id != self.author.id:

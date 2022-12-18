@@ -24,7 +24,7 @@ class FitRoom(commands.Cog):
         url = f"https://www.fit.vut.cz/fit/map/.cs?show={room.upper()}&big=1"
         r = requests.get(url)
         if r.status_code != 200:
-            return await inter.edit_original_message(Messages.fit_room_unreach)
+            return await inter.edit_original_response(Messages.fit_room_unreach)
 
         try:
             soup = BeautifulSoup(r.content, 'html.parser')
@@ -34,10 +34,10 @@ class FitRoom(commands.Cog):
             image = main_body.find("svg", {"id": "map"})
             cursor = main_body.find("polygon", {"id": "arrow"})
         except AttributeError:
-            return await inter.edit_original_message(Messages.fit_room_parsing_failed)
+            return await inter.edit_original_response(Messages.fit_room_parsing_failed)
 
         if image is None or cursor is None:
-            return await inter.edit_original_message(
+            return await inter.edit_original_response(
                 utils.fill_message("fit_room_room_not_on_plan", room=room[:1024])
                 )
 
@@ -56,7 +56,7 @@ class FitRoom(commands.Cog):
         embed.description = f"[Odkaz na plánek]({url})"
         utils.add_author_footer(embed, inter.author, additional_text=[str(active_floor.text)])
         file = disnake.File(fp=image_bytes, filename="plan.png")
-        await inter.edit_original_message(embed=embed, file=file)
+        await inter.edit_original_response(embed=embed, file=file)
 
 
 def setup(bot):

@@ -75,7 +75,7 @@ class Verification(BaseFeature):
 
         if not is_resend:
             view = VerifyWithResendButtonView(user.login)
-            await inter.edit_original_message(content=success_message, view=view)
+            await inter.edit_original_response(content=success_message, view=view)
         else:
             view = VerifyView(user.login)
             await inter.response.edit_message(content=success_message, view=view)
@@ -99,7 +99,7 @@ class Verification(BaseFeature):
                         user=inter.user.id,
                         admin=config.admin_ids[0],
                     )
-                    await inter.edit_original_message(content=msg)
+                    await inter.edit_original_response(content=msg)
                     await inter.followup.send(content=msg)
                     await self.log_verify_fail(
                         inter, "getcode (xlogin) - Unknown login", str({"login": login})
@@ -113,7 +113,7 @@ class Verification(BaseFeature):
                         user=inter.user.id,
                         admin=config.admin_ids[0],
                     )
-                    await inter.edit_original_message(content=msg)
+                    await inter.edit_original_response(content=msg)
                     await self.log_verify_fail(
                         inter,
                         "getcode (xlogin) - Invalid verify state",
@@ -127,7 +127,7 @@ class Verification(BaseFeature):
                     int(login)
                 except ValueError:
                     msg = utils.fill_message("invalid_login", user=inter.user.id, admin=config.admin_ids[0])
-                    await inter.edit_original_message(msg)
+                    await inter.edit_original_response(msg)
                     await self.log_verify_fail(inter, "getcode (MUNI)", str({"login": login}))
                     return
 
@@ -289,7 +289,7 @@ class Verification(BaseFeature):
     async def send_xlogin_info(self, inter: disnake.ApplicationCommandInteraction):
         guild = self.bot.get_guild(config.guild_id)
         fp = await guild.fetch_emoji(585915845146968093)
-        await inter.edit_original_message(
+        await inter.edit_original_response(
             content=utils.fill_message("verify_send_dumbshit", user=inter.user.id, emote=str(fp))
         )
 

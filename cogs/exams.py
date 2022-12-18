@@ -56,7 +56,7 @@ class Exams(commands.Cog):
     @terms.sub_command(name="update", description=Messages.exams_update_term_brief)
     async def update(self, inter: disnake.ApplicationCommandInteraction):
         updated_chans = await self.update_exam_terms(inter.guild, inter.author)
-        await inter.edit_original_message(utils.fill_message("exams_terms_updated", num_chan=updated_chans))
+        await inter.edit_original_response(utils.fill_message("exams_terms_updated", num_chan=updated_chans))
 
     @commands.check(utils.is_bot_admin_or_mod)
     @terms.sub_command(name="remove_all", description=Messages.exams_remove_all_terms_brief)
@@ -74,13 +74,13 @@ class Exams(commands.Cog):
                             await message.delete()
                         except disnake.NotFound:
                             pass
-        await inter.edit_original_message(Messages.exams_terms_removed)
+        await inter.edit_original_response(Messages.exams_terms_removed)
 
     @commands.check(utils.is_bot_admin_or_mod)
     @terms.sub_command(name="remove", description=Messages.exams_remove_terms_brief)
     async def remove(self, inter: disnake.ApplicationCommandInteraction, channel: disnake.TextChannel):
         if not isinstance(channel, disnake.TextChannel):
-            return await inter.edit_original_message(
+            return await inter.edit_original_response(
                 utils.fill_message("exams_channel_is_not_text_channel", chan_name=channel.name)
             )
 
@@ -205,9 +205,9 @@ class Exams(commands.Cog):
                         if rocnik is not None:
                             return await self.process_exams(inter, rocnik, inter.author)
 
-                await inter.edit_original_message(Messages.exams_no_valid_role)
+                await inter.edit_original_response(Messages.exams_no_valid_role)
             else:
-                await inter.edit_original_message(Messages.exams_specify_year)
+                await inter.edit_original_response(Messages.exams_specify_year)
         else:
             await self.process_exams(inter, rocnik, inter.author)
 
@@ -417,7 +417,7 @@ class Exams(commands.Cog):
             pages.append(embed)
         if isinstance(ctx, disnake.ApplicationCommandInteraction):
             view = EmbedView(ctx.author, pages)
-            view.message = await ctx.response.edit_message(embed=pages[0], view=view)
+            view.message = await ctx.edit_original_response(embed=pages[0], view=view)
         else:
             header = disnake.Embed(
                 title=title, description=description, color=disnake.Color.dark_blue()

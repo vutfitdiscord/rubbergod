@@ -54,16 +54,16 @@ class IconSelect(disnake.ui.Select):
         [choice] = self.values
         icon = disnake.utils.get(inter.guild.roles, id=int(choice))
         if icon is None:
-            await inter.edit_original_message(Messages.icon_ui_fail)
+            await inter.edit_original_response(Messages.icon_ui_fail)
             return
         user = inter.user
         if await can_assign(icon, user):
-            await inter.edit_original_message(
+            await inter.edit_original_response(
                 Messages.icon_set_success.format(user=inter.user, icon=icon_name(icon)), view=None
             )
             await do_set_icon(icon, user)
         else:
-            await inter.edit_original_message(Messages.icon_ui_no_permission)
+            await inter.edit_original_response(Messages.icon_ui_no_permission)
 
 
 async def icon_autocomp(inter: disnake.ApplicationCommandInteraction, partial: str):
@@ -102,7 +102,7 @@ class Icons(commands.Cog):
                 placeholder=Messages.icon_ui_choose, options=options[start_i: start_i + 25], row=0,
             )
             view.add_item(component)
-        await inter.edit_original_message(view=view)
+        await inter.edit_original_response(view=view)
 
     @commands.Cog.listener()
     async def on_button_click(self, inter: disnake.MessageInteraction):

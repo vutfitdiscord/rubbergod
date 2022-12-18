@@ -35,7 +35,7 @@ class Studijni(commands.Cog):
                 hours = Messages.studijni_web_error
         embed.add_field(name=Messages.studijni_office_hours, value=hours, inline=False)
         add_author_footer(embed, inter.author)
-        await inter.edit_original_message(embed=embed)
+        await inter.edit_original_response(embed=embed)
 
 
 def setup(bot):

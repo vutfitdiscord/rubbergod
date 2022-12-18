@@ -173,7 +173,7 @@ class Karma(commands.Cog):
     ):
         await inter.response.defer(with_message=True, ephemeral=ephemeral)
         embed = await self.karma.message_karma(inter.author, message)
-        await inter.edit_original_message(embed=embed)
+        await inter.edit_original_response(embed=embed)
         msg = await inter.original_message()
         if not ephemeral:
             await msg.add_reaction("🔁")

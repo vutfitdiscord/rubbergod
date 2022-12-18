@@ -56,13 +56,13 @@ class Nameday(commands.Cog):
     async def name_day_cz(self, inter: disnake.ApplicationCommandInteraction):
         await inter.response.defer()
         name_day_cz = await self._name_day_cz()
-        await inter.edit_original_message(name_day_cz)
+        await inter.edit_original_response(name_day_cz)
 
     @commands.slash_command(name="meniny", description=Messages.name_day_sk_brief)
     async def name_day_sk(self, inter: disnake.ApplicationCommandInteraction):
         await inter.response.defer()
         name_day_sk = await self._name_day_sk()
-        await inter.edit_original_message(name_day_sk)
+        await inter.edit_original_response(name_day_sk)
 
     @tasks.loop(time=time(7, 0, tzinfo=local_tz))
     async def send_names(self):

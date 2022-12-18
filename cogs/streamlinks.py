@@ -72,14 +72,14 @@ class StreamLinks(commands.Cog):
         streamlinks = self.streamlinks_repo.get_streamlinks_of_subject(subject.lower())
 
         if len(streamlinks) == 0:
-            await inter.edit_original_message(content=Messages.streamlinks_no_stream)
+            await inter.edit_original_response(content=Messages.streamlinks_no_stream)
             return
 
         embeds = []
         for idx, link in enumerate(streamlinks):
             embeds.append(self.create_embed_of_link(link, inter.author, len(streamlinks), idx+1))
         view = EmbedView(inter.author, embeds, timeout=180)
-        view.message = await inter.edit_original_message(embed=embeds[0], view=view)
+        view.message = await inter.edit_original_response(embed=embeds[0], view=view)
 
     @commands.check(utils.helper_plus)
     @_streamlinks_mod.sub_command(name="add", description=Messages.streamlinks_add_brief)
@@ -97,7 +97,7 @@ class StreamLinks(commands.Cog):
         link = utils.clear_link_escape(link)
 
         if self.streamlinks_repo.exists_link(link):
-            await inter.edit_original_message(
+            await inter.edit_original_response(
                 utils.fill_message('streamlinks_add_link_exists', user=inter.author.id)
             )
             return
@@ -122,7 +122,7 @@ class StreamLinks(commands.Cog):
             link_data['image'],
             link_data['upload_date']
         )
-        await inter.edit_original_message(content=Messages.streamlinks_add_success)
+        await inter.edit_original_response(content=Messages.streamlinks_add_success)
 
     @_streamlinks.sub_command(name="list", description=Messages.streamlinks_list_brief)
     async def streamlinks_list(
@@ -164,7 +164,7 @@ class StreamLinks(commands.Cog):
 
         await inter.response.defer()
         if not self.streamlinks_repo.exists(id):
-            await inter.edit_original_message(Messages.streamlinks_not_exists)
+            await inter.edit_original_response(Messages.streamlinks_not_exists)
             return
 
         stream = self.streamlinks_repo.get_stream_by_id(id)

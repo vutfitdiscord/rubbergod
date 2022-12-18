@@ -19,7 +19,7 @@ class Weather(commands.Cog):
 
         place = place[:100]
         if "&" in place:
-            return await inter.edit_original_message("Takhle se žádné město určitě nejmenuje.")
+            return await inter.edit_original_response("Takhle se žádné město určitě nejmenuje.")
 
         url = (
             "http://api.openweathermap.org/data/2.5/weather?q="
@@ -51,14 +51,14 @@ class Weather(commands.Cog):
 
             utils.add_author_footer(embed, inter.author)
 
-            await inter.edit_original_message(embed=embed)
+            await inter.edit_original_response(embed=embed)
 
         elif str(res["cod"]) == "404":
-            await inter.edit_original_message("Město nenalezeno")
+            await inter.edit_original_response("Město nenalezeno")
         elif str(res["cod"]) == "401":
-            await inter.edit_original_message("Rip token -> Rebel pls fix")
+            await inter.edit_original_response("Rip token -> Rebel pls fix")
         else:
-            await inter.edit_original_message(
+            await inter.edit_original_response(
                 "Město nenalezeno! <:pepeGun:484470874246742018> (" + res["message"] + ")"
             )
 
