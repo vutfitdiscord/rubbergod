@@ -17,7 +17,7 @@ from repository.exams_repo import ExamsTermsMessageRepo
 import utils
 
 year_regex = "[1-3][BM]IT"
-year_list = ["1BIT", "2BIT", "3BIT", "1MIT", "2MIT"]
+YEAR_LIST = ["1BIT", "2BIT", "3BIT", "1MIT", "2MIT"]
 CLEANR = re.compile("<.*?>|&([a-z0-9]+|#[0-9]{1,6}|#x[0-9a-f]{1,6});")
 
 DATE_OFFSET = 14
@@ -135,6 +135,11 @@ class Exams(commands.Cog):
         year = match.string[match.regs[0][0]: match.regs[0][1]]
         return year
 
+    @staticmethod
+    def list_int(input) -> List[int]:
+        """Convert any list to list of integers"""
+        return list(map(int, input))
+
     async def get_message_destination(self, channel: disnake.TextChannel, message_index: int = 0):
         saved_messages = self.exams_repo.get_message_from_channel(channel.id)
         if saved_messages and message_index < len(saved_messages):
@@ -190,7 +195,7 @@ class Exams(commands.Cog):
     async def exams(
         self,
         inter: disnake.ApplicationCommandInteraction,
-        rocnik: str = commands.Param(name='rocnik', choices=year_list, default=None)
+        rocnik: str = commands.Param(name='rocnik', choices=YEAR_LIST, default=None)
     ):
         await inter.response.defer()
         if rocnik is None:
@@ -213,10 +218,21 @@ class Exams(commands.Cog):
 
     async def process_exams(
         self,
-        ctx: Union[disnake.ApplicationCommandInteraction, disnake.TextChannel, disnake.Message],
+        target: Union[disnake.ApplicationCommandInteraction, disnake.TextChannel, disnake.Message],
         year: Union[str, None],
         author: Optional[disnake.User] = None,
     ):
+        """
+        Get exams data from web, parse and send/update message
+
+        params:
+            target:
+                Intercation: called from `exam` command
+                TextChannel: called on `term` start command
+                Message: called on `term` update cron job
+            year: one of `YEAR_LIST` or None, get just specified year info
+            author: author of command to display in embed footer
+        """
         date = datetime.date.today()
 
         semester = "ZS"
@@ -243,8 +259,8 @@ class Exams(commands.Cog):
             # Site returned fail code
             embed = disnake.Embed(title=title, description=description, color=disnake.Color.dark_blue())
             utils.add_author_footer(embed, author if author is not None else self.bot.user)
-            if isinstance(ctx, disnake.ApplicationCommandInteraction):
-                await ctx.send(embed=embed)
+            if isinstance(target, disnake.ApplicationCommandInteraction):
+                await target.send(embed=embed)
             return
 
         soup = BeautifulSoup(r.content, "html.parser")
@@ -257,8 +273,8 @@ class Exams(commands.Cog):
             embed = disnake.Embed(title=title, description=description, color=disnake.Color.dark_blue())
             utils.add_author_footer(embed, author if author is not None else self.bot.user)
 
-            if isinstance(ctx, disnake.ApplicationCommandInteraction):
-                return await ctx.send(embed=embed)
+            if isinstance(target, disnake.ApplicationCommandInteraction):
+                return await target.send(embed=embed)
 
         # There is body so start parsing table
         exams = body.find_all("tr")
@@ -304,8 +320,8 @@ class Exams(commands.Cog):
                             # Mainly for terms without specified time
                             term_date_str = strong_tag.contents[0].replace("\xa0", "").replace(" ", "")
 
-                            date_splits = list(map(int, term_date_str.split(".")))
-                            date_splits.reverse()
+                            date_splits = self.list_int(term_date_str.split("."))
+                            date_splits.reverse()  # from DDMMYYYY to YYYYMMDD
                             # Without actual time set time to end of the day
                             term_datetime = datetime.datetime(*date_splits, 23, 59)
 
@@ -350,17 +366,15 @@ class Exams(commands.Cog):
                                     term_time_str += str(c)
                                 term_time_str = term_time_str.replace("<sup>", ":").replace("</sup>", "")
 
-                                date_splits = list(map(int, term_date_str.split(".")))
-                                date_splits.reverse()
+                                date_splits = self.list_int(term_date_str.split("."))
+                                date_splits.reverse()  # from DDMMYYYY to YYYYMMDD
 
-                                start_time_str_parts = list(map(
-                                    int,
+                                start_time_str_parts = self.list_int(
                                     term_time_str.split("-")[0].replace(" ", "").split(":")
-                                ))
-                                end_time_str_parts = list(map(
-                                    int,
+                                )
+                                end_time_str_parts = self.list_int(
                                     term_time_str.split("-")[1].replace(" ", "").split(":")
-                                ))
+                                )
 
                                 term_datetime = datetime.datetime(
                                     *date_splits,
@@ -415,14 +429,14 @@ class Exams(commands.Cog):
             embed = disnake.Embed(title=title, description=description, color=disnake.Color.dark_blue())
             utils.add_author_footer(embed, author if author is not None else self.bot.user)
             pages.append(embed)
-        if isinstance(ctx, disnake.ApplicationCommandInteraction):
-            view = EmbedView(ctx.author, pages)
-            view.message = await ctx.edit_original_response(embed=pages[0], view=view)
+        if isinstance(target, disnake.ApplicationCommandInteraction):
+            view = EmbedView(target.author, pages)
+            view.message = await target.edit_original_response(embed=pages[0], view=view)
         else:
             header = disnake.Embed(
                 title=title, description=description, color=disnake.Color.dark_blue()
             )
-            await self.handle_exams_with_database_access(term_strings_dict, header, ctx)
+            await self.handle_exams_with_database_access(term_strings_dict, header, target)
 
     async def handle_exams_with_database_access(
         self, src_data: dict, header: disnake.Embed, dest: Union[disnake.TextChannel, disnake.Message]
