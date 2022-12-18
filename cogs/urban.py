@@ -50,7 +50,7 @@ class Urban(commands.Cog):
     async def urban_pages(self, inter, embeds):
         """Send message and handle pagination for 300 seconds"""
         view = EmbedView(inter.author, embeds)
-        view.message = await inter.edit_original_message(embed=embeds[0], view=view)
+        view.message = await inter.edit_original_response(embed=embeds[0], view=view)
 
     @cooldowns.short_cooldown
     @commands.slash_command(name="urban", description=Messages.urban_brief)
@@ -63,9 +63,9 @@ class Urban(commands.Cog):
             response.raise_for_status()
 
         except requests.HTTPError as http_err:
-            await inter.edit_original_message(f"HTTP error occurred: {http_err}")
+            await inter.edit_original_response(f"HTTP error occurred: {http_err}")
         except Exception as err:
-            await inter.edit_original_message(f"Error occurred: {err}")
+            await inter.edit_original_response(f"Error occurred: {err}")
         else:
             # Request was successful
             embeds = self.urban_embeds(inter.author, dict)
@@ -73,7 +73,7 @@ class Urban(commands.Cog):
         if embeds:
             await self.urban_pages(inter, embeds)
         else:
-            await inter.edit_original_message(Messages.urban_not_found)
+            await inter.edit_original_response(Messages.urban_not_found)
         return
 
 

@@ -311,14 +311,14 @@ class Roles(commands.Cog):
         await inter.send(Messages.channel_copy_start)
         for key in src.overwrites:
             await dst.set_permissions(key, overwrite=src.overwrites[key])
-        await inter.edit_original_message(Messages.channel_copy_done)
+        await inter.edit_original_response(Messages.channel_copy_done)
 
     @channel.sub_command(name="clone", description=Messages.role_channel_clone_brief)
     async def clone(self, inter, src: Union[disnake.TextChannel, disnake.VoiceChannel], name):
         """Clone channel with same permissions as src."""
         await inter.send(Messages.channel_clone_start)
         new = await src.clone(name=name)
-        await inter.edit_original_message(utils.fill_message("channel_clone_done", id=new.id))
+        await inter.edit_original_response(utils.fill_message("channel_clone_done", id=new.id))
 
     @channel.sub_command(name="create", description=Messages.role_channel_create_brief)
     async def create(
@@ -338,11 +338,11 @@ class Roles(commands.Cog):
         for index, member in enumerate(role.members):
             await channel.set_permissions(member, view_channel=True)
             if (index % rate == 0):
-                await inter.edit_original_message(
+                await inter.edit_original_response(
                     f"• uživatelů: {len(role.members)}\n" + utils.create_bar(index+1, len(role.members))
                 )
 
-        await inter.edit_original_message(
+        await inter.edit_original_response(
             utils.fill_message(
                 "channel_create_done",
                 channel=channel.mention,
