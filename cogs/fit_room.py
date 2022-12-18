@@ -17,7 +17,7 @@ class FitRoom(commands.Cog):
     @commands.slash_command(name="room", description=Messages.fit_room_brief)
     async def room(
         self,
-        inter,
+        inter: disnake.ApplicationCommandInteraction,
         room: str
     ):
         await inter.response.defer()
