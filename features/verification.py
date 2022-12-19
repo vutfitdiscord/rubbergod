@@ -129,6 +129,7 @@ class Verification(BaseFeature):
                     msg = utils.fill_message("invalid_login", user=inter.user.id, admin=config.admin_ids[0])
                     await inter.edit_original_message(msg)
                     await self.log_verify_fail(inter, "getcode (MUNI)", str({"login": login}))
+                    return
 
                 user = self.repo.get_user_by_login(login)
 
