@@ -81,7 +81,7 @@ class Review(commands.Cog):
             await inter.send(Messages.review_wrong_subject)
             return
         view = ReviewView(inter.author, self.bot, embeds)
-        await inter.response.edit_message(embed=embeds[0], view=view)
+        await inter.edit_original_response(embed=embeds[0], view=view)
         view.message = await inter.original_message()
 
     @reviews.sub_command(name='add', description=Messages.review_add_brief)
