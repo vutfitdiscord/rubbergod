@@ -277,7 +277,7 @@ class Roles(commands.Cog):
     @group.sub_command(name="list", description=Messages.group_list)
     async def groups(self, inter):
         names = group_repo.group_names()
-        groups = "\n".join([str(name) for name in names])
+        groups = "\n".join(names)
         output = utils.cut_string_by_words(groups, 1900, "\n")
         await inter.send(f"```md\n# ACTIVE GROUPS:\n{output[0]}```")
         for message in output[1:]:
