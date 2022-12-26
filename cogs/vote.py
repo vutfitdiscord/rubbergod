@@ -54,8 +54,8 @@ class VoteMessage:
         matches = cls.emoji_regex.match(opt_line)
         if matches is None:
             # it is not a disnake emoji, try unicode
-            emojis = emoji.emoji_lis(opt_line)
-            if len(emojis) > 0 and emojis[0]['location'] == 0:
+            emojis = emoji.emoji_list(opt_line)
+            if len(emojis) > 0 and emojis[0]['match_start'] == 0:
                 opt_emoji = emojis[0]['emoji']
                 opt_message = opt_line[len(opt_emoji):].strip()
             else:
