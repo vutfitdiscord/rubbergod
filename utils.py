@@ -118,6 +118,21 @@ def split_to_parts(items, size: int):
     return result
 
 
+def cut_string_by_words(string: str, part_len: int, delimiter: str):
+    """returns list of strings with length of part_len, only whole words"""
+    result = []
+    while True:
+        if len(string) < part_len:
+            result.append(string)
+            break
+        chunk = string[:part_len]
+        last_delimiter = chunk.rindex(delimiter)    # get index of last delimiter
+        chunk = chunk[:last_delimiter]
+        result.append(chunk)
+        string = string[len(chunk):]
+    return result
+
+
 class NotHelperPlusError(commands.CommandError):
     """An error indicating that a user doesn't have permissions to use
     a command that is available only to helpers, submods and mods.
