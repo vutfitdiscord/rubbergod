@@ -277,11 +277,11 @@ class Roles(commands.Cog):
     @group.sub_command(name="list", description=Messages.group_list)
     async def groups(self, inter):
         names = group_repo.group_names()
-        groups = '\n'.join([str(name) for name in names])
-        output = utils.cut_string(groups, 1900)
-        output[0] = f"```md\n# ACTIVE GROUPS:\n{output[0]}```"
-        for message in output:
-            await inter.send(message)
+        groups = "\n".join([str(name) for name in names])
+        output = utils.cut_string_by_words(groups, 1900, "\n")
+        await inter.send(f"```md\n# ACTIVE GROUPS:\n{output[0]}```")
+        for message in output[1:]:
+            await inter.channel.send(f"```md\n{message}```")
 
     @group.sub_command(name="add_channel_id", description=Messages.group_add_channel_id)
     async def add_channel_id(self, inter, name: str, channel_id: str):
