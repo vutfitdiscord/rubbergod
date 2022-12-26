@@ -256,8 +256,12 @@ class Roles(commands.Cog):
 
     @group.sub_command(name="add", description=Messages.group_add)
     async def add_group(self, inter, name: str):
+        group = group_repo.get_group(name)
+        if group is not None:
+            await inter.send(f"Groupa s názvem {name} už existuje.")
+            return
         group_repo.add_group(name)
-        await inter.send(f"Pridal jsem groupu {name}")
+        await inter.send(f"Pridal jsem groupu {name}.")
 
     @group.sub_command(name="get", description=Messages.group_get)
     async def get_group(self, inter, name: str):
@@ -273,8 +277,11 @@ class Roles(commands.Cog):
     @group.sub_command(name="list", description=Messages.group_list)
     async def groups(self, inter):
         names = group_repo.group_names()
-        for name in names:
-            await inter.send(name)
+        groups = '\n'.join([str(name) for name in names])
+        output = utils.cut_string(groups, 1900)
+        output[0] = f"```md\n# ACTIVE GROUPS:\n{output[0]}```"
+        for message in output:
+            await inter.send(message)
 
     @group.sub_command(name="add_channel_id", description=Messages.group_add_channel_id)
     async def add_channel_id(self, inter, name: str, channel_id: str):
