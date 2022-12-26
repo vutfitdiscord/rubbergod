@@ -83,7 +83,7 @@ class Messages:
     karma_vote_allvoted = "Už se hlasovalo o všech emotech."
     karma_revote_format = "Očekávám pouze formát " \
                           f"`{prefix}karma revote [emote]`"
-    karma_emote_not_found = "Emote jsem na serveru nenašel."
+    emote_not_found = "Emote `{emote}` jsem na serveru nenašel."
     karma_get_format = "Použití:\n" \
                        "`/karma getall`: " \
                        "vypíše všechny emoty s hodnotou.\n" \

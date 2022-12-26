@@ -13,6 +13,7 @@ from config import cooldowns
 from config.messages import Messages
 from dateutil import parser
 
+import utils
 from repository import vote_repo
 
 vote_r = vote_repo.VoteRepository()
@@ -146,8 +147,15 @@ class Vote(commands.Cog):
 
         self.vote_cache[ctx.message.id] = parsed_vote
         vote_r.add_vote(ctx.message.id, ctx.channel.id, parsed_vote.end_date, one_of)
-        await self.init_vote(ctx.message)
-        await ctx.send(Messages.vote_none)
+        ret = await self.init_vote(ctx.message)
+        if ret:
+            # init_failed: remove vote from DB and cache
+            vote_r.finish_vote(ctx.message.id)
+            del self.vote_cache[ctx.message.id]
+            match = re.search(f"<:(.*):{ret}>", message)
+            await ctx.send(utils.fill_message("emote_not_found", emote=match.group(1)))
+        else:
+            await ctx.send(Messages.vote_none)
 
     async def init_vote(self, message: Message):
         vote = self.vote_cache[message.id]
@@ -167,6 +175,8 @@ class Vote(commands.Cog):
                     e = vote.options[opt].emoji
                 else:
                     e = self.bot.get_emoji(int(vote.options[opt].emoji))
+                if e is None:
+                    return vote.options[opt].emoji
                 await message.add_reaction(e)
 
         if vote.end_date is not None:
@@ -174,6 +184,7 @@ class Vote(commands.Cog):
             if sec < 1:
                 sec = 1
             asyncio.ensure_future(self.send_final_message(sec, message.id, message.channel.id))
+        return 0
 
     async def handle_raw_reaction_add(self, payload: RawReactionActionEvent):
         # Called from reactions.py

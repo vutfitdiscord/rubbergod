@@ -119,7 +119,7 @@ class Karma(BaseFeature):
                 await message.channel.send(Messages.karma_revote_format)
                 return
             except disnake.NotFound:
-                await message.channel.send(Messages.karma_emote_not_found)
+                await message.channel.send(utils.fill_message("emote_not_found", emote=emoji))
                 return
 
         vote_value = await self.emoji_process_vote(message.channel, emoji)
@@ -141,7 +141,7 @@ class Karma(BaseFeature):
                 await inter.response.send_message(Messages.karma_get_format)
                 return
             except disnake.NotFound:
-                await inter.response.send_message(Messages.karma_emote_not_found)
+                await inter.response.send_message(utils.fill_message("emote_not_found", emote=emoji))
                 return
 
         val = self.repo.emoji_value_raw(emoji)
