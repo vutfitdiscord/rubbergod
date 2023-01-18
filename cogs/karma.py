@@ -133,7 +133,7 @@ class Karma(commands.Cog):
         await inter.response.send_message(self.karma.karma_get(inter.author, user), ephemeral=ephemeral)
 
     @_karma.sub_command(description=messages.karma_stalk_brief)
-    async def stalk(self, inter: disnake.ApplicationCommandInteraction, user: disnake.Member):
+    async def stalk(self, inter: disnake.ApplicationCommandInteraction, user: disnake.User):
         await inter.response.send_message(self.karma.karma_get(inter.author, user))
         await self.check.botroom_check(inter)
 
@@ -341,6 +341,9 @@ class Karma(commands.Cog):
             return True
         if isinstance(error, commands.CheckFailure):
             await inter.reply(utils.fill_message("insufficient_rights", user=inter.author.id))
+            return True
+        if isinstance(error, commands.UserNotFound):
+            await inter.send(utils.fill_message("user_not_found", user=inter.author.id))
             return True
 
     async def validate_leaderboard_offset(self, offset: int, inter) -> bool:
