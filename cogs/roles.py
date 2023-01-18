@@ -1,7 +1,7 @@
 import asyncio
 import disnake
 from disnake.ext import commands
-from typing import Tuple, Union, List
+from typing import Tuple, List
 
 import utils
 from config.app_config import config
@@ -309,8 +309,8 @@ class Roles(commands.Cog):
         pass
 
     @channel.sub_command(name="copy", description=Messages.role_channel_copy_brief)
-    async def copy(self, inter, src: Union[disnake.TextChannel, disnake.VoiceChannel],
-                   dst: Union[disnake.TextChannel, disnake.VoiceChannel]):
+    async def copy(self, inter, src: disnake.abc.GuildChannel,
+                   dst: disnake.abc.GuildChannel):
         """
         Copy permissions from src channel to dst.
         Both channels are expected as tags or IDs
@@ -321,7 +321,7 @@ class Roles(commands.Cog):
         await inter.edit_original_response(Messages.channel_copy_done)
 
     @channel.sub_command(name="clone", description=Messages.role_channel_clone_brief)
-    async def clone(self, inter, src: Union[disnake.TextChannel, disnake.VoiceChannel], name):
+    async def clone(self, inter, src: disnake.abc.GuildChannel, name: str):
         """Clone channel with same permissions as src."""
         await inter.send(Messages.channel_clone_start)
         new = await src.clone(name=name)
