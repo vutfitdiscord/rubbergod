@@ -34,8 +34,8 @@ class SystemView(BaseView):
         await inter.response.edit_message(view=self)
 
     async def on_timeout(self):
-        lenght = len(self.children)
-        for x in range(lenght):
+        length = len(self.children)
+        for x in range(length):
             self.remove_item(self.children[0])
         await self.message.edit(view=self)
 
