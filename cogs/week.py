@@ -18,7 +18,7 @@ class Week(commands.Cog):
     async def week(self, inter: disnake.ApplicationCommandInteraction):
         """See if the current week is odd or even"""
         cal_week = date.today().isocalendar()[1]
-        stud_week = cal_week - config.starting_week
+        stud_week = (cal_week - config.starting_week) % 52 
         even, odd = "sudý", "lichý"
         cal_type = even if cal_week % 2 == 0 else odd
 
