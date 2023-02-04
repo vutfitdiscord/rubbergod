@@ -135,7 +135,7 @@ class Review(commands.Cog):
     @subject.command(brief=Messages.subject_update_biref)
     async def update(self, ctx):
         """Updates subjects from web"""
-        global subjects
+        global subjects, programmes
         programme_details_link = "https://www.fit.vut.cz/study/"
         reply = ""
         async with ctx.channel.typing():
@@ -152,6 +152,8 @@ class Review(commands.Cog):
             # sports
             self.manager.update_sport_subjects()
             subjects = self.repo.get_all_subjects()
+            programmes = self.repo.get_all_programmes()
+            self.get_all_options()
             reply += Messages.subject_update_success
             await ctx.reply(reply)
 
