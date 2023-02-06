@@ -267,8 +267,7 @@ class Roles(commands.Cog):
                         if channel.topic != sub.name and channel.topic != newName:
                             await logChan.send(channel.name+' - '+channel.topic+sub.name)
                     else:
-                        await channel.edit(topic = sub.name if not boolik else newName)
-
+                        await channel.edit(topic=sub.name if not boolik else newName)
 
     @commands.check(utils.is_bot_admin_or_mod)
     @commands.slash_command(name="group", guild_ids=[config.guild_id])
