@@ -6,12 +6,14 @@ from disnake.ext import commands
 from config import cooldowns
 from config.app_config import config
 from config.messages import Messages
+from repository import review_repo
 import utils
 import shlex
 
 
 class Random(commands.Cog):
     def __init__(self, bot):
+        self.repo = review_repo.ReviewRepository()
         self.bot = bot
 
     @cooldowns.short_cooldown
@@ -42,6 +44,22 @@ class Random(commands.Cog):
             return
         option = disnake.utils.escape_mentions(random.choice(args))
         await inter.send(f"{option} {inter.author.mention}")
+
+    @cooldowns.short_cooldown
+    @commands.slash_command(name="do_da_thing", description='hodi prdeli', guild_ids=[config.guild_id])
+    async def do_da_thing(self, inter: disnake.ApplicationCommandInteraction):
+        guild = self.bot.get_guild(config.guild_id)
+        for channel in guild.channels:
+            if channel.type == disnake.ChannelType.text:
+                boolik = '-' in channel.name
+                name = channel.name.split('-')[0] if boolik else channel.name
+                sub = self.repo.get_subject_details(name)
+                if sub:
+                    if channel.topic:
+                        if channel.topic != sub.name and channel.topic != sub.name + ', but ' + '-'.join(channel.name.split('-')[1:]):
+                            await self.bot.get_channel(config.log_channel).send(channel.name+' - '+channel.topic+sub.name)
+                    else:
+                        await channel.edit(topic = sub.name if not boolik else sub.name + ', but ' + '-'.join(channel.name.split('-')[1:]))
 
     @cooldowns.short_cooldown
     @commands.slash_command(name="flip", description=Messages.random_flip_brief)
