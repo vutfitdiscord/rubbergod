@@ -9,6 +9,7 @@ from config.app_config import config
 # TODO: use messages
 from config.messages import Messages
 from repository import role_group_repo
+from repository import review_repo
 from features.reaction_context import ReactionContext
 
 group_repo = role_group_repo.RoleGroupRepository()
@@ -18,6 +19,7 @@ class Roles(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
         self.lock = asyncio.Lock()
+        self.repo = review_repo.ReviewRepository()
 
     # Returns list of role names and emotes that represent them
     async def get_join_role_data(self, message):
@@ -248,6 +250,24 @@ class Roles(commands.Cog):
             channel = None if role else disnake.utils.get(guild.channels, name=target.lower())
 
         return [role], [channel]
+
+    @commands.check(utils.is_bot_admin_or_mod)
+    @commands.slash_command(name="do_da_thing", description='hodi prdeli', guild_ids=[config.guild_id])
+    async def do_da_thing(self, inter: disnake.ApplicationCommandInteraction):
+        guild = self.bot.get_guild(config.guild_id)
+        logChan = self.bot.get_channel(config.log_channel)
+        for channel in guild.channels:
+            if channel.type == disnake.ChannelType.text:
+                boolik = '-' in channel.name
+                name = channel.name.split('-')[0] if boolik else channel.name
+                sub = self.repo.get_subject_details(name)
+                if sub:
+                    newName = sub.name + ', but ' + '-'.join(channel.name.split('-')[1:])
+                    if channel.topic:
+                        if channel.topic != sub.name and channel.topic != newName:
+                            await logChan.send(channel.name+' - '+channel.topic+sub.name)
+                    else:
+                        await channel.edit(topic=sub.name if not boolik else newName)
 
     @commands.check(utils.is_bot_admin_or_mod)
     @commands.slash_command(name="group", guild_ids=[config.guild_id])
