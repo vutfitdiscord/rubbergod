@@ -157,6 +157,21 @@ class ReviewManager:
         else:
             return False
 
+    def authored_reviews(self, author: str):
+        """Returns embed of reviews written by user"""
+        reviews = self.repo.get_reviews_by_author(author)
+        reviews_cnt = reviews.count()
+
+        if reviews_cnt == 0:
+            description = "*Zatim nic.*"
+        else:
+            description = ""
+            for review in reviews:
+                description += review.subject.upper() + "\n"
+
+        embed = disnake.Embed(title="Ohodnotil jsi:", description=description)
+        return embed
+
     def add_vote(self, review_id: int, vote: bool, author: str):
         """Add/update vote for review"""
         relevance = self.repo.get_vote_by_author(review_id, author)
