@@ -100,7 +100,7 @@ class FitWide(commands.Cog):
         permited = session.query(Permit)
         permited_ids = [int(person.discord_ID) for person in permited]
 
-        years = ["0BIT", "1BIT", "2BIT", "3BIT+", "0MIT", "1MIT", "2MIT+", "PhD+", "VUT", "Dropout"]
+        years = ["0BIT", "1BIT", "2BIT", "3BIT+", "0MIT", "1MIT", "2MIT+", "Doktorand", "VUT", "Dropout"]
 
         year_roles = {year: disnake.utils.get(guild.roles, name=year) for year in years}
 

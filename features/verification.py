@@ -201,7 +201,7 @@ class Verification(BaseFeature):
             ]:
                 return "2MIT+" if year_value >= 2 else f"{year_value}MIT"
             elif year_parts[1] in ["DVI4", "DRH", "DITP"]:
-                return "PhD+"
+                return "Doktorand"
         elif "FEKT" in year_parts:  # FEKT student
             return "VUT"
         elif len(year_parts) == 1 and year_parts[0] == "MUNI":  # Maybe MUNI?
