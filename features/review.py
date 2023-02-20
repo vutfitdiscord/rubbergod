@@ -165,7 +165,7 @@ class ReviewManager:
         if reviews_cnt == 0:
             description = "*Zatim nic.*"
         else:
-            description = '\n'.join(map(lambda x:x.subject.upper(), reviews))
+            description = '\n'.join(map(lambda x: x.subject.upper(), reviews))
 
         embed = disnake.Embed(title="Ohodnotil jsi:", description=description)
         return embed
