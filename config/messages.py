@@ -440,3 +440,14 @@ class Messages:
     icon_removed = "Ikona byla odstraněna"
 
     cooldown = "Příliš rychle, zkus to znovu za {:.3}s"
+
+    timeout_brief = "Dočasně zakáže uživateli interakce na serveru."
+    timeout_time = "Čas ve formátu dd.mm.yyyy nebo dd.mm.yyyy hh:mm"
+    timeout_reason = "Důvod timeoutu pro uživatele"
+    timedout_phrase = "Uživatel: {user} | Timeout do: **{timeout_end}.**\nDůvod: **{reason}**"
+
+    cat_brief = "Pošle náhodný obrázek kočky"
+    dog_brief = "Pošle náhodný obrázek psa"
+    fox_brief = "Pošle náhodný obrázek lišky"
+    duck_brief = "Pošle náhodný obrázek kachny"
+    dadjoke_brief = "Pošle náhodný dadjoke nebo vyhledá podle zadaného slova"
