@@ -1,18 +1,23 @@
+"""
+Here are commands that call random apis for fun things.
+examples - animal pictures, dadjokes
+"""
+
 import aiohttp
 import contextlib
 import random
 import re
+from datetime import datetime
 from typing import List, Dict
 
 import disnake
 from disnake.ext import commands
 from config import cooldowns
-from datetime import datetime
 
 from config.messages import Messages
 
 
-class RandomApis(commands.Cog):
+class Fun(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
@@ -189,4 +194,4 @@ class RandomApis(commands.Cog):
 
 
 def setup(bot):
-    bot.add_cog(RandomApis(bot))
+    bot.add_cog(Fun(bot))
