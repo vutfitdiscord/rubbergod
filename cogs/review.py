@@ -123,6 +123,11 @@ class Review(commands.Cog):
                 return
         await inter.send(Messages.review_remove_error)
 
+    @reviews.sub_command(name='list', description=Messages.review_list_brief)
+    async def author_list(self, inter: disnake.ApplicationCommandInteraction):
+        embed = self.manager.authored_reviews(inter.author.id)
+        await inter.send(embed=embed)
+
     @cooldowns.short_cooldown
     @commands.group()
     @commands.check(utils.is_bot_admin)

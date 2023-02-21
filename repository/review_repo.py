@@ -34,6 +34,12 @@ class ReviewRepository(BaseRepository):
             .first()
         )
 
+    def get_reviews_by_author(self, author_id):
+        return (
+            session.query(Review)
+            .filter(Review.member_ID == str(author_id))
+        )
+
     def update_review(self, id, tier, anonym: bool, text):
         review = Review(id=id, tier=tier, anonym=anonym, text_review=text, date=datetime.date.today())
         session.merge(review)

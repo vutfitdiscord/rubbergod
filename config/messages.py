@@ -223,6 +223,7 @@ class Messages:
     review_add_brief = 'Přidá recenzi na předmět'
     review_get_brief = 'Vypíše recenze na vybraný předmět'
     review_remove_brief = 'Odstraní hodnocení'
+    review_list_brief = 'Vypíše předměty, které si již ohodnotil'
     subject_update_biref = 'Automaticky vyhledá a přidá předměty do reviews i subject databáze'
 
     review_wrong_subject = "Nesprávná zkratka předmětu."
