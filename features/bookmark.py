@@ -20,7 +20,7 @@ class BookmarkFeatures():
         embed.set_image(image)
         embed.add_field(
             name="Channel",
-            value=f"{inter.message.channel.mention}"
+            value=f"{inter.message.channel.mention} - #{inter.message.channel}"
         )
         return embed
 
@@ -72,6 +72,6 @@ class BookmarkFeatures():
             embed.add_field(name="Poznámka", value=Messages.bookmark_upload_limit, inline=False)
         embed.add_field(
             name="Channel",
-            value=f"{inter.message.channel.mention}"
+            value=f"{inter.message.channel.mention} - #{inter.message.channel}"
         )
         return ([embed], images, files_attached)
