@@ -24,32 +24,35 @@ class Fun(commands.Cog):
     def custom_footer(self, author, url):
         return f"📩 {author} | {url} • {datetime.now().strftime('%d.%m.%Y %H:%M')}"
 
+    async def get_image(self, inter, url):
+        async with aiohttp.ClientSession() as session:
+            async with session.get(url) as response:
+                if response.status != 200:
+                    await inter.send(
+                        "Command encountered an error (E{code}).".format(code=response.status)
+                    )
+                    return
+                image_response = await response.json()
+        return image_response
+
+    async def get_fact(self, url):
+        async with aiohttp.ClientSession() as session:
+            with contextlib.suppress(OSError):
+                async with session.get(url) as response:
+                    if response.status == 200:
+                        fact_response_ = await response.json()
+                        fact_response = fact_response_["data"][0]
+        return fact_response
+
     @cooldowns.default_cooldown
     @commands.slash_command(name="cat", description=Messages.cat_brief)
     async def cat(self, inter):
         """Get random image of a cat"""
-        async with aiohttp.ClientSession() as session:
-            async with session.get(
-                "https://api.thecatapi.com/v1/images/search"
-            ) as response:
-                if response.status != 200:
-                    await inter.reply(
-                        (inter, "Command encountered an error (E{code}).").format(
-                            code=response.status
-                        )
-                    )
-                    return
-                image_response = await response.json()
+        image_response = await self.get_image(inter, "https://api.thecatapi.com/v1/images/search")
 
-            fact_response: str = ""
-            if random.randint(0, 9) == 1:
-                url: str = "https://meowfacts.herokuapp.com/"
-
-                with contextlib.suppress(OSError):
-                    async with session.get(url) as response:
-                        if response.status == 200:
-                            fact_response_ = await response.json()
-                            fact_response = fact_response_["data"][0]
+        fact_response: str = ""
+        if random.randint(0, 9) == 1:
+            fact_response = await self.get_fact("https://meowfacts.herokuapp.com/")
 
         image_embed = disnake.Embed()
         image_embed.set_footer(text=self.custom_footer(inter.author, "thecatapi.com"))
@@ -70,25 +73,11 @@ class Fun(commands.Cog):
     @commands.slash_command(name="dog", description=Messages.dog_brief)
     async def dog(self, inter):
         """Get random image of a dog"""
-        async with aiohttp.ClientSession() as session:
-            async with session.get(
-                "https://api.thedogapi.com/v1/images/search"
-            ) as response:
-                if response.status != 200:
-                    return await inter.reply(
-                        (inter, "Command encountered an error (E{code}).").format(
-                            code=response.status
-                        )
-                    )
-                image_response = await response.json()
+        image_response = await self.get_image(inter, "https://api.thedogapi.com/v1/images/search")
 
-            fact_response: str = ""
-            if random.randint(0, 9) == 1:
-                with contextlib.suppress(OSError):
-                    async with session.get("https://dogapi.dog/api/facts/") as response:
-                        if response.status == 200:
-                            fact_response_ = await response.json()
-                            fact_response = fact_response_["facts"][0]
+        fact_response: str = ""
+        if random.randint(0, 9) == 1:
+            fact_response = await self.get_fact("https://dogapi.dog/api/facts/")
 
         image_embed = disnake.Embed()
         image_embed.set_footer(text=self.custom_footer(inter.author, "thedogapi.com"))
@@ -109,20 +98,11 @@ class Fun(commands.Cog):
     @commands.slash_command(name="fox", description=Messages.fox_brief)
     async def fox(self, inter):
         """Get random image of a fox"""
-        async with aiohttp.ClientSession() as session:
-            async with session.get("https://randomfox.ca/floof/") as response:
-                if response.status != 200:
-                    return await inter.reply(
-                        (inter, "Command encountered an error (E{code}).").format(
-                            code=response.status
-                        )
-                    )
-
-                json_response = await response.json()
+        image_response = await self.get_image(inter, "https://randomfox.ca/floof/")
 
         embed = disnake.Embed()
         embed.set_footer(text=self.custom_footer(inter.author, "randomfox.ca"))
-        embed.set_image(url=json_response["image"])
+        embed.set_image(url=image_response["image"])
 
         await inter.send(embed=embed)
 
@@ -130,20 +110,11 @@ class Fun(commands.Cog):
     @commands.slash_command(name="duck", description=Messages.duck_brief)
     async def duck(self, inter):
         """Get random image of a duck"""
-        async with aiohttp.ClientSession() as session:
-            async with session.get("https://random-d.uk/api/v2/random") as response:
-                if response.status != 200:
-                    return await inter.reply(
-                        (inter, "Command encountered an error (E{code}).").format(
-                            code=response.status
-                        )
-                    )
-
-                json_response = await response.json()
+        image_response = await self.get_image(inter, "https://random-d.uk/api/v2/random")
 
         embed = disnake.Embed()
         embed.set_footer(text=self.custom_footer(inter.author, "random-d.uk"))
-        embed.set_image(url=json_response["url"])
+        embed.set_image(url=image_response["url"])
 
         await inter.send(embed=embed)
 
