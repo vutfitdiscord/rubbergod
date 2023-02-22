@@ -169,8 +169,7 @@ class Messages:
                               "<#489461089432633346> Pro pravidla a další info"
     server_link = "https://discord.com/channels/461541385204400138/"
     verify_verify_success_mail = "Gratuluji, byl jsi verifikován!"
-    verify_post_verify_info_mail = "Podivej se do kanalu:\n" \
-                              f"#add-roles - Pro přidání rolí ({server_link}591384273051975683) \n" \
+    verify_post_verify_info_mail = "Podivej se do kanalu " \
                               f"#server-info - Pro pravidla a další info ({server_link}489461089432633346)"
     verify_mail_content = "Obdržel/a jsi kód pro ověření se k přístup na server VUT FIT.\n" \
                           "Po stisknutí na tlačítko \"Zadat kód\" vyplň ověřovací kód přesně tak jak je uveden níže.\n\n" \
