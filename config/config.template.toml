@@ -25,9 +25,9 @@ pass = ''
 db_string = "postgresql://postgres:postgres@db:5432/postgres"
 
 [cogs]
-extensions = ['base', 'karma', 'meme', 'random', 'verify', 'fitwide', 'autopin', 'urban', 'help',
-    'acl', 'review', 'vote', 'name_day', 'week', 'weather', 'roles', 'error', 'absolvent', 'pet', 'reactions',
-    'streamlinks', 'bookmark']
+extensions = ['base', 'karma', 'meme', 'random', 'verify', 'fitwide', 'autopin', 'help',
+    'acl', 'review', 'vote', 'name_day', 'week', 'roles', 'error', 'absolvent', 'pet', 'reactions',
+    'streamlinks', 'bookmark', 'subscriptions', 'latex', 'info', 'fun', 'moderation']
 
 [config]
 static = ['config_static', 'toml_dict', 'key', 'weather_token', 'db_string']
