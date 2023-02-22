@@ -443,8 +443,8 @@ class Messages:
 
     timeout_brief = "Dočasně zakáže uživateli interakce na serveru."
     timeout_time = "Čas ve formátu dd.mm.yyyy nebo dd.mm.yyyy hh:mm"
-    timeout_reason = "Důvod timeoutu pro uživatele"
-    timedout_phrase = "Uživatel: {user} | Timeout do: **{timeout_end}.**\nDůvod: **{reason}**"
+    timeout_reason = "Důvod dočasného umlčení uživatele"
+    timedout_phrase = "Uživatel: {user} | Umlčení do: **{timeout_end}.**\nDůvod: **{reason}**"
 
     cat_brief = "Pošle náhodný obrázek kočky"
     dog_brief = "Pošle náhodný obrázek psa"
