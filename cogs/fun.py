@@ -145,7 +145,7 @@ class Fun(commands.Cog):
         if keyword is not None:
             res = fetched["results"]
             if len(res) == 0:
-                await inter.send("I didn't find a joke like that.")
+                return await inter.send("I didn't find a joke like that.")
             result = random.choice(res)
             result["joke"] = re.sub(
                 f"(\\b\\w*{keyword}\\w*\\b)",
