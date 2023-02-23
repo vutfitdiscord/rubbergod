@@ -59,7 +59,7 @@ class System(commands.Cog):
 
         selects = await self.create_selects()
         view = SystemView(self.bot, len(selects), selects)
-        embed = Dropdown.create_embed(self, inter.author.colour)
+        embed = Dropdown.create_embed(self, inter.author.color)
         await inter.send(embed=embed, view=view)
 
         # pass message object to classes

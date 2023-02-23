@@ -109,8 +109,8 @@ class Dropdown(disnake.ui.Select):
         unloaded.sort()
         return unloaded
 
-    def create_embed(self, author_colour):
-        embed = disnake.Embed(title="Cogs information and loading", colour=author_colour)
+    def create_embed(self, author_color):
+        embed = disnake.Embed(title="Cogs information and loading", color=author_color)
         all_cogs = utils.get_all_cogs()
 
         cog_loaded = []
@@ -188,6 +188,6 @@ class Dropdown(disnake.ui.Select):
                         await inter.send(f"Reloading error\n`{e}`")
 
             self.options = self.create_select()
-            await self.msg.edit(embed=self.create_embed(inter.author.colour), view=self._view)
+            await self.msg.edit(embed=self.create_embed(inter.author.color), view=self._view)
         else:
             await inter.send(utils.fill_message("insufficient_rights", user=inter.author.id), ephemeral=True)
