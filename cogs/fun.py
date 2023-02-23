@@ -35,13 +35,13 @@ class Fun(commands.Cog):
                 image_response = await response.json()
         return image_response
 
-    async def get_fact(self, url):
+    async def get_fact(self, url, key):
         async with aiohttp.ClientSession() as session:
             with contextlib.suppress(OSError):
                 async with session.get(url) as response:
                     if response.status == 200:
                         fact_response_ = await response.json()
-                        fact_response = fact_response_["data"][0]
+                        fact_response = fact_response_[key][0]
         return fact_response
 
     @cooldowns.default_cooldown
@@ -52,9 +52,9 @@ class Fun(commands.Cog):
 
         fact_response: str = ""
         if random.randint(0, 9) == 1:
-            fact_response = await self.get_fact("https://meowfacts.herokuapp.com/")
+            fact_response = await self.get_fact("https://meowfacts.herokuapp.com/", "data")
 
-        image_embed = disnake.Embed()
+        image_embed = disnake.Embed(color=disnake.Color.blue())
         image_embed.set_footer(text=self.custom_footer(inter.author, "thecatapi.com"))
         image_embed.set_image(url=image_response[0]["url"])
         embeds: List[disnake.Embed] = [image_embed]
@@ -63,6 +63,7 @@ class Fun(commands.Cog):
             fact_embed = disnake.Embed(
                 title="Cat fact",
                 description=fact_response,
+                color=disnake.Color.blue(),
             )
             fact_embed.set_footer(text=self.custom_footer(inter.author, "thecatapi.com"))
             embeds.append(fact_embed)
@@ -77,9 +78,9 @@ class Fun(commands.Cog):
 
         fact_response: str = ""
         if random.randint(0, 9) == 1:
-            fact_response = await self.get_fact("https://dogapi.dog/api/facts/")
+            fact_response = await self.get_fact("https://dogapi.dog/api/facts/", "facts")
 
-        image_embed = disnake.Embed()
+        image_embed = disnake.Embed(color=disnake.Color.blue())
         image_embed.set_footer(text=self.custom_footer(inter.author, "thedogapi.com"))
         image_embed.set_image(url=image_response[0]["url"])
         embeds: List[disnake.Embed] = [image_embed]
@@ -88,6 +89,7 @@ class Fun(commands.Cog):
             fact_embed = disnake.Embed(
                 title="Dog fact",
                 description=fact_response,
+                color=disnake.Color.blue(),
             )
             fact_embed.set_footer(text=self.custom_footer(inter.author, "thedogapi.com"))
             embeds.append(fact_embed)
@@ -100,7 +102,7 @@ class Fun(commands.Cog):
         """Get random image of a fox"""
         image_response = await self.get_image(inter, "https://randomfox.ca/floof/")
 
-        embed = disnake.Embed()
+        embed = disnake.Embed(color=disnake.Color.blue())
         embed.set_footer(text=self.custom_footer(inter.author, "randomfox.ca"))
         embed.set_image(url=image_response["image"])
 
@@ -112,7 +114,7 @@ class Fun(commands.Cog):
         """Get random image of a duck"""
         image_response = await self.get_image(inter, "https://random-d.uk/api/v2/random")
 
-        embed = disnake.Embed()
+        embed = disnake.Embed(color=disnake.Color.blue())
         embed.set_footer(text=self.custom_footer(inter.author, "random-d.uk"))
         embed.set_image(url=image_response["url"])
 
@@ -155,8 +157,9 @@ class Fun(commands.Cog):
             result = fetched
 
         embed = disnake.Embed(
-            title="Link",
+            title="Dadjoke",
             description=result["joke"],
+            color=disnake.Color.blue(),
             url="https://icanhazdadjoke.com/j/" + result["id"],
         )
         embed.set_footer(text=self.custom_footer(inter.author, "icanhazdadjoke.com"))
