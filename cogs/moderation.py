@@ -20,17 +20,17 @@ class Moderation(commands.Cog):
     async def mod_tag(self, message: disnake.Message, title, room):
         if len(message.content) < 3800:
             embed = disnake.Embed(
-                title=f"Tag {title} used in #{message.channel.name}",
+                title=f"Tagged {title}",
                 description=f"**User:** {message.author.mention}\n"
-                f"**Room:** {message.channel.mention}\n"
+                f"**Room:** #{message.channel}\n"
                 f"**Content:**\n{message.content}",
                 color=disnake.Colour.yellow()
             )
         else:
             embed = disnake.Embed(
-                title=f"Tag {title} used in #{message.channel.name}",
+                title=f"Tagged {title}",
                 description=f"**User:** {message.author.mention}\n"
-                f"**Room:** {message.channel.mention}\n",
+                f"**Room:** #{message.channel}\n",
                 color=disnake.Colour.yellow()
             )
             parts = utils.split_to_parts(message.content, 1024)
@@ -41,12 +41,7 @@ class Moderation(commands.Cog):
         embed.set_footer(text=datetime.now().strftime('%d.%m.%Y %H:%M'))
         await room.send(
             embed=embed,
-            view=ModerationView(
-                message.jump_url,
-                "Unresolved",
-                disnake.ButtonStyle.gray,
-                self.moderation_false
-            )
+            view=ModerationView(message.jump_url, "Resolve", self.moderation_false)
         )
 
     @commands.Cog.listener()
@@ -66,24 +61,24 @@ class Moderation(commands.Cog):
 
         embed = inter.message.embeds[0].to_dict()
         if inter.component.custom_id == self.moderation_true:
-            label = "Unresolved"
-            style = disnake.ButtonStyle.gray
+            label = "Resolve"
             custom_id = self.moderation_false
+            embed["color"] = disnake.Color.yellow()
             for field in embed["fields"]:
                 if field["name"] == "Resolved by:":
                     field["value"] = "---"
 
         else:
-            label = "Resolved"
-            style = disnake.ButtonStyle.green
+            label = "Unresolve"
             custom_id = self.moderation_true
+            embed["color"] = disnake.Color.green()
             for field in embed["fields"]:
                 if field["name"] == "Resolved by:":
                     field["value"] = inter.author.mention
 
         await inter.response.edit_message(
             embed=disnake.Embed.from_dict(embed),
-            view=ModerationView(inter.message.jump_url, label, style, custom_id)
+            view=ModerationView(inter.message.jump_url, label, custom_id)
         )
 
 
