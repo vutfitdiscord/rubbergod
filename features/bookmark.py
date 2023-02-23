@@ -15,7 +15,7 @@ class BookmarkFeatures():
             title_name = utils.fill_message("bookmark_title", server=inter.guild.name)
 
         author = inter.message.author
-        embed = disnake.Embed(title=title_name, color=author.colour)
+        embed = disnake.Embed(title=title_name, color=author.color)
         embed.set_author(name=author, icon_url=author.display_avatar.url)
         embed.set_image(image)
         embed.add_field(
@@ -29,13 +29,13 @@ class BookmarkFeatures():
             title_name = utils.fill_message("bookmark_title", server=inter.guild.name)
 
         author = inter.message.author
-        embed = disnake.Embed(title=title_name, colour=author.colour)
+        embed = disnake.Embed(title=title_name, color=author.color)
         embed.set_author(name=author, icon_url=author.display_avatar.url)
 
         content = ""
         if inter.message.embeds:
             for embed in inter.message.embeds:
-                embed.title, embed.colour = title_name, author.colour
+                embed.title, embed.color = title_name, author.color
                 embed.set_author(name=author, icon_url=author.display_avatar.url)
 
         if inter.message.content:

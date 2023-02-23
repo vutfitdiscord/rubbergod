@@ -31,7 +31,7 @@ class ReviewManager:
         else:
             shortcut = subject
         embed = disnake.Embed(title=f"{shortcut} reviews", description=description)
-        embed.colour = 0x6D6A69
+        embed.color = 0x6D6A69
         id = 0
         if review:
             id = review.id
@@ -57,9 +57,9 @@ class ReviewManager:
             embed.add_field(name="👎", value=f"{dislikes}")
             diff = likes - dislikes
             if diff > 0:
-                embed.colour = 0x34CB0B
+                embed.color = 0x34CB0B
             elif diff < 0:
-                embed.colour = 0xCB410B
+                embed.color = 0xCB410B
         if type(subject) == Subject_details and not subject.shortcut.lower().startswith("tv"):
             sem = 1 if subject.semester == "L" else 2
             subject_id = subject.card.split("/")[-2]
@@ -74,7 +74,7 @@ class ReviewManager:
 
     def update_embed(self, embed: disnake.Embed, review: Review, text_page: int = 1):
         """Update embed fields"""
-        embed.colour = 0x6D6A69
+        embed.color = 0x6D6A69
         text = review.text_review
         idx = 3
         add_new_field = False
@@ -109,9 +109,9 @@ class ReviewManager:
             embed.remove_field(idx)
         diff = likes - dislikes
         if diff > 0:
-            embed.colour = 0x34CB0B
+            embed.color = 0x34CB0B
         elif diff < 0:
-            embed.colour = 0xCB410B
+            embed.color = 0xCB410B
         return embed
 
     def add_review(self, author_id: int, subject: str, tier: int, anonym: bool, text: str):

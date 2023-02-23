@@ -24,14 +24,14 @@ class Moderation(commands.Cog):
                 description=f"**User:** {message.author.mention}\n"
                 f"**Room:** #{message.channel}\n"
                 f"**Content:**\n{message.content}",
-                color=disnake.Colour.yellow()
+                color=disnake.Color.yellow()
             )
         else:
             embed = disnake.Embed(
                 title=f"Tagged {title}",
                 description=f"**User:** {message.author.mention}\n"
                 f"**Room:** #{message.channel}\n",
-                color=disnake.Colour.yellow()
+                color=disnake.Color.yellow()
             )
             parts = utils.split_to_parts(message.content, 1024)
             for msg in parts:

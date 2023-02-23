@@ -280,7 +280,7 @@ class Karma(BaseFeature):
 
     async def message_karma(self, author: disnake.User, msg: disnake.Message):
         reactions = msg.reactions
-        colour = 0x6d6a69
+        color = 0x6d6a69
         output = {'-1': [], '1': [], '0': []}
         karma = 0
         for react in reactions:
@@ -317,10 +317,10 @@ class Karma(BaseFeature):
                     name = 'Negativní'
                 embed.add_field(name=name, value=message, inline=False)
         if karma > 0:
-            colour = 0x34cb0b
+            color = 0x34cb0b
         elif karma < 0:
-            colour = 0xcb410b
-        embed.colour = colour
+            color = 0xcb410b
+        embed.color = color
         embed.add_field(name='Celková karma za zprávu:', value=karma, inline=False)
         utils.add_author_footer(embed, author)
         return embed
