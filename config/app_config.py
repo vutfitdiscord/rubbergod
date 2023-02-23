@@ -88,6 +88,7 @@ class Config:
     vote_room: int = get_attr(toml_dict, "channels", "vote_room")
     bot_room: int = get_attr(toml_dict, "channels", "bot_room")
     mod_room: int = get_attr(toml_dict, "channels", "mod_room")
+    submod_helper_room: int = get_attr(toml_dict, "channels", "submod_helper_room")
 
     # Meme repost
     meme_room: int = get_attr(toml_dict, "meme_repost", "meme_room")

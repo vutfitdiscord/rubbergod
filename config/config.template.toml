@@ -25,9 +25,9 @@ pass = ''
 db_string = "postgresql://postgres:postgres@db:5432/postgres"
 
 [cogs]
-extensions = ['base', 'karma', 'meme', 'random', 'verify', 'fitwide', 'autopin', 'urban', 'help',
-    'acl', 'review', 'vote', 'name_day', 'week', 'weather', 'roles', 'error', 'absolvent', 'pet', 'reactions',
-    'streamlinks', 'bookmark']
+extensions = ['base', 'karma', 'meme', 'random', 'verify', 'fitwide', 'autopin', 'help',
+    'acl', 'review', 'vote', 'name_day', 'week', 'roles', 'error', 'absolvent', 'pet', 'reactions',
+    'streamlinks', 'bookmark', 'subscriptions', 'latex', 'info', 'fun', 'moderation']
 
 [config]
 static = ['config_static', 'toml_dict', 'key', 'weather_token', 'db_string']
@@ -58,6 +58,7 @@ bot_dev_channel = 597009137905303552
 vote_room = 461544375105749003
 bot_room = 461549842896781312
 mod_room = 505679727936143361
+submod_helper_room = 1023669101744357377
 
 allowed_channels = [
         'bot_room',
