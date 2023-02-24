@@ -145,7 +145,7 @@ class Fun(commands.Cog):
         if keyword is not None:
             res = fetched["results"]
             if len(res) == 0:
-                await inter.send("I didn't find a joke like that.")
+                return await inter.send("I didn't find a joke like that.")
             result = random.choice(res)
             result["joke"] = re.sub(
                 f"(\\b\\w*{keyword}\\w*\\b)",
@@ -163,6 +163,29 @@ class Fun(commands.Cog):
             url="https://icanhazdadjoke.com/j/" + result["id"],
         )
         embed.set_footer(text=self.custom_footer(inter.author, "icanhazdadjoke.com"))
+
+        await inter.send(embed=embed)
+
+    @cooldowns.default_cooldown
+    @commands.slash_command(name="yo_mamajoke", description=Messages.yo_mamajoke_brief)
+    async def yo_mamajoke(self, inter):
+        """Get random Yo momma joke"""
+        async with aiohttp.ClientSession() as session:
+            async with session.get("https://api.yomomma.info/") as response:
+                if response.status != 200:
+                    await inter.send(
+                        "Command encountered an error (E{code}).".format(code=response.status)
+                    )
+                    return
+                result = await response.json()
+
+        embed = disnake.Embed(
+            title="Yo mamajoke",
+            description=result["joke"],
+            color=disnake.Color.blue(),
+            url="https://yomomma.info",
+        )
+        embed.set_footer(text=self.custom_footer(inter.author, "yomomma.info"))
 
         await inter.send(embed=embed)
 
