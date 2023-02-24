@@ -450,3 +450,5 @@ class Messages:
     fox_brief = "Pošle náhodný obrázek lišky"
     duck_brief = "Pošle náhodný obrázek kachny"
     dadjoke_brief = "Pošle náhodný dadjoke nebo vyhledá podle zadaného slova"
+    yo_mamajoke_brief = "Pošle náhodný Yo momma joke"
+
