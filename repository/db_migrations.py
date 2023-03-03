@@ -16,11 +16,14 @@ from repository.database.meme_repost import MemeRepost  # noqa: F401
 from repository.database.exams import ExamsTermsMessage  # noqa: F401
 from repository.database.error import ErrorLog  # noqa: F401
 from repository.database.cooldown import Cooldown  # noqa: F401
+from repository.database.timeout import Timeout  # noqa: F401
+
 
 from config.app_config import config
 
 
 def init_db(commit: bool = True):
+    # database.base.metadata.drop_all(database.db)
     database.base.metadata.create_all(database.db)
 
     if commit:

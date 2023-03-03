@@ -441,9 +441,16 @@ class Messages:
     cooldown = "Příliš rychle, zkus to znovu za {:.3}s"
 
     timeout_brief = "Dočasně zakáže uživateli interakce na serveru."
-    timeout_time = "Čas ve formátu dd.mm.yyyy nebo dd.mm.yyyy hh:mm"
-    timeout_reason = "Důvod dočasného umlčení uživatele"
-    timedout_phrase = "Uživatel: {user} | Umlčení do: **{timeout_end}.**\nDůvod: **{reason}**"
+    timeout_time = "Čas ve formátu dd.mm.yyyy nebo dd.mm.yyyy hh:mm. Základní jednotka je 1 hodina."
+    timeout_reason = "Důvod dočasného umlčení uživatele."
+    timeout_phrase = "Uživatel: {user} | Umlčení do: **{timeout_end}.**\nDůvod: **{reason}**"
+    timeout_list_brief = "Vypíše uživatele se zatlumením."
+    timeout_remove_brief = "Předčasně odebere umlčení uživateli."
+    timeout_remove = "Umlčení zrušeno uživateli {user}."
+    timeout_bad_format = "Neznamý formát času. Možné formáty:\n**3** - celé hodiny\n**0.5** - necelé hodiny, použij tečku\n**{format}**"
+    timeout_permission = "Na umlčení tohoto uživatele nemám práva."
+    timeout_negative_time = "Čas nemůže být záporný."
+    timeout_overflow = "Příliš velký počet hodin. Použij formát datumu."
 
     cat_brief = "Pošle náhodný obrázek kočky"
     dog_brief = "Pošle náhodný obrázek psa"
@@ -451,4 +458,3 @@ class Messages:
     duck_brief = "Pošle náhodný obrázek kachny"
     dadjoke_brief = "Pošle náhodný dadjoke nebo vyhledá podle zadaného slova"
     yo_mamajoke_brief = "Pošle náhodný Yo momma joke"
-
