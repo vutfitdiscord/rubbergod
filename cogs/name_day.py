@@ -1,19 +1,18 @@
 import disnake
 import aiohttp
 import asyncio
-from datetime import date, time, datetime
+from datetime import date, time
 from disnake.ext import commands, tasks
 
 from config.app_config import config
 from config.messages import Messages
+import utils
 
 
 class Nameday(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.send_names.start()
-
-    local_tz = datetime.now().astimezone().tzinfo
 
     async def _name_day_cz(self):
         async with aiohttp.ClientSession(timeout=aiohttp.ClientTimeout(total=10)) as session:
@@ -42,7 +41,7 @@ class Nameday(commands.Cog):
                 return "Website unreachable"
 
     async def _birthday(self):
-        headers = {"ApiKey": config.grillbot_api_key}
+        headers = {"ApiKey": config.grillbot_api_key, "Author": str(self.bot.owner.id)}
         async with aiohttp.ClientSession(timeout=aiohttp.ClientTimeout(total=10), headers=headers) as session:
             try:
                 url = "https://grillbot.cloud/api/user/birthday/today"
@@ -64,7 +63,7 @@ class Nameday(commands.Cog):
         name_day_sk = await self._name_day_sk()
         await inter.edit_original_response(name_day_sk)
 
-    @tasks.loop(time=time(7, 0, tzinfo=local_tz))
+    @tasks.loop(time=time(7, 0, tzinfo=utils.get_local_zone()))
     async def send_names(self):
         name_day_cz = await self._name_day_cz()
         name_day_sk = await self._name_day_sk()
