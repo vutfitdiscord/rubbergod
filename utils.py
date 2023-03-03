@@ -362,3 +362,7 @@ async def get_username_from_tag(self, tag):
         user = await self.bot.get_or_fetch_user(int(user))
         user_names.append(user.name)
     return user_names
+
+
+def get_local_zone():
+    return datetime.now().astimezone().tzinfo
