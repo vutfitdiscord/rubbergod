@@ -53,42 +53,30 @@ class Timeout(commands.Cog):
 
     async def timeout_embed_listing(self, users, title, room):
         """Embed for sending timeout updates on users"""
+        embeds = []
         # max 25 fields per embed
-        if len(users) > 25:
-            embeds = []
-            users_lists = utils.split_to_parts(users, 25)
-            for users_list in users_lists:
-                embed = self.create_embed(self.bot.user, title)
-                for timeout in users_list:
-                    embed.add_field(
-                        name=f"{self.bot.get_user(timeout.user_id)}"
-                             f" | {(timeout.end).strftime('%d.%m.%Y %H:%M')}",
-                        value=timeout.reason,
-                        inline=False
-                    )
-                embeds.append(embed)
-            await room.send(embeds=embeds)
-        else:
+        users_lists = utils.split_to_parts(users, 25)
+        for users_list in users_lists:
             embed = self.create_embed(self.bot.user, title)
-            for timeout in users:
+            for timeout in users_list:
                 embed.add_field(
-                    name=f"{self.bot.get_user(timeout.user_id)} | {(timeout.end).strftime('%d.%m.%Y %H:%M')}",
+                    name=f"{self.bot.get_user(timeout.user_id)}"
+                         f" | {(timeout.end).strftime('%d.%m.%Y %H:%M')}",
                     value=timeout.reason,
                     inline=False
                 )
-            await room.send(embed=embed)
+            embeds.append(embed)
+        await room.send(embeds=embeds)
 
     async def timeout_perms(self, inter, user, duration, endtime, reason) -> bool:
         """Set timeout for user or remove it and save in db"""
         try:
+            await user.timeout(duration=duration, reason=reason)
             if duration is None:
-                await user.timeout(duration=duration, reason=reason)
                 self.timeout_repo.remove_timeout(user.id)
-                return False
             else:
-                await user.timeout(duration=duration, reason=reason)
                 self.timeout_repo.add_timeout(user.id, endtime, reason)
-                return False
+            return False
         except disnake.Forbidden:
             await inter.send(Messages.timeout_permission)
             return True
@@ -141,6 +129,7 @@ class Timeout(commands.Cog):
                 except ValueError:
                     raise commands.BadArgument
 
+            # maximum lenght for timeout is 28 days set by discord
             if timeout_duration.days > 28:
                 if await self.timeout_perms(inter, user, timedelta(days=28), endtime, reason):
                     return
@@ -202,9 +191,17 @@ class Timeout(commands.Cog):
         for user in users:
             guild = self.bot.get_guild(config.guild_id)
             member = guild.get_member(user.user_id)
+
+            # member left server
+            if member is None:
+                self.timeout_repo.remove_timeout(user.user_id)
+                continue
+
+            # someone removed timeout manually
             if member.current_timeout is None:
                 self.timeout_repo.remove_timeout(user.user_id)
                 continue
+
             current_timeout = member.current_timeout.astimezone(tz=utils.get_local_zone())
             end_timeout = user.end.replace(tzinfo=utils.get_local_zone())
 
