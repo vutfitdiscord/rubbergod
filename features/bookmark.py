@@ -61,6 +61,10 @@ class BookmarkFeatures():
             embed.set_image(images[0])
             del images[0]
 
+        if inter.message.stickers:
+            for sticker in inter.message.stickers:
+                files_attached.append(await sticker.to_file())
+
         if len(content) > 1024:
             parts = split_to_parts(content, 1024)
             for msg in parts:
