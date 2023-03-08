@@ -44,7 +44,7 @@ class SystemView(BaseView):
         if permission_check.is_bot_admin(inter):
             return True
         else:
-            await inter.send(utils.fill_message("insufficient_rights", user=inter.author.id), ephemeral=True)
+            await inter.send(utils.fill_message("missing_perms", user=inter.author.id), ephemeral=True)
             return False
 
 
@@ -191,4 +191,4 @@ class Dropdown(disnake.ui.Select):
             self.options = self.create_select()
             await self.msg.edit(embed=self.create_embed(inter.author.color), view=self._view)
         else:
-            await inter.send(utils.fill_message("insufficient_rights", user=inter.author.id), ephemeral=True)
+            await inter.send(utils.fill_message("missing_perms", user=inter.author.id), ephemeral=True)

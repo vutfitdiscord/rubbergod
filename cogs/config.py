@@ -169,14 +169,6 @@ class DynamicConfig(commands.Cog):
             toml.dump(config.toml_dict, fd)
         await ctx.send(Messages.config_updated)
 
-    @config.error
-    async def configerror(self, ctx, error):
-        """
-        Error in case of insufficient rights for command
-        """
-        if isinstance(error, commands.CheckFailure):
-            await ctx.send(utils.fill_message("insufficient_rights", user=ctx.author.id))
-
 
 def setup(bot):
     bot.add_cog(DynamicConfig(bot))

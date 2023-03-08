@@ -9,6 +9,7 @@ from config.messages import Messages
 from features.error import ErrorLogger
 from repository.database import session
 import utils
+from permissions import permission_check
 
 
 class Error(commands.Cog):
@@ -25,8 +26,16 @@ class Error(commands.Cog):
         if isinstance(error, sqlalchemy.exc.InternalError):
             session.rollback()
             return
+        if (
+            isinstance(error, permission_check.NotHelperPlusError)
+            or isinstance(error, permission_check.NotSubmodPlusError)
+            or isinstance(error, permission_check.NotModPlusError)
+            or isinstance(error, permission_check.NotAdminError)
+        ):
+            await ctx.send(error.message)
+            return
         if isinstance(error, commands.errors.CheckFailure):
-            await ctx.reply(utils.fill_message("insufficient_rights", user=ctx.author.id))
+            await ctx.reply(utils.fill_message("missing_perms", user=ctx.author.id))
             return
         if (
             isinstance(error, commands.BadArgument)
@@ -52,15 +61,11 @@ class Error(commands.Cog):
             return
 
         if isinstance(error, commands.CommandOnCooldown):
-            await ctx.send(utils.fill_message("spamming", user=ctx.author.id))
+            await ctx.send(utils.fill_message("spamming", user=ctx.author.id, time=error.retry_after))
             return
 
         if isinstance(error, commands.NoPrivateMessage):
             await ctx.send(Messages.guild_only)
-            return
-
-        if isinstance(error, utils.NotHelperPlusError):
-            await ctx.send(Messages.helper_plus_only)
             return
 
         output = "".join(traceback.format_exception(type(error), error, error.__traceback__))
@@ -82,6 +87,15 @@ class Error(commands.Cog):
         if isinstance(error, disnake.errors.DiscordServerError):
             return
 
+        if (
+            isinstance(error, permission_check.NotHelperPlusError)
+            or isinstance(error, permission_check.NotSubmodPlusError)
+            or isinstance(error, permission_check.NotModPlusError)
+            or isinstance(error, permission_check.NotAdminError)
+        ):
+            await inter.response.send_message(error.message)
+            return
+
         if isinstance(error, commands.errors.CheckFailure):
             await inter.response.send_message(utils.fill_message("missing_perms", user=inter.author.id))
             return
@@ -95,11 +109,9 @@ class Error(commands.Cog):
             return
 
         if isinstance(error, commands.CommandOnCooldown):
-            await inter.response.send_message(utils.fill_message("spamming", user=inter.author.id))
-            return
-
-        if isinstance(error, utils.NotHelperPlusError):
-            await inter.response.send_message(Messages.helper_plus_only)
+            await inter.response.send_message(
+                utils.fill_message("spamming", user=inter.author.id, time=error.retry_after)
+            )
             return
 
         embed = self.logger.create_embed(
