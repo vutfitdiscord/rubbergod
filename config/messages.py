@@ -8,10 +8,8 @@ class Messages:
 
     help_title = "Nápověda"
     help_description = "Kompletní seznam lze také najít ve veřejné administraci bota (https://public.grillbot.cloud/)"
-    help_command_not_found = "Žádný příkaz jako `{command}` neexistuje."
 
     karma_get_missing = "Toaster pls, měl jsi bordel v DB. Musel jsem za tebe uklidit."
-    missing_perms = "Na tohle nemáš práva, {user}"
     acl_help = "{user}, Použití:\n`!acl {{action}} {{table}} [args]`\n"\
                "action: add, edit, del nebo list\n"\
                "table: group, rule, role nebo user\n"\
@@ -32,13 +30,19 @@ class Messages:
     moved_command = "Tento příkaz již není v textové formě podporován. Příkaz byl nahrazen příkazem </{name}:{id}>"
     no_such_command = "Takový příkaz neznám. <:sadcat:576171980118687754>"
     command_timed_out = "Příkaz nereagoval a byl nečekaně ukončen."
-    spamming = "{user} Nespamuj tolik <:sadcat:576171980118687754>"
-    insufficient_rights = "{user}, na použití tohoto příkazu nemáš právo."
+    spamming = "{user} Nespamuj tolik <:sadcat:576171980118687754>, příkaz můžeš použít až za {time:.2f}s."
+
+    # PERMISSIONS
+    missing_perms = "{user}, na použití tohoto příkazu nemáš právo."
     helper_plus_only = "Na tohle mají práva jen Helper+. <:KKomrade:484470873001164817>"
+    submod_plus_only = "Na tohle mají práva jen Submod+. <:KKomrade:484470873001164817>"
+    mod_plus_only = "Na tohle mají práva jen Mod+. <:KKomrade:484470873001164817>"
+    bot_admin_only = "Na tohle mají práva jen Admin. <:KKomrade:484470873001164817>"
     vote_room_only = "Tohle funguje jen v {room}."
     guild_only = "Tohle funguje jen na serveru"
     bot_room_redirect = "{user} <:sadcat:576171980118687754> 👉 " \
                         "<#{bot_room}>\n"
+
     covid_storno = "{user} <:WeirdChamp:680711174802899007>"
     uhoh_counter = "{uhohs} uh ohs od spuštění."
     uhoh_brief = "Vypíše počet uh ohs od spuštění"

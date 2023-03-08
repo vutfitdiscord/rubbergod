@@ -240,11 +240,6 @@ class Warden(commands.Cog):
             return
         await send.add_reaction("❎")
 
-    @scan.error
-    async def role_checks_error(self, ctx, error):
-        if isinstance(error, commands.errors.CheckFailure):
-            await ctx.send(utils.fill_message("insufficient_rights", user=ctx.author.id))
-
 
 def setup(bot):
     bot.add_cog(Warden(bot))

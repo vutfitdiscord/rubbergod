@@ -325,9 +325,6 @@ class Karma(commands.Cog):
                 utils.fill_message("karma_message_format", user=inter.author.id)
             )
             return True
-        if isinstance(error, commands.CheckFailure):
-            await inter.reply(utils.fill_message("insufficient_rights", user=inter.author.id))
-            return True
         if isinstance(error, commands.UserNotFound):
             await inter.send(utils.fill_message("user_not_found", user=inter.author.id))
             return True

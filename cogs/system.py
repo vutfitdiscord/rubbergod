@@ -72,9 +72,6 @@ class System(commands.Cog):
     @pull.error
     @cogs.error
     async def on_command_error(self, ctx: commands.Context, error):
-        if isinstance(error, commands.errors.CheckFailure):
-            await ctx.send(utils.fill_message("insufficient_rights", user=ctx.author.id))
-            return True
         if isinstance(error, commands.errors.CommandInvokeError):
             if isinstance(error.__cause__, commands.errors.ExtensionAlreadyLoaded):
                 await ctx.send(utils.fill_message("cog_is_loaded", cog=error.__cause__.name))
