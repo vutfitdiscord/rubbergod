@@ -8,6 +8,7 @@ from config.messages import Messages
 from config import cooldowns
 from repository import review_repo
 import utils
+from permissions import permission_check
 from features.review import ReviewManager
 from buttons.review import ReviewView
 from buttons.embed import EmbedView
@@ -112,7 +113,7 @@ class Review(commands.Cog):
         For admin it is possible to use 'id' as subject shortcut and delete review by its ID
         """
         if id is not None:
-            if utils.is_bot_admin(inter):
+            if permission_check.is_bot_admin(inter):
                 self.repo.remove(id)
                 await inter.send(Messages.review_remove_success)
                 return
@@ -130,7 +131,7 @@ class Review(commands.Cog):
 
     @cooldowns.short_cooldown
     @commands.group()
-    @commands.check(utils.is_bot_admin)
+    @commands.check(permission_check.is_bot_admin)
     async def subject(self, ctx):
         """Group of commands for managing subjects in DB"""
         if ctx.invoked_subcommand is None:

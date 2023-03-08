@@ -1,6 +1,7 @@
 import disnake
 import utils
 import math
+from permissions import permission_check
 
 from config.app_config import config
 from buttons.base import BaseView
@@ -40,7 +41,7 @@ class SystemView(BaseView):
         await self.message.edit(view=self)
 
     async def interaction_check(self, inter: disnake.Interaction):
-        if utils.is_bot_admin(inter):
+        if permission_check.is_bot_admin(inter):
             return True
         else:
             await inter.send(utils.fill_message("insufficient_rights", user=inter.author.id), ephemeral=True)
@@ -155,7 +156,7 @@ class Dropdown(disnake.ui.Select):
     async def callback(self, inter: disnake.MessageInteraction):
         """React to user selecting cog(s)."""
         await inter.response.defer()
-        if utils.is_bot_admin(inter):
+        if permission_check.is_bot_admin(inter):
             unloaded = self.create_cog_lists()
 
             for cog in self.unloadable_cogs:

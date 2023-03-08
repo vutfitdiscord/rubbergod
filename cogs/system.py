@@ -2,6 +2,7 @@ from disnake.ext import commands
 from features.git import Git
 from disnake.message import Message
 import utils
+from permissions import permission_check
 import disnake
 import math
 from config.app_config import config
@@ -21,7 +22,7 @@ class System(commands.Cog):
         pass
 
     @git.command(brief=Messages.git_pull_brief)
-    @commands.check(utils.is_bot_admin)
+    @commands.check(permission_check.is_bot_admin)
     async def pull(self, ctx: commands.Context):
         message: Message = await ctx.send("Pulling")
 
@@ -48,7 +49,7 @@ class System(commands.Cog):
 
         return all_selects
 
-    @commands.check(utils.is_bot_admin)
+    @commands.check(permission_check.is_bot_admin)
     @commands.slash_command(name="cogs", description=Messages.cogs_brief, guild_ids=[config.guild_id])
     async def cogs(self, inter: disnake.ApplicationCommandInteraction):
         """

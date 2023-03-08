@@ -1,13 +1,24 @@
+"""All checks for room permissions"""
+
+import disnake
+from disnake.ext import commands
+from typing import Union
+
 import utils
 from config.app_config import config
 
 
-class RoomCheck:
+def is_in_modroom(ctx: Union[commands.Context, disnake.ApplicationCommandInteraction]):
+    """Check if the command is invoked in modroom"""
+    return ctx.channel.id == config.mod_room
 
+
+class RoomCheck:
     def __init__(self, bot):
         self.bot = bot
 
     async def botroom_check(self, message):
+        """Check if command is called somewhere except botroom"""
         room = await self.get_room(message)
         if room is not None and room.id not in config.allowed_channels:
             await message.channel.send(utils.fill_message("bot_room_redirect",

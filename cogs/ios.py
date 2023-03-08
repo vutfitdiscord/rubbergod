@@ -6,6 +6,7 @@ from repository.database import session
 from repository.database.verification import Permit, Valid_person
 from features.list_message_sender import send_list_of_messages
 import utils
+from permissions import permission_check
 import subprocess
 import datetime
 import re
@@ -225,22 +226,22 @@ class IOS(commands.Cog):
         self.bot = bot
 
     @cooldowns.default_cooldown
-    @commands.check(utils.helper_plus)
+    @commands.check(permission_check.helper_plus)
     @commands.command()
     async def ios(self, ctx):
         await self.ios_body(ctx.channel)
 
-    @commands.check(utils.is_bot_admin)
+    @commands.check(permission_check.is_bot_admin)
     @commands.command()
     async def ios_start(self, ctx):
         self.ios_body.start(ctx.channel)
 
-    @commands.check(utils.is_bot_admin)
+    @commands.check(permission_check.is_bot_admin)
     @commands.command()
     async def ios_stop(self, ctx):
         self.ios_body.stop()
 
-    @commands.check(utils.is_bot_admin)
+    @commands.check(permission_check.is_bot_admin)
     @commands.command()
     async def ios_cancel(self, ctx):
         self.ios_body.cancel()

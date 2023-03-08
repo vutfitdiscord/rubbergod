@@ -9,7 +9,7 @@ from config import messages, cooldowns
 from features import karma
 from features.leaderboard import LeaderboardPageSource
 from repository import karma_repo
-from cogs import room_check
+from permissions import room_check, permission_check
 from features.reaction_context import ReactionContext
 from repository.database.karma import Karma as Database_karma
 
@@ -185,7 +185,7 @@ class Karma(commands.Cog):
             command_id = utils.get_command_id(self, "karma")
             await ctx.reply(utils.fill_message("moved_command", name="karma", id=command_id))
 
-    @commands.check(utils.is_bot_admin)
+    @commands.check(permission_check.is_bot_admin)
     @karma.command(brief=messages.karma_revote_brief)
     async def revote(self, ctx, *args):
         if not await self.check.guild_check(ctx.message):
@@ -201,7 +201,7 @@ class Karma(commands.Cog):
                 dc_vote_room = disnake.utils.get(ctx.guild.channels, id=config.vote_room)
                 await ctx.reply(utils.fill_message("vote_room_only", room=dc_vote_room))
 
-    @commands.check(utils.is_bot_admin)
+    @commands.check(permission_check.is_bot_admin)
     @karma.command(brief=messages.karma_vote_brief)
     async def vote(self, ctx, *args):
         if not await self.check.guild_check(ctx.message):
@@ -217,12 +217,12 @@ class Karma(commands.Cog):
                 dc_vote_room = disnake.utils.get(ctx.guild.channels, id=config.vote_room)
                 await ctx.reply(utils.fill_message("vote_room_only", room=dc_vote_room))
 
-    @commands.check(utils.is_bot_admin)
+    @commands.check(permission_check.is_bot_admin)
     @karma.command(brief=messages.karma_give_brief)
     async def give(self, ctx, *args):
         await self.karma.karma_give(ctx.message)
 
-    @commands.check(utils.is_bot_admin)
+    @commands.check(permission_check.is_bot_admin)
     @karma.command(brief=messages.karma_transfer_brief)
     async def transfer(self, ctx, *args):
         await self.karma.karma_transfer(ctx.message)

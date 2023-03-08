@@ -10,7 +10,7 @@ from config import cooldowns
 from repository.hugs_repo import HugsRepository
 from features.leaderboard import LeaderboardPageSource
 from repository.database.hugs import HugsTable
-from cogs import room_check
+from permissions import room_check
 from buttons.embed import EmbedView
 from utils import make_pts_column_row_formatter
 
