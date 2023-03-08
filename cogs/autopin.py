@@ -3,6 +3,7 @@ from typing import List
 import datetime
 import disnake
 import utils
+from permissions import permission_check
 from disnake.ext import commands
 from repository import pin_repo
 from repository.database.pin_map import PinMap
@@ -19,7 +20,7 @@ class AutoPin(commands.Cog):
         self.bot = bot
         self.repo = pin_repo.PinRepository()
 
-    @commands.check(utils.helper_plus)
+    @commands.check(permission_check.helper_plus)
     @commands.group(pass_context=True)
     async def pin(self, ctx: commands.Context):
         """

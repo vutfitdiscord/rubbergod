@@ -21,7 +21,20 @@ class Bookmark(commands.Cog):
             if images:
                 for image in images:
                     embed.append(await BookmarkFeatures.create_image_embed(self, ctx, image))
-            await ctx.member.send(embeds=embed, view=BookmarkView(ctx.message.jump_url), files=files_attached)
+            # when sending sticker there can be overflow of files
+            if len(files_attached) <= 10:
+                await ctx.member.send(
+                    embeds=embed,
+                    view=BookmarkView(ctx.message.jump_url),
+                    files=files_attached
+                )
+            else:
+                await ctx.member.send(
+                    embeds=embed,
+                    view=BookmarkView(ctx.message.jump_url),
+                    files=files_attached[:10]
+                )
+                await ctx.member.send(files=files_attached[10:])
         except disnake.HTTPException as e:
             if e.code == 50007:
                 await ctx.channel.send(utils.fill_message("blocked_bot", user=ctx.author.id))

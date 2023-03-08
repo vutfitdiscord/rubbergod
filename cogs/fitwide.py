@@ -7,6 +7,7 @@ from disnake.ext import commands
 
 
 import utils
+from permissions import permission_check, room_check
 from config.app_config import config
 from config import cooldowns
 from features import verification
@@ -31,7 +32,7 @@ class FitWide(commands.Cog):
             await channel.send(embed=gif)
 
     @cooldowns.default_cooldown
-    @commands.check(utils.helper_plus)
+    @commands.check(permission_check.submod_plus)
     @commands.command()
     async def rolehoarders(self, ctx, limit=config.rolehoarder_default_limit):
         guild = self.bot.get_guild(config.guild_id)
@@ -61,7 +62,7 @@ class FitWide(commands.Cog):
         await ctx.send(msg)
 
     @cooldowns.default_cooldown
-    @commands.check(utils.is_bot_admin)
+    @commands.check(permission_check.is_bot_admin)
     @commands.command()
     async def role_check(
         self,
@@ -205,7 +206,7 @@ class FitWide(commands.Cog):
         return
 
     @cooldowns.default_cooldown
-    @commands.check(utils.is_bot_admin)
+    @commands.check(permission_check.is_bot_admin)
     @commands.command()
     async def increment_roles(self, ctx):
         # guild = self.bot.get_guild(config.guild_id)
@@ -341,7 +342,7 @@ class FitWide(commands.Cog):
         await ctx.send("Holy fuck, všechno se povedlo, " "tak zase za rok <:Cauec:602052606210211850>")
 
     @cooldowns.default_cooldown
-    @commands.check(utils.is_in_modroom)
+    @commands.check(room_check.is_in_modroom)
     @commands.command()
     async def update_db(self, ctx, convert_0xit: bool = False):
         with open("merlin-latest", "r") as f:
@@ -403,7 +404,7 @@ class FitWide(commands.Cog):
             await ctx.send(f"Debug: Našel jsem {cnt_new} nových prvaků.")
 
     @cooldowns.default_cooldown
-    @commands.check(utils.is_in_modroom)
+    @commands.check(room_check.is_in_modroom)
     @commands.command()
     async def get_db(self, ctx):
         process = subprocess.Popen(["ssh", "merlin"], stdout=subprocess.PIPE)
@@ -420,7 +421,7 @@ class FitWide(commands.Cog):
         await ctx.send("Stažení databáze proběhlo úspěšně.")
 
     @cooldowns.default_cooldown
-    @commands.check(utils.is_in_modroom)
+    @commands.check(room_check.is_in_modroom)
     @commands.command()
     async def get_users_login(self, ctx, member: disnake.Member):
         result = session.query(Permit).filter(Permit.discord_ID == str(member.id)).one_or_none()
@@ -438,7 +439,7 @@ class FitWide(commands.Cog):
         await ctx.send(("Login: `{p.login}`\nJméno: `{p.name}`\n" "Ročník: `{p.year}`").format(p=person))
 
     @cooldowns.default_cooldown
-    @commands.check(utils.is_in_modroom)
+    @commands.check(room_check.is_in_modroom)
     @commands.command()
     async def get_logins_user(self, ctx, login):
         result = session.query(Permit).filter(Permit.login == login).one_or_none()
@@ -457,7 +458,7 @@ class FitWide(commands.Cog):
             await ctx.send(utils.generate_mention(result.discord_ID))
 
     @cooldowns.default_cooldown
-    @commands.check(utils.is_in_modroom)
+    @commands.check(room_check.is_in_modroom)
     @commands.command()
     async def reset_login(self, ctx, login):
 
@@ -471,7 +472,7 @@ class FitWide(commands.Cog):
             await ctx.send("Hotovo.")
 
     @cooldowns.default_cooldown
-    @commands.check(utils.is_in_modroom)
+    @commands.check(room_check.is_in_modroom)
     @commands.command()
     async def connect_login_to_user(self, ctx, login, member: disnake.Member):
 
@@ -484,7 +485,7 @@ class FitWide(commands.Cog):
             session.commit()
             await ctx.send("Hotovo.")
 
-    @commands.check(utils.is_bot_admin)
+    @commands.check(permission_check.is_bot_admin)
     @commands.command()
     async def shutdown(self, ctx):
         await ctx.send("shutting down")

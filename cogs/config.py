@@ -6,6 +6,7 @@ import toml
 from datetime import datetime
 
 import utils
+from permissions import permission_check
 from config.app_config import config, load_config
 from config.messages import Messages
 
@@ -14,7 +15,7 @@ class DynamicConfig(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.check(utils.is_bot_admin)
+    @commands.check(permission_check.is_bot_admin)
     @commands.group(pass_context=True)
     async def config(self, ctx):
         """

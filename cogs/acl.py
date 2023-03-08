@@ -2,7 +2,7 @@ import disnake
 from disnake.ext import commands
 
 import utils
-from cogs import room_check
+from permissions import room_check
 from features import acl
 from config.app_config import config
 from config import cooldowns

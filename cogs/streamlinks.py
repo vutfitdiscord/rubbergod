@@ -7,6 +7,7 @@ from config.app_config import config
 from config.messages import Messages
 from typing import List, Union
 import utils
+from permissions import permission_check
 from repository.database.stream_link import StreamLink
 import requests
 from bs4 import BeautifulSoup
@@ -81,7 +82,7 @@ class StreamLinks(commands.Cog):
         view = EmbedView(inter.author, embeds, timeout=180)
         view.message = await inter.edit_original_response(embed=embeds[0], view=view)
 
-    @commands.check(utils.helper_plus)
+    @commands.check(permission_check.helper_plus)
     @_streamlinks_mod.sub_command(name="add", description=Messages.streamlinks_add_brief)
     async def streamlinks_add(
         self,
@@ -154,7 +155,7 @@ class StreamLinks(commands.Cog):
         channel = self.bot.get_channel(config.log_channel)
         await channel.send(embed=embed)
 
-    @commands.check(utils.helper_plus)
+    @commands.check(permission_check.helper_plus)
     @_streamlinks_mod.sub_command(name="remove", description=Messages.streamlinks_remove_brief)
     async def streamlinks_remove(
         self,

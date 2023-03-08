@@ -93,18 +93,6 @@ def pagination_next(id: str, page: int, max_page: int, roll_around: bool = True)
         return 0
 
 
-def is_bot_admin(ctx: Union[commands.Context, disnake.ApplicationCommandInteraction]):
-    return ctx.author.id in config.admin_ids
-
-
-def is_bot_admin_or_mod(ctx: Union[commands.Context, disnake.ApplicationCommandInteraction]):
-    return ctx.author.id in config.admin_ids or ctx.author.guild_permissions.administrator
-
-
-def is_in_modroom(ctx: Union[commands.Context, disnake.ApplicationCommandInteraction]):
-    return ctx.channel.id == config.mod_room
-
-
 def cut_string(string: str, part_len: int):
     return list(string[0 + i: part_len + i] for i in range(0, len(string), part_len))
 
@@ -131,26 +119,6 @@ def cut_string_by_words(string: str, part_len: int, delimiter: str):
         result.append(chunk)
         string = string[len(chunk):]
     return result
-
-
-class NotHelperPlusError(commands.CommandError):
-    """An error indicating that a user doesn't have permissions to use
-    a command that is available only to helpers, submods and mods.
-    """
-
-    pass
-
-
-def helper_plus(ctx):
-    allowed_roles = {config.mod_role, config.submod_role, config.helper_role}
-    guild = ctx.bot.get_guild(config.guild_id)
-    user = guild.get_member(ctx.author.id)
-    for role in user.roles:
-        if role.id in allowed_roles:
-            return True
-    if ctx.author.id in config.admin_ids:
-        return True
-    raise NotHelperPlusError
 
 
 def add_author_footer(embed: disnake.Embed, author: disnake.User,

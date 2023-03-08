@@ -6,6 +6,7 @@ import disnake
 from disnake.ext import commands, tasks
 
 import utils
+from permissions import permission_check
 from config.app_config import config
 from config.messages import Messages
 from typing import List
@@ -138,7 +139,7 @@ class Timeout(commands.Cog):
                     return
         return endtime
 
-    @commands.check(utils.helper_plus)
+    @commands.check(permission_check.submod_plus)
     @commands.slash_command(name="timeout", guild_ids=[config.guild_id])
     async def _timeout(self, inter):
         pass

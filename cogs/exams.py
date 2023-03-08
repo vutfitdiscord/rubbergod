@@ -15,6 +15,7 @@ from config import cooldowns
 from config.messages import Messages
 from repository.exams_repo import ExamsTermsMessageRepo
 import utils
+from permissions import permission_check
 
 year_regex = "[1-3][BM]IT"
 YEAR_LIST = ["1BIT", "2BIT", "3BIT", "1MIT", "2MIT"]
@@ -47,7 +48,7 @@ class Exams(commands.Cog):
             self.update_terms_task.cancel()
 
     @cooldowns.default_cooldown
-    @commands.check(utils.helper_plus)
+    @commands.check(permission_check.helper_plus)
     @commands.slash_command(name="terms")
     async def terms(self, inter: disnake.ApplicationCommandInteraction):
         """Group of commands for terms."""
@@ -58,7 +59,7 @@ class Exams(commands.Cog):
         updated_chans = await self.update_exam_terms(inter.guild, inter.author)
         await inter.edit_original_response(utils.fill_message("exams_terms_updated", num_chan=updated_chans))
 
-    @commands.check(utils.is_bot_admin_or_mod)
+    @commands.check(permission_check.mod_plus)
     @terms.sub_command(name="remove_all", description=Messages.exams_remove_all_terms_brief)
     async def remove_all(self, inter: disnake.ApplicationCommandInteraction):
         for channel in inter.guild.channels:
@@ -76,7 +77,7 @@ class Exams(commands.Cog):
                             pass
         await inter.edit_original_response(Messages.exams_terms_removed)
 
-    @commands.check(utils.is_bot_admin_or_mod)
+    @commands.check(permission_check.mod_plus)
     @terms.sub_command(name="remove", description=Messages.exams_remove_terms_brief)
     async def remove(self, inter: disnake.ApplicationCommandInteraction, channel: disnake.TextChannel):
         if not isinstance(channel, disnake.TextChannel):
@@ -97,7 +98,7 @@ class Exams(commands.Cog):
         else:
             await inter.send(utils.fill_message("exams_nothing_to_remove", chan_name=channel.name))
 
-    @commands.check(utils.is_bot_admin_or_mod)
+    @commands.check(permission_check.mod_plus)
     @terms.sub_command(name="start", description=Messages.exams_start_terms_brief)
     async def start(self, inter: disnake.ApplicationCommandInteraction):
         if inter.guild.id not in self.subscribed_guilds:
@@ -111,7 +112,7 @@ class Exams(commands.Cog):
 
         await inter.send(utils.fill_message("exams_automatic_update_started", guild_name=inter.guild.name))
 
-    @commands.check(utils.is_bot_admin_or_mod)
+    @commands.check(permission_check.mod_plus)
     @terms.sub_command(name="stop", description=Messages.exams_stop_terms_brief)
     async def stop(self, inter: disnake.ApplicationCommandInteraction):
         if inter.guild in self.subscribed_guilds:

@@ -5,6 +5,7 @@ from config import cooldowns
 from features import verification
 from config.messages import Messages
 import disnake
+from permissions import room_check
 from config.app_config import config
 from features.dynamic_verify import DynamicVerifyManager
 from modals.dynamic_verify import DynamicVerifyEditModal
@@ -45,7 +46,7 @@ class Verify(commands.Cog):
             await inter.send(Messages.verify_invalid_channel, ephemeral=True)
             return True
 
-    @commands.check(utils.is_in_modroom)
+    @commands.check(room_check.is_in_modroom)
     @commands.slash_command(name="dynamic_verify", guild_ids=[config.guild_id])
     async def dynamic_verify(self, inter: disnake.ApplicationCommandInteraction):
         """This method is only group for another commands. This function does nothing."""

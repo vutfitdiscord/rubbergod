@@ -9,6 +9,7 @@ import dhash
 from PIL import Image
 
 import utils
+from permissions import permission_check
 from config.app_config import config
 from config.messages import Messages
 from repository import image_repo
@@ -102,7 +103,7 @@ class Warden(commands.Cog):
             yield img_hash
 
     @commands.group()
-    @commands.check(utils.is_bot_admin)
+    @commands.check(permission_check.is_bot_admin)
     async def scan(self, ctx):
         """Scan for reposts"""
         if ctx.invoked_subcommand is None:

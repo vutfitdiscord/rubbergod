@@ -4,6 +4,7 @@ from disnake.ext import commands
 from typing import Tuple, List
 
 import utils
+from permissions import permission_check
 from config.app_config import config
 
 # TODO: use messages
@@ -251,7 +252,7 @@ class Roles(commands.Cog):
 
         return [role], [channel]
 
-    @commands.check(utils.is_bot_admin_or_mod)
+    @commands.check(permission_check.mod_plus)
     @commands.slash_command(name="do_da_thing", description='hodi prdeli', guild_ids=[config.guild_id])
     async def do_da_thing(self, inter: disnake.ApplicationCommandInteraction):
         guild = self.bot.get_guild(config.guild_id)
@@ -269,7 +270,7 @@ class Roles(commands.Cog):
                     else:
                         await channel.edit(topic=sub.name if not boolik else newName)
 
-    @commands.check(utils.is_bot_admin_or_mod)
+    @commands.check(permission_check.mod_plus)
     @commands.slash_command(name="group", guild_ids=[config.guild_id])
     async def group(self, inter):
         pass
@@ -323,7 +324,7 @@ class Roles(commands.Cog):
         group_repo.group_reset_roles(name)
         await inter.send("Done")
 
-    @commands.check(utils.is_bot_admin_or_mod)
+    @commands.check(permission_check.mod_plus)
     @commands.slash_command(name="channel", guild_ids=[config.guild_id])
     async def channel(self, inter):
         pass
