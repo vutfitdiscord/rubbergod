@@ -12,6 +12,7 @@ from repository import karma_repo
 from permissions import room_check, permission_check
 from features.reaction_context import ReactionContext
 from repository.database.karma import Karma as Database_karma
+from cogs.grillbot_api import GrillbotApi
 
 
 karma_r = karma_repo.KarmaRepository()
@@ -23,16 +24,14 @@ class Karma(commands.Cog):
         self.bot = bot
         self.karma = karma.Karma(bot, karma_r)
         self.check = room_check.RoomCheck(bot)
+        self.grillbot_api = GrillbotApi(bot)
         self._leaderboard_formatter = utils.make_pts_column_row_formatter(Database_karma.karma.name)
         self._positive_formatter = utils.make_pts_column_row_formatter(Database_karma.positive.name)
         self._negative_formatter = utils.make_pts_column_row_formatter(Database_karma.negative.name)
 
     async def handle_reaction(self, ctx: ReactionContext):
-        # grillbot emoji for removing message causes errors
-        if ctx.emoji == "⏹️":
-            return
         # handle karma vote
-        elif ctx.message.content.startswith(messages.karma_vote_message_hack):
+        if ctx.message.content.startswith(messages.karma_vote_message_hack):
             if ctx.emoji not in ["✅", "❌", "0⃣"]:
                 await ctx.message.remove_reaction(ctx.emoji, ctx.member)
             else:
@@ -68,10 +67,15 @@ class Karma(commands.Cog):
             and ctx.message.channel.id != config.meme_repost_room
             and config.karma_ban_role_id not in map(lambda x: x.id, ctx.member.roles)
         ):
+            member_giver = karma_r.get_karma_object(ctx.member.id)
+            member_getter = karma_r.get_karma_object(ctx.message.author.id)
+
             if isinstance(ctx.emoji, str):
                 karma_r.karma_emoji(ctx.message.author, ctx.member, ctx.emoji)
+                await self.grillbot_api.post_karma_store([member_getter, member_giver])
             else:
                 karma_r.karma_emoji(ctx.message.author, ctx.member, ctx.emoji.id)
+                await self.grillbot_api.post_karma_store([member_getter, member_giver])
 
     @commands.Cog.listener()
     async def on_raw_reaction_remove(self, payload):
@@ -86,10 +90,15 @@ class Karma(commands.Cog):
             and ctx.message.channel.id != config.meme_repost_room
             and config.karma_ban_role_id not in map(lambda x: x.id, ctx.member.roles)
         ):
+            member_giver = karma_r.get_karma_object(ctx.member.id)
+            member_getter = karma_r.get_karma_object(ctx.message.author.id)
+
             if isinstance(ctx.emoji, str):
                 karma_r.karma_emoji_remove(ctx.message.author, ctx.member, ctx.emoji)
+                await self.grillbot_api.post_karma_store([member_getter, member_giver])
             else:
                 karma_r.karma_emoji_remove(ctx.message.author, ctx.member, ctx.emoji.id)
+                await self.grillbot_api.post_karma_store([member_getter, member_giver])
 
     def api(self, message: disnake.Message, params: list) -> dict:
         """Sending karma boards to grillbot"""
