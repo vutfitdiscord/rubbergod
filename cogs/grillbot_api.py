@@ -2,6 +2,8 @@ from io import BytesIO
 import disnake
 from disnake.ext import commands
 import json
+import asyncio
+import aiohttp
 
 from config.app_config import config
 
@@ -10,6 +12,23 @@ class GrillbotApi(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
+
+    async def post_karma_store(self, karma_objects):
+        """send karma objects to grillbot api"""
+        headers = {"ApiKey": config.grillbot_api_key, "Author": str(self.bot.owner_id)}
+        async with aiohttp.ClientSession(timeout=aiohttp.ClientTimeout(total=10), headers=headers) as session:
+            try:
+                url = "https://grillbot.cloud/api/user/karma/store"
+                data = [{
+                        "member_ID": str(data.member_ID),
+                        "karmaValue": data.karma,
+                        "positive": data.positive,
+                        "negative": data.negative
+                        } for data in karma_objects]
+                async with session.post(url, json=data):
+                    pass
+            except (asyncio.exceptions.TimeoutError, aiohttp.client_exceptions.ClientConnectorError):
+                pass
 
     @commands.Cog.listener()
     async def on_message(self, message: disnake.Message):
