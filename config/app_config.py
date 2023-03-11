@@ -117,7 +117,6 @@ class Config:
     # memes
     hug_emojis: List[str] = get_attr(toml_dict, "meme", "hug_emojis")
     covid_channel_id: str = get_attr(toml_dict, "meme", "covid_channel_id")
-    storno_delay: int = get_attr(toml_dict, "meme", "storno_delay")
 
     # Arcas
     arcas_id: int = get_attr(toml_dict, "meme", "arcas_id")
