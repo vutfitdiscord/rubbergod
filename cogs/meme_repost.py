@@ -44,9 +44,9 @@ class MemeRepost(commands.Cog):
 
                 if original_post_user:
                     if isinstance(ctx.emoji, str):
-                        self.karma_repo.karma_emoji(original_post_user, ctx.member, ctx.emoji)
+                        self.karma_repo.karma_emoji(original_post_user.id, ctx.member.id, ctx.emoji)
                     else:
-                        self.karma_repo.karma_emoji(original_post_user, ctx.member, ctx.emoji.id)
+                        self.karma_repo.karma_emoji(original_post_user.id, ctx.member.id, ctx.emoji.id)
 
     @commands.Cog.listener()
     async def on_raw_reaction_remove(self, payload):
@@ -67,9 +67,9 @@ class MemeRepost(commands.Cog):
 
             if original_post_user:
                 if isinstance(ctx.emoji, str):
-                    self.karma_repo.karma_emoji_remove(original_post_user, ctx.member, ctx.emoji)
+                    self.karma_repo.karma_emoji_remove(original_post_user.id, ctx.member.id, ctx.emoji)
                 else:
-                    self.karma_repo.karma_emoji_remove(original_post_user, ctx.member, ctx.emoji.id)
+                    self.karma_repo.karma_emoji_remove(original_post_user.id, ctx.member.id, ctx.emoji.id)
 
     async def __repost_message(self, ctx: ReactionContext,
                                reactions: List[disnake.Reaction]):
