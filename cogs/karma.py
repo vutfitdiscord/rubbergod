@@ -71,10 +71,10 @@ class Karma(commands.Cog):
             member_getter = karma_r.get_karma_object(ctx.message.author.id)
 
             if isinstance(ctx.emoji, str):
-                karma_r.karma_emoji(ctx.message.author, ctx.member, ctx.emoji)
+                karma_r.karma_emoji(ctx.message.author.id, ctx.member.id, ctx.emoji)
                 await self.grillbot_api.post_karma_store([member_getter, member_giver])
             else:
-                karma_r.karma_emoji(ctx.message.author, ctx.member, ctx.emoji.id)
+                karma_r.karma_emoji(ctx.message.author.id, ctx.member.id, ctx.emoji.id)
                 await self.grillbot_api.post_karma_store([member_getter, member_giver])
 
     @commands.Cog.listener()
@@ -94,10 +94,10 @@ class Karma(commands.Cog):
             member_getter = karma_r.get_karma_object(ctx.message.author.id)
 
             if isinstance(ctx.emoji, str):
-                karma_r.karma_emoji_remove(ctx.message.author, ctx.member, ctx.emoji)
+                karma_r.karma_emoji_remove(ctx.message.author.id, ctx.member.id, ctx.emoji)
                 await self.grillbot_api.post_karma_store([member_getter, member_giver])
             else:
-                karma_r.karma_emoji_remove(ctx.message.author, ctx.member, ctx.emoji.id)
+                karma_r.karma_emoji_remove(ctx.message.author.id, ctx.member.id, ctx.emoji.id)
                 await self.grillbot_api.post_karma_store([member_getter, member_giver])
 
     def api(self, message: disnake.Message, params: list) -> dict:
