@@ -24,7 +24,7 @@ class GrillbotApi(commands.Cog):
             try:
                 url = "https://grillbot.cloud/api/user/karma/store"
                 data = [{
-                        "member_ID": str(data.member_ID),
+                        "member_ID": data.member_ID,
                         "karmaValue": data.karma,
                         "positive": data.positive,
                         "negative": data.negative
