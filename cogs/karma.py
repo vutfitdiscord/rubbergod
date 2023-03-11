@@ -67,15 +67,14 @@ class Karma(commands.Cog):
             and ctx.message.channel.id != config.meme_repost_room
             and config.karma_ban_role_id not in map(lambda x: x.id, ctx.member.roles)
         ):
-            member_giver = karma_r.get_karma_object(ctx.member.id)
-            member_getter = karma_r.get_karma_object(ctx.message.author.id)
-
             if isinstance(ctx.emoji, str):
-                karma_r.karma_emoji(ctx.message.author.id, ctx.member.id, ctx.emoji)
-                await self.grillbot_api.post_karma_store([member_getter, member_giver])
+                members_update = karma_r.karma_emoji(ctx.message.author.id, ctx.member.id, ctx.emoji)
+                if members_update is not None:
+                    await self.grillbot_api.post_karma_store(members_update)
             else:
-                karma_r.karma_emoji(ctx.message.author.id, ctx.member.id, ctx.emoji.id)
-                await self.grillbot_api.post_karma_store([member_getter, member_giver])
+                members_update = karma_r.karma_emoji(ctx.message.author.id, ctx.member.id, ctx.emoji.id)
+                if members_update is not None:
+                    await self.grillbot_api.post_karma_store(members_update)
 
     @commands.Cog.listener()
     async def on_raw_reaction_remove(self, payload):
@@ -90,15 +89,18 @@ class Karma(commands.Cog):
             and ctx.message.channel.id != config.meme_repost_room
             and config.karma_ban_role_id not in map(lambda x: x.id, ctx.member.roles)
         ):
-            member_giver = karma_r.get_karma_object(ctx.member.id)
-            member_getter = karma_r.get_karma_object(ctx.message.author.id)
-
             if isinstance(ctx.emoji, str):
-                karma_r.karma_emoji_remove(ctx.message.author.id, ctx.member.id, ctx.emoji)
-                await self.grillbot_api.post_karma_store([member_getter, member_giver])
+                members_update = karma_r.karma_emoji_remove(ctx.message.author.id, ctx.member.id, ctx.emoji)
+                if members_update is not None:
+                    await self.grillbot_api.post_karma_store(members_update)
             else:
-                karma_r.karma_emoji_remove(ctx.message.author.id, ctx.member.id, ctx.emoji.id)
-                await self.grillbot_api.post_karma_store([member_getter, member_giver])
+                members_update = karma_r.karma_emoji_remove(
+                    ctx.message.author.id,
+                    ctx.member.id,
+                    ctx.emoji.id
+                )
+                if members_update is not None:
+                    await self.grillbot_api.post_karma_store(members_update)
 
     @cooldowns.default_cooldown
     @commands.slash_command(name="karma", guild_ids=[config.guild_id])

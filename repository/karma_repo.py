@@ -47,8 +47,7 @@ class KarmaRepository(BaseRepository):
         return emoji.value if emoji else None
 
     def set_emoji_value(self, emoji_id, value: int):
-        emoji = Karma_emoji(emoji_ID=utils.str_emoji_id(emoji_id),
-                            value=str(value))
+        emoji = Karma_emoji(emoji_ID=utils.str_emoji_id(emoji_id), value=str(value))
         # Merge == 'insert on duplicate key update'
         session.merge(emoji)
         session.commit()
@@ -60,17 +59,20 @@ class KarmaRepository(BaseRepository):
         session.commit()
 
     def update_karma(self, member_id, giver_id, emoji_value, remove=False):
-        self.update_karma_get(member_id, emoji_value)
-        self.update_karma_give(giver_id, emoji_value, remove)
+        member_getter = self.update_karma_get(member_id, emoji_value)
+        member_giver = self.update_karma_give(giver_id, emoji_value, remove)
 
         session.commit()
+        return [member_getter, member_giver]
 
     def update_karma_get(self, member_id, emoji_value):
-        members_karma = self.get_karma_object(member_id)
-        if members_karma is not None:
-            members_karma.karma += emoji_value
+        member_karma = self.get_karma_object(member_id)
+        if member_karma is not None:
+            member_karma.karma += emoji_value
         else:
-            session.add(Karma(member_ID=member_id, karma=emoji_value))
+            member_karma = Karma(member_ID=str(member_id), karma=emoji_value)
+            session.add(member_karma)
+        return member_karma
 
     def update_karma_give(self, giver_id, emoji_value, remove):
         if emoji_value > 0:
@@ -87,24 +89,27 @@ class KarmaRepository(BaseRepository):
         if column == 'negative':
             emoji_value *= -1
 
-        givers_karma = self.get_karma_object(giver_id)
-        if givers_karma is not None:
-            setattr(givers_karma, column,
-                    getattr(givers_karma, column) + emoji_value)
+        giver_karma = self.get_karma_object(giver_id)
+        if giver_karma is not None:
+            setattr(giver_karma, column, getattr(giver_karma, column) + emoji_value)
         else:
-            new_giver = Karma(member_ID=giver_id)
-            setattr(new_giver, column, emoji_value)
-            session.add(new_giver)
+            # new giver
+            giver_karma = Karma(member_ID=str(giver_id))
+            setattr(giver_karma, column, emoji_value)
+            session.add(giver_karma)
+        return giver_karma
 
     def karma_emoji(self, member_id, giver_id, emoji_id):
         emoji_value = int(self.emoji_value(str(emoji_id)))
         if emoji_value:
-            self.update_karma(member_id, giver_id, emoji_value)
+            members_update = self.update_karma(member_id, giver_id, emoji_value)
+            return members_update
 
     def karma_emoji_remove(self, member_id, giver_id, emoji_id):
         emoji_value = int(self.emoji_value(str(emoji_id)))
         if emoji_value:
-            self.update_karma(member_id, giver_id, emoji_value * (-1), True)
+            members_update = self.update_karma(member_id, giver_id, emoji_value * (-1), True)
+            return members_update
 
     def get_karma_object(self, member_id):
         return session.query(Karma).\
