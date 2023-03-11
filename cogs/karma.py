@@ -100,31 +100,6 @@ class Karma(commands.Cog):
                 karma_r.karma_emoji_remove(ctx.message.author.id, ctx.member.id, ctx.emoji.id)
                 await self.grillbot_api.post_karma_store([member_getter, member_giver])
 
-    def api(self, message: disnake.Message, params: list) -> dict:
-        """Sending karma boards to grillbot"""
-        if params["order"] not in ["asc", "desc"]:
-            return 1, "Unsuported order"
-        if params["board"] not in ["karma", "positive", "negative"]:
-            return 1, "Unsuported board"
-        start = config.karma_grillbot_leaderboard_size * (params["page"] - 1)
-        attribute = getattr(getattr(Database_karma, params["board"]), params["order"])()
-        board = karma_r.get_leaderboard(attribute, start, config.karma_grillbot_leaderboard_size)
-
-        output = []
-        for user in board:
-            dump = user.__dict__
-            del dump['_sa_instance_state']
-            output.append(dump)
-
-        items_count = karma_r.get_leaderboard_max()
-        meta = {
-            "page": params["page"],
-            "items_count": items_count,
-            "total_pages": math.ceil(items_count / config.karma_grillbot_leaderboard_size),
-        }
-
-        return 0, {"meta": meta, "content": output}
-
     @cooldowns.default_cooldown
     @commands.slash_command(name="karma", guild_ids=[config.guild_id])
     async def _karma(self, inter):
