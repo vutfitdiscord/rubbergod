@@ -1,3 +1,7 @@
+"""
+Functions and commands communicating with grillbot API
+"""
+
 from io import BytesIO
 import disnake
 from disnake.ext import commands
