@@ -1,4 +1,3 @@
-import datetime
 from io import BytesIO
 from PIL import Image
 from random import choice
@@ -14,8 +13,6 @@ from config.messages import Messages
 from config import cooldowns
 
 uhoh_counter = 0
-storno_time = datetime.datetime.now(datetime.timezone.utc) - datetime.timedelta(hours=config.storno_delay)
-storno_images = ["storno.png", "storno_lgtm.png"]
 
 
 class Meme(commands.Cog):
@@ -25,7 +22,6 @@ class Meme(commands.Cog):
     @commands.Cog.listener()
     async def on_message(self, message: disnake.message):
         global uhoh_counter
-        global storno_time
 
         if message.author.bot:
             if (
@@ -41,18 +37,6 @@ class Meme(commands.Cog):
             uhoh_counter += 1
         elif message.content == "PR":
             await message.channel.send(Messages.pr_meme)
-        elif (
-            storno_time + datetime.timedelta(hours=config.storno_delay)
-            < message.created_at
-            and "storno" in message.content.lower()
-            and message.channel.id == config.covid_channel_id
-        ):
-            storno_time = message.created_at
-            image = choice(storno_images)
-            await message.channel.send(
-                utils.fill_message("covid_storno", user=message.author.id),
-                file=disnake.File(f"images/{image}", filename=image),
-            )
 
     @commands.slash_command(name="uhoh", description=Messages.uhoh_brief)
     async def uhoh(self, inter):
