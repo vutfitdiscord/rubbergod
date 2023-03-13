@@ -48,6 +48,10 @@ class Error(commands.Cog):
             await ctx.send("Chyba ve vstupu, jestli vstup obsahuje `\"` nahraď je za `'`")
             return
 
+        if isinstance(error, commands.errors.MemberNotFound):
+            await ctx.send(utils.fill_message("member_not_found", user=ctx.author.id))
+            return
+
         if isinstance(error, commands.CommandNotFound):
             slash_comms = [command.name for command in self.bot.slash_commands]
             invoked = ctx.message.content.split(" ")[0][1:]
@@ -147,6 +151,23 @@ class Error(commands.Cog):
         if isinstance(error, commands.errors.CheckFailure):
             await inter.response.send_message(utils.fill_message("missing_perms", user=inter.author.id))
             return
+        if isinstance(error, commands.errors.MemberNotFound):
+            await inter.response.send_message(utils.fill_message("member_not_found", user=inter.author.id))
+            return
+
+        embed = self.logger.create_embed(
+            f"User command - {inter.application_command.qualified_name}",
+            inter.filled_options,
+            inter.author,
+            inter.guild,
+            f"https://discord.com/channels/{inter.guild_id}/{inter.channel_id}/{inter.id}",
+        )
+
+        channel = self.bot.get_channel(config.bot_dev_channel)
+        await channel.send(embed=embed)
+
+        output = "".join(traceback.format_exception(type(error), error, error.__traceback__))
+        await self.logger.send_output(output, channel)
 
     @commands.Cog.listener()
     async def on_message_command_error(self, inter: disnake.ApplicationCommandInteraction, error):
@@ -161,6 +182,20 @@ class Error(commands.Cog):
         if isinstance(error, commands.errors.CheckFailure):
             await inter.response.send_message(utils.fill_message("missing_perms", user=inter.author.id))
             return
+
+        embed = self.logger.create_embed(
+            f"Message command - {inter.application_command.qualified_name}",
+            inter.filled_options,
+            inter.author,
+            inter.guild,
+            f"https://discord.com/channels/{inter.guild_id}/{inter.channel_id}/{inter.id}",
+        )
+
+        channel = self.bot.get_channel(config.bot_dev_channel)
+        await channel.send(embed=embed)
+
+        output = "".join(traceback.format_exception(type(error), error, error.__traceback__))
+        await self.logger.send_output(output, channel)
 
 
 def setup(bot):

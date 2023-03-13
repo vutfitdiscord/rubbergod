@@ -76,11 +76,17 @@ class Verify(commands.Cog):
 
     @commands.check(permission_check.submod_plus)
     @commands.user_command(name="Verify host")
-    async def verify_host(self, inter: disnake.UserCommandInteraction, user: disnake.Member):
+    async def verify_host(self, inter: disnake.UserCommandInteraction, member: disnake.Member):
+        """add verify and host role to new member"""
         host_id = inter.guild.get_role(config.verification_host_id)
         verify_id = inter.guild.get_role(config.verification_role_id)
-        await user.add_roles(host_id, verify_id)
-        await inter.response.send_message(Messages.verify_verify_success.format(user=user.mention))
+
+        # check if user is still on server
+        try:
+            await member.add_roles(host_id, verify_id)
+        except AttributeError:
+            raise commands.errors.MemberNotFound("Member not found")
+        await inter.response.send_message(Messages.verify_verify_success.format(user=member.mention))
 
 
 def setup(bot):
