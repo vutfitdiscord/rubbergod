@@ -39,9 +39,7 @@ class Hugs(commands.Cog):
         pass
 
     @cooldowns.long_cooldown
-    @_hug.sub_command(name="hugboard",
-                      description=Messages.hug_hugboard_brief,
-                      guild_ids=[config.guild_id])
+    @_hug.sub_command(name="hugboard", description=Messages.hug_hugboard_brief)
     async def hugboard(
         self,
         inter: disnake.ApplicationCommandInteraction
@@ -69,9 +67,7 @@ class Hugs(commands.Cog):
         await self.check.botroom_check(inter)
 
     @cooldowns.long_cooldown
-    @_hug.sub_command(name="huggersboard",
-                      description=Messages.hug_huggersboard_brief,
-                      guild_ids=[config.guild_id])
+    @_hug.sub_command(name="huggersboard", description=Messages.hug_huggersboard_brief)
     async def huggersboard(
         self,
         inter: disnake.ApplicationCommandInteraction
@@ -99,9 +95,7 @@ class Hugs(commands.Cog):
         await self.check.botroom_check(inter)
 
     @cooldowns.long_cooldown
-    @_hug.sub_command(name="mosthugged",
-                      description=Messages.hug_mosthugged_brief,
-                      guild_ids=[config.guild_id])
+    @_hug.sub_command(name="mosthugged", description=Messages.hug_mosthugged_brief)
     async def mosthugged(
         self,
         inter: disnake.ApplicationCommandInteraction
@@ -129,7 +123,7 @@ class Hugs(commands.Cog):
         await self.check.botroom_check(inter)
 
     @cooldowns.long_cooldown
-    @_hug.sub_command(name="me", description=Messages.hug_stats_brief, guild_ids=[config.guild_id])
+    @_hug.sub_command(name="me", description=Messages.hug_stats_brief)
     async def stats(
         self,
         inter: disnake.ApplicationCommandInteraction,
@@ -179,7 +173,7 @@ class Hugs(commands.Cog):
         await self.check.botroom_check(inter)
 
     @cooldowns.long_cooldown
-    @_hug.sub_command(name="give", description=Messages.hug_give_brief, guild_ids=[config.guild_id])
+    @_hug.sub_command(name="give", description=Messages.hug_give_brief)
     async def give(
         self,
         inter: disnake.ApplicationCommandInteraction,
