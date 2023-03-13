@@ -10,7 +10,7 @@ services:
     bot:
         build: .
         volumes:
-            - ./config/config.toml:/rubbergod/config/config.toml
+            - .:/rubbergod:Z
         depends_on:
             - db
 
