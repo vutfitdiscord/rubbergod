@@ -52,6 +52,12 @@ class Messages:
     uptime_title = "Uptime"
     upsince_title = "Up since"
 
+    hug_brief = "Because everyone likes hugs <3"
+    hugs_brief = "Get your lovely hug stats."
+    hugboard_brief = "Overall hugging stats."
+    huggers_brief = "Get the biggest huggers."
+    hugged_brief = "Get the most hugged."
+
     karma = "{user} Karma uživatele `{target}` je: **{karma}** " \
             "(**{order}.**)\nA rozdal:\n" \
             "**{karma_pos}** pozitivní karmy " \
