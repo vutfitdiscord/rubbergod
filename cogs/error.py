@@ -134,6 +134,34 @@ class Error(commands.Cog):
         output = "".join(traceback.format_exception(type(error), error, error.__traceback__))
         await self.logger.send_output(output, channel)
 
+    @commands.Cog.listener()
+    async def on_user_command_error(self, inter: disnake.ApplicationCommandInteraction, error):
+        if (
+            isinstance(error, permission_check.NotHelperPlusError)
+            or isinstance(error, permission_check.NotSubmodPlusError)
+            or isinstance(error, permission_check.NotModPlusError)
+            or isinstance(error, permission_check.NotAdminError)
+        ):
+            await inter.response.send_message(error.message)
+            return
+        if isinstance(error, commands.errors.CheckFailure):
+            await inter.response.send_message(utils.fill_message("missing_perms", user=inter.author.id))
+            return
+
+    @commands.Cog.listener()
+    async def on_message_command_error(self, inter: disnake.ApplicationCommandInteraction, error):
+        if (
+            isinstance(error, permission_check.NotHelperPlusError)
+            or isinstance(error, permission_check.NotSubmodPlusError)
+            or isinstance(error, permission_check.NotModPlusError)
+            or isinstance(error, permission_check.NotAdminError)
+        ):
+            await inter.response.send_message(error.message)
+            return
+        if isinstance(error, commands.errors.CheckFailure):
+            await inter.response.send_message(utils.fill_message("missing_perms", user=inter.author.id))
+            return
+
 
 def setup(bot):
     bot.add_cog(Error(bot))

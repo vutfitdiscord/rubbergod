@@ -5,7 +5,7 @@ from config import cooldowns
 from features import verification
 from config.messages import Messages
 import disnake
-from permissions import room_check
+from permissions import room_check, permission_check
 from config.app_config import config
 from features.dynamic_verify import DynamicVerifyManager
 from modals.dynamic_verify import DynamicVerifyEditModal
@@ -73,6 +73,14 @@ class Verify(commands.Cog):
             return
         modal = DynamicVerifyEditModal(inter.guild, rule)
         await inter.response.send_modal(modal)
+
+    @commands.check(permission_check.submod_plus)
+    @commands.user_command(name="Verify host")
+    async def verify_host(self, inter: disnake.UserCommandInteraction, user: disnake.Member):
+        host_id = inter.guild.get_role(config.verification_host_id)
+        verify_id = inter.guild.get_role(config.verification_role_id)
+        await user.add_roles(host_id, verify_id)
+        await inter.response.send_message(Messages.verify_verify_success.format(user=user.mention))
 
 
 def setup(bot):

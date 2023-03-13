@@ -13,6 +13,7 @@ helper_role = 461550323727859712
 [verification]
 role = ''
 role_id = 591349196267716608
+host_id = 603673568051462144
 
 [email]
 name = 'toasterrubbergod@gmail.com'
@@ -27,7 +28,8 @@ db_string = "postgresql://postgres:postgres@db:5432/postgres"
 [cogs]
 extensions = ['base', 'karma', 'meme', 'random', 'verify', 'fitwide', 'autopin', 'help',
     'acl', 'review', 'vote', 'week', 'roles', 'error', 'absolvent', 'pet', 'reactions',
-    'streamlinks', 'bookmark', 'subscriptions', 'latex', 'info', 'fun', 'moderation']
+    'streamlinks', 'bookmark', 'subscriptions', 'latex', 'info', 'fun', 'moderation',
+    'timeout']
 
 [config]
 static = ['config_static', 'toml_dict', 'key', 'weather_token', 'db_string']
