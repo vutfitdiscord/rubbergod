@@ -33,10 +33,14 @@ class Hugs(commands.Cog):
         self._tophuggers_formatter = make_pts_column_row_formatter(HugsTable.given.name)
         self._tophugged_formatter = make_pts_column_row_formatter(HugsTable.received.name)
 
+    @commands.slash_command(name="hug", guild_ids=[config.guild_id])
+    async def _hug(self, inter):
+        pass
+
     @cooldowns.long_cooldown
-    @commands.slash_command(name="hugboard",
-                            description=Messages.hugboard_brief,
-                            guild_ids=[config.guild_id])
+    @_hug.sub_command(name="hugboard",
+                      description=Messages.hug_hugboard_brief,
+                      guild_ids=[config.guild_id])
     async def hugboard(
         self,
         inter: disnake.ApplicationCommandInteraction
@@ -63,10 +67,10 @@ class Hugs(commands.Cog):
         await self.check.botroom_check(inter)
 
     @cooldowns.long_cooldown
-    @commands.slash_command(name="huggers",
-                            description=Messages.huggers_brief,
-                            guild_ids=[config.guild_id])
-    async def huggers(
+    @_hug.sub_command(name="huggersboard",
+                      description=Messages.hug_huggersboard_brief,
+                      guild_ids=[config.guild_id])
+    async def huggersboard(
         self,
         inter: disnake.ApplicationCommandInteraction
     ):
@@ -92,10 +96,10 @@ class Hugs(commands.Cog):
         await self.check.botroom_check(inter)
 
     @cooldowns.long_cooldown
-    @commands.slash_command(name="hugged",
-                            description=Messages.hugged_brief,
-                            guild_ids=[config.guild_id])
-    async def hugged(
+    @_hug.sub_command(name="mosthugged",
+                      description=Messages.hug_mosthugged_brief,
+                      guild_ids=[config.guild_id])
+    async def mosthugged(
         self,
         inter: disnake.ApplicationCommandInteraction
     ):
@@ -121,8 +125,8 @@ class Hugs(commands.Cog):
         await self.check.botroom_check(inter)
 
     @cooldowns.long_cooldown
-    @commands.slash_command(name="hugs", description=Messages.hugs_brief, guild_ids=[config.guild_id])
-    async def hugs(
+    @_hug.sub_command(name="me", description=Messages.hug_stats_brief, guild_ids=[config.guild_id])
+    async def stats(
         self,
         inter: disnake.ApplicationCommandInteraction,
         user: disnake.Member = None
@@ -171,8 +175,8 @@ class Hugs(commands.Cog):
         await self.check.botroom_check(inter)
 
     @cooldowns.long_cooldown
-    @commands.slash_command(name="hug", description=Messages.hug_brief, guild_ids=[config.guild_id])
-    async def hug(
+    @_hug.sub_command(name="give", description=Messages.hug_give_brief, guild_ids=[config.guild_id])
+    async def give(
         self,
         inter: disnake.ApplicationCommandInteraction,
         user: disnake.Member = None,
@@ -203,8 +207,8 @@ class Hugs(commands.Cog):
         else:
             await inter.send(f"{choice(emojis)} **{user_str}**")
 
-    @hugs.error
-    @hug.error
+    @stats.error
+    @give.error
     async def hug_error(self, inter, error):
         if isinstance(error, commands.BadArgument):
             await inter.send(utils.fill_message("member_not_found", user=inter.author.id))
