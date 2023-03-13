@@ -184,6 +184,8 @@ class Hugs(commands.Cog):
         Because everyone likes hugs <3
         """
 
+        await inter.response.defer()
+
         if user is None:
             user = inter.author
         elif user.bot:
@@ -191,8 +193,6 @@ class Hugs(commands.Cog):
                 utils.get_emoji(self.bot.get_guild(config.guild_id), "huggers") or ":people_hugging:"
             )
             return
-
-        await inter.response.defer()
 
         emojis = config.hug_emojis
         if user != inter.author:
@@ -210,8 +210,7 @@ class Hugs(commands.Cog):
     async def hug_error(self, inter, error):
         if isinstance(error, commands.BadArgument):
             await inter.send(utils.fill_message("member_not_found", user=inter.author.id))
-        else:
-            print(error)
+            return True
 
 
 def setup(bot):
