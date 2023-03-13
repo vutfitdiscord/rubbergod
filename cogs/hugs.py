@@ -10,6 +10,7 @@ from config import cooldowns
 from repository.hugs_repo import HugsRepository
 from features.leaderboard import LeaderboardPageSource
 from repository.database.hugs import HugsTable
+from buttons.embed import EmbedView
 from permissions import room_check
 from utils import make_pts_column_row_formatter
 
@@ -63,7 +64,8 @@ class Hugs(commands.Cog):
         page = page_source.get_page(0)
         embed = page_source.format_page(page)
 
-        await inter.edit_original_response(embed=embed)
+        view = EmbedView(inter.author, embeds=[embed], page_source=page_source)
+        await inter.edit_original_response(embed=embed, view=view)
         await self.check.botroom_check(inter)
 
     @cooldowns.long_cooldown
@@ -92,7 +94,8 @@ class Hugs(commands.Cog):
         page = page_source.get_page(0)
         embed = page_source.format_page(page)
 
-        await inter.edit_original_response(embed=embed)
+        view = EmbedView(inter.author, embeds=[embed], page_source=page_source)
+        await inter.edit_original_response(embed=embed, view=view)
         await self.check.botroom_check(inter)
 
     @cooldowns.long_cooldown
@@ -121,7 +124,8 @@ class Hugs(commands.Cog):
         page = page_source.get_page(0)
         embed = page_source.format_page(page)
 
-        await inter.edit_original_response(embed=embed)
+        view = EmbedView(inter.author, embeds=[embed], page_source=page_source)
+        await inter.edit_original_response(embed=embed, view=view)
         await self.check.botroom_check(inter)
 
     @cooldowns.long_cooldown
