@@ -172,7 +172,7 @@ class Hugs(commands.Cog):
         await inter.edit_original_response(embed=embed)
         await self.check.botroom_check(inter)
 
-    @cooldowns.long_cooldown
+    @cooldowns.short_cooldown
     @_hug.sub_command(name="give", description=Messages.hug_give_brief)
     async def give(
         self,
