@@ -11,7 +11,6 @@ from repository.hugs_repo import HugsRepository
 from features.leaderboard import LeaderboardPageSource
 from repository.database.hugs import HugsTable
 from permissions import room_check
-from buttons.embed import EmbedView
 from utils import make_pts_column_row_formatter
 
 
@@ -35,146 +34,180 @@ class Hugs(commands.Cog):
         self._tophugged_formatter = make_pts_column_row_formatter(HugsTable.received.name)
 
     @cooldowns.long_cooldown
-    @commands.command()
-    async def hugboard(self, ctx: commands.Context):
+    @commands.slash_command(name="hugboard",
+                            description=Messages.hugboard_brief,
+                            guild_ids=[config.guild_id])
+    async def hugboard(
+        self,
+        inter: disnake.ApplicationCommandInteraction
+    ):
         """
         Overall hugging stats.
         """
-        async with ctx.typing():
-            page_source = LeaderboardPageSource(
+
+        await inter.response.defer()
+
+        page_source = LeaderboardPageSource(
                 bot=self.bot,
-                author=ctx.author,
+                author=inter.author,
                 query=self.hugs_repo.get_top_all_query(),
                 row_formatter=_tophugs_formatter,
                 title='HUGBOARD',
                 emote_name='peepoHugger',
-            )
-            page = page_source.get_page(0)
-            embed = page_source.format_page(page)
+        )
 
-        await self.check.botroom_check(ctx.message)
-        view = EmbedView(ctx.author, embeds=[embed], page_source=page_source)
-        view.message = await ctx.send(embed=embed, view=view)
+        page = page_source.get_page(0)
+        embed = page_source.format_page(page)
+
+        await inter.edit_original_response(embed=embed)
+        await self.check.botroom_check(inter)
 
     @cooldowns.long_cooldown
-    @commands.command()
-    async def huggers(self, ctx: commands.Context):
+    @commands.slash_command(name="huggers",
+                            description=Messages.huggers_brief,
+                            guild_ids=[config.guild_id])
+    async def huggers(
+        self,
+        inter: disnake.ApplicationCommandInteraction
+    ):
         """
         Get the biggest huggers.
         """
-        async with ctx.typing():
-            page_source = LeaderboardPageSource(
+
+        await inter.response.defer()
+
+        page_source = LeaderboardPageSource(
                 bot=self.bot,
-                author=ctx.author,
+                author=inter.author,
                 query=self.hugs_repo.get_top_givers_query(),
                 row_formatter=self._tophuggers_formatter,
                 title='TOP HUGGERS',
                 emote_name='peepoHugger'
-            )
+        )
 
-            page = page_source.get_page(0)
-            embed = page_source.format_page(page)
+        page = page_source.get_page(0)
+        embed = page_source.format_page(page)
 
-        await self.check.botroom_check(ctx.message)
-        view = EmbedView(ctx.author, embeds=[embed], page_source=page_source)
-        view.message = await ctx.send(embed=embed, view=view)
+        await inter.edit_original_response(embed=embed)
+        await self.check.botroom_check(inter)
 
     @cooldowns.long_cooldown
-    @commands.command()
-    async def hugged(self, ctx: commands.Context):
+    @commands.slash_command(name="hugged",
+                            description=Messages.hugged_brief,
+                            guild_ids=[config.guild_id])
+    async def hugged(
+        self,
+        inter: disnake.ApplicationCommandInteraction
+    ):
         """
         Get the most hugged.
         """
-        async with ctx.typing():
-            page_source = LeaderboardPageSource(
+
+        await inter.response.defer()
+
+        page_source = LeaderboardPageSource(
                 bot=self.bot,
-                author=ctx.author,
+                author=inter.author,
                 query=self.hugs_repo.get_top_receivers_query(),
                 row_formatter=self._tophugged_formatter,
                 title='TOP HUGGED',
                 emote_name='peepoHugger',
-            )
+        )
 
-            page = page_source.get_page(0)
-            embed = page_source.format_page(page)
+        page = page_source.get_page(0)
+        embed = page_source.format_page(page)
 
-        await self.check.botroom_check(ctx.message)
-        view = EmbedView(ctx.author, embeds=[embed], page_source=page_source)
-        view.message = await ctx.send(embed=embed, view=view)
+        await inter.edit_original_response(embed=embed)
+        await self.check.botroom_check(inter)
 
     @cooldowns.long_cooldown
-    @commands.command()
-    async def hugs(self, ctx: commands.Context, user: disnake.Member = None):
+    @commands.slash_command(name="hugs", description=Messages.hugs_brief, guild_ids=[config.guild_id])
+    async def hugs(
+        self,
+        inter: disnake.ApplicationCommandInteraction,
+        user: disnake.Member = None
+    ):
         """
         Get your lovely hug stats.
         """
-        if user is None or user == ctx.author:
-            user = ctx.author
+
+        await inter.response.defer()
+
+        if user is None or user == inter.author:
+            user = inter.author
             user_str = utils.get_username(user)
             title = "{0} Your Lovely Hug Stats {0}"
         else:
             user_str = utils.get_username(user)
             title = f"{{0}} {user_str}'s Lovely Hug Stats {{0}}"
 
-        async with ctx.typing():
-            stats = self.hugs_repo.get_members_stats(user.id)
-            positions = self.hugs_repo.get_member_position(stats)
-            avg_position = int((positions[0] + positions[1]) // 2)
-            guild = self.bot.get_guild(config.guild_id)
+        stats = self.hugs_repo.get_members_stats(user.id)
+        positions = self.hugs_repo.get_member_position(stats)
+        avg_position = int((positions[0] + positions[1]) // 2)
+        guild = self.bot.get_guild(config.guild_id)
 
-            embed = disnake.Embed(
-                title=title.format(utils.get_emoji(guild, "peepoHugger") or ""),
-                description=" | ".join(
-                    (
-                        "**Ranks**",
-                        f"Given: **{positions[0]}.**",
-                        f"Received: **{positions[1]}.**",
-                        f"Avg: **{avg_position}.**",
-                    )
-                ),
-            )
+        embed = disnake.Embed(
+            title=title.format(utils.get_emoji(guild, "peepoHugger") or ""),
+            description=" | ".join(
+                (
+                    "**Ranks**",
+                    f"Given: **{positions[0]}.**",
+                    f"Received: **{positions[1]}.**",
+                    f"Avg: **{avg_position}.**",
+                )
+            ),
+        )
 
-            embed.set_author(name=user_str, icon_url=user.avatar.url)
-            utils.add_author_footer(embed, ctx.author)
+        embed.set_author(name=user_str, icon_url=user.avatar.url)
+        utils.add_author_footer(embed, inter.author)
 
-            given_emoji = utils.get_emoji(guild, "peepohugs") or ""
-            recv_emoji = utils.get_emoji(guild, "huggers") or ""
+        given_emoji = utils.get_emoji(guild, "peepohugs") or ""
+        recv_emoji = utils.get_emoji(guild, "huggers") or ""
 
-            embed.add_field(name=f"{given_emoji} Given", value=str(stats.given))
-            embed.add_field(name=f"{recv_emoji} Received", value=str(stats.received))
+        embed.add_field(name=f"{given_emoji} Given", value=str(stats.given))
+        embed.add_field(name=f"{recv_emoji} Received", value=str(stats.received))
 
-        await ctx.send(embed=embed)
-        await self.check.botroom_check(ctx.message)
+        await inter.edit_original_response(embed=embed)
+        await self.check.botroom_check(inter)
 
-    @cooldowns.short_cooldown
-    @commands.command()
-    async def hug(self, ctx: commands.Context, user: disnake.Member = None, intensity: int = 0):
-        """Because everyone likes hugs"""
+    @cooldowns.long_cooldown
+    @commands.slash_command(name="hug", description=Messages.hug_brief, guild_ids=[config.guild_id])
+    async def hug(
+        self,
+        inter: disnake.ApplicationCommandInteraction,
+        user: disnake.Member = None,
+        intensity: int = 0
+    ):
+        """
+        Because everyone likes hugs <3
+        """
+
         if user is None:
-            user = ctx.author
+            user = inter.author
         elif user.bot:
-            await ctx.send(
+            await inter.send(
                 utils.get_emoji(self.bot.get_guild(config.guild_id), "huggers") or ":people_hugging:"
             )
             return
 
-        async with ctx.typing():
-            emojis = config.hug_emojis
-            if user != ctx.author:
-                self.hugs_repo.do_hug(giver_id=ctx.author.id, receiver_id=user.id)
+        await inter.response.defer()
 
-            user_str = utils.get_username(user)
+        emojis = config.hug_emojis
+        if user != inter.author:
+            self.hugs_repo.do_hug(giver_id=inter.author.id, receiver_id=user.id)
+
+        user_str = utils.get_username(user)
 
         if 0 <= intensity < len(emojis):
-            await ctx.send(f"{emojis[intensity]} **{user_str}**")
+            await inter.send(f"{emojis[intensity]} **{user_str}**")
         else:
-            await ctx.send(f"{choice(emojis)} **{user_str}**")
+            await inter.send(f"{choice(emojis)} **{user_str}**")
 
     @hugs.error
     @hug.error
-    async def hug_error(self, ctx, error):
+    async def hug_error(self, inter, error):
         if isinstance(error, commands.BadArgument):
-            await ctx.send(utils.fill_message("member_not_found", user=ctx.author.id))
+            await inter.send(utils.fill_message("member_not_found", user=inter.author.id))
         else:
             print(error)
 
