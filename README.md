@@ -32,6 +32,10 @@ git clone https://github.com/toaster192/rubbergod.git
 cd rubbergod
 ```
 
+## Dev containers vscode (one click run)
+
+If you are using vscode you can simply run Rubbergod by using Dev containers extension. Either by clicking on notification or by clicking on arrows in left bottom corner (Open a Remote Window) and choosing `Reopen in container`.
+
 ## Docker compose setup (recomended)
 
 Install `docker` and `docker-compose` for your system (will vary from system to system)
