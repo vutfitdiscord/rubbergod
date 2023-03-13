@@ -38,7 +38,7 @@ class Hugs(commands.Cog):
     async def _hug(self, inter):
         pass
 
-    @cooldowns.long_cooldown
+    @cooldowns.default_cooldown
     @_hug.sub_command(name="hugboard", description=Messages.hug_hugboard_brief)
     async def hugboard(
         self,
@@ -66,7 +66,7 @@ class Hugs(commands.Cog):
         await inter.edit_original_response(embed=embed, view=view)
         await self.check.botroom_check(inter)
 
-    @cooldowns.long_cooldown
+    @cooldowns.default_cooldown
     @_hug.sub_command(name="huggersboard", description=Messages.hug_huggersboard_brief)
     async def huggersboard(
         self,
@@ -94,7 +94,7 @@ class Hugs(commands.Cog):
         await inter.edit_original_response(embed=embed, view=view)
         await self.check.botroom_check(inter)
 
-    @cooldowns.long_cooldown
+    @cooldowns.default_cooldown
     @_hug.sub_command(name="mosthugged", description=Messages.hug_mosthugged_brief)
     async def mosthugged(
         self,
@@ -122,7 +122,7 @@ class Hugs(commands.Cog):
         await inter.edit_original_response(embed=embed, view=view)
         await self.check.botroom_check(inter)
 
-    @cooldowns.long_cooldown
+    @cooldowns.default_cooldown
     @_hug.sub_command(name="me", description=Messages.hug_stats_brief)
     async def stats(
         self,
