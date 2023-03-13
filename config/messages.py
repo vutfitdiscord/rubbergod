@@ -52,6 +52,12 @@ class Messages:
     uptime_title = "Uptime"
     upsince_title = "Up since"
 
+    hug_give_brief = "Obejme kamaráda"
+    hug_stats_brief = "Tvé statistiky obejmutí"
+    hug_hugboard_brief = "Celková tabulka statistiky obejmutí"
+    hug_huggersboard_brief = "Vypíše nejčastější objímače"
+    hug_mosthugged_brief = "Vypíše nejvíce objímané lidi"
+
     karma = "{user} Karma uživatele `{target}` je: **{karma}** " \
             "(**{order}.**)\nA rozdal:\n" \
             "**{karma_pos}** pozitivní karmy " \
