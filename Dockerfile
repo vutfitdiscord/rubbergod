@@ -15,5 +15,6 @@ COPY requirements.txt requirements.txt
 RUN pip install -r requirements.txt --user
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 COPY . .
+RUN git config --global --add safe.directory /rubbergod
 
 ENTRYPOINT [ "python3", "rubbergod.py" ]
