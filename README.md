@@ -1,61 +1,135 @@
-# Discord bot for the VUT FIT discord server
+# Discord bot for the VUT FIT Discord server
 
 ## About
 
-This bot manages the verification process, karma and a bunch of simple commands
-on our VUT FIT discord server. Since most of the features are custom-made I
+This bot manages the verification process, karma and a bunch of other simple commands
+on our VUT FIT Discord server. It is written in Python with the help of [Disnake](https://docs.disnake.dev/en/latest/index.html) and its DB runs on PostgreSQL with ORM.
+
+Since the most of the features are custom-made, we
 wouldn't recommend using it for different servers.
 
-[Rubbergoddess](https://github.com/sinus-x/rubbergoddess) is a Rubbergod-based
-bot used on VUT FEKT discord server.
+## Setup
 
-## Creating discord application
+### Creating a Discord App
 
-Before first run of bot you need to create discord application.
-Guide for creating new application and adding bot to your server can be found at
-disnake [documentation](https://docs.disnake.dev/en/latest/discord.html)
+Before you proceed to the environment setup, you will need to create a Discord application
+to get the Discord API key. We will not provide you with the exact steps on how to do this as there already exists this 
+[awesome guide](https://docs.disnake.dev/en/latest/discord.html)
+from the developers of Disnake, Discord API Python library.
 
-While creating discord appilication one more step is required.
-You will also need to enable `SERVER MEMBERS INTENT` in `Bot` tab.
+- When creating an invite URL in the [Inviting Your Bot](https://docs.disnake.dev/en/latest/discord.html#inviting-your-bot) section, 
+the `bot` and `applications.commands` scopes are required. We also strongly recommend choosing `Administrator` in the __Bot permissions__
+as it is hard to figure out which of these permissions you actually need for the development. 
 
-## Installing and running the bot
+> You should set up a separate server just for the development purposes so it shouldn't be that much of a security risk anyway.
 
-Prerequisites:
+- After you create the Discord application, one additional step is required.
+You will also need to enable `SERVER MEMBERS INTENT` in __Bot__ tab:
 
-* Postgresql
-* Python3.8+
+![image](https://user-images.githubusercontent.com/16971100/224842973-efa05793-31a4-4e88-b2da-8bc864d6adcb.png)
+
+> You can do this by going to the [Discord Developer Portal](https://discord.com/developers/applications) and selecting your newly created application. 
+Then click on the __Bot__ tab on the left and scroll down to the __Privileged Gateway Intents__ section.
+
+### Installing and running the bot
 
 Start by cloning the repo:
 
 ```bash
-git clone https://github.com/toaster192/rubbergod.git
+git clone https://github.com/Toaster192/rubbergod.git
 cd rubbergod
 ```
 
-## Dev containers vscode (one click run)
+> If you want to participate in the development, you will need to [__create a fork and clone that instead__](#contribution).
 
-If you are using vscode you can simply run Rubbergod by using Dev containers extension. Either by clicking on notification or by clicking on arrows in left bottom corner (Open a Remote Window) and choosing `Reopen in container`.
-
-## Docker compose setup (recomended)
-
-Install `docker` and `docker-compose` for your system (will vary from system to system)
-and run `docker` (`systemctl start docker.service`)
-
-To run docker user needs to be in `docker` group. (eg. `sudo usermod -aG docker $USER`).
+#### Configuration
 
 ```bash
-docker build .
+cp config/config.template.toml config/config.toml
 ```
 
-and then everytime you want to run the app
+Now open the `config.toml` file in your favorite editor. Insert the Discord API key you obtained earlier in the setup process:
+```
+1 [base]
+2 command_prefix = ['?', '!']
+3 default_prefix = '?'
+4 ignored_prefixes = ['!']
+5 key = '<Your Discord API key>'
+...
+```
+
+> __Be careful.__ Bad things will happen if anyone else gets a possession of this key. Do not share it with anyone, ever!
+
+On the next line, insert your Discord user ID into the array so you get administrator rights over the bot:
+
+```
+6 admin_ids = [<Your Discord user ID>]
+```
+
+> [Where can I find my User/Server/Message ID?](https://support.discord.com/hc/en-us/articles/206346498-Where-can-I-find-my-User-Server-Message-ID-)
+
+Then, create the following 5 channels (or use one channel for all of them) on your server and paste their IDs to the config:
+
+```
+58 log_channel = <Channel ID>
+59 bot_dev_channel = <Channel ID>
+60 vote_room = <Channel ID>
+61 bot_room = <Channel ID>
+62 mod_room = <Channel ID>
+```
+
+(Optional) For some features you will also need to set other config variables, usually they are divided into categories based on cogs.
+
+--------------------------------------
+
+### Docker setup (recommended)
+
+Install either Docker Desktop (a) or Docker Engine (b) by going to their [official documentation](https://docs.docker.com/engine/install/). Just select your OS and follow the steps.
+
+If you haven't already, run `docker` (`systemctl start docker.service`). To use Docker, you also need to be in `docker` group (eg. `sudo usermod -aG docker $USER && newgrp docker`).
+
+> It might be necessary to log out and back in or even restart your system (to get all the permissions and other stuff right).
+
+#### a. Dev containers in VS Code (one click run) - preferred option
+
+If you are using VS Code, you can simply run Rubbergod by using the [Dev containers](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers) extension. 
+Either by clicking on notification or by clicking on arrows in left bottom corner (Open a Remote Window) and choosing `Reopen in container`.
+
+#### b. Docker Compose CLI - if you don't use VS Code
+
+This command should do the trick:
 
 ```bash
-docker-compose down && docker-compose up --build
+docker compose up --build
 ```
 
-## Local setup (not recommended)
+Docker will download all the necessary stuff and run the container. If you did everything correctly, bot will connect to the DB, load all the extensions and print `Ready` at the end. It will also send `:peepowave:` emoji to the `#bot-room` if you configured one. You're now all set!
 
-Install the required python modules (`venv` / `--user` flag recommended):
+--------------------------------------
+
+### Development
+
+If you didn't run the container in detached mode, just press `Ctrl+C` to stop it.
+
+Try to tweak some command a little bit and run the bot again, this time in detached mode so it won't block your terminal:
+
+```bash
+docker compose up --detach
+```
+
+> Your changes should be propagated to the server in a moment.
+
+To stop the detached container, use this command:
+
+```bash
+docker compose down
+```
+
+--------------------------------------
+
+### Local setup (not recommended)
+
+Install the required Python modules (`venv` / `--user` flag recommended):
 
 ```bash
 pip3 install -r requirements.txt
@@ -67,7 +141,7 @@ Run the bot (might want to use `nohup` or something):
 python3 rubbergod.py
 ```
 
-### Required/recommended packages (apt)
+#### Required/recommended packages (apt)
 
 ```bash
 git
@@ -78,10 +152,15 @@ postgresql
 postgresql-contrib
 libpq-dev
 ```
+---------------------------------------
 
-## Pre-commit (useful for dev)
+## Contribution
 
-We have setup pre-commit in this repository. To use it use these commands:
+To participate in the development, you need to create a fork and send us your contributions through "Pull requests". You can read more in [About forks](https://docs.github.com/en/get-started/quickstart/fork-a-repo#about-forks) and [Creating a pull request](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/creating-a-pull-request) guides directly from GitHub. It may look scary at the first moment, but don't worry, it's actually pretty simple. If you don't know where to start, we can help you on Discord (mentioned below).
+
+#### `pre-commit` (useful for contributors)
+
+We have set up `pre-commit` in this repository. Use it by running these commands:
 
 ```bash
 pip install -r requirements-dev.txt
@@ -100,6 +179,14 @@ pre-commit install
 * [Solumath](https://github.com/solumath)
 
 **Pull requests, issues or tips for new features are very much welcome!**
+
+## Discord development channel
+
+You can discuss bot-related stuff in the [`#bot-development`](https://discord.com/channels/461541385204400138/597009137905303552) channel on the VUT FIT Discord server.
+
+## Other bots
+
+[GrillBot](https://github.com/GrillBot) - our 2nd Discord bot almost entirely developed and maintained by [@Misha12](https://github.com/Misha12) aka Hobit.
 
 ## License
 
