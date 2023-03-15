@@ -84,7 +84,7 @@ Then, create the following 5 channels (or use one channel for all of them) on yo
 
 ### Docker setup (recommended)
 
-Install either Docker Desktop (a) or Docker Engine (b) by going to their [official documentation](https://docs.docker.com/engine/install/). Just select your OS and follow the steps.
+Install Docker Engine or (more full-featured) Docker Desktop by going to their [official documentation](https://docs.docker.com/engine/install/). Just select your OS and follow the steps.
 
 If you haven't already, run `docker` (`systemctl start docker.service`). To use Docker, you also need to be in `docker` group (eg. `sudo usermod -aG docker $USER && newgrp docker`).
 
@@ -160,7 +160,7 @@ To participate in the development, you need to create a fork and send us your co
 
 #### `pre-commit` (useful for contributors)
 
-We have set up `pre-commit` in this repository. Use it by running these commands:
+We use `pre-commit` for lint check before each commit. Use it by running these commands:
 
 ```bash
 pip install -r requirements-dev.txt
