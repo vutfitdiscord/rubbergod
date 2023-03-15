@@ -1,9 +1,9 @@
-# Discord bot for the VUT FIT Discord server
+# Discord bot for the BUT FIT Discord server
 
 ## About
 
 This bot manages the verification process, karma and a bunch of other simple commands
-on our VUT FIT Discord server. It is written in Python with the help of [Disnake](https://docs.disnake.dev/en/latest/index.html) and its DB runs on PostgreSQL with ORM.
+on our [BUT FIT Discord server](https://discord.com/invite/vutfit). It is written in Python with the help of [Disnake](https://docs.disnake.dev/en/latest/index.html) and its DB runs on PostgreSQL with ORM.
 
 Since the most of the features are custom-made, we
 wouldn't recommend using it for different servers.
@@ -40,7 +40,7 @@ git clone https://github.com/Toaster192/rubbergod.git
 cd rubbergod
 ```
 
-> If you want to participate in the development, you will need to [__create a fork and clone that instead__](#contribution).
+> If you want to contribute to this project, refer to the [contribution](#contribution) section first.
 
 #### Configuration
 
@@ -48,7 +48,7 @@ cd rubbergod
 cp config/config.template.toml config/config.toml
 ```
 
-Now open the `config.toml` file in your favorite editor. Insert the Discord API key you obtained earlier in the setup process:
+Now open the `config.toml` file in your editor. Insert the Discord API key you obtained earlier in the setup process:
 ```
 1 [base]
 2 command_prefix = ['?', '!']
@@ -182,7 +182,7 @@ pre-commit install
 
 ## Discord development channel
 
-You can discuss bot-related stuff in the [`#bot-development`](https://discord.com/channels/461541385204400138/597009137905303552) channel on the VUT FIT Discord server.
+You can discuss bot-related stuff in the [`#bot-development`](https://discord.com/channels/461541385204400138/597009137905303552) channel on the [BUT FIT Discord server](https://discord.com/invite/vutfit).
 
 ## Other bots
 
