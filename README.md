@@ -188,6 +188,8 @@ You can discuss bot-related stuff in the [`#bot-development`](https://discord.co
 
 [GrillBot](https://github.com/GrillBot) - our 2nd Discord bot almost entirely developed and maintained by [@Misha12](https://github.com/Misha12) aka Hobit.
 
+[Pumpkin.py](https://github.com/pumpkin-py/pumpkin-py) - Highly modular Discord bot created by folks at BUT FEEC.
+
 ## License
 
 This project is licensed under the GNU GPL v.3 License.
