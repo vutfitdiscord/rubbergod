@@ -182,6 +182,8 @@ pre-commit install
 
 ## Discord development channel
 
+#### Got stuck with the above steps? Any questions?
+
 You can discuss bot-related stuff in the [`#bot-development`](https://discord.com/channels/461541385204400138/597009137905303552) channel on the [BUT FIT Discord server](https://discord.com/invite/vutfit).
 
 ## Other bots
