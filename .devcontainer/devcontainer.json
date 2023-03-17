@@ -7,5 +7,10 @@
 		"../docker-compose.yml"
 	],
 	"service": "bot",
-	"workspaceFolder": "/rubbergod"
+	"workspaceFolder": "/rubbergod",
+	"customizations": {
+		"vscode": {
+		  "extensions": ["ms-python.python"]
+		}
+	  }
 }
