@@ -25,8 +25,7 @@ class Hugs(commands.Cog):
     Hugging commands.
     """
 
-    emojis = config.hug_emojis
-    emoji_count = len(emojis)
+    emoji_count = len(config.hug_emojis)
 
     def __init__(self, bot):
         self.bot = bot
@@ -179,13 +178,14 @@ class Hugs(commands.Cog):
         self,
         inter: disnake.ApplicationCommandInteraction,
         user: disnake.Member = None,
-        intensity: int = commands.Param(name='intensity',
-                                        description=Messages.hug_intensity_description
-                                        .format(emoji_count=emoji_count),
-                                        ge=1,
-                                        le=emoji_count,
-                                        default=1,
-                                        )
+        intensity: int = commands.Param(
+            name='intensity',
+            description=utils.fill_message("hug_intensity_description",
+                                           emoji_count=emoji_count),
+            ge=1,
+            le=emoji_count,
+            default=1,
+        )
     ):
         """
         Because everyone likes hugs <3
@@ -209,7 +209,7 @@ class Hugs(commands.Cog):
         # Convert a human-friendly intensity to an array index
         intensity -= 1
 
-        await inter.send(f"{self.emojis[intensity]} **{user_str}**")
+        await inter.send(f"{config.hug_emojis[intensity]} **{user_str}**")
 
     @stats.error
     @give.error
