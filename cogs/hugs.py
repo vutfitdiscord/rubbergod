@@ -1,5 +1,3 @@
-from random import choice
-
 import disnake
 from disnake.ext import commands
 
@@ -26,6 +24,8 @@ class Hugs(commands.Cog):
     """
     Hugging commands.
     """
+
+    emoji_count = len(config.hug_emojis)
 
     def __init__(self, bot):
         self.bot = bot
@@ -178,7 +178,16 @@ class Hugs(commands.Cog):
         self,
         inter: disnake.ApplicationCommandInteraction,
         user: disnake.Member = None,
-        intensity: int = 0
+        intensity: int = commands.Param(
+            name='intensity',
+            description=utils.fill_message(
+                "hug_intensity_description",
+                emoji_count=emoji_count
+            ),
+            ge=1,
+            le=emoji_count,
+            default=1,
+        )
     ):
         """
         Because everyone likes hugs <3
@@ -194,16 +203,15 @@ class Hugs(commands.Cog):
             )
             return
 
-        emojis = config.hug_emojis
         if user != inter.author:
             self.hugs_repo.do_hug(giver_id=inter.author.id, receiver_id=user.id)
 
         user_str = utils.get_username(user)
 
-        if 0 <= intensity < len(emojis):
-            await inter.send(f"{emojis[intensity]} **{user_str}**")
-        else:
-            await inter.send(f"{choice(emojis)} **{user_str}**")
+        # Convert a human-friendly intensity to an array index
+        intensity -= 1
+
+        await inter.send(f"{config.hug_emojis[intensity]} **{user_str}**")
 
     @stats.error
     @give.error
