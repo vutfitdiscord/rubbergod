@@ -180,7 +180,8 @@ class Hugs(commands.Cog):
         inter: disnake.ApplicationCommandInteraction,
         user: disnake.Member = None,
         intensity: int = commands.Param(name='intensity',
-                                        description=f"Síla obejmutí (číslo 1-{emoji_count})",
+                                        description=Messages.hug_intensity_description
+                                        .format(emoji_count=emoji_count),
                                         ge=1,
                                         le=emoji_count,
                                         default=1,

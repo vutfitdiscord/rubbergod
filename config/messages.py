@@ -53,6 +53,7 @@ class Messages:
     upsince_title = "Up since"
 
     hug_give_brief = "Obejme kamaráda"
+    hug_intensity_description = "Síla obejmutí (číslo 1-{emoji_count})"
     hug_stats_brief = "Tvé statistiky obejmutí"
     hug_hugboard_brief = "Celková tabulka statistiky obejmutí"
     hug_huggersboard_brief = "Vypíše nejčastější objímače"
