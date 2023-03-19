@@ -42,6 +42,7 @@ class Timeout(commands.Cog):
         self.timeout_repo = TimeoutRepository()
         self.formats = ("%d.%m.%Y", "%d/%m/%Y", "%d.%m.%Y %H:%M", "%d/%m/%Y %H:%M")
         self.refresh_timeout.start()
+        self.perms_users = []
 
     def create_embed(self, author, title):
         """Embed template for Timeout"""
@@ -79,7 +80,7 @@ class Timeout(commands.Cog):
                 self.timeout_repo.add_timeout(user.id, endtime, reason)
             return False
         except disnake.Forbidden:
-            await inter.send(Messages.timeout_permission)
+            self.perms_users.append(user)
             return True
 
     async def timeout_parse(self, inter, user, endtime, reason):
@@ -148,7 +149,7 @@ class Timeout(commands.Cog):
     async def timeout_user(
         self,
         inter: disnake.ApplicationCommandInteraction,
-        user: disnake.Member,
+        user: str = commands.Param(max_length=1000, description=Messages.timeout_user_brief),
         endtime: str = commands.Param(
             autocomplete=autocomplete_times,
             max_length=20, description=Messages.timeout_time
@@ -156,12 +157,37 @@ class Timeout(commands.Cog):
         reason: str = commands.Param(max_length=256, description=Messages.timeout_reason)
     ):
         """Set timeout for user"""
-        endtime = await self.timeout_parse(inter, user, endtime, reason)
-        if endtime is None:
-            return
+        await inter.response.defer()
+        members = await utils.get_members_from_tag(inter.guild, user)
         embed = self.create_embed(inter.author, "Timeout")
-        embed.add_field(name=f"{user} | {endtime.strftime('%d.%m.%Y %H:%M')}", value=reason)
-        await inter.send(user.mention, embed=embed)
+        timeout_members = False
+
+        # no member found
+        if not members:
+            return await inter.send(utils.fill_message("member_not_found", user=inter.author.id))
+
+        for user in members:
+            parsed_endtime = await self.timeout_parse(inter, user, endtime, reason)
+            # if error in parsing return
+            if parsed_endtime is None:
+                continue
+
+            timeout_members = True
+            embed.add_field(
+                name=f"{user} | {parsed_endtime.strftime('%d.%m.%Y %H:%M')}",
+                value=reason,
+                inline=False
+            )
+
+        if timeout_members:
+            await inter.send(''.join(f'{user.mention}' for user in members), embed=embed)
+
+        # there are users in list self.perms_users
+        if self.perms_users:
+            await inter.followup.send('\n'.join(
+                    f'{Messages.timeout_permission.format(user=user.name)}'for user in self.perms_users)
+            )
+            self.perms_users = []
 
     @_timeout.sub_command(name="remove", description=Messages.timeout_remove_brief)
     async def remove_timeout(self, inter: disnake.ApplicationCommandInteraction, user: disnake.Member):
@@ -212,6 +238,7 @@ class Timeout(commands.Cog):
                 await member.timeout(until=user.end, reason=user.reason)
 
         # send update
+        users = self.timeout_repo.get_timeout_users()
         submod_helper_room = self.bot.get_channel(config.submod_helper_room)
         await self.timeout_embed_listing(users, "Timeout Update", submod_helper_room)
 

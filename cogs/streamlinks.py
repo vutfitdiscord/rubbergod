@@ -103,10 +103,11 @@ class StreamLinks(commands.Cog):
             )
             return
 
-        # str is discord tag so fetch user and get his name
+        # str is discord tag so fetch user and get his name, or multiple users
         if "@" in user:
-            user = await utils.get_username_from_tag(self, user)
-            user = " & ".join(user)
+            users = await utils.get_users_from_tag(self, user)
+            users = [user.name for user in users]
+            user = " & ".join(users)
 
         link_data = self.get_link_data(link)
         if date is not None:
