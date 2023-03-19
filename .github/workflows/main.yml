@@ -16,7 +16,7 @@ jobs:
       uses: actions/setup-python@v4
       with:
         python-version: 3.8
-        
+
     - name: Restore cache
       uses: actions/cache@v3
       with:
@@ -26,8 +26,9 @@ jobs:
     - name: Install dependencies
       run: |
         python3 -m pip install --upgrade pip wheel
-        python3 -m pip install --upgrade --upgrade-strategy eager flake8
-  
-    - name: Run flake8
+        python3 -m pip install --upgrade --upgrade-strategy eager pre-commit
+        sudo apt-get install -y git
+
+    - name: Run pre-commit
       run: |
-        flake8 .
+        git diff-tree --no-commit-id --name-only -r $GITHUB_SHA | xargs pre-commit run --files
