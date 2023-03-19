@@ -13,13 +13,13 @@ wouldn't recommend using it for different servers.
 ### Creating a Discord App
 
 Before you proceed to the environment setup, you will need to create a Discord application
-to get the Discord API key. We will not provide you with the exact steps on how to do this as there already exists this 
+to get the Discord API key. We will not provide you with the exact steps on how to do this as there already exists this
 [awesome guide](https://docs.disnake.dev/en/latest/discord.html)
 from the developers of Disnake, Discord API Python library.
 
-- When creating an invite URL in the [Inviting Your Bot](https://docs.disnake.dev/en/latest/discord.html#inviting-your-bot) section, 
+- When creating an invite URL in the [Inviting Your Bot](https://docs.disnake.dev/en/latest/discord.html#inviting-your-bot) section,
 the `bot` and `applications.commands` scopes are required. We also strongly recommend choosing `Administrator` in the __Bot permissions__
-as it is hard to figure out which of these permissions you actually need for the development. 
+as it is hard to figure out which of these permissions you actually need for the development.
 
 > You should set up a separate server just for the development purposes so it shouldn't be that much of a security risk anyway.
 
@@ -28,7 +28,7 @@ You will also need to enable `SERVER MEMBERS INTENT` in __Bot__ tab:
 
 ![image](https://user-images.githubusercontent.com/16971100/224842973-efa05793-31a4-4e88-b2da-8bc864d6adcb.png)
 
-> You can do this by going to the [Discord Developer Portal](https://discord.com/developers/applications) and selecting your newly created application. 
+> You can do this by going to the [Discord Developer Portal](https://discord.com/developers/applications) and selecting your newly created application.
 Then click on the __Bot__ tab on the left and scroll down to the __Privileged Gateway Intents__ section.
 
 ### Installing and running the bot
@@ -92,7 +92,7 @@ If you haven't already, run `docker` (`systemctl start docker.service`). To use 
 
 #### a. Dev containers in VS Code (one click run) - preferred option
 
-If you are using VS Code, you can simply run Rubbergod by using the [Dev containers](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers) extension. 
+If you are using VS Code, you can simply run Rubbergod by using the [Dev containers](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers) extension.
 Either by clicking on notification or by clicking on arrows in left bottom corner (Open a Remote Window) and choosing `Reopen in container`.
 
 #### b. Docker Compose CLI - if you don't use VS Code
