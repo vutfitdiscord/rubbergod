@@ -1,11 +1,10 @@
-from typing import List
-import requests
-
-from bs4 import BeautifulSoup
 from dataclasses import dataclass
 from enum import Enum
-from urllib.parse import urlparse
-from urllib.parse import parse_qs
+from typing import List
+from urllib.parse import parse_qs, urlparse
+
+import requests
+from bs4 import BeautifulSoup
 
 
 class Semester(Enum):

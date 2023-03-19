@@ -1,7 +1,8 @@
-from sqlalchemy.ext.declarative import declarative_base
-from repository.base_repository import BaseRepository
 from sqlalchemy import create_engine
+from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
+
+from repository.base_repository import BaseRepository
 
 
 class Database(BaseRepository):

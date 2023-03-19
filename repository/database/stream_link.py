@@ -1,4 +1,5 @@
-from sqlalchemy import BIGINT, Column, String, DateTime
+from sqlalchemy import BIGINT, Column, DateTime, String
+
 from repository.database import database
 
 

@@ -1,15 +1,15 @@
 import datetime
 import traceback
-import requests
 from io import BytesIO
 from pathlib import Path
-from PIL import Image, ImageDraw, ImageFont
 
 import disnake
+import requests
+from PIL import Image, ImageDraw, ImageFont
 
+import utils
 from config.app_config import config
 from repository.database.error import ErrorLog
-import utils
 
 
 class ErrorLogger:

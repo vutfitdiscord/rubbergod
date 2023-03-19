@@ -1,7 +1,9 @@
-from sqlalchemy import Column, String, Integer, Boolean
-from repository.database import database
-from typing import List
 import json
+from typing import List
+
+from sqlalchemy import Boolean, Column, Integer, String
+
+from repository.database import database
 
 
 class Permit(database.base):

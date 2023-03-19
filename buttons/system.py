@@ -1,10 +1,11 @@
-import disnake
-import utils
 import math
-from permissions import permission_check
 
-from config.app_config import config
+import disnake
+
+import utils
 from buttons.base import BaseView
+from config.app_config import config
+from permissions import permission_check
 
 
 class SystemView(BaseView):

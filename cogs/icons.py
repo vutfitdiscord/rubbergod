@@ -1,10 +1,10 @@
 import disnake
 from disnake.ext import commands
 
+import utils
 from buttons.icon import IconView
 from config.app_config import config
 from config.messages import Messages
-import utils
 
 
 def remove_prefix(text, prefix):

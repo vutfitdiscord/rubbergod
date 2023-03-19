@@ -2,10 +2,10 @@ from __future__ import annotations
 
 import datetime
 from typing import Optional
+
 from sqlalchemy import Column, Date, Integer
 
-from repository.database import session
-from repository.database import database
+from repository.database import database, session
 
 
 class ErrorLog(database.base):

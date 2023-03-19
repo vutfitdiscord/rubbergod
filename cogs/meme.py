@@ -1,16 +1,16 @@
 from io import BytesIO
-from PIL import Image
 from random import choice
-import requests
 from typing import List
 
 import disnake
+import requests
 from disnake.ext import commands
+from PIL import Image
 
 import utils
+from config import cooldowns
 from config.app_config import config
 from config.messages import Messages
-from config import cooldowns
 
 uhoh_counter = 0
 

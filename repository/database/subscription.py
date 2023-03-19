@@ -1,4 +1,5 @@
 from sqlalchemy import BigInteger, Column, Integer
+
 from repository.database import database
 
 

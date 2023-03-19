@@ -1,25 +1,24 @@
 import re
 
-from repository.database import database, session
-from repository.database.karma import Karma, Karma_emoji
-from repository.database.review import Review, ReviewRelevance, Subject, Subject_details  # noqa: F401
-from repository.database.verification import Permit, Valid_person
-from repository.database.image import Image  # noqa: F401
-from repository.database.role_group import RoleGroup  # noqa: F401
-from repository.review_repo import ReviewRepository
-from repository.database.hugs import HugsTable
-from repository.database.pin_map import PinMap  # noqa: F401
-from repository.database.stream_link import StreamLink  # noqa: F401
-from repository.database.vote import Vote  # noqa: F401
-from repository.database.subscription import Subscription  # noqa: F401
-from repository.database.meme_repost import MemeRepost  # noqa: F401
-from repository.database.exams import ExamsTermsMessage  # noqa: F401
-from repository.database.error import ErrorLog  # noqa: F401
-from repository.database.cooldown import Cooldown  # noqa: F401
-from repository.database.timeout import Timeout  # noqa: F401
-
-
 from config.app_config import config
+from repository.database import database, session
+from repository.database.cooldown import Cooldown  # noqa: F401
+from repository.database.error import ErrorLog  # noqa: F401
+from repository.database.exams import ExamsTermsMessage  # noqa: F401
+from repository.database.hugs import HugsTable
+from repository.database.image import Image  # noqa: F401
+from repository.database.karma import Karma, Karma_emoji
+from repository.database.meme_repost import MemeRepost  # noqa: F401
+from repository.database.pin_map import PinMap  # noqa: F401
+from repository.database.review import (Review, ReviewRelevance,  # noqa: F401
+                                        Subject, Subject_details)
+from repository.database.role_group import RoleGroup  # noqa: F401
+from repository.database.stream_link import StreamLink  # noqa: F401
+from repository.database.subscription import Subscription  # noqa: F401
+from repository.database.timeout import Timeout  # noqa: F401
+from repository.database.verification import Permit, Valid_person
+from repository.database.vote import Vote  # noqa: F401
+from repository.review_repo import ReviewRepository
 
 
 def init_db(commit: bool = True):

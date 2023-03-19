@@ -1,6 +1,8 @@
+from typing import Union
+
 import disnake
 from disnake.ext.commands import Bot
-from typing import Union
+
 from config.app_config import config
 
 

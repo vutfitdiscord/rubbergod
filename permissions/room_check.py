@@ -1,8 +1,9 @@
 """All checks for room permissions"""
 
+from typing import Union
+
 import disnake
 from disnake.ext import commands
-from typing import Union
 
 import utils
 from config.app_config import config

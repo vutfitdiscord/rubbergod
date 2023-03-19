@@ -1,6 +1,7 @@
 from sqlalchemy import Column, String
-from sqlalchemy.types import PickleType
 from sqlalchemy.ext.mutable import MutableList
+from sqlalchemy.types import PickleType
+
 from repository.database import database
 
 

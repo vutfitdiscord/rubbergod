@@ -1,21 +1,22 @@
-import disnake
-from disnake.ext import commands, tasks
+import collections
 import datetime
-from typing import Union, List, Optional
+import math
 import re
+from typing import List, Optional, Union
+
+import disnake
 import requests
 from bs4 import BeautifulSoup
 from bs4.element import NavigableString
-import math
-import collections
+from disnake.ext import commands, tasks
 
-from buttons.embed import EmbedView
-from config.app_config import config
-from config import cooldowns
-from config.messages import Messages
-from repository.exams_repo import ExamsTermsMessageRepo
 import utils
+from buttons.embed import EmbedView
+from config import cooldowns
+from config.app_config import config
+from config.messages import Messages
 from permissions import permission_check
+from repository.exams_repo import ExamsTermsMessageRepo
 
 year_regex = "[1-3][BM]IT"
 YEAR_LIST = ["1BIT", "2BIT", "3BIT", "1MIT", "2MIT"]

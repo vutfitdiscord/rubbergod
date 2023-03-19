@@ -1,4 +1,4 @@
-from sqlalchemy import Column, BigInteger, DateTime, Boolean
+from sqlalchemy import BigInteger, Boolean, Column, DateTime
 
 from repository.database import database
 

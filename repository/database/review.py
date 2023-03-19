@@ -1,5 +1,7 @@
-from sqlalchemy import Column, String, Integer, Boolean, Date, PrimaryKeyConstraint, ForeignKey
+from sqlalchemy import (Boolean, Column, Date, ForeignKey, Integer,
+                        PrimaryKeyConstraint, String)
 from sqlalchemy.orm import relationship
+
 from repository.database import database
 
 

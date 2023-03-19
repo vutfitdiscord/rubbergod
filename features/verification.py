@@ -1,22 +1,22 @@
 import random
+import re
 import smtplib
 import ssl
 import string
-import re
+from datetime import datetime
+from email.mime.text import MIMEText
 
 import disnake
 from disnake.ext.commands import Bot
 
 import utils
+from buttons.verify import VerifyView, VerifyWithResendButtonView
 from config.app_config import config
 from config.messages import Messages
 from features.base_feature import BaseFeature
-from repository.user_repo import UserRepository, VerifyStatus
-from repository.database.verification import Valid_person
-from email.mime.text import MIMEText
-from buttons.verify import VerifyWithResendButtonView, VerifyView
-from datetime import datetime
 from features.verify_helper import VerifyHelper
+from repository.database.verification import Valid_person
+from repository.user_repo import UserRepository, VerifyStatus
 
 
 class Verification(BaseFeature):

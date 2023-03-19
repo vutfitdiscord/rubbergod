@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from sqlalchemy import Column, String, BigInteger
+from sqlalchemy import BigInteger, Column, String
 
 from repository.database import database
 

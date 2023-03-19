@@ -1,8 +1,10 @@
-import disnake
 import re
-from utils import split_to_parts
+
+import disnake
+
 import utils
 from config.messages import Messages
+from utils import split_to_parts
 
 
 class BookmarkFeatures():

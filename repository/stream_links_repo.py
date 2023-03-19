@@ -1,9 +1,11 @@
-from repository.base_repository import BaseRepository
-from repository.database.stream_link import StreamLink
-from repository.database import session
-from sqlalchemy.sql import exists
-from sqlalchemy import desc
 from datetime import datetime
+
+from sqlalchemy import desc
+from sqlalchemy.sql import exists
+
+from repository.base_repository import BaseRepository
+from repository.database import session
+from repository.database.stream_link import StreamLink
 
 
 class StreamLinksRepo(BaseRepository):

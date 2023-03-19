@@ -1,15 +1,17 @@
+from typing import Dict, Union
+
 import disnake
-from features.verify_helper import VerifyHelper
-import utils
-from features.base_feature import BaseFeature
 from disnake.ext.commands import Bot
+
+import utils
+from buttons.dynamic_verify import DynamicVerifyRequestView
+from config.app_config import config
+from config.messages import Messages
+from features.base_feature import BaseFeature
+from features.verify_helper import VerifyHelper
 from repository.database.verification import DynamicVerifyRule
 from repository.user_repo import UserRepository
 from repository.verify_repo import VerifyRepository
-from typing import Union, Dict
-from config.app_config import config
-from config.messages import Messages
-from buttons.dynamic_verify import DynamicVerifyRequestView
 
 
 class DynamicVerifyManager(BaseFeature):

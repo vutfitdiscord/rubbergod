@@ -1,6 +1,6 @@
 from repository.base_repository import BaseRepository
 from repository.database import session
-from repository.database.acl import (Acl_groups, Acl_rules, Acl_role_binding,
+from repository.database.acl import (Acl_groups, Acl_role_binding, Acl_rules,
                                      Acl_user_binding)
 
 

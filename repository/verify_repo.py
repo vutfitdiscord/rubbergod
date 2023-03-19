@@ -1,9 +1,11 @@
-from repository.base_repository import BaseRepository
-from sqlalchemy.sql import exists
+from typing import List, Union
+
 from sqlalchemy import asc
+from sqlalchemy.sql import exists
+
+from repository.base_repository import BaseRepository
 from repository.database import session
 from repository.database.verification import DynamicVerifyRule
-from typing import List, Union
 
 
 class VerifyRepository(BaseRepository):

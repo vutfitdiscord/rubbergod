@@ -1,10 +1,12 @@
 import datetime
 import math
-from sqlalchemy import func, desc, asc
+
+from sqlalchemy import asc, desc, func
 
 from repository.base_repository import BaseRepository
 from repository.database import session
-from repository.database.review import Programme, Review, ReviewRelevance, Subject, Subject_details
+from repository.database.review import (Programme, Review, ReviewRelevance,
+                                        Subject, Subject_details)
 
 
 class ReviewRepository(BaseRepository):

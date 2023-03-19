@@ -3,12 +3,12 @@ Here are commands that get information from other sources.
 examples - urban meaning of word, weather at location
 """
 
-import requests
 import disnake
+import requests
 from disnake.ext import commands
-from buttons.embed import EmbedView
 
 import utils
+from buttons.embed import EmbedView
 from config import cooldowns
 from config.app_config import config
 from config.messages import Messages
