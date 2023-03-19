@@ -1,23 +1,25 @@
+import re
+from datetime import datetime
+from typing import List, Union
+
 import disnake
+import requests
+from bs4 import BeautifulSoup
 from disnake.ext import commands
-from repository.stream_links_repo import StreamLinksRepo
-from repository.review_repo import ReviewRepository
+from requests.adapters import HTTPAdapter
+from requests.packages.urllib3.util.retry import Retry
+
+import utils
+from buttons.embed import EmbedView
 from config import cooldowns
 from config.app_config import config
 from config.messages import Messages
-from typing import List, Union
-import utils
+from features.list_message_sender import send_list_of_messages
+from features.prompt import PromptSession
 from permissions import permission_check
 from repository.database.stream_link import StreamLink
-import requests
-from bs4 import BeautifulSoup
-from datetime import datetime
-import re
-from requests.packages.urllib3.util.retry import Retry
-from requests.adapters import HTTPAdapter
-from features.prompt import PromptSession
-from features.list_message_sender import send_list_of_messages
-from buttons.embed import EmbedView
+from repository.review_repo import ReviewRepository
+from repository.stream_links_repo import StreamLinksRepo
 
 # Pattern: "AnyText | [Subject] Page: CurrentPage / {TotalPages}"
 pagination_regex = re.compile(r'^\[([^\]]*)\]\s*Page:\s*(\d*)\s*\/\s*(\d*)')

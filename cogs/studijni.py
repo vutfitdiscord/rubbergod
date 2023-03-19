@@ -1,7 +1,7 @@
 import disnake
+import requests
 from disnake.ext import commands
 from lxml import etree
-import requests
 
 from config.messages import Messages
 from utils import add_author_footer

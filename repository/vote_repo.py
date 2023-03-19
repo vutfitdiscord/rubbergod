@@ -1,11 +1,11 @@
+from datetime import datetime
 from typing import List, Optional
 
 from sqlalchemy import or_
 
 from repository.base_repository import BaseRepository
-from repository.database.vote import Vote
 from repository.database import session
-from datetime import datetime
+from repository.database.vote import Vote
 
 
 class VoteRepository(BaseRepository):

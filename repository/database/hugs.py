@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, BIGINT
+from sqlalchemy import BIGINT, Column, Integer
 
 from repository.database import database
 

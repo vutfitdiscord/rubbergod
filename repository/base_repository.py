@@ -1,5 +1,5 @@
-from config.app_config import config
 from config import messages
+from config.app_config import config
 
 
 class BaseRepository:

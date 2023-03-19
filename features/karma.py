@@ -1,7 +1,7 @@
 import asyncio
 
 import disnake
-from disnake import Emoji, TextChannel, Member
+from disnake import Emoji, Member, TextChannel
 from disnake.ext.commands import Bot
 from emoji import demojize
 

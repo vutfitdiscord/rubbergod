@@ -1,9 +1,9 @@
+from datetime import datetime
 from typing import List
 
 from repository.base_repository import BaseRepository
-from repository.database.timeout import Timeout
 from repository.database import session
-from datetime import datetime
+from repository.database.timeout import Timeout
 
 
 class TimeoutRepository(BaseRepository):

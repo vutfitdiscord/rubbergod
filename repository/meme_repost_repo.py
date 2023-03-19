@@ -1,6 +1,7 @@
+from typing import Union
+
 from repository.database import session
 from repository.database.meme_repost import MemeRepost
-from typing import Union
 
 
 class MemeRepostRepo:

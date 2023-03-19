@@ -1,15 +1,15 @@
-import disnake
-from disnake.ext import commands
-
-import unicodedata
-import requests
-from lxml import etree
 import re
+import unicodedata
 
-from repository import user_repo
+import disnake
+import requests
+from disnake.ext import commands
+from lxml import etree
+
+import utils
 from config.app_config import config
 from config.messages import Messages
-import utils
+from repository import user_repo
 
 user_r = user_repo.UserRepository()
 

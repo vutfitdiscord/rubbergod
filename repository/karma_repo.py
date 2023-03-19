@@ -1,5 +1,6 @@
-import utils
 from sqlalchemy import func
+
+import utils
 from repository.base_repository import BaseRepository
 from repository.database import session
 from repository.database.karma import Karma, Karma_emoji

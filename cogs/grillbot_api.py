@@ -2,12 +2,13 @@
 Functions and commands communicating with grillbot API
 """
 
+import asyncio
+import json
 from io import BytesIO
+
+import aiohttp
 import disnake
 from disnake.ext import commands
-import json
-import asyncio
-import aiohttp
 
 from config.app_config import config
 

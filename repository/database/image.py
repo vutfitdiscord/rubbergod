@@ -1,5 +1,6 @@
 # stolen from rubbergoddess
-from sqlalchemy import Column, String, BigInteger, DateTime
+from sqlalchemy import BigInteger, Column, DateTime, String
+
 from repository.database import database
 
 

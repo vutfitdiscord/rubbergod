@@ -1,14 +1,13 @@
-from config.messages import Messages
-import disnake
-from disnake.ext import commands
-import utils
+from io import BytesIO
 
+import disnake
+import requests
+from disnake.ext import commands
 from PIL import Image
 
-from io import BytesIO
-import requests
-
+import utils
 from config import cooldowns
+from config.messages import Messages
 
 
 class Pet(commands.Cog):

@@ -1,7 +1,8 @@
+import asyncio
+from collections import OrderedDict
+
 import disnake
 from disnake.ext import commands
-from collections import OrderedDict
-import asyncio
 
 
 class PromptSession:

@@ -1,14 +1,13 @@
-from functools import lru_cache
 import math
-from functools import cached_property
-from typing import Iterable, Union, Callable
+from functools import cached_property, lru_cache
+from typing import Callable, Iterable, Union
 
 import disnake
 from sqlalchemy.orm.query import Query
 from sqlalchemy.schema import Table
 
-from config.app_config import config
 import utils
+from config.app_config import config
 
 DatabasePage = Iterable[Table]
 

@@ -1,6 +1,7 @@
+from typing import List, Optional
+
 import disnake
 from disnake.ext import commands
-from typing import Optional, List
 
 from config.app_config import config
 from config.messages import Messages

@@ -1,9 +1,11 @@
+from typing import List, Union
+
 import disnake
-from config.messages import Messages
-from repository.database.verification import DynamicVerifyRule
-from typing import Union, List
-from features.dynamic_verify import DynamicVerifyManager
+
 import utils
+from config.messages import Messages
+from features.dynamic_verify import DynamicVerifyManager
+from repository.database.verification import DynamicVerifyRule
 
 
 class DynamicVerifyEditModal(disnake.ui.Modal):

@@ -1,10 +1,11 @@
-import disnake
 from typing import List
 
+import disnake
+
+import utils
 from buttons.base import BaseView
 from config.messages import Messages
 from features.leaderboard import LeaderboardPageSource
-import utils
 
 
 class EmbedView(BaseView):

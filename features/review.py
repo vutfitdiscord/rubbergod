@@ -1,13 +1,14 @@
 from typing import Union
-from bs4 import BeautifulSoup
+
 import disnake
 import requests
+from bs4 import BeautifulSoup
 
-from repository import review_repo
-from features import sports
-from config.app_config import config
-from repository.database.review import Review, Subject_details
 import utils
+from config.app_config import config
+from features import sports
+from repository import review_repo
+from repository.database.review import Review, Subject_details
 
 
 class ReviewManager:

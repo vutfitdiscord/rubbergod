@@ -1,7 +1,8 @@
 import disnake
-from features import dynamic_verify
+
 from config.app_config import config
 from config.messages import Messages
+from features import dynamic_verify
 
 
 class DynamicVerifyRequestView(disnake.ui.View):

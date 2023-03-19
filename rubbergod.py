@@ -1,16 +1,15 @@
-import traceback
 import argparse
 import logging
+import traceback
 
-from disnake import Embed, TextChannel, AllowedMentions, Intents
+from disnake import AllowedMentions, Embed, Intents, TextChannel
 from disnake.ext import commands
-from features.error import ErrorLogger
-
-from config.messages import Messages
-from config.app_config import config
-from features import presence
 
 import repository.db_migrations as migrations
+from config.app_config import config
+from config.messages import Messages
+from features import presence
+from features.error import ErrorLogger
 
 logger = logging.getLogger('disnake')
 logger.setLevel(logging.WARNING)

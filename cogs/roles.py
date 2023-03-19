@@ -1,17 +1,16 @@
 import asyncio
+from typing import List, Tuple
+
 import disnake
 from disnake.ext import commands
-from typing import Tuple, List
 
 import utils
-from permissions import permission_check
 from config.app_config import config
-
 # TODO: use messages
 from config.messages import Messages
-from repository import role_group_repo
-from repository import review_repo
 from features.reaction_context import ReactionContext
+from permissions import permission_check
+from repository import review_repo, role_group_repo
 
 group_repo = role_group_repo.RoleGroupRepository()
 

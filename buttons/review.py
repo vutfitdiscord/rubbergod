@@ -1,11 +1,12 @@
 from typing import List
+
 import disnake
 
+import utils
 from buttons.embed import EmbedView
 from config.messages import Messages
-from repository import review_repo
 from features.review import ReviewManager
-import utils
+from repository import review_repo
 
 
 class ReviewView(EmbedView):

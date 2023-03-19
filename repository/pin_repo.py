@@ -1,8 +1,8 @@
 from typing import List
 
 from repository.base_repository import BaseRepository
-from repository.database.pin_map import PinMap
 from repository.database import session
+from repository.database.pin_map import PinMap
 
 
 class PinRepository(BaseRepository):

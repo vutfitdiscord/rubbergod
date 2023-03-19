@@ -3,9 +3,9 @@ from typing import Optional
 
 import disnake
 
+import utils
 from config.app_config import config
 from features.error import ErrorLogger
-import utils
 
 
 class BaseView(disnake.ui.View):

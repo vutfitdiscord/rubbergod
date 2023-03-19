@@ -1,6 +1,8 @@
+from typing import Iterable, Union
+
 import disnake
 from disnake.ext import commands
-from typing import Union, Iterable
+
 import utils
 
 

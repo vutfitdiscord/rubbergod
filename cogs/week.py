@@ -4,9 +4,9 @@ import disnake
 from disnake.ext import commands
 
 import utils
+from config import cooldowns
 from config.app_config import config
 from config.messages import Messages
-from config import cooldowns
 
 
 class Week(commands.Cog):

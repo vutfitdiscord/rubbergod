@@ -1,9 +1,10 @@
 import disnake
 from disnake.ext import commands
+
+import utils
+from buttons.bookmark import BookmarkView
 from features.bookmark import BookmarkFeatures
 from modals.bookmark import BookmarkModal
-from buttons.bookmark import BookmarkView
-import utils
 
 
 class Bookmark(commands.Cog):
