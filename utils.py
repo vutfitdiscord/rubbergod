@@ -322,14 +322,28 @@ def get_command_id(self, name):
     return getattr(command, "id", None)
 
 
-async def get_username_from_tag(self, tag):
-    """get user name from tag, return list of name(s)"""
-    user_names = []
-    user_ids = re.findall(r'\d+', tag)
+async def get_users_from_tag(self, tag):
+    """get user(s) object(s) from tag(s), return list of user(s)"""
+    users = []
+    # regex to match global name or nickname
+    user_ids = re.findall(r'<@[!]?\d+>', tag)
     for user in user_ids:
-        user = await self.bot.get_or_fetch_user(int(user))
-        user_names.append(user.name)
-    return user_names
+        user = re.search(r'\d+', user)
+        user = await self.bot.get_or_fetch_user(int(user.group()))
+        users.append(user)
+    return users
+
+
+async def get_members_from_tag(guild, tag):
+    """get member(s) object(s) from tag(s), return list of member(s)"""
+    members = []
+    # regex to match global name or nickname
+    member_ids = re.findall(r'<@[!]?\d+>', tag)
+    for member in member_ids:
+        member = re.search(r'\d+', member)
+        member = await guild.get_or_fetch_member(int(member.group()))
+        members.append(member)
+    return members
 
 
 def get_local_zone():
