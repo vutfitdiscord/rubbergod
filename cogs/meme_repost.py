@@ -1,12 +1,19 @@
 import asyncio
+import math
 from typing import List, Union
 
 import disnake
 from disnake.ext import commands
+from sqlalchemy.schema import Table
 
 import utils
+from buttons.embed import EmbedView
+from cogs import room_check
 from config.app_config import config
+from config.messages import Messages
+from features.leaderboard import LeaderboardPageSource
 from features.reaction_context import ReactionContext
+from repository.better_meme import BetterMemeRepository
 from repository.karma_repo import KarmaRepository
 from repository.meme_repost_repo import MemeRepostRepo
 
@@ -17,7 +24,9 @@ class MemeRepost(commands.Cog):
 
         self.karma_repo = KarmaRepository()
         self.repost_repo = MemeRepostRepo()
+        self.better_repo = BetterMemeRepository()
         self.repost_channel: Union[disnake.TextChannel, None] = None
+        self.check = room_check.RoomCheck(bot)
 
         self.repost_lock = asyncio.Lock()
 
@@ -177,6 +186,40 @@ class MemeRepost(commands.Cog):
                                            repost_message_id,
                                            ctx.member.id,
                                            secondary_message_id)
+
+    def leaderboard_formatter(entry: Table, **kwargs):
+        return Messages.base_leaderboard_format_str.format_map(
+            kwargs) + f"{entry.posts} posts\t{entry.total_karma} pts"
+
+    @commands.slash_command(name="better-meme")
+    async def better_meme(self):
+        pass
+
+    @better_meme.sub_command(name="leaderboard", description="TODO")
+    async def leaderboard(
+        self,
+        inter: disnake.ApplicationCommandInteraction,
+        start: int = 1,
+        order_by: str = commands.Param(name='order_by', choices=["total_karma", "posts"], default="posts"),
+    ):
+        embed = disnake.Embed()
+        page_source = LeaderboardPageSource(
+            bot=self.bot,
+            author=inter.author,
+            query=self.better_repo.get_leaderboard(order_by, start),
+            row_formatter=self.leaderboard_formatter,
+            base_embed=embed,
+            title='BETTER MEMES LEADERBOARD',
+            emote_name='trophy',
+            member_id_col_name='member_ID',
+        )
+        page_num = math.floor(start/page_source.per_page)
+        page = page_source.get_page(page_num)
+        embed = page_source.format_page(page)
+        await self.check.botroom_check(inter)
+        view = EmbedView(inter.author, embeds=[embed], page_source=page_source)
+        await inter.response.send_message(embed=embed, view=view)
+        view.message = await inter.original_message()
 
 
 def setup(bot):
