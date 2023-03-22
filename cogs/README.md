@@ -220,7 +220,10 @@ Cog for meme commands.\
 
 ### [MemeRepost](memerepost.py)
 
-Cog for handling memes with X number of reactions to be reposted to a specific channel.
+Cog for handling memes with X number of reactions to be reposted to a specific channel.\
+**Commands:**
+
+    - /better-meme leaderboard
 
 ---
 
