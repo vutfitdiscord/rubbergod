@@ -403,6 +403,7 @@ class Messages:
     fit_room_room_not_on_plan = "Zadaná místnost {room} není na plánku nebo neexistuje."
 
     meme_repost_link = "[Odkaz na originál]({original_message_url}) v <#{original_channel}>"
+    meme_leaderboard_brief = "#better-memes leaderboard"
 
     exams_brief = f"Zobrazí zkoušky pro daný ročník (výchozí ročník podle role)"
     exams_no_valid_role = "Nebyla nalezena ročníková role"

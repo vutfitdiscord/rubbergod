@@ -3,17 +3,29 @@ Cog for handling memes with X number of reactions to be reposted to a specific c
 """
 
 import asyncio
+import math
 from typing import List, Union
 
 import disnake
 from disnake.ext import commands
 
 import utils
+from buttons.embed import EmbedView
 from cogs.base import Base
 from config.app_config import config
+from config.messages import Messages
+from features.leaderboard import LeaderboardPageSource
 from features.reaction_context import ReactionContext
+from permissions import room_check
+from repository.better_meme import BetterMemeRepository
+from repository.database.better_meme import BetterMeme
 from repository.karma_repo import KarmaRepository
 from repository.meme_repost_repo import MemeRepostRepo
+
+
+def _leaderboard_formatter(entry: BetterMeme, **kwargs):
+    return Messages.base_leaderboard_format_str.format_map(
+        kwargs) + f" **{entry.posts}** posts **{entry.total_karma}** pts"
 
 
 class MemeRepost(Base, commands.Cog):
@@ -22,7 +34,9 @@ class MemeRepost(Base, commands.Cog):
 
         self.karma_repo = KarmaRepository()
         self.repost_repo = MemeRepostRepo()
+        self.better_repo = BetterMemeRepository()
         self.repost_channel: Union[disnake.TextChannel, None] = None
+        self.check = room_check.RoomCheck(bot)
 
         self.repost_lock = asyncio.Lock()
 
@@ -50,6 +64,7 @@ class MemeRepost(Base, commands.Cog):
                 original_post_user = ctx.guild.get_member(int(repost.author_id))
 
                 if original_post_user:
+                    self.better_repo.update_post_karma(original_post_user.id, +1)
                     if isinstance(ctx.emoji, str):
                         self.karma_repo.karma_emoji(original_post_user.id, ctx.member.id, ctx.emoji)
                     else:
@@ -73,6 +88,7 @@ class MemeRepost(Base, commands.Cog):
             original_post_user = ctx.guild.get_member(int(repost.author_id))
 
             if original_post_user:
+                self.better_repo.update_post_karma(original_post_user.id, -1)
                 if isinstance(ctx.emoji, str):
                     self.karma_repo.karma_emoji_remove(original_post_user.id, ctx.member.id, ctx.emoji)
                 else:
@@ -182,6 +198,48 @@ class MemeRepost(Base, commands.Cog):
                                            repost_message_id,
                                            ctx.message.author.id,
                                            secondary_message_id)
+
+            total_karma = 0
+
+            for reac in reactions:
+                emoji_key = str(reac.emoji.id) if type(reac.emoji) != str else reac.emoji
+                emoji_val = self.karma_repo.emoji_value(emoji_key)
+                total_karma += reac.count * emoji_val
+
+            self.better_repo.add_post_to_repo(ctx.message.author.id,
+                                              total_karma)
+
+    @commands.slash_command(name="better-meme", guild_ids=[config.guild_id])
+    async def _better_meme(self, inter):
+        pass
+
+    @_better_meme.sub_command(name="leaderboard", description=Messages.meme_leaderboard_brief)
+    async def leaderboard(
+        self,
+        inter: disnake.ApplicationCommandInteraction,
+        start: int = 1,
+        order_by: str = commands.Param(name='order_by', choices=["total_karma", "posts"], default="posts"),
+    ):
+        await inter.response.defer(ephemeral=self.check.botroom_check(inter))
+
+        embed = disnake.Embed()
+        page_source = LeaderboardPageSource(
+            bot=self.bot,
+            author=inter.author,
+            query=self.better_repo.get_leaderboard(order_by, start - 1),
+            row_formatter=_leaderboard_formatter,
+            base_embed=embed,
+            title='BETTER MEMES LEADERBOARD',
+            emote_name='trophy',
+            member_id_col_name='member_ID',
+        )
+        page_num = math.floor(start/page_source.per_page)
+        page = page_source.get_page(page_num)
+        embed = page_source.format_page(page)
+
+        view = EmbedView(inter.author, embeds=[embed], page_source=page_source)
+        await inter.edit_original_response(embed=embed, view=view)
+        view.message = await inter.original_message()
 
 
 def setup(bot):
