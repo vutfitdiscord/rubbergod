@@ -54,18 +54,22 @@ class Timeout(commands.Cog):
         utils.add_author_footer(embed, author)
         return embed
 
-    async def timeout_embed_listing(self, users, title, room):
+    async def timeout_embed_listing(self, users, title, room, author):
         """Embed for sending timeout updates on users"""
         embeds = []
         # max 25 fields per embed
         users_lists = utils.split_to_parts(users, 25)
         for users_list in users_lists:
-            embed = self.create_embed(self.bot.user, title)
+            embed = self.create_embed(author, title)
             for timeout in users_list:
                 embed.add_field(
-                    name=f"{self.bot.get_user(timeout.user_id)}"
-                         f" | {(timeout.end).strftime('%d.%m.%Y %H:%M')}",
-                    value=timeout.reason,
+                    name=Messages.timeout_title.format(
+                        user=self.bot.get_user(timeout.user_id),
+                        endtime=(timeout.end).strftime('%d.%m.%Y %H:%M')
+                    ),
+                    value=Messages.timeout_field_text.format(
+                        mod=self.bot.get_user(timeout.mod_id),
+                        reason=timeout.reason),
                     inline=False
                 )
             embeds.append(embed)
@@ -78,7 +82,7 @@ class Timeout(commands.Cog):
             if duration is None:
                 self.timeout_repo.remove_timeout(user.id)
             else:
-                self.timeout_repo.add_timeout(user.id, endtime, reason)
+                self.timeout_repo.add_timeout(user.id, inter.author.id, endtime, reason)
             return False
         except disnake.Forbidden:
             self.perms_users.append(user)
@@ -176,7 +180,7 @@ class Timeout(commands.Cog):
             timeout_members = True
             embed.add_field(
                 name=f"{user} | {parsed_endtime.strftime('%d.%m.%Y %H:%M')}",
-                value=reason,
+                value=f"**Důvod:** {reason}",
                 inline=False
             )
 
@@ -208,7 +212,7 @@ class Timeout(commands.Cog):
             await inter.send("Nikoho jsem nenašel.")
             return
 
-        await self.timeout_embed_listing(users, "Timeout list", inter)
+        await self.timeout_embed_listing(users, "Timeout list", inter, inter.author)
 
     @tasks.loop(time=time(12, 0, tzinfo=utils.get_local_zone()))
     async def refresh_timeout(self):
@@ -241,7 +245,7 @@ class Timeout(commands.Cog):
         # send update
         users = self.timeout_repo.get_timeout_users()
         submod_helper_room = self.bot.get_channel(config.submod_helper_room)
-        await self.timeout_embed_listing(users, "Timeout Update", submod_helper_room)
+        await self.timeout_embed_listing(users, "Timeout Update", submod_helper_room, self.bot.user)
 
     @commands.Cog.listener()
     async def on_member_update(self, before, after):
