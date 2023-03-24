@@ -226,7 +226,6 @@ class Timeout(commands.Cog):
 
             # member left server
             if member is None:
-                self.timeout_repo.remove_timeout(user.user_id)
                 continue
 
             # someone removed timeout manually
