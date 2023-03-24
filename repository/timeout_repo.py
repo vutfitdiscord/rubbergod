@@ -16,16 +16,17 @@ class TimeoutRepository(BaseRepository):
     def get_timeout_user(self, user_id: int):
         return session.query(Timeout).get(user_id)
 
-    def add_timeout(self, user_id: int, end: datetime, reason: str):
+    def add_timeout(self, user_id: int, mod_id: int, end: datetime, reason: str):
         exists = self.get_timeout_user(user_id)
         if exists:
+            exists.mod_id = mod_id
             exists.end = end
             exists.start = datetime.now()
             exists.reason = reason
             session.commit()
             return
         try:
-            timeout = Timeout(user_id=user_id, start=datetime.now(), end=end, reason=reason)
+            timeout = Timeout(user_id=user_id, mod_id=mod_id, start=datetime.now(), end=end, reason=reason)
             session.add(timeout)
             session.commit()
         except Exception:
