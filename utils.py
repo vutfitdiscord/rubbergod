@@ -342,6 +342,8 @@ async def get_members_from_tag(guild, tag):
     for member in member_ids:
         member = re.search(r'\d+', member)
         member = await guild.get_or_fetch_member(int(member.group()))
+        if member is None:
+            continue
         members.append(member)
     return members
 
