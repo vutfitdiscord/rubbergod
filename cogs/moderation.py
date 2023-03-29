@@ -23,7 +23,7 @@ class Moderation(commands.Cog):
             embed = disnake.Embed(
                 title=f"Tagged {title}",
                 description=f"**User:** {message.author.mention}\n"
-                f"**Room:** #{message.channel}\n"
+                f"**Link:** [#{message.channel}]({message.jump_url})\n"
                 f"**Content:**\n{message.content}",
                 color=disnake.Color.yellow()
             )
@@ -31,7 +31,7 @@ class Moderation(commands.Cog):
             embed = disnake.Embed(
                 title=f"Tagged {title}",
                 description=f"**User:** {message.author.mention}\n"
-                f"**Room:** #{message.channel}\n",
+                f"**Link:** [#{message.channel}]({message.jump_url})\n",
                 color=disnake.Color.yellow()
             )
             parts = utils.split_to_parts(message.content, 1024)
@@ -42,7 +42,7 @@ class Moderation(commands.Cog):
         embed.set_footer(text=datetime.now().strftime('%d.%m.%Y %H:%M'))
         await room.send(
             embed=embed,
-            view=ModerationView(message.jump_url, "Resolve", self.moderation_false)
+            view=ModerationView("Resolve", self.moderation_false)
         )
 
     @commands.Cog.listener()
@@ -79,7 +79,7 @@ class Moderation(commands.Cog):
 
         await inter.response.edit_message(
             embed=disnake.Embed.from_dict(embed),
-            view=ModerationView(inter.message.jump_url, label, custom_id)
+            view=ModerationView(label, custom_id)
         )
 
 
