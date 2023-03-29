@@ -3,6 +3,7 @@ Containing timeout commands and manipulating with timeout.
 """
 
 from datetime import datetime, time, timedelta
+from functools import cached_property
 from typing import List
 
 import disnake
@@ -44,6 +45,10 @@ class Timeout(commands.Cog):
         self.formats = ("%d.%m.%Y", "%d/%m/%Y", "%d.%m.%Y %H:%M", "%d/%m/%Y %H:%M")
         self.refresh_timeout.start()
         self.perms_users = []
+
+    @cached_property
+    def submod_helper_room(self):
+        return self.bot.get_channel(config.submod_helper_room)
 
     def create_embed(self, author, title):
         """Embed template for Timeout"""
@@ -161,7 +166,7 @@ class Timeout(commands.Cog):
         ),
         reason: str = commands.Param(max_length=256, description=Messages.timeout_reason)
     ):
-        """Set timeout for user"""
+        """Set timeout for user(s)"""
         await inter.response.defer()
         members = await utils.get_members_from_tag(inter.guild, user)
         embed = self.create_embed(inter.author, "Timeout")
@@ -184,10 +189,15 @@ class Timeout(commands.Cog):
                 inline=False
             )
 
+        # print users with timeout
         if timeout_members:
-            await inter.send(''.join(f'{user.mention}' for user in members), embed=embed)
+            message = await inter.original_message()
 
-        # there are users in list self.perms_users
+            await inter.send(''.join(f'{user.mention}' for user in members), embed=embed)
+            embed.add_field(name="Link", value=f"[#{inter.channel.name}]({message.jump_url})")
+            await self.submod_helper_room.send(''.join(f'{user.mention}' for user in members), embed=embed)
+
+        # print users that can't be timed out
         if self.perms_users:
             await inter.followup.send('\n'.join(
                     f'{Messages.timeout_permission.format(user=user.name)}'for user in self.perms_users)
@@ -195,11 +205,25 @@ class Timeout(commands.Cog):
             self.perms_users = []
 
     @_timeout.sub_command(name="remove", description=Messages.timeout_remove_brief)
-    async def remove_timeout(self, inter: disnake.ApplicationCommandInteraction, user: disnake.Member):
-        """Removes timeout from user"""
-        if await self.timeout_perms(inter, user, None, None, "Předčasné odebrání"):
-            return
-        await inter.send(Messages.timeout_remove.format(user=user.mention))
+    async def remove_timeout(
+        self,
+        inter: disnake.ApplicationCommandInteraction,
+        user: str = commands.Param(max_length=1000, description=Messages.timeout_user_brief)
+    ):
+        """Removes timeout from user(s)"""
+        members = await utils.get_members_from_tag(inter.guild, user)
+        embed = self.create_embed(inter.author, "Timeout remove")
+
+        # no member found
+        if not members:
+            return await inter.send(utils.fill_message("member_not_found", user=inter.author.id))
+
+        for user in members:
+            if await self.timeout_perms(inter, user, None, None, "Předčasné odebrání"):
+                continue
+            embed.add_field(name=user, value="Předčasně odebráno", inline=False)
+
+        await inter.send(embed=embed)
 
     @_timeout.sub_command(name="list", description=Messages.timeout_list_brief)
     async def timeout_list(
@@ -243,13 +267,18 @@ class Timeout(commands.Cog):
 
         # send update
         users = self.timeout_repo.get_timeout_users()
-        submod_helper_room = self.bot.get_channel(config.submod_helper_room)
-        await self.timeout_embed_listing(users, "Timeout Update", submod_helper_room, self.bot.user)
+        await self.timeout_embed_listing(users, "Timeout Update", self.submod_helper_room, self.bot.user)
 
     @commands.Cog.listener()
-    async def on_member_update(self, before, after):
-        if after.current_timeout is None:
-            self.timeout_repo.remove_timeout(after.id)
+    async def on_audit_log_entry_create(self, entry):
+        """Remove timeout from user if it was removed manually. Send message to submod_helper_room"""
+        if entry.action == disnake.AuditLogAction.member_update:
+            if entry.target.current_timeout is None:
+                self.timeout_repo.remove_timeout(entry.target.id)
+                embed = self.create_embed(entry.user, "Timeout remove")
+                embed.add_field(name=entry.target, value="Předčasně odebráno", inline=False)
+
+                await self.submod_helper_room.send(embed=embed)
 
     @timeout_user.error
     async def timeout_error(self, inter: disnake.ApplicationCommandInteraction, error):

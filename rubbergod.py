@@ -48,6 +48,7 @@ intents.messages = True
 intents.message_content = True
 intents.reactions = True
 intents.presences = True
+intents.moderation = True
 
 bot = commands.Bot(
     command_prefix=commands.when_mentioned_or(*config.command_prefix),
