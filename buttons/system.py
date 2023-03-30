@@ -44,9 +44,7 @@ class SystemView(BaseView):
     async def interaction_check(self, inter: disnake.Interaction):
         if permission_check.is_bot_admin(inter):
             return True
-        else:
-            await inter.send(utils.fill_message("missing_perms", user=inter.author.id), ephemeral=True)
-            return False
+        return False
 
 
 class Dropdown(disnake.ui.Select):
