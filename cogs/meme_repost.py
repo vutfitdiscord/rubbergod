@@ -175,7 +175,7 @@ class MemeRepost(commands.Cog):
 
             self.repost_repo.create_repost(ctx.message.id,
                                            repost_message_id,
-                                           ctx.member.id,
+                                           ctx.message.author.id,
                                            secondary_message_id)
 
 
