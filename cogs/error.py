@@ -97,11 +97,14 @@ class Error(commands.Cog):
             or isinstance(error, permission_check.NotModPlusError)
             or isinstance(error, permission_check.NotAdminError)
         ):
-            await inter.response.send_message(error.message)
+            await inter.response.send_message(error.message, ephemeral=True)
             return
 
         if isinstance(error, commands.errors.CheckFailure):
-            await inter.response.send_message(utils.fill_message("missing_perms", user=inter.author.id))
+            await inter.response.send_message(
+                utils.fill_message("missing_perms", user=inter.author.id),
+                ephemeral=True
+            )
             return
 
         if isinstance(error, sqlalchemy.exc.InternalError):

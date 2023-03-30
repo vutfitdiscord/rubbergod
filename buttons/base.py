@@ -2,10 +2,12 @@ import traceback
 from typing import Optional
 
 import disnake
+from disnake.ext import commands
 
 import utils
 from config.app_config import config
 from features.error import ErrorLogger
+from permissions import permission_check
 
 
 class BaseView(disnake.ui.View):
@@ -15,9 +17,26 @@ class BaseView(disnake.ui.View):
         super().__init__(timeout=timeout)
 
     async def on_error(self, error, item: disnake.ui.Item, interaction: disnake.MessageInteraction):
+        if (
+            isinstance(error, permission_check.NotHelperPlusError)
+            or isinstance(error, permission_check.NotSubmodPlusError)
+            or isinstance(error, permission_check.NotModPlusError)
+            or isinstance(error, permission_check.NotAdminError)
+        ):
+            await interaction.response.send_message(error.message, ephemeral=True)
+            return
+
+        if isinstance(error, commands.errors.CheckFailure):
+            await interaction.response.send_message(
+                utils.fill_message("missing_perms", user=interaction.author.id),
+                ephemeral=True
+            )
+            return
+
         channel_out = interaction.bot.get_channel(config.bot_dev_channel)
         embed = self.log_error.create_embed(
             interaction.data.custom_id,
+            interaction.message.content,
             interaction.author,
             interaction.guild,
             interaction.message.jump_url,
