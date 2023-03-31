@@ -47,7 +47,7 @@ class TimeoutWars(commands.Cog):
             writer = csv.writer(f, delimiter=";")
             writer.writerow([timeout_users, reacted_users, original_message_author, reason, datetime.now()])
 
-    async def send_embed_log(self, original_message, user: Union[list, disnake.Member], link=True):
+    async def send_embed_log(self, original_message, user: Union[list, disnake.Member], reason=None):
         """Embed template for Timeout wars"""
         embed = disnake.Embed(
             title="Moderace lidu",
@@ -62,8 +62,14 @@ class TimeoutWars(commands.Cog):
         else:
             embed.add_field(name="Umlčený uživatel", value=user.mention, inline=False)
 
-        if link:
-            embed.add_field(name="Link", value=f"[Zpráva]({original_message.jump_url})", inline=False)
+        if reason == self.message_delete:
+            embed.add_field(name="Důvod", value=reason, inline=False)
+
+        embed.add_field(
+            name="Link",
+            value=f"[#{original_message.channel.name}]({original_message.jump_url})",
+            inline=False
+        )
         utils.add_author_footer(embed, original_message.author)
         await self.timeout_wars_channel.send(embed=embed)
 
@@ -115,14 +121,12 @@ class TimeoutWars(commands.Cog):
                         user=user.mention,
                         time=config.timeout_wars_timeout_time.total_seconds()//60
                     ))
-                    link = False
                 else:
                     await channel.send(Messages.timeout_wars_user.format(
                             user=user.mention,
                             time=config.timeout_wars_timeout_time.total_seconds()//60)
                     )
-                    link = True
-                await self.send_embed_log(original_message, user, link)
+                await self.send_embed_log(original_message, user, reason)
             except disnake.Forbidden:
                 pass
 
@@ -175,15 +179,20 @@ class TimeoutWars(commands.Cog):
         """
         give timeout to author of message (default case)
         """
-        user = ctx.message.author
         reaction_users = await reaction.users().flatten()
 
-        await self.mute_user(ctx.message, ctx.channel, user, config.timeout_wars_timeout_time)
+        # if user used slash command
+        if ctx.message.interaction is not None:
+            author = await ctx.guild.get_or_fetch_member(ctx.message.interaction.user.id)
+        else:
+            author = ctx.message.author
+
+        await self.mute_user(ctx.message, ctx.channel, author, config.timeout_wars_timeout_time)
         timeouted = []
-        if not self.get_immunity(user):
-            self.give_immunity(user, config.timeout_wars_immunity_time)
-            timeouted.append(user.id)
-        self.write_log(timeouted, [user.id for user in reaction_users], ctx.message.author.id, "author mute")
+        if not self.get_immunity(author):
+            self.give_immunity(author, config.timeout_wars_immunity_time)
+            timeouted.append(author.id)
+        self.write_log(timeouted, [user.id for user in reaction_users], author.id, "author mute")
 
     async def handle_reaction(self, ctx):
         """
