@@ -466,6 +466,11 @@ class Messages:
     timeout_overflow = "Příliš velký počet hodin. Použij formát datumu."
     timeout_user_brief = "Použij tag uživatele/uživatelů"
 
+    # TIMEOUT WARS
+    timeout_wars_user = "Uživatel {user} byl umlčen na {time:.0f} minut."
+    timeout_wars_message_delete = "Uživatel {user} byl přistižen při mazání zpráv. Byl proto umlčen na {time:.0f} minut."
+    timeout_wars_user_immunity = "Uživatel {user} má ještě imunitu na {time:.0f} sekund."
+
     # FUN COG
     cat_brief = "Pošle náhodný obrázek kočky"
     dog_brief = "Pošle náhodný obrázek psa"

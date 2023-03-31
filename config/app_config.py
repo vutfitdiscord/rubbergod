@@ -1,3 +1,4 @@
+from datetime import timedelta
 from typing import Dict, List
 
 import toml
@@ -172,6 +173,18 @@ class Config:
         int(k): v for k, v in get_attr(toml_dict, "icons", "rule").items()
     }
     icon_ui_cooldown: float = get_attr(toml_dict, "icons", "ui_cooldown")
+
+    # timeout wars
+    timeout_wars_reaction_count: int = get_attr(toml_dict, "timeout_wars", "reaction_count")
+    timeout_wars_log_channel: int = get_attr(toml_dict, "timeout_wars", "log_channel")
+    timeout_wars_immunity_time: timedelta = timedelta(
+        minutes=get_attr(toml_dict, "timeout_wars", "immunity_time")
+    )
+    timeout_wars_timeout_time: timedelta = timedelta(
+        minutes=get_attr(toml_dict, "timeout_wars", "timeout_time")
+    )
+    timeout_wars_chance_all_mute: int = get_attr(toml_dict, "timeout_wars", "chance_all_mute")
+    timeout_wars_chance_random_mute: int = get_attr(toml_dict, "timeout_wars", "chance_random_mute")
 
 
 config = Config()
