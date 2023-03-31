@@ -85,12 +85,12 @@ class TimeoutWars(commands.Cog):
                         user=user.mention,
                         time=config.timeout_wars_timeout_time.total_seconds()//60)
                     )
-                    await self.send_embed_log(original_message, users)
                 except disnake.Forbidden:
                     pass
 
         if message:
             await channel.send('\n'.join(message))
+        await self.send_embed_log(original_message, users)
 
     async def mute_user(
         self,
