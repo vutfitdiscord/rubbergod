@@ -6,3 +6,4 @@ __pycache__
 *.log
 .vscode
 merlin-latest
+timeout_wars

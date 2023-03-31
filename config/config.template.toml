@@ -161,3 +161,11 @@ ui_cooldown = 10.0
 allow=[] # prevent anyone from self-assigning this role
 [icons.rule.1]
 deny=[461550034668748800, 140547421733126145] # prevent mods and the user arcasCZ from self-assigning this icon via the UI.
+
+[timeout_wars]
+reaction_count = 10
+log_channel = 1091275431866544148
+immunity_time = 15
+timeout_time = 10
+chance_all_mute = 5
+chance_random_mute = 25
