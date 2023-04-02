@@ -273,7 +273,10 @@ class Timeout(commands.Cog):
     async def on_audit_log_entry_create(self, entry):
         """Remove timeout from user if it was removed manually. Send message to submod_helper_room"""
         if entry.action == disnake.AuditLogAction.member_update:
-            if entry.target.current_timeout is None:
+            before_timeout = getattr(entry.changes.before, "timeout", None)
+            after_timeout = getattr(entry.changes.after, "timeout", None)
+
+            if before_timeout is not None and after_timeout is None:
                 self.timeout_repo.remove_timeout(entry.target.id)
                 embed = self.create_embed(entry.user, "Timeout remove")
                 embed.add_field(name=entry.target, value="Předčasně odebráno", inline=False)
