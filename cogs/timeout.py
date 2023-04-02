@@ -223,6 +223,7 @@ class Timeout(commands.Cog):
                 continue
             embed.add_field(name=user, value="Předčasně odebráno", inline=False)
 
+        await self.submod_helper_room.send(embed=embed)
         await inter.send(embed=embed)
 
     @_timeout.sub_command(name="list", description=Messages.timeout_list_brief)
@@ -276,7 +277,11 @@ class Timeout(commands.Cog):
             before_timeout = getattr(entry.changes.before, "timeout", None)
             after_timeout = getattr(entry.changes.after, "timeout", None)
 
-            if before_timeout is not None and after_timeout is None:
+            if (
+                before_timeout is not None
+                and after_timeout is None
+                and entry.user.id != self.bot.user.id
+            ):
                 self.timeout_repo.remove_timeout(entry.target.id)
                 embed = self.create_embed(entry.user, "Timeout remove")
                 embed.add_field(name=entry.target, value="Předčasně odebráno", inline=False)
