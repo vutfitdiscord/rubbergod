@@ -236,10 +236,10 @@ class Karma(commands.Cog):
         page = page_source.get_page(page_num)
         embed = page_source.format_page(page)
 
-        await self.check.botroom_check(inter)
         view = EmbedView(inter.author, embeds=[embed], page_source=page_source)
         await inter.response.send_message(embed=embed, view=view)
         view.message = await inter.original_message()
+        await self.check.botroom_check(inter)
 
     @cooldowns.long_cooldown
     @_karma.sub_command(name="bajkarboard", description=messages.karma_bajkarboard_brief)
@@ -260,10 +260,10 @@ class Karma(commands.Cog):
         page = page_source.get_page(page_num)
         embed = page_source.format_page(page)
 
-        await self.check.botroom_check(inter)
         view = EmbedView(inter.author, embeds=[embed], page_source=page_source)
         await inter.response.send_message(embed=embed, view=view)
         view.message = await inter.original_message()
+        await self.check.botroom_check(inter)
 
     @cooldowns.long_cooldown
     @_karma.sub_command(name="givingboard", description=messages.karma_givingboard_brief)
@@ -284,10 +284,10 @@ class Karma(commands.Cog):
         page = page_source.get_page(page_num)
         embed = page_source.format_page(page)
 
-        await self.check.botroom_check(inter)
         view = EmbedView(inter.author, embeds=[embed], page_source=page_source)
         await inter.response.send_message(embed=embed, view=view)
         view.message = await inter.original_message()
+        await self.check.botroom_check(inter)
 
     @cooldowns.long_cooldown
     @_karma.sub_command(name="ishaboard", description=messages.karma_ishaboard_brief)
@@ -308,10 +308,10 @@ class Karma(commands.Cog):
         page = page_source.get_page(page_num)
         embed = page_source.format_page(page)
 
-        await self.check.botroom_check(inter)
         view = EmbedView(inter.author, embeds=[embed], page_source=page_source)
         await inter.response.send_message(embed=embed, view=view)
         view.message = await inter.original_message()
+        await self.check.botroom_check(inter)
 
     @revote.error
     @vote.error
