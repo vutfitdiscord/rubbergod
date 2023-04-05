@@ -31,36 +31,6 @@ class FitWide(commands.Cog):
             await channel.send(embed=gif)
 
     @cooldowns.default_cooldown
-    @commands.check(permission_check.submod_plus)
-    @commands.command()
-    async def rolehoarders(self, ctx, limit=config.rolehoarder_default_limit):
-        guild = self.bot.get_guild(config.guild_id)
-
-        found_members = []
-        for member in guild.members:
-            role_count = 0
-            for role in member.roles:
-                if role.name.lower() in config.subjects:
-                    role_count += 1
-            if role_count >= limit:
-                found_members.append((member, role_count))
-
-        msg = ""
-        if len(found_members) == 0:
-            msg = "Žádné jsem nenašel :slight_smile:"
-        else:
-            found_members.sort(key=lambda x: x[1], reverse=True)
-            for i, (member, role_count) in enumerate(found_members):
-                line = "{index}) <@{id}> - {count}\n".format(index=i + 1, id=member.id, count=role_count)
-                if len(line) + len(msg) >= 2000:
-                    await ctx.send(msg)
-                    msg = line
-                else:
-                    msg += line
-
-        await ctx.send(msg)
-
-    @cooldowns.default_cooldown
     @commands.check(permission_check.is_bot_admin)
     @commands.command()
     async def role_check(
