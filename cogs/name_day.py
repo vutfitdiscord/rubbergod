@@ -1,6 +1,5 @@
 import asyncio
 from datetime import date, time
-from functools import cached_property
 
 import aiohttp
 import disnake
@@ -15,11 +14,13 @@ class Nameday(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.send_names.start()
+        self._owner_id = bot.owner_id
 
-    @cached_property
-    async def bot_owner(self):
-        bot_owner = await self.bot.application_info()
-        return str(bot_owner.owner.id)
+    async def owner_id(self):
+        if not self._owner_id:
+            app_info = await self.bot.application_info()
+            self._owner_id = app_info.owner.id
+        return str(self._owner_id)
 
     async def _name_day_cz(self):
         async with aiohttp.ClientSession(timeout=aiohttp.ClientTimeout(total=10)) as session:
@@ -48,7 +49,7 @@ class Nameday(commands.Cog):
                 return "Website unreachable"
 
     async def _birthday(self):
-        headers = {"ApiKey": config.grillbot_api_key, "Author": await self.bot_owner}
+        headers = {"ApiKey": config.grillbot_api_key, "Author": await self.owner_id()}
         async with aiohttp.ClientSession(timeout=aiohttp.ClientTimeout(total=10), headers=headers) as session:
             try:
                 url = "https://grillbot.cloud/api/user/birthday/today"
