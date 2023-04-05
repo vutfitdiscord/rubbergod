@@ -114,9 +114,6 @@ class Config:
     subject_mit_id_end: int = get_attr(toml_dict, "review", "mit_id_end")
     subject_mit_id_rnd: List[int] = get_attr(toml_dict, "review", "mit_id_rnd")
 
-    # How many roles a user needs to have to be considered a rolehoarder
-    rolehoarder_default_limit: int = get_attr(toml_dict, "rolehoarder", "default_limit")
-
     # memes
     hug_emojis: List[str] = get_attr(toml_dict, "meme", "hug_emojis")
     covid_channel_id: str = get_attr(toml_dict, "meme", "covid_channel_id")

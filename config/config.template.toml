@@ -110,10 +110,6 @@ mit_id_start = 14967
 mit_id_end = 14983
 mit_id_rnd = [15220]
 
-[rolehoarder]
-# How many people to print if the limit argument is not specified
-default_limit = 10
-
 [grillbot]
 #      Production,         Development
 ids = [902678773307174943, 599119578811072523]
