@@ -4,6 +4,7 @@ Functions and commands communicating with grillbot API
 
 import asyncio
 import json
+from functools import cached_property
 from io import BytesIO
 
 import aiohttp
@@ -18,9 +19,14 @@ class GrillbotApi(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
+    @cached_property
+    async def bot_owner(self):
+        bot_owner = await self.bot.application_info()
+        return str(bot_owner.owner.id)
+
     async def post_karma_store(self, karma_objects):
         """send karma objects to grillbot api"""
-        headers = {"ApiKey": config.grillbot_api_key, "Author": str(self.bot.owner_id)}
+        headers = {"ApiKey": config.grillbot_api_key, "Author": await self.bot_owner}
         async with aiohttp.ClientSession(timeout=aiohttp.ClientTimeout(total=10), headers=headers) as session:
             try:
                 url = "https://grillbot.cloud/api/user/karma/store"

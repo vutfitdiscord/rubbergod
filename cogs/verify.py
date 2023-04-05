@@ -75,7 +75,7 @@ class Verify(commands.Cog):
         await inter.response.send_modal(modal)
 
     @commands.check(permission_check.submod_plus)
-    @commands.user_command(name="Verify host")
+    @commands.user_command(name="Verify host", guild_ids=[config.guild_id])
     async def verify_host(self, inter: disnake.UserCommandInteraction, member: disnake.Member):
         """add verify and host role to new member"""
         host_id = inter.guild.get_role(config.verification_host_id)
