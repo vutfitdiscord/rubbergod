@@ -465,6 +465,7 @@ class Messages:
     timeout_negative_time = "Čas nemůže být záporný."
     timeout_overflow = "Příliš velký počet hodin. Použij formát datumu."
     timeout_user_brief = "Použij tag uživatele/uživatelů"
+    timeout_update_none = "Nenalezeny žádné umlčení."
 
     # TIMEOUT WARS
     timeout_wars_user = "Uživatel {user} byl umlčen na {time:.0f} minut."

@@ -243,10 +243,10 @@ class Timeout(commands.Cog):
     async def refresh_timeout(self):
         """Update timeout for users saved in db"""
         users = self.timeout_repo.get_timeout_users()
+        guild = self.bot.get_guild(config.guild_id)
 
         # find member and update timeout
         for user in users:
-            guild = self.bot.get_guild(config.guild_id)
             member = guild.get_member(user.user_id)
 
             # member left server
@@ -268,7 +268,10 @@ class Timeout(commands.Cog):
 
         # send update
         users = self.timeout_repo.get_timeout_users()
-        await self.timeout_embed_listing(users, "Timeout Update", self.submod_helper_room, self.bot.user)
+        if users:
+            await self.timeout_embed_listing(users, "Timeout Update", self.submod_helper_room, self.bot.user)
+        else:
+            await self.submod_helper_room.send(Messages.timeout_update_none)
 
     @commands.Cog.listener()
     async def on_audit_log_entry_create(self, entry):
