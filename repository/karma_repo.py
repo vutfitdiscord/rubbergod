@@ -20,7 +20,6 @@ class Karma_data():
 
 
 class KarmaRepository(BaseRepository):
-
     def __init__(self):
         super().__init__()
 
@@ -175,4 +174,4 @@ class KarmaRepository(BaseRepository):
         from_user_karma.negative = 0
 
         session.commit()
-        return log_karma
+        return log_karma, [from_user_karma, to_user_karma]
