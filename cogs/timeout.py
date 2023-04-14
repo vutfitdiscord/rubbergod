@@ -67,13 +67,21 @@ class Timeout(commands.Cog):
         for users_list in users_lists:
             embed = self.create_embed(author, title)
             for timeout in users_list:
+                timeout_left = timeout.end - datetime.now()
                 embed.add_field(
                     name=Messages.timeout_title.format(
                         user=self.bot.get_user(timeout.user_id),
-                        endtime=(timeout.end).strftime('%d.%m.%Y %H:%M')
+                        endtime=timeout.end.strftime('%d.%m.%Y %H:%M'),
+                        length=f"{timeout.length.days}d, "
+                               f"{timeout.length.seconds // 3600}h, "
+                               f"{(timeout.length.seconds // 60) % 60}m"
                     ),
                     value=Messages.timeout_field_text.format(
                         mod=self.bot.get_user(timeout.mod_id),
+                        starttime=timeout.start.strftime('%d.%m.%Y %H:%M'),
+                        length=f"{timeout_left.days}d, "
+                               f"{timeout_left.seconds // 3600}h, "
+                               f"{(timeout_left.seconds // 60) % 60}m",
                         reason=timeout.reason),
                     inline=False
                 )
@@ -87,22 +95,43 @@ class Timeout(commands.Cog):
             if duration is None:
                 self.timeout_repo.remove_timeout(user.id)
             else:
-                self.timeout_repo.add_timeout(user.id, inter.author.id, endtime, reason)
+                # convert to local time and remove timezone info
+                starttime = inter.created_at.astimezone(tz=utils.get_local_zone()).replace(tzinfo=None)
+                self.timeout_repo.add_timeout(user.id, inter.author.id, starttime, endtime, reason)
             return False
         except disnake.Forbidden:
             self.perms_users.append(user)
             return True
 
     async def timeout_parse(self, inter, user, endtime, reason):
-        """Parse time argument to timedelta(lenght)"""
+        """
+        Parse time argument to timedelta(length) or datetime object
+
+        Decision tree
+        -------------
+            if forever:
+                set timeout to 1000 years from now
+            elif timestamp:
+                look in timestamps dict, convert to timedelta
+            else:
+                date:
+                    convert to datetime
+                hours:
+                    convert to timedelta
+        returns
+            endtime: class datetime
+        """
+
+        # convert to local time and remove timezone info
+        now = inter.created_at.astimezone(tz=utils.get_local_zone()).replace(tzinfo=None)
         if "forever" == endtime.lower():
-            endtime = datetime.now().replace(year=datetime.now().year+1000)
+            endtime = now.replace(year=now.year+1000)
             if await self.timeout_perms(inter, user, timedelta(days=28), endtime, reason):
                 return
 
         elif endtime in timestamps:
             timeout_duration = timedelta(hours=float(timestamps[endtime]))
-            endtime = datetime.now() + timeout_duration
+            endtime = now + timeout_duration
             if await self.timeout_perms(inter, user, timeout_duration, endtime, reason):
                 return
 
@@ -112,12 +141,12 @@ class Timeout(commands.Cog):
                 try:
                     endtime = datetime.strptime(endtime, format)
 
-                    # check for positive timeout lenght
-                    if datetime.now() > endtime:
+                    # check for positive timeout length
+                    if now > endtime:
                         await inter.send(Messages.timeout_negative_time)
                         return
 
-                    timeout_duration = endtime - datetime.now()
+                    timeout_duration = endtime - now
                     date = True
                     break
                 except ValueError:
@@ -126,22 +155,22 @@ class Timeout(commands.Cog):
             # else convert hours to deltatime
             if not date:
                 try:
-                    # check for positive timeout lenght
+                    # check for positive timeout length
                     if float(endtime) <= 0:
                         await inter.send(Messages.timeout_negative_time)
                         return
 
                     # int overflow
-                    if len(endtime) > 7:
+                    if len(endtime) > 6:
                         await inter.send(Messages.timeout_overflow)
                         return
 
                     timeout_duration = timedelta(hours=float(endtime))
-                    endtime = datetime.now() + timeout_duration
+                    endtime = now + timeout_duration
                 except ValueError:
                     raise commands.BadArgument
 
-            # maximum lenght for timeout is 28 days set by discord
+            # maximum length for timeout is 28 days set by discord
             if timeout_duration.days > 28:
                 if await self.timeout_perms(inter, user, timedelta(days=28), endtime, reason):
                     return
@@ -183,13 +212,28 @@ class Timeout(commands.Cog):
                 continue
 
             timeout_members = True
-            embed.add_field(
-                name=f"{user} | {parsed_endtime.strftime('%d.%m.%Y %H:%M')}",
-                value=f"**Důvod:** {reason}",
-                inline=False
-            )
 
-        # print users with timeout
+            # get length of timeout, inter.created_at is in utc
+            parsed_endtime = parsed_endtime.astimezone(tz=utils.get_local_zone())
+            created_at = inter.created_at.astimezone(tz=utils.get_local_zone())
+            length = parsed_endtime - created_at
+            embed.add_field(
+                    name=Messages.timeout_title.format(
+                        user=user,
+                        endtime=parsed_endtime.strftime('%d.%m.%Y %H:%M'),
+                        length=f"{length.days}d, "
+                               f"{length.seconds // 3600}h, "
+                               f"{(length.seconds // 60) % 60}m"
+                    ),
+                    value=Messages.timeout_field_text.format(
+                        mod=inter.author,
+                        starttime=created_at.strftime('%d.%m.%Y %H:%M'),
+                        length=f"{length.days}d, {length.seconds // 3600}h, {(length.seconds // 60) % 60}m",
+                        reason=reason),
+                    inline=False
+                )
+
+        # print users with timeout if any exists
         if timeout_members:
             message = await inter.original_message()
 
@@ -234,7 +278,7 @@ class Timeout(commands.Cog):
         """List all timed out users"""
         users = self.timeout_repo.get_timeout_users()
         if not users:
-            await inter.send("Nikoho jsem nenašel.")
+            await inter.send(Messages.timeout_list_none)
             return
 
         await self.timeout_embed_listing(users, "Timeout list", inter, inter.author)
@@ -258,6 +302,7 @@ class Timeout(commands.Cog):
                 self.timeout_repo.remove_timeout(user.user_id)
                 continue
 
+            # get timezone aware datetime object
             current_timeout = member.current_timeout.astimezone(tz=utils.get_local_zone())
             end_timeout = user.end.replace(tzinfo=utils.get_local_zone())
 
