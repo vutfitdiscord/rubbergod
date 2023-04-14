@@ -270,8 +270,6 @@ class Timeout(commands.Cog):
         users = self.timeout_repo.get_timeout_users()
         if users:
             await self.timeout_embed_listing(users, "Timeout Update", self.submod_helper_room, self.bot.user)
-        else:
-            await self.submod_helper_room.send(Messages.timeout_update_none)
 
     @commands.Cog.listener()
     async def on_audit_log_entry_create(self, entry):
