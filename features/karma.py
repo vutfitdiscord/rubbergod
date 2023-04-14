@@ -6,6 +6,7 @@ from disnake.ext.commands import Bot
 from emoji import demojize
 
 import utils
+from cogs.grillbot_api import GrillbotApi
 from config.app_config import config as cfg
 from config.messages import Messages
 from features.base_feature import BaseFeature
@@ -33,6 +34,7 @@ class Karma(BaseFeature):
     def __init__(self, bot: Bot, karma_repository: KarmaRepository):
         super().__init__(bot)
         self.repo = karma_repository
+        self.grillbot_api = GrillbotApi(bot)
 
     async def emoji_process_vote(self, inter, emoji):
         delay = cfg.vote_minutes * 60
@@ -236,7 +238,8 @@ class Karma(BaseFeature):
     async def karma_give(self, inter, members, karma):
         members = await utils.get_members_from_tag(inter.guild, members)
         for member in members:
-            self.repo.update_karma(member.id, inter.author.id, karma)
+            members_update = self.repo.update_karma(member.id, inter.author.id, karma)
+            await self.grillbot_api.post_karma_store(members_update)
         if karma >= 0:
             await inter.send(Messages.karma_give_success)
         else:
@@ -245,7 +248,7 @@ class Karma(BaseFeature):
             )
 
     async def karma_transfer(self, inter, from_user, to_user):
-        transfered = self.repo.transfer_karma(from_user, to_user)
+        transfered, members_update = self.repo.transfer_karma(from_user, to_user)
         if transfered is None:
             return await inter.send(Messages.karma_transer_user_no_karma.format(user=from_user))
 
@@ -257,7 +260,7 @@ class Karma(BaseFeature):
             positive=transfered.positive,
             negative=transfered.negative
         )
-
+        await self.grillbot_api.post_karma_store(members_update)
         await inter.send(formated_message)
 
     def karma_get(self, author, target=None):
