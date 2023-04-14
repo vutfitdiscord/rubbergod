@@ -22,7 +22,7 @@ messages = messages.Messages
 class Karma(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.karma = karma.Karma(bot, karma_r)
+        self.karma_helper = karma.Karma(bot, karma_r)
         self.check = room_check.RoomCheck(bot)
         self.grillbot_api = GrillbotApi(bot)
         self._leaderboard_formatter = utils.make_pts_column_row_formatter(Database_karma.karma.name)
@@ -57,7 +57,7 @@ class Karma(commands.Cog):
                 except commands.errors.MessageNotFound:
                     ctx.message.delete()
                     return
-                embed = await self.karma.message_karma(ctx.member, message)
+                embed = await self.karma_helper.message_karma(ctx.member, message)
                 await ctx.message.edit(embed=embed)
         # handle karma
         elif (
@@ -110,42 +110,46 @@ class Karma(commands.Cog):
     @cooldowns.default_cooldown
     @_karma.sub_command(description=messages.karma_brief)
     async def me(self, inter: disnake.ApplicationCommandInteraction):
-        await inter.response.send_message(self.karma.karma_get(inter.author))
-        await self.check.botroom_check(inter)
+        await inter.response.send_message(
+            self.karma_helper.karma_get(inter.author),
+            ephemeral=self.check.botroom_check(inter)
+        )
 
     @commands.user_command(name="Karma uživatele")
     async def stalk_app(self, inter: disnake.UserCommandInteraction, user: disnake.Member):
-        ephemeral = inter.channel_id != config.bot_room
-        await inter.response.send_message(self.karma.karma_get(inter.author, user), ephemeral=ephemeral)
+        await inter.response.send_message(
+            self.karma_helper.karma_get(inter.author, user),
+            ephemeral=self.check.botroom_check(inter)
+        )
 
     @_karma.sub_command(description=messages.karma_stalk_brief)
     async def stalk(self, inter: disnake.ApplicationCommandInteraction, user: disnake.User):
-        await inter.response.send_message(self.karma.karma_get(inter.author, user))
-        await self.check.botroom_check(inter)
+        await inter.response.send_message(
+            self.karma_helper.karma_get(inter.author, user),
+            ephemeral=self.check.botroom_check(inter)
+        )
 
-    @commands.cooldown(rate=1, per=300.0, type=commands.BucketType.guild)
+    @commands.cooldown(rate=1, per=1.0, type=commands.BucketType.guild)
     @_karma.sub_command(description=messages.karma_getall_brief)
     async def getall(self, inter: disnake.ApplicationCommandInteraction):
-        try:
-            await inter.response.send_message(messages.karma_getall_response)
-            await self.karma.emoji_list_all_values(inter.channel)
-            await self.check.botroom_check(inter)
-        except disnake.errors.Forbidden:
-            return
+        await inter.send(
+            messages.karma_getall_response,
+            ephemeral=self.check.botroom_check(inter)
+        )
+        await self.karma_helper.emoji_list_all_values(inter, self.check.botroom_check(inter))
 
     @cooldowns.default_cooldown
     @_karma.sub_command(description=messages.karma_get_brief)
     async def get(self, inter: disnake.ApplicationCommandInteraction, emoji):
-        try:
-            await self.karma.emoji_get_value(inter, emoji)
-            await self.check.botroom_check(inter)
-        except disnake.errors.Forbidden:
-            return
+        await self.karma_helper.emoji_get_value(
+            inter,
+            emoji,
+            ephemeral=self.check.botroom_check(inter)
+        )
 
     @commands.message_command(name="Karma zprávy")
     async def message_app(self, inter: disnake.MessageCommandInteraction, message: disnake.Message):
-        ephemeral = inter.channel_id != config.bot_room
-        await self._message(inter, message, ephemeral=ephemeral)
+        await self._message(inter, message, ephemeral=self.check.botroom_check(inter))
 
     @cooldowns.long_cooldown
     @_karma.sub_command(description=messages.karma_message_brief)
@@ -158,7 +162,7 @@ class Karma(commands.Cog):
         ephemeral: bool = False
     ):
         await inter.response.defer(with_message=True, ephemeral=ephemeral)
-        embed = await self.karma.message_karma(inter.author, message)
+        embed = await self.karma_helper.message_karma(inter.author, message)
         await inter.edit_original_response(embed=embed)
         msg = await inter.original_message()
         if not ephemeral:
@@ -180,7 +184,7 @@ class Karma(commands.Cog):
             if ctx.message.channel.id == config.vote_room:
                 try:
                     await ctx.message.delete()
-                    await self.karma.emoji_revote_value(ctx.message)
+                    await self.karma_helper.emoji_revote_value(ctx.message)
                 except disnake.errors.Forbidden:
                     return
             else:
@@ -196,7 +200,7 @@ class Karma(commands.Cog):
             if ctx.message.channel.id == config.vote_room:
                 try:
                     await ctx.message.delete()
-                    await self.karma.emoji_vote_value(ctx.message)
+                    await self.karma_helper.emoji_vote_value(ctx.message)
                 except disnake.errors.Forbidden:
                     return
             else:
@@ -206,12 +210,12 @@ class Karma(commands.Cog):
     @commands.check(permission_check.is_bot_admin)
     @karma.command(brief=messages.karma_give_brief)
     async def give(self, ctx, *args):
-        await self.karma.karma_give(ctx.message)
+        await self.karma_helper.karma_give(ctx.message)
 
     @commands.check(permission_check.is_bot_admin)
     @karma.command(brief=messages.karma_transfer_brief)
     async def transfer(self, ctx, *args):
-        await self.karma.karma_transfer(ctx.message)
+        await self.karma_helper.karma_transfer(ctx.message)
 
     @cooldowns.long_cooldown
     @_karma.sub_command(name="leaderboard", description=messages.karma_leaderboard_brief)
@@ -237,9 +241,8 @@ class Karma(commands.Cog):
         embed = page_source.format_page(page)
 
         view = EmbedView(inter.author, embeds=[embed], page_source=page_source)
-        await inter.response.send_message(embed=embed, view=view)
+        await inter.response.send_message(embed=embed, view=view, ephemeral=self.check.botroom_check(inter))
         view.message = await inter.original_message()
-        await self.check.botroom_check(inter)
 
     @cooldowns.long_cooldown
     @_karma.sub_command(name="bajkarboard", description=messages.karma_bajkarboard_brief)
@@ -261,9 +264,8 @@ class Karma(commands.Cog):
         embed = page_source.format_page(page)
 
         view = EmbedView(inter.author, embeds=[embed], page_source=page_source)
-        await inter.response.send_message(embed=embed, view=view)
+        await inter.response.send_message(embed=embed, view=view, ephemeral=self.check.botroom_check(inter))
         view.message = await inter.original_message()
-        await self.check.botroom_check(inter)
 
     @cooldowns.long_cooldown
     @_karma.sub_command(name="givingboard", description=messages.karma_givingboard_brief)
@@ -285,9 +287,8 @@ class Karma(commands.Cog):
         embed = page_source.format_page(page)
 
         view = EmbedView(inter.author, embeds=[embed], page_source=page_source)
-        await inter.response.send_message(embed=embed, view=view)
+        await inter.response.send_message(embed=embed, view=view, ephemeral=self.check.botroom_check(inter))
         view.message = await inter.original_message()
-        await self.check.botroom_check(inter)
 
     @cooldowns.long_cooldown
     @_karma.sub_command(name="ishaboard", description=messages.karma_ishaboard_brief)
@@ -309,9 +310,8 @@ class Karma(commands.Cog):
         embed = page_source.format_page(page)
 
         view = EmbedView(inter.author, embeds=[embed], page_source=page_source)
-        await inter.response.send_message(embed=embed, view=view)
+        await inter.response.send_message(embed=embed, view=view, ephemeral=self.check.botroom_check(inter))
         view.message = await inter.original_message()
-        await self.check.botroom_check(inter)
 
     @revote.error
     @vote.error

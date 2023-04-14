@@ -1,11 +1,12 @@
-"""All checks for room permissions"""
+"""
+Verify room permissions and determine if ephemeral messaging is necessary.
+"""
 
 from typing import Union
 
 import disnake
 from disnake.ext import commands
 
-import utils
 from config.app_config import config
 
 
@@ -18,25 +19,26 @@ class RoomCheck:
     def __init__(self, bot):
         self.bot = bot
 
-    async def botroom_check(self, message):
-        """Check if command is called somewhere except botroom"""
-        room = await self.get_room(message)
-        if room is not None and room.id not in config.allowed_channels:
-            await message.channel.send(utils.fill_message("bot_room_redirect",
-                                       user=message.author.id, bot_room=config.bot_room))
+    def botroom_check(self, inter) -> bool:
+        """
+        returns False/True if we want ephemeral command
+        False if:
+            1. in DMs with bot
+            2. in thread
+            3. in allowed channel
+        else True
+        """
 
-    async def get_room(self, message):
-        guild = self.bot.get_guild(config.guild_id)
-        try:
-            if message.channel.guild == guild:
-                return message.channel
-        except AttributeError:
-            # Jsme v PM
-            return None
-
-    async def guild_check(self, message):
-        try:
-            guild = self.bot.get_guild(config.guild_id)
-            return message.channel.guild == guild
-        except AttributeError:
+        # DMs with bot
+        if inter.guild is None:
             return False
+
+        # allow threads in channels
+        if isinstance(inter.channel, disnake.Thread):
+            return False
+
+        # allowed channels
+        if inter.channel_id in config.allowed_channels:
+            return False
+
+        return True

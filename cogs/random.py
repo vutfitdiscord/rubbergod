@@ -8,11 +8,13 @@ import utils
 from config import cooldowns
 from config.app_config import config
 from config.messages import Messages
+from permissions import room_check
 
 
 class Random(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+        self.check = room_check.RoomCheck(bot)
 
     @cooldowns.short_cooldown
     @commands.slash_command(name="pick", description=Messages.random_pick_brief)
@@ -41,12 +43,15 @@ class Random(commands.Cog):
             await inter.send(Messages.random_pick_empty)
             return
         option = disnake.utils.escape_mentions(random.choice(args))
-        await inter.send(f"{option} {inter.author.mention}")
+        await inter.send(f"{option} {inter.author.mention}", ephemeral=self.check.botroom_check(inter))
 
     @cooldowns.short_cooldown
     @commands.slash_command(name="flip", description=Messages.random_flip_brief)
     async def flip(self, inter: disnake.ApplicationCommandInteraction):
-        await inter.response.send_message(random.choice(["True", "False"]))
+        await inter.response.send_message(
+            random.choice(["True", "False"]),
+            ephemeral=self.check.botroom_check(inter)
+        )
 
     @cooldowns.short_cooldown
     @commands.slash_command(name="roll", description=Messages.rng_generator_format)
@@ -55,7 +60,7 @@ class Random(commands.Cog):
             first, second = second, first
 
         option = str(random.randint(first, second))
-        await inter.response.send_message(option)
+        await inter.response.send_message(option, ephemeral=self.check.botroom_check(inter))
 
     @pick.error
     @roll.error

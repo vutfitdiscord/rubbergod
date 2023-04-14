@@ -252,6 +252,10 @@ def split(array, k):
 
 
 def create_bar(value, total) -> str:
+    """
+    creates progress bar
+    returns string like this: ▓▓▓▓▓░░░░░ 50%
+    """
     prog_bar_str = ""
     prog_bar_length = 10
     percentage = 0

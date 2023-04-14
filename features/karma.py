@@ -132,7 +132,7 @@ class Karma(BaseFeature):
             await message.channel.send(utils.fill_message("karma_vote_notpassed",
                                        emote=str(emoji), minimum=str(cfg.vote_minimum)))
 
-    async def emoji_get_value(self, inter, emoji):
+    async def emoji_get_value(self, inter, emoji, ephemeral):
         if not is_unicode(emoji):
             try:
                 emoji_id = int(emoji.split(':')[2][:-1])
@@ -141,18 +141,23 @@ class Karma(BaseFeature):
                 await inter.response.send_message(Messages.karma_get_format)
                 return
             except disnake.NotFound:
-                await inter.response.send_message(utils.fill_message("emote_not_found", emote=emoji))
+                await inter.response.send_message(
+                    utils.fill_message("emote_not_found", emote=emoji),
+                    ephemeral=ephemeral
+                )
                 return
 
         val = self.repo.emoji_value_raw(emoji)
 
         if val is not None:
             await inter.response.send_message(
-                utils.fill_message("karma_get", emote=str(emoji), value=str(val))
+                utils.fill_message("karma_get", emote=str(emoji), value=str(val)),
+                ephemeral=ephemeral
             )
         else:
             await inter.response.send_message(
-                utils.fill_message("karma_get_emote_not_voted", emote=str(emoji))
+                utils.fill_message("karma_get_emote_not_voted", emote=str(emoji)),
+                ephemeral=ephemeral
             )
 
     async def __make_emoji_list(self, guild, emojis):
@@ -204,23 +209,23 @@ class Karma(BaseFeature):
         message = [line for line in message if line != ""]
         return message, is_error
 
-    async def emoji_list_all_values(self, channel):
+    async def emoji_list_all_values(self, inter, ephemeral):
         error = False
         for value in ['1', '-1']:
             emojis, is_error = await self.__make_emoji_list(
-                    channel.guild,
+                    inter.guild,
                     self.repo.get_ids_of_emojis_valued(value))
             error |= is_error
             try:
-                await channel.send("Hodnota " + value + ":")
+                await inter.followup.send("Hodnota " + value + ":", ephemeral=ephemeral)
                 for line in emojis:
-                    await channel.send(line)
+                    await inter.followup.send(line, ephemeral=ephemeral)
             except disnake.errors.HTTPException:
                 pass  # TODO: error handling?
 
         if error:
-            channel = await self.bot.fetch_channel(cfg.bot_dev_channel)
-            await channel.send(Messages.karma_get_missing)
+            bot_dev_channel = await self.bot.fetch_channel(cfg.bot_dev_channel)
+            await bot_dev_channel.send(Messages.karma_get_missing)
 
     async def karma_give(self, message):
         input_string = message.content.split()
