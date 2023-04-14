@@ -152,11 +152,20 @@ class KarmaRepository(BaseRepository):
         from_user_karma = self.get_karma_object(from_user.id)
         to_user_karma = self.get_karma_object(to_user.id)
 
+        # transfering from user that is not in the database
+        if from_user_karma is None:
+            return None
+
+        # transfering to user that is not in the database
+        if to_user_karma is None:
+            to_user_karma = Karma(member_ID=str(to_user.id))
+            session.add(to_user_karma)
+
         log_karma = Karma_data(from_user_karma.karma, from_user_karma.positive, from_user_karma.negative)
 
         # Move karma
-        self.update_karma_get(to_user, from_user_karma.karma)
-        self.update_karma_get(from_user, -from_user_karma.karma)
+        self.update_karma_get(to_user.id, from_user_karma.karma)
+        self.update_karma_get(from_user.id, -from_user_karma.karma)
 
         # Move positive and negative reactions
         to_user_karma.positive += from_user_karma.positive

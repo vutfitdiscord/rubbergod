@@ -80,8 +80,6 @@ class Messages:
     karma_ishaboard_brief = 'Leaderboard rozdávání negativní karmy'
 
     karma_invalid_command = "Neznámý karma příkaz."
-    karma_vote_format = "Neočekávám žádný argument. " \
-                        f"Správný formát: `{prefix}karma vote`"
     karma_vote_message_hack = "Hlasování o karma ohodnocení emotu"
     karma_vote_message = f"{karma_vote_message_hack} {{emote}}"
     karma_vote_info = "Hlasování skončí za **{delay}** " \
@@ -92,8 +90,8 @@ class Messages:
     karma_vote_notpassed = "Hlasování o emotu {emote} neprošlo.\n" \
                            "Bylo třeba aspoň {minimum} hlasů."
     karma_vote_allvoted = "Už se hlasovalo o všech emotech."
-    karma_revote_format = "Očekávám pouze formát " \
-                          f"`{prefix}karma revote [emote]`"
+    karma_revote_not_emoji = "Špatný formát emoji."
+    karma_revote_started = "Hlasování o nové hodnotě emotu začalo."
     emote_not_found = "Emote `{emote}` jsem na serveru nenašel."
     karma_get_format = "Použití:\n" \
                        "`/karma getall`: " \
@@ -103,12 +101,6 @@ class Messages:
     karma_get = "Hodnota {emote} je {value}."
     karma_getall_response = "Ohodnocené emoji:"
     karma_get_emote_not_voted = "{emote} není ohodnocen."
-    karma_give_format = "Toaster pls, formát je " \
-                        f"`{prefix}karma give [number] [user(s)]`"
-    karma_give_format_number = "Toaster pls, formát je " \
-                               f"`{prefix}karma give " \
-                               "[number, jakože číslo, " \
-                               "ne {input}] [user(s)]` "
     karma_give_success = "Karma byla úspěšně přidána."
     karma_give_negative_success = "Karma byla úspěšně odebrána."
     karma_message_format = "Musíš zadat url zprávy"
@@ -116,7 +108,8 @@ class Messages:
     karma_leaderboard_offset_error = "{user} Špatný offset, zadej kladné číslo"
     karma_web_title = "Celý leaderboard"
     karma_web = "https://karma.grillbot.cloud/"
-    karma_transfer_format = f"Správný formát je `{prefix} karma transfer [od koho] [komu]`"
+    karma_transfer_same_user = "Nelze převést karmu na stejného uživatele."
+    karma_transer_user_no_karma = "{user} nemá žádnou karmu."
     karma_transfer_complete = "Karma byla úspěšně převedena z `{from_user}` na `{to_user}`:\n" \
                               "Množství karmy: **{karma}**\n" \
                               "Množství pozitivně rozdané karmy: **{positive}** \n" \
