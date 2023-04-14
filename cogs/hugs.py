@@ -48,7 +48,7 @@ class Hugs(commands.Cog):
         Overall hugging stats.
         """
 
-        await inter.response.defer()
+        await inter.response.defer(ephemeral=self.check.botroom_check(inter))
 
         page_source = LeaderboardPageSource(
                 bot=self.bot,
@@ -64,7 +64,6 @@ class Hugs(commands.Cog):
 
         view = EmbedView(inter.author, embeds=[embed], page_source=page_source)
         view.message = await inter.edit_original_response(embed=embed, view=view)
-        await self.check.botroom_check(inter)
 
     @cooldowns.default_cooldown
     @_hug.sub_command(name="huggersboard", description=Messages.hug_huggersboard_brief)
@@ -76,7 +75,7 @@ class Hugs(commands.Cog):
         Get the biggest huggers.
         """
 
-        await inter.response.defer()
+        await inter.response.defer(ephemeral=self.check.botroom_check(inter))
 
         page_source = LeaderboardPageSource(
                 bot=self.bot,
@@ -92,7 +91,6 @@ class Hugs(commands.Cog):
 
         view = EmbedView(inter.author, embeds=[embed], page_source=page_source)
         view.message = await inter.edit_original_response(embed=embed, view=view)
-        await self.check.botroom_check(inter)
 
     @cooldowns.default_cooldown
     @_hug.sub_command(name="mosthugged", description=Messages.hug_mosthugged_brief)
@@ -104,7 +102,7 @@ class Hugs(commands.Cog):
         Get the most hugged.
         """
 
-        await inter.response.defer()
+        await inter.response.defer(ephemeral=self.check.botroom_check(inter))
 
         page_source = LeaderboardPageSource(
                 bot=self.bot,
@@ -120,7 +118,6 @@ class Hugs(commands.Cog):
 
         view = EmbedView(inter.author, embeds=[embed], page_source=page_source)
         view.message = await inter.edit_original_response(embed=embed, view=view)
-        await self.check.botroom_check(inter)
 
     @cooldowns.default_cooldown
     @_hug.sub_command(name="me", description=Messages.hug_stats_brief)
@@ -133,7 +130,7 @@ class Hugs(commands.Cog):
         Get your lovely hug stats.
         """
 
-        await inter.response.defer()
+        await inter.response.defer(ephemeral=self.check.botroom_check(inter))
 
         if user is None or user == inter.author:
             user = inter.author
@@ -170,7 +167,6 @@ class Hugs(commands.Cog):
         embed.add_field(name=f"{recv_emoji} Received", value=str(stats.received))
 
         await inter.edit_original_response(embed=embed)
-        await self.check.botroom_check(inter)
 
     @cooldowns.short_cooldown
     @_hug.sub_command(name="give", description=Messages.hug_give_brief)

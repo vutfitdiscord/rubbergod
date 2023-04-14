@@ -8,4 +8,4 @@ This folder contains permission checks for roles, users, rooms to help us manage
 
 ## [Room_check.py](room_check.py)
 
-- Contains room checks to determine where commands can be invoked.
+- Contains room checks to determine where commands can be invoked and/or wheter to send ephemeral message.

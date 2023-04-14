@@ -8,6 +8,7 @@ from disnake.ext import commands, tasks
 import utils
 from config.app_config import config
 from config.messages import Messages
+from permissions import room_check
 
 
 class Nameday(commands.Cog):
@@ -15,6 +16,7 @@ class Nameday(commands.Cog):
         self.bot = bot
         self.send_names.start()
         self._owner_id = bot.owner_id
+        self.check = room_check.RoomCheck(bot)
 
     async def owner_id(self):
         if not self._owner_id:
@@ -61,13 +63,13 @@ class Nameday(commands.Cog):
 
     @commands.slash_command(name="svatek", description=Messages.name_day_cz_brief)
     async def name_day_cz(self, inter: disnake.ApplicationCommandInteraction):
-        await inter.response.defer()
+        await inter.response.defer(ephemeral=self.check.botroom_check(inter))
         name_day_cz = await self._name_day_cz()
         await inter.edit_original_response(name_day_cz)
 
     @commands.slash_command(name="meniny", description=Messages.name_day_sk_brief)
     async def name_day_sk(self, inter: disnake.ApplicationCommandInteraction):
-        await inter.response.defer()
+        await inter.response.defer(ephemeral=self.check.botroom_check(inter))
         name_day_sk = await self._name_day_sk()
         await inter.edit_original_response(name_day_sk)
 
