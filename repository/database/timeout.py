@@ -1,4 +1,4 @@
-from sqlalchemy import BigInteger, Column, DateTime, String
+from sqlalchemy import BigInteger, Column, DateTime, Interval, String
 
 from repository.database import database
 
@@ -10,4 +10,5 @@ class Timeout(database.base):
     mod_id = Column(BigInteger)
     start = Column(DateTime)
     end = Column(DateTime)
+    length = Column(Interval)
     reason = Column(String)
