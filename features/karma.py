@@ -1,7 +1,7 @@
 import asyncio
 
 import disnake
-from disnake import Emoji, Member, TextChannel
+from disnake import Emoji
 from disnake.ext.commands import Bot
 from emoji import demojize
 
@@ -34,18 +34,19 @@ class Karma(BaseFeature):
         super().__init__(bot)
         self.repo = karma_repository
 
-    async def emoji_process_vote(self, channel, emoji):
+    async def emoji_process_vote(self, inter, emoji):
         delay = cfg.vote_minutes * 60
         message = utils.fill_message("karma_vote_message", emote=str(emoji))
         message += '\n'
         message += utils.fill_message("karma_vote_info", delay=str(delay//60), minimum=str(cfg.vote_minimum))
-        message = await channel.send(message)
+        message = await inter.channel.send(message)
+        await inter.send(Messages.karma_revote_started)
         await message.add_reaction("✅")
         await message.add_reaction("❌")
         await message.add_reaction("0⃣")
         await asyncio.sleep(delay)
 
-        message = await channel.fetch_message(message.id)
+        message = await inter.channel.fetch_message(message.id)
 
         plus = 0
         minus = 0
@@ -69,15 +70,10 @@ class Karma(BaseFeature):
         else:
             return 0
 
-    async def emoji_vote_value(self, message):
-        if len(message.content.split()) != 2:
-            await message.channel.send(
-                Messages.karma_vote_format)
-            return
-
+    async def emoji_vote_value(self, inter):
         emojis = self.repo.get_all_emojis()
 
-        for server_emoji in message.guild.emojis:
+        for server_emoji in inter.guild.emojis:
             if not server_emoji.animated:
                 e = list(
                     filter(
@@ -86,51 +82,61 @@ class Karma(BaseFeature):
 
                 if len(e) == 0:
                     self.repo.set_emoji_value(server_emoji, 0)
-                    vote_value = await self.emoji_process_vote(message.channel,
+                    vote_value = await self.emoji_process_vote(inter.channel,
                                                                server_emoji)
                     emoji = server_emoji  # Save for use outside loop
                     break
         else:
-            await message.channel.send(Messages.karma_vote_allvoted)
+            await inter.channel.send(Messages.karma_vote_allvoted)
             return
 
         if vote_value is None:
             self.repo.remove_emoji(emoji)
-            await message.channel.send(utils.fill_message("karma_vote_notpassed",
-                                       emote=str(emoji), minimum=str(cfg.vote_minimum)))
+            await inter.channel.send(
+                utils.fill_message(
+                    "karma_vote_notpassed",
+                    emote=str(emoji), minimum=str(cfg.vote_minimum)
+                )
+            )
 
         else:
             self.repo.set_emoji_value(emoji, vote_value)
-            await message.channel.send(utils.fill_message("karma_vote_result",
-                                       emote=str(emoji), result=str(vote_value)))
+            await inter.channel.send(
+                utils.fill_message(
+                    "karma_vote_result",
+                    emote=str(emoji), result=str(vote_value)
+                )
+            )
 
-    async def emoji_revote_value(self, message):
-        content = message.content.split()
-        if len(content) != 3:
-            await message.channel.send(Messages.karma_revote_format)
-            return
-
-        emoji = content[2]
+    async def emoji_revote_value(self, inter, emoji):
         if not is_unicode(emoji):
             try:
                 emoji_id = int(emoji.split(':')[2][:-1])
-                emoji = await message.channel.guild.fetch_emoji(emoji_id)
+                emoji = await inter.guild.fetch_emoji(emoji_id)
             except (ValueError, IndexError):
-                await message.channel.send(Messages.karma_revote_format)
+                await inter.send(Messages.karma_revote_not_emoji)
                 return
             except disnake.NotFound:
-                await message.channel.send(utils.fill_message("emote_not_found", emote=emoji))
+                await inter.send(utils.fill_message("emote_not_found", emote=emoji))
                 return
 
-        vote_value = await self.emoji_process_vote(message.channel, emoji)
+        vote_value = await self.emoji_process_vote(inter, emoji)
 
         if vote_value is not None:
             self.repo.set_emoji_value(emoji, vote_value)
-            await message.channel.send(utils.fill_message("karma_vote_result",
-                                       emote=str(emoji), result=str(vote_value)))
+            await inter.channel.send(
+                utils.fill_message(
+                    "karma_vote_result",
+                    emote=str(emoji), result=str(vote_value)
+                )
+            )
         else:
-            await message.channel.send(utils.fill_message("karma_vote_notpassed",
-                                       emote=str(emoji), minimum=str(cfg.vote_minimum)))
+            await inter.channel.send(
+                utils.fill_message(
+                    "karma_vote_notpassed",
+                    emote=str(emoji), minimum=str(cfg.vote_minimum)
+                )
+            )
 
     async def emoji_get_value(self, inter, emoji, ephemeral):
         if not is_unicode(emoji):
@@ -227,45 +233,32 @@ class Karma(BaseFeature):
             bot_dev_channel = await self.bot.fetch_channel(cfg.bot_dev_channel)
             await bot_dev_channel.send(Messages.karma_get_missing)
 
-    async def karma_give(self, message):
-        input_string = message.content.split()
-        if len(input_string) < 4:
-            await message.channel.send(Messages.karma_give_format)
+    async def karma_give(self, inter, members, karma):
+        members = await utils.get_members_from_tag(inter.guild, members)
+        for member in members:
+            self.repo.update_karma(member.id, inter.author.id, karma)
+        if karma >= 0:
+            await inter.send(Messages.karma_give_success)
         else:
-            try:
-                number = int(input_string[2])
-            except ValueError:
-                await message.channel.send(utils.fill_message("karma_give_format_number",
-                                                              input=input_string[2]))
-                return
-            for member in message.mentions:
-                self.repo.update_karma(member, message.author, number)
-            if number >= 0:
-                await message.channel.send(Messages.karma_give_success)
-            else:
-                await message.channel.send(
-                    Messages.karma_give_negative_success
-                )
+            await inter.send(
+                Messages.karma_give_negative_success
+            )
 
-    async def karma_transfer(self, message: TextChannel):
-        input_string = message.content.split()
-        if len(input_string) < 4 or len(message.mentions) < 2:
-            await message.channel.send(Messages.karma_transfer_format)
-            return
+    async def karma_transfer(self, inter, from_user, to_user):
+        transfered = self.repo.transfer_karma(from_user, to_user)
+        if transfered is None:
+            return await inter.send(Messages.karma_transer_user_no_karma.format(user=from_user))
 
-        try:
-            from_user: Member = message.mentions[0]
-            to_user: Member = message.mentions[1]
+        formated_message = utils.fill_message(
+            "karma_transfer_complete",
+            from_user=from_user.name,
+            to_user=to_user.name,
+            karma=transfered.karma,
+            positive=transfered.positive,
+            negative=transfered.negative
+        )
 
-            transfered = self.repo.transfer_karma(from_user, to_user)
-            formated_message = utils.fill_message("karma_transfer_complete", from_user=from_user.name,
-                                                  to_user=to_user.name, karma=transfered.karma,
-                                                  positive=transfered.positive, negative=transfered.negative)
-
-            await self.reply_to_channel(message.channel, formated_message)
-        except ValueError:
-            await self.reply_to_channel(message.channel, Messages.karma_transfer_format)
-            return
+        await inter.send(formated_message)
 
     def karma_get(self, author, target=None):
         if target is None:
