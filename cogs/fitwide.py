@@ -471,6 +471,7 @@ class FitWide(commands.Cog):
     async def fitwide_checks_error(self, ctx, error):
         if isinstance(error, commands.CheckFailure):
             await ctx.send("Nothing to see here comrade. " + "<:KKomrade:484470873001164817>")
+            return True
 
 
 def setup(bot):
