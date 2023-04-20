@@ -171,14 +171,14 @@ def insult_login(parsed_items, system, res_type):
         user = session.query(Permit).filter(Permit.login == login).one_or_none()
 
         if not user:
-            msg = f"Na {system} leží {_inflected_resources[res_type][0]}" \
-                f"nějakého `{login}` co není na serveru."
+            msg = f"Na {system} leží {_inflected_resources[res_type][0]} " \
+                f"nějakého `{login}`, co není na serveru."
         else:
             count = len(array)
             avg_time = int(sum(array) // count)
 
             msg = (
-                f"{utils.generate_mention(user.discord_ID)} máš na"
+                f"{utils.generate_mention(user.discord_ID)} máš na "
                 f"{system} `{count}` {_inflected_resources[res_type][1]}, "
                 f"{_inflected_resources[res_type][2]} průměrně `{format_time(avg_time)}`, ty prase."
             )
@@ -193,14 +193,14 @@ def insult_login_shm(parsed_files, system):
         array, login_not_in_name = data
 
         if not user:
-            msg = f"Na {system} leží soubory semaforů nějakého `{login}` co není na serveru."
+            msg = f"Na {system} leží soubory semaforů nějakého `{login}`, co není na serveru."
         else:
             count = len(array)
             avg_time = float(sum(array)) // count
 
             msg = (
                 f"{utils.generate_mention(user.discord_ID)} "
-                f"máš na {system}(`/dev/shm`) `{count}` souborů semaforů.")
+                f"máš na {system} (`/dev/shm`) `{count}` souborů semaforů.")
             if avg_time > 9:
                 msg += f"\n\t\tLeží ti tam průměrně už `{format_time(avg_time)}`, ty prase."
             if login_not_in_name:
