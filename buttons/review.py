@@ -75,19 +75,19 @@ class ReviewView(EmbedView):
             self.embed = self.manager.update_embed(self.embed, review)
             await interaction.response.edit_message(embed=self.embed)
 
-    @disnake.ui.button(emoji="👍", custom_id="review:like", style=disnake.ButtonStyle.success)
+    @disnake.ui.button(emoji="👍", custom_id="review:like", style=disnake.ButtonStyle.success, row=0)
     async def like(self, button: disnake.ui.Button, interaction: disnake.MessageInteraction):
         await self.handle_vote(interaction, True)
 
-    @disnake.ui.button(emoji="🛑", custom_id="review:vote_remove")
+    @disnake.ui.button(emoji="🛑", custom_id="review:vote_remove", row=0)
     async def vote_remove(self, button: disnake.ui.Button, interaction: disnake.MessageInteraction):
         await self.handle_vote(interaction)
 
-    @disnake.ui.button(emoji="👎", custom_id="review:dislike", style=disnake.ButtonStyle.danger)
+    @disnake.ui.button(emoji="👎", custom_id="review:dislike", style=disnake.ButtonStyle.danger, row=0)
     async def dislike(self, button: disnake.ui.Button, interaction: disnake.MessageInteraction):
         await self.handle_vote(interaction, False)
 
-    @disnake.ui.button(emoji="❔", custom_id="review:help", style=disnake.ButtonStyle.primary)
+    @disnake.ui.button(emoji="❔", custom_id="review:help", style=disnake.ButtonStyle.primary, row=0)
     async def help(self, button: disnake.ui.Button, interaction: disnake.MessageInteraction):
         await interaction.send(Messages.reviews_reaction_help, ephemeral=True)
 
