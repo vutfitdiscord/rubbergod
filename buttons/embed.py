@@ -85,6 +85,7 @@ class EmbedView(BaseView):
             self.lock_button = disnake.ui.Button(
                 emoji="🔓",
                 custom_id="embed:lock",
+                row=0,
                 style=disnake.ButtonStyle.success
             )
             self.add_item(self.lock_button)
