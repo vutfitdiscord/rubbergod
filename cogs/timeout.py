@@ -156,7 +156,7 @@ class Timeout(commands.Cog):
             if not date:
                 try:
                     # check for positive timeout length
-                    if float(endtime) <= 0:
+                    if float(endtime) < 0:
                         await inter.send(Messages.timeout_negative_time)
                         return
 
@@ -276,6 +276,8 @@ class Timeout(commands.Cog):
         inter: disnake.ApplicationCommandInteraction,
     ):
         """List all timed out users"""
+        await self.update_timeout()
+
         users = self.timeout_repo.get_timeout_users()
         if not users:
             await inter.send(Messages.timeout_list_none)
@@ -283,9 +285,8 @@ class Timeout(commands.Cog):
 
         await self.timeout_embed_listing(users, "Timeout list", inter, inter.author)
 
-    @tasks.loop(time=time(12, 0, tzinfo=utils.get_local_zone()))
-    async def refresh_timeout(self):
-        """Update timeout for users saved in db"""
+    async def update_timeout(self):
+        """update all user's timeout in database and on server"""
         users = self.timeout_repo.get_timeout_users()
         guild = self.bot.get_guild(config.guild_id)
 
@@ -310,6 +311,11 @@ class Timeout(commands.Cog):
                 await member.timeout(duration=timedelta(days=28), reason=user.reason)
             elif current_timeout < end_timeout:
                 await member.timeout(until=user.end, reason=user.reason)
+
+    @tasks.loop(time=time(12, 0, tzinfo=utils.get_local_zone()))
+    async def refresh_timeout(self):
+        """Update timeout for users saved in db"""
+        await self.update_timeout()
 
         # send update
         users = self.timeout_repo.get_timeout_users()
