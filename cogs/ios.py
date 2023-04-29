@@ -22,7 +22,11 @@ def running_for(time):
         minutes = now.minute - int(time[1])
         return hours * 60 + minutes
     else:
-        date = datetime.datetime.strptime(time[0], "%b%d")
+        try:
+            date = datetime.datetime.strptime(time[0], "%b%d")
+        except ValueError:
+            date = datetime.datetime.strptime(time[0], "%a%d")
+            date = date.replace(year=now.year, month=now.month)
         minutes = (now - date.replace(year=now.year)).total_seconds() // 60
         # subtracting a day as to assume it was ran right before midnight
         return minutes - 1440
