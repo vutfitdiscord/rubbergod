@@ -1,8 +1,10 @@
 import argparse
 import logging
+import sys
 import traceback
 
 from disnake import AllowedMentions, Embed, Intents, TextChannel
+from disnake.errors import DiscordServerError
 from disnake.ext import commands
 
 import repository.db_migrations as migrations
@@ -81,6 +83,9 @@ async def on_ready():
 
 @bot.event
 async def on_error(event, *args, **kwargs):
+    e = sys.exc_info()[1]
+    if isinstance(e, DiscordServerError) and e.status == 503:
+        return
     channel_out = bot.get_channel(config.bot_dev_channel)
     output = traceback.format_exc()
     print(output)
