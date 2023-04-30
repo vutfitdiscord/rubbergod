@@ -1,6 +1,6 @@
-# Database-related things
+## Database-related things
 
-## Connecting to the DB through Docker (externally)
+### Connecting to the DB through Docker (externally)
 
 ```
 docker exec -it $(docker ps -aqf "name=rubbergod-db-1") psql -U postgres
