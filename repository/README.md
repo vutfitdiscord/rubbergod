@@ -36,3 +36,11 @@ from repository.database.meme_repost import MemeRepost  # noqa: F401
 > That way, the module gets imported on startup and creates the table automatically.
 
 > The `noqa` formula is for `flake8` to ignore seemingly unused import.
+
+## Enable debug prints
+
+Add `echo=True` to `repository/database/__init__.py`:
+```python
+12      self.db = create_engine(self.config.db_string, echo=True)
+                                                       ^
+```
