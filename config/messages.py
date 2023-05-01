@@ -51,6 +51,7 @@ class Messages:
     uptime_brief = "Vypíše čas spuštění a čas uplynulý od spuštění"
     uptime_title = "Uptime"
     upsince_title = "Up since"
+    shutdown_brief = "Vypne bota"
 
     hug_give_brief = "Obejme kamaráda"
     hug_intensity_description = "Síla obejmutí (číslo 1-{emoji_count})"
