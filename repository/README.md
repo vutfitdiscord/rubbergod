@@ -2,7 +2,7 @@
 
 ### Connecting to the DB through Docker (externally)
 
-```
+```bash
 docker exec -it $(docker ps -aqf "name=rubbergod-db-1") psql -U postgres
 ```
 
@@ -11,7 +11,8 @@ PostgreSQL prompt will open and you can now run any SQL (or Postgre-specific) co
 ### Create new table at the start of the Bot
 
 Create a new module with DB structure class ( example from `MemeRepost`):
-```
+
+```python
 from sqlalchemy import Column, String
 
 from repository.database import database
@@ -28,7 +29,7 @@ class MemeRepost(database.base):
 
 Add the following into `repository/db_migrations.py`:
 
-```
+```python
 from repository.database.meme_repost import MemeRepost  # noqa: F401
 ```
 
