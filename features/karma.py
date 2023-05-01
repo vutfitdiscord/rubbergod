@@ -6,7 +6,7 @@ from disnake.ext.commands import Bot
 from emoji import demojize
 
 import utils
-from cogs.grillbot_api import GrillbotApi
+from cogs.grillbotapi import GrillbotApi
 from config.app_config import config as cfg
 from config.messages import Messages
 from features.base_feature import BaseFeature

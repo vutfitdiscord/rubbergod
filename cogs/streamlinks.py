@@ -11,6 +11,7 @@ from requests.packages.urllib3.util.retry import Retry
 
 import utils
 from buttons.embed import EmbedView
+from cogs.base import Base
 from config import cooldowns
 from config.app_config import config
 from config.messages import Messages
@@ -36,7 +37,7 @@ async def autocomp_subjects_with_stream(inter: disnake.ApplicationCommandInterac
     return [subject[0] for subject in subjects_with_stream if user_input.lower() in subject[0]][:25]
 
 
-class StreamLinks(commands.Cog):
+class StreamLinks(Base, commands.Cog):
     def __init__(self, bot):
         global subjects, subjects_with_stream
         self.bot = bot

@@ -3,11 +3,12 @@ from disnake.ext import commands
 
 import utils
 from buttons.bookmark import BookmarkView
+from cogs.base import Base
 from features.bookmark import BookmarkFeatures
 from modals.bookmark import BookmarkModal
 
 
-class Bookmark(commands.Cog):
+class Bookmark(Base, commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 

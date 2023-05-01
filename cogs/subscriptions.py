@@ -3,6 +3,7 @@ from typing import List, Optional
 import disnake
 from disnake.ext import commands
 
+from cogs.base import Base
 from config.app_config import config
 from config.messages import Messages
 from repository import subscription_repo
@@ -17,7 +18,7 @@ async def autocomplete_rooms(inter, string: str) -> List[str]:
     return [room.name for room in rooms if string.lower() in room.name.lower()]
 
 
-class Subscriptions(commands.Cog):
+class Subscriptions(Base, commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         global rooms

@@ -2,13 +2,14 @@ import disnake
 import sqlalchemy
 from disnake.ext import commands
 
+from cogs.base import Base
 from config.app_config import config
 from features.reaction_context import ReactionContext
 from repository.database import session
 from utils import is_command_message
 
 
-class Reactions(commands.Cog):
+class Reactions(Base, commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 

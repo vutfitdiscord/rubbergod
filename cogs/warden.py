@@ -9,6 +9,7 @@ from disnake.ext import commands
 from PIL import Image
 
 import utils
+from cogs.base import Base
 from config.app_config import config
 from config.messages import Messages
 from permissions import permission_check
@@ -18,7 +19,7 @@ dhash.force_pil()
 repo_i = image_repo.ImageRepository()
 
 
-class Warden(commands.Cog):
+class Warden(Base, commands.Cog):
     """A cog for database lookups"""
 
     def __init__(self, bot):

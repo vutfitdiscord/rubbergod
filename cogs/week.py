@@ -4,12 +4,13 @@ import disnake
 from disnake.ext import commands
 
 import utils
+from cogs.base import Base
 from config import cooldowns
 from config.app_config import config
 from config.messages import Messages
 
 
-class Week(commands.Cog):
+class Week(Base, commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 

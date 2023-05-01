@@ -7,11 +7,12 @@ from cairosvg import svg2png
 from disnake.ext import commands
 
 import utils
+from cogs.base import Base
 from config import cooldowns
 from config.messages import Messages
 
 
-class FitRoom(commands.Cog):
+class FitRoom(Base, commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 

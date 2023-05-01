@@ -6,6 +6,7 @@ from disnake.ext import commands
 from sqlalchemy.orm.exc import MultipleResultsFound, NoResultFound
 
 import utils
+from cogs.base import Base
 from config import cooldowns
 from config.app_config import config
 from config.messages import Messages
@@ -17,7 +18,7 @@ from repository.database.verification import Permit, Valid_person
 arcas_time = datetime.datetime.utcnow() - datetime.timedelta(hours=config.arcas_delay)
 
 
-class FitWide(commands.Cog):
+class FitWide(Base, commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.verification = verification.Verification(bot)

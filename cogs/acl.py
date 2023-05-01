@@ -2,6 +2,7 @@ import disnake
 from disnake.ext import commands
 
 import utils
+from cogs.base import Base
 from config import cooldowns
 from config.app_config import config
 from features import acl
@@ -12,7 +13,7 @@ acl_repo = acl_repo.AclRepository()
 acl = acl.Acl(acl_repo)
 
 
-class Acl(commands.Cog):
+class Acl(Base, commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot

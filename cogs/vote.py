@@ -11,6 +11,7 @@ from disnake.ext import commands
 from disnake.ext.commands import Bot, Context
 
 import utils
+from cogs.base import Base
 from config import cooldowns
 from config.messages import Messages
 from repository import vote_repo
@@ -101,7 +102,7 @@ class VoteMessage:
             raise self.ParseError()
 
 
-class Vote(commands.Cog):
+class Vote(Base, commands.Cog):
     def __init__(self, bot: Bot):
         self.bot = bot
         self.vote_cache: Dict[int, VoteMessage] = {}

@@ -10,10 +10,11 @@ import aiohttp
 import disnake
 from disnake.ext import commands
 
+from cogs.base import Base
 from config.app_config import config
 
 
-class GrillbotApi(commands.Cog):
+class GrillbotApi(Base, commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot

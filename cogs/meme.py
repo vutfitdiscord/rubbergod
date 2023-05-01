@@ -8,6 +8,7 @@ from disnake.ext import commands
 from PIL import Image
 
 import utils
+from cogs.base import Base
 from config import cooldowns
 from config.app_config import config
 from config.messages import Messages
@@ -15,7 +16,7 @@ from config.messages import Messages
 uhoh_counter = 0
 
 
-class Meme(commands.Cog):
+class Meme(Base, commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 

@@ -6,6 +6,7 @@ import disnake
 from disnake.ext import commands, tasks
 
 import utils
+from cogs.base import Base
 from config import cooldowns
 from config.app_config import config
 from features.list_message_sender import send_list_of_messages
@@ -227,9 +228,10 @@ async def print_output(bot, channel, system, resources):
         await send_list_of_messages(channel, out_arr)
 
 
-class IOS(commands.Cog):
+class IOS(Base, commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+        self.tasks = [self.ios_body]
 
     @cooldowns.default_cooldown
     @commands.check(permission_check.helper_plus)

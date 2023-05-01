@@ -6,13 +6,14 @@ import aiohttp
 import disnake
 from disnake.ext import commands
 
+from cogs.base import Base
 from config import cooldowns
 from config.messages import Messages
 
 PNG_HEADER = b'\x89PNG\r\n\x1a\n'
 
 
-class Latex(commands.Cog):
+class Latex(Base, commands.Cog):
     @cooldowns.default_cooldown
     @commands.command(brief=Messages.latex_desc, description=Messages.latex_help)
     async def latex(self, ctx, *args):

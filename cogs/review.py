@@ -7,6 +7,7 @@ from disnake.ext import commands
 import utils
 from buttons.embed import EmbedView
 from buttons.review import ReviewView
+from cogs.base import Base
 from config import cooldowns
 from config.app_config import config
 from config.messages import Messages
@@ -27,7 +28,7 @@ async def autocomp_subjects(inter: disnake.ApplicationCommandInteraction, user_i
     return [subject for subject in subjects if user_input.lower() in subject][:25]
 
 
-class Review(commands.Cog):
+class Review(Base, commands.Cog):
     def __init__(self, bot):
         global subjects, programmes
         self.bot = bot

@@ -7,6 +7,7 @@ from disnake.ext import commands
 from lxml import etree
 
 import utils
+from cogs.base import Base
 from config.app_config import config
 from config.messages import Messages
 from repository import user_repo
@@ -14,7 +15,7 @@ from repository import user_repo
 user_r = user_repo.UserRepository()
 
 
-class Absolvent(commands.Cog):
+class Absolvent(Base, commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 

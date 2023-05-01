@@ -5,7 +5,8 @@ from disnake.ext import commands
 
 import utils
 from buttons.embed import EmbedView
-from cogs.grillbot_api import GrillbotApi
+from cogs.base import Base
+from cogs.grillbotapi import GrillbotApi
 from config import cooldowns
 from config.app_config import config
 from config.messages import Messages
@@ -19,7 +20,7 @@ from repository.database.karma import Karma as Database_karma
 karma_r = karma_repo.KarmaRepository()
 
 
-class Karma(commands.Cog):
+class Karma(Base, commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.karma_helper = karma.Karma(bot, karma_r)

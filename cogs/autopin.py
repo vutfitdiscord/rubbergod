@@ -5,6 +5,7 @@ import disnake
 from disnake.ext import commands
 
 import utils
+from cogs.base import Base
 from config.app_config import config
 from config.messages import Messages
 from permissions import permission_check
@@ -12,7 +13,7 @@ from repository import pin_repo
 from repository.database.pin_map import PinMap
 
 
-class AutoPin(commands.Cog):
+class AutoPin(Base, commands.Cog):
     def __init__(self, bot):
         self.warning_time = datetime.datetime.utcnow() - datetime.timedelta(
             minutes=config.autopin_warning_cooldown

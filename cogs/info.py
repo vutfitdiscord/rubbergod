@@ -9,12 +9,13 @@ from disnake.ext import commands
 
 import utils
 from buttons.embed import EmbedView
+from cogs.base import Base
 from config import cooldowns
 from config.app_config import config
 from config.messages import Messages
 
 
-class Info(commands.Cog):
+class Info(Base, commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 

@@ -3,11 +3,12 @@ import requests
 from disnake.ext import commands
 from lxml import etree
 
+from cogs.base import Base
 from config.messages import Messages
 from utils import add_author_footer
 
 
-class Studijni(commands.Cog):
+class Studijni(Base, commands.Cog):
 
     @commands.slash_command(name="studijni", description=Messages.studijni_brief)
     async def studijni(self, inter: disnake.ApplicationCommandInteraction):
