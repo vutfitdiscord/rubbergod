@@ -1,4 +1,9 @@
+"""
+Core cog for bot. Can't be unloaded. Contains commands for cog management.
+"""
+
 import math
+from datetime import datetime
 
 import disnake
 from disnake.ext import commands
@@ -6,15 +11,21 @@ from disnake.message import Message
 
 import utils
 from buttons.system import Dropdown, SystemView
+from cogs.base import Base
+from config import cooldowns
 from config.app_config import config
 from config.messages import Messages
+from features.error import ErrorLogger
 from features.git import Git
 from permissions import permission_check
 
+boottime = datetime.now().replace(microsecond=0)
 
-class System(commands.Cog):
+
+class System(Base, commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+        self.error_log = ErrorLogger()
         self.git = Git()
 
         self.unloadable_cogs = ["system"]
@@ -70,6 +81,22 @@ class System(commands.Cog):
         view.message = message
         for i, cogs in enumerate(selects):
             view.selects[i].msg = message
+
+    @cooldowns.default_cooldown
+    @commands.slash_command(name="uptime", description=Messages.uptime_brief)
+    async def uptime(self, inter: disnake.ApplicationCommandInteraction):
+        now = datetime.now().replace(microsecond=0)
+        delta = now - boottime
+        count = self.error_log.log_error_date(set=False)
+        embed = disnake.Embed(
+            title="Uptime",
+            description=f"{count} days without an accident.",
+            color=0xeee657,
+        )
+        embed.add_field(name=Messages.upsince_title, value=str(boottime))
+        embed.add_field(name=Messages.uptime_title, value=str(delta))
+        self.error_log.set_image(embed, self.bot.user, count)
+        await inter.send(embed=embed)
 
     @pull.error
     @cogs.error

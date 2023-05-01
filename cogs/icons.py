@@ -3,6 +3,7 @@ from disnake.ext import commands
 
 import utils
 from buttons.icon import IconView
+from cogs.base import Base
 from config.app_config import config
 from config.messages import Messages
 
@@ -79,7 +80,7 @@ def get_icon_emoji(icon: disnake.Role):
     return emoji
 
 
-class Icons(commands.Cog):
+class Icons(Base, commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 

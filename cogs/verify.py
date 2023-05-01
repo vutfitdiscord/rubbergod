@@ -2,6 +2,7 @@ import disnake
 from disnake.ext import commands
 
 import utils
+from cogs.base import Base
 from config import cooldowns
 from config.app_config import config
 from config.messages import Messages
@@ -16,7 +17,7 @@ async def dynamic_verify_rules_autocomplete(inter: disnake.ApplicationCommandInt
     return service.get_rules_list()
 
 
-class Verify(commands.Cog):
+class Verify(Base, commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.verification = verification.Verification(bot)

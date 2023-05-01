@@ -12,6 +12,7 @@ from disnake.ext import commands, tasks
 
 import utils
 from buttons.embed import EmbedView
+from cogs.base import Base
 from config import cooldowns
 from config.app_config import config
 from config.messages import Messages
@@ -26,7 +27,7 @@ DATE_OFFSET = 14
 TIME_OFFSET = 14
 
 
-class Exams(commands.Cog):
+class Exams(Base, commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
 
@@ -37,16 +38,7 @@ class Exams(commands.Cog):
         self.exams_repo = ExamsTermsMessageRepo()
 
         if self.subscribed_guilds:
-            self.update_terms_task.start()
-
-    def cog_unload(self):
-        if self.update_terms_task.is_running():
-            self.update_terms_task.cancel()
-        self.subscribed_guilds = []
-
-    def __del__(self):
-        if self.update_terms_task.is_running():
-            self.update_terms_task.cancel()
+            self.tasks = [self.update_terms_task.start()]
 
     @cooldowns.default_cooldown
     @commands.check(permission_check.helper_plus)

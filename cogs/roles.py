@@ -5,6 +5,7 @@ import disnake
 from disnake.ext import commands
 
 import utils
+from cogs.base import Base
 from config.app_config import config
 # TODO: use messages
 from config.messages import Messages
@@ -15,7 +16,7 @@ from repository import review_repo, role_group_repo
 group_repo = role_group_repo.RoleGroupRepository()
 
 
-class Roles(commands.Cog):
+class Roles(Base, commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
         self.lock = asyncio.Lock()

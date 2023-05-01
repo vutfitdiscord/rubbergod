@@ -10,6 +10,7 @@ import disnake
 from disnake.ext import commands, tasks
 
 import utils
+from cogs.base import Base
 from config.app_config import config
 from config.messages import Messages
 from permissions import permission_check
@@ -38,12 +39,12 @@ async def autocomplete_times(inter, string: str) -> List[str]:
     return [endtime for endtime in timestamps.keys() if string.lower() in endtime.lower()]
 
 
-class Timeout(commands.Cog):
+class Timeout(Base, commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.timeout_repo = TimeoutRepository()
         self.formats = ("%d.%m.%Y", "%d/%m/%Y", "%d.%m.%Y %H:%M", "%d/%m/%Y %H:%M")
-        self.refresh_timeout.start()
+        self.tasks = [self.refresh_timeout.start()]
         self.perms_users = []
 
     @cached_property

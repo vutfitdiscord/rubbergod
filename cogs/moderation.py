@@ -9,10 +9,11 @@ from disnake.ext import commands
 
 import utils
 from buttons.moderation import ModerationView
+from cogs.base import Base
 from config.app_config import config
 
 
-class Moderation(commands.Cog):
+class Moderation(Base, commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.moderation_true = "moderation:resolve:true"

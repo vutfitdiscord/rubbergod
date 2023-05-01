@@ -5,13 +5,14 @@ import disnake
 from disnake.ext import commands
 
 import utils
+from cogs.base import Base
 from config.app_config import config
 from features.reaction_context import ReactionContext
 from repository.karma_repo import KarmaRepository
 from repository.meme_repost_repo import MemeRepostRepo
 
 
-class MemeRepost(commands.Cog):
+class MemeRepost(Base, commands.Cog):
     def __init__(self, bot):
         self.bot: commands.Bot = bot
 

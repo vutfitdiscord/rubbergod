@@ -6,11 +6,12 @@ from disnake.ext import commands
 from PIL import Image
 
 import utils
+from cogs.base import Base
 from config import cooldowns
 from config.messages import Messages
 
 
-class Pet(commands.Cog):
+class Pet(Base, commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 

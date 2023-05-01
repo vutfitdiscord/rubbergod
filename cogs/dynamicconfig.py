@@ -7,12 +7,13 @@ import toml
 from disnake.ext import commands
 
 import utils
+from cogs.base import Base
 from config.app_config import config, load_config
 from config.messages import Messages
 from permissions import permission_check
 
 
-class DynamicConfig(commands.Cog):
+class DynamicConfig(Base, commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 

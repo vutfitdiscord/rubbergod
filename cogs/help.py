@@ -5,13 +5,14 @@ from disnake.ext import commands
 
 import utils
 from buttons.embed import EmbedView
+from cogs.base import Base
 from config import cooldowns
 from config.app_config import config
 from config.messages import Messages
 from features.git import Git
 
 
-class Help(commands.Cog):
+class Help(Base, commands.Cog):
     """Help command"""
 
     def __init__(self, bot: commands.Bot):

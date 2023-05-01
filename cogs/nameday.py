@@ -6,17 +6,18 @@ import disnake
 from disnake.ext import commands, tasks
 
 import utils
+from cogs.base import Base
 from config.app_config import config
 from config.messages import Messages
 from permissions import room_check
 
 
-class Nameday(commands.Cog):
+class Nameday(Base, commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.send_names.start()
         self._owner_id = bot.owner_id
         self.check = room_check.RoomCheck(bot)
+        self.tasks = [self.send_names.start()]
 
     async def owner_id(self):
         if not self._owner_id:
