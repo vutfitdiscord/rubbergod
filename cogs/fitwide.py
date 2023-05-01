@@ -8,6 +8,7 @@ from sqlalchemy.orm.exc import MultipleResultsFound, NoResultFound
 import utils
 from config import cooldowns
 from config.app_config import config
+from config.messages import Messages
 from features import verification
 from permissions import permission_check, room_check
 from repository.database import session
@@ -455,9 +456,9 @@ class FitWide(commands.Cog):
             await ctx.send("Hotovo.")
 
     @commands.check(permission_check.is_bot_admin)
-    @commands.command()
-    async def shutdown(self, ctx):
-        await ctx.send("shutting down")
+    @commands.slash_command(name="shutdown", description=Messages.shutdown_brief)
+    async def shutdown(self, inter: disnake.ApplicationCommandInteraction):
+        await inter.send("Shutting down...")
         await self.bot.close()
         exit(0)
 
