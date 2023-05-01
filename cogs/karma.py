@@ -208,6 +208,7 @@ class Karma(commands.Cog):
         users: str,
         karma: int
     ):
+        await inter.response.defer()
         await self.karma_helper.karma_give(inter, users, karma)
 
     @_karma_mod.sub_command(name="transfer", description=Messages.karma_transfer_brief)
@@ -217,6 +218,7 @@ class Karma(commands.Cog):
         from_user: disnake.Member,
         to_user: disnake.Member
     ):
+        await inter.response.defer()
         if from_user == to_user:
             return await inter.send(Messages.karma_transfer_same_user)
         await self.karma_helper.karma_transfer(inter, from_user, to_user)
@@ -224,6 +226,9 @@ class Karma(commands.Cog):
     @cooldowns.long_cooldown
     @_karma.sub_command(name="leaderboard", description=Messages.karma_leaderboard_brief)
     async def leaderboard(self, inter: disnake.ApplicationCommandInteraction, start: int = 1):
+
+        await inter.response.defer(ephemeral=self.check.botroom_check(inter))
+
         if not await self.validate_leaderboard_offset(start, inter):
             return
         embed = disnake.Embed()
@@ -245,12 +250,15 @@ class Karma(commands.Cog):
         embed = page_source.format_page(page)
 
         view = EmbedView(inter.author, embeds=[embed], page_source=page_source)
-        await inter.response.send_message(embed=embed, view=view, ephemeral=self.check.botroom_check(inter))
+        await inter.edit_original_response(embed=embed, view=view)
         view.message = await inter.original_message()
 
     @cooldowns.long_cooldown
     @_karma.sub_command(name="bajkarboard", description=Messages.karma_bajkarboard_brief)
     async def bajkarboard(self, inter: disnake.ApplicationCommandInteraction, start: int = 1):
+
+        await inter.response.defer(ephemeral=self.check.botroom_check(inter))
+
         if not await self.validate_leaderboard_offset(start, inter):
             return
 
@@ -268,12 +276,15 @@ class Karma(commands.Cog):
         embed = page_source.format_page(page)
 
         view = EmbedView(inter.author, embeds=[embed], page_source=page_source)
-        await inter.response.send_message(embed=embed, view=view, ephemeral=self.check.botroom_check(inter))
+        await inter.edit_original_response(embed=embed, view=view)
         view.message = await inter.original_message()
 
     @cooldowns.long_cooldown
     @_karma.sub_command(name="givingboard", description=Messages.karma_givingboard_brief)
     async def givingboard(self, inter: disnake.ApplicationCommandInteraction, start: int = 1):
+
+        await inter.response.defer(ephemeral=self.check.botroom_check(inter))
+
         if not await self.validate_leaderboard_offset(start, inter):
             return
 
@@ -291,12 +302,15 @@ class Karma(commands.Cog):
         embed = page_source.format_page(page)
 
         view = EmbedView(inter.author, embeds=[embed], page_source=page_source)
-        await inter.response.send_message(embed=embed, view=view, ephemeral=self.check.botroom_check(inter))
+        await inter.edit_original_response(embed=embed, view=view)
         view.message = await inter.original_message()
 
     @cooldowns.long_cooldown
     @_karma.sub_command(name="ishaboard", description=Messages.karma_ishaboard_brief)
     async def ishaboard(self, inter: disnake.ApplicationCommandInteraction, start: int = 1):
+
+        await inter.response.defer(ephemeral=self.check.botroom_check(inter))
+
         if not await self.validate_leaderboard_offset(start, inter):
             return
 
@@ -314,7 +328,7 @@ class Karma(commands.Cog):
         embed = page_source.format_page(page)
 
         view = EmbedView(inter.author, embeds=[embed], page_source=page_source)
-        await inter.response.send_message(embed=embed, view=view, ephemeral=self.check.botroom_check(inter))
+        await inter.edit_original_response(embed=embed, view=view)
         view.message = await inter.original_message()
 
     @revote.error
