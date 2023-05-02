@@ -231,17 +231,25 @@ def make_pts_column_row_formatter(pts_column_name: str):
 def get_all_cogs():
     """Returns all available cogs with their class names as ordered dict."""
     all_cogs = {}
-    pattern = r"class (.*)\(commands\.Cog\):"
+    ignored = ["__init__.py", "base.py"]
+    cog_pattern = re.compile(r"class\s+(\w+)\((?:\w+,\s)*commands\.Cog")
+
     for name in os.listdir("./cogs"):
-        filename = f"./cogs/{name}"
-        if isfile(filename) and filename.endswith(".py"):
-            with open(filename, "r") as file:
-                for line in file:
-                    if re.search(pattern, line):
-                        result = re.search(pattern, line)
-                        all_cogs[name[:-3]] = result.group(1)
-                        break
-    return {key: all_cogs[key] for key in sorted(all_cogs.keys())}
+        filepath = f"./cogs/{name}"
+
+        # ignore __init__.py, non-python files and folders/non-existent files
+        if name in ignored or not name.endswith(".py") or not isfile(filepath):
+            continue
+
+        # get all cog classes
+        with open(os.path.join("./cogs", name), "r") as file:
+            contents = file.read()
+            match = cog_pattern.findall(contents)
+            if match:
+                all_cogs[match[0].lower()] = match[0]
+
+    all_cogs = {key: all_cogs[key] for key in sorted(all_cogs.keys())}
+    return all_cogs
 
 
 def split(array, k):
