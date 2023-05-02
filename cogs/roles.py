@@ -1,3 +1,7 @@
+"""
+Cog implementing channels and roles management. Copying/creating channels with permissions.
+"""
+
 import asyncio
 from typing import List, Tuple
 
@@ -7,7 +11,7 @@ from disnake.ext import commands
 import utils
 from cogs.base import Base
 from config.app_config import config
-# TODO: use messages
+# TODO: use messages for prints
 from config.messages import Messages
 from features.reaction_context import ReactionContext
 from permissions import permission_check

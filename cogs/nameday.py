@@ -1,3 +1,7 @@
+"""
+Cog for sending name days and birthdays.
+"""
+
 import asyncio
 from datetime import date, time
 

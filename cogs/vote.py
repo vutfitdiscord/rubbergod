@@ -1,3 +1,7 @@
+"""
+Cog implementing vote and polls feature.
+"""
+
 import asyncio
 import re
 from datetime import datetime

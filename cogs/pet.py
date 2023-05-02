@@ -1,3 +1,7 @@
+"""
+Cog for petting people.
+"""
+
 from io import BytesIO
 
 import disnake

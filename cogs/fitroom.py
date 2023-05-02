@@ -1,3 +1,7 @@
+"""
+Cog for finding rooms on FIT BUT.
+"""
+
 from io import BytesIO
 
 import disnake

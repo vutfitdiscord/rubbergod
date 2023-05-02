@@ -1,6 +1,5 @@
 """
-Here are commands that call random apis for fun things.
-examples - animal pictures, dadjokes
+Cog containing commands that call random APIs for fun things.
 """
 
 import contextlib

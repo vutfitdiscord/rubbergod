@@ -1,3 +1,8 @@
+"""
+Cog implementing subscription to allowed channels. Subscribed users will receive notifications
+about new messages if they are offline.
+"""
+
 from typing import List, Optional
 
 import disnake

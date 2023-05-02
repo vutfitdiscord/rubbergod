@@ -1,3 +1,7 @@
+"""
+Cog implementing streamlinks system. List streams for a subject.
+"""
+
 import re
 from datetime import datetime
 from typing import List, Union
@@ -17,7 +21,7 @@ from config.app_config import config
 from config.messages import Messages
 from features.list_message_sender import send_list_of_messages
 from features.prompt import PromptSession
-from permissions import permission_check
+from permissions import permission_check, room_check
 from repository.database.stream_link import StreamLink
 from repository.review_repo import ReviewRepository
 from repository.stream_links_repo import StreamLinksRepo
@@ -43,6 +47,7 @@ class StreamLinks(Base, commands.Cog):
         self.bot = bot
         self.review_repo = ReviewRepository()
         self.streamlinks_repo = StreamLinksRepo()
+        self.check = room_check.RoomCheck(bot)
         subjects = self.review_repo.get_all_subjects()
         subjects_with_stream = self.streamlinks_repo.get_subjects_with_stream()
 
@@ -71,7 +76,7 @@ class StreamLinks(Base, commands.Cog):
         inter: disnake.ApplicationCommandInteraction,
         subject: str = commands.Param(autocomplete=autocomp_subjects_with_stream)
     ):
-        await inter.response.defer()
+        await inter.response.defer(ephemeral=self.check.botroom_check(inter))
 
         streamlinks = self.streamlinks_repo.get_streamlinks_of_subject(subject.lower())
 
@@ -144,7 +149,7 @@ class StreamLinks(Base, commands.Cog):
         messages = [f"Streamy k **{subject.upper()}**:"]
         for stream in streamlinks:
             at = stream.created_at.strftime("%d. %m. %Y")
-            messages.append(f"**{stream.member_name}** ({at}): <{stream.link}> - {stream.description}\n")
+            messages.append(f"**{stream.member_name}** ({at}) - [{stream.description}](<{stream.link}>)\n")
 
         await send_list_of_messages(inter, messages)
 
@@ -238,7 +243,7 @@ class StreamLinks(Base, commands.Cog):
         embed.add_field(name="Předmět", value=streamlink.subject.upper(), inline=True)
         embed.add_field(name="Od", value=streamlink.member_name, inline=True)
         embed.add_field(name="Datum vydání", value=streamlink.created_at.strftime("%d. %m. %Y"), inline=True)
-        embed.add_field(name="Odkaz", value=f"[{streamlink.link}]({streamlink.link})", inline=False)
+        embed.add_field(name="Odkaz", value=f"[Link]({streamlink.link})", inline=False)
         embed.add_field(name="Popis", value=streamlink.description[:1024], inline=False)
         embed.timestamp = datetime.utcnow()
         utils.add_author_footer(embed, author, additional_text=[

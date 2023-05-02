@@ -1,3 +1,7 @@
+"""
+Cog for handling reactions and delegating to specific cog.
+"""
+
 import disnake
 import sqlalchemy
 from disnake.ext import commands

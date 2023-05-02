@@ -1,5 +1,5 @@
 """
-Here are commands that get information from other sources.
+Cog containing commands that get basic information from other sources.
 examples - urban meaning of word, weather at location
 """
 

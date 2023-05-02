@@ -1,3 +1,7 @@
+"""
+Cog for the IOS subject. Get users on merlin/eva server which have blocking processes running.
+"""
+
 import datetime
 import re
 import subprocess

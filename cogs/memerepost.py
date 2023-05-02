@@ -1,3 +1,7 @@
+"""
+Cog for handling memes with X number of reactions to be reposted to a specific channel.
+"""
+
 import asyncio
 from typing import List, Union
 

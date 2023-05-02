@@ -1,3 +1,8 @@
+"""
+Cog for handling command errors. This is mostly for logging purposes.
+If not command error th error is propagated to rubbergod.py on_error function.
+"""
+
 import traceback
 
 import disnake

@@ -1,3 +1,7 @@
+"""
+Cog controlling auto pinning of messages. Create priority pinned messages in channels.
+"""
+
 import datetime
 from typing import List
 

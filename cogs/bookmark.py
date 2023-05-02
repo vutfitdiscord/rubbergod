@@ -1,3 +1,7 @@
+"""
+Cog controlling bookmarks. React with bookmark emoji and the bot will send copy of message to user.
+"""
+
 import disnake
 from disnake.ext import commands
 

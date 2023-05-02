@@ -1,3 +1,7 @@
+"""
+Cog for dynamicaly changing config.
+"""
+
 import os
 import re
 from datetime import datetime
