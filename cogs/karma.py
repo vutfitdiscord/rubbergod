@@ -226,7 +226,9 @@ class Karma(commands.Cog):
     @cooldowns.long_cooldown
     @_karma.sub_command(name="leaderboard", description=Messages.karma_leaderboard_brief)
     async def leaderboard(self, inter: disnake.ApplicationCommandInteraction, start: int = 1):
-
+        """
+        Get karma leaderboard
+        """
         await inter.response.defer(ephemeral=self.check.botroom_check(inter))
 
         if not await self.validate_leaderboard_offset(start, inter):
@@ -256,7 +258,9 @@ class Karma(commands.Cog):
     @cooldowns.long_cooldown
     @_karma.sub_command(name="bajkarboard", description=Messages.karma_bajkarboard_brief)
     async def bajkarboard(self, inter: disnake.ApplicationCommandInteraction, start: int = 1):
-
+        """
+        Leaderboard, but reversed (lowest first)
+        """
         await inter.response.defer(ephemeral=self.check.botroom_check(inter))
 
         if not await self.validate_leaderboard_offset(start, inter):
@@ -282,7 +286,9 @@ class Karma(commands.Cog):
     @cooldowns.long_cooldown
     @_karma.sub_command(name="givingboard", description=Messages.karma_givingboard_brief)
     async def givingboard(self, inter: disnake.ApplicationCommandInteraction, start: int = 1):
-
+        """
+        Get the biggest karma givers
+        """
         await inter.response.defer(ephemeral=self.check.botroom_check(inter))
 
         if not await self.validate_leaderboard_offset(start, inter):
@@ -308,7 +314,9 @@ class Karma(commands.Cog):
     @cooldowns.long_cooldown
     @_karma.sub_command(name="ishaboard", description=Messages.karma_ishaboard_brief)
     async def ishaboard(self, inter: disnake.ApplicationCommandInteraction, start: int = 1):
-
+        """
+        Get the biggest haters (those who given others the most of negative karma)
+        """
         await inter.response.defer(ephemeral=self.check.botroom_check(inter))
 
         if not await self.validate_leaderboard_offset(start, inter):
