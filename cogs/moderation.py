@@ -1,5 +1,6 @@
 """
-Functions for server moderation and help functions for mods
+Cog implementing functions for server moderation and help functions for mods.
+Implemented logging for tagging @mods.
 """
 
 from datetime import datetime

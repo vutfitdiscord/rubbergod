@@ -1,5 +1,5 @@
 """
-Containing timeout commands and manipulating with timeout.
+Cog containing timeout commands and manipulating with timeout.
 """
 
 from datetime import datetime, time, timedelta

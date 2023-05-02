@@ -1,3 +1,8 @@
+"""
+Cog to parse exams data from website and send it to channel.
+Available for each year of study.
+"""
+
 import collections
 import datetime
 import math

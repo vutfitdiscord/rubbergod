@@ -1,4 +1,7 @@
-import datetime
+"""
+Cog implementing management of year roles and database of user logins.
+"""
+
 import subprocess
 
 import disnake

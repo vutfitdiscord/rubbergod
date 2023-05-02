@@ -1,3 +1,7 @@
+"""
+Cog containing information about week (odd/even) and its relation to calendar/academic week.
+"""
+
 from datetime import date
 
 import disnake

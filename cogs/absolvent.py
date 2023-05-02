@@ -1,3 +1,7 @@
+"""
+Cog for diploma verification. When successful, the user is given Survivor(Bc.) or King(Ing.) role.
+"""
+
 import re
 import unicodedata
 

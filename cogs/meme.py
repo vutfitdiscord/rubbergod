@@ -1,3 +1,7 @@
+"""
+Cog for meme commands.
+"""
+
 from io import BytesIO
 from random import choice
 from typing import List

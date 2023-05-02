@@ -1,3 +1,7 @@
+"""
+Cog for repost detection.
+"""
+
 # stolen from rubbergoddess
 import asyncio
 import time
@@ -167,6 +171,7 @@ class Warden(Base, commands.Cog):
     @scan.command(name="message")
     async def scan_message(self, ctx, link):
         """Scan message attachments in whole database"""
+        # TODO: implement
         pass
 
     async def checkDuplicate(self, message: disnake.Message):

@@ -1,3 +1,7 @@
+"""
+Cog implementing hug commands. Send hug to user and see leaderboard.
+"""
+
 import disnake
 from disnake.ext import commands
 

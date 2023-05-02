@@ -1,3 +1,8 @@
+"""
+Base cog class. All cogs should inherit from this class.
+"""
+
+
 class Base:
     def __init__(self):
         self.tasks = []

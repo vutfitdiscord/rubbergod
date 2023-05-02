@@ -1,3 +1,7 @@
+"""
+Cog implementing karma system. Users can give each other positive/negative karma points with reactions.
+"""
+
 import math
 
 import disnake

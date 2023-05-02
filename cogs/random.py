@@ -1,3 +1,7 @@
+"""
+Cog implementing commands using random module.
+"""
+
 import random
 import shlex
 

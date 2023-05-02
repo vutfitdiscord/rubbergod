@@ -1,3 +1,7 @@
+"""
+Cog implementing review system for subjects.
+"""
+
 import copy
 import datetime
 

@@ -1,3 +1,7 @@
+"""
+Cog for interpreting latex commands as images.
+"""
+
 import asyncio
 import io
 import urllib
@@ -14,6 +18,9 @@ PNG_HEADER = b'\x89PNG\r\n\x1a\n'
 
 
 class Latex(Base, commands.Cog):
+    def __init__(self, bot):
+        self.bot = bot
+
     @cooldowns.default_cooldown
     @commands.command(brief=Messages.latex_desc, description=Messages.latex_help)
     async def latex(self, ctx, *args):

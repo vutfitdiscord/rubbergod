@@ -1,3 +1,8 @@
+"""
+Cog containing help command. Only shows commands that user has access to
+and are context commands.
+"""
+
 import copy
 
 import disnake

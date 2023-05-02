@@ -1,3 +1,7 @@
+"""
+Cog implementing information about office hours of the study department.
+"""
+
 import disnake
 import requests
 from disnake.ext import commands

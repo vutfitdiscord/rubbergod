@@ -1,5 +1,5 @@
 """
-Functions and commands communicating with grillbot API
+Functions and commands that communicate with the Grillbot API.
 """
 
 import asyncio

@@ -1,3 +1,7 @@
+"""
+Cog for verification system. Enables users to verify themselves with xlogin00 and gain access to server.
+"""
+
 import disnake
 from disnake.ext import commands
 

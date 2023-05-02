@@ -1,3 +1,7 @@
+"""
+Cog implementing dynamic icon system. Users can assign themselves icons from a list of roles.
+"""
+
 import disnake
 from disnake.ext import commands
 
