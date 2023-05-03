@@ -10,23 +10,6 @@ class Messages:
     help_description = "Kompletní seznam lze také najít ve veřejné administraci bota (https://public.grillbot.cloud/)"
 
     karma_get_missing = "Toaster pls, měl jsi bordel v DB. Musel jsem za tebe uklidit."
-    acl_help = "{user}, Použití:\n`!acl {{action}} {{table}} [args]`\n"\
-               "action: add, edit, del nebo list\n"\
-               "table: group, rule, role nebo user\n"\
-               "Argumenty záleží na zvolené akci a tabulce: "\
-               "pro přidání groupy musíte zadat název groupy a ID rodiče jako nepovinný argument."
-    acl_add_group = "Group vytvořena."
-    acl_edit_group = "Group změněna."
-    acl_del_group = "Group smazána."
-    acl_add_rule = "Pravidlo vytvořeno."
-    acl_edit_rule = "Pravidlo změněno."
-    acl_del_rule = "Pravidlo smazáno."
-    acl_add_role = "Výjimka pro roli přidána."
-    acl_edit_role = "Výjimka pro roli upravena."
-    acl_del_role = "Výjimka pro roli smazána."
-    acl_add_user = "Výjimka pro uživatele přidána."
-    acl_edit_user = "Výjimka pro uživatele upravena."
-    acl_del_user = "Výjimka pro uživatele smazána."
     moved_command = "Tento příkaz již není v textové formě podporován. Příkaz byl nahrazen příkazem </{name}:{id}>"
     no_such_command = "Takový příkaz neznám. <:sadcat:576171980118687754>"
     command_timed_out = "Příkaz nereagoval a byl nečekaně ukončen."
