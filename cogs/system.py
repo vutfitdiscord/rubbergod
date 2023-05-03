@@ -47,6 +47,13 @@ class System(Base, commands.Cog):
         for part in pull_parts[1:]:
             await ctx.send(f"```{part}```")
 
+    @commands.check(permission_check.is_bot_admin)
+    @commands.slash_command(name="shutdown", description=Messages.shutdown_brief)
+    async def shutdown(self, inter: disnake.ApplicationCommandInteraction):
+        await inter.send("Shutting down...")
+        await self.bot.close()
+        exit(0)
+
     async def create_selects(self):
         """Slices dictionary of all cogs to chunks for select."""
         cog_files = list(utils.get_all_cogs().keys())
