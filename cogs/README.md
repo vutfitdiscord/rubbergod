@@ -169,13 +169,13 @@ Cog containing commands that get basic information from other sources.\
 Cog for the IOS subject. Get users on merlin/eva server which have blocking processes running.\
 **Commands:**
 
-    - ?ios
-    - ?ios_start
-    - ?ios_stop
-    - ?ios_cancel
+    - /ios
+    - /ios_task start
+    - /ios_task stop
+    - /ios_task cancel
 **Tasks:**
 
-    - ios_body
+    - ios_task
 ---
 
 ### [Karma](karma.py)

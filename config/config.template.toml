@@ -137,6 +137,7 @@ loading="<a:loading:814969399442014259>"
 
 [util]
 ios_looptime_minutes=120
+ios_channel_id=534431057001316362
 
 [subscriptions]
 # list of channels users are allowed to subscribe to

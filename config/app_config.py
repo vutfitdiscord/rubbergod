@@ -149,6 +149,7 @@ class Config:
 
     # util
     ios_looptime_minutes: int = get_attr(toml_dict, "util", "ios_looptime_minutes")
+    ios_channel_id: int = get_attr(toml_dict, "util", "ios_channel_id")
 
     # subscriptions
     subscribable_channels: list = get_attr(toml_dict, "subscriptions", "subscribable_channels")

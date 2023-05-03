@@ -43,6 +43,17 @@ class Messages:
     hug_huggersboard_brief = "Vypíše nejčastější objímače"
     hug_mosthugged_brief = "Vypíše nejvíce objímané lidi"
 
+    ios_brief = "Připomene všem prasatům, že si mají jít po sobě uklidit"
+    ios_task_start_brief = "Začne pravidelně připomínat všem prasatům, že si mají jít po sobě uklidit"
+    ios_task_start_success = f"Automatické připomínání úspěšně nastaveno. Bude se od teď provádět každých {config.ios_looptime_minutes} minut."
+    ios_task_start_already_set = "Automatické připomínání už je nastaveno."
+    ios_task_stop_brief = "Zastaví automatické připomínání"
+    ios_task_stop_success = "Automatické připomínání zastaveno."
+    ios_task_stop_nothing_to_stop = "Automatické připomínání není nastaveno."
+    ios_task_cancel_brief = "Okamžitě ukončí automatické připomínání (přeruší aktuální běh)"
+    ios_parsing_error = "Toastere, máš bordel v parsování."
+    ios_howto_clean = "Pokud nevíte, jak po sobě uklidit, checkněte: https://discordapp.com/channels/461541385204400138/534431057001316362/698701631495340033"
+
     karma = "{user} Karma uživatele `{target}` je: **{karma}** " \
             "(**{order}.**)\nA rozdal:\n" \
             "**{karma_pos}** pozitivní karmy " \
