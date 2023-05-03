@@ -17,22 +17,11 @@ from permissions import permission_check, room_check
 from repository.database import session
 from repository.database.verification import Permit, Valid_person
 
-arcas_time = datetime.datetime.utcnow() - datetime.timedelta(hours=config.arcas_delay)
-
 
 class FitWide(Base, commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.verification = verification.Verification(bot)
-
-    @commands.Cog.listener()
-    async def on_typing(self, channel, user, when):
-        global arcas_time
-        if arcas_time + datetime.timedelta(hours=config.arcas_delay) < when and config.arcas_id == user.id:
-            arcas_time = when
-            gif = disnake.Embed()
-            gif.set_image(url="https://i.imgur.com/v2ueHcl.gif")
-            await channel.send(embed=gif)
 
     @cooldowns.default_cooldown
     @commands.check(permission_check.is_bot_admin)
@@ -465,6 +454,7 @@ class FitWide(Base, commands.Cog):
     @increment_roles.error
     @update_db.error
     @get_db.error
+    @connect_login_to_user.error
     async def fitwide_checks_error(self, ctx, error):
         if isinstance(error, commands.CheckFailure):
             await ctx.send("Nothing to see here comrade. " + "<:KKomrade:484470873001164817>")
