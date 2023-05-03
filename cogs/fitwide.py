@@ -12,7 +12,6 @@ import utils
 from cogs.base import Base
 from config import cooldowns
 from config.app_config import config
-from config.messages import Messages
 from features import verification
 from permissions import permission_check, room_check
 from repository.database import session
@@ -458,13 +457,6 @@ class FitWide(Base, commands.Cog):
             result.status = 0
             session.commit()
             await ctx.send("Hotovo.")
-
-    @commands.check(permission_check.is_bot_admin)
-    @commands.slash_command(name="shutdown", description=Messages.shutdown_brief)
-    async def shutdown(self, inter: disnake.ApplicationCommandInteraction):
-        await inter.send("Shutting down...")
-        await self.bot.close()
-        exit(0)
 
     @get_users_login.error
     @reset_login.error
