@@ -60,7 +60,7 @@ class DynamicVerifyManager(BaseFeature):
         embed.add_field("Pravidlo", f"{rule.name} ({rule.id})")
         embed.add_field(
             "Uživatel",
-            f"{inter.user.name}#{inter.user.discriminator} ({utils.generate_mention(inter.user.id)})",
+            f"{inter.user.display_name} ({utils.generate_mention(inter.user.id)})",
         )
 
         channel = self.bot.get_channel(config.mod_room)
