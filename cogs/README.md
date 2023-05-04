@@ -16,7 +16,7 @@ All extensions, also known as cogs, are contained within this folder. The cogs c
 
 ### [Absolvent](absolvent.py)
 
-Cog for diploma verification. When successful, the user is given role Survivor(Bc.) or King(Ing.).\
+Cog for diploma verification. When successful, the user is given Survivor(Bc.) or King(Ing.) role.\
 **Commands:**
 
     - /diplom help
