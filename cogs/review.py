@@ -114,12 +114,18 @@ class Review(Base, commands.Cog):
             await inter.send(Messages.review_added)
 
     @reviews.sub_command(name='remove', description=Messages.review_remove_brief)
-    async def remove(self, inter: disnake.ApplicationCommandInteraction, subject: str = None, id: int = None):
+    async def remove(
+        self,
+        inter: disnake.ApplicationCommandInteraction,
+        subject: str = None,
+        id: int = commands.Param(default=None, description=Messages.review_id_brief)
+    ):
         """Remove review from DB. User is just allowed to remove his own review
         For admin it is possible to use 'id' as subject shortcut and delete review by its ID
         """
+        error_message = utils.fill_message("review_remove_denied", user=inter.author.id)
         if id is not None:
-            if permission_check.is_bot_admin(inter):
+            if permission_check.is_bot_admin(inter, error_message):
                 self.repo.remove(id)
                 await inter.send(Messages.review_remove_success)
                 return
@@ -128,7 +134,7 @@ class Review(Base, commands.Cog):
             if self.manager.remove(str(inter.author.id), subject):
                 await inter.send(Messages.review_remove_success)
                 return
-        await inter.send(Messages.review_remove_error)
+        await inter.send(Messages.review_not_found)
 
     @reviews.sub_command(name='list', description=Messages.review_list_brief)
     async def author_list(self, inter: disnake.ApplicationCommandInteraction):

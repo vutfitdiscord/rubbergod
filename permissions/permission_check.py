@@ -15,15 +15,18 @@ class NotAdminError(commands.CommandError):
     """An error indicating that a user doesn't have permissions to use
     a command that is available only to admins of bot.
     """
-    def __init__(self) -> None:
-        self.message = Messages.bot_admin_only
+    def __init__(self, message: str = None) -> None:
+        if message is None:
+            self.message = Messages.bot_admin_only
+        else:
+            self.message = message
 
 
-def is_bot_admin(ctx: Union[commands.Context, disnake.ApplicationCommandInteraction]):
+def is_bot_admin(ctx: Union[commands.Context, disnake.ApplicationCommandInteraction], message: str = None):
     """Check if user is bot admin"""
     if ctx.author.id in config.admin_ids:
         return True
-    raise NotAdminError
+    raise NotAdminError(message)
 
 
 def role_check(ctx, roles, MissingPermission):
