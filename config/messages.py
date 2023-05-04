@@ -31,11 +31,6 @@ class Messages:
     uhoh_brief = "Vypíše počet uh ohs od spuštění"
     uhoh = "uh oh"
 
-    uptime_brief = "Vypíše čas spuštění a čas uplynulý od spuštění"
-    uptime_title = "Uptime"
-    upsince_title = "Up since"
-    shutdown_brief = "Vypne bota"
-
     hug_give_brief = "Obejme kamaráda"
     hug_intensity_description = "Síla obejmutí (číslo 1-{emoji_count})"
     hug_stats_brief = "Tvé statistiky obejmutí"
@@ -60,19 +55,19 @@ class Messages:
             "(**{karma_pos_order}.**)\n" \
             "**{karma_neg}** negativní karmy " \
             "(**{karma_neg_order}.**)"
-    karma_brief = 'Vypíše stav vaší karmy (vč. rozdané a odebrané)'
-    karma_stalk_brief = 'Vypíše karmu uživatele'
-    karma_message_brief = 'Zobrazí karmu za zprávu'
-    karma_get_brief = 'Vrátí karma hodnotu emotu'
-    karma_getall_brief = 'Vypíše, které emoty mají hodnotu 1 a -1'
-    karma_give_brief = 'Přidá karmu uživateli'
-    karma_transfer_brief = 'Převede karmu z jednoho uživatele na druhého'
-    karma_vote_brief = 'Odstartuje hlasování o hodnotě zatím neohodnoceného emotu'
-    karma_revote_brief = 'Odstartuje hlasování o nové hodnotě emotu'
-    karma_leaderboard_brief = 'Karma leaderboard'
-    karma_bajkarboard_brief = 'Karma leaderboard reversed'
-    karma_givingboard_brief = 'Leaderboard rozdávání pozitivní karmy'
-    karma_ishaboard_brief = 'Leaderboard rozdávání negativní karmy'
+    karma_brief = "Vypíše stav vaší karmy (vč. rozdané a odebrané)"
+    karma_stalk_brief = "Vypíše karmu uživatele"
+    karma_message_brief = "Zobrazí karmu za zprávu"
+    karma_get_brief = "Vrátí karma hodnotu emotu"
+    karma_getall_brief = "Vypíše, které emoty mají hodnotu 1 a -1"
+    karma_give_brief = "Přidá karmu uživateli"
+    karma_transfer_brief = "Převede karmu z jednoho uživatele na druhého"
+    karma_vote_brief = "Odstartuje hlasování o hodnotě zatím neohodnoceného emotu"
+    karma_revote_brief = "Odstartuje hlasování o nové hodnotě emotu"
+    karma_leaderboard_brief = "Karma leaderboard"
+    karma_bajkarboard_brief = "Karma leaderboard reversed"
+    karma_givingboard_brief = "Leaderboard rozdávání pozitivní karmy"
+    karma_ishaboard_brief = "Leaderboard rozdávání negativní karmy"
 
     karma_invalid_command = "Neznámý karma příkaz."
     karma_vote_message_hack = "Hlasování o karma ohodnocení emotu"
@@ -119,8 +114,8 @@ class Messages:
     role_not_on_server = "Nepíšeš na serveru, takže předpokládám, že myslíš role VUT FIT serveru."
     role_not_role = "{user}, {not_role} není role."
     role_invalid_emote = "{user}, {not_emote} pro roli {role} není emote."
-    role_channel_copy_brief = 'Zkopíruje opravnění z jednoho kanálu na druhý'
-    role_channel_clone_brief = 'Naklonuje kanál'
+    role_channel_copy_brief = "Zkopíruje opravnění z jednoho kanálu na druhý"
+    role_channel_clone_brief = "Naklonuje kanál"
     role_channel_create_brief = "Vytvoří privátní text kanál pro uživatele z konkrétní role."
 
     role_create_start = "Migrace oprávnění na roli pro **{role}**"
@@ -218,11 +213,12 @@ class Messages:
     vote_result_multiple = "V hlasování „{question}“ vyhrály možnosti {winning_emojis} s {votes} hlasy."
     vote_result_none = "V hlasování „{question}“ nikdo nehlasoval. <:sadcat:576171980118687754>"
 
-    review_add_brief = 'Přidá recenzi na předmět'
-    review_get_brief = 'Vypíše recenze na vybraný předmět'
-    review_remove_brief = 'Odstraní hodnocení'
-    review_list_brief = 'Vypíše předměty, které si již ohodnotil'
-    subject_update_biref = 'Automaticky vyhledá a přidá předměty do reviews i subject databáze'
+    # REVIEW
+    review_add_brief = "Přidá recenzi na předmět. Pokud jsi již recenzi na předmět napsal, bude nahrazena novou."
+    review_get_brief = "Vypíše recenze na vybraný předmět"
+    review_remove_brief = "Odstraní hodnocení"
+    review_list_brief = "Vypíše předměty, které si již ohodnotil"
+    review_id_brief = "ID recenze, pouze pro administrátory"
 
     review_wrong_subject = "Nesprávná zkratka předmětu."
     review_tier = "Tier je z rozsahu 0-4, kde 0 je nejlepší."
@@ -231,6 +227,12 @@ class Messages:
                             "Pro odstranění hlasu je možné použit 🛑.\n" \
                             "Použijte reakce ◀️ a ▶️ pro navigaci mezi recenzemi.\n" \
                             "Pro navigaci v textu delších recenzí použijte 🔼 a 🔽.\n"
+    review_vote_own = "Nemůžeš hlasovat pro vlastní recenzi"
+    review_remove_success = "Hodnocení předmětu bylo odebráno."
+    review_not_found = "Hodnocení předmětu nebylo nalezeno."
+    review_remove_denied = "{user}, `id` je pouze pro administrátory. Pro smazání použij jen `subject`."
+    review_add_denied = "{user}, na přidání hodnocení předmětu nemáš právo."
+    review_not_on_server = "{user}, na použití tohoto příkazu musíš být na FITwide serveru."
 
     # review modal
     review_modal_title = "Přidat novou recenzi"
@@ -239,17 +241,13 @@ class Messages:
     review_signed_label = "Zobrazit nick"
     review_tier_placeholder = "Hodnocení předmětu"
     review_tier_0_desc = "Nejlepší, jednoduchý, naučí"
-    review_tier_1_desc = "Naučí, ale treba zapracovať"
-    review_tier_2_desc = "Priemerný predmet"
-    review_tier_3_desc = "Nič moc"
+    review_tier_1_desc = "Naučí, ale je třeba zapracovat"
+    review_tier_2_desc = "Průměrný předmět"
+    review_tier_3_desc = "Nic moc"
     review_tier_4_desc = "Nejhorší, celé zle"
     review_text_label = "Text recenze"
 
-    review_vote_own = "Nemůžeš hlasovat pro vlastní recenzi"
-    review_remove_success = "Hodnocení předmětu bylo odebráno."
-    review_remove_error = "Hodnocení předmětu nebylo nalezeno."
-    review_add_denied = "{user}, na přidání hodnocení předmětu nemáš právo."
-    review_not_on_server = "{user}, na použití tohto příkazu musíš být na FITwide serveru."
+    subject_update_biref = "Automaticky vyhledá a přidá předměty do reviews i subject databáze"
     subject_format = f"{prefix}subject [update]"
     subject_update_error = "Aktualizace se nezdařila pro <{url}>\n"
     subject_update_success = "Předměty byly aktualizovány."
@@ -262,6 +260,7 @@ class Messages:
                 "<:wuuut:484470874003472394>",
                 "nech mě <:sadcat:576171980118687754>"]
 
+    # NAMEDAY
     name_day_cz = "Dnes má svátek {name}"
     name_day_cz_brief = "Vypíše, kdo má dnes svátek"
     name_day_sk = "Dnes má meniny {name}"
@@ -273,6 +272,7 @@ class Messages:
     repost_content = "Pokud je obrázek repost, dej mu ♻️.\nJestli není, klikni tady na ❎ "\
                      "a při {limit} takových reakcích se toho upozornění smaže."
 
+    # ABSOLVENT
     absolvent_wrong_diploma_format = "Chybný formát čísla diplomu! Př: 123456/2019"
     absolvent_wrong_name = "Nepovedla se ověřit shoda zadaného jména s tvým předchozím záznamem o studiu na FIT VUT."
     absolvent_thesis_not_found_error = "Práce dle zadaného ID nebyla na webu nalezena."
@@ -288,9 +288,13 @@ class Messages:
         "(při <https://dspace.vutbr.cz/handle/11012/99999>)\n" \
         "Údaje slouží k jednorázovému ověření a nejsou nikam ukládány."
 
+    # INFO
     urban_brief = "Vyhledávaní výrazu v urban slovníku"
     urban_help = f"`{prefix}urban výraz`\nPříklad:\n`{prefix}urban sure`"
     urban_not_found = "Pro daný výraz neexistuje záznam <:sadcat:576171980118687754>"
+
+    weather_brief = "Vypíše informace o počasí ve zvoleném městě. Výchozí město je Brno."
+
 
     autopin_max_pins_error = "Byl dosažen maximální počet připnutých zpráv."
     autopin_add_brief = "Začne sledovat zprávu jako prioritní pin.\n"
@@ -307,15 +311,21 @@ class Messages:
 
     on_ready_message = "<:peepowave:693070888546861096>"
 
-    git_pull_brief = 'Stáhne aktuálni změny z repa'
+    # SYSTEM
+    shutdown_brief = "Vypne bota"
+    git_pull_brief = "Stáhne aktuálni změny z repa"
 
-    cogs_brief = 'Vypíše seznam všech cogs a jejich stav'
-    cog_is_loaded = 'Toto rozšíření `{cog}` je již načtené.'
-    cog_unloaded = 'Rozšíření `{cog}` odebráno.'
-    cog_loaded = 'Rozšíření `{cog}` načteno.'
-    cog_is_unloaded = 'Toto rozšíření `{cog}` není načteno'
-    cog_not_unloadable = 'Toto rozšíření `{cog}` je neodebratelné.'
-    cog_reloaded = 'Rozšíření `{cog}` bylo načteno znovu.'
+    uptime_brief = "Vypíše čas spuštění a čas uplynulý od spuštění"
+    uptime_title = "Uptime"
+    upsince_title = "Up since"
+
+    cogs_brief = "Vypíše seznam všech cogs a jejich stav"
+    cog_is_loaded = "Toto rozšíření `{cog}` je již načtené."
+    cog_unloaded = "Rozšíření `{cog}` odebráno."
+    cog_loaded = "Rozšíření `{cog}` načteno."
+    cog_is_unloaded = "Toto rozšíření `{cog}` není načteno"
+    cog_not_unloadable = "Toto rozšíření `{cog}` je neodebratelné."
+    cog_reloaded = "Rozšíření `{cog}` bylo načteno znovu."
 
     config_backup_brief = "Vytvoří záložní kopii konfigurace v novém souboru"
     config_get_brief = "Získa hodnotu z konfigurace"
@@ -323,15 +333,15 @@ class Messages:
     config_append_brief = "Přidá hodnotu do pole v konfiguraci"
     config_load_brief = "Znovu načíta třídu ze souboru. Pro aplikováni změn je potřeba znovu načíst i cog"
     config_list_brief = "Vypíše klíče konfigurace"
-    config_updated = 'Config updated'
-    config_loaded = 'Config loaded'
-    config_wrong_key = 'Nesprávny klíč'
-    config_wrong_type = 'Nesprávny typ'
-    config_backup_created = 'Config backup created'
-    config_append_format = f'{prefix}config append [key] hodnota/y'
-    config_list_invalid_regex = 'Chybný regex\n`{regex_err}`'
-    config_sync_template_brief = 'Synchronizuje config s template, přidá chybějíci klíče'
-    config_synced = 'Config byl synchronizován'
+    config_updated = "Config updated"
+    config_loaded = "Config loaded"
+    config_wrong_key = "Nesprávny klíč"
+    config_wrong_type = "Nesprávny typ"
+    config_backup_created = "Config backup created"
+    config_append_format = f"{prefix}config append [key] hodnota/y"
+    config_list_invalid_regex = "Chybný regex\n`{regex_err}`"
+    config_sync_template_brief = "Synchronizuje config s template, přidá chybějíci klíče"
+    config_synced = "Config byl synchronizován"
 
     channel_copy_start = "Probíhá kopírování kanálu"
     channel_copy_done = "Práva byla zkopírována."
@@ -342,8 +352,6 @@ class Messages:
     channel_create_rate = "Po kolika perms updatovat progress bar."
 
     warden_scan_brief = "Prohledá obrázky v aktuálním kanále a uloží je jako hash pro detekci repostu.\nlimit: [all | <int>]"
-
-    weather_brief = "Vypíše informace o počasí ve zvoleném městě. Výchozí město je Brno."
 
     week_brief = "Vypíše, kolikátý je zrovna týden a jestli je sudý nebo lichý"
     week_warning = "Pro sudý/lichý se využívá kalendářní týden"

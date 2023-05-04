@@ -103,11 +103,11 @@ class Error(Base, commands.Cog):
             or isinstance(error, permission_check.NotModPlusError)
             or isinstance(error, permission_check.NotAdminError)
         ):
-            await inter.response.send_message(error.message, ephemeral=True)
+            await inter.send(error.message, ephemeral=True)
             return
 
         if isinstance(error, commands.errors.CheckFailure):
-            await inter.response.send_message(
+            await inter.send(
                 utils.fill_message("missing_perms", user=inter.author.id),
                 ephemeral=True
             )
@@ -118,11 +118,11 @@ class Error(Base, commands.Cog):
             return
 
         if isinstance(error, disnake.InteractionTimedOut):
-            await inter.response.send_message(Messages.command_timed_out)
+            await inter.send(Messages.command_timed_out)
             return
 
         if isinstance(error, commands.CommandOnCooldown):
-            await inter.response.send_message(
+            await inter.send(
                 utils.fill_message("spamming", user=inter.author.id, time=error.retry_after)
             )
             return
@@ -155,13 +155,13 @@ class Error(Base, commands.Cog):
             or isinstance(error, permission_check.NotModPlusError)
             or isinstance(error, permission_check.NotAdminError)
         ):
-            await inter.response.send_message(error.message)
+            await inter.send(error.message)
             return
         if isinstance(error, commands.errors.CheckFailure):
-            await inter.response.send_message(utils.fill_message("missing_perms", user=inter.author.id))
+            await inter.send(utils.fill_message("missing_perms", user=inter.author.id))
             return
         if isinstance(error, commands.errors.MemberNotFound):
-            await inter.response.send_message(utils.fill_message("member_not_found", user=inter.author.id))
+            await inter.send(utils.fill_message("member_not_found", user=inter.author.id))
             return
 
         embed = self.logger.create_embed(
@@ -186,10 +186,10 @@ class Error(Base, commands.Cog):
             or isinstance(error, permission_check.NotModPlusError)
             or isinstance(error, permission_check.NotAdminError)
         ):
-            await inter.response.send_message(error.message)
+            await inter.send(error.message)
             return
         if isinstance(error, commands.errors.CheckFailure):
-            await inter.response.send_message(utils.fill_message("missing_perms", user=inter.author.id))
+            await inter.send(utils.fill_message("missing_perms", user=inter.author.id))
             return
 
         embed = self.logger.create_embed(
