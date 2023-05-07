@@ -2,6 +2,7 @@ from config.app_config import config
 
 
 class Messages:
+    # GENERAL MESSAGES
     prefix = config.default_prefix
 
     server_warning = "Tohle funguje jen na VUT FIT serveru."
@@ -14,6 +15,9 @@ class Messages:
     no_such_command = "Takový příkaz neznám. <:sadcat:576171980118687754>"
     command_timed_out = "Příkaz nereagoval a byl nečekaně ukončen."
     spamming = "{user} Nespamuj tolik <:sadcat:576171980118687754>, příkaz můžeš použít až za {time:.2f}s."
+    member_not_found = "{member} Nikoho takového jsem na serveru nenašel."
+    user_not_found = "{user} Nikoho takového jsem nenašel."
+    help_command_not_found = "Žádný příkaz jako `{command}` neexistuje."
 
     # PERMISSIONS
     missing_perms = "{user}, na použití tohoto příkazu nemáš právo."
@@ -93,7 +97,6 @@ class Messages:
     karma_give_success = "Uživateli {user} bylo úspěšně přidáno **{karma} karmy**."
     karma_give_negative_success = "Uživateli {user} bylo úspěšně odebráno **{karma} karmy**."
     karma_message_format = "Musíš zadat url zprávy"
-    member_not_found = "{user} Nikoho takového jsem nenašel."
     karma_leaderboard_offset_error = "{user} Špatný offset, zadej kladné číslo"
     karma_web_title = "Celý leaderboard"
     karma_web = "https://karma.grillbot.cloud/"

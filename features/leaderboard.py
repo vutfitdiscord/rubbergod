@@ -171,15 +171,17 @@ class LeaderboardPageSource(DatabaseIteratorPageSource):
         Returns page number for given position in query.
         """
         last_page = self.get_max_pages()
+        page_num = start//self.per_page
 
-        # add 1 to prevent overflow to next page
-        page_num = start//(self.per_page+1)
+        # if it's last element on page we need to subtract 1 from page_num
+        if start % self.per_page == 0:
+            page_num -= 1
 
         # if page is out of range, set it to last page
-        if page_num > last_page:
+        if page_num >= last_page:
             page_num = last_page - 1
 
-        # if page is negative, set it to 0, happens with empty leaderboard
+        # if page is negative, set it to 0, happens with empty board
         if page_num < 0:
             page_num = 0
 
