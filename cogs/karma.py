@@ -290,8 +290,8 @@ class Karma(Base, commands.Cog):
         order_karma = karma_column.desc() if direction == "descending" else karma_column.asc()
         query = karma_r.leaderboard_query(order_karma)
         formatter = self._positive_formatter if karma == "positive" else self._negative_formatter
-        title = "KARMA GIVINGBOARD" if not karma else "KARMA NEGATIVE GIVINGBOARD"
-        emote = "peepolove" if not karma else "gasbutton"
+        title = "KARMA GIVINGBOARD" if karma == "positive" else "KARMA NEGATIVE GIVINGBOARD"
+        emote = "peepolove" if karma == "positive" else "gasbutton"
 
         page_source = LeaderboardPageSource(
             bot=self.bot,
