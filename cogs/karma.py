@@ -230,14 +230,26 @@ class Karma(Base, commands.Cog):
 
     @cooldowns.long_cooldown
     @_karma.sub_command(name="leaderboard", description=Messages.karma_leaderboard_brief)
-    async def leaderboard(self, inter: disnake.ApplicationCommandInteraction, start: int = 1):
+    async def leaderboard(
+        self,
+        inter: disnake.ApplicationCommandInteraction,
+        direction: str = commands.Param(default="descending", choices=["ascending", "descending"]),
+        start: int = commands.Param(default=1, gt=0, lt=100000000, description=Messages.karma_board_start)
+    ):
         """
         Get karma leaderboard
         """
         await inter.response.defer(ephemeral=self.check.botroom_check(inter))
 
-        if not await self.validate_leaderboard_offset(start, inter):
-            return
+        if direction == "descending":
+            query = karma_r.leaderboard_query(Database_karma.karma.desc())
+            title = "KARMA LEADERBOARD"
+            emote = "trophy"
+        else:
+            query = karma_r.leaderboard_query(Database_karma.karma.asc())
+            title = "KARMA LEADERBOARD REVERSED"
+            emote = "coolStoryBob"
+
         embed = disnake.Embed()
         value_num = math.ceil(start / config.karma_grillbot_leaderboard_size)
         value = Messages.karma_web if value_num == 1 else f"{Messages.karma_web}{value_num}"
@@ -245,14 +257,15 @@ class Karma(Base, commands.Cog):
         page_source = LeaderboardPageSource(
             bot=self.bot,
             author=inter.author,
-            query=karma_r.leaderboard_query(Database_karma.karma.desc()),
+            query=query,
             row_formatter=self._leaderboard_formatter,
             base_embed=embed,
-            title='KARMA LEADERBOARD',
-            emote_name='trophy',
-            member_id_col_name='member_ID',
+            title=title,
+            emote_name=emote,
+            member_id_col_name="member_ID",
         )
-        page_num = math.floor(start/page_source.per_page)
+
+        page_num = page_source.get_page_number(start)
         page = page_source.get_page(page_num)
         embed = page_source.format_page(page)
 
@@ -260,86 +273,39 @@ class Karma(Base, commands.Cog):
         await inter.edit_original_response(embed=embed, view=view)
         view.message = await inter.original_message()
 
-    @cooldowns.long_cooldown
-    @_karma.sub_command(name="bajkarboard", description=Messages.karma_bajkarboard_brief)
-    async def bajkarboard(self, inter: disnake.ApplicationCommandInteraction, start: int = 1):
-        """
-        Leaderboard, but reversed (lowest first)
-        """
-        await inter.response.defer(ephemeral=self.check.botroom_check(inter))
-
-        if not await self.validate_leaderboard_offset(start, inter):
-            return
-
-        page_source = LeaderboardPageSource(
-            bot=self.bot,
-            author=inter.author,
-            query=karma_r.leaderboard_query(Database_karma.karma),
-            row_formatter=self._leaderboard_formatter,
-            title='KARMA BAJKARBOARD',
-            emote_name='coolStoryBob',
-            member_id_col_name='member_ID',
-        )
-        page_num = math.floor(start/page_source.per_page)
-        page = page_source.get_page(page_num)
-        embed = page_source.format_page(page)
-
-        view = EmbedView(inter.author, embeds=[embed], page_source=page_source)
-        await inter.edit_original_response(embed=embed, view=view)
-        view.message = await inter.original_message()
-
-    @cooldowns.long_cooldown
     @_karma.sub_command(name="givingboard", description=Messages.karma_givingboard_brief)
-    async def givingboard(self, inter: disnake.ApplicationCommandInteraction, start: int = 1):
+    async def givingboard(
+        self,
+        inter: disnake.ApplicationCommandInteraction,
+        karma: str = commands.Param(default="positive", choices=["positive", "negative"]),
+        direction: str = commands.Param(default="descending", choices=["ascending", "descending"]),
+        start: int = commands.Param(default=1, gt=0, lt=100000000, description=Messages.karma_board_start)
+    ):
         """
-        Get the biggest karma givers
+        Get the biggest positive/negative karma givers
         """
         await inter.response.defer(ephemeral=self.check.botroom_check(inter))
 
-        if not await self.validate_leaderboard_offset(start, inter):
-            return
+        karma_column = Database_karma.positive if karma == "positive" else Database_karma.negative
+        order_karma = karma_column.desc() if direction == "descending" else karma_column.asc()
+        query = karma_r.leaderboard_query(order_karma)
+        formatter = self._positive_formatter if karma == "positive" else self._negative_formatter
+        title = "KARMA GIVINGBOARD" if not karma else "KARMA NEGATIVE GIVINGBOARD"
+        emote = "peepolove" if not karma else "gasbutton"
 
         page_source = LeaderboardPageSource(
             bot=self.bot,
             author=inter.author,
-            query=karma_r.leaderboard_query(Database_karma.positive.desc()),
-            row_formatter=self._positive_formatter,
-            title='KARMA GIVINGBOARD',
-            emote_name='peepolove',
-            member_id_col_name='member_ID',
+            query=query,
+            row_formatter=formatter,
+            title=title,
+            emote_name=emote,
+            member_id_col_name="member_ID",
         )
-        page_num = math.floor(start/page_source.per_page)
+
+        page_num = page_source.get_page_number(start)
         page = page_source.get_page(page_num)
         embed = page_source.format_page(page)
-
-        view = EmbedView(inter.author, embeds=[embed], page_source=page_source)
-        await inter.edit_original_response(embed=embed, view=view)
-        view.message = await inter.original_message()
-
-    @cooldowns.long_cooldown
-    @_karma.sub_command(name="ishaboard", description=Messages.karma_ishaboard_brief)
-    async def ishaboard(self, inter: disnake.ApplicationCommandInteraction, start: int = 1):
-        """
-        Get the biggest haters (those who given others the most of negative karma)
-        """
-        await inter.response.defer(ephemeral=self.check.botroom_check(inter))
-
-        if not await self.validate_leaderboard_offset(start, inter):
-            return
-
-        page_source = LeaderboardPageSource(
-            bot=self.bot,
-            author=inter.author,
-            query=karma_r.leaderboard_query(Database_karma.negative.desc()),
-            row_formatter=self._negative_formatter,
-            title='KARMA ISHABOARD',
-            emote_name='<:ishagrin:638277508651024394>',
-            member_id_col_name='member_ID',
-        )
-        page_num = math.floor(start/page_source.per_page)
-        page = page_source.get_page(page_num)
-        embed = page_source.format_page(page)
-
         view = EmbedView(inter.author, embeds=[embed], page_source=page_source)
         await inter.edit_original_response(embed=embed, view=view)
         view.message = await inter.original_message()
@@ -362,17 +328,6 @@ class Karma(Base, commands.Cog):
         if isinstance(error, commands.NoPrivateMessage):
             await inter.reply(Messages.server_warning)
             return True
-
-    async def validate_leaderboard_offset(self, offset: int, inter) -> bool:
-        if not 0 < offset < 100000000:  # Any value larger than the server
-            # user cnt and lower than 32bit
-            # int max will do
-            await inter.response.send_message(
-                utils.fill_message("karma_leaderboard_offset_error", user=inter.author.id)
-            )
-            return False
-
-        return True
 
 
 def setup(bot):

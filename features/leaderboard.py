@@ -165,3 +165,22 @@ class LeaderboardPageSource(DatabaseIteratorPageSource):
         )
 
         return self.base_embed
+
+    def get_page_number(self, start) -> int:
+        """
+        Returns page number for given position in query.
+        """
+        last_page = self.get_max_pages()
+
+        # add 1 to prevent overflow to next page
+        page_num = start//(self.per_page+1)
+
+        # if page is out of range, set it to last page
+        if page_num > last_page:
+            page_num = last_page - 1
+
+        # if page is negative, set it to 0, happens with empty leaderboard
+        if page_num < 0:
+            page_num = 0
+
+        return page_num

@@ -189,9 +189,7 @@ Cog implementing karma system. Users can give each other positive/negative karma
     - /karma get
     - /karma message
     - /karma leaderboard
-    - /karma bajkarboard
     - /karma givingboard
-    - /karma ishaboard
     - /karma_mod revote
     - /karma_mod vote
     - /karma_mod give

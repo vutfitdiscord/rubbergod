@@ -241,10 +241,18 @@ class Karma(BaseFeature):
             members_update = self.repo.update_karma(member.id, inter.author.id, karma)
             await self.grillbot_api.post_karma_store(members_update)
         if karma >= 0:
-            await inter.send(Messages.karma_give_success)
+            await inter.send(
+                Messages.karma_give_success.format(
+                    user=" ".join([member.mention for member in members]),
+                    karma=karma
+                )
+            )
         else:
             await inter.send(
-                Messages.karma_give_negative_success
+                Messages.karma_give_negative_success.format(
+                    user=" ".join([member.mention for member in members]),
+                    karma=karma
+                )
             )
 
     async def karma_transfer(self, inter, from_user, to_user):
