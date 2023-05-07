@@ -3,7 +3,6 @@ Cog for handling memes with X number of reactions to be reposted to a specific c
 """
 
 import asyncio
-import math
 from typing import List, Union
 
 import disnake
@@ -217,8 +216,8 @@ class MemeRepost(Base, commands.Cog):
     async def leaderboard(
         self,
         inter: disnake.ApplicationCommandInteraction,
-        start: int = 1,
         order_by: str = commands.Param(name='order_by', choices=["total_karma", "posts"], default="posts"),
+        start: int = commands.Param(default=1, gt=0, lt=100000000, description=Messages.karma_board_start)
     ):
         await inter.response.defer(ephemeral=self.check.botroom_check(inter))
 
@@ -233,7 +232,7 @@ class MemeRepost(Base, commands.Cog):
             emote_name='trophy',
             member_id_col_name='member_ID',
         )
-        page_num = math.floor(start/page_source.per_page)
+        page_num = page_source.get_page_number(start)
         page = page_source.get_page(page_num)
         embed = page_source.format_page(page)
 

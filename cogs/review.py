@@ -76,7 +76,7 @@ class Review(Base, commands.Cog):
         """Group of commands for reviews."""
         await inter.response.defer()
 
-    @reviews.sub_command(name='get', description=Messages.review_get_brief)
+    @reviews.sub_command(name="get", description=Messages.review_get_brief)
     async def get(
         self,
         inter: disnake.ApplicationCommandInteraction,
@@ -91,7 +91,7 @@ class Review(Base, commands.Cog):
         await inter.edit_original_response(embed=embeds[0], view=view)
         view.message = await inter.original_message()
 
-    @reviews.sub_command(name='add', description=Messages.review_add_brief)
+    @reviews.sub_command(name="add", description=Messages.review_add_brief)
     async def add(
         self,
         inter: disnake.ApplicationCommandInteraction,
@@ -113,7 +113,7 @@ class Review(Base, commands.Cog):
         else:
             await inter.send(Messages.review_added)
 
-    @reviews.sub_command(name='remove', description=Messages.review_remove_brief)
+    @reviews.sub_command(name="remove", description=Messages.review_remove_brief)
     async def remove(
         self,
         inter: disnake.ApplicationCommandInteraction,
@@ -121,14 +121,19 @@ class Review(Base, commands.Cog):
         id: int = commands.Param(default=None, description=Messages.review_id_brief)
     ):
         """Remove review from DB. User is just allowed to remove his own review
-        For admin it is possible to use 'id' as subject shortcut and delete review by its ID
+        For admin it is possible to use "id" as subject shortcut and delete review by its ID
         """
-        error_message = utils.fill_message("review_remove_denied", user=inter.author.id)
         if id is not None:
-            if permission_check.is_bot_admin(inter, error_message):
+            if permission_check.is_bot_admin(inter, False):
                 self.repo.remove(id)
                 await inter.send(Messages.review_remove_success)
                 return
+
+            # not admin
+            return await inter.send(
+                utils.fill_message("review_remove_denied", user=inter.author.id),
+                ephemeral=True
+            )
         elif subject is not None:
             subject = subject.lower()
             if self.manager.remove(str(inter.author.id), subject):
@@ -136,7 +141,7 @@ class Review(Base, commands.Cog):
                 return
         await inter.send(Messages.review_not_found)
 
-    @reviews.sub_command(name='list', description=Messages.review_list_brief)
+    @reviews.sub_command(name="list", description=Messages.review_list_brief)
     async def author_list(self, inter: disnake.ApplicationCommandInteraction):
         embed = self.manager.authored_reviews(inter.author.id)
         await inter.send(embed=embed)
@@ -234,10 +239,10 @@ class Review(Base, commands.Cog):
     async def tierboard(
         self,
         inter: disnake.ApplicationCommandInteraction,
-        type: str = commands.Param(name='typ', choices=['P', 'PVT', 'PVA', 'V']),
-        sem: str = commands.Param(name='semestr', choices=['Z', 'L']),
+        type: str = commands.Param(name="typ", choices=["P", "PVT", "PVA", "V"]),
+        sem: str = commands.Param(name="semestr", choices=["Z", "L"]),
         year: str = commands.Param(
-            name='rocnik', choices=["1BIT", "2BIT", "3BIT", "1MIT", "2MIT"], default=''
+            name="rocnik", choices=["1BIT", "2BIT", "3BIT", "1MIT", "2MIT"], default=""
         )
     ):
         """Board of suject based on average tier from reviews"""
