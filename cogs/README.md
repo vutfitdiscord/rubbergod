@@ -107,6 +107,12 @@ Cog implementing management of year roles and database of user logins.\
     - ?connect_login_to_user
 ---
 
+### [Forum](forum.py)
+
+Cog managing threads in forums (auto-archive, etc.).
+
+---
+
 ### [Fun](fun.py)
 
 Cog containing commands that call random APIs for fun things.\
