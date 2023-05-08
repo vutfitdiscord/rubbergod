@@ -20,7 +20,7 @@ class Forum(Base, commands.Cog):
             return
 
         # can't edit archived threads
-        if before.archived:
+        if before.archived or after.archived:
             return
 
         before_tags = [tag.name.lower() for tag in before.applied_tags]
