@@ -118,9 +118,6 @@ class Config:
     hug_emojis: List[str] = get_attr(toml_dict, "meme", "hug_emojis")
     covid_channel_id: str = get_attr(toml_dict, "meme", "covid_channel_id")
 
-    # Arcas
-    arcas_id: int = get_attr(toml_dict, "meme", "arcas_id")
-    arcas_delay: int = get_attr(toml_dict, "meme", "arcas_delay")  # Value is in hours
     # uh oh
     uhoh_string: str = get_attr(toml_dict, "meme", "uhoh_string")
 
