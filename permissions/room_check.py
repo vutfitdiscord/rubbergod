@@ -15,6 +15,11 @@ def is_in_modroom(ctx: Union[commands.Context, disnake.ApplicationCommandInterac
     return ctx.channel.id == config.mod_room
 
 
+def is_in_voteroom(ctx: Union[commands.Context, disnake.ApplicationCommandInteraction]):
+    """Check if the command is invoked in voteroom"""
+    return ctx.channel.id == config.vote_room
+
+
 class RoomCheck:
     def __init__(self, bot):
         self.bot = bot

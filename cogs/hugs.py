@@ -214,13 +214,6 @@ class Hugs(Base, commands.Cog):
 
         await inter.send(f"{config.hug_emojis[intensity]} **{user_str}**")
 
-    @stats.error
-    @give.error
-    async def hug_error(self, inter, error):
-        if isinstance(error, commands.BadArgument):
-            await inter.send(utils.fill_message("member_not_found", user=inter.author.id))
-            return True
-
 
 def setup(bot):
     bot.add_cog(Hugs(bot))

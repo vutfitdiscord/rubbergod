@@ -414,19 +414,6 @@ class Roles(Base, commands.Cog):
                     await self.remove_perms(line[0], ctx.member, ctx.guild)
                     break
 
-    @copy.error
-    @clone.error
-    async def error(self, ctx, error):
-        """Print help on missing argument"""
-        if isinstance(error, commands.MissingRequiredArgument):
-            if "copy" in ctx.invoked_subcommand.name:
-                await ctx.send(Messages.channel_copy_help)
-            elif "clone" in ctx.invoked_subcommand.name:
-                await ctx.send(Messages.channel_clone_help)
-        else:
-            # channel not found
-            await ctx.send(error)
-
 
 def setup(bot):
     bot.add_cog(Roles(bot))

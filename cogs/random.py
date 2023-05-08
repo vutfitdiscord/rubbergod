@@ -8,10 +8,8 @@ import shlex
 import disnake
 from disnake.ext import commands
 
-import utils
 from cogs.base import Base
 from config import cooldowns
-from config.app_config import config
 from config.messages import Messages
 from permissions import room_check
 
@@ -66,32 +64,6 @@ class Random(Base, commands.Cog):
 
         option = str(random.randint(first, second))
         await inter.response.send_message(option, ephemeral=self.check.botroom_check(inter))
-
-    @pick.error
-    @roll.error
-    @flip.error
-    async def command_error(self, ctx, error):
-        if isinstance(error, commands.CheckFailure):
-            await ctx.message.channel.send(
-                utils.fill_message("bot_room_redirect", user=ctx.message.author.id, bot_room=config.bot_room)
-            )
-
-    def _channel_id(self, ctx):
-        return ctx.channel.parent_id if type(ctx.channel) == disnake.Thread else ctx.channel.id
-
-    async def cog_after_invoke(self, ctx):
-        channel_id = self._channel_id(ctx)
-        if channel_id not in config.allowed_channels:
-            await ctx.message.channel.send(
-                utils.fill_message("bot_room_redirect", user=ctx.message.author.id, bot_room=config.bot_room)
-            )
-
-    async def cog_check(self, ctx):
-        if not config.enable_room_check:
-            return True
-        if not ctx.guild:
-            return True
-        return self._channel_id(ctx) in config.allowed_channels
 
 
 def setup(bot):
