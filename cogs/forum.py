@@ -16,7 +16,7 @@ class Forum(Base, commands.Cog):
     @commands.Cog.listener()
     async def on_thread_update(self, before: disnake.Thread, after: disnake.Thread):
         """archive thread in 24 hours of inactivity after it is tagged for archivation"""
-        if before.parent_id != config.advertising_room:
+        if before.parent_id not in config.forum_autoclose_forums:
             return
 
         # can't edit archived threads
@@ -29,12 +29,12 @@ class Forum(Base, commands.Cog):
 
         # removed archivation tag from still active thread - reset archive timer
         if (
-            any(tag in before_tags for tag in config.tags)
-            and not any(tag in after_tags for tag in config.tags)
+            any(tag in before_tags for tag in config.forum_tags)
+            and not any(tag in after_tags for tag in config.forum_tags)
         ):
             return await after.edit(auto_archive_duration=one_day*7)
         # thread tagged for archivation
-        if any(tag in after_tags for tag in config.tags):
+        if any(tag in after_tags for tag in config.forum_tags):
             return await after.edit(auto_archive_duration=one_day)
 
 
