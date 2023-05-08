@@ -1,6 +1,12 @@
 """
 Cog for handling command errors. This is mostly for logging purposes.
-If not command error th error is propagated to rubbergod.py on_error function.
+Errors originating from other then commands (such as reaction handlers and listeners)
+are handled in rubbergod.py `on_error` function.
+
+Listeners catch errors from commands and send a response to the user.
+If an error remains uncaught, the entire traceback is printed to the bot_dev_channel.
+
+CheckFailure must be last in the list of errors, because it is the most generic one.
 """
 
 import traceback
@@ -25,8 +31,6 @@ class Error(Base, commands.Cog):
 
     @commands.Cog.listener()
     async def on_command_error(self, ctx, error):
-        # The local handlers so far only catch bad arguments so we still
-        # want to print the rest
         if isinstance(error, disnake.errors.DiscordServerError):
             return
         if isinstance(error, sqlalchemy.exc.InternalError):
@@ -40,13 +44,10 @@ class Error(Base, commands.Cog):
         ):
             await ctx.send(error.message)
             return
-        if isinstance(error, commands.errors.CheckFailure):
-            await ctx.reply(utils.fill_message("missing_perms", user=ctx.author.id))
-            return
         if (
             isinstance(error, commands.BadArgument)
-            or isinstance(error, commands.errors.MissingAnyRole)
-            or isinstance(error, commands.errors.MissingRequiredArgument)
+            or isinstance(error, commands.MissingAnyRole)
+            or isinstance(error, commands.MissingRequiredArgument)
         ) and hasattr(ctx.command, "on_error"):
             return
 
@@ -54,8 +55,12 @@ class Error(Base, commands.Cog):
             await ctx.send("Chyba ve vstupu, jestli vstup obsahuje `\"` nahraď je za `'`")
             return
 
-        if isinstance(error, commands.errors.MemberNotFound):
-            await ctx.send(utils.fill_message("member_not_found", user=ctx.author.id))
+        if isinstance(error, commands.UserNotFound):
+            await ctx.send(Messages.user_not_found.format(user=ctx.author.mention))
+            return
+
+        if isinstance(error, commands.MemberNotFound):
+            await ctx.send(Messages.member_not_found.format(member=ctx.author.mention))
             return
 
         if isinstance(error, commands.CommandNotFound):
@@ -78,6 +83,10 @@ class Error(Base, commands.Cog):
             await ctx.send(Messages.guild_only)
             return
 
+        if isinstance(error, commands.CheckFailure):
+            await ctx.reply(utils.fill_message("missing_perms", user=ctx.author.id))
+            return
+
         output = "".join(traceback.format_exception(type(error), error, error.__traceback__))
         embed = self.logger.create_embed(
             ctx.command,
@@ -97,24 +106,25 @@ class Error(Base, commands.Cog):
         if isinstance(error, disnake.errors.DiscordServerError):
             return
 
+        if isinstance(error, sqlalchemy.exc.InternalError):
+            session.rollback()
+            return
+
         if (
             isinstance(error, permission_check.NotHelperPlusError)
             or isinstance(error, permission_check.NotSubmodPlusError)
             or isinstance(error, permission_check.NotModPlusError)
             or isinstance(error, permission_check.NotAdminError)
         ):
-            await inter.send(error.message, ephemeral=True)
+            await inter.send(error.message)
             return
 
-        if isinstance(error, commands.errors.CheckFailure):
-            await inter.send(
-                utils.fill_message("missing_perms", user=inter.author.id),
-                ephemeral=True
-            )
+        if isinstance(error, commands.UserNotFound):
+            await inter.send(Messages.user_not_found.format(user=inter.author.mention))
             return
 
-        if isinstance(error, sqlalchemy.exc.InternalError):
-            session.rollback()
+        if isinstance(error, commands.MemberNotFound):
+            await inter.send(Messages.member_not_found.format(member=inter.author.mention))
             return
 
         if isinstance(error, disnake.InteractionTimedOut):
@@ -124,6 +134,17 @@ class Error(Base, commands.Cog):
         if isinstance(error, commands.CommandOnCooldown):
             await inter.send(
                 utils.fill_message("spamming", user=inter.author.id, time=error.retry_after)
+            )
+            return
+
+        if isinstance(error, commands.NoPrivateMessage):
+            await inter.send(Messages.guild_only)
+            return
+
+        if isinstance(error, commands.CheckFailure):
+            await inter.send(
+                utils.fill_message("missing_perms", user=inter.author.id),
+                ephemeral=True
             )
             return
 
@@ -157,11 +178,19 @@ class Error(Base, commands.Cog):
         ):
             await inter.send(error.message)
             return
-        if isinstance(error, commands.errors.CheckFailure):
-            await inter.send(utils.fill_message("missing_perms", user=inter.author.id))
+        if isinstance(error, commands.UserNotFound):
+            await inter.send(Messages.user_not_found.format(user=inter.author.mention))
             return
-        if isinstance(error, commands.errors.MemberNotFound):
-            await inter.send(utils.fill_message("member_not_found", user=inter.author.id))
+        if isinstance(error, commands.MemberNotFound):
+            await inter.send(Messages.member_not_found.format(member=inter.author.mention))
+            return
+        if isinstance(error, commands.CommandOnCooldown):
+            await inter.send(
+                utils.fill_message("spamming", user=inter.author.id, time=error.retry_after)
+            )
+            return
+        if isinstance(error, commands.CheckFailure):
+            await inter.send(utils.fill_message("missing_perms", user=inter.author.id))
             return
 
         embed = self.logger.create_embed(
@@ -188,7 +217,12 @@ class Error(Base, commands.Cog):
         ):
             await inter.send(error.message)
             return
-        if isinstance(error, commands.errors.CheckFailure):
+        if isinstance(error, commands.CommandOnCooldown):
+            await inter.send(
+                utils.fill_message("spamming", user=inter.author.id, time=error.retry_after)
+            )
+            return
+        if isinstance(error, commands.CheckFailure):
             await inter.send(utils.fill_message("missing_perms", user=inter.author.id))
             return
 

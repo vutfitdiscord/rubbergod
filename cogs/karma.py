@@ -112,7 +112,6 @@ class Karma(Base, commands.Cog):
     async def _karma(self, inter):
         pass
 
-    @cooldowns.default_cooldown
     @_karma.sub_command(description=Messages.karma_brief)
     async def me(self, inter: disnake.ApplicationCommandInteraction):
         await inter.response.send_message(
@@ -143,7 +142,6 @@ class Karma(Base, commands.Cog):
         )
         await self.karma_helper.emoji_list_all_values(inter, self.check.botroom_check(inter))
 
-    @cooldowns.default_cooldown
     @_karma.sub_command(description=Messages.karma_get_brief)
     async def get(self, inter: disnake.ApplicationCommandInteraction, emoji):
         await self.karma_helper.emoji_get_value(
@@ -152,6 +150,7 @@ class Karma(Base, commands.Cog):
             ephemeral=self.check.botroom_check(inter)
         )
 
+    @cooldowns.long_cooldown
     @commands.message_command(name="Karma zprávy")
     async def message_app(self, inter: disnake.MessageCommandInteraction, message: disnake.Message):
         await self._message(inter, message, ephemeral=self.check.botroom_check(inter))
@@ -172,61 +171,6 @@ class Karma(Base, commands.Cog):
         msg = await inter.original_message()
         if not ephemeral:
             await msg.add_reaction("🔁")
-
-    @cooldowns.default_cooldown
-    @commands.group()
-    @commands.guild_only()
-    async def karma(self, ctx: commands.Context):
-        if not (config.guild_id == ctx.guild.id):
-            return await ctx.reply(Messages.server_warning)
-        if ctx.invoked_subcommand is None:
-            command_id = utils.get_command_id(self, "karma")
-            await ctx.reply(utils.fill_message("moved_command", name="karma", id=command_id))
-
-    @commands.check(permission_check.is_bot_admin)
-    @commands.slash_command(name="karma_mod", description=Messages.karma_brief)
-    async def _karma_mod(self, inter: disnake.ApplicationCommandInteraction):
-        pass
-
-    @_karma_mod.sub_command(name="revote", description=Messages.karma_revote_brief)
-    async def revote(self, inter: disnake.ApplicationCommandInteraction, emoji):
-        await inter.response.defer(ephemeral=True)
-        if inter.channel_id == config.vote_room:
-            await self.karma_helper.emoji_revote_value(inter, emoji)
-        else:
-            dc_vote_room = disnake.utils.get(inter.guild.channels, id=config.vote_room)
-            await inter.send(utils.fill_message("vote_room_only", room=dc_vote_room))
-
-    @_karma_mod.sub_command(name="vote", description=Messages.karma_vote_brief)
-    async def vote(self, inter: disnake.ApplicationCommandInteraction):
-        await inter.response.defer(ephemeral=True)
-        if inter.channel_id == config.vote_room:
-            await self.karma_helper.emoji_vote_value(inter)
-        else:
-            dc_vote_room = disnake.utils.get(inter.guild.channels, id=config.vote_room)
-            await inter.send(utils.fill_message("vote_room_only", room=dc_vote_room))
-
-    @_karma_mod.sub_command(name="give", description=Messages.karma_give_brief)
-    async def give(
-        self,
-        inter: disnake.ApplicationCommandInteraction,
-        users: str,
-        karma: int
-    ):
-        await inter.response.defer()
-        await self.karma_helper.karma_give(inter, users, karma)
-
-    @_karma_mod.sub_command(name="transfer", description=Messages.karma_transfer_brief)
-    async def transfer(
-        self,
-        inter: disnake.ApplicationCommandInteraction,
-        from_user: disnake.Member,
-        to_user: disnake.Member
-    ):
-        await inter.response.defer()
-        if from_user == to_user:
-            return await inter.send(Messages.karma_transfer_same_user)
-        await self.karma_helper.karma_transfer(inter, from_user, to_user)
 
     @cooldowns.long_cooldown
     @_karma.sub_command(name="leaderboard", description=Messages.karma_leaderboard_brief)
@@ -273,6 +217,7 @@ class Karma(Base, commands.Cog):
         await inter.edit_original_response(embed=embed, view=view)
         view.message = await inter.original_message()
 
+    @cooldowns.long_cooldown
     @_karma.sub_command(name="givingboard", description=Messages.karma_givingboard_brief)
     async def givingboard(
         self,
@@ -310,23 +255,61 @@ class Karma(Base, commands.Cog):
         await inter.edit_original_response(embed=embed, view=view)
         view.message = await inter.original_message()
 
+    @commands.check(permission_check.is_bot_admin)
+    @commands.slash_command(name="karma_mod", description=Messages.karma_brief)
+    async def _karma_mod(self, inter: disnake.ApplicationCommandInteraction):
+        pass
+
+    @commands.check(room_check.is_in_voteroom)
+    @_karma_mod.sub_command(name="revote", description=Messages.karma_revote_brief)
+    async def revote(self, inter: disnake.ApplicationCommandInteraction, emoji):
+        """Start a revote of the karma value for emojis."""
+        await inter.response.defer(ephemeral=True)
+        await self.karma_helper.emoji_revote_value(inter, emoji)
+
+    @commands.check(room_check.is_in_voteroom)
+    @_karma_mod.sub_command(name="vote", description=Messages.karma_vote_brief)
+    async def vote(self, inter: disnake.ApplicationCommandInteraction):
+        """Start a vote using emojis without a karma value."""
+        await inter.response.defer(ephemeral=True)
+        await self.karma_helper.emoji_vote_value(inter)
+
+    @_karma_mod.sub_command(name="give", description=Messages.karma_give_brief)
+    async def give(
+        self,
+        inter: disnake.ApplicationCommandInteraction,
+        users: str,
+        karma: int
+    ):
+        await inter.response.defer()
+        await self.karma_helper.karma_give(inter, users, karma)
+
+    @_karma_mod.sub_command(name="transfer", description=Messages.karma_transfer_brief)
+    async def transfer(
+        self,
+        inter: disnake.ApplicationCommandInteraction,
+        from_user: disnake.Member,
+        to_user: disnake.Member
+    ):
+        await inter.response.defer()
+        if from_user == to_user:
+            return await inter.send(Messages.karma_transfer_same_user)
+        await self.karma_helper.karma_transfer(inter, from_user, to_user)
+
+    @cooldowns.default_cooldown
+    @commands.guild_only()
+    async def karma(self, ctx: commands.Context):
+        if not (config.guild_id == ctx.guild.id):
+            return await ctx.reply(Messages.server_warning)
+        command_id = utils.get_command_id(self, "karma")
+        await ctx.reply(utils.fill_message("moved_command", name="karma", id=command_id))
+
     @revote.error
     @vote.error
-    @give.error
-    @transfer.error
-    @stalk.error
-    @message.error
     async def karma_error(self, inter: disnake.ApplicationCommandInteraction, error):
-        if isinstance(error, commands.MessageNotFound):
-            await inter.response.send_message(
-                utils.fill_message("karma_message_format", user=inter.author.id)
-            )
-            return True
-        if isinstance(error, commands.UserNotFound):
-            await inter.send(utils.fill_message("user_not_found", user=inter.author.id))
-            return True
-        if isinstance(error, commands.NoPrivateMessage):
-            await inter.reply(Messages.server_warning)
+        if isinstance(error, commands.CheckFailure):
+            vote_room = self.bot.get_channel(config.vote_room)
+            await inter.send(Messages.vote_room_only.format(room=vote_room.mention))
             return True
 
 
