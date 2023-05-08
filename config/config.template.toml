@@ -29,7 +29,7 @@ db_string = "postgresql://postgres:postgres@db:5432/postgres"
 extensions = ['karma', 'meme', 'memerepost', 'random', 'verify', 'fitwide', 'autopin',
     'help', 'review', 'vote', 'week', 'roles', 'error', 'absolvent', 'pet', 'reactions',
     'streamlinks', 'bookmark', 'subscriptions', 'latex', 'info', 'fun', 'moderation',
-    'timeout']
+    'timeout', 'forum']
 
 [config]
 static = ['config_static', 'toml_dict', 'key', 'weather_token', 'db_string']
@@ -166,3 +166,7 @@ immunity_time = 15
 timeout_time = 10
 chance_all_mute = 5
 chance_random_mute = 25
+
+[forum]
+tags = ["prodáno/uzavřeno"]
+autoclose_forums = [1064946755231297536]
