@@ -182,8 +182,8 @@ class Config:
     timeout_wars_chance_random_mute: int = get_attr(toml_dict, "timeout_wars", "chance_random_mute")
 
     # forum
-    tags: List[str] = get_attr(toml_dict, "forum", "tags")
-    autoclose_forums: List[int] = get_attr(toml_dict, "forum", "autoclose_forums")
+    forum_tags: List[str] = get_attr(toml_dict, "forum", "tags")
+    forum_autoclose_forums: List[int] = get_attr(toml_dict, "forum", "autoclose_forums")
 
 
 config = Config()
