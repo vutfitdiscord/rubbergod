@@ -25,62 +25,61 @@ class AutoPin(Base, commands.Cog):
         self.bot = bot
         self.repo = pin_repo.PinRepository()
 
+    @commands.guild_only()
     @commands.check(permission_check.helper_plus)
-    @commands.group(pass_context=True)
-    async def pin(self, ctx: commands.Context):
-        """
-        Controls auto pin.
-        """
+    @commands.slash_command(name="pin")
+    async def pin(self, inter: disnake.ApplicationCommandInteraction):
+        pass
 
-        if ctx.invoked_subcommand is None:
-            await ctx.send(utils.get_command_group_signature(ctx))
-
-    @pin.command(brief=Messages.autopin_add_brief)
-    async def add(self, ctx: commands.Context, message_url: str):
+    @pin.sub_command(name="add", description=Messages.autopin_add_brief)
+    async def add(self, inter: disnake.ApplicationCommandInteraction, message_url: str):
         try:
             converter = commands.MessageConverter()
-            message: disnake.Message = await converter.convert(ctx, message_url)
+            message: disnake.Message = await converter.convert(inter, message_url)
+
+            if message.is_system():
+                return await inter.send(Messages.autopin_system_message)
 
             if len(await message.channel.pins()) == 50:
-                await ctx.send(Messages.autopin_max_pins_error)
-                return
+                return await inter.send(Messages.autopin_max_pins_error)
 
             self.repo.add_or_update_channel(str(message.channel.id), str(message.id))
 
             if not message.pinned:
                 await message.pin()
 
-            await ctx.send(Messages.autopin_add_done)
-        except commands.errors.BadArgument:
-            await ctx.send(Messages.autopin_add_unknown_message)
-            return
+            await inter.send(Messages.autopin_add_done)
+        except commands.MessageNotFound:
+            return await inter.send(Messages.autopin_add_unknown_message)
 
-    @pin.command(brief=Messages.autopin_remove_brief)
-    async def remove(self, ctx: commands.Context, channel: disnake.TextChannel = None):
+    @pin.sub_command(name="remove", description=Messages.autopin_remove_brief)
+    async def remove(
+        self,
+        inter: disnake.ApplicationCommandInteraction,
+        channel: disnake.TextChannel = None
+    ):
         if channel is None:
-            channel = ctx.channel
+            channel = inter.channel
 
         if self.repo.find_channel_by_id(str(channel.id)) is None:
-            await ctx.send(utils.fill_message("autopin_remove_not_exists", channel_name=channel.name))
+            await inter.send(utils.fill_message("autopin_remove_not_exists", channel_name=channel.mention))
             return
 
         self.repo.remove_channel(str(channel.id))
-        await ctx.send(Messages.autopin_remove_done)
+        await inter.send(Messages.autopin_remove_done)
 
-    @pin.command(aliases=["list"], brief=Messages.autopin_list_brief)
-    async def get_list(self, ctx: commands.Context):
+    @pin.sub_command(name="list", description=Messages.autopin_list_brief)
+    async def get_list(self, inter: disnake.ApplicationCommandInteraction):
         mappings: List[PinMap] = self.repo.get_mappings()
 
-        if len(mappings) == 0:
-            await ctx.send(Messages.autopin_no_messages)
-            return
+        if not mappings:
+            return await inter.send(Messages.autopin_no_messages)
 
         lines: List[str] = []
         for item in mappings:
-
             try:
-                channel: disnake.TextChannel = await self.bot.fetch_channel(int(item.channel_id))
-            except disnake.errors.NotFound:
+                channel: disnake.TextChannel = await self.bot.get_or_fetch_channel(int(item.channel_id))
+            except disnake.NotFound:
                 lines.append(utils.fill_message("autopin_list_unknown_channel", channel_id=item.channel_id))
                 self.repo.remove_channel(str(item.channel_id))
                 continue
@@ -89,53 +88,58 @@ class AutoPin(Base, commands.Cog):
                 message: disnake.Message = await channel.fetch_message(int(item.message_id))
                 jump_url: str = message.jump_url
                 msg: str = utils.fill_message("autopin_list_item", channel=channel.mention, url=jump_url)
-            except disnake.errors.NotFound:
+            except disnake.NotFound:
                 msg: str = utils.fill_message("autopin_list_unknown_message", channel=channel.mention)
             finally:
                 lines.append(msg)
 
         for part in utils.split_to_parts(lines, 10):
-            await ctx.send("\n".join(part))
+            await inter.send("\n".join(part))
 
     @commands.Cog.listener()
-    async def on_guild_channel_pins_update(self, channel: disnake.TextChannel, last_pin):
+    async def on_guild_channel_pins_update(self, channel: disnake.TextChannel, _):
+        """
+        repin priority pin if new pin is added
+        """
         pin_map: PinMap = self.repo.find_channel_by_id(str(channel.id))
 
+        # This channel is not used to check priority pins.
         if pin_map is None:
-            # This channel is not used to check pins.
             return
 
-        pins: List[disnake.Message] = await channel.pins()
+        pins: List[int] = [message.id for message in await channel.pins()]
 
-        if not any(x.id == int(pin_map.message_id) for x in pins):
-            # Mapped pin was removed. Remove from map.
+        # Mapped pin was removed. Remove from map.
+        if not int(pin_map.message_id) in pins:
             self.repo.remove_channel(str(channel.id))
-            print(f"INFO:\tRemoved {channel.id} from PIN mapping. (on_guild_channel_pins_update)")
-        elif pins[0].id != int(pin_map.message_id):
+
+        # check priority pin is first
+        elif pins[0] != int(pin_map.message_id):
             message: disnake.Message = await channel.fetch_message(int(pin_map.message_id))
 
+            # Message doesn't exist. Remove from map.
             if message is None:
-                # Message not exists. Remove from map.
                 self.repo.remove_channel(str(channel.id))
                 return
 
             await message.unpin()
             await message.pin()
-            print(f"INFO:\tMessage: {message.id} was repinned. (on_guild_channel_pins_update)")
 
     @commands.Cog.listener()
     async def on_raw_message_delete(self, payload: disnake.RawMessageDeleteEvent):
+        """
+        if the priority pin is deleted remove it from the map
+        """
         pin_map: PinMap = self.repo.find_channel_by_id(str(payload.channel_id))
 
         if pin_map is None or pin_map.message_id != str(payload.message_id):
             return
 
         self.repo.remove_channel(str(payload.channel_id))
-        print(f"INFO:\tRemoved {pin_map.channel_id} from PIN mapping. (on_raw_message_delete)")
 
     async def handle_reaction(self, ctx):
         """
-        if the message has X or more 'pin' emojis pin the message
+        if the message has X or more 'pushpin' emojis pin the message
         """
         message = ctx.message
         channel = ctx.channel
@@ -147,9 +151,10 @@ class AutoPin(Base, commands.Cog):
                 reaction.emoji == "📌"
                 and reaction.count >= config.autopin_count
                 and not message.pinned
-                and message.type == disnake.MessageType.default
+                and not message.is_system()
                 and message.channel.id not in config.autopin_banned_channels
             ):
+                # prevent spamming max_pins_error message in channel
                 pin_count = await channel.pins()
                 if len(pin_count) == 50:
                     now = datetime.datetime.utcnow()
@@ -159,6 +164,7 @@ class AutoPin(Base, commands.Cog):
                         )
                         self.warning_time = now
                     return
+
                 users = await reaction.users().flatten()
                 await self.log(message, users)
                 await message.pin()
@@ -169,12 +175,14 @@ class AutoPin(Base, commands.Cog):
         """
         Logging message link and users that pinned message
         """
-        embed = disnake.Embed(title="📌 Auto pin message log", color=0xEEE657)
-        user_names = ", ".join([user.name for user in users])
-        message_link = message.jump_url
+        embed = disnake.Embed(title="📌 Auto pin message log", color=disnake.Colour.yellow())
+        user_names = ", ".join([f"{user.mention}({user.name})" for user in users])
         embed.add_field(name="Users", value=user_names if len(user_names) > 0 else "**Missing users**")
-        embed.add_field(name="In channel", value=message.channel)
-        embed.add_field(name="Message", value=message_link, inline=False)
+        embed.add_field(
+            name="Message in channel",
+            value=f"[#{message.channel.name}]({message.jump_url})",
+            inline=False
+        )
         embed.timestamp = datetime.datetime.now(tz=datetime.timezone.utc)
         channel = self.bot.get_channel(config.log_channel)
         await channel.send(embed=embed)
