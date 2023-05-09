@@ -362,3 +362,10 @@ async def get_members_from_tag(guild, tag):
 
 def get_local_zone():
     return datetime.now().astimezone().tzinfo
+
+
+async def get_or_fetch_channel(bot, channel_id) -> disnake.TextChannel:
+    channel: disnake.TextChannel = bot.get_channel(channel_id)
+    if channel is None:
+        channel: disnake.TextChannel = await bot.fetch_channel(channel_id)
+    return channel

@@ -29,7 +29,7 @@ class AutoPin(Base, commands.Cog):
     @commands.check(permission_check.helper_plus)
     @commands.slash_command(name="pin")
     async def pin(self, inter: disnake.ApplicationCommandInteraction):
-        pass
+        await inter.response.defer()
 
     @pin.sub_command(name="add", description=Messages.autopin_add_brief)
     async def add(self, inter: disnake.ApplicationCommandInteraction, message_url: str):
@@ -78,7 +78,7 @@ class AutoPin(Base, commands.Cog):
         lines: List[str] = []
         for item in mappings:
             try:
-                channel: disnake.TextChannel = await self.bot.get_or_fetch_channel(int(item.channel_id))
+                channel = await utils.get_or_fetch_channel(self.bot, int(item.channel_id))
             except disnake.NotFound:
                 lines.append(utils.fill_message("autopin_list_unknown_channel", channel_id=item.channel_id))
                 self.repo.remove_channel(str(item.channel_id))
@@ -86,15 +86,19 @@ class AutoPin(Base, commands.Cog):
 
             try:
                 message: disnake.Message = await channel.fetch_message(int(item.message_id))
-                jump_url: str = message.jump_url
-                msg: str = utils.fill_message("autopin_list_item", channel=channel.mention, url=jump_url)
+                msg: str = utils.fill_message(
+                    "autopin_list_item",
+                    channel=channel.mention,
+                    url=message.jump_url
+                )
             except disnake.NotFound:
                 msg: str = utils.fill_message("autopin_list_unknown_message", channel=channel.mention)
             finally:
                 lines.append(msg)
 
+        await inter.send(Messages.autopin_list_info)
         for part in utils.split_to_parts(lines, 10):
-            await inter.send("\n".join(part))
+            await inter.channel.send("\n".join(part))
 
     @commands.Cog.listener()
     async def on_guild_channel_pins_update(self, channel: disnake.TextChannel, _):
