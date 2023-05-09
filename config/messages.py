@@ -297,7 +297,7 @@ class Messages:
 
     weather_brief = "Vypíše informace o počasí ve zvoleném městě. Výchozí město je Brno."
 
-
+    # AUTOPIN
     autopin_max_pins_error = "Byl dosažen maximální počet připnutých zpráv."
     autopin_add_brief = "Začne sledovat zprávu jako prioritní pin.\n"
     autopin_add_unknown_message = "Očekáváno URL zprávy"
@@ -306,10 +306,11 @@ class Messages:
     autopin_remove_not_exists = "V kanálu {channel_name} není nastavena prioritní zpráva pro piny."
     autopin_remove_done = "Priorita pinu odebrána."
     autopin_no_messages = "Ještě neexistuje žádné mapování."
-    autopin_list_brief = "Zobrazí všechny piny s nastevenou prioritou"
+    autopin_list_brief = "Zobrazí všechny piny s nastavenou prioritou"
     autopin_list_unknown_channel = "> Neznámý kanál ({channel_id})"
     autopin_list_unknown_message = "> {channel} - Neznámá zpráva"
     autopin_list_item = "> {channel} - {url}"
+    autopin_system_message = "Nelze připnout systémovou zprávu."
 
     on_ready_message = "<:peepowave:693070888546861096>"
 

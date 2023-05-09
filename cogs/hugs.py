@@ -39,7 +39,7 @@ class Hugs(Base, commands.Cog):
         self._tophuggers_formatter = make_pts_column_row_formatter(HugsTable.given.name)
         self._tophugged_formatter = make_pts_column_row_formatter(HugsTable.received.name)
 
-    @commands.slash_command(name="hug", guild_ids=[config.guild_id])
+    @commands.slash_command(name="hug")
     async def _hug(self, inter):
         pass
 
