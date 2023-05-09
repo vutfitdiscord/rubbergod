@@ -24,20 +24,6 @@ from utils import fill_message, is_command_message, str_emoji_id
 vote_r = vote_repo.VoteRepository()
 
 
-async def get_or_fetch_channel(bot: Bot, channel_id):
-    channel = bot.get_channel(channel_id)
-    if channel is None:
-        channel = await bot.fetch_channel(channel_id)
-    return channel
-
-
-async def get_or_fetch_user(bot: Bot, user_id):
-    user = bot.get_user(user_id)
-    if user is None:
-        user = await bot.fetch_user(user_id)
-    return user
-
-
 class VoteMessage:
     class VoteOption:
         def __init__(self, emoji: str, is_unicode: bool, message: str, count: int):
@@ -115,7 +101,7 @@ class Vote(Base, commands.Cog):
         db_votes = vote_r.get_pending_votes()
         for v in db_votes:
             try:
-                chan = await get_or_fetch_channel(self.bot, v.channel_id)
+                chan = await utils.get_or_fetch_channel(self.bot, v.channel_id)
                 msg = await chan.fetch_message(v.message_id)
                 self.vote_cache[v.message_id] = VoteMessage(msg.content, v.is_one_of)
                 await self.init_vote(msg)
@@ -197,19 +183,19 @@ class Vote(Base, commands.Cog):
             return
 
         vote = self.vote_cache[payload.message_id]
-        chan = await get_or_fetch_channel(self.bot, payload.channel_id)
+        chan = await utils.get_or_fetch_channel(self.bot, payload.channel_id)
 
         emoji_str = str_emoji_id(payload.emoji)
 
         if emoji_str not in vote.options:
             msg = await chan.fetch_message(payload.message_id)
-            usr = await get_or_fetch_user(self.bot, payload.user_id)
+            usr = await self.bot.get_or_fetch_user(self.bot, payload.user_id)
             await msg.remove_reaction(payload.emoji, usr)
             return
 
         if vote.is_one_of:
             msg: Message = await chan.fetch_message(payload.message_id)
-            usr = await get_or_fetch_user(self.bot, payload.user_id)
+            usr = await self.bot.get_or_fetch_user(self.bot, payload.user_id)
             for r in msg.reactions:
                 if str_emoji_id(r.emoji) == emoji_str:
                     continue
@@ -236,7 +222,7 @@ class Vote(Base, commands.Cog):
         if str_emoji_id(payload.emoji) not in vote.options:
             return
 
-        chan = await get_or_fetch_channel(self.bot, payload.channel_id)
+        chan = await utils.get_or_fetch_channel(self.bot, payload.channel_id)
         emoji_str = str_emoji_id(payload.emoji)
 
         last_max_opt = max(vote.options.values(), key=lambda x: x.count).count
@@ -301,7 +287,7 @@ class Vote(Base, commands.Cog):
     async def send_final_message(self, timeout, message_id, channel_id):
         await asyncio.sleep(timeout)
         vote = self.vote_cache[message_id]
-        chan = await get_or_fetch_channel(self.bot, channel_id)
+        chan = await utils.get_or_fetch_channel(self.bot, channel_id)
         await chan.send(content=self.get_message(vote, True))
         vote_r.finish_vote(message_id)
 

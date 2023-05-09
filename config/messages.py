@@ -311,6 +311,7 @@ class Messages:
     autopin_list_unknown_message = "> {channel} - Neznámá zpráva"
     autopin_list_item = "> {channel} - {url}"
     autopin_system_message = "Nelze připnout systémovou zprávu."
+    autopin_list_info = "## Prioritní piny:"
 
     on_ready_message = "<:peepowave:693070888546861096>"
 
