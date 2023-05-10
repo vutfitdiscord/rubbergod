@@ -225,7 +225,7 @@ class MemeRepost(Base, commands.Cog):
         page_source = LeaderboardPageSource(
             bot=self.bot,
             author=inter.author,
-            query=self.better_repo.get_leaderboard(order_by, start - 1),
+            query=self.better_repo.get_leaderboard(order_by),
             row_formatter=_leaderboard_formatter,
             base_embed=embed,
             title='BETTER MEMES LEADERBOARD',

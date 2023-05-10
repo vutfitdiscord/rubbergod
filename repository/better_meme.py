@@ -29,7 +29,6 @@ class BetterMemeRepository(BaseRepository):
             session.merge(member)
             session.commit()
 
-    def get_leaderboard(self, order_by, offset, limit=10):
+    def get_leaderboard(self, order_by):
         return session.query(BetterMeme) \
-            .order_by(getattr(BetterMeme, order_by).desc()) \
-            .offset(offset).limit(limit)
+            .order_by(getattr(BetterMeme, order_by).desc())
