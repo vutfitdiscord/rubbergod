@@ -9,10 +9,13 @@ from PIL import Image, ImageDraw, ImageFont
 
 import utils
 from config.app_config import config
+from features.imagehandler import ImageHandler
 from repository.database.error import ErrorLog
 
 
 class ErrorLogger:
+    def __init__(self):
+        self.imagehandler = ImageHandler()
 
     def set_image(self, embed: disnake.Embed, user: disnake.User, count: int):
         try:
@@ -29,7 +32,7 @@ class ErrorLogger:
             if not user.avatar:
                 avatar = avatar.convert("RGB")
 
-            avatar = utils.round_image(avatar)
+            avatar = self.imagehandler.square_to_circle(avatar)
             avatar = avatar.resize((230, 230))
             avatar = avatar.crop((0, 0, 230, 200))
             background.paste(avatar, (560, 270), avatar)
