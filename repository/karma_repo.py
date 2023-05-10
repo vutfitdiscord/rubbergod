@@ -140,13 +140,6 @@ class KarmaRepository(BaseRepository):
     def leaderboard_query(self, atribute):
         return session.query(Karma).order_by(atribute)
 
-    def get_leaderboard(self, atribute, offset=0, limit=10):
-        leaderboard = session.query(Karma).order_by(atribute).offset(offset).limit(limit)
-        return leaderboard
-
-    def get_leaderboard_max(self):
-        return session.query(Karma).count()
-
     def transfer_karma(self, from_user, to_user):
         from_user_karma = self.get_karma_object(from_user.id)
         to_user_karma = self.get_karma_object(to_user.id)
