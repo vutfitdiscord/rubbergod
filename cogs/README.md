@@ -126,6 +126,17 @@ Cog containing commands that call random APIs for fun things.\
     - /yo_mamajoke
 ---
 
+### [Gif](gif.py)
+
+Cog for creating gifs.\
+**Commands:**
+
+    - /pet
+    - /catnap
+    - /bonk
+
+---
+
 ### [GrillbotApi](grillbotapi.py)
 
 Functions and commands that communicate with the Grillbot API.
@@ -248,15 +259,6 @@ Cog for sending name days and birthdays.\
 **Tasks:**
 
     - send_names
-
----
-
-### [Pet](pet.py)
-
-Cog for petting people.\
-**Commands:**
-
-    - /pet
 
 ---
 

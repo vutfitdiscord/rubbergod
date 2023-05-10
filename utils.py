@@ -9,7 +9,6 @@ import disnake
 from disnake import Emoji, Member, PartialEmoji
 from disnake.ext import commands
 from genericpath import isfile
-from PIL import Image, ImageDraw
 from sqlalchemy.schema import Table
 
 from config.app_config import config
@@ -278,15 +277,6 @@ def create_bar(value, total) -> str:
         prog_bar_str = "░" * prog_bar_length
     prog_bar_str = prog_bar_str + f" {round(percentage * 100)}%"
     return prog_bar_str
-
-
-def round_image(frame_avatar: Image.Image) -> Image.Image:
-    """Convert square avatar to circle"""
-    frame_mask = Image.new("1", frame_avatar.size, 0)
-    draw = ImageDraw.Draw(frame_mask)
-    draw.ellipse((0, 0) + frame_avatar.size, fill=255)
-    frame_avatar.putalpha(frame_mask)
-    return frame_avatar
 
 
 class PCommandOnCooldown(commands.CommandError):
