@@ -468,6 +468,7 @@ class Messages:
     timeout_overflow = "Příliš velký počet hodin. Použij formát datumu."
     timeout_user_brief = "Použij tag uživatele/uživatelů"
     timeout_list_none = "Nenalezeny žádné umlčení."
+    timeout_member_not_found = "{member} Nikoho takového jsem na serveru nenašel. Ujisti se, že jsi uživatele zadal @tagem."
 
     # TIMEOUT WARS
     timeout_wars_user = "Uživatel {user} byl umlčen na {time:.0f} minut."
