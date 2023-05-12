@@ -51,7 +51,7 @@ class Random(Base, commands.Cog):
     @cooldowns.short_cooldown
     @commands.slash_command(name="flip", description=Messages.random_flip_brief)
     async def flip(self, inter: disnake.ApplicationCommandInteraction):
-        await inter.response.send_message(
+        await inter.send(
             random.choice(["True", "False"]),
             ephemeral=self.check.botroom_check(inter)
         )
@@ -63,7 +63,7 @@ class Random(Base, commands.Cog):
             first, second = second, first
 
         option = str(random.randint(first, second))
-        await inter.response.send_message(option, ephemeral=self.check.botroom_check(inter))
+        await inter.send(option, ephemeral=self.check.botroom_check(inter))
 
 
 def setup(bot):
