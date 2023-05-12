@@ -4,6 +4,7 @@ Implemented logging for tagging @mods.
 """
 
 from datetime import datetime
+from typing import List
 
 import disnake
 from disnake.ext import commands
@@ -12,6 +13,29 @@ import utils
 from buttons.moderation import ModerationView
 from cogs.base import Base
 from config.app_config import config
+from config.messages import Messages
+from permissions import permission_check
+
+# Reflects UI slider values
+slowmode_delay_timestamps = {
+    "5s": 5,
+    "10s": 10,
+    "15s": 15,
+    "30s": 30,
+    "1min": 60,
+    "2min": 2*60,
+    "5min": 5*60,
+    "10min": 10*60,
+    "15min": 15*60,
+    "30min": 30*60,
+    "1h": 1*60*60,
+    "2h": 2*60*60,
+    "6h": 6*60*60
+}
+
+
+async def slowmode_delay_times(inter, string: str) -> List[str]:
+    return [delay for delay in slowmode_delay_timestamps.keys() if string.lower() in delay.lower()]
 
 
 class Moderation(Base, commands.Cog):
@@ -83,6 +107,35 @@ class Moderation(Base, commands.Cog):
             embed=disnake.Embed.from_dict(embed),
             view=ModerationView(label, custom_id)
         )
+
+    @commands.check(permission_check.submod_plus)
+    @commands.slash_command(name="slowmode", description=Messages.slowmode_brief)
+    async def _slowmode(self, inter):
+        pass
+
+    @_slowmode.sub_command(name="set", description=Messages.slowmode_set_brief)
+    async def set(
+        self,
+        inter: disnake.ApplicationCommandInteraction,
+        delay: int = commands.Param(
+            autocomplete=slowmode_delay_timestamps,
+            description=Messages.slowmode_time,
+            ge=0,
+            lt=21600  # Maximum is 6 hours (See Disnake docs)
+        )
+    ):
+
+        await inter.response.defer(ephemeral=True)
+        await inter.channel.edit(slowmode_delay=delay)
+        await inter.edit_original_response(Messages.slowmode_set_success.format(delay=delay))
+
+    @commands.check(permission_check.submod_plus)
+    @_slowmode.sub_command(name="remove", description=Messages.slowmode_remove_brief)
+    async def remove(self, inter: disnake.ApplicationCommandInteraction):
+
+        await inter.response.defer(ephemeral=True)
+        await inter.channel.edit(slowmode_delay=0)
+        await inter.edit_original_response(Messages.slowmode_remove_success)
 
 
 def setup(bot):

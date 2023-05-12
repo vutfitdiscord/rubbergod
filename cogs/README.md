@@ -234,7 +234,11 @@ Cog for handling memes with X number of reactions to be reposted to a specific c
 ### [Moderation](moderation.py)
 
 Cog implementing functions for server moderation and help functions for mods.
-Implemented logging for tagging @mods.
+Implemented logging for tagging @mods.\
+**Commands:**
+
+    - /slowmode set
+    - /slowmode remove
 
 ---
 
