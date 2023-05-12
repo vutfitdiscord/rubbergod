@@ -474,6 +474,14 @@ class Messages:
     timeout_wars_message_delete = "Uživatel {user} byl přistižen při mazání zpráv. Byl proto umlčen na {time:.0f} minut."
     timeout_wars_user_immunity = "Uživatel {user} má ještě imunitu na {time:.0f} sekund."
 
+    # MODERATION
+    slowmode_brief = "Správa slowmode channelu"
+    slowmode_time = "Délka prodlevy v sekundách (nebo vyber v autocomplete)"
+    slowmode_set_brief = "Nastaví slowmode aktuálnímu channelu"
+    slowmode_set_success = "Slowmode nastaven na {delay} sekund."
+    slowmode_remove_brief = "Vypne slowmode v aktuálním channelu"
+    slowmode_remove_success = "Slowmode úspěšně odstraněn."
+
     # FUN COG
     cat_brief = "Pošle náhodný obrázek kočky"
     dog_brief = "Pošle náhodný obrázek psa"
