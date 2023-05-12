@@ -204,7 +204,7 @@ class Timeout(Base, commands.Cog):
 
         # no member found
         if not members:
-            return await inter.send(utils.fill_message("member_not_found", user=inter.author.id))
+            return await inter.send(utils.fill_message("timeout_member_not_found", member=inter.author.id))
 
         for user in members:
             parsed_endtime = await self.timeout_parse(inter, user, endtime, reason)
@@ -261,7 +261,7 @@ class Timeout(Base, commands.Cog):
 
         # no member found
         if not members:
-            return await inter.send(utils.fill_message("member_not_found", user=inter.author.id))
+            return await inter.send(utils.fill_message("timeout_member_not_found", member=inter.author.id))
 
         for user in members:
             if await self.timeout_perms(inter, user, None, None, "Předčasné odebrání"):
