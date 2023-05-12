@@ -3,7 +3,7 @@ Cog implementing functions for server moderation and help functions for mods.
 Implemented logging for tagging @mods.
 """
 
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import List
 
 import disnake
@@ -109,7 +109,7 @@ class Moderation(Base, commands.Cog):
         )
 
     @commands.check(permission_check.submod_plus)
-    @commands.slash_command(name="slowmode", description=Messages.slowmode_brief)
+    @commands.slash_command(name="slowmode")
     async def _slowmode(self, inter):
         pass
 
@@ -124,18 +124,58 @@ class Moderation(Base, commands.Cog):
             lt=21600  # Maximum is 6 hours (See Disnake docs)
         )
     ):
-
         await inter.response.defer(ephemeral=True)
+
+        prev_delay = inter.channel.slowmode_delay
         await inter.channel.edit(slowmode_delay=delay)
-        await inter.edit_original_response(Messages.slowmode_set_success.format(delay=delay))
+        await self.log(inter, prev_delay)
+        await inter.edit_original_response(Messages.slowmode_set_success.format(
+                                            channel=inter.channel.mention,
+                                            delay=delay))
 
     @commands.check(permission_check.submod_plus)
     @_slowmode.sub_command(name="remove", description=Messages.slowmode_remove_brief)
-    async def remove(self, inter: disnake.ApplicationCommandInteraction):
-
+    async def remove(
+        self,
+        inter: disnake.ApplicationCommandInteraction
+    ):
         await inter.response.defer(ephemeral=True)
+
+        prev_delay = inter.channel.slowmode_delay
         await inter.channel.edit(slowmode_delay=0)
-        await inter.edit_original_response(Messages.slowmode_remove_success)
+        await self.log(inter, prev_delay)
+        await inter.edit_original_response(Messages.slowmode_remove_success.format(
+                                            channel=inter.channel.mention))
+
+    async def log(
+        self,
+        inter: disnake.ApplicationCommandInteraction,
+        prev_delay: int
+    ):
+        """
+        Log slowmode changes
+        """
+        embed = disnake.Embed(title="Channel slowmode change", color=disnake.Colour.yellow())
+        embed.add_field(
+            name="Mod",
+            value=f"{inter.author.mention} ({inter.author.display_name})"
+        )
+        embed.add_field(
+            name="Channel",
+            value=inter.channel.mention,
+            inline=False
+        )
+        embed.add_field(
+            name="Old value",
+            value=f"{prev_delay} seconds"
+        )
+        embed.add_field(
+            name="New value",
+            value=f"{inter.channel.slowmode_delay} seconds"
+        )
+        embed.timestamp = datetime.now(tz=timezone.utc)
+        channel = self.bot.get_channel(config.log_channel)
+        await channel.send(embed=embed)
 
 
 def setup(bot):
