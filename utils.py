@@ -92,11 +92,12 @@ def pagination_next(id: str, page: int, max_page: int, roll_around: bool = True)
         return 0
 
 
-def cut_string(string: str, part_len: int):
+def cut_string(string: str, part_len: int) -> list:
     return list(string[0 + i: part_len + i] for i in range(0, len(string), part_len))
 
 
-def split_to_parts(items, size: int):
+def split_to_parts(items, size: int) -> list:
+    """Splits list into smaller lists with given size"""
     result = []
 
     for x in range(math.ceil(len(items) / size)):
@@ -105,7 +106,7 @@ def split_to_parts(items, size: int):
     return result
 
 
-def cut_string_by_words(string: str, part_len: int, delimiter: str):
+def cut_string_by_words(string: str, part_len: int, delimiter: str) -> list:
     """returns list of strings with length of part_len, only whole words"""
     result = []
     while True:
@@ -118,6 +119,13 @@ def cut_string_by_words(string: str, part_len: int, delimiter: str):
         result.append(chunk)
         string = string[len(chunk):]
     return result
+
+
+def split(array, k) -> list:
+    """Splits list into K parts of approximate equal length"""
+    n = len(array)
+    lists = [array[i * (n // k) + min(i, n % k):(i+1) * (n // k) + min(i+1, n % k)] for i in range(k)]
+    return lists
 
 
 def add_author_footer(embed: disnake.Embed, author: disnake.User,
@@ -249,13 +257,6 @@ def get_all_cogs():
 
     all_cogs = {key: all_cogs[key] for key in sorted(all_cogs.keys())}
     return all_cogs
-
-
-def split(array, k):
-    """Splits list into K parts of approximate equal length"""
-    n = len(array)
-    lists = [array[i * (n // k) + min(i, n % k):(i+1) * (n // k) + min(i+1, n % k)] for i in range(k)]
-    return lists
 
 
 def create_bar(value, total) -> str:
