@@ -61,8 +61,12 @@ def merge_messages(message_list: Iterable, max_msg_len: int):
 # @param message_list list of messages to send
 # @param max_msg_len maximal length of message
 #
-async def send_list_of_messages(channel: Union[disnake.TextChannel, disnake.Object, commands.Context],
-                                message_list: Iterable, max_msg_len: int = 1900):
+async def send_list_of_messages(
+        ctx: Union[disnake.TextChannel, commands.Context, disnake.ApplicationCommandInteraction],
+        message_list: Iterable,
+        max_msg_len: int = 1900,
+        ephemeral: bool = False
+):
     assert isinstance(max_msg_len, int)
     if max_msg_len > 2000:
         max_msg_len = 2000
@@ -73,7 +77,13 @@ async def send_list_of_messages(channel: Union[disnake.TextChannel, disnake.Obje
     message_list = merge_messages(message_list, max_msg_len - 1)
 
     for idx, message in enumerate(message_list):
-        if idx == 0 and type(channel) is commands.Context:
-            await channel.reply(message)
-        else:
-            await channel.send(message)
+        if isinstance(ctx, disnake.ApplicationCommandInteraction):
+            if idx == 0:
+                await ctx.edit_original_response(message)
+            else:
+                await ctx.send(message, ephemeral=ephemeral)
+        elif isinstance(ctx, commands.Context):
+            if idx == 0:
+                await ctx.channel.reply(message)
+            else:
+                await ctx.channel.send(message)

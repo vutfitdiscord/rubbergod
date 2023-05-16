@@ -63,12 +63,7 @@ class StreamLinks(Base, commands.Cog):
     @cooldowns.default_cooldown
     @commands.slash_command(name="streamlinks", brief=Messages.streamlinks_brief)
     async def _streamlinks(self, inter: disnake.ApplicationCommandInteraction):
-        pass
-
-    @cooldowns.default_cooldown
-    @commands.slash_command(name="streamlinks_mod", brief=Messages.streamlinks_brief)
-    async def _streamlinks_mod(self, inter: disnake.ApplicationCommandInteraction):
-        pass
+        await inter.response.defer(ephemeral=self.check.botroom_check(inter))
 
     @_streamlinks.sub_command(name="get", description=Messages.streamlinks_brief)
     async def streamlinks_get(
@@ -76,8 +71,6 @@ class StreamLinks(Base, commands.Cog):
         inter: disnake.ApplicationCommandInteraction,
         subject: str = commands.Param(autocomplete=autocomp_subjects_with_stream)
     ):
-        await inter.response.defer(ephemeral=self.check.botroom_check(inter))
-
         streamlinks = self.streamlinks_repo.get_streamlinks_of_subject(subject.lower())
 
         if len(streamlinks) == 0:
@@ -89,6 +82,30 @@ class StreamLinks(Base, commands.Cog):
             embeds.append(self.create_embed_of_link(link, inter.author, len(streamlinks), idx+1))
         view = EmbedView(inter.author, embeds, timeout=180)
         view.message = await inter.edit_original_response(embed=embeds[0], view=view)
+
+    @_streamlinks.sub_command(name="list", description=Messages.streamlinks_list_brief)
+    async def streamlinks_list(
+        self,
+        inter: disnake.ApplicationCommandInteraction,
+        subject: str = commands.Param(autocomplete=autocomp_subjects_with_stream)
+    ):
+        streamlinks: List[StreamLink] = self.streamlinks_repo.get_streamlinks_of_subject(subject.lower())
+
+        if len(streamlinks) == 0:
+            await inter.send(content=Messages.streamlinks_no_stream)
+            return
+
+        messages = [f"Streamy k **{subject.upper()}**:"]
+        for stream in streamlinks:
+            date = stream.created_at.strftime("%d. %m. %Y")
+            messages.append(f"**{stream.member_name}** ({date}) - [{stream.description}](<{stream.link}>)\n")
+
+        await send_list_of_messages(inter, messages, ephemeral=self.check.botroom_check(inter))
+
+    @cooldowns.default_cooldown
+    @commands.slash_command(name="streamlinks_mod", brief=Messages.streamlinks_brief)
+    async def _streamlinks_mod(self, inter: disnake.ApplicationCommandInteraction):
+        pass
 
     @commands.check(permission_check.helper_plus)
     @_streamlinks_mod.sub_command(name="add", description=Messages.streamlinks_add_brief)
@@ -134,36 +151,6 @@ class StreamLinks(Base, commands.Cog):
         )
         await inter.edit_original_response(content=Messages.streamlinks_add_success)
 
-    @_streamlinks.sub_command(name="list", description=Messages.streamlinks_list_brief)
-    async def streamlinks_list(
-        self,
-        inter: disnake.ApplicationCommandInteraction,
-        subject: str = commands.Param(autocomplete=autocomp_subjects_with_stream)
-    ):
-        streamlinks: List[StreamLink] = self.streamlinks_repo.get_streamlinks_of_subject(subject.lower())
-
-        if len(streamlinks) == 0:
-            await inter.send(content=Messages.streamlinks_no_stream)
-            return
-
-        messages = [f"Streamy k **{subject.upper()}**:"]
-        for stream in streamlinks:
-            at = stream.created_at.strftime("%d. %m. %Y")
-            messages.append(f"**{stream.member_name}** ({at}) - [{stream.description}](<{stream.link}>)\n")
-
-        await send_list_of_messages(inter, messages)
-
-    async def log(self, stream, user):
-        embed = disnake.Embed(title="Odkaz na stream byl smazán", color=0xEEE657)
-        embed.add_field(name="Provedl", value=user.name)
-        embed.add_field(name="Předmět", value=stream.subject.upper())
-        embed.add_field(name="Od", value=stream.member_name)
-        embed.add_field(name="Popis", value=stream.description[:1024])
-        embed.add_field(name="Odkaz", value=f"[{stream.link}]({stream.link})", inline=False)
-        embed.timestamp = datetime.utcnow()
-        channel = self.bot.get_channel(config.log_channel)
-        await channel.send(embed=embed)
-
     @commands.check(permission_check.helper_plus)
     @_streamlinks_mod.sub_command(name="remove", description=Messages.streamlinks_remove_brief)
     async def streamlinks_remove(
@@ -187,6 +174,17 @@ class StreamLinks(Base, commands.Cog):
             await self.log(stream, inter.author)
             self.streamlinks_repo.remove(id)
             await inter.channel.send(utils.fill_message('streamlinks_remove_success', link=link))
+
+    async def log(self, stream, user):
+        embed = disnake.Embed(title="Odkaz na stream byl smazán", color=disnake.Color.yellow())
+        embed.add_field(name="Provedl", value=user.name)
+        embed.add_field(name="Předmět", value=stream.subject.upper())
+        embed.add_field(name="Od", value=stream.member_name)
+        embed.add_field(name="Popis", value=stream.description[:1024])
+        embed.add_field(name="Odkaz", value=f"[{stream.link}]({stream.link})", inline=False)
+        embed.timestamp = datetime.utcnow()
+        channel = self.bot.get_channel(config.log_channel)
+        await channel.send(embed=embed)
 
     def get_link_data(self, link: str):
         """
@@ -234,7 +232,7 @@ class StreamLinks(Base, commands.Cog):
 
     def create_embed_of_link(self, streamlink: StreamLink, author: Union[disnake.User, disnake.Member],
                              links_count: int, current_pos: int) -> disnake.Embed:
-        embed = disnake.Embed(color=0xEEE657)
+        embed = disnake.Embed(color=disnake.Color.yellow())
         embed.set_author(name="Streamlinks")
 
         if streamlink.thumbnail_url is not None:
