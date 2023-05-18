@@ -329,8 +329,9 @@ class Messages:
     autopin_list_item = "> {channel} - {url}"
     autopin_system_message = "Nelze připnout systémovou zprávu."
     autopin_list_info = "## Prioritní piny:"
-
-    on_ready_message = "<:peepowave:693070888546861096>"
+    autopin_get_all_brief = "Získá všechny piny z kanálu a pošle je ve formátu markdown."
+    autopin_no_pins = "V kanálu nejsou žádné piny."
+    autopin_get_all_done = "Všechny piny z kanálu {channel_name} byly úspěšně staženy."
 
     # SYSTEM
     shutdown_brief = "Vypne bota"

@@ -10,9 +10,11 @@ from disnake.ext import commands
 
 import utils
 from cogs.base import Base
+from config import cooldowns
 from config.app_config import config
 from config.messages import Messages
-from permissions import permission_check
+from features.autopin import AutopinFeatures, pin_channel_type
+from permissions import permission_check, room_check
 from repository import pin_repo
 from repository.database.pin_map import PinMap
 
@@ -24,14 +26,16 @@ class AutoPin(Base, commands.Cog):
         )
         self.bot = bot
         self.repo = pin_repo.PinRepository()
+        self.check = room_check.RoomCheck(bot)
+        self.pin_features = AutopinFeatures(bot)
 
     @commands.guild_only()
     @commands.check(permission_check.helper_plus)
-    @commands.slash_command(name="pin")
-    async def pin(self, inter: disnake.ApplicationCommandInteraction):
+    @commands.slash_command(name="pin_mod")
+    async def pin_mod(self, inter: disnake.ApplicationCommandInteraction):
         await inter.response.defer()
 
-    @pin.sub_command(name="add", description=Messages.autopin_add_brief)
+    @pin_mod.sub_command(name="add", description=Messages.autopin_add_brief)
     async def add(self, inter: disnake.ApplicationCommandInteraction, message_url: str):
         try:
             converter = commands.MessageConverter()
@@ -52,7 +56,7 @@ class AutoPin(Base, commands.Cog):
         except commands.MessageNotFound:
             return await inter.send(Messages.autopin_add_unknown_message)
 
-    @pin.sub_command(name="remove", description=Messages.autopin_remove_brief)
+    @pin_mod.sub_command(name="remove", description=Messages.autopin_remove_brief)
     async def remove(
         self,
         inter: disnake.ApplicationCommandInteraction,
@@ -68,7 +72,7 @@ class AutoPin(Base, commands.Cog):
         self.repo.remove_channel(str(channel.id))
         await inter.send(Messages.autopin_remove_done)
 
-    @pin.sub_command(name="list", description=Messages.autopin_list_brief)
+    @pin_mod.sub_command(name="list", description=Messages.autopin_list_brief)
     async def get_list(self, inter: disnake.ApplicationCommandInteraction):
         mappings: List[PinMap] = self.repo.get_mappings()
 
@@ -99,6 +103,32 @@ class AutoPin(Base, commands.Cog):
         await inter.send(Messages.autopin_list_info)
         for part in utils.split_to_parts(lines, 10):
             await inter.channel.send("\n".join(part))
+
+    @cooldowns.long_cooldown
+    @commands.slash_command(name="pin")
+    async def pin(self, inter: disnake.ApplicationCommandInteraction):
+        await inter.response.defer(ephemeral=self.check.botroom_check(inter))
+
+    @pin.sub_command(name="get_all", description=Messages.autopin_get_all_brief)
+    async def get_all(
+        self,
+        inter: disnake.ApplicationCommandInteraction,
+        channel: pin_channel_type = None,
+        type: str = commands.Param(description="file type", choices=["json", "markdown"], default="markdown")
+    ):
+        """Get all pins from channel and send it to user in markdown file"""
+        channel = inter.channel if channel is None else channel
+        pins = await channel.pins()
+        if not pins:
+            return await inter.send(Messages.autopin_no_pins)
+
+        if type == "markdown":
+            await self.pin_features.create_markdown_file(inter, channel, pins)
+        else:
+            await self.pin_features.create_json_file(inter, channel, pins)
+
+        channel_mention = channel.mention if hasattr(channel, "mention") else "**DM s botem**"
+        await inter.edit_original_response(Messages.autopin_get_all_done.format(channel_name=channel_mention))
 
     @commands.Cog.listener()
     async def on_guild_channel_pins_update(self, channel: disnake.TextChannel, _):

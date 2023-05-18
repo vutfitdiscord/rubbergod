@@ -28,10 +28,10 @@ Cog for diploma verification. When successful, the user is given Survivor(Bc.) o
 Cog controlling auto pinning of messages and priority pins in channels.\
 **Commands:**
 
-    - ?pin
-    - ?pin add
-    - ?pin remove
-    - ?pin list
+    - /pin_mod add
+    - /pin_mod remove
+    - /pin_mod list
+    - /pin get_all
 ---
 
 ### [Bookmark](bookmark.py)
