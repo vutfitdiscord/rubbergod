@@ -18,6 +18,11 @@ class Messages:
     member_not_found = "{member} Nikoho takového jsem na serveru nenašel."
     user_not_found = "{user} Nikoho takového jsem nenašel."
     help_command_not_found = "Žádný příkaz jako `{command}` neexistuje."
+    on_ready_message = "<:peepowave:693070888546861096>"
+    cooldown = "Příliš rychle, zkus to znovu za {:.3}s"
+    embed_not_author = "Hraj si na svém písečku s tebou zavolanými příkazy. <:pepeGun:826943455032901643>"
+    base_leaderboard_format_str = "_{position}._ - **{member_name}**:"
+
 
     # PERMISSIONS
     missing_perms = "{user}, na použití tohoto příkazu nemáš právo."
@@ -30,11 +35,17 @@ class Messages:
     bot_room_redirect = "{user} <:sadcat:576171980118687754> 👉 " \
                         "<#{bot_room}>\n"
 
-    covid_storno = "{user} <:WeirdChamp:680711174802899007>"
+    # MEME
     uhoh_counter = "{uhohs} uh ohs od spuštění."
     uhoh_brief = "Vypíše počet uh ohs od spuštění"
     uhoh = "uh oh"
 
+    pr_meme = "https://github.com/Toaster192/rubbergod/pulls"
+    question = ["<:what:638277508541710337>",
+                "<:wuuut:484470874003472394>",
+                "nech mě <:sadcat:576171980118687754>"]
+
+    # HUGS
     hug_give_brief = "Obejme kamaráda"
     hug_intensity_description = "Síla obejmutí (číslo 1-{emoji_count})"
     hug_stats_brief = "Tvé statistiky obejmutí"
@@ -42,6 +53,7 @@ class Messages:
     hug_huggersboard_brief = "Vypíše nejčastější objímače"
     hug_mosthugged_brief = "Vypíše nejvíce objímané lidi"
 
+    # IOS
     ios_brief = "Připomene všem prasatům, že si mají jít po sobě uklidit"
     ios_task_start_brief = "Začne pravidelně připomínat všem prasatům, že si mají jít po sobě uklidit"
     ios_task_start_success = f"Automatické připomínání úspěšně nastaveno. Bude se od teď provádět každých {config.ios_looptime_minutes} minut."
@@ -53,6 +65,7 @@ class Messages:
     ios_parsing_error = "Toastere, máš bordel v parsování."
     ios_howto_clean = "Pokud nevíte, jak po sobě uklidit, checkněte: https://discordapp.com/channels/461541385204400138/534431057001316362/698701631495340033"
 
+    # KARMA
     karma = "{user} Karma uživatele `{target}` je: **{karma}** " \
             "(**{order}.**)\nA rozdal:\n" \
             "**{karma_pos}** pozitivní karmy " \
@@ -113,6 +126,7 @@ class Messages:
     pet_brief = "Vytvoří gif z uživatele."
     gif_req_error = "Nepodařilo se získat profilový obrázek uživatele."
 
+    # ROLES
     role_add_denied = "{user}, na přidání role {role} nemáš právo."
     role_remove_denied = "{user}, na odebrání role {role} nemáš právo."
     role_invalid_line = "{user}, řádek `{line}` je neplatný."
@@ -139,6 +153,7 @@ class Messages:
     group_reset_channels = "Resetuje kanály pro skupinu"
     group_reset_roles = "Resetuje role pro skupinu"
 
+    # RANDOM
     random_roll_brief = "Vygeneruje náhodné celé číslo z intervalu <**first**, **second**>"
     random_flip_brief = "Hodí mincí"
     random_pick_brief = "Vybere jedno ze slov za otazníkem."
@@ -150,6 +165,7 @@ class Messages:
                            "pokud y není specifikováno, " \
                            "je považováno za 0."
 
+    # VERIFY
     verify_brief = "Ověření studenta pro přístup na server."
     verify_login_parameter = "Přihlašovací FIT login (nebo MUNI UČO). FIT login ve formátu `xlogin00`"
     verify_already_verified = "{user} Už jsi byl verifikován " \
@@ -261,11 +277,6 @@ class Messages:
     tierboard_brief = "Založeno na `reviews` z průměru tier hodnot"
     tierboard_missing_year = f"Nezadal jsi ročník a nemáš školní roli"
 
-    pr_meme = "https://github.com/Toaster192/rubbergod/pulls"
-    question = ["<:what:638277508541710337>",
-                "<:wuuut:484470874003472394>",
-                "nech mě <:sadcat:576171980118687754>"]
-
     # NAMEDAY
     name_day_cz = "Dnes má svátek {name}"
     name_day_cz_brief = "Vypíše, kdo má dnes svátek"
@@ -273,6 +284,8 @@ class Messages:
     name_day_sk_brief = "Vypíše, kto má dnes meniny"
     birthday_api_error = "Hobitovi to zas nefunguje, tak nevím kdo má dnes narozeniny <:sadge:751913081285902336>"
 
+    # WARDEN
+    warden_scan_brief = "Prohledá obrázky v aktuálním kanále a uloží je jako hash pro detekci repostu.\nlimit: [all | <int>]"
     repost_title = "Nápověda"
     repost_description = "{user}, shoda **{value}**!"
     repost_content = "Pokud je obrázek repost, dej mu ♻️.\nJestli není, klikni tady na ❎ "\
@@ -335,6 +348,7 @@ class Messages:
     cog_not_unloadable = "Toto rozšíření `{cog}` je neodebratelné."
     cog_reloaded = "Rozšíření `{cog}` bylo načteno znovu."
 
+    # DYNAMICCONFIG
     config_backup_brief = "Vytvoří záložní kopii konfigurace v novém souboru"
     config_get_brief = "Získa hodnotu z konfigurace"
     config_set_brief = "Nastaví hodnotu v konfiguraci"
@@ -351,6 +365,7 @@ class Messages:
     config_sync_template_brief = "Synchronizuje config s template, přidá chybějíci klíče"
     config_synced = "Config byl synchronizován"
 
+    # ROLES
     channel_copy_start = "Probíhá kopírování kanálu"
     channel_copy_done = "Práva byla zkopírována."
     channel_clone_start = "Probíhá klonování kanálu"
@@ -359,11 +374,11 @@ class Messages:
     channel_create_done = "Vytvoření kanálu bylo úspěšné, kanál {channel} vytvořen s přístupem pro roli **{role}**.\n • Počet overwrites: **{perms}**"
     channel_create_rate = "Po kolika perms updatovat progress bar."
 
-    warden_scan_brief = "Prohledá obrázky v aktuálním kanále a uloží je jako hash pro detekci repostu.\nlimit: [all | <int>]"
-
+    # WEEK
     week_brief = "Vypíše, kolikátý je zrovna týden a jestli je sudý nebo lichý"
     week_warning = "Pro sudý/lichý se využívá kalendářní týden"
 
+    # STREAMLINKS
     streamlinks_brief = "Úložiště všech streamů"
     streamlinks_add_brief = "Zapíše nový stream k předmětu"
     streamlinks_add_link_exists = "Tento stream již existuje."
@@ -379,6 +394,7 @@ class Messages:
     streamlinks_remove_success = "Stream <{link}> byl úspěšně smazán."
     streamlinks_date_format = "Formát `dd.mm.yyyy`. Bez zadání se bere datum u videa případně dnešní datum."
 
+    # LATEX
     latex_help = f"Příklad:\n`{prefix}latex [?fg=blue] x^n + y^n = z^n`"
     latex_desc = "Vykreslí LaTeX výraz"
     latex_colors = """**Možné barvy textu:**
@@ -390,6 +406,7 @@ class Messages:
     Periwinkle CadetBlue CornflowerBlue MidnightBlue Cerulean Emerald JungleGreen SeaGreen ForestGreen
     PineGreen LimeGreen YellowGreen SpringGreen OliveGreen RawSienna"""
 
+    # SUBSCRIPTIONS
     subscribe_brief = "Přihlášení k odběru zpráv kanálu do DM"
     unsubscribe_brief = "Odhlášení odběru zpráv do DM"
     subscribeable_brief = "Výpis kanálů které je možné sledovat"
@@ -405,19 +422,23 @@ class Messages:
     subscriptions_unsubscribed = "Nová upozornění na zprávy ti už posílat nebudu."
     subscriptions_none = "Nebyly nalezeny žádné výsledky."
 
+    # STUDIJNI
     studijni_brief = "Úřední hodiny studijního Oddělení"
     studijni_web_error = "Chyba při parsování webu"
     studijni_office_hours = "Úřední hodiny"
     studijni_title = "C109 Studijní oddělení"
 
+    # FITROOM
     fit_room_brief = "Zobrazení místnosti na plánku fakulty."
     fit_room_unreach = "Stránka s plánkem je nedostupná."
     fit_room_parsing_failed = "Načtení stránky s plánkem se nezdařilo. Nahlaš prosím tuto chybu správci bota."
     fit_room_room_not_on_plan = "Zadaná místnost {room} není na plánku nebo neexistuje."
 
+    # MEME REPOST
     meme_repost_link = "[Odkaz na originál]({original_message_url}) v <#{original_channel}>"
     meme_leaderboard_brief = "#better-memes leaderboard"
 
+    # EXAMS
     exams_brief = f"Zobrazí zkoušky pro daný ročník (výchozí ročník podle role)"
     exams_no_valid_role = "Nebyla nalezena ročníková role"
     exams_specify_year = "Specifikuj ročník"
@@ -434,15 +455,13 @@ class Messages:
     exams_automatic_update_started = "`Zapnuta automatická aktualizace termínů pro server: {guild_name}`"
     exams_automatic_update_stopped = "`Zastavena automatická aktualizace termínů pro server: {guild_name}`"
 
-    embed_not_author = "Hraj si na svém písečku s tebou zavolanými příkazy. <:pepeGun:826943455032901643>"
-
-    base_leaderboard_format_str = "_{position}._ - **{member_name}**:"
-
+    # BOOKMARK
     bookmark_title = "Záložka na serveru {server}"
     blocked_bot = "Nemůžu ti posílat zprávy {user}"
     bookmark_created = "Záložka **{title_name}** vytvořena"
     bookmark_upload_limit = "Zpráva obsahuje přílohu přesahující upload limit, doporučuji si tuto přílohu stáhnout. V připadě smazání původní zprávy nebude příloha dostupná."
 
+    # ICONS
     icon_ui = "UI pro přiřazení ikony"
     icon_set_success = "Užiteli {user} nastavena ikona {icon}"
     icon_set_no_role = "Vstup neodpovídá žádné možné ikoně"
@@ -450,8 +469,6 @@ class Messages:
     icon_ui_fail = "Nastavit ikonu se nepodařilo"
     icon_ui_no_permission = "Na tuto ikonu nemáš právo"
     icon_removed = "Ikona byla odstraněna"
-
-    cooldown = "Příliš rychle, zkus to znovu za {:.3}s"
 
     # TIMEOUT COG
     timeout_brief = "Dočasně zakáže uživateli interakce na serveru."
@@ -483,9 +500,9 @@ class Messages:
     slowmode_remove_success = "Slowmode v kanálu {channel} úspěšně odstraněn."
 
     # FUN COG
-    cat_brief = "Pošle náhodný obrázek kočky"
-    dog_brief = "Pošle náhodný obrázek psa"
-    fox_brief = "Pošle náhodný obrázek lišky"
-    duck_brief = "Pošle náhodný obrázek kachny"
-    dadjoke_brief = "Pošle náhodný dadjoke nebo vyhledá podle zadaného slova"
-    yo_mamajoke_brief = "Pošle náhodný Yo momma joke"
+    fun_cat_brief = "Pošle náhodný obrázek kočky"
+    fun_dog_brief = "Pošle náhodný obrázek psa"
+    fun_fox_brief = "Pošle náhodný obrázek lišky"
+    fun_duck_brief = "Pošle náhodný obrázek kachny"
+    fun_dadjoke_brief = "Pošle náhodný dadjoke nebo vyhledá podle zadaného slova"
+    fun_yo_mamajoke_brief = "Pošle náhodný Yo momma joke"
