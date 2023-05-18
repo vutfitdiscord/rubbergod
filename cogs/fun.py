@@ -45,7 +45,7 @@ class Fun(Base, commands.Cog):
         return fact_response
 
     @cooldowns.default_cooldown
-    @commands.slash_command(name="cat", description=Messages.cat_brief)
+    @commands.slash_command(name="cat", description=Messages.fun_cat_brief)
     async def cat(self, inter):
         """Get random image of a cat"""
         image_response = await self.get_image(inter, "https://api.thecatapi.com/v1/images/search")
@@ -71,7 +71,7 @@ class Fun(Base, commands.Cog):
         await inter.send(embeds=embeds)
 
     @cooldowns.default_cooldown
-    @commands.slash_command(name="dog", description=Messages.dog_brief)
+    @commands.slash_command(name="dog", description=Messages.fun_dog_brief)
     async def dog(self, inter):
         """Get random image of a dog"""
         image_response = await self.get_image(inter, "https://api.thedogapi.com/v1/images/search")
@@ -97,7 +97,7 @@ class Fun(Base, commands.Cog):
         await inter.send(embeds=embeds)
 
     @cooldowns.default_cooldown
-    @commands.slash_command(name="fox", description=Messages.fox_brief)
+    @commands.slash_command(name="fox", description=Messages.fun_fox_brief)
     async def fox(self, inter):
         """Get random image of a fox"""
         image_response = await self.get_image(inter, "https://randomfox.ca/floof/")
@@ -109,7 +109,7 @@ class Fun(Base, commands.Cog):
         await inter.send(embed=embed)
 
     @cooldowns.default_cooldown
-    @commands.slash_command(name="duck", description=Messages.duck_brief)
+    @commands.slash_command(name="duck", description=Messages.fun_duck_brief)
     async def duck(self, inter):
         """Get random image of a duck"""
         image_response = await self.get_image(inter, "https://random-d.uk/api/v2/random")
@@ -121,7 +121,7 @@ class Fun(Base, commands.Cog):
         await inter.send(embed=embed)
 
     @cooldowns.default_cooldown
-    @commands.slash_command(name="dadjoke", description=Messages.dadjoke_brief)
+    @commands.slash_command(name="dadjoke", description=Messages.fun_dadjoke_brief)
     async def dadjoke(self, inter: disnake.ApplicationCommandInteraction, *, keyword=None):
         """Get random dad joke
         Arguments
@@ -167,7 +167,7 @@ class Fun(Base, commands.Cog):
         await inter.send(embed=embed)
 
     @cooldowns.default_cooldown
-    @commands.slash_command(name="yo_mamajoke", description=Messages.yo_mamajoke_brief)
+    @commands.slash_command(name="yo_mamajoke", description=Messages.fun_yo_mamajoke_brief)
     async def yo_mamajoke(self, inter):
         """Get random Yo momma joke"""
         async with aiohttp.ClientSession() as session:
