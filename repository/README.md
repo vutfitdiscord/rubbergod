@@ -1,6 +1,6 @@
-## Database-related things
+# Database-related things
 
-### Connecting to the DB through Docker (externally)
+## Connecting to the DB through Docker (externally)
 
 ```bash
 docker exec -it $(docker ps -aqf "name=rubbergod-db-1") psql -U postgres
@@ -8,7 +8,7 @@ docker exec -it $(docker ps -aqf "name=rubbergod-db-1") psql -U postgres
 
 PostgreSQL prompt will open and you can now run any SQL (or Postgre-specific) commands you want. To quit, press Ctrl+D.
 
-### Create new table at the start of the Bot
+## Create new table at the start of the Bot
 
 Create a new module with DB structure class ( example from `MemeRepost`):
 
@@ -33,7 +33,7 @@ Add the following into `repository/db_migrations.py`:
 from repository.database.meme_repost import MemeRepost  # noqa: F401
 ```
 
-> That way, the module gets imported on startup and creates the table automatically.
+That way, the module gets imported on startup and creates the table automatically.
 
 > The `noqa` formula is for `flake8` to ignore seemingly unused import.
 
