@@ -351,7 +351,7 @@ Cog implementing subscription to allowed channels. Subscribed users will receive
 Core cog for bot. Can't be unloaded. Contains commands for cog management.\
 **Commands:**
 
-    - ?git pull
+    - /git pull
     - /cogs
     - /uptime
 ---
