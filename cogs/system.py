@@ -30,14 +30,15 @@ class System(Base, commands.Cog):
 
         self.unloadable_cogs = ["system"]
 
-    @commands.group(pass_context=True)
-    async def git(self, ctx: commands.Context):
+    @commands.check(permission_check.is_bot_admin)
+    @commands.slash_command(name="git")
+    async def git(self, inter):
         pass
 
-    @git.command(brief=Messages.git_pull_brief)
-    @commands.check(permission_check.is_bot_admin)
-    async def pull(self, ctx: commands.Context):
-        message: Message = await ctx.send("Pulling")
+    @git.sub_command(name="pull", description=Messages.git_pull_brief)
+    async def pull(self, inter: disnake.ApplicationCommandInteraction):
+        await inter.send("Pulling...")
+        message: Message = await inter.original_message()
 
         pull_result = await self.git.pull()
         pull_parts = utils.cut_string(pull_result, 1900)
@@ -45,7 +46,7 @@ class System(Base, commands.Cog):
         await message.edit(content=f"```{pull_parts[0]}```")
 
         for part in pull_parts[1:]:
-            await ctx.send(f"```{part}```")
+            await inter.send(f"```{part}```")
 
     @commands.check(permission_check.is_bot_admin)
     @commands.slash_command(name="shutdown", description=Messages.shutdown_brief)
