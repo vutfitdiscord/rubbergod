@@ -16,7 +16,7 @@ All extensions, also known as cogs, are contained within this folder. The cogs c
 
 ### [Absolvent](absolvent.py)
 
-Cog for diploma verification. When successful, the user is given Survivor(Bc.) or King(Ing.) role.\
+Cog for diploma verification. When successful, the user is given Survivor (Bc.) or King (Ing.) role.\
 **Commands:**
 
     - /diplom help
@@ -45,7 +45,7 @@ Cog controlling bookmarks. The bot will send copy of message to user.\
 
 ### [DynamicConfig](dynamicconfig.py)
 
-Cog for dynamicaly changing config.\
+Cog for dynamically changing config.\
 **Commands:**
 
     - ?config
@@ -55,7 +55,7 @@ Cog for dynamicaly changing config.\
     - ?config list
     - ?config get
     - ?config backup
-    - ?coonfig sync_template
+    - ?config sync_template
 ---
 
 ### [Error](error.py)
@@ -134,7 +134,6 @@ Cog for creating gifs.\
     - /pet
     - /catnap
     - /bonk
-
 ---
 
 ### [GrillbotApi](grillbotapi.py)
@@ -230,7 +229,6 @@ Cog for meme commands.\
 
     - /uhoh
     - ???
-    - /bonk
 ---
 
 ### [MemeRepost](memerepost.py)
