@@ -7,8 +7,7 @@ import disnake
 
 pin_channel_type = Union[
     disnake.TextChannel,
-    disnake.Thread,
-    disnake.ForumChannel
+    disnake.Thread
 ]
 
 
