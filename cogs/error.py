@@ -133,7 +133,8 @@ class Error(Base, commands.Cog):
 
         if isinstance(error, commands.CommandOnCooldown):
             await inter.send(
-                utils.fill_message("spamming", user=inter.author.id, time=error.retry_after)
+                utils.fill_message("spamming", user=inter.author.id, time=error.retry_after),
+                ephemeral=True
             )
             return
 
