@@ -114,7 +114,11 @@ class AutoPin(Base, commands.Cog):
         self,
         inter: disnake.ApplicationCommandInteraction,
         channel: pin_channel_type = None,
-        type: str = commands.Param(description="file type", choices=["json", "markdown"], default="markdown")
+        type: str = commands.Param(
+            description="Typ výstupu. Markdown/JSON",
+            choices=["json", "markdown"],
+            default="markdown"
+        )
     ):
         """Get all pins from channel and send it to user in markdown file"""
         channel = inter.channel if channel is None else channel
