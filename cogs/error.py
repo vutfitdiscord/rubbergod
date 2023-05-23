@@ -221,7 +221,8 @@ class Error(Base, commands.Cog):
             return
         if isinstance(error, commands.CommandOnCooldown):
             await inter.send(
-                utils.fill_message("spamming", user=inter.author.id, time=error.retry_after)
+                utils.fill_message("spamming", user=inter.author.id, time=error.retry_after),
+                ephemeral=True
             )
             return
         if isinstance(error, commands.CheckFailure):
