@@ -184,6 +184,13 @@ class Config:
     forum_tags: List[str] = get_attr(toml_dict, "forum", "tags")
     forum_autoclose_forums: List[int] = get_attr(toml_dict, "forum", "autoclose_forums")
 
+    def get_keys(self) -> list:
+        keys = []
+        for key in Config.__dict__.keys():
+            if not key.startswith('__') and key not in self.config_static:  # Remove builtin attributes
+                keys.append(key)
+        return keys
+
 
 config = Config()
 
