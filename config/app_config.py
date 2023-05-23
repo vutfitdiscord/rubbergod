@@ -188,6 +188,14 @@ class Config:
 config = Config()
 
 
+def config_get_keys() -> list:
+    keys = []
+    for key in Config.__dict__.keys():
+        if not key.startswith('__') and key not in config.config_static:  # Remove builtin attributes
+            keys.append(key)
+    return keys
+
+
 def load_config():
     global config
     config = Config()

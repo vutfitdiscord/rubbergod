@@ -1,5 +1,6 @@
 bckup*
 config/config.toml
+config/config_backup*.toml
 __pycache__
 .idea
 .venv/
