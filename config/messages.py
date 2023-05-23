@@ -41,9 +41,6 @@ class Messages:
     uhoh = "uh oh"
 
     pr_meme = "https://github.com/Toaster192/rubbergod/pulls"
-    question = ["<:what:638277508541710337>",
-                "<:wuuut:484470874003472394>",
-                "nech mě <:sadcat:576171980118687754>"]
 
     # HUGS
     hug_give_brief = "Obejme kamaráda"
