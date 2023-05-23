@@ -79,7 +79,6 @@ image_extensions = ["png", "jpg", "jpeg", "gif"]
 
 [meme]
 uhoh_string = 'uh oh'
-covid_channel_id = 686554441167405077
 hug_emojis = ["<:peepoHug:600435649786544151>",
     "<:peepoHugger:602052621007585280>",
     "<:huggers:602823825880514561>", "(っ˘̩╭╮˘̩)っ", "(っ´▽｀)っ",
