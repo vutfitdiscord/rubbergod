@@ -3,7 +3,7 @@ import os
 import re
 import time
 from datetime import datetime, timezone
-from typing import Callable, Iterable, Optional, Union
+from typing import Callable, Iterable, Literal, Optional, Union
 
 import disnake
 from disnake import Emoji, Member, PartialEmoji
@@ -353,6 +353,38 @@ async def get_members_from_tag(guild, tag):
 
 def get_local_zone():
     return datetime.now().astimezone().tzinfo
+
+
+time_types = Literal["Default", "Short Time", "Long Time", "Short Date", "Long Date",
+                     "Short Date/Time", "Long Date/Time", "Relative Time"]
+
+
+time_types_dict = {
+    "Default": "",
+    "Short Time": ":t",
+    "Long Time": ":T",
+    "Short Date": ":d",
+    "Long Date": ":D",
+    "Short Date/Time": ":f",
+    "Long Date/Time": ":F",
+    "Relative Time": ":R"
+}
+
+
+def get_discord_timestamp(dt: datetime, style: time_types = "Default") -> str:
+    """get unix timestamp from datetime object and return it as discord timestamp
+    more about discord timestamps: https://gist.github.com/LeviSnoot/d9147767abeef2f770e9ddcd91eb85aa
+
+    Default and Short Date/Time formats are identical, but for the sake of consistency,
+    I've left them as separate options.
+
+    returns
+    -------
+    <t:unix_time[:type]>
+    """
+    if style not in time_types_dict:
+        raise ValueError(f"Invalid timestamp style: {style}")
+    return f"<t:{int(dt.timestamp())}{time_types_dict[style]}>"
 
 
 async def get_or_fetch_channel(bot, channel_id) -> disnake.TextChannel:

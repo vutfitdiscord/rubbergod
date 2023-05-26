@@ -240,7 +240,11 @@ class StreamLinks(Base, commands.Cog):
 
         embed.add_field(name="Předmět", value=streamlink.subject.upper(), inline=True)
         embed.add_field(name="Od", value=streamlink.member_name, inline=True)
-        embed.add_field(name="Datum vydání", value=streamlink.created_at.strftime("%d. %m. %Y"), inline=True)
+        embed.add_field(
+            name="Datum vydání",
+            value=utils.get_discord_timestamp(streamlink.created_at, "Short Date"),
+            inline=True
+        )
         embed.add_field(name="Odkaz", value=f"[Link]({streamlink.link})", inline=False)
         embed.add_field(name="Popis", value=streamlink.description[:1024], inline=False)
         embed.timestamp = datetime.utcnow()
