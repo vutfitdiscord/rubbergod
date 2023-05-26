@@ -1,3 +1,4 @@
+from datetime import datetime, time
 from typing import Union
 
 import disnake
@@ -43,7 +44,10 @@ class ReviewManager:
                 author = guild.get_member(int(review.member_ID))
             embed.add_field(name="Author", value=author)
             embed.add_field(name="Tier", value=review.tier)
-            embed.add_field(name="Date", value=review.date)
+            embed.add_field(
+                name="Date",
+                value=utils.get_discord_timestamp(datetime.combine(review.date, time(12, 0)), "Relative Time")
+            )
             text = review.text_review
             if text is not None:
                 text_len = len(text)
