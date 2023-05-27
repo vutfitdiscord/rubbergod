@@ -11,6 +11,7 @@ from disnake.ext import commands, tasks
 
 import utils
 from cogs.base import Base
+from config import cooldowns
 from config.app_config import config
 from config.messages import Messages
 from permissions import permission_check
@@ -341,6 +342,23 @@ class Timeout(Base, commands.Cog):
 
                 await self.submod_helper_room.send(embed=embed)
 
+    @cooldowns.default_cooldown
+    @commands.slash_command(name="selftimeout", description=Messages.self_timeout)
+    async def self_timeout(self, inter: disnake.ApplicationCommandInteraction, endtime: str = commands.Param(
+            autocomplete=autocomplete_times,
+            max_length=20, description=Messages.timeout_time
+            )):
+        await inter.response.defer(ephemeral=True)
+        endtime = await self.timeout_parse(inter, inter.user, endtime, Messages.self_timeout_reason)
+        if endtime is None:
+            raise commands.BadArgument
+        starttime = inter.created_at.astimezone(tz=utils.get_local_zone()).replace(tzinfo=None)
+        # convert to local time and remove timezone info
+        self.timeout_repo.add_timeout(inter.user.id, inter.author.id, starttime,
+                                      endtime, Messages.self_timeout_reason)
+        await inter.send(content=Messages.self_timeout_success, ephemeral=True)
+
+    @self_timeout.error
     @timeout_user.error
     async def timeout_error(self, inter: disnake.ApplicationCommandInteraction, error):
         if isinstance(error, commands.BadArgument):

@@ -488,6 +488,12 @@ class Messages:
     timeout_list_none = "Nenalezeny žádné umlčení."
     timeout_member_not_found = "{member} Nikoho takového jsem na serveru nenašel. Ujisti se, že jsi uživatele zadal @tagem."
 
+    # SELFTIMEOUT COG
+    self_timeout = "Dočasně si zakážeš interakce na serveru"
+    self_timeout_reason = "Sebeumlčení"
+    self_timeout_something_went_wrong = "Něco se pokazilo"
+    self_timeout_success = "Sebeumlčení proběhlo úspěšně"
+
     # TIMEOUT WARS
     timeout_wars_user = "Uživatel {user} byl umlčen na {time:.0f} minut."
     timeout_wars_message_delete = "Uživatel {user} byl přistižen při mazání zpráv. Byl proto umlčen na {time:.0f} minut."
