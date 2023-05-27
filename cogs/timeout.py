@@ -356,7 +356,7 @@ class Timeout(Base, commands.Cog):
         # convert to local time and remove timezone info
         self.timeout_repo.add_timeout(inter.user.id, inter.author.id, starttime,
                                       endtime, Messages.self_timeout_reason)
-        await inter.send(content=Messages.self_timeout_success, ephemeral=True)
+        await inter.send(content=Messages.self_timeout_success)
 
     @self_timeout.error
     @timeout_user.error
