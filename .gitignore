@@ -1,5 +1,6 @@
 bckup*
-config/config.toml
+/cfg
+config/external/config.toml
 __pycache__
 .idea
 .venv/

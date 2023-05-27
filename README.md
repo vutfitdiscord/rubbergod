@@ -45,7 +45,7 @@ cd rubbergod
 #### Configuration
 
 ```bash
-cp config/config.template.toml config/config.toml
+cp config/config.template.toml config/external/config.toml
 ```
 
 Now open the `config.toml` file in your editor. Insert the Discord API key you obtained earlier in the setup process:
