@@ -126,6 +126,19 @@ To stop the detached container, use this command:
 docker compose down
 ```
 
+### Tips (optional)
+
+> These things are not necessary for development but can help from time to time.
+
+#### Enable commands sync debug
+
+To enable command synchronization debug logging, change the following setting in `rubbergod.py` to `True`:
+
+```python
+command_sync_flags = commands.CommandSyncFlags()
+command_sync_flags.sync_commands_debug = False
+```
+
 --------------------------------------
 
 ### Local setup (not recommended)

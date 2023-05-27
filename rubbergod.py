@@ -52,12 +52,16 @@ intents.reactions = True
 intents.presences = True
 intents.moderation = True
 
+command_sync_flags = commands.CommandSyncFlags()
+command_sync_flags.sync_commands_debug = False
+
 bot = commands.Bot(
     command_prefix=commands.when_mentioned_or(*config.command_prefix),
     help_command=None,
     case_insensitive=True,
     allowed_mentions=AllowedMentions(roles=False, everyone=False, users=True),
     intents=intents,
+    command_sync_flags=command_sync_flags
 )
 
 presence = presence.Presence(bot)
