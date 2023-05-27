@@ -350,8 +350,6 @@ class Timeout(Base, commands.Cog):
             )):
         await inter.response.defer(ephemeral=True)
         endtime = await self.timeout_parse(inter, inter.user, endtime, Messages.self_timeout_reason)
-        if endtime is None:
-            raise commands.BadArgument
         starttime = inter.created_at.astimezone(tz=utils.get_local_zone()).replace(tzinfo=None)
         # convert to local time and remove timezone info
         self.timeout_repo.add_timeout(inter.user.id, inter.author.id, starttime,
