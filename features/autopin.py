@@ -68,7 +68,7 @@ class AutopinFeatures():
                 f.write(f"### Content\n\n{pin.content}\n\n") if pin.content else ...
                 files = ""
                 for file in pin.attachments:
-                    if "image" in file.content_type:
+                    if file.content_type is not None and "image" in file.content_type:
                         files += f"![{file.filename}]({file.url}); \n"
                     else:
                         files += f"[{file.filename}]({file.url}); \n"
