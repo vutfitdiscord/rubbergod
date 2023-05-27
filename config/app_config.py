@@ -30,7 +30,10 @@ class Config:
     It checks value from config override and if not exists that will be take from config template.
     """
 
-    toml_dict: dict = toml.load("config/external/config.toml", _dict=dict)
+    try:
+        toml_dict: dict = toml.load("config/external/config.toml", _dict=dict)
+    except FileNotFoundError:
+        toml_dict: dict = toml.load("config/config.toml", _dict=dict)
 
     # Authorization
     key: str = get_attr(toml_dict, "base", "key")
