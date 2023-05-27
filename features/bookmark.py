@@ -49,9 +49,10 @@ class BookmarkFeatures():
         upload_limit = False
         images = []
         files_attached = []
+        max_upload_size = 25000000    # 25MB
         if inter.message.attachments:
             for attachment in inter.message.attachments:
-                if attachment.size > 8388608:
+                if attachment.size > max_upload_size:
                     upload_limit = True
                     continue
                 if re.search(r"\.png|\.jpg|\.jpeg|\.gif$", str(attachment)):
