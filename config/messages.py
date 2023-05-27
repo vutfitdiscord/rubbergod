@@ -487,8 +487,6 @@ class Messages:
     timeout_user_brief = "Použij tag uživatele/uživatelů"
     timeout_list_none = "Nenalezeny žádné umlčení."
     timeout_member_not_found = "{member} Nikoho takového jsem na serveru nenašel. Ujisti se, že jsi uživatele zadal @tagem."
-
-    # SELFTIMEOUT COG
     self_timeout = "Dočasně si zakážeš interakce na serveru"
     self_timeout_reason = "Sebeumlčení"
     self_timeout_something_went_wrong = "Něco se pokazilo"
