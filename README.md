@@ -60,10 +60,11 @@ Now open the `config.toml` file in your editor. Insert the Discord API key you o
 
 > __Be careful.__ Bad things will happen if anyone else gets a possession of this key. Do not share it with anyone, ever!
 
-On the next line, insert your Discord user ID into the array so you get administrator rights over the bot:
+On the next two lines, insert your Discord user and server ID so you get administrator rights over the bot:
 
 ```
 6 admin_ids = [<Your Discord user ID>]
+7 guild_id = <Your Server ID here>
 ```
 
 > [Where can I find my User/Server/Message ID?](https://support.discord.com/hc/en-us/articles/206346498-Where-can-I-find-my-User-Server-Message-ID-)
