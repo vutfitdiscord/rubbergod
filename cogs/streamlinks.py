@@ -121,6 +121,11 @@ class StreamLinks(Base, commands.Cog):
         await inter.response.defer()
 
         link = utils.clear_link_escape(link)
+        try:
+            requests.get(link)
+        except Exception:
+            await inter.edit_original_response(Messages.streamlinks_invalid_link)
+            return
 
         if self.streamlinks_repo.exists_link(link):
             await inter.edit_original_response(
