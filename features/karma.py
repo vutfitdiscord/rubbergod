@@ -258,7 +258,8 @@ class Karma(BaseFeature):
     async def karma_transfer(self, inter, from_user, to_user):
         transfered, members_update = self.repo.transfer_karma(from_user, to_user)
         if transfered is None:
-            return await inter.send(Messages.karma_transer_user_no_karma.format(user=from_user))
+            await inter.send(Messages.karma_transer_user_no_karma.format(user=from_user))
+            return
 
         formated_message = utils.fill_message(
             "karma_transfer_complete",

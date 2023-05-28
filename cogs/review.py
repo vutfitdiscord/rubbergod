@@ -130,10 +130,11 @@ class Review(Base, commands.Cog):
                 return
 
             # not admin
-            return await inter.send(
+            await inter.send(
                 utils.fill_message("review_remove_denied", user=inter.author.id),
                 ephemeral=True
             )
+            return
         elif subject is not None:
             subject = subject.lower()
             if self.manager.remove(str(inter.author.id), subject):

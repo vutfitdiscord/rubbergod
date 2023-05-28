@@ -129,7 +129,8 @@ class Fun(Base, commands.Cog):
         keyword: search for a certain keyword in a joke
         """
         if keyword is not None and ("&" in keyword or "?" in keyword):
-            return await inter.send("I didn't find a joke like that.")
+            await inter.send("I didn't find a joke like that.")
+            return
 
         params: Dict[str, str] = {"limit": "30"}
         url: str = "https://icanhazdadjoke.com"
@@ -145,7 +146,8 @@ class Fun(Base, commands.Cog):
         if keyword is not None:
             res = fetched["results"]
             if len(res) == 0:
-                return await inter.send("I didn't find a joke like that.")
+                await inter.send("I didn't find a joke like that.")
+                return
             result = random.choice(res)
             result["joke"] = re.sub(
                 f"(\\b\\w*{keyword}\\w*\\b)",

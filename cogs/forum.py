@@ -31,11 +31,12 @@ class Forum(Base, commands.Cog):
             thread.auto_archive_duration != one_day*7
             and not any(tag in after_tags for tag in config.forum_tags)
         ):
-            print("abcd")
-            return await thread.edit(auto_archive_duration=one_day*7)
+            await thread.edit(auto_archive_duration=one_day*7)
+            return
         # thread tagged for archivation
         if any(tag in after_tags for tag in config.forum_tags):
-            return await thread.edit(auto_archive_duration=one_day)
+            await thread.edit(auto_archive_duration=one_day)
+            return
 
 
 def setup(bot):

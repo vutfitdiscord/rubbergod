@@ -293,14 +293,16 @@ class Karma(Base, commands.Cog):
     ):
         await inter.response.defer()
         if from_user == to_user:
-            return await inter.send(Messages.karma_transfer_same_user)
+            await inter.send(Messages.karma_transfer_same_user)
+            return
         await self.karma_helper.karma_transfer(inter, from_user, to_user)
 
     @cooldowns.default_cooldown
     @commands.guild_only()
     async def karma(self, ctx: commands.Context):
         if not (config.guild_id == ctx.guild.id):
-            return await ctx.reply(Messages.server_warning)
+            await ctx.reply(Messages.server_warning)
+            return
         command_id = utils.get_command_id(self, "karma")
         await ctx.reply(utils.fill_message("moved_command", name="karma", id=command_id))
 
