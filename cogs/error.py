@@ -1,6 +1,6 @@
 """
 Cog for handling command errors. This is mostly for logging purposes.
-Errors originating from other then commands (such as reaction handlers and listeners)
+Errors originating from other than commands (such as reaction handlers and listeners)
 are handled in rubbergod.py `on_error` function.
 
 Listeners catch errors from commands and send a response to the user.
@@ -33,9 +33,11 @@ class Error(Base, commands.Cog):
     async def on_command_error(self, ctx, error):
         if isinstance(error, disnake.errors.DiscordServerError):
             return
+
         if isinstance(error, sqlalchemy.exc.InternalError):
             session.rollback()
             return
+
         if (
             isinstance(error, permission_check.NotHelperPlusError)
             or isinstance(error, permission_check.NotSubmodPlusError)
@@ -44,6 +46,7 @@ class Error(Base, commands.Cog):
         ):
             await ctx.send(error.message)
             return
+
         if (
             isinstance(error, commands.BadArgument)
             or isinstance(error, commands.MissingAnyRole)
@@ -52,7 +55,7 @@ class Error(Base, commands.Cog):
             return
 
         if isinstance(error, commands.UserInputError):
-            await ctx.send("Chyba ve vstupu, jestli vstup obsahuje `\"` nahraď je za `'`")
+            await ctx.send(Messages.user_input_error)
             return
 
         if isinstance(error, commands.UserNotFound):
@@ -74,6 +77,10 @@ class Error(Base, commands.Cog):
             elif prefix not in config.ignored_prefixes:
                 await ctx.send(Messages.no_such_command)
             return
+
+        # no return here, because we want to log these errors
+        if isinstance(error, commands.CommandInvokeError):
+            await ctx.send(Messages.command_invoke_error)
 
         if isinstance(error, commands.CommandOnCooldown):
             await ctx.send(utils.fill_message("spamming", user=ctx.author.id, time=error.retry_after))
@@ -131,6 +138,10 @@ class Error(Base, commands.Cog):
             await inter.send(Messages.command_timed_out)
             return
 
+        # no return here, because we want to log these errors
+        if isinstance(error, commands.CommandInvokeError):
+            await inter.send(Messages.command_invoke_error)
+
         if isinstance(error, commands.CommandOnCooldown):
             await inter.send(
                 utils.fill_message("spamming", user=inter.author.id, time=error.retry_after),
@@ -179,12 +190,19 @@ class Error(Base, commands.Cog):
         ):
             await inter.send(error.message)
             return
+
         if isinstance(error, commands.UserNotFound):
             await inter.send(Messages.user_not_found.format(user=inter.author.mention))
             return
+
         if isinstance(error, commands.MemberNotFound):
             await inter.send(Messages.member_not_found.format(member=inter.author.mention))
             return
+
+        # no return here, because we want to log these errors
+        if isinstance(error, commands.CommandInvokeError):
+            await inter.send(Messages.command_invoke_error)
+
         if isinstance(error, commands.CommandOnCooldown):
             await inter.send(
                 utils.fill_message("spamming", user=inter.author.id, time=error.retry_after),
@@ -219,12 +237,18 @@ class Error(Base, commands.Cog):
         ):
             await inter.send(error.message)
             return
+
+        # no return here, because we want to log these errors
+        if isinstance(error, commands.CommandInvokeError):
+            await inter.send(Messages.command_invoke_error)
+
         if isinstance(error, commands.CommandOnCooldown):
             await inter.send(
                 utils.fill_message("spamming", user=inter.author.id, time=error.retry_after),
                 ephemeral=True
             )
             return
+
         if isinstance(error, commands.CheckFailure):
             await inter.send(utils.fill_message("missing_perms", user=inter.author.id))
             return

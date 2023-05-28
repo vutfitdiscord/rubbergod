@@ -11,18 +11,22 @@ class Messages:
     help_description = "Kompletní seznam lze také najít ve veřejné administraci bota (https://public.grillbot.cloud/)"
 
     karma_get_missing = "Toaster pls, měl jsi bordel v DB. Musel jsem za tebe uklidit."
-    moved_command = "Tento příkaz již není v textové formě podporován. Příkaz byl nahrazen příkazem </{name}:{id}>"
-    no_such_command = "Takový příkaz neznám. <:sadcat:576171980118687754>"
-    command_timed_out = "Příkaz nereagoval a byl nečekaně ukončen."
-    spamming = "{user} Nespamuj tolik <:sadcat:576171980118687754>, příkaz můžeš použít až za {time:.2f}s."
-    member_not_found = "{member} Nikoho takového jsem na serveru nenašel."
-    user_not_found = "{user} Nikoho takového jsem nenašel."
-    help_command_not_found = "Žádný příkaz jako `{command}` neexistuje."
+
     on_ready_message = "<:peepowave:693070888546861096>"
     cooldown = "Příliš rychle, zkus to znovu za {:.3}s"
     embed_not_author = "Hraj si na svém písečku s tebou zavolanými příkazy. <:pepeGun:826943455032901643>"
     base_leaderboard_format_str = "_{position}._ - **{member_name}**:"
 
+    # ERROR
+    moved_command = "Tento příkaz již není v textové formě podporován. Příkaz byl nahrazen příkazem </{name}:{id}>"
+    no_such_command = "Takový příkaz neznám. <:sadcat:576171980118687754>"
+    command_timed_out = "Příkaz nereagoval a byl nečekaně ukončen."
+    command_invoke_error = "Došlo k nečekané chybě, už na tom pracujeme <:notLikeRubbergod:1112395455142314044>"
+    user_input_error = "Chyba ve vstupu, jestli vstup obsahuje `\"`, nahraď je za `'`"
+    spamming = "{user} Nespamuj tolik <:sadcat:576171980118687754>, příkaz můžeš použít až za {time:.2f}s."
+    member_not_found = "{member} Nikoho takového jsem na serveru nenašel."
+    user_not_found = "{user} Nikoho takového jsem nenašel."
+    help_command_not_found = "Žádný příkaz jako `{command}` neexistuje."
 
     # PERMISSIONS
     missing_perms = "{user}, na použití tohoto příkazu nemáš právo."
@@ -478,7 +482,7 @@ class Messages:
     timeout_list_brief = "Vypíše uživatele se zatlumením."
     timeout_remove_brief = "Předčasně odebere umlčení uživateli."
     timeout_remove = "Umlčení zrušeno uživateli {user}."
-    timeout_bad_format = "Neznamý formát času. Možné formáty:\n**3** - celé hodiny\n**0.5** - necelé hodiny, použij tečku\n**Datum konce:\n{format}**"
+    timeout_bad_format = "Neznamý formát času. Možné formáty:\n**3** - celé hodiny\n**0.5** - necelé hodiny, použij tečku\n**Datum konce:**\n{format}"
     timeout_permission = "Na umlčení **{user}** nemám práva."
     timeout_negative_time = "Čas nemůže být záporný."
     timeout_overflow = "Příliš velký počet hodin. Použij formát datumu."

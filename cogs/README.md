@@ -61,7 +61,7 @@ Cog for dynamically changing config.\
 ### [Error](error.py)
 
 Cog for handling command errors. This is mostly for logging purposes.
-Errors originating from other then commands (such as reaction handlers and listeners) are handled in rubbergod.py `on_error` function.
+Errors originating from other than commands (such as reaction handlers and listeners) are handled in rubbergod.py `on_error` function.
 
 ---
 
