@@ -30,6 +30,10 @@ class StreamLinksRepo(BaseRepository):
             session.rollback()
             raise
 
+    def merge(streamlink: StreamLink):
+        session.merge(streamlink)
+        session.commit()
+
     def exists_link(self, link: str):
         return session.query(exists().where(StreamLink.link == link)).scalar()
 

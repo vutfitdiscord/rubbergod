@@ -322,6 +322,7 @@ Cog implementing streamlinks system. List streams for a subject.\
     - /streamlinks list
     - /streamlinks_mod add
     - /streamlinks_mod remove
+    - /streamlinks_mod update
 ---
 
 ### [Studijni](studijni.py)
