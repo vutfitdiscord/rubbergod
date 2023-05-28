@@ -80,7 +80,8 @@ class Gif(Base, commands.Cog):
         try:
             response = requests.get(url, timeout=10)
         except requests.exceptions.RequestException:
-            return await inter.send(Messages.gif_req_error, ephemeral=True)
+            await inter.send(Messages.gif_req_error, ephemeral=True)
+            return
         avatar = Image.open(BytesIO(response.content)).convert("RGBA")
 
         width, height = avatar.size
@@ -93,7 +94,8 @@ class Gif(Base, commands.Cog):
         avatar = avatar.convert("P", palette=Image.ADAPTIVE, colors=200).convert("RGBA")
         with BytesIO() as image_binary:
             self.imagehandler.render_catnap(image_binary, avatar)
-            return await inter.send(file=disnake.File(fp=image_binary, filename="steal.gif"))
+            await inter.send(file=disnake.File(fp=image_binary, filename="steal.gif"))
+            return
 
     @cooldowns.default_cooldown
     @commands.slash_command(name="bonk", description=Messages.bonk_brief)

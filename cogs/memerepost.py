@@ -52,7 +52,8 @@ class MemeRepost(Base, commands.Cog):
                     emoji_val = self.karma_repo.emoji_value(emoji_key)
 
                     if int(emoji_val) >= 1:
-                        return await self.__repost_message(ctx, all_reactions)
+                        await self.__repost_message(ctx, all_reactions)
+                        return
         elif ctx.channel.id == config.meme_repost_room:
             repost = self.repost_repo.find_repost_by_repost_message_id(ctx.message.id)
 

@@ -42,10 +42,12 @@ class AutoPin(Base, commands.Cog):
             message: disnake.Message = await converter.convert(inter, message_url)
 
             if message.is_system():
-                return await inter.send(Messages.autopin_system_message)
+                await inter.send(Messages.autopin_system_message)
+                return
 
             if len(await message.channel.pins()) == 50:
-                return await inter.send(Messages.autopin_max_pins_error)
+                await inter.send(Messages.autopin_max_pins_error)
+                return
 
             self.repo.add_or_update_channel(str(message.channel.id), str(message.id))
 
@@ -54,7 +56,8 @@ class AutoPin(Base, commands.Cog):
 
             await inter.send(Messages.autopin_add_done)
         except commands.MessageNotFound:
-            return await inter.send(Messages.autopin_add_unknown_message)
+            await inter.send(Messages.autopin_add_unknown_message)
+            return
 
     @pin_mod.sub_command(name="remove", description=Messages.autopin_remove_brief)
     async def remove(
@@ -77,7 +80,8 @@ class AutoPin(Base, commands.Cog):
         mappings: List[PinMap] = self.repo.get_mappings()
 
         if not mappings:
-            return await inter.send(Messages.autopin_no_messages)
+            await inter.send(Messages.autopin_no_messages)
+            return
 
         lines: List[str] = []
         for item in mappings:
@@ -124,7 +128,8 @@ class AutoPin(Base, commands.Cog):
         channel = inter.channel if channel is None else channel
         pins = await channel.pins()
         if not pins:
-            return await inter.send(Messages.autopin_no_pins)
+            await inter.send(Messages.autopin_no_pins)
+            return
 
         if type == "markdown":
             await self.pin_features.create_markdown_file(inter, channel, pins)

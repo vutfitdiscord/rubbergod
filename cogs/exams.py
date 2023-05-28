@@ -79,9 +79,10 @@ class Exams(Base, commands.Cog):
     @terms.sub_command(name="remove", description=Messages.exams_remove_terms_brief)
     async def remove(self, inter: disnake.ApplicationCommandInteraction, channel: disnake.TextChannel):
         if not isinstance(channel, disnake.TextChannel):
-            return await inter.edit_original_response(
+            await inter.edit_original_response(
                 utils.fill_message("exams_channel_is_not_text_channel", chan_name=channel.name)
             )
+            return
 
         message_ids = self.exams_repo.remove_from_channel(channel.id)
         for message_id in message_ids:
@@ -207,7 +208,8 @@ class Exams(Base, commands.Cog):
                     if match is not None:
                         rocnik = self.process_match(match)
                         if rocnik is not None:
-                            return await self.process_exams(inter, rocnik, inter.author)
+                            await self.process_exams(inter, rocnik, inter.author)
+                            return
 
                 await inter.edit_original_response(Messages.exams_no_valid_role)
             else:
@@ -273,7 +275,8 @@ class Exams(Base, commands.Cog):
             utils.add_author_footer(embed, author if author is not None else self.bot.user)
 
             if isinstance(target, disnake.ApplicationCommandInteraction):
-                return await target.send(embed=embed)
+                await target.send(embed=embed)
+                return
 
         # There is body so start parsing table
         exams = body.find_all("tr")

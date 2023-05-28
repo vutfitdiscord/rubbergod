@@ -88,7 +88,8 @@ class Info(Base, commands.Cog):
 
         place = place[:100]
         if "&" in place:
-            return await inter.edit_original_response("Takhle se žádné město určitě nejmenuje.")
+            await inter.edit_original_response("Takhle se žádné město určitě nejmenuje.")
+            return
 
         url = (
             "http://api.openweathermap.org/data/2.5/weather?q="

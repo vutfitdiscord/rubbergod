@@ -27,7 +27,8 @@ class Latex(Base, commands.Cog):
         foreground = "White"
 
         if len(args) < 1:
-            return await ctx.send(f"{Messages.latex_help}\n{Messages.latex_colors}")
+            await ctx.send(f"{Messages.latex_help}\n{Messages.latex_colors}")
+            return
         if "?fg=" in args[0]:
             foreground = args[0][4:]
             args = args[1:]
@@ -43,11 +44,13 @@ class Latex(Base, commands.Cog):
                     async with session.get(imgURL) as resp:
 
                         if resp.status != 200:
-                            return await ctx.send("Could not get image.")
+                            await ctx.send("Could not get image.")
+                            return
 
                         data = await resp.read()
                         if not data.startswith(PNG_HEADER):
-                            return await ctx.send("Could not get image.")
+                            await ctx.send("Could not get image.")
+                            return
 
                         datastream = io.BytesIO(data)
                         await channel.send(file=disnake.File(datastream, "latex.png"))

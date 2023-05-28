@@ -31,7 +31,8 @@ class FitRoom(Base, commands.Cog):
         url = f"https://www.fit.vut.cz/fit/map/.cs?show={room.upper()}&big=1"
         r = requests.get(url)
         if r.status_code != 200:
-            return await inter.edit_original_response(Messages.fit_room_unreach)
+            await inter.edit_original_response(Messages.fit_room_unreach)
+            return
 
         try:
             soup = BeautifulSoup(r.content, 'html.parser')
@@ -41,12 +42,14 @@ class FitRoom(Base, commands.Cog):
             image = main_body.find("svg", {"id": "map"})
             cursor = main_body.find("polygon", {"id": "arrow"})
         except AttributeError:
-            return await inter.edit_original_response(Messages.fit_room_parsing_failed)
+            await inter.edit_original_response(Messages.fit_room_parsing_failed)
+            return
 
         if image is None or cursor is None:
-            return await inter.edit_original_response(
+            await inter.edit_original_response(
                 utils.fill_message("fit_room_room_not_on_plan", room=room[:1024])
-                )
+            )
+            return
 
         image_bytes = BytesIO()
         image_bytestring = str(image).encode("utf-8")
