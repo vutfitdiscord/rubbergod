@@ -13,12 +13,23 @@ class TimeoutRepository(BaseRepository):
     def get_timeout_users(self) -> List[Timeout]:
         return session.query(Timeout).all()
 
+    def get_timeout_users_filter_self(self, isself) -> List[Timeout]:
+        return session.query(Timeout).filter(Timeout.isself == isself).all()
+
     def get_timeout_user(self, user_id: int):
         return session.query(Timeout).get(user_id)
 
-    def add_timeout(self, user_id: int, mod_id: int, start: datetime, end: datetime, reason: str):
+    def add_timeout(
+        self,
+        user_id: int,
+        mod_id: int,
+        start: datetime,
+        end: datetime,
+        reason: str,
+        isself: bool
+    ):
         """
-        Add the user and their timeout to the database.
+        Add the user and their timeout/selftimeout to the database.
         Save all datetimes in the database without timezone information.
         """
         exists = self.get_timeout_user(user_id)
@@ -28,6 +39,7 @@ class TimeoutRepository(BaseRepository):
             exists.end = end
             exists.length = end - start
             exists.reason = reason
+            exists.isself = isself
             session.commit()
             return
         try:
@@ -37,7 +49,8 @@ class TimeoutRepository(BaseRepository):
                 start=start,
                 end=end,
                 length=end-start,
-                reason=reason
+                reason=reason,
+                isself=isself
             )
             session.add(timeout)
             session.commit()

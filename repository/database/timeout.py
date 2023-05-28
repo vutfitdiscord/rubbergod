@@ -1,4 +1,4 @@
-from sqlalchemy import BigInteger, Column, DateTime, Interval, String
+from sqlalchemy import BigInteger, Boolean, Column, DateTime, Interval, String
 
 from repository.database import database
 
@@ -12,3 +12,4 @@ class Timeout(database.base):
     end = Column(DateTime)
     length = Column(Interval)
     reason = Column(String)
+    isself = Column(Boolean)
