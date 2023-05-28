@@ -391,6 +391,7 @@ class Messages:
     streamlinks_remove_prompt = "Opravdu chceš tento stream odstranit ({link})?"
     streamlinks_remove_success = "Stream <{link}> byl úspěšně smazán."
     streamlinks_date_format = "Formát `dd.mm.yyyy`. Bez zadání se bere datum u videa případně dnešní datum."
+    streamlinks_invalid_link = "Neplatný odkaz na stream."
 
     # LATEX
     latex_help = f"Příklad:\n`{prefix}latex [?fg=blue] x^n + y^n = z^n`"
@@ -477,7 +478,7 @@ class Messages:
     timeout_list_brief = "Vypíše uživatele se zatlumením."
     timeout_remove_brief = "Předčasně odebere umlčení uživateli."
     timeout_remove = "Umlčení zrušeno uživateli {user}."
-    timeout_bad_format = "Neznamý formát času. Možné formáty:\n**3** - celé hodiny\n**0.5** - necelé hodiny, použij tečku\n**{format}**"
+    timeout_bad_format = "Neznamý formát času. Možné formáty:\n**3** - celé hodiny\n**0.5** - necelé hodiny, použij tečku\n**Datum konce:\n{format}**"
     timeout_permission = "Na umlčení **{user}** nemám práva."
     timeout_negative_time = "Čas nemůže být záporný."
     timeout_overflow = "Příliš velký počet hodin. Použij formát datumu."
