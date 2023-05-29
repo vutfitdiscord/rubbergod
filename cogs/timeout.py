@@ -356,11 +356,7 @@ class Timeout(Base, commands.Cog):
         await inter.response.defer(ephemeral=True)
         # user can not remove timeout from mods, because he can not write to server chat
 
-        endtime = await self.timeout_parse(inter, inter.user, endtime, Messages.self_timeout_reason, True)
-        starttime = inter.created_at.astimezone(tz=utils.get_local_zone()).replace(tzinfo=None)
-        # convert to local time and remove timezone info
-        self.timeout_repo.add_timeout(inter.user.id, inter.author.id, starttime,
-                                      endtime, Messages.self_timeout_reason, True)
+        await self.timeout_parse(inter, inter.user, endtime, Messages.self_timeout_reason, True)
         await inter.send(content=Messages.self_timeout_success)
 
     @self_timeout.error
