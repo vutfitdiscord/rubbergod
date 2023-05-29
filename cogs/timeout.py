@@ -105,7 +105,7 @@ class Timeout(Base, commands.Cog):
             self.perms_users.append(user)
             return True
 
-    async def timeout_parse(self, inter, user, endtime, reason, isself):
+    async def timeout_parse(self, inter, user, endtime, reason, isself=False):
         """
         Parse time argument to timedelta(length) or datetime object and
         gives user timeout and adds it to db
@@ -209,7 +209,7 @@ class Timeout(Base, commands.Cog):
             return await inter.send(utils.fill_message("timeout_member_not_found", member=inter.author.id))
 
         for user in members:
-            parsed_endtime = await self.timeout_parse(inter, user, endtime, reason, False)
+            parsed_endtime = await self.timeout_parse(inter, user, endtime, reason)
             # if error in parsing return
             if parsed_endtime is None:
                 continue
