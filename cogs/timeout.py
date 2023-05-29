@@ -352,7 +352,8 @@ class Timeout(Base, commands.Cog):
         )
     async def self_timeout(
         self,
-        inter: disnake.ApplicationCommandInteraction, endtime: str = commands.Param(
+        inter: disnake.ApplicationCommandInteraction,
+        endtime: str = commands.Param(
             autocomplete=autocomplete_times,
             max_length=20, description=Messages.timeout_time
         )
