@@ -13,7 +13,7 @@ class TimeoutRepository(BaseRepository):
     def get_timeout_users(self) -> List[Timeout]:
         return session.query(Timeout).all()
 
-    def get_timeout_users_filter_self(self, isself) -> List[Timeout]:
+    def get_timeout_users_filter_self(self, isself: bool = False) -> List[Timeout]:
         return session.query(Timeout).filter(Timeout.isself == isself).all()
 
     def get_timeout_user(self, user_id: int):
@@ -26,7 +26,7 @@ class TimeoutRepository(BaseRepository):
         start: datetime,
         end: datetime,
         reason: str,
-        isself: bool
+        isself: bool = False
     ):
         """
         Add the user and their timeout/selftimeout to the database.
