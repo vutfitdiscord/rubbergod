@@ -344,18 +344,17 @@ class Timeout(Base, commands.Cog):
                 await self.submod_helper_room.send(embed=embed)
 
     @cooldowns.default_cooldown
-    @commands.slash_command(name="selftimeout", description=Messages.self_timeout)
+    @commands.slash_command(
+        name="selftimeout",
+        description=Messages.self_timeout,
+        guild_ids=[config.guild_id]
+        )
     async def self_timeout(self, inter: disnake.ApplicationCommandInteraction, endtime: str = commands.Param(
             autocomplete=autocomplete_times,
             max_length=20, description=Messages.timeout_time
             )):
         await inter.response.defer(ephemeral=True)
         # user can not remove timeout from mods, because he can not write to server chat
-
-        # test if user used the command in guild from config
-        if inter.guild_id != config.guild_id:
-            await inter.send(content=Messages.self_timeout_not_in_guild_chat)
-            return
 
         endtime = await self.timeout_parse(inter, inter.user, endtime, Messages.self_timeout_reason, True)
         starttime = inter.created_at.astimezone(tz=utils.get_local_zone()).replace(tzinfo=None)
