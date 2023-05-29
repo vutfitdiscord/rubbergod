@@ -107,7 +107,8 @@ class Timeout(Base, commands.Cog):
 
     async def timeout_parse(self, inter, user, endtime, reason, isself):
         """
-        Parse time argument to timedelta(length) or datetime object
+        Parse time argument to timedelta(length) or datetime object and
+        gives user timeout and and adds it to db
 
         Decision tree
         -------------
