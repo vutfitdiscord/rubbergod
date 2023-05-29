@@ -349,7 +349,7 @@ class Timeout(Base, commands.Cog):
         name="selftimeout",
         description=Messages.self_timeout,
         guild_ids=[config.guild_id]
-        )
+    )
     async def self_timeout(
         self,
         inter: disnake.ApplicationCommandInteraction,
