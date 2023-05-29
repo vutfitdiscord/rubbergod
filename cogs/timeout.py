@@ -123,6 +123,7 @@ class Timeout(Base, commands.Cog):
                     convert to timedelta
         returns
             endtime: class datetime
+            or None in case of insufficient permissions
         """
 
         # convert to local time and remove timezone info
@@ -289,6 +290,31 @@ class Timeout(Base, commands.Cog):
 
         await self.timeout_embed_listing(users, "Timeout list", inter, inter.author)
 
+    @cooldowns.default_cooldown
+    @commands.slash_command(
+        name="selftimeout",
+        description=Messages.self_timeout,
+        guild_ids=[config.guild_id]
+    )
+    async def self_timeout(
+        self,
+        inter: disnake.ApplicationCommandInteraction,
+        endtime: str = commands.Param(
+            autocomplete=autocomplete_times,
+            max_length=20, description=Messages.timeout_time
+        )
+    ):
+        # Guild_id is used to prevent users from bypassing timeout
+        # given by moderator and using selftimeout in DMs
+
+        await inter.response.defer(ephemeral=True)
+
+        if await self.timeout_parse(inter, inter.user, endtime, Messages.self_timeout_reason, True) is None:
+            await inter.send(content=Messages.timeout_permission.format(user=inter.user))
+            self.perms_users = []
+            return
+        await inter.send(content=Messages.self_timeout_success)
+
     async def update_timeout(self):
         """update all user's timeout in database and on server"""
         users = self.timeout_repo.get_timeout_users()
@@ -343,28 +369,6 @@ class Timeout(Base, commands.Cog):
                 embed.add_field(name=entry.target, value="Předčasně odebráno", inline=False)
 
                 await self.submod_helper_room.send(embed=embed)
-
-    @cooldowns.default_cooldown
-    @commands.slash_command(
-        name="selftimeout",
-        description=Messages.self_timeout,
-        guild_ids=[config.guild_id]
-    )
-    async def self_timeout(
-        self,
-        inter: disnake.ApplicationCommandInteraction,
-        endtime: str = commands.Param(
-            autocomplete=autocomplete_times,
-            max_length=20, description=Messages.timeout_time
-        )
-    ):
-        # Guild_id is used to prevent users from bypassing timeout
-        # given by moderator and using selftimeout in DMs
-
-        await inter.response.defer(ephemeral=True)
-
-        await self.timeout_parse(inter, inter.user, endtime, Messages.self_timeout_reason, True)
-        await inter.send(content=Messages.self_timeout_success)
 
     @self_timeout.error
     @timeout_user.error
