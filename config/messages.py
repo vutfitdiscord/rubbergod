@@ -489,7 +489,6 @@ class Messages:
     timeout_member_not_found = "{member} Nikoho takového jsem na serveru nenašel. Ujisti se, že jsi uživatele zadal @tagem."
     self_timeout = "Dočasně si zakážeš interakce na serveru"
     self_timeout_reason = "Sebeumlčení"
-    self_timeout_something_went_wrong = "Něco se pokazilo"
     self_timeout_success = "Sebeumlčení proběhlo úspěšně"
     self_timeout_not_in_guild_chat = "Tento příkaz nelze použít mimo server, který tento bot spravuje"
 
