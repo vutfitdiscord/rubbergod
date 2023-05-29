@@ -490,7 +490,6 @@ class Messages:
     self_timeout = "Dočasně si zakážeš interakce na serveru"
     self_timeout_reason = "Sebeumlčení"
     self_timeout_success = "Sebeumlčení proběhlo úspěšně"
-    self_timeout_not_in_guild_chat = "Tento příkaz nelze použít mimo server, který tento bot spravuje"
 
     # TIMEOUT WARS
     timeout_wars_user = "Uživatel {user} byl umlčen na {time:.0f} minut."
