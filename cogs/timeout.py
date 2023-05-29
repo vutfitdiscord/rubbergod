@@ -350,10 +350,14 @@ class Timeout(Base, commands.Cog):
         description=Messages.self_timeout,
         guild_ids=[config.guild_id]
         )
-    async def self_timeout(self, inter: disnake.ApplicationCommandInteraction, endtime: str = commands.Param(
+    async def self_timeout(
+        self,
+        inter: disnake.ApplicationCommandInteraction, endtime: str = commands.Param(
             autocomplete=autocomplete_times,
             max_length=20, description=Messages.timeout_time
-            )):
+        )
+    ):
+
         await inter.response.defer(ephemeral=True)
         # user can not remove timeout from mods, because he can not write to server chat
 
