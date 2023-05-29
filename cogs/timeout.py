@@ -357,9 +357,9 @@ class Timeout(Base, commands.Cog):
             max_length=20, description=Messages.timeout_time
         )
     ):
+        # User can not remove /timeout user using /selftimeout, because /selftimeout is only visible in guild
 
         await inter.response.defer(ephemeral=True)
-        # user can not remove timeout from mods, because he can not write to server chat
 
         await self.timeout_parse(inter, inter.user, endtime, Messages.self_timeout_reason, True)
         await inter.send(content=Messages.self_timeout_success)
