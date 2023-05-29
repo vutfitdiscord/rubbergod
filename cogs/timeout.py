@@ -90,7 +90,7 @@ class Timeout(Base, commands.Cog):
             embeds.append(embed)
         await room.send(embeds=embeds)
 
-    async def timeout_perms(self, inter, user, duration, endtime, reason, isself) -> bool:
+    async def timeout_perms(self, inter, user, duration, endtime, reason, isself=False) -> bool:
         """Set timeout for user or remove it and save in db"""
         try:
             await user.timeout(duration=duration, reason=reason)
@@ -266,7 +266,7 @@ class Timeout(Base, commands.Cog):
             return await inter.send(utils.fill_message("timeout_member_not_found", member=inter.author.id))
 
         for user in members:
-            if await self.timeout_perms(inter, user, None, None, "Předčasné odebrání", False):
+            if await self.timeout_perms(inter, user, None, None, "Předčasné odebrání"):
                 continue
             embed.add_field(name=user, value="Předčasně odebráno", inline=False)
 
