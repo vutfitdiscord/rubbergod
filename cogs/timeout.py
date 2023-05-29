@@ -358,7 +358,8 @@ class Timeout(Base, commands.Cog):
             max_length=20, description=Messages.timeout_time
         )
     ):
-        # User can not remove /timeout user using /selftimeout, because /selftimeout is only visible in guild
+        # Guild_id is used to prevent users from bypassing timeout
+        # given by moderator and using selftimeout in DMs
 
         await inter.response.defer(ephemeral=True)
 
