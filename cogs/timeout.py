@@ -249,7 +249,7 @@ class Timeout(Base, commands.Cog):
         # print users that can't be timed out
         if self.perms_users:
             await inter.followup.send('\n'.join(
-                    f'{Messages.timeout_permission.format(user=user.name)}'for user in self.perms_users)
+                    f'{Messages.timeout_permission.format(user=user)}'for user in self.perms_users)
             )
             self.perms_users = []
 
