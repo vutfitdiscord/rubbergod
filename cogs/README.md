@@ -362,6 +362,7 @@ Containing timeout commands and manipulating with timeout.\
     - /timeout user
     - /timeout remove
     - /timeout list
+    - /selftimeout
 **Tasks:**
 
     - refresh_timeout

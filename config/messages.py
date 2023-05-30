@@ -484,6 +484,9 @@ class Messages:
     timeout_user_brief = "Použij tag uživatele/uživatelů"
     timeout_list_none = "Nenalezeny žádné umlčení."
     timeout_member_not_found = "{member} Nikoho takového jsem na serveru nenašel. Ujisti se, že jsi uživatele zadal @tagem."
+    self_timeout = "Dočasně si zakážeš interakce na serveru"
+    self_timeout_reason = "Sebeumlčení"
+    self_timeout_success = "Sebeumlčení proběhlo úspěšně"
 
     # TIMEOUT WARS
     timeout_wars_user = "Uživatel {user} byl umlčen na {time:.0f} minut."

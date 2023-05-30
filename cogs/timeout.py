@@ -11,6 +11,7 @@ from disnake.ext import commands, tasks
 
 import utils
 from cogs.base import Base
+from config import cooldowns
 from config.app_config import config
 from config.messages import Messages
 from permissions import permission_check
@@ -89,7 +90,7 @@ class Timeout(Base, commands.Cog):
             embeds.append(embed)
         await room.send(embeds=embeds)
 
-    async def timeout_perms(self, inter, user, duration, endtime, reason) -> bool:
+    async def timeout_perms(self, inter, user, duration, endtime, reason, isself=False) -> bool:
         """Set timeout for user or remove it and save in db"""
         try:
             await user.timeout(duration=duration, reason=reason)
@@ -98,15 +99,16 @@ class Timeout(Base, commands.Cog):
             else:
                 # convert to local time and remove timezone info
                 starttime = inter.created_at.astimezone(tz=utils.get_local_zone()).replace(tzinfo=None)
-                self.timeout_repo.add_timeout(user.id, inter.author.id, starttime, endtime, reason)
+                self.timeout_repo.add_timeout(user.id, inter.author.id, starttime, endtime, reason, isself)
             return False
         except disnake.Forbidden:
             self.perms_users.append(user)
             return True
 
-    async def timeout_parse(self, inter, user, endtime, reason):
+    async def timeout_parse(self, inter, user, endtime, reason, isself=False):
         """
-        Parse time argument to timedelta(length) or datetime object
+        Parse time argument to timedelta(length) or datetime object and
+        gives user timeout and adds it to db
 
         Decision tree
         -------------
@@ -121,19 +123,20 @@ class Timeout(Base, commands.Cog):
                     convert to timedelta
         returns
             endtime: class datetime
+            or None in case of insufficient permissions
         """
 
         # convert to local time and remove timezone info
         now = inter.created_at.astimezone(tz=utils.get_local_zone()).replace(tzinfo=None)
         if "forever" == endtime.lower():
             endtime = now.replace(year=now.year+1000)
-            if await self.timeout_perms(inter, user, timedelta(days=28), endtime, reason):
+            if await self.timeout_perms(inter, user, timedelta(days=28), endtime, reason, isself):
                 return
 
         elif endtime in timestamps:
             timeout_duration = timedelta(hours=float(timestamps[endtime]))
             endtime = now + timeout_duration
-            if await self.timeout_perms(inter, user, timeout_duration, endtime, reason):
+            if await self.timeout_perms(inter, user, timeout_duration, endtime, reason, isself):
                 return
 
         else:
@@ -173,10 +176,10 @@ class Timeout(Base, commands.Cog):
 
             # maximum length for timeout is 28 days set by discord
             if timeout_duration.days > 28:
-                if await self.timeout_perms(inter, user, timedelta(days=28), endtime, reason):
+                if await self.timeout_perms(inter, user, timedelta(days=28), endtime, reason, isself):
                     return
             else:
-                if await self.timeout_perms(inter, user, timeout_duration, endtime, reason):
+                if await self.timeout_perms(inter, user, timeout_duration, endtime, reason, isself):
                     return
         return endtime
 
@@ -275,16 +278,42 @@ class Timeout(Base, commands.Cog):
     async def timeout_list(
         self,
         inter: disnake.ApplicationCommandInteraction,
+        selftimeout: bool = commands.Param(default=False)
     ):
         """List all timed out users"""
         await self.update_timeout()
 
-        users = self.timeout_repo.get_timeout_users()
+        users = self.timeout_repo.get_timeout_users_filter_self(selftimeout)
         if not users:
             await inter.send(Messages.timeout_list_none)
             return
 
         await self.timeout_embed_listing(users, "Timeout list", inter, inter.author)
+
+    @cooldowns.default_cooldown
+    @commands.slash_command(
+        name="selftimeout",
+        description=Messages.self_timeout,
+        guild_ids=[config.guild_id]
+    )
+    async def self_timeout(
+        self,
+        inter: disnake.ApplicationCommandInteraction,
+        endtime: str = commands.Param(
+            autocomplete=autocomplete_times,
+            max_length=20, description=Messages.timeout_time
+        )
+    ):
+        # Guild_id is used to prevent users from bypassing timeout
+        # given by moderator and using selftimeout in DMs
+
+        await inter.response.defer(ephemeral=True)
+
+        if await self.timeout_parse(inter, inter.user, endtime, Messages.self_timeout_reason, True) is None:
+            await inter.send(content=Messages.timeout_permission.format(user=inter.user))
+            self.perms_users = []
+            return
+        await inter.send(content=Messages.self_timeout_success)
 
     async def update_timeout(self):
         """update all user's timeout in database and on server"""
@@ -341,6 +370,7 @@ class Timeout(Base, commands.Cog):
 
                 await self.submod_helper_room.send(embed=embed)
 
+    @self_timeout.error
     @timeout_user.error
     async def timeout_error(self, inter: disnake.ApplicationCommandInteraction, error):
         if isinstance(error, commands.BadArgument):
