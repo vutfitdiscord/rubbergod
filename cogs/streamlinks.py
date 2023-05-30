@@ -105,6 +105,7 @@ class StreamLinks(Base, commands.Cog):
     @cooldowns.default_cooldown
     @commands.slash_command(name="streamlinks_mod", brief=Messages.streamlinks_brief)
     async def _streamlinks_mod(self, inter: disnake.ApplicationCommandInteraction):
+        await inter.response.defer()
         pass
 
     @commands.check(permission_check.helper_plus)
@@ -118,7 +119,6 @@ class StreamLinks(Base, commands.Cog):
         description: str = commands.Param(max_length=1024),
         date: str = commands.Param(default=None, description=Messages.streamlinks_date_format)
     ):
-        await inter.response.defer()
 
         link = utils.clear_link_escape(link)
         try:
@@ -167,7 +167,6 @@ class StreamLinks(Base, commands.Cog):
         date: str = commands.Param(default=None, description=Messages.streamlinks_date_format)
     ):
         parameter = False
-        await inter.response.defer(ephemeral=True)
 
         embed = disnake.Embed(title="Odkaz na stream byl změněn", color=disnake.Color.yellow())
         stream = self.streamlinks_repo.get_stream_by_id(id)
@@ -205,6 +204,7 @@ class StreamLinks(Base, commands.Cog):
 
         if link is not None:
             parameter = True
+
             link_data = self.get_link_data(stream.link)
             stream.thumbnail_url = link_data['image']
             stream.created_at = link_data['upload_date']
@@ -243,7 +243,6 @@ class StreamLinks(Base, commands.Cog):
         id: int = commands.Param(description=Messages.streamlinks_ID)
     ):
 
-        await inter.response.defer()
         if not self.streamlinks_repo.exists(id):
             await inter.edit_original_response(Messages.streamlinks_not_exists)
             return
