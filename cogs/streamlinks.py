@@ -187,6 +187,12 @@ class StreamLinks(Base, commands.Cog):
         if link is not None:
             parameter = True
             link = utils.clear_link_escape(link)
+            try:
+                requests.get(link)
+            except Exception:
+                await inter.edit_original_response(Messages.streamlinks_invalid_link)
+                return
+            link = utils.clear_link_escape(link)
             embed.add_field(
                 name="Odkaz",
                 value=f"[link]({stream.link}) -> [link]({link})",
