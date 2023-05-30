@@ -106,7 +106,6 @@ class StreamLinks(Base, commands.Cog):
     @commands.slash_command(name="streamlinks_mod", brief=Messages.streamlinks_brief)
     async def _streamlinks_mod(self, inter: disnake.ApplicationCommandInteraction):
         await inter.response.defer()
-        pass
 
     @commands.check(permission_check.helper_plus)
     @_streamlinks_mod.sub_command(name="add", description=Messages.streamlinks_add_brief)
