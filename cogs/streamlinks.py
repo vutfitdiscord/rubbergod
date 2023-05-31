@@ -258,8 +258,8 @@ class StreamLinks(Base, commands.Cog):
             self.streamlinks_repo.remove(id)
             await inter.channel.send(utils.fill_message('streamlinks_remove_success', link=link))
 
-    async def log(self, stream, user, title="Odkaz na stream byl smazán"):
-        embed = disnake.Embed(title=title, color=disnake.Color.yellow())
+    async def log(self, stream, user):
+        embed = disnake.Embed(title="Odkaz na stream byl smazán", color=disnake.Color.yellow())
         embed.add_field(name="Provedl", value=user.name)
         embed.add_field(name="Předmět", value=stream.subject.upper())
         embed.add_field(name="Od", value=stream.member_name)
