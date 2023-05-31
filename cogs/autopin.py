@@ -29,6 +29,24 @@ class AutoPin(Base, commands.Cog):
         self.check = room_check.RoomCheck(bot)
         self.pin_features = AutopinFeatures(bot)
 
+    async def api(self, message: commands.Context, params: list):
+        """Sending pins from channel to grillbot"""
+        if "command" in params and params["command"] is not None:
+            if params["command"] == "pin_get_all":
+                channel = self.bot.get_channel(int(params["channel"]))
+                if channel is None:
+                    return 1, "Channel not found"
+                pins = await channel.pins()
+                if not pins:
+                    return 0, Messages.autopin_no_pins
+                if params["type"] == "markdown":
+                    res = await self.pin_features.create_markdown_file(channel, pins)
+                    return 0, res
+                else:
+                    res = await self.pin_features.create_json_file(channel, pins)
+                    return 0, res
+        return 1, "Command not found"
+
     @commands.guild_only()
     @commands.check(permission_check.helper_plus)
     @commands.slash_command(name="pin_mod")
@@ -132,11 +150,12 @@ class AutoPin(Base, commands.Cog):
             return
 
         if type == "markdown":
-            await self.pin_features.create_markdown_file(inter, channel, pins)
+            file = await self.pin_features.create_markdown_file(channel, pins)
         else:
-            await self.pin_features.create_json_file(inter, channel, pins)
+            file = await self.pin_features.create_json_file(channel, pins)
 
         channel_mention = channel.mention if hasattr(channel, "mention") else "**DM s botem**"
+        await inter.send(file=file)
         await inter.edit_original_response(Messages.autopin_get_all_done.format(channel_name=channel_mention))
 
     @commands.Cog.listener()
