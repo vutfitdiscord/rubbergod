@@ -191,13 +191,15 @@ class StreamLinks(Base, commands.Cog):
             except Exception:
                 await inter.edit_original_response(Messages.streamlinks_invalid_link)
                 return
-            link = utils.clear_link_escape(link)
             embed.add_field(
                 name="Odkaz",
                 value=f"[link]({stream.link}) -> [link]({link})",
                 inline=False
             )
             stream.link = link
+            link_data = self.get_link_data(stream.link)
+            stream.thumbnail_url = link_data['image']
+            stream.created_at = link_data['upload_date']
 
         if user is not None:
             parameter = True
@@ -206,13 +208,6 @@ class StreamLinks(Base, commands.Cog):
                 user = await self.get_user_string(user)
             embed.add_field(name="Od", value=self.gen_change_string(stream.member_name, user))
             stream.member_name = user
-
-        if link is not None:
-            parameter = True
-
-            link_data = self.get_link_data(stream.link)
-            stream.thumbnail_url = link_data['image']
-            stream.created_at = link_data['upload_date']
 
         if date is not None:
             parameter = True
