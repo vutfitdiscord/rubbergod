@@ -62,9 +62,12 @@ class GrillbotApi(Base, commands.Cog):
         cog = self.bot.get_cog(request["method"])
         # check if cog is loaded
         if cog:
-            status, content = cog.api(message, params)
+            status, content = await cog.api(message, params)
             if status != 0:
                 await message.reply(content)
+                return
+            if isinstance(content, disnake.File):
+                await message.reply(file=content)
                 return
             res_json = json.dumps(content)
             with BytesIO(bytes(res_json, 'utf-8')) as file_binary:

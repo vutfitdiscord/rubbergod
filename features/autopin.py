@@ -17,11 +17,10 @@ class AutopinFeatures():
 
     async def create_json_file(
             self,
-            inter: disnake.ApplicationCommandInteraction,
             channel: pin_channel_type,
             pins: List[disnake.Message],
     ):
-        """Create json file with all pins from channel and send it to user"""
+        """Create json file with all pins from channel"""
         if hasattr(channel, "name"):
             channel_name = channel.name
             channel_url = channel.jump_url
@@ -44,15 +43,14 @@ class AutopinFeatures():
         with io.StringIO() as f:
             f.write(json_pins)
             f.seek(0)
-            await inter.send(file=disnake.File(f, filename=f"{channel_name}_pins.json"))
+            return disnake.File(f, filename=f"{channel_name}_pins.json")
 
     async def create_markdown_file(
             self,
-            inter: disnake.ApplicationCommandInteraction,
             channel: pin_channel_type,
             pins: List[disnake.Message]
     ):
-        """Create markdown file with all pins from channel and send it to user"""
+        """Create markdown file with all pins from channel"""
         if hasattr(channel, "name"):
             channel_name = channel.name
             channel_url = channel.jump_url
@@ -75,4 +73,4 @@ class AutopinFeatures():
                 f.write(f"### Atachments\n\n{files}\n\n") if files else ...
                 f.write("---\n\n")
             f.seek(0)
-            await inter.send(file=disnake.File(f, filename=f"{channel_name}_pins.md"))
+            return disnake.File(f, filename=f"{channel_name}_pins.md")
