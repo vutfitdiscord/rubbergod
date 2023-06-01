@@ -34,7 +34,7 @@ class AutopinFeatures():
                 "created_at": pin.created_at.strftime('%d. %m. %Y %H:%M:%S'),
                 "jump_url": pin.jump_url,
                 "content": pin.content,
-                "attachments": [(file.filename, file.url) for file in pin.attachments]
+                "attachments": [{"name": file.filename, "url": file.url} for file in pin.attachments]
             }
             list_pins.append(dict_pin)
 
