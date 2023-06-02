@@ -5,6 +5,8 @@ from typing import List, Union
 
 import disnake
 
+import utils
+
 pin_channel_type = Union[
     disnake.TextChannel,
     disnake.Thread
@@ -29,9 +31,10 @@ class AutopinFeatures():
             channel_url = ""
         list_pins = []
         for pin in pins:
+            created_at = pin.created_at.astimezone(tz=utils.get_local_zone()).replace(tzinfo=None)
             dict_pin = {
                 "author": pin.author.name,
-                "created_at": pin.created_at.strftime('%d. %m. %Y %H:%M:%S'),
+                "created_at": created_at.isoformat("T", "seconds"),
                 "jump_url": pin.jump_url,
                 "content": pin.content,
                 "attachments": [{"name": file.filename, "url": file.url} for file in pin.attachments]
@@ -61,7 +64,8 @@ class AutopinFeatures():
         with io.StringIO() as f:
             f.write(f"# [#{channel_name}]({channel_url})\n\n")
             for index, pin in enumerate(pins):
-                f.write(f"## {index+1}. {pin.author} — {pin.created_at.strftime('%d. %m. %Y %H:%M:%S')}\n\n")
+                created_at = pin.created_at.astimezone(tz=utils.get_local_zone()).replace(tzinfo=None)
+                f.write(f"## {index+1}. {pin.author} — {created_at.strftime('%d. %m. %Y %H:%M:%S')}\n\n")
                 f.write(f"[Message link]({pin.jump_url})\n\n")
                 f.write(f"### Content\n\n{pin.content}\n\n") if pin.content else ...
                 files = ""
