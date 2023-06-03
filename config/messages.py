@@ -478,7 +478,7 @@ class Messages:
     timeout_time = "Čas ve formátu dd.mm.yyyy nebo dd.mm.yyyy hh:mm. Základní jednotka je 1 hodina."
     timeout_reason = "Důvod dočasného umlčení uživatele."
     timeout_title = "{member} do {endtime} ({length})"
-    timeout_field_text = "**Od:** {mod} | {starttime}\n**Zbývá:** {length}\n**Důvod:** {reason}"
+    timeout_field_text = "**Od:** {mod} | {starttime}\n**Navrácení:** {length}\n**Důvod:** {reason}"
     timeout_list_brief = "Vypíše uživatele se zatlumením."
     timeout_remove_brief = "Předčasně odebere umlčení uživateli."
     timeout_remove = "Umlčení zrušeno uživateli {user}."
