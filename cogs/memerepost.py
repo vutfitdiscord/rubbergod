@@ -64,7 +64,9 @@ class MemeRepost(Base, commands.Cog):
                 original_post_user = ctx.guild.get_member(int(repost.author_id))
 
                 if original_post_user:
-                    self.better_repo.update_post_karma(original_post_user.id, +1)
+                    emoji_key = str(ctx.emoji.id) if type(ctx.emoji) != str else ctx.emoji
+                    emoji_val = self.karma_repo.emoji_value(emoji_key)
+                    self.better_repo.update_post_karma(original_post_user.id, emoji_val)
                     if isinstance(ctx.emoji, str):
                         self.karma_repo.karma_emoji(original_post_user.id, ctx.member.id, ctx.emoji)
                     else:
@@ -88,7 +90,9 @@ class MemeRepost(Base, commands.Cog):
             original_post_user = ctx.guild.get_member(int(repost.author_id))
 
             if original_post_user:
-                self.better_repo.update_post_karma(original_post_user.id, -1)
+                emoji_key = str(ctx.emoji.id) if type(ctx.emoji) != str else ctx.emoji
+                emoji_val = self.karma_repo.emoji_value(emoji_key)
+                self.better_repo.update_post_karma(original_post_user.id, -emoji_val)
                 if isinstance(ctx.emoji, str):
                     self.karma_repo.karma_emoji_remove(original_post_user.id, ctx.member.id, ctx.emoji)
                 else:
