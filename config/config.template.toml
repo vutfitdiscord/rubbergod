@@ -61,6 +61,7 @@ vote_room = 461544375105749003
 bot_room = 461549842896781312
 mod_room = 505679727936143361
 submod_helper_room = 1023669101744357377
+report_room = 1119315446106161172
 
 allowed_channels = [
         'bot_room',

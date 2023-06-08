@@ -282,6 +282,18 @@ Cog for handling reactions and delegating to specific cog.
 
 ---
 
+### [Report](report.py)
+
+Cog implementing anonymous reporting from users.
+**Commands:**
+
+    - /report general
+    - /report message
+    - /report_mod unban
+    - message_command Report message
+
+---
+
 ### [Review](review.py)
 
 Cog implementing review system for subjects.\

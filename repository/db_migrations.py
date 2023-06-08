@@ -11,6 +11,7 @@ from repository.database.image import Image  # noqa: F401
 from repository.database.karma import Karma, Karma_emoji
 from repository.database.meme_repost import MemeRepost  # noqa: F401
 from repository.database.pin_map import PinMap  # noqa: F401
+from repository.database.report import Answer, Report, User  # noqa: F401
 from repository.database.review import (Review, ReviewRelevance,  # noqa: F401
                                         Subject, Subject_details)
 from repository.database.role_group import RoleGroup  # noqa: F401
