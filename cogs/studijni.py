@@ -13,8 +13,8 @@ from utils import add_author_footer
 
 
 class Studijni(Base, commands.Cog):
-
     def __init__(self, bot):
+        super().__init__()
         self.bot = bot
 
     @commands.slash_command(name="studijni", description=Messages.studijni_brief)

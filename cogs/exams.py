@@ -34,6 +34,7 @@ TIME_OFFSET = 14
 
 class Exams(Base, commands.Cog):
     def __init__(self, bot: commands.Bot):
+        super().__init__()
         self.bot = bot
 
         self.subscribed_guilds: List[int] = []

@@ -18,6 +18,7 @@ from permissions import room_check
 
 class Nameday(Base, commands.Cog):
     def __init__(self, bot):
+        super().__init__()
         self.bot = bot
         self._owner_id = bot.owner_id
         self.check = room_check.RoomCheck(bot)

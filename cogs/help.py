@@ -21,6 +21,7 @@ class Help(Base, commands.Cog):
     """Help command"""
 
     def __init__(self, bot: commands.Bot):
+        super().__init__()
         self.bot = bot
         self.git = Git()
 

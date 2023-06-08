@@ -23,6 +23,7 @@ async def dynamic_verify_rules_autocomplete(inter: disnake.ApplicationCommandInt
 
 class Verify(Base, commands.Cog):
     def __init__(self, bot):
+        super().__init__()
         self.bot = bot
         self.verification = verification.Verification(bot)
         self.dynamic_verify_manager = DynamicVerifyManager(bot)

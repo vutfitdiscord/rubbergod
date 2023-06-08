@@ -14,6 +14,7 @@ from modals.bookmark import BookmarkModal
 
 class Bookmark(Base, commands.Cog):
     def __init__(self, bot):
+        super().__init__()
         self.bot = bot
 
     @commands.message_command(name="Bookmark")

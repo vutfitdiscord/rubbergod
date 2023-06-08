@@ -27,6 +27,7 @@ class Warden(Base, commands.Cog):
     """A cog for database lookups"""
 
     def __init__(self, bot):
+        super().__init__()
         self.bot = bot
 
         self.limit_full = 3

@@ -17,6 +17,7 @@ from features.imagehandler import ImageHandler
 
 class Gif(Base, commands.Cog):
     def __init__(self, bot):
+        super().__init__()
         self.bot = bot
         self.imagehandler = ImageHandler()
 

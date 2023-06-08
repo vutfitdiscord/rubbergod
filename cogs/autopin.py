@@ -21,6 +21,7 @@ from repository.database.pin_map import PinMap
 
 class AutoPin(Base, commands.Cog):
     def __init__(self, bot):
+        super().__init__()
         self.warning_time = datetime.datetime.utcnow() - datetime.timedelta(
             minutes=config.autopin_warning_cooldown
         )

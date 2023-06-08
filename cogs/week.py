@@ -16,6 +16,7 @@ from config.messages import Messages
 
 class Week(Base, commands.Cog):
     def __init__(self, bot):
+        super().__init__()
         self.bot = bot
 
     @cooldowns.default_cooldown

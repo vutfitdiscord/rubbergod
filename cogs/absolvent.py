@@ -21,6 +21,7 @@ user_r = user_repo.UserRepository()
 
 class Absolvent(Base, commands.Cog):
     def __init__(self, bot):
+        super().__init__()
         self.bot = bot
 
     @commands.slash_command(name="diplom_help", description=Messages.absolvent_help_brief)

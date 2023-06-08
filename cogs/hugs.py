@@ -33,6 +33,7 @@ class Hugs(Base, commands.Cog):
     emoji_count = len(config.hug_emojis)
 
     def __init__(self, bot):
+        super().__init__()
         self.bot = bot
         self.hugs_repo = HugsRepository()
         self.check = room_check.RoomCheck(bot)

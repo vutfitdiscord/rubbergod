@@ -20,6 +20,7 @@ from repository.database.verification import Permit, Valid_person
 
 class FitWide(Base, commands.Cog):
     def __init__(self, bot):
+        super().__init__()
         self.bot = bot
         self.verification = verification.Verification(bot)
 

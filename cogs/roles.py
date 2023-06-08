@@ -22,6 +22,7 @@ group_repo = role_group_repo.RoleGroupRepository()
 
 class Roles(Base, commands.Cog):
     def __init__(self, bot: commands.Bot):
+        super().__init__()
         self.bot = bot
         self.lock = asyncio.Lock()
         self.repo = review_repo.ReviewRepository()

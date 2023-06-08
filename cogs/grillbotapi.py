@@ -15,8 +15,8 @@ from config.app_config import config
 
 
 class GrillbotApi(Base, commands.Cog):
-
     def __init__(self, bot):
+        super().__init__()
         self.bot = bot
         self._owner_id = bot.owner_id
 

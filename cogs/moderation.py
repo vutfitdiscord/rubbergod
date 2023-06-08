@@ -47,6 +47,7 @@ slowmode_channel_type = Union[
 
 class Moderation(Base, commands.Cog):
     def __init__(self, bot):
+        super().__init__()
         self.bot = bot
         self.moderation_true = "moderation:resolve:true"
         self.moderation_false = "moderation:resolve:false"

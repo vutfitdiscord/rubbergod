@@ -43,6 +43,7 @@ async def autocomplete_times(inter, string: str) -> List[str]:
 
 class Timeout(Base, commands.Cog):
     def __init__(self, bot):
+        super().__init__()
         self.bot = bot
         self.timeout_repo = TimeoutRepository()
         self.formats = ("%d.%m.%Y", "%d/%m/%Y", "%d.%m.%Y %H:%M", "%d/%m/%Y %H:%M")
