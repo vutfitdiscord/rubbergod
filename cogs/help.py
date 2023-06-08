@@ -103,7 +103,7 @@ class Help(Base, commands.Cog):
             value += item["description"] if item["description"] else ''
             embed.add_field(name=name, value=value if value else None, inline=False)
 
-    def api(self, message: commands.Context, params: list):
+    async def api(self, message: commands.Context, params: list):
         """Sending commands help to grillbot"""
         mock_message = copy.copy(message)
         mock_view = commands.view.StringView("")
