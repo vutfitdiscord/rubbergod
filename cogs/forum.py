@@ -11,6 +11,7 @@ from config.app_config import config
 
 class Forum(Base, commands.Cog):
     def __init__(self, bot):
+        super().__init__()
         self.bot = bot
 
     @commands.Cog.listener()

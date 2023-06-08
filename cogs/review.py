@@ -35,6 +35,7 @@ async def autocomp_subjects(inter: disnake.ApplicationCommandInteraction, user_i
 class Review(Base, commands.Cog):
     def __init__(self, bot):
         global subjects, programmes
+        super().__init__()
         self.bot = bot
         self.manager = ReviewManager(bot)
         self.repo = review_repo.ReviewRepository()

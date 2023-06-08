@@ -17,6 +17,7 @@ from config.messages import Messages
 
 class Info(Base, commands.Cog):
     def __init__(self, bot):
+        super().__init__()
         self.bot = bot
 
     def urban_embeds(self, author, dict):

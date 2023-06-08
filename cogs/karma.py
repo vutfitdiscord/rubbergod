@@ -26,6 +26,7 @@ karma_r = karma_repo.KarmaRepository()
 
 class Karma(Base, commands.Cog):
     def __init__(self, bot):
+        super().__init__()
         self.bot = bot
         self.karma_helper = karma.Karma(bot, karma_r)
         self.check = room_check.RoomCheck(bot)

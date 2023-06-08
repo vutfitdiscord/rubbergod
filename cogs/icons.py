@@ -86,6 +86,7 @@ def get_icon_emoji(icon: disnake.Role):
 
 class Icons(Base, commands.Cog):
     def __init__(self, bot):
+        super().__init__()
         self.bot = bot
 
     @utils.PersistentCooldown(command_name="icon", limit=config.icon_ui_cooldown)

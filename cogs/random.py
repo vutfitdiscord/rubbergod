@@ -16,6 +16,7 @@ from permissions import room_check
 
 class Random(Base, commands.Cog):
     def __init__(self, bot):
+        super().__init__()
         self.bot = bot
         self.check = room_check.RoomCheck(bot)
 

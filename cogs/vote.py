@@ -94,6 +94,7 @@ class VoteMessage:
 
 class Vote(Base, commands.Cog):
     def __init__(self, bot: Bot):
+        super().__init__()
         self.bot = bot
         self.vote_cache: Dict[int, VoteMessage] = {}
 

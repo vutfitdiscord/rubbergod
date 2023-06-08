@@ -16,6 +16,7 @@ uhoh_counter = 0
 
 class Meme(Base, commands.Cog):
     def __init__(self, bot):
+        super().__init__()
         self.bot = bot
 
     @commands.Cog.listener()

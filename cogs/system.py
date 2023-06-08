@@ -24,6 +24,7 @@ boottime = datetime.now().replace(microsecond=0)
 
 class System(Base, commands.Cog):
     def __init__(self, bot):
+        super().__init__()
         self.bot = bot
         self.error_log = ErrorLogger()
         self.git = Git()

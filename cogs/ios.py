@@ -235,6 +235,7 @@ async def print_output(bot, channel, system, resources):
 
 class IOS(Base, commands.Cog):
     def __init__(self, bot):
+        super().__init__()
         self.bot = bot
         self.tasks = [self.ios_task]
 

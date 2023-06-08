@@ -26,6 +26,7 @@ from repository.database import session
 
 class Error(Base, commands.Cog):
     def __init__(self, bot):
+        super().__init__()
         self.bot = bot
         self.logger = ErrorLogger()
 

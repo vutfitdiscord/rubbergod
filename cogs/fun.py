@@ -19,6 +19,7 @@ from config.messages import Messages
 
 class Fun(Base, commands.Cog):
     def __init__(self, bot):
+        super().__init__()
         self.bot = bot
 
     def custom_footer(self, author, url):

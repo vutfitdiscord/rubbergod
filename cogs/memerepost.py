@@ -29,6 +29,7 @@ def _leaderboard_formatter(entry: BetterMeme, **kwargs):
 
 class MemeRepost(Base, commands.Cog):
     def __init__(self, bot):
+        super().__init__()
         self.bot: commands.Bot = bot
 
         self.karma_repo = KarmaRepository()

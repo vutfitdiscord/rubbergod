@@ -15,6 +15,7 @@ from utils import is_command_message
 
 class Reactions(Base, commands.Cog):
     def __init__(self, bot):
+        super().__init__()
         self.bot = bot
 
     @commands.Cog.listener()

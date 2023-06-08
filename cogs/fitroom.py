@@ -18,6 +18,7 @@ from config.messages import Messages
 
 class FitRoom(Base, commands.Cog):
     def __init__(self, bot):
+        super().__init__()
         self.bot = bot
 
     @cooldowns.default_cooldown

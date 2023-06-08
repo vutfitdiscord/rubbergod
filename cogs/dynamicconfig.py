@@ -25,6 +25,7 @@ async def autocomp_keys(inter: disnake.ApplicationCommandInteraction, user_input
 
 class DynamicConfig(Base, commands.Cog):
     def __init__(self, bot):
+        super().__init__()
         self.bot = bot
 
     @commands.check(permission_check.is_bot_admin)

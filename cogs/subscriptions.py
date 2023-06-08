@@ -25,6 +25,7 @@ async def autocomplete_rooms(inter, string: str) -> List[str]:
 
 class Subscriptions(Base, commands.Cog):
     def __init__(self, bot):
+        super().__init__()
         self.bot = bot
         global rooms
 
