@@ -30,7 +30,7 @@ class StreamLinksRepo(BaseRepository):
             session.rollback()
             raise
 
-    def merge(streamlink: StreamLink):
+    def merge(self, streamlink: StreamLink):
         session.merge(streamlink)
         session.commit()
 

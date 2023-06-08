@@ -230,6 +230,8 @@ class StreamLinks(Base, commands.Cog):
             await inter.edit_original_response(content=Messages.streamlinks_update_nothing_to_change)
             return
 
+        self.streamlinks_repo.merge(stream)
+
         utils.add_author_footer(embed, inter.author)
         embed.timestamp = datetime.utcnow()
         channel = self.bot.get_channel(config.log_channel)
