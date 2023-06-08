@@ -73,6 +73,11 @@ class Messages(metaclass=Formatable):
     bot_room_redirect = "{user} <:sadcat:576171980118687754> 👉 " \
                         "<#{bot_room}>\n"
 
+    # EMOJI
+    emoji_get_emojis_brief = "Pošle zip se všemi emoji a stickery ze serveru"
+    emoji_get_emoji_brief = "Zobrazí emoji v plné velikosti"
+    emoji_not_emoji = "Neplatný formát emoji"
+
     # MEME
     uhoh_counter = "{uhohs} uh ohs od spuštění."
     uhoh_brief = "Vypíše počet uh ohs od spuštění"

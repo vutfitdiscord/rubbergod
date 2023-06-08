@@ -15,6 +15,10 @@ class Base:
         self.tasks = []
 
     @cached_property
+    def base_guild(self) -> disnake.TextChannel:
+        return self.bot.get_guild(Base.config.guild_id)
+
+    @cached_property
     def mod_room(self) -> disnake.TextChannel:
         return self.bot.get_channel(self.config.mod_room)
 
