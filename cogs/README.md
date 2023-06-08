@@ -48,14 +48,13 @@ Cog controlling bookmarks. The bot will send copy of message to user.\
 Cog for dynamically changing config.\
 **Commands:**
 
-    - ?config
-    - ?config set
-    - ?config append
-    - ?config load
-    - ?config list
-    - ?config get
-    - ?config backup
-    - ?config sync_template
+    - /config set
+    - /config append
+    - /config load
+    - /config list
+    - /config get
+    - /config backup
+    - /config update
 ---
 
 ### [Error](error.py)
