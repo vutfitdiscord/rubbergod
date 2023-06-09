@@ -121,7 +121,6 @@ class Gif(Base, commands.Cog):
                 append_images=frames[1:],
                 duration=30,
                 loop=0,
-                transparency=0,
                 disposal=2,
                 optimize=False,
             )
