@@ -29,3 +29,7 @@ class VerifyRepository(BaseRepository):
     def update_rule(self, rule: DynamicVerifyRule) -> None:
         session.merge(rule)
         session.commit()
+
+    def remove_rule(self, rule: DynamicVerifyRule) -> None:
+        session.query(DynamicVerifyRule).filter(DynamicVerifyRule.id == rule.id).delete()
+        session.commit()
