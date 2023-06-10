@@ -42,7 +42,7 @@ class DynamicVerifyManager(BaseFeature):
         await self.log_attempt(rule, inter, user_id)
         member = await guild.get_or_fetch_member(user_id)
         for role in list(filter(lambda x: x is not None, roles)):
-            await member.add_roles(role, reason="Rubbergod dynamic verification")
+            await member.add_roles(role, reason=f"Dynamic verification - Rule {rule.name} ({rule.id})")
 
         try:
             await member.send(utils.fill_message("verify_verify_success", user=user_id))
