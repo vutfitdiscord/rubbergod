@@ -178,6 +178,7 @@ Cog containing commands that get basic information from other sources.\
 
     - /urban
     - /pocasi
+    - /kreditovy_strop
 ---
 
 ### [IOS](ios.py)
