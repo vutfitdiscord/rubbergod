@@ -133,6 +133,13 @@ class Info(Base, commands.Cog):
                 "Město nenalezeno! <:pepeGun:484470874246742018> (" + res["message"] + ")"
             )
 
+    @commands.slash_command(name="kreditovy_strop", description=Messages.credit_limit_brief)
+    async def kreditovy_strop(self, inter):
+        """
+        Prints annual credit limit criteria
+        """
+        await inter.send(Messages.credit_limit_info)
+
 
 def setup(bot):
     bot.add_cog(Info(bot))
