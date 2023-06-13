@@ -11,8 +11,10 @@ services:
         build: .
         volumes:
             - .:/rubbergod:Z
+            - ssh_config:/root/.ssh:Z
         depends_on:
             - db
 
 volumes:
     postgres_data:
+    ssh_config:
