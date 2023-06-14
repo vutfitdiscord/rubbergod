@@ -3,18 +3,23 @@ Cog containing commands that call random APIs for fun things.
 """
 
 import contextlib
+import os
 import random
 import re
 from datetime import datetime
+from random import randint
 from typing import Dict, List
 
 import aiohttp
 import disnake
 from disnake.ext import commands
 
+import utils
 from cogs.base import Base
 from config import cooldowns
 from config.messages import Messages
+
+fuchs_list = os.listdir("images/fuchs/")
 
 
 class Fun(Base, commands.Cog):
@@ -191,6 +196,30 @@ class Fun(Base, commands.Cog):
         embed.set_footer(text=self.custom_footer(inter.author, "yomomma.info"))
 
         await inter.send(embed=embed)
+
+    @cooldowns.default_cooldown
+    @commands.slash_command(name="fuchs", description=Messages.fuchs_brief)
+    async def fuchs(self, inter, hlaskaid: int = commands.Param(default=None)):
+        await inter.response.defer()
+
+        if len(fuchs_list) == 0:
+            raise Exception("Žádná fuchs reakce")
+
+        if hlaskaid is None:
+            index = randint(0, len(fuchs_list))
+        else:
+            index = hlaskaid % len(fuchs_list)
+
+        embed = disnake.Embed(
+            title="Fuchs reakce",
+            color=disnake.Color.blue(),
+        )
+        embed.set_image(url=f"attachment://{fuchs_list[index]}")
+
+        utils.add_author_footer(embed, inter.author, additional_text=[f" (hláška id: #{index})"])
+
+        with open("images/fuchs/" + fuchs_list[index], 'rb') as fp:
+            await inter.send(embed=embed, file=disnake.File(fp=fp, filename=fuchs_list[index]))
 
 
 def setup(bot):
