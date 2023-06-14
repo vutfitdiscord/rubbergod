@@ -123,6 +123,7 @@ Cog containing commands that call random APIs for fun things.\
     - /duck
     - /dadjoke
     - /yo_mamajoke
+    - /fuchs
 ---
 
 ### [Gif](gif.py)

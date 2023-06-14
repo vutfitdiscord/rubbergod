@@ -198,28 +198,26 @@ class Fun(Base, commands.Cog):
         await inter.send(embed=embed)
 
     @cooldowns.default_cooldown
-    @commands.slash_command(name="fuchs", description=Messages.fuchs_brief)
-    async def fuchs(self, inter, hlaskaid: int = commands.Param(default=None)):
-        await inter.response.defer()
-
+    @commands.slash_command(name="fuchs", description=Messages.fun_fuchs_brief)
+    async def fuchs(self, inter, hlaskaid: int = commands.Param(default=None, ge=1, le=len(fuchs_list))):
         if len(fuchs_list) == 0:
             raise Exception("Žádná fuchs reakce")
 
         if hlaskaid is None:
-            index = randint(0, len(fuchs_list))
+            index = randint(1, len(fuchs_list))
         else:
-            index = hlaskaid % len(fuchs_list)
+            index = hlaskaid
 
         embed = disnake.Embed(
             title="Fuchs reakce",
             color=disnake.Color.blue(),
         )
-        embed.set_image(url=f"attachment://{fuchs_list[index]}")
+        embed.set_image(url=f"attachment://{str(index)}.png")
 
-        utils.add_author_footer(embed, inter.author, additional_text=[f" (hláška id: #{index})"])
+        utils.add_author_footer(embed, inter.author, additional_text=[f" (hláškaid: #{str(index)})"])
 
-        with open("images/fuchs/" + fuchs_list[index], 'rb') as fp:
-            await inter.send(embed=embed, file=disnake.File(fp=fp, filename=fuchs_list[index]))
+        with open("images/fuchs/" + str(index) + ".png", 'rb') as fp:
+            await inter.send(embed=embed, file=disnake.File(fp=fp, filename=str(index) + ".png"))
 
 
 def setup(bot):
