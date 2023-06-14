@@ -523,3 +523,4 @@ if ("Mám průměr pod 2.0")                                           \n  retur
     fun_duck_brief = "Pošle náhodný obrázek kachny"
     fun_dadjoke_brief = "Pošle náhodný dadjoke nebo vyhledá podle zadaného slova"
     fun_yo_mamajoke_brief = "Pošle náhodný Yo momma joke"
+    fuchs_brief = "Pošle random fuchs reakci"
