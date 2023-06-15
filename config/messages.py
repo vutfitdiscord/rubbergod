@@ -524,4 +524,4 @@ if ("Mám průměr pod 2.0")                                           \n  retur
     fun_dadjoke_brief = "Pošle náhodný dadjoke nebo vyhledá podle zadaného slova"
     fun_yo_mamajoke_brief = "Pošle náhodný Yo momma joke"
     fun_fuchs_brief = "Pošle náhodnou fuchs reakci"
-    fun_fuchs_out_of_bound = "Hláškaid musí být id existující fuchs reakce"
+    fun_fuchs_no_reaction = "Žádná fuchs reakce není k dispozici"
