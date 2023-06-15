@@ -201,7 +201,8 @@ class Fun(Base, commands.Cog):
     @commands.slash_command(name="fuchs", description=Messages.fun_fuchs_brief)
     async def fuchs(self, inter, hlaskaid: int = commands.Param(default=None, ge=1, le=len(fuchs_list))):
         if len(fuchs_list) == 0:
-            raise Exception("Žádná fuchs reakce")
+            inter.send(Messages.fun_fuchs_no_reaction)
+            return
 
         if hlaskaid is None:
             index = randint(1, len(fuchs_list))
