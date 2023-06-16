@@ -152,7 +152,7 @@ class Karma(Base, commands.Cog):
         )
 
     @cooldowns.long_cooldown
-    @commands.message_command(name="Karma zprávy")
+    @commands.message_command(name="Karma zprávy", guild_ids=[config.guild_id])
     async def message_app(self, inter: disnake.MessageCommandInteraction, message: disnake.Message):
         await self._message(inter, message, ephemeral=self.check.botroom_check(inter))
 

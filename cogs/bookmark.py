@@ -8,6 +8,7 @@ from disnake.ext import commands
 import utils
 from buttons.bookmark import BookmarkView
 from cogs.base import Base
+from config.app_config import config
 from features.bookmark import BookmarkFeatures
 from modals.bookmark import BookmarkModal
 
@@ -17,7 +18,7 @@ class Bookmark(Base, commands.Cog):
         super().__init__()
         self.bot = bot
 
-    @commands.message_command(name="Bookmark")
+    @commands.message_command(name="Bookmark", guild_ids=[config.guild_id])
     async def bookmark(self, inter: disnake.ApplicationCommandInteraction, message: disnake.Message):
         """Send modal with input for bookmark name and then send to user"""
         await inter.response.send_modal(modal=BookmarkModal(message))
