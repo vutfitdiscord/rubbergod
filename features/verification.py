@@ -267,7 +267,7 @@ class Verification(BaseFeature):
             verify_success_msg = utils.fill_message("verify_verify_success", user=inter.user.id)
             try:
                 await member.send(verify_success_msg)
-                await member.send(Messages.verify_post_verify_info)
+                await member.send(Messages.verify_post_verify_info, suppress_embeds=True)
             except disnake.errors.Forbidden:
                 mail = new_user.get_mail(self.get_mail_postfix(login))
                 self.send_mail_verified(mail, member)
