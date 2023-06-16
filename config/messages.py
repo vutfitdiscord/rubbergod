@@ -181,13 +181,13 @@ class Messages:
     verify_verify_manual = "Čauec {user}, nechám {admin}, aby to udělal manuálně, " \
                            "jsi shady (Year: {year})"
     verify_verify_success = "{user} Gratuluji, byl jsi verifikován!"
-    verify_post_verify_info = "Podívej se do kanálů:\n" \
-                              "<#591384273051975683> Pro přidání rolí\n" \
-                              "<#489461089432633346> Pro pravidla a další info"
+    verify_post_verify_info = "Role si přidáš v Channels & Roles " \
+                              "(Jak na to 👉 https://discord.com/channels/461541385204400138/489461089432633346/635184378065977354)\n" \
+                              "Dále se mrkni do <#489461089432633346> pro pravidla a další info"
     server_link = "https://discord.com/channels/461541385204400138/"
     verify_verify_success_mail = "Gratuluji, byl jsi verifikován!"
-    verify_post_verify_info_mail = "Podivej se do kanalu " \
-                              f"#server-info - Pro pravidla a další info ({server_link}489461089432633346)"
+    verify_post_verify_info_mail = "Podívej se do kanálu " \
+                              f"#server-info pro pravidla a další info ({server_link}489461089432633346)"
     verify_mail_content = "Obdržel/a jsi kód pro ověření se k přístup na server VUT FIT.\n" \
                           "Po stisknutí na tlačítko \"Zadat kód\" vyplň ověřovací kód přesně tak jak je uveden níže.\n\n" \
                           "Ověřovací kód: {code}"
