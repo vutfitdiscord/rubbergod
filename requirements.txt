@@ -1,7 +1,7 @@
 disnake>=2.8.1
 emoji>=2.0.0
 gitpython
-sqlalchemy
+sqlalchemy>=2.0.0
 psycopg2-binary
 requests
 pillow

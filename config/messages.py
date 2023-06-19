@@ -529,6 +529,8 @@ if ("Mám průměr pod 2.0")                                           \n  retur
     # REPORT COG
     report_brief = "Systém pro reportování uživatelů nebo problémů na serveru"
     report_general_brief = "Nahlaš anonymně obecný problém moderátorům"
+    report_google_form = "https://forms.gle/dkyb9eunjkJYTQdHA"
+    report_google_form_brief = "Pošle odkaz na google form pro anonymní report"
     report_modal_placeholder = "Zadej důvod reportu"
     report_modal_success = "Report byl úspěšně odeslán"
     report_answer = "Zadej zprávu pro uživatele"
