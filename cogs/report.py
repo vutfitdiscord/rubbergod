@@ -51,6 +51,10 @@ class Report(Base, commands.Cog):
             return
         await inter.response.send_modal(modal=ReportModal(self.bot, "Message report", message))
 
+    @_report.sub_command(name="google_form", description=Messages.report_google_form_brief)
+    async def report_google_form(self, inter: disnake.ApplicationCommandInteraction):
+        await inter.send(Messages.report_google_form, ephemeral=True)
+
     @commands.check(permission_check.submod_plus)
     @commands.slash_command(name="report_mod", description=Messages.report_brief)
     async def _report_mod(self, inter: disnake.ApplicationCommandInteraction): ...

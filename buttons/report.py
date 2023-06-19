@@ -1,3 +1,5 @@
+from datetime import datetime, timezone
+
 import disnake
 
 import features.report as report_features
@@ -261,11 +263,17 @@ class ReportAnswerModal(disnake.ui.Modal):
 
         if inter.channel.type == disnake.ChannelType.private:
             author = "Anonym"
+            embed.timestamp = datetime.now(tz=timezone.utc)
+            embed.set_footer(
+                icon_url=inter.author.default_avatar.url,
+                text=f"{author} | ID: {report.id}"
+            )
+
         else:
             author = f"{inter.author.mention} @{inter.author.name}"
+            utils.add_author_footer(embed, inter.author, additional_text=[f"ID: {report.id}"])
 
         embed.add_field(name="Answered by", value=author, inline=False)
-        utils.add_author_footer(embed, inter.author, additional_text=[f"ID: {report.id}"])
         return embed
 
     async def callback(self, inter: disnake.ModalInteraction) -> None:

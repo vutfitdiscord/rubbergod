@@ -289,6 +289,7 @@ Cog implementing anonymous reporting from users.
 
     - /report general
     - /report message
+    - /report google_form
     - /report_mod unban
     - message_command Report message
 
