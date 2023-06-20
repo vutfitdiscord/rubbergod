@@ -1,6 +1,7 @@
+from datetime import datetime
 from typing import List, Optional
 
-from sqlalchemy import Boolean, Column, ForeignKey, Integer, String
+from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from repository.database import database, session
@@ -11,6 +12,7 @@ class Report(database.base):
 
     id = Column(Integer, primary_key=True, nullable=False, unique=True, autoincrement=True)
     type = Column(String, default="general", nullable=False)
+    datetime = Column(DateTime, default=datetime.now(), nullable=False)
     author: Mapped["User"] = relationship(back_populates="reports")
     author_id: Mapped[int] = mapped_column(ForeignKey("user.id"))
     target_user_id = Column(String, default="", nullable=False)
@@ -172,6 +174,7 @@ class Answer(database.base):
     __tablename__ = "answer"
 
     id = Column(Integer, primary_key=True, nullable=False, unique=True)
+    datetime = Column(DateTime, default=datetime.now(), nullable=False)
     report: Mapped["Report"] = relationship(back_populates="answers")
     report_id: Mapped[int] = mapped_column(ForeignKey("report.id"))
     author_id = Column(String, nullable=False)

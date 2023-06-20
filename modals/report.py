@@ -3,6 +3,7 @@ from functools import cached_property
 
 import disnake
 
+import features.report as report_features
 from buttons.report import ReportGeneralView, ReportMessageView
 from config.app_config import config
 from config.messages import Messages
@@ -59,8 +60,8 @@ class ReportModal(disnake.ui.Modal):
         return embed
 
     @cached_property
-    def report_room(self):
-        return self.bot.get_channel(config.report_room)
+    def report_channel(self) -> disnake.ForumChannel:
+        return self.bot.get_channel(config.report_channel)
 
     async def callback(self, inter: disnake.ModalInteraction) -> None:
         if isinstance(self.message, disnake.Message):
@@ -76,9 +77,15 @@ class ReportModal(disnake.ui.Modal):
 
         embed = self.report_embed(inter, report_reason, report_id)
 
-        message = await self.report_room.send(embed=embed, view=ReportGeneralView(self.bot))
+        _, message = await self.report_channel.create_thread(
+            name=f"Report #{report_id}",
+            embed=embed,
+            view=ReportGeneralView(self.bot)
+        )
+
+        await message.pin()
+        await report_features.set_tag(self.report_channel, message.channel, "open")
         Report.set_report_url(report_id, message.jump_url)
-        await message.create_thread(name=f"Report #{report_id}")
         await inter.author.send(embed=embed)
         await inter.send(Messages.report_modal_success, ephemeral=True)
 
@@ -99,8 +106,14 @@ class ReportModal(disnake.ui.Modal):
 
         embed = self.report_embed(inter, report_reason, report_id)
 
-        message = await self.report_room.send(embed=embed, view=ReportMessageView(self.bot))
+        _, message = await self.report_channel.create_thread(
+            name=f"Report #{report_id} - {self.message.author}",
+            embed=embed,
+            view=ReportMessageView(self.bot)
+        )
+
+        await message.pin()
+        await report_features.set_tag(self.report_channel, message.channel, "open")
         Report.set_report_url(report_id, message.jump_url)
-        await message.create_thread(name=f"Report #{report_id}")
         await inter.author.send(embed=embed)
         await inter.send(Messages.report_modal_success, ephemeral=True)
