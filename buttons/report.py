@@ -1,10 +1,13 @@
 from datetime import datetime, timezone
+from functools import cached_property
+from typing import Tuple
 
 import disnake
 
 import features.report as report_features
 import utils
 from buttons.base import BaseView
+from config.app_config import config
 from config.messages import Messages
 from permissions import permission_check
 from repository.database.report import Answer, Report
@@ -14,7 +17,11 @@ class ReportView(BaseView):
     def __init__(self):
         super().__init__(timeout=None)
 
-    async def set_view_resolved(self, embed: dict, author_id: int, report_id: int):
+    @cached_property
+    def report_channel(self) -> disnake.ForumChannel:
+        return self.bot.get_channel(config.report_channel)
+
+    async def set_view_resolved(self, embed: dict, author_id: int, report_id: int) -> disnake.Embed:
         """set the report as resolved or not resolved"""
         report = Report.get_report(report_id)
 
@@ -33,7 +40,44 @@ class ReportView(BaseView):
         report_author = await self.bot.get_or_fetch_user(report_author_id)
         return report_author
 
-    async def interaction_check(self, inter: disnake.Interaction):
+    async def set_spam(
+        self,
+        button: disnake.ui.Button,
+        inter: disnake.MessageInteraction,
+        report: Report
+    ) -> Tuple[str, disnake.Embed]:
+        """Set the report as spam, change buttons and tag thread as spam"""
+        resolved_author = f"{inter.author.mention} @{inter.author.name}"
+        embed = inter.message.embeds[0].to_dict()
+
+        if report.fake_report:
+            Report.set_fake_report(report.id, inter.author.id, False)
+            for child in self.children:
+                if child.custom_id == "report:resolve":
+                    embed = await report_features.embed_resolved(
+                        self, resolved_author, embed, report.type, False
+                    )
+            button.label = "Mark spam"
+            button.style = disnake.ButtonStyle.red
+            message = Messages.report_message_not_spam.format(id=report.id, author=inter.author.name)
+            await report_features.set_tag(self.report_channel, inter.message.channel, "open")
+
+        else:
+            Report.set_fake_report(report.id, inter.author.id, True)
+            for child in self.children:
+                if child.custom_id == "report:resolve":
+                    embed = await report_features.embed_resolved(
+                        self, resolved_author, embed, "Spam", True
+                    )
+                    child.disabled = True
+            button.disabled = False
+            button.label = f"Spam marked by @{inter.author.name}"
+            button.style = disnake.ButtonStyle.primary
+            message = Messages.report_message_spam.format(id=report.id, author=inter.author.name)
+            await report_features.set_tag(self.report_channel, inter.message.channel, "spam")
+        return message, embed
+
+    async def interaction_check(self, inter: disnake.Interaction) -> bool:
         return permission_check.submod_plus(inter)
 
     @disnake.ui.button(
@@ -42,7 +86,7 @@ class ReportView(BaseView):
         style=disnake.ButtonStyle.secondary,
         custom_id="report:resolve"
     )
-    async def resolve(self, button: disnake.ui.Button, inter: disnake.MessageInteraction):
+    async def resolve(self, button: disnake.ui.Button, inter: disnake.MessageInteraction) -> None:
         await inter.response.defer()
         report_author = await self.get_report_author(inter)
         report_id = report_features.extract_report_id(inter)
@@ -53,12 +97,14 @@ class ReportView(BaseView):
         if report.resolved:
             embed = await report_features.embed_resolved(self, resolved_by, embed, report.type, False)
             report.set_resolved(report_id, inter.author.id, False)
+            await report_features.set_tag(self.report_channel, inter.message.channel, "open")
         else:
             embed = await report_features.embed_resolved(self, resolved_by, embed, report.type, True)
             report.set_resolved(report_id, inter.author.id, True)
+            await report_features.set_tag(self.report_channel, inter.message.channel, "resolved")
 
         await report_author.send(embed=embed)
-        await inter.message.thread.send(embed=embed)
+        await inter.message.channel.send(embed=embed)
         await inter.edit_original_response(embed=embed, view=self)
 
     @disnake.ui.button(
@@ -67,7 +113,7 @@ class ReportView(BaseView):
         style=disnake.ButtonStyle.secondary,
         custom_id="report:answer"
     )
-    async def answer(self, button: disnake.ui.Button, inter: disnake.MessageInteraction):
+    async def answer(self, button: disnake.ui.Button, inter: disnake.MessageInteraction) -> None:
         report_id = report_features.extract_report_id(inter)
         await inter.response.send_modal(modal=ReportAnswerModal(self, self.bot, inter, report_id))
 
@@ -77,41 +123,17 @@ class ReportView(BaseView):
         style=disnake.ButtonStyle.red,
         custom_id="report:spam"
     )
-    async def spam(self, button: disnake.ui.Button, inter: disnake.MessageInteraction):
+    async def spam(self, button: disnake.ui.Button, inter: disnake.MessageInteraction) -> None:
         """The report is a spam"""
         await inter.response.defer()
         report_id = report_features.extract_report_id(inter)
-        embed = inter.message.embeds[0].to_dict()
         report = Report.get_report(report_id)
         report_author = await self.get_report_author(inter)
         report_message = await report_features.convert_url(inter, report.report_url)
-        resolved_author = f"{inter.author.mention} @{inter.author.name}"
-
-        if report.fake_report:
-            Report.set_fake_report(report_id, inter.author.id, False)
-            for child in self.children:
-                if child.custom_id == "report:resolve":
-                    embed = await report_features.embed_resolved(
-                        self, inter.author.mention, embed, report.type, False
-                    )
-                child.disabled = False
-            button.label = "Mark spam"
-            button.style = disnake.ButtonStyle.red
-            message = Messages.report_message_not_spam.format(id=report_id, author=inter.author.name)
-
-        else:
-            Report.set_fake_report(report_id, inter.author.id, True)
-            for child in self.children:
-                if child.custom_id == "report:resolve":
-                    embed = await report_features.embed_resolved(self, resolved_author, embed, "Spam", True)
-                child.disabled = True
-            button.disabled = False
-            button.style = disnake.ButtonStyle.primary
-            button.label = f"Spam marked by @{inter.author.name}"
-            message = Messages.report_message_spam.format(id=report_id, author=inter.author.name)
+        message, embed = await self.set_spam(button, inter, report)
 
         await report_author.send(message)
-        await report_message.thread.send(message)
+        await report_message.channel.send(message)
         await inter.edit_original_response(embed=embed, view=self)
 
 
@@ -132,7 +154,7 @@ class ReportMessageView(ReportView):
         style=disnake.ButtonStyle.red,
         custom_id="report:delete"
     )
-    async def delete(self, button: disnake.ui.Button, inter: disnake.MessageInteraction):
+    async def delete(self, button: disnake.ui.Button, inter: disnake.MessageInteraction) -> None:
         """The reported message is deleted"""
         await inter.response.defer()
         button.disabled = True
@@ -150,7 +172,7 @@ class ReportMessageView(ReportView):
             delete_message = Messages.report_message_deleted.format(author=inter.author.name)
             await message.delete()
 
-        await report_message.thread.send(delete_message)
+        await report_message.channel.send(delete_message)
         await inter.edit_original_response(view=self)
 
 
@@ -159,7 +181,11 @@ class ReportAnonymView(BaseView):
         super().__init__(timeout=None)
         self.bot = bot
 
-    async def interaction_check(self, inter: disnake.Interaction):
+    @cached_property
+    def report_channel(self) -> disnake.ForumChannel:
+        return self.bot.get_channel(config.report_channel)
+
+    async def interaction_check(self, inter: disnake.Interaction) -> bool:
         report_id = report_features.extract_report_id(inter)
         if Report.is_resolved(report_id):
             await inter.message.edit(view=None)
@@ -173,7 +199,7 @@ class ReportAnonymView(BaseView):
         style=disnake.ButtonStyle.secondary,
         custom_id="report:resolve:anonym"
     )
-    async def resolve(self, button: disnake.ui.Button, inter: disnake.MessageInteraction):
+    async def resolve(self, button: disnake.ui.Button, inter: disnake.MessageInteraction) -> None:
         await inter.response.defer()
         report_id = report_features.extract_report_id(inter)
         report = Report.get_report(report_id)
@@ -190,8 +216,9 @@ class ReportAnonymView(BaseView):
             view = ReportMessageView(self.bot)
             embed = await view.set_view_resolved(embed, "", report_id)
 
+        await report_features.set_tag(self.report_channel, report_message.channel, "resolved")
         await report_message.edit(embed=embed, view=view)
-        await report_message.thread.send(embed=embed)
+        await report_message.channel.send(embed=embed)
         await inter.edit_original_message(view=None)
         await inter.send(embed=embed)
 
@@ -201,7 +228,7 @@ class ReportAnonymView(BaseView):
         style=disnake.ButtonStyle.secondary,
         custom_id="report:answer:anonym"
     )
-    async def answer(self, button: disnake.ui.Button, inter: disnake.MessageInteraction):
+    async def answer(self, button: disnake.ui.Button, inter: disnake.MessageInteraction) -> None:
         report_id = report_features.extract_report_id(inter)
         await inter.response.send_modal(modal=ReportAnswerModal(self, self.bot, inter, report_id))
         await inter.edit_original_response(view=self)
@@ -212,7 +239,7 @@ class ReportAnswerOnlyView(BaseView):
         super().__init__(timeout=None)
         self.bot = bot
 
-    async def interaction_check(self, inter: disnake.Interaction):
+    async def interaction_check(self, inter: disnake.Interaction) -> bool:
         return permission_check.submod_plus(inter)
 
     @disnake.ui.button(
@@ -221,7 +248,7 @@ class ReportAnswerOnlyView(BaseView):
         style=disnake.ButtonStyle.secondary,
         custom_id="report:answer:only"
     )
-    async def answer(self, button: disnake.ui.Button, inter: disnake.MessageInteraction):
+    async def answer(self, button: disnake.ui.Button, inter: disnake.MessageInteraction) -> None:
         report_id = report_features.extract_report_id(inter)
         await inter.response.send_modal(modal=ReportAnswerModal(self, self.bot, inter, report_id))
         await inter.edit_original_message(view=self)
@@ -286,15 +313,11 @@ class ReportAnswerModal(disnake.ui.Modal):
 
         # interaction in DMs
         if inter.channel.type == disnake.ChannelType.private:
-            await report_message.thread.send(embed=embed, view=ReportAnswerOnlyView(self.bot))
+            await report_message.channel.send(embed=embed, view=ReportAnswerOnlyView(self.bot))
             await inter.response.edit_message(view=None)
-        # interaction in thread
-        elif inter.channel.type == disnake.ChannelType.public_thread:
-            await report_message.thread.send(embed=embed)
-            await inter.response.edit_message(view=None)
-        # interaction in channel
+        # interaction in forum thread
         else:
-            await report_message.thread.send(embed=embed)
+            await report_message.channel.send(embed=embed)
 
         await report_author.send(embed=embed, view=ReportAnonymView(self.bot))
         await inter.send(Messages.report_modal_success, ephemeral=True)

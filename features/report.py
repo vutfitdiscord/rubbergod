@@ -27,6 +27,7 @@ async def embed_resolved(
     report_type: str,
     resolved: bool
 ) -> disnake.Embed:
+    """Changes the embed to a resolved embed or back to a report embed"""
     if resolved:
         embed["color"] = disnake.Color.green()
         embed["title"] = "Resolved"
@@ -54,3 +55,12 @@ async def embed_resolved(
                 child.emoji = "❌"
     embed = disnake.Embed.from_dict(embed)
     return embed
+
+
+async def set_tag(forum: disnake.ForumChannel, forum_thread: disnake.Thread, tag_name: str) -> None:
+    """Remove all tags and add the tag with the given name"""
+    await forum_thread.remove_tags(*forum_thread.applied_tags)
+    for tag in forum.available_tags:
+        if tag.name.lower() == tag_name:
+            await forum_thread.add_tags(tag)
+            return
