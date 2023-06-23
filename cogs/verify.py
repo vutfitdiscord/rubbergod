@@ -14,7 +14,6 @@ from features import verification
 from features.dynamic_verify import DynamicVerifyManager
 from modals.dynamic_verify import DynamicVerifyEditModal
 from permissions import permission_check, room_check
-from repository.verify_repo import VerifyRepository
 
 
 async def dynamic_verify_rules_autocomplete(inter: disnake.ApplicationCommandInteraction, user_input: str):
@@ -28,7 +27,6 @@ class Verify(Base, commands.Cog):
         self.bot = bot
         self.verification = verification.Verification(bot)
         self.dynamic_verify_manager = DynamicVerifyManager(bot)
-        self.verify_repo = VerifyRepository()
 
     def is_valid_guild(ctx: disnake.ApplicationCommandInteraction) -> bool:
         return ctx.guild_id is None or ctx.guild_id == config.guild_id
@@ -96,7 +94,7 @@ class Verify(Base, commands.Cog):
                 utils.fill_message("dynamic_verify_missing_rule", rule_id=rule_id)
             )
             return
-        self.verify_repo.remove_rule(rule)
+        rule.remove_rule()
         await inter.response.send_message(Messages.dynamic_verify_remove_success)
 
     @commands.check(permission_check.submod_plus)

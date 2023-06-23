@@ -15,7 +15,7 @@ from config.app_config import config
 from features import verification
 from permissions import permission_check, room_check
 from repository.database import session
-from repository.database.verification import Permit, Valid_person
+from repository.database.verification import PermitDB, ValidPersonDB
 
 
 class FitWide(Base, commands.Cog):
@@ -61,7 +61,7 @@ class FitWide(Base, commands.Cog):
             and vut not in member.roles
         ]
 
-        permited = session.query(Permit)
+        permited = session.query(PermitDB)
         permited_ids = [int(person.discord_ID) for person in permited]
 
         years = ["0BIT", "1BIT", "2BIT", "3BIT+", "0MIT", "1MIT", "2MIT+", "Doktorand", "VUT", "Dropout"]
@@ -78,9 +78,9 @@ class FitWide(Base, commands.Cog):
                     await ctx.send("Ve verified databázi jsem nenašel: " + utils.generate_mention(member.id))
             else:
                 try:
-                    login = session.query(Permit).filter(Permit.discord_ID == str(member.id)).one().login
+                    login = session.query(PermitDB).filter(PermitDB.discord_ID == str(member.id)).one().login
 
-                    person = session.query(Valid_person).filter(Valid_person.login == login).one()
+                    person = session.query(ValidPersonDB).filter(ValidPersonDB.login == login).one()
                 except NoResultFound:
                     continue
                 except MultipleResultsFound:
@@ -314,7 +314,7 @@ class FitWide(Base, commands.Cog):
         found_people = []
         found_logins = []
         new_logins = []
-        login_results = session.query(Valid_person.login).all()
+        login_results = session.query(ValidPersonDB.login).all()
         # Use unpacking on results
         old_logins = [value for value, in login_results]
 
@@ -330,11 +330,11 @@ class FitWide(Base, commands.Cog):
                 continue
 
             if convert_0xit and year.endswith("1r"):
-                person = session.query(Valid_person).filter(Valid_person.login == login).one_or_none()
+                person = session.query(ValidPersonDB).filter(ValidPersonDB.login == login).one_or_none()
                 if person is not None and person.year.endswith("0r"):
                     year = year.replace("1r", "0r")
 
-            found_people.append(Valid_person(login=login, year=year, name=name, mail=mail))
+            found_people.append(ValidPersonDB(login=login, year=year, name=name, mail=mail))
             found_logins.append(login)
 
         for login in found_logins:
@@ -347,7 +347,7 @@ class FitWide(Base, commands.Cog):
             session.merge(person)
 
         cnt_new = 0
-        for person in session.query(Valid_person):
+        for person in session.query(ValidPersonDB):
             if person.login not in found_logins:
                 try:
                     # check for muni
@@ -387,13 +387,13 @@ class FitWide(Base, commands.Cog):
     @commands.check(room_check.is_in_modroom)
     @commands.command()
     async def get_users_login(self, ctx, member: disnake.Member):
-        result = session.query(Permit).filter(Permit.discord_ID == str(member.id)).one_or_none()
+        result = session.query(PermitDB).filter(PermitDB.discord_ID == str(member.id)).one_or_none()
 
         if result is None:
             await ctx.send("Uživatel není v databázi.")
             return
 
-        person = session.query(Valid_person).filter(Valid_person.login == result.login).one_or_none()
+        person = session.query(ValidPersonDB).filter(ValidPersonDB.login == result.login).one_or_none()
 
         if person is None:
             await ctx.send(result.login)
@@ -405,10 +405,10 @@ class FitWide(Base, commands.Cog):
     @commands.check(room_check.is_in_modroom)
     @commands.command()
     async def get_logins_user(self, ctx, login):
-        result = session.query(Permit).filter(Permit.login == login).one_or_none()
+        result = session.query(PermitDB).filter(PermitDB.login == login).one_or_none()
 
         if result is None:
-            person = session.query(Valid_person).filter(Valid_person.login == login).one_or_none()
+            person = session.query(ValidPersonDB).filter(ValidPersonDB.login == login).one_or_none()
             if person is None:
                 await ctx.send("Uživatel není v databázi možných loginů.")
             else:
@@ -425,11 +425,11 @@ class FitWide(Base, commands.Cog):
     @commands.command()
     async def reset_login(self, ctx, login):
 
-        result = session.query(Valid_person).filter(Valid_person.login == login).one_or_none()
+        result = session.query(ValidPersonDB).filter(ValidPersonDB.login == login).one_or_none()
         if result is None:
             await ctx.send("To není validní login.")
         else:
-            session.query(Permit).filter(Permit.login == login).delete()
+            session.query(PermitDB).filter(PermitDB.login == login).delete()
             result.status = 1
             session.commit()
             await ctx.send("Hotovo.")
@@ -439,11 +439,11 @@ class FitWide(Base, commands.Cog):
     @commands.command()
     async def connect_login_to_user(self, ctx, login, member: disnake.Member):
 
-        result = session.query(Valid_person).filter(Valid_person.login == login).one_or_none()
+        result = session.query(ValidPersonDB).filter(ValidPersonDB.login == login).one_or_none()
         if result is None:
             await ctx.send("To není validní login.")
         else:
-            session.add(Permit(login=login, discord_ID=str(member.id)))
+            session.add(PermitDB(login=login, discord_ID=str(member.id)))
             result.status = 0
             session.commit()
             await ctx.send("Hotovo.")

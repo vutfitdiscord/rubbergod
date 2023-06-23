@@ -16,9 +16,8 @@ from repository.database.review import (Review, ReviewRelevance,  # noqa: F401
                                         Subject, Subject_details)
 from repository.database.role_group import RoleGroup  # noqa: F401
 from repository.database.stream_link import StreamLink  # noqa: F401
-from repository.database.subscription import Subscription  # noqa: F401
-from repository.database.timeout import Timeout  # noqa: F401
-from repository.database.verification import Permit, Valid_person
+from repository.database.timeout import TimeoutDB  # noqa: F401
+from repository.database.verification import PermitDB, ValidPersonDB
 from repository.database.vote import Vote  # noqa: F401
 from repository.review_repo import ReviewRepository
 
@@ -36,8 +35,8 @@ def load_dump(filename: str):
 
     session.query(Karma).delete()
     session.query(Karma_emoji).delete()
-    session.query(Permit).delete()
-    session.query(Valid_person).delete()
+    session.query(PermitDB).delete()
+    session.query(ValidPersonDB).delete()
     session.query(HugsTable).delete()
     session.commit()
 
@@ -83,19 +82,20 @@ def load_dump(filename: str):
             values = re.split(r',(?=\')', values)
             values = [value.replace('\'', '') for value in values]
             for i in range(0, len(values), 3):
-                session.add(Permit(login=values[i],
-                                   discord_ID=values[i + 2]))
+                session.add(PermitDB(login=values[i], discord_ID=values[i + 2]))
         elif insert.startswith("INSERT INTO `bot_valid_persons`"):
             values = values[1:-2].replace('\'', '')
             values = values.replace('(', '').replace(')', '')
             values = values.split(',')
             for i in range(0, len(values), 5):
-                session.add(Valid_person(login=values[i],
-                                         name=values[i + 1],
-                                         year=values[i + 2],
-                                         code=values[i + 3]
-                                         if values[i + 3] != "NULL" else None,
-                                         status=values[i + 4]))
+                session.add(ValidPersonDB(
+                    login=values[i],
+                    name=values[i + 1],
+                    year=values[i + 2],
+                    code=values[i + 3]
+                    if values[i + 3] != "NULL" else None,
+                    status=values[i + 4])
+                )
 
     for karma in karma_values:
         session.merge(karma)

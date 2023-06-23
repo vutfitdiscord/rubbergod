@@ -17,7 +17,7 @@ from config.messages import Messages
 from features.list_message_sender import send_list_of_messages
 from permissions import permission_check
 from repository.database import session
-from repository.database.verification import Permit, Valid_person
+from repository.database.verification import PermitDB, ValidPersonDB
 
 
 def running_for(time):
@@ -49,7 +49,7 @@ def filter_year(resources):
     # get unique logins and people objects from db
     logins = set(login for res_data in resources.values() for login in res_data.keys())
     people = {
-        login: session.query(Valid_person).filter(Valid_person.login == login).one_or_none()
+        login: session.query(ValidPersonDB).filter(ValidPersonDB.login == login).one_or_none()
         for login in logins
     }
 
@@ -178,7 +178,7 @@ _inflected_resources = {
 def insult_login(parsed_items, system, res_type):
     output_array = []
     for login, array in parsed_items.items():
-        user = session.query(Permit).filter(Permit.login == login).one_or_none()
+        user = session.query(PermitDB).filter(PermitDB.login == login).one_or_none()
 
         if not user:
             msg = f"Na {system} leží {_inflected_resources[res_type][0]} " \
@@ -199,7 +199,7 @@ def insult_login(parsed_items, system, res_type):
 def insult_login_shm(parsed_files, system):
     output_array = []
     for login, data in parsed_files.items():
-        user = session.query(Permit).filter(Permit.login == login).one_or_none()
+        user = session.query(PermitDB).filter(PermitDB.login == login).one_or_none()
         array, login_not_in_name = data
 
         if not user:

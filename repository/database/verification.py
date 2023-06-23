@@ -1,19 +1,21 @@
+from __future__ import annotations
+
 import json
-from typing import List
+from typing import List, Union
 
-from sqlalchemy import Boolean, Column, Integer, String
+from sqlalchemy import Boolean, Column, Integer, String, asc, exists
 
-from repository.database import database
+from repository.database import database, session
 
 
-class Permit(database.base):
+class PermitDB(database.base):
     __tablename__ = "bot_permit"
 
     login = Column(String, primary_key=True)
     discord_ID = Column(String)
 
 
-class Valid_person(database.base):
+class ValidPersonDB(database.base):
     __tablename__ = "bot_valid_persons"
 
     login = Column(String, primary_key=True)
@@ -36,7 +38,7 @@ class Valid_person(database.base):
         return f"{self.login}@{fallback_domain}"  # fallback
 
 
-class DynamicVerifyRule(database.base):
+class DynamicVerifyDB(database.base):
     __tablename__ = "dynamic_verify_rules"
 
     id = Column(String, primary_key=True)
@@ -51,3 +53,29 @@ class DynamicVerifyRule(database.base):
 
     def set_role_ids(self, roles: List[int]) -> None:
         self.role_ids = json.dumps(roles)
+
+    def update_rule(self) -> None:
+        session.merge(self)
+        session.commit()
+
+    def remove_rule(self) -> None:
+        session.delete(self)
+        session.commit()
+
+    @classmethod
+    def exists_rule(cls, rule: str) -> bool:
+        return session.query(
+            exists().where(cls.id == rule and cls.enabled)
+        ).scalar()
+
+    @classmethod
+    def get_rule(cls, rule: str) -> Union[DynamicVerifyDB, None]:
+        return (
+            session.query(cls)
+            .filter(cls.id == rule)
+            .one_or_none()
+        )
+
+    @classmethod
+    def get_rules(cls, limit: int) -> List[DynamicVerifyDB]:
+        return session.query(cls).order_by(asc("id")).limit(limit).all()
