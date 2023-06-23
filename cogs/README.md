@@ -347,18 +347,6 @@ Cog implementing information about office hours of the study department.\
     - /studijni
 ---
 
-### [Subscriptions](subscriptions.py)
-
-Cog implementing subscription to allowed channels. Subscribed users will receive notifications about new messages if they are offline.\
-**Commands:**
-
-    - /subscription subscribe
-    - /subscription unsubscribe
-    - /subscription list
-    - /subscription channel
-    - /subscription user
----
-
 ### [System](system.py)
 
 Core cog for bot. Can't be unloaded. Contains commands for cog management.\
