@@ -15,8 +15,7 @@ from config import cooldowns
 from config.app_config import config
 from config.messages import Messages
 from permissions import permission_check
-from repository.database.timeout import Timeout as TimeoutDB
-from repository.timeout_repo import TimeoutRepository
+from repository.database.timeout import TimeoutDB as TimeoutDB
 
 timestamps = {
     "60s": 1/60,
@@ -45,7 +44,7 @@ class Timeout(Base, commands.Cog):
     def __init__(self, bot):
         super().__init__()
         self.bot = bot
-        self.timeout_repo = TimeoutRepository()
+        self.timeout_db = TimeoutDB()
         self.formats = ("%d.%m.%Y", "%d/%m/%Y", "%d.%m.%Y %H:%M", "%d/%m/%Y %H:%M")
         self.tasks = [self.refresh_timeout.start()]
 
@@ -104,13 +103,13 @@ class Timeout(Base, commands.Cog):
         try:
             if length == 0 or endtime is None:
                 await member.timeout(until=None, reason=reason)
-                self.timeout_repo.remove_timeout(member.id)
+                self.timeout_db.remove_timeout(member.id)
             elif length.days > 28:
                 await member.timeout(until=datetime.now()+timedelta(days=28), reason=reason)
-                self.timeout_repo.add_timeout(member.id, inter.author.id, starttime, endtime, reason, isself)
+                self.timeout_db.add_timeout(member.id, inter.author.id, starttime, endtime, reason, isself)
             else:
                 await member.timeout(until=endtime, reason=reason)
-                self.timeout_repo.add_timeout(member.id, inter.author.id, starttime, endtime, reason, isself)
+                self.timeout_db.add_timeout(member.id, inter.author.id, starttime, endtime, reason, isself)
             return True
         except disnake.Forbidden:
             return False
@@ -315,7 +314,7 @@ class Timeout(Base, commands.Cog):
         """List all timed out users"""
         await self.update_timeout()
 
-        users = self.timeout_repo.get_timeout_users_filter_self(selftimeout)
+        users = self.timeout_db.get_timeout_users_filter_self(selftimeout)
         if not users:
             await inter.send(Messages.timeout_list_none)
             return
@@ -362,7 +361,7 @@ class Timeout(Base, commands.Cog):
 
     async def update_timeout(self):
         """update all user's timeout in database and on server"""
-        users = self.timeout_repo.get_timeout_users()
+        users = self.timeout_db.get_timeout_users()
         guild = self.bot.get_guild(config.guild_id)
 
         # find member and update timeout
@@ -372,12 +371,12 @@ class Timeout(Base, commands.Cog):
             # member left server
             if member is None:
                 if user.end < datetime.now():
-                    self.timeout_repo.remove_timeout(user.user_id)
+                    self.timeout_db.remove_timeout(user.user_id)
                 continue
 
             # someone removed timeout manually
             if member.current_timeout is None:
-                self.timeout_repo.remove_timeout(user.user_id)
+                self.timeout_db.remove_timeout(user.user_id)
                 continue
 
             # get timezone aware datetime object
@@ -395,7 +394,7 @@ class Timeout(Base, commands.Cog):
         await self.update_timeout()
 
         # send update
-        users = self.timeout_repo.get_timeout_users_filter_self(isself=False)
+        users = self.timeout_db.get_timeout_users_filter_self(isself=False)
         if users:
             await self.timeout_embed_listing(users, "Timeout Update", self.log_channel, self.bot.user)
 
@@ -411,7 +410,7 @@ class Timeout(Base, commands.Cog):
                 and after_timeout is None
                 and entry.user.id != self.bot.user.id
             ):
-                self.timeout_repo.remove_timeout(entry.target.id)
+                self.timeout_db.remove_timeout(entry.target.id)
                 embed = self.create_embed(entry.user, "Timeout remove")
                 embed.add_field(name=entry.target, value="Předčasně odebráno", inline=False)
 

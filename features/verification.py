@@ -15,7 +15,7 @@ from config.app_config import config
 from config.messages import Messages
 from features.base_feature import BaseFeature
 from features.verify_helper import VerifyHelper
-from repository.database.verification import Valid_person
+from repository.database.verification import ValidPersonDB
 from repository.user_repo import UserRepository, VerifyStatus
 
 
@@ -51,7 +51,7 @@ class Verification(BaseFeature):
     async def gen_code_and_send_mail(
         self,
         inter: disnake.ApplicationCommandInteraction,
-        user: Valid_person,
+        user: ValidPersonDB,
         mail_postfix: str,
         is_resend: bool = False,
         dry_run: bool = False,
@@ -220,7 +220,7 @@ class Verification(BaseFeature):
             )
             return
 
-        new_user: Valid_person = self.repo.get_user(login)
+        new_user: ValidPersonDB = self.repo.get_user(login)
         if new_user is not None:
             if code != new_user.code:
                 await inter.response.send_message(Messages.verify_verify_wrong_code)
