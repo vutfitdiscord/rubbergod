@@ -420,22 +420,6 @@ if ("Mám průměr pod 2.0")                                           \n  retur
     Periwinkle CadetBlue CornflowerBlue MidnightBlue Cerulean Emerald JungleGreen SeaGreen ForestGreen
     PineGreen LimeGreen YellowGreen SpringGreen OliveGreen RawSienna"""
 
-    # SUBSCRIPTIONS
-    subscribe_brief = "Přihlášení k odběru zpráv kanálu do DM"
-    unsubscribe_brief = "Odhlášení odběru zpráv do DM"
-    subscribeable_brief = "Výpis kanálů které je možné sledovat"
-    subscriptions_user_brief = "Výpis odběrů zpráv uživatele"
-    subscriptions_channel_brief = "Výpis odběrů zpráv kanálu"
-    subscriptions_embed_name = "Informace o zprávě"
-    subscriptions_embed_value = "Zpráva obsahuje přílohy."
-    subscriptions_message_link = "Odkaz na zprávu"
-    subscriptions_unsubscribable = "Tento kanál odebírat nemůžeš."
-    subscriptions_already_subscribed = "Tuto místnost již odebíráš."
-    subscriptions_new_subscription = "Upozornění na nové zprávy ti budu posílat do DM."
-    subscriptions_not_subscribed = "Tuto místnost neodebíráš."
-    subscriptions_unsubscribed = "Nová upozornění na zprávy ti už posílat nebudu."
-    subscriptions_none = "Nebyly nalezeny žádné výsledky."
-
     # STUDIJNI
     studijni_brief = "Úřední hodiny studijního Oddělení"
     studijni_web_error = "Chyba při parsování webu"
