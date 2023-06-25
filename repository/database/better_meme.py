@@ -2,8 +2,9 @@ from __future__ import annotations
 
 from typing import List, Optional
 
-from database import database, session
 from sqlalchemy import Column, Integer, String
+
+from repository.database import database, session
 
 
 class BetterMemeDB(database.base):
