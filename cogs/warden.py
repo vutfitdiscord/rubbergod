@@ -17,10 +17,9 @@ from cogs.base import Base
 from config.app_config import config
 from config.messages import Messages
 from permissions import permission_check
-from repository import image_repo
+from repository.database.image import ImageDB
 
 dhash.force_pil()
-repo_i = image_repo.ImageRepository()
 
 
 class Warden(Base, commands.Cog):
@@ -53,7 +52,7 @@ class Warden(Base, commands.Cog):
     @commands.Cog.listener()
     async def on_message_delete(self, message: disnake.Message):
         if self.doCheckRepost(message):
-            repo_i.deleteByMessage(message.id)
+            ImageDB.deleteByMessage(message.id)
 
             # try to detect repost embed
             messages = await message.channel.history(after=message, limit=10, oldest_first=True).flatten()
@@ -100,7 +99,7 @@ class Warden(Base, commands.Cog):
                 continue
             img_hash = dhash.dhash_int(image)
 
-            repo_i.add_image(
+            ImageDB.add_image(
                 channel_id=message.channel.id,
                 message_id=message.id,
                 attachment_id=f.id,
@@ -183,7 +182,7 @@ class Warden(Base, commands.Cog):
             return
 
         duplicates = {}
-        posts = repo_i.getAll()
+        posts = ImageDB.getAll()
         for img_hash in hashes:
             hamming_min = 128
             duplicate = None
