@@ -7,7 +7,7 @@ from repository.database.cooldown import Cooldown  # noqa: F401
 from repository.database.error import ErrorLog  # noqa: F401
 from repository.database.exams import ExamsTermsMessage  # noqa: F401
 from repository.database.hugs import HugsTable
-from repository.database.image import Image  # noqa: F401
+from repository.database.image import ImageDB  # noqa: F401
 from repository.database.karma import Karma, Karma_emoji
 from repository.database.meme_repost import MemeRepost  # noqa: F401
 from repository.database.pin_map import PinMapDB  # noqa: F401
