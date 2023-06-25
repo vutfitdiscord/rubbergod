@@ -15,9 +15,8 @@ from config.app_config import config
 from config.messages import Messages
 from features.reaction_context import ReactionContext
 from permissions import permission_check
-from repository import review_repo, role_group_repo
-
-group_repo = role_group_repo.RoleGroupRepository()
+from repository import review_repo
+from repository.database.role_group import RoleGroupDB
 
 
 class Roles(Base, commands.Cog):
@@ -228,7 +227,7 @@ class Roles(Base, commands.Cog):
     def get_target(self, target, guild) -> Tuple[List[disnake.Role], List[disnake.abc.GuildChannel]]:
         """Detect if target is a channel a role or a group."""
         # Try a group first
-        group = group_repo.get_group(target)
+        group = RoleGroupDB.get_group(target)
         if group is not None:
             roles, channels = [], []
             for role_id in group.role_ids:
@@ -282,27 +281,27 @@ class Roles(Base, commands.Cog):
 
     @group.sub_command(name="add", description=Messages.group_add)
     async def add_group(self, inter, name: str):
-        group = group_repo.get_group(name)
+        group = RoleGroupDB.get_group(name)
         if group is not None:
             await inter.send(f"Groupa s názvem {name} už existuje.")
             return
-        group_repo.add_group(name)
+        RoleGroupDB.add_group(name)
         await inter.send(f"Pridal jsem groupu {name}.")
 
     @group.sub_command(name="get", description=Messages.group_get)
     async def get_group(self, inter, name: str):
-        group = group_repo.get_group(name)
+        group = RoleGroupDB.get_group(name)
         channels = ", ".join([f"<#{channel_id}>" for channel_id in group.channel_ids])
         await inter.send(f"Jmeno: {group.name}\n" f"Channel IDs: {channels}\n" f"Role IDs:{group.role_ids}")
 
     @group.sub_command(name="delete", description=Messages.group_delete)
     async def delete_group(self, inter, name: str):
-        group_repo.group_delete(name)
+        RoleGroupDB.group_delete(name)
         await inter.send(f"Odebral jsem groupu {name}")
 
     @group.sub_command(name="list", description=Messages.group_list)
     async def groups(self, inter):
-        names = group_repo.group_names()
+        names = RoleGroupDB.group_names()
         groups = "\n".join(names)
         output = utils.cut_string_by_words(groups, 1900, "\n")
         await inter.send(f"```md\n# ACTIVE GROUPS:\n{output[0]}```")
@@ -311,22 +310,22 @@ class Roles(Base, commands.Cog):
 
     @group.sub_command(name="add_channel_id", description=Messages.group_add_channel_id)
     async def add_channel_id(self, inter, name: str, channel_id: str):
-        group_repo.group_add_channel_id(name, channel_id)
+        RoleGroupDB.group_add_channel_id(name, channel_id)
         await inter.send("Done")
 
     @group.sub_command(name="add_role_id", description=Messages.group_add_role_id)
     async def add_role_id(self, inter, name: str, role_id: str):
-        group_repo.group_add_role_id(name, role_id)
+        RoleGroupDB.group_add_role_id(name, role_id)
         await inter.send("Done")
 
     @group.sub_command(name="reset_channels", description=Messages.group_reset_channels)
     async def group_reset_channels(self, inter, name: str):
-        group_repo.group_reset_channels(name)
+        RoleGroupDB.group_reset_channels(name)
         await inter.send("Done")
 
     @group.sub_command(name="reset_roles", description=Messages.group_reset_roles)
     async def group_reset_roles(self, inter, name: str):
-        group_repo.group_reset_roles(name)
+        RoleGroupDB.group_reset_roles(name)
         await inter.send("Done")
 
     @commands.check(permission_check.mod_plus)
