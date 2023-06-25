@@ -15,7 +15,7 @@ from repository.database.report import Answer, Report, User  # noqa: F401
 from repository.database.review import (Review, ReviewRelevance,  # noqa: F401
                                         Subject, Subject_details)
 from repository.database.role_group import RoleGroup  # noqa: F401
-from repository.database.stream_link import StreamLink  # noqa: F401
+from repository.database.streamlinks import StreamLinkDB  # noqa: F401
 from repository.database.timeout import TimeoutDB  # noqa: F401
 from repository.database.verification import PermitDB, ValidPersonDB
 from repository.database.vote import Vote  # noqa: F401
