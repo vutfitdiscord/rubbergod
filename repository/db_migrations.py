@@ -2,7 +2,7 @@ import re
 
 from config.app_config import config
 from repository.database import database, session
-from repository.database.better_meme import BetterMeme  # noqa: F401
+from repository.database.better_meme import BetterMemeDB  # noqa: F401
 from repository.database.cooldown import Cooldown  # noqa: F401
 from repository.database.error import ErrorLog  # noqa: F401
 from repository.database.exams import ExamsTermsMessage  # noqa: F401

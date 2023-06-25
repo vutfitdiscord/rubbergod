@@ -16,13 +16,12 @@ from config.messages import Messages
 from features.leaderboard import LeaderboardPageSource
 from features.reaction_context import ReactionContext
 from permissions import room_check
-from repository.better_meme import BetterMemeRepository
-from repository.database.better_meme import BetterMeme
+from repository.database.better_meme import BetterMemeDB
 from repository.karma_repo import KarmaRepository
 from repository.meme_repost_repo import MemeRepostRepo
 
 
-def _leaderboard_formatter(entry: BetterMeme, **kwargs):
+def _leaderboard_formatter(entry: BetterMemeDB, **kwargs):
     return Messages.base_leaderboard_format_str.format_map(
         kwargs) + f" **{entry.posts}** posts **{entry.total_karma}** pts"
 
@@ -34,7 +33,7 @@ class MemeRepost(Base, commands.Cog):
 
         self.karma_repo = KarmaRepository()
         self.repost_repo = MemeRepostRepo()
-        self.better_repo = BetterMemeRepository()
+        self.better_db = BetterMemeDB()
         self.repost_channel: Union[disnake.TextChannel, None] = None
         self.check = room_check.RoomCheck(bot)
 
@@ -67,7 +66,7 @@ class MemeRepost(Base, commands.Cog):
                 if original_post_user:
                     emoji_key = str(ctx.emoji.id) if type(ctx.emoji) != str else ctx.emoji
                     emoji_val = self.karma_repo.emoji_value(emoji_key)
-                    self.better_repo.update_post_karma(original_post_user.id, emoji_val)
+                    self.better_db.update_post_karma(original_post_user.id, emoji_val)
                     if isinstance(ctx.emoji, str):
                         self.karma_repo.karma_emoji(original_post_user.id, ctx.member.id, ctx.emoji)
                     else:
@@ -93,7 +92,7 @@ class MemeRepost(Base, commands.Cog):
             if original_post_user:
                 emoji_key = str(ctx.emoji.id) if type(ctx.emoji) != str else ctx.emoji
                 emoji_val = self.karma_repo.emoji_value(emoji_key)
-                self.better_repo.update_post_karma(original_post_user.id, -emoji_val)
+                self.better_db.update_post_karma(original_post_user.id, -emoji_val)
                 if isinstance(ctx.emoji, str):
                     self.karma_repo.karma_emoji_remove(original_post_user.id, ctx.member.id, ctx.emoji)
                 else:
@@ -211,8 +210,7 @@ class MemeRepost(Base, commands.Cog):
                 emoji_val = self.karma_repo.emoji_value(emoji_key)
                 total_karma += reac.count * emoji_val
 
-            self.better_repo.add_post_to_repo(ctx.message.author.id,
-                                              total_karma)
+            self.better_db.add_post_to_repo(ctx.message.author.id, total_karma)
 
     @commands.slash_command(name="better-meme", guild_ids=[config.guild_id])
     async def _better_meme(self, inter):
@@ -231,7 +229,7 @@ class MemeRepost(Base, commands.Cog):
         page_source = LeaderboardPageSource(
             bot=self.bot,
             author=inter.author,
-            query=self.better_repo.get_leaderboard(order_by),
+            query=self.better_db.get_leaderboard(order_by),
             row_formatter=_leaderboard_formatter,
             base_embed=embed,
             title='BETTER MEMES LEADERBOARD',
