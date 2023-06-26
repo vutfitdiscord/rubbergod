@@ -109,7 +109,9 @@ class Verify(Base, commands.Cog):
             await member.add_roles(host_id, verify_id)
         except AttributeError:
             raise commands.errors.MemberNotFound("Member not found")
-        await inter.response.send_message(Messages.verify_verify_success.format(user=member.mention))
+        response_message = Messages.verify_verify_success.format(user=member.mention)
+        await inter.response.send_message(response_message)
+        await member.send(response_message)
 
 
 def setup(bot):
