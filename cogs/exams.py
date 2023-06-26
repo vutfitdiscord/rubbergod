@@ -22,7 +22,7 @@ from config import cooldowns
 from config.app_config import config
 from config.messages import Messages
 from permissions import permission_check
-from repository.exams_repo import ExamsTermsMessageRepo
+from repository.database.exams import ExamsTermsMessageDB
 
 year_regex = "[1-3][BM]IT"
 YEAR_LIST = ["1BIT", "2BIT", "3BIT", "1MIT", "2MIT"]
@@ -40,8 +40,6 @@ class Exams(Base, commands.Cog):
         self.subscribed_guilds: List[int] = []
         if config.exams_subscribe_default_guild:
             self.subscribed_guilds.append(config.guild_id)
-
-        self.exams_repo = ExamsTermsMessageRepo()
 
         if self.subscribed_guilds:
             self.tasks = [self.update_terms_task.start()]
@@ -67,7 +65,7 @@ class Exams(Base, commands.Cog):
 
             for channel_name in config.exams_term_channels:
                 if channel_name.lower() == channel.name.lower():
-                    message_ids = self.exams_repo.remove_from_channel(channel.id)
+                    message_ids = ExamsTermsMessageDB.remove_from_channel(channel.id)
                     for message_id in message_ids:
                         try:
                             message = await channel.fetch_message(message_id)
@@ -85,7 +83,7 @@ class Exams(Base, commands.Cog):
             )
             return
 
-        message_ids = self.exams_repo.remove_from_channel(channel.id)
+        message_ids = ExamsTermsMessageDB.remove_from_channel(channel.id)
         for message_id in message_ids:
             try:
                 message = await channel.fetch_message(message_id)
@@ -142,7 +140,7 @@ class Exams(Base, commands.Cog):
         return list(map(int, input))
 
     async def get_message_destination(self, channel: disnake.TextChannel, message_index: int = 0):
-        saved_messages = self.exams_repo.get_message_from_channel(channel.id)
+        saved_messages = ExamsTermsMessageDB.get_message_from_channel(channel.id)
         if saved_messages and message_index < len(saved_messages):
             if message_index < 0:
                 message_index = 0
@@ -153,7 +151,7 @@ class Exams(Base, commands.Cog):
                 dest = await channel.fetch_message(message_id)
             except disnake.NotFound:
                 # If cant find message then remove it from database
-                self.exams_repo.remove_term_message(message_id)
+                ExamsTermsMessageDB.remove_term_message(message_id)
 
             # If message is not found then set it to channel itself
             if dest is None:
@@ -490,7 +488,7 @@ class Exams(Base, commands.Cog):
             # No previous message in channel
             send_message = await dest.send(content=src_data_string, embed=header)
             if send_message is not None:
-                self.exams_repo.create_term_message(send_message.id, send_message.channel.id)
+                ExamsTermsMessageDB.create_term_message(send_message.id, send_message.channel.id)
         else:
             # Message already exists
             await dest.edit(content=src_data_string, embed=header)
