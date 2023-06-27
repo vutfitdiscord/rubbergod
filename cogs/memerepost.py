@@ -17,8 +17,8 @@ from features.leaderboard import LeaderboardPageSource
 from features.reaction_context import ReactionContext
 from permissions import room_check
 from repository.database.better_meme import BetterMemeDB
+from repository.database.meme_repost import MemeRepostDB
 from repository.karma_repo import KarmaRepository
-from repository.meme_repost_repo import MemeRepostRepo
 
 
 def _leaderboard_formatter(entry: BetterMemeDB, **kwargs):
@@ -32,7 +32,6 @@ class MemeRepost(Base, commands.Cog):
         self.bot: commands.Bot = bot
 
         self.karma_repo = KarmaRepository()
-        self.repost_repo = MemeRepostRepo()
         self.better_db = BetterMemeDB()
         self.repost_channel: Union[disnake.TextChannel, None] = None
         self.check = room_check.RoomCheck(bot)
@@ -41,7 +40,7 @@ class MemeRepost(Base, commands.Cog):
 
     async def handle_reaction(self, ctx: ReactionContext):
         if ctx.channel.id == config.meme_room:
-            if self.repost_repo.find_repost_by_original_message_id(ctx.message.id) is not None:
+            if MemeRepostDB.find_repost_by_original_message_id(ctx.message.id) is not None:
                 # Message was reposted before
                 return
 
@@ -55,7 +54,7 @@ class MemeRepost(Base, commands.Cog):
                         await self.__repost_message(ctx, all_reactions)
                         return
         elif ctx.channel.id == config.meme_repost_room:
-            repost = self.repost_repo.find_repost_by_repost_message_id(ctx.message.id)
+            repost = MemeRepostDB.find_repost_by_repost_message_id(ctx.message.id)
 
             if repost is not None:
                 if ctx.member.id == int(repost.author_id):
@@ -81,7 +80,7 @@ class MemeRepost(Base, commands.Cog):
         if ctx.channel.id != config.meme_repost_room:
             return
 
-        repost = self.repost_repo.find_repost_by_repost_message_id(ctx.message.id)
+        repost = MemeRepostDB.find_repost_by_repost_message_id(ctx.message.id)
         if repost is not None:
 
             if ctx.member.id == int(repost.author_id):
@@ -108,7 +107,7 @@ class MemeRepost(Base, commands.Cog):
             return
 
         async with self.repost_lock:
-            if self.repost_repo.find_repost_by_original_message_id(ctx.message.id) is not None:
+            if MemeRepostDB.find_repost_by_original_message_id(ctx.message.id) is not None:
                 return
 
             # Generate string with all reactions on post at the time
@@ -198,10 +197,12 @@ class MemeRepost(Base, commands.Cog):
                     secondary_message = await self.repost_channel.send(urls, files=files)
                     secondary_message_id = secondary_message.id
 
-            self.repost_repo.create_repost(ctx.message.id,
-                                           repost_message_id,
-                                           ctx.message.author.id,
-                                           secondary_message_id)
+            MemeRepostDB.create_repost(
+                ctx.message.id,
+                repost_message_id,
+                ctx.message.author.id,
+                secondary_message_id
+            )
 
             total_karma = 0
 
