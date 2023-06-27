@@ -309,6 +309,11 @@ class Messages:
         "např: Bc. Josef Novák 123456/2019 99999\n" \
         "(při <https://dspace.vutbr.cz/handle/11012/99999>)\n" \
         "Údaje slouží k jednorázovému ověření a nejsou nikam ukládány."
+    absolvent_degree_param = "Dosažený titul - Bc./Ing."
+    absolvent_name_param = "Křestní jméno např.: Josef"
+    absolvent_surname_param = "Příjmení např.: Novák"
+    absolvent_diploma_param = "Číslo diplomu např.: 123456/2019"
+    absolvent_thesis_id_param = "ID kvalifikační práce z URL na webu knihovny VUT(www.dspace.vutbr.cz) např.: 99999"
 
     # INFO
     urban_brief = "Vyhledávaní výrazu v urban slovníku"
