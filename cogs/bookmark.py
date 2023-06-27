@@ -5,7 +5,6 @@ Cog controlling bookmarks. React with bookmark emoji and the bot will send copy 
 import disnake
 from disnake.ext import commands
 
-import utils
 from buttons.bookmark import BookmarkView
 from cogs.base import Base
 from config.app_config import config
@@ -25,29 +24,23 @@ class Bookmark(Base, commands.Cog):
 
     async def bookmark_reaction(self, ctx):
         embed, images, files_attached = await BookmarkFeatures.create_bookmark_embed(self, ctx)
-        try:
-            if images:
-                for image in images:
-                    embed.append(await BookmarkFeatures.create_image_embed(self, ctx, image))
-            # when sending sticker there can be overflow of files
-            if len(files_attached) <= 10:
-                await ctx.member.send(
-                    embeds=embed,
-                    view=BookmarkView(ctx.message.jump_url),
-                    files=files_attached
-                )
-            else:
-                await ctx.member.send(
-                    embeds=embed,
-                    view=BookmarkView(ctx.message.jump_url),
-                    files=files_attached[:10]
-                )
-                await ctx.member.send(files=files_attached[10:])
-        except disnake.HTTPException as e:
-            if e.code == 50007:
-                await ctx.channel.send(utils.fill_message("blocked_bot", user=ctx.author.id))
-            else:
-                raise e
+        if images:
+            for image in images:
+                embed.append(await BookmarkFeatures.create_image_embed(self, ctx, image))
+        # when sending sticker there can be overflow of files
+        if len(files_attached) <= 10:
+            await ctx.member.send(
+                embeds=embed,
+                view=BookmarkView(ctx.message.jump_url),
+                files=files_attached
+            )
+        else:
+            await ctx.member.send(
+                embeds=embed,
+                view=BookmarkView(ctx.message.jump_url),
+                files=files_attached[:10]
+            )
+            await ctx.member.send(files=files_attached[10:])
 
     @commands.Cog.listener()
     async def on_button_click(self, inter: disnake.MessageInteraction):
