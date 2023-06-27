@@ -32,15 +32,15 @@ class Absolvent(Base, commands.Cog):
     async def diplom(
         self,
         inter: disnake.ApplicationCommandInteraction,
-        degree: str,
-        name: str,
-        surname: str,
-        diploma_number: str,
-        thesis_web_id: int
+        degree: str = commands.Param(choices=["Bc.", "Ing."], description=Messages.absolvent_degree_param),
+        name: str = commands.Param(description=Messages.absolvent_name_param),
+        surname: str = commands.Param(description=Messages.absolvent_surname_param),
+        diploma_number: str = commands.Param(description=Messages.absolvent_diploma_param),
+        thesis_web_id: int = commands.Param(description=Messages.absolvent_thesis_id_param)
     ):
         """Command for diploma verification and honourable role addition
 
-        :param inter: disnake context
+        :param inter: disnake interaction
         :param name: first name (case-sensitive)
         :param surname: last name (case-sensitive)
         :param degree: strictly either "Bc." or "Ing." (case-sensitive)
@@ -125,17 +125,6 @@ class Absolvent(Base, commands.Cog):
                "li[4]/a[.='Fakulta informačních technologií']/text()"
             )
         )
-
-        # await inter.edit_original_response(f"""
-        # DEBUG:
-        # nf: {not_found}
-        # mt: {master_thesis}
-        # bt: {bachelor_thesis}
-        # ta: {thesis_author_without_degree_surname_first}
-        # hd: {habilitation_date}
-        # re: {result}
-        # fa: {faculty}
-        # """)
 
         if "Page cannot be found" in not_found:
             await inter.edit_original_response(Messages.absolvent_thesis_not_found_error)
