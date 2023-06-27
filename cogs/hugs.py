@@ -13,12 +13,11 @@ from config.app_config import config
 from config.messages import Messages
 from features.leaderboard import LeaderboardPageSource
 from permissions import room_check
-from repository.database.hugs import HugsTable
-from repository.hugs_repo import HugsRepository
+from repository.database.hugs import HugsTableDB
 from utils import make_pts_column_row_formatter
 
 
-def _tophugs_formatter(entry: HugsTable, **kwargs):
+def _tophugs_formatter(entry: HugsTableDB, **kwargs):
     return (
         Messages.base_leaderboard_format_str.format_map(kwargs)
         + f" _Given:_ **{entry.given}** - _Received:_** {entry.received}**"
@@ -35,10 +34,10 @@ class Hugs(Base, commands.Cog):
     def __init__(self, bot):
         super().__init__()
         self.bot = bot
-        self.hugs_repo = HugsRepository()
+        self.hugs_db = HugsTableDB()
         self.check = room_check.RoomCheck(bot)
-        self._tophuggers_formatter = make_pts_column_row_formatter(HugsTable.given.name)
-        self._tophugged_formatter = make_pts_column_row_formatter(HugsTable.received.name)
+        self._tophuggers_formatter = make_pts_column_row_formatter(HugsTableDB.given.name)
+        self._tophugged_formatter = make_pts_column_row_formatter(HugsTableDB.received.name)
 
     @commands.slash_command(name="hug")
     async def _hug(self, inter):
@@ -59,7 +58,7 @@ class Hugs(Base, commands.Cog):
         page_source = LeaderboardPageSource(
                 bot=self.bot,
                 author=inter.author,
-                query=self.hugs_repo.get_top_all_query(),
+                query=self.hugs_db.get_top_all_query(),
                 row_formatter=_tophugs_formatter,
                 title='HUGBOARD',
                 emote_name='peepoHugger',
@@ -86,7 +85,7 @@ class Hugs(Base, commands.Cog):
         page_source = LeaderboardPageSource(
                 bot=self.bot,
                 author=inter.author,
-                query=self.hugs_repo.get_top_givers_query(),
+                query=self.hugs_db.get_top_givers_query(),
                 row_formatter=self._tophuggers_formatter,
                 title='TOP HUGGERS',
                 emote_name='peepoHugger'
@@ -113,7 +112,7 @@ class Hugs(Base, commands.Cog):
         page_source = LeaderboardPageSource(
                 bot=self.bot,
                 author=inter.author,
-                query=self.hugs_repo.get_top_receivers_query(),
+                query=self.hugs_db.get_top_receivers_query(),
                 row_formatter=self._tophugged_formatter,
                 title='TOP HUGGED',
                 emote_name='peepoHugger',
@@ -146,8 +145,8 @@ class Hugs(Base, commands.Cog):
             user_str = utils.get_username(user)
             title = f"{{0}} {user_str}'s Lovely Hug Stats {{0}}"
 
-        stats = self.hugs_repo.get_members_stats(user.id)
-        positions = self.hugs_repo.get_member_position(stats)
+        stats = self.hugs_db.get_members_stats(user.id)
+        positions = self.hugs_db.get_member_position(stats)
         avg_position = int((positions[0] + positions[1]) // 2)
         guild = self.bot.get_guild(config.guild_id)
 
@@ -206,7 +205,7 @@ class Hugs(Base, commands.Cog):
             return
 
         if user != inter.author:
-            self.hugs_repo.do_hug(giver_id=inter.author.id, receiver_id=user.id)
+            self.hugs_db.do_hug(giver_id=inter.author.id, receiver_id=user.id)
 
         user_str = utils.get_username(user)
 

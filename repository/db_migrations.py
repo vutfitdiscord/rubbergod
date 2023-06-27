@@ -6,7 +6,7 @@ from repository.database.better_meme import BetterMemeDB  # noqa: F401
 from repository.database.cooldown import Cooldown  # noqa: F401
 from repository.database.error import ErrorLog  # noqa: F401
 from repository.database.exams import ExamsTermsMessageDB  # noqa: F401
-from repository.database.hugs import HugsTable
+from repository.database.hugs import HugsTableDB
 from repository.database.image import ImageDB  # noqa: F401
 from repository.database.karma import Karma, Karma_emoji
 from repository.database.meme_repost import MemeRepostDB  # noqa: F401
@@ -37,7 +37,7 @@ def load_dump(filename: str):
     session.query(Karma_emoji).delete()
     session.query(PermitDB).delete()
     session.query(ValidPersonDB).delete()
-    session.query(HugsTable).delete()
+    session.query(HugsTableDB).delete()
     session.commit()
 
     print(f'Loading dump from {filename}')
