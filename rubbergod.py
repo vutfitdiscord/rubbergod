@@ -4,7 +4,7 @@ import sys
 import traceback
 
 import sqlalchemy
-from disnake import AllowedMentions, Embed, Intents, TextChannel
+from disnake import AllowedMentions, Embed, HTTPException, Intents, TextChannel
 from disnake.errors import DiscordServerError
 from disnake.ext import commands
 
@@ -107,6 +107,11 @@ async def on_error(event, *args, **kwargs):
     if isinstance(e, sqlalchemy.exc.InternalError):
         session.rollback()
         return
+
+    if isinstance(e, HTTPException):
+        # 50007: Cannot send messages to this user
+        if e.code == 50007:
+            return
 
     channel_out = bot.get_channel(config.bot_dev_channel)
     output = traceback.format_exc()

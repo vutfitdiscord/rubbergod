@@ -79,9 +79,13 @@ class Error(Base, commands.Cog):
                 await ctx.send(Messages.no_such_command)
             return
 
-        # no return here, because we want to log these errors
         if isinstance(error, commands.CommandInvokeError):
+            # bot cant send messages to user
+            if "50007" in error.original.args[0]:
+                await ctx.send(utils.fill_message("blocked_bot", user=ctx.author.id))
+                return
             await ctx.send(Messages.command_invoke_error)
+            # no return here, because we want to log these errors
 
         if isinstance(error, commands.CommandOnCooldown):
             await ctx.send(utils.fill_message("spamming", user=ctx.author.id, time=error.retry_after))
@@ -117,7 +121,6 @@ class Error(Base, commands.Cog):
         if isinstance(error, sqlalchemy.exc.InternalError):
             session.rollback()
             return
-
         if (
             isinstance(error, permission_check.NotHelperPlusError)
             or isinstance(error, permission_check.NotSubmodPlusError)
@@ -139,9 +142,13 @@ class Error(Base, commands.Cog):
             await inter.send(Messages.command_timed_out)
             return
 
-        # no return here, because we want to log these errors
         if isinstance(error, commands.CommandInvokeError):
+            # bot cant send messages to user
+            if "50007" in error.original.args[0]:
+                await inter.send(utils.fill_message("blocked_bot", user=inter.author.id))
+                return
             await inter.send(Messages.command_invoke_error)
+            # no return here, because we want to log these errors
 
         if isinstance(error, commands.CommandOnCooldown):
             await inter.send(
@@ -200,9 +207,13 @@ class Error(Base, commands.Cog):
             await inter.send(Messages.member_not_found.format(member=inter.author.mention))
             return
 
-        # no return here, because we want to log these errors
         if isinstance(error, commands.CommandInvokeError):
+            # bot cant send messages to user
+            if "50007" in error.original.args[0]:
+                await inter.send(utils.fill_message("blocked_bot", user=inter.author.id))
+                return
             await inter.send(Messages.command_invoke_error)
+            # no return here, because we want to log these errors
 
         if isinstance(error, commands.CommandOnCooldown):
             await inter.send(
@@ -239,9 +250,13 @@ class Error(Base, commands.Cog):
             await inter.send(error.message)
             return
 
-        # no return here, because we want to log these errors
         if isinstance(error, commands.CommandInvokeError):
+            # bot cant send messages to user
+            if "50007" in error.original.args[0]:
+                await inter.send(utils.fill_message("blocked_bot", user=inter.author.id))
+                return
             await inter.send(Messages.command_invoke_error)
+            # no return here, because we want to log these errors
 
         if isinstance(error, commands.CommandOnCooldown):
             await inter.send(
