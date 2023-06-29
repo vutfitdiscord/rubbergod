@@ -46,10 +46,9 @@ class StreamLinks(Base, commands.Cog):
         super().__init__()
         self.bot = bot
         self.review_repo = ReviewRepository()
-        self.streamlinks_db = StreamLinkDB()
         self.check = room_check.RoomCheck(bot)
         subjects = self.review_repo.get_all_subjects()
-        subjects_with_stream = self.streamlinks_db.get_subjects_with_stream()
+        subjects_with_stream = StreamLinkDB.get_subjects_with_stream()
 
     @cooldowns.default_cooldown
     @commands.group(aliases=[
@@ -71,7 +70,7 @@ class StreamLinks(Base, commands.Cog):
         inter: disnake.ApplicationCommandInteraction,
         subject: str = commands.Param(autocomplete=autocomp_subjects_with_stream)
     ):
-        streamlinks = self.streamlinks_db.get_streamlinks_of_subject(subject.lower())
+        streamlinks = StreamLinkDB.get_streamlinks_of_subject(subject.lower())
 
         if len(streamlinks) == 0:
             await inter.edit_original_response(content=Messages.streamlinks_no_stream)
@@ -89,7 +88,7 @@ class StreamLinks(Base, commands.Cog):
         inter: disnake.ApplicationCommandInteraction,
         subject: str = commands.Param(autocomplete=autocomp_subjects_with_stream)
     ):
-        streamlinks: List[StreamLinkDB] = self.streamlinks_db.get_streamlinks_of_subject(subject.lower())
+        streamlinks: List[StreamLinkDB] = StreamLinkDB.get_streamlinks_of_subject(subject.lower())
 
         if len(streamlinks) == 0:
             await inter.send(content=Messages.streamlinks_no_stream)
@@ -126,7 +125,7 @@ class StreamLinks(Base, commands.Cog):
             await inter.edit_original_response(Messages.streamlinks_invalid_link)
             return
 
-        if self.streamlinks_db.exists_link(link):
+        if StreamLinkDB.exists_link(link):
             await inter.edit_original_response(
                 utils.fill_message('streamlinks_add_link_exists', user=inter.author.id)
             )
@@ -143,7 +142,7 @@ class StreamLinks(Base, commands.Cog):
             if link_data['upload_date'] is None:
                 link_data['upload_date'] = datetime.utcnow()
 
-        self.streamlinks_db.create(
+        StreamLinkDB.create(
             subject.lower(),
             link,
             user,
@@ -168,7 +167,7 @@ class StreamLinks(Base, commands.Cog):
         parameter = False
 
         embed = disnake.Embed(title="Odkaz na stream byl změněn", color=disnake.Color.yellow())
-        stream = self.streamlinks_db.get_stream_by_id(id)
+        stream = StreamLinkDB.get_stream_by_id(id)
         embed.add_field(name="Provedl", value=inter.author)
 
         if stream is None:
@@ -246,11 +245,11 @@ class StreamLinks(Base, commands.Cog):
         id: int = commands.Param(description=Messages.streamlinks_ID)
     ):
 
-        if not self.streamlinks_db.exists(id):
+        if not StreamLinkDB.exists(id):
             await inter.edit_original_response(Messages.streamlinks_not_exists)
             return
 
-        stream = self.streamlinks_db.get_stream_by_id(id)
+        stream = StreamLinkDB.get_stream_by_id(id)
         link = stream.link
 
         prompt_message = utils.fill_message('streamlinks_remove_prompt', link=link)

@@ -65,7 +65,7 @@ class MemeRepost(Base, commands.Cog):
                 if original_post_user:
                     emoji_key = str(ctx.emoji.id) if type(ctx.emoji) != str else ctx.emoji
                     emoji_val = self.karma_repo.emoji_value(emoji_key)
-                    self.better_db.update_post_karma(original_post_user.id, emoji_val)
+                    BetterMemeDB.update_post_karma(original_post_user.id, emoji_val)
                     if isinstance(ctx.emoji, str):
                         self.karma_repo.karma_emoji(original_post_user.id, ctx.member.id, ctx.emoji)
                     else:
@@ -91,7 +91,7 @@ class MemeRepost(Base, commands.Cog):
             if original_post_user:
                 emoji_key = str(ctx.emoji.id) if type(ctx.emoji) != str else ctx.emoji
                 emoji_val = self.karma_repo.emoji_value(emoji_key)
-                self.better_db.update_post_karma(original_post_user.id, -emoji_val)
+                BetterMemeDB.update_post_karma(original_post_user.id, -emoji_val)
                 if isinstance(ctx.emoji, str):
                     self.karma_repo.karma_emoji_remove(original_post_user.id, ctx.member.id, ctx.emoji)
                 else:
@@ -211,7 +211,7 @@ class MemeRepost(Base, commands.Cog):
                 emoji_val = self.karma_repo.emoji_value(emoji_key)
                 total_karma += reac.count * emoji_val
 
-            self.better_db.add_post_to_repo(ctx.message.author.id, total_karma)
+            BetterMemeDB.add_post_to_repo(ctx.message.author.id, total_karma)
 
     @commands.slash_command(name="better-meme", guild_ids=[config.guild_id])
     async def _better_meme(self, inter):
@@ -230,7 +230,7 @@ class MemeRepost(Base, commands.Cog):
         page_source = LeaderboardPageSource(
             bot=self.bot,
             author=inter.author,
-            query=self.better_db.get_leaderboard(order_by),
+            query=BetterMemeDB.get_leaderboard(order_by),
             row_formatter=_leaderboard_formatter,
             base_embed=embed,
             title='BETTER MEMES LEADERBOARD',
