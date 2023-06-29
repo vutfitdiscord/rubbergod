@@ -18,7 +18,7 @@ from repository.database.role_group import RoleGroupDB  # noqa: F401
 from repository.database.streamlinks import StreamLinkDB  # noqa: F401
 from repository.database.timeout import TimeoutDB  # noqa: F401
 from repository.database.verification import PermitDB, ValidPersonDB
-from repository.database.vote import Vote  # noqa: F401
+from repository.database.vote import VoteDB  # noqa: F401
 from repository.review_repo import ReviewRepository
 
 

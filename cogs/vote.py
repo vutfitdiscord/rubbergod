@@ -18,10 +18,8 @@ import utils
 from cogs.base import Base
 from config import cooldowns
 from config.messages import Messages
-from repository import vote_repo
+from repository.database.vote import VoteDB
 from utils import fill_message, is_command_message, str_emoji_id
-
-vote_r = vote_repo.VoteRepository()
 
 
 class VoteMessage:
@@ -99,7 +97,7 @@ class Vote(Base, commands.Cog):
         self.vote_cache: Dict[int, VoteMessage] = {}
 
     async def load_cached(self):
-        db_votes = vote_r.get_pending_votes()
+        db_votes = VoteDB.get_pending_votes()
         for v in db_votes:
             try:
                 chan = await utils.get_or_fetch_channel(self.bot, v.channel_id)
@@ -138,11 +136,11 @@ class Vote(Base, commands.Cog):
             return
 
         self.vote_cache[ctx.message.id] = parsed_vote
-        vote_r.add_vote(ctx.message.id, ctx.channel.id, parsed_vote.end_date, one_of)
+        VoteDB.add_vote(ctx.message.id, ctx.channel.id, parsed_vote.end_date, one_of)
         ret = await self.init_vote(ctx.message)
         if ret:
             # init_failed: remove vote from DB and cache
-            vote_r.finish_vote(ctx.message.id)
+            VoteDB.remove(ctx.message.id)
             del self.vote_cache[ctx.message.id]
             match = re.search(f"<:(.*):{ret}>", message)
             await ctx.send(utils.fill_message("emote_not_found", emote=match.group(1)))
@@ -290,7 +288,7 @@ class Vote(Base, commands.Cog):
         vote = self.vote_cache[message_id]
         chan = await utils.get_or_fetch_channel(self.bot, channel_id)
         await chan.send(content=self.get_message(vote, True))
-        vote_r.finish_vote(message_id)
+        VoteDB.remove(message_id)
 
 
 def setup(bot):
