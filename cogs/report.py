@@ -11,7 +11,7 @@ from config.app_config import config
 from config.messages import Messages
 from modals.report import ReportModal
 from permissions import permission_check
-from repository.database.report import User
+from repository.database.report import UserDB
 
 
 class Report(Base, commands.Cog):
@@ -22,7 +22,7 @@ class Report(Base, commands.Cog):
     @cooldowns.default_cooldown
     @commands.message_command(name="Report message", guild_ids=[config.guild_id])
     async def app_report_message(self, inter: disnake.MessageCommandInteraction, message: disnake.Message):
-        if User.is_banned(inter.author.id):
+        if UserDB.is_banned(inter.author.id):
             await inter.send(Messages.report_banned, ephemeral=True)
             return
         await inter.response.send_modal(modal=ReportModal(self.bot, "Message report", message))
@@ -30,7 +30,7 @@ class Report(Base, commands.Cog):
     @cooldowns.default_cooldown
     @commands.slash_command(name="report", description=Messages.report_brief, guild_ids=[config.guild_id])
     async def _report(self, inter: disnake.ApplicationCommandInteraction):
-        if User.is_banned(inter.author.id):
+        if UserDB.is_banned(inter.author.id):
             await inter.send(Messages.report_banned, ephemeral=True)
             return
 
@@ -61,7 +61,7 @@ class Report(Base, commands.Cog):
 
     @_report_mod.sub_command(name="unban", description=Messages.report_unban_user_brief)
     async def report_unban_user(self, inter: disnake.ApplicationCommandInteraction, user: disnake.User):
-        User.unban_user(user.id)
+        UserDB.unban_user(user.id)
         await inter.send(Messages.report_unban_user.format(user=user.mention))
 
 

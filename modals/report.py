@@ -7,7 +7,7 @@ import features.report as report_features
 from buttons.report import ReportGeneralView, ReportMessageView
 from config.app_config import config
 from config.messages import Messages
-from repository.database.report import Report, User
+from repository.database.report import ReportDB, UserDB
 
 
 class ReportModal(disnake.ui.Modal):
@@ -72,8 +72,8 @@ class ReportModal(disnake.ui.Modal):
     async def report_general(self, inter: disnake.ModalInteraction) -> None:
         """add general report to db and send it to the report room"""
         report_reason = inter.text_values['reason']
-        User.add_user(inter.author.id)
-        report_id = Report.add_report(type="general", author_id=inter.author.id, reason=report_reason)
+        UserDB.add_user(inter.author.id)
+        report_id = ReportDB.add_report(type="general", author_id=inter.author.id, reason=report_reason)
 
         embed = self.report_embed(inter, report_reason, report_id)
 
@@ -85,7 +85,7 @@ class ReportModal(disnake.ui.Modal):
 
         await message.pin()
         await report_features.set_tag(self.report_channel, message.channel, "open")
-        Report.set_report_url(report_id, message.jump_url)
+        ReportDB.set_report_url(report_id, message.jump_url)
         await inter.author.send(embed=embed)
         await inter.send(Messages.report_modal_success, ephemeral=True)
 
@@ -95,8 +95,8 @@ class ReportModal(disnake.ui.Modal):
             content=self.message.content,
             reason=inter.text_values['reason']
         )
-        User.add_user(inter.author.id)
-        report_id = Report.add_report(
+        UserDB.add_user(inter.author.id)
+        report_id = ReportDB.add_report(
             type="message",
             author_id=inter.author.id,
             reason=inter.text_values['reason'],
@@ -114,6 +114,6 @@ class ReportModal(disnake.ui.Modal):
 
         await message.pin()
         await report_features.set_tag(self.report_channel, message.channel, "open")
-        Report.set_report_url(report_id, message.jump_url)
+        ReportDB.set_report_url(report_id, message.jump_url)
         await inter.author.send(embed=embed)
         await inter.send(Messages.report_modal_success, ephemeral=True)
