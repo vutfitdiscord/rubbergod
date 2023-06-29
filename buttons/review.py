@@ -6,14 +6,13 @@ import utils
 from buttons.embed import EmbedView
 from config.messages import Messages
 from features.review import ReviewManager
-from repository import review_repo
+from repository.database.review import ReviewDB, ReviewRelevanceDB
 
 
 class ReviewView(EmbedView):
 
     def __init__(self, author: disnake.User, bot: disnake.Client, embeds: List[disnake.Embed]):
         self.manager = ReviewManager(bot)
-        self.repo = review_repo.ReviewRepository()
         self.total_pages = len(embeds)
         super().__init__(author, embeds, row=1, end_arrow=False, timeout=300)
         self.check_text_pages()
@@ -62,7 +61,7 @@ class ReviewView(EmbedView):
         return self.embed.footer.text.split("|")[-1][5:]
 
     async def handle_vote(self, interaction: disnake.MessageInteraction, vote: bool = None):
-        review = self.repo.get_review_by_id(self.review_id)
+        review = ReviewDB.get_review_by_id(self.review_id)
         if review:
             member_id = str(interaction.author.id)
             if member_id == review.member_ID:
@@ -71,7 +70,7 @@ class ReviewView(EmbedView):
             if vote is not None:
                 self.manager.add_vote(self.review_id, vote, member_id)
             else:
-                self.repo.remove_vote(self.review_id, member_id)
+                ReviewRelevanceDB.remove_vote(self.review_id, member_id)
             self.embed = self.manager.update_embed(self.embed, review)
             await interaction.response.edit_message(embed=self.embed)
 
@@ -108,7 +107,7 @@ class ReviewView(EmbedView):
                 await interaction.send(Messages.embed_not_author, ephemeral=True)
                 return False
             # text page pagination
-            review = self.repo.get_review_by_id(self.review_id)
+            review = ReviewDB.get_review_by_id(self.review_id)
             if review:
                 pages = self.embed.fields[3].value.split("/")
                 text_page = int(pages[0])

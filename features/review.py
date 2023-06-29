@@ -8,8 +8,9 @@ from bs4 import BeautifulSoup
 import utils
 from config.app_config import config
 from features import sports
-from repository import review_repo
-from repository.database.review import Review, Subject_details
+from repository.database.review import (ProgrammeDB, ReviewDB,
+                                        ReviewRelevanceDB, SubjectDB,
+                                        SubjectDetailsDB)
 
 
 class ReviewManager:
@@ -17,18 +18,17 @@ class ReviewManager:
 
     def __init__(self, bot):
         self.bot = bot
-        self.repo = review_repo.ReviewRepository()
 
     def make_embed(
         self,
         msg_author: disnake.User,
-        review: Review,
-        subject: Union[Subject_details, str],
+        review: ReviewDB,
+        subject: Union[SubjectDetailsDB, str],
         description: str,
         page: str
     ):
         """Create new embed for reviews"""
-        if type(subject) == Subject_details:
+        if type(subject) == SubjectDetailsDB:
             shortcut = getattr(subject, "shortcut")
         else:
             shortcut = subject
@@ -56,16 +56,16 @@ class ReviewManager:
                     text = text[:1024]
                     embed.add_field(name="Text page", value=f"1/{pages}", inline=False)
                 embed.add_field(name="Text", value=text, inline=False)
-            likes = self.repo.get_votes_count(review.id, True)
+            likes = ReviewRelevanceDB.get_votes_count(review.id, True)
             embed.add_field(name="👍", value=f"{likes}")
-            dislikes = self.repo.get_votes_count(review.id, False)
+            dislikes = ReviewRelevanceDB.get_votes_count(review.id, False)
             embed.add_field(name="👎", value=f"{dislikes}")
             diff = likes - dislikes
             if diff > 0:
                 embed.color = 0x34CB0B
             elif diff < 0:
                 embed.color = 0xCB410B
-        if type(subject) == Subject_details and not subject.shortcut.lower().startswith("tv"):
+        if type(subject) == SubjectDetailsDB and not subject.shortcut.lower().startswith("tv"):
             sem = 1 if subject.semester == "L" else 2
             subject_id = subject.card.split("/")[-2]
             vutis_link = "https://www.vut.cz/studis/student.phtml?script_name=anketa_statistiky"
@@ -77,7 +77,7 @@ class ReviewManager:
         utils.add_author_footer(embed, msg_author, additional_text=[f"Review: {page} | ID: {id}"])
         return embed
 
-    def update_embed(self, embed: disnake.Embed, review: Review, text_page: int = 1):
+    def update_embed(self, embed: disnake.Embed, review: ReviewDB, text_page: int = 1):
         """Update embed fields"""
         embed.color = 0x6D6A69
         text = review.text_review
@@ -97,9 +97,9 @@ class ReviewManager:
                 idx += 1
             embed.set_field_at(idx, name="Text", value=text, inline=False)
             idx += 1
-        likes = self.repo.get_votes_count(review.id, True)
+        likes = ReviewRelevanceDB.get_votes_count(review.id, True)
         embed.set_field_at(idx, name="👍", value=f"{likes}")
-        dislikes = self.repo.get_votes_count(review.id, False)
+        dislikes = ReviewRelevanceDB.get_votes_count(review.id, False)
         idx += 1
         if add_new_field or fields_cnt <= idx:
             embed.add_field(name="👎", value=f"{dislikes}")
@@ -121,24 +121,27 @@ class ReviewManager:
 
     def add_review(self, author_id: int, subject: str, tier: int, anonym: bool, text: str):
         """Add new review, if review with same author and subject exists -> update"""
-        if not self.repo.get_subject(subject).first():
+        if not SubjectDB.get(subject):
             return False
-        update = self.repo.get_review_by_author_subject(author_id, subject)
-        if update:
-            self.repo.update_review(update.id, tier, anonym, text)
+        review = ReviewDB.get_review_by_author_subject(author_id, subject)
+        if review:
+            review.tier = tier
+            review.anonym = anonym
+            review.text_review = text
+            review.update()
         else:
-            self.repo.add_review(author_id, subject, tier, anonym, text)
+            ReviewDB.add_review(author_id, subject, tier, anonym, text)
         return True
 
     def list_reviews(self, author: disnake.User, subject: str):
-        subject_obj = self.repo.get_subject(subject).first()
+        subject_obj = SubjectDB.get(subject)
         if not subject_obj:
-            subject_obj = self.repo.get_subject(f"tv-{subject}").first()
+            subject_obj = SubjectDB.get(f"tv-{subject}")
             if not subject_obj:
                 return None
-        reviews = self.repo.get_subject_reviews(subject_obj.shortcut)
+        reviews = ReviewDB.get_subject_reviews(subject_obj.shortcut)
         reviews_cnt = reviews.count()
-        subject_details = self.repo.get_subject_details(subject_obj.shortcut) or subject_obj.shortcut
+        subject_details = SubjectDetailsDB.get(subject_obj.shortcut) or subject_obj.shortcut
         name = getattr(subject_details, "name",  "")
         if reviews_cnt == 0:
             description = f"{name}\n*No reviews*"
@@ -146,7 +149,7 @@ class ReviewManager:
         else:
             embeds = []
             for idx in range(reviews_cnt):
-                review = reviews[idx].Review
+                review = reviews[idx].ReviewDB
                 description = f"{name}\n**Average tier:** {round(reviews[idx].avg_tier)}"
                 page = f"{idx+1}/{reviews_cnt}"
 
@@ -155,16 +158,16 @@ class ReviewManager:
 
     def remove(self, author: str, subject: str):
         """Remove review from DB"""
-        result = self.repo.get_review_by_author_subject(author, subject)
+        result = ReviewDB.get_review_by_author_subject(author, subject)
         if result:
-            self.repo.remove(result.id)
+            result.remove()
             return True
         else:
             return False
 
     def authored_reviews(self, author: str):
         """Returns embed of reviews written by user"""
-        reviews = self.repo.get_reviews_by_author(author)
+        reviews = ReviewDB.get_reviews_by_author(author)
         reviews_cnt = reviews.count()
 
         if reviews_cnt == 0:
@@ -177,9 +180,9 @@ class ReviewManager:
 
     def add_vote(self, review_id: int, vote: bool, author: str):
         """Add/update vote for review"""
-        relevance = self.repo.get_vote_by_author(review_id, author)
+        relevance = ReviewRelevanceDB.get_vote_by_author(review_id, author)
         if not relevance or relevance.vote != vote:
-            self.repo.add_vote(review_id, vote, author)
+            ReviewRelevanceDB.add_vote(review_id, vote, author)
 
     def update_subject_types(self, link: str, MIT: bool):
         """Send request to `link`, parse page and find all subjects.
@@ -201,9 +204,9 @@ class ReviewManager:
         specialization = soup.select("main p strong")[0].get_text()
         full_specialization = soup.select("h1")[0].get_text()
 
-        programmme_db = self.repo.get_programme(specialization)
+        programmme_db = ProgrammeDB.get(specialization)
         if not programmme_db or programmme_db.link != link:
-            self.repo.set_programme(specialization, full_specialization, link)
+            ProgrammeDB.set(specialization, full_specialization, link)
 
         sem = 1
         year = 1
@@ -216,8 +219,8 @@ class ReviewManager:
                 if len(columns) != 5:
                     continue
                 # update subject DB
-                if not self.repo.get_subject(shortcut.lower()).first():
-                    self.repo.add_subject(shortcut.lower())
+                if not SubjectDB.get(shortcut.lower()):
+                    SubjectDB.add(shortcut.lower())
                 name = columns[0].get_text()
                 type = columns[2].get_text()
                 degree = "BIT"
@@ -233,23 +236,23 @@ class ReviewManager:
                         for_year = "VMIT"
                 if MIT:
                     degree = "MIT"
-                detail = self.repo.get_subject_details(shortcut)
+                detail = SubjectDetailsDB.get(shortcut)
                 semester = "Z"
                 if sem == 2:
                     semester = "L"
                 if not detail:
                     # subject not in DB
-                    self.repo.set_subject_details(
-                        shortcut,
-                        name,
-                        columns[1].get_text(),  # credits
-                        semester,
-                        columns[3].get_text(),  # end
-                        columns[0].find("a").attrs["href"],  # link
-                        type,
-                        for_year,
-                        degree,
-                    )
+                    SubjectDetailsDB(
+                        shortcut=shortcut,
+                        name=name,
+                        credits=columns[1].get_text(),
+                        semester=semester,
+                        end=columns[3].get_text(),
+                        card=columns[0].find("a").attrs["href"],
+                        type=type,
+                        year=for_year,
+                        degree=degree,
+                    ).update()
                 else:
                     changed = False
                     if name != detail.name:
@@ -276,7 +279,7 @@ class ReviewManager:
                         detail.card = columns[0].find("a").attrs["href"]
                         changed = True
                     if changed:
-                        self.repo.update_subject(detail)
+                        detail.update()
             sem += 1
             if sem == 3:
                 year += 1
@@ -286,16 +289,16 @@ class ReviewManager:
     def update_sport_subjects(self):
         sports_list = sports.VutSports().get_sports()
         for item in sports_list:
-            if not self.repo.get_subject(item.shortcut.lower()).first():
-                self.repo.add_subject(item.shortcut.lower())
-                self.repo.set_subject_details(
-                    item.shortcut,
-                    item.name,
-                    1,
-                    item.semester.value,
-                    "Za",
-                    item.subject_id,
-                    "V",
-                    "VBIT, VMIT",
-                    "BIT, MIT",
-                )
+            if not SubjectDB.get(item.shortcut.lower()):
+                SubjectDB.add(item.shortcut.lower())
+                SubjectDetailsDB(
+                    shortcut=item.shortcut,
+                    name=item.name,
+                    credits=1,
+                    semester=item.semester.value,
+                    end="Za",
+                    card=item.subject_id,
+                    type="V",
+                    year="VBIT, VMIT",
+                    degree="BIT, MIT",
+                ).update()

@@ -15,7 +15,7 @@ from config.app_config import config
 from config.messages import Messages
 from features.reaction_context import ReactionContext
 from permissions import permission_check
-from repository import review_repo
+from repository.database.review import SubjectDetailsDB
 from repository.database.role_group import RoleGroupDB
 
 
@@ -24,7 +24,6 @@ class Roles(Base, commands.Cog):
         super().__init__()
         self.bot = bot
         self.lock = asyncio.Lock()
-        self.repo = review_repo.ReviewRepository()
 
     # Returns list of role names and emotes that represent them
     async def get_join_role_data(self, message):
@@ -265,7 +264,7 @@ class Roles(Base, commands.Cog):
             if channel.type == disnake.ChannelType.text:
                 boolik = '-' in channel.name
                 name = channel.name.split('-')[0] if boolik else channel.name
-                sub = self.repo.get_subject_details(name)
+                sub = SubjectDetailsDB.get(name)
                 if sub:
                     newName = sub.name + ', but ' + '-'.join(channel.name.split('-')[1:])
                     if channel.topic:
