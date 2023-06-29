@@ -12,14 +12,15 @@ from repository.database.karma import Karma, Karma_emoji
 from repository.database.meme_repost import MemeRepostDB  # noqa: F401
 from repository.database.pin_map import PinMapDB  # noqa: F401
 from repository.database.report import AnswerDB, ReportDB, UserDB  # noqa: F401
-from repository.database.review import (Review, ReviewRelevance,  # noqa: F401
-                                        Subject, Subject_details)
+from repository.database.review import ReviewDB  # noqa: F401
+from repository.database.review import ReviewRelevanceDB  # noqa: F401
+from repository.database.review import SubjectDetailsDB  # noqa: F401
+from repository.database.review import SubjectDB
 from repository.database.role_group import RoleGroupDB  # noqa: F401
 from repository.database.streamlinks import StreamLinkDB  # noqa: F401
 from repository.database.timeout import TimeoutDB  # noqa: F401
 from repository.database.verification import PermitDB, ValidPersonDB
 from repository.database.vote import VoteDB  # noqa: F401
-from repository.review_repo import ReviewRepository
 
 
 def init_db(commit: bool = True):
@@ -113,8 +114,7 @@ def load_subjects():
     # Remove duplicates
     subjects = list(set(config.subjects))
 
-    review_repo = ReviewRepository()
     for subject in subjects:
         print(f'Importing subject {subject}')
-        review_repo.add_subject(subject)
+        SubjectDB.add(subject)
     print('Import complete')

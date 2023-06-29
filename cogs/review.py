@@ -17,7 +17,8 @@ from config.app_config import config
 from config.messages import Messages
 from features.review import ReviewManager
 from permissions import permission_check
-from repository import review_repo
+from repository.database.review import (ProgrammeDB, ReviewDB, SubjectDB,
+                                        SubjectDetailsDB)
 
 subjects = []
 programmes = []
@@ -38,9 +39,8 @@ class Review(Base, commands.Cog):
         super().__init__()
         self.bot = bot
         self.manager = ReviewManager(bot)
-        self.repo = review_repo.ReviewRepository()
-        subjects = self.repo.get_all_subjects()
-        programmes = self.repo.get_all_programmes()
+        subjects = SubjectDB.get_all()
+        programmes = ProgrammeDB.get_all()
         self.get_all_options()
 
     def get_all_options(self):
@@ -126,8 +126,12 @@ class Review(Base, commands.Cog):
         """
         if id is not None:
             if permission_check.is_bot_admin(inter, False):
-                self.repo.remove(id)
-                await inter.send(Messages.review_remove_success)
+                review = ReviewDB.get_review_by_id(id)
+                if review:
+                    review.remove()
+                    await inter.send(Messages.review_remove_success)
+                else:
+                    await inter.send(Messages.review_not_found)
                 return
 
             # not admin
@@ -176,8 +180,8 @@ class Review(Base, commands.Cog):
                     reply += Messages.subject_update_error.format(url=url)
             # sports
             self.manager.update_sport_subjects()
-            subjects = self.repo.get_all_subjects()
-            programmes = self.repo.get_all_programmes()
+            subjects = SubjectDB.get_all()
+            programmes = ProgrammeDB.get_all()
             self.get_all_options()
             reply += Messages.subject_update_success
             await ctx.reply(reply)
@@ -189,14 +193,14 @@ class Review(Base, commands.Cog):
         shortcut: str = commands.Param(autocomplete=autocomp_subjects_programmes),
     ):
         """Informations about subject specified by its shortcut"""
-        programme = self.repo.get_programme(shortcut.upper())
+        programme = ProgrammeDB.get(shortcut.upper())
         if programme:
             embed = disnake.Embed(title=programme.shortcut, description=programme.name)
             embed.add_field(name="Link", value=programme.link)
         else:
-            subject = self.repo.get_subject_details(shortcut)
+            subject = SubjectDetailsDB.get(shortcut)
             if not subject:
-                subject = self.repo.get_subject_details(f"TV-{shortcut}")
+                subject = SubjectDetailsDB.get(f"TV-{shortcut}")
                 if not subject:
                     await inter.response.send_message(Messages.review_wrong_subject)
                     return
@@ -287,9 +291,9 @@ class Review(Base, commands.Cog):
             embed.add_field(name="Ročník", value=year)
         utils.add_author_footer(embed, author)
 
-        pages_total = self.repo.get_tierboard_page_count(type, sem, degree, year)
+        pages_total = SubjectDetailsDB.get_tierboard_page_count(type, sem, degree, year)
         for page in range(pages_total):
-            board = self.repo.get_tierboard(type, sem, degree, year, page*10)
+            board = SubjectDetailsDB.get_tierboard(type, sem, degree, year, page*10)
             output = ""
             cnt = 1
             for line in board:

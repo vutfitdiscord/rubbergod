@@ -22,8 +22,8 @@ from config.messages import Messages
 from features.list_message_sender import send_list_of_messages
 from features.prompt import PromptSession
 from permissions import permission_check, room_check
+from repository.database.review import SubjectDB
 from repository.database.streamlinks import StreamLinkDB
-from repository.review_repo import ReviewRepository
 
 # Pattern: "AnyText | [Subject] Page: CurrentPage / {TotalPages}"
 pagination_regex = re.compile(r'^\[([^\]]*)\]\s*Page:\s*(\d*)\s*\/\s*(\d*)')
@@ -45,9 +45,8 @@ class StreamLinks(Base, commands.Cog):
         global subjects, subjects_with_stream
         super().__init__()
         self.bot = bot
-        self.review_repo = ReviewRepository()
         self.check = room_check.RoomCheck(bot)
-        subjects = self.review_repo.get_all_subjects()
+        subjects = SubjectDB.get_all()
         subjects_with_stream = StreamLinkDB.get_subjects_with_stream()
 
     @cooldowns.default_cooldown
