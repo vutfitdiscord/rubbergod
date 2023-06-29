@@ -1,11 +1,19 @@
 from __future__ import annotations
 
 import json
-from typing import List, Union
+from enum import IntEnum
+from typing import List, Optional
 
 from sqlalchemy import Boolean, Column, Integer, String, asc, exists
 
 from repository.database import database, session
+
+
+class VerifyStatus(IntEnum):
+    """ Common enum to verification states. """
+    Verified = 0
+    Unverified = 1
+    InProcess = 2
 
 
 class PermitDB(database.base):
@@ -17,6 +25,9 @@ class PermitDB(database.base):
 
 class ValidPersonDB(database.base):
     __tablename__ = "bot_valid_persons"
+    # Status 0 = verified
+    # Status 1 = unverified
+    # Status 2 = in process of verification (code sent)
 
     login = Column(String, primary_key=True)
     name = Column(String)
@@ -36,6 +47,55 @@ class ValidPersonDB(database.base):
             )
 
         return f"{self.login}@{fallback_domain}"  # fallback
+
+    @classmethod
+    def get_user(cls, login: str, status: int = 2) -> Optional[ValidPersonDB]:
+        """"Finds login from database"""
+        user = (
+            session.query(ValidPersonDB)
+            .filter(ValidPersonDB.login == login, ValidPersonDB.status == status)
+            .one_or_none()
+        )
+        return user
+
+    @classmethod
+    def add_user(cls, login: str, year: str, status: int = 1) -> ValidPersonDB:
+        """Add user to database"""
+        person = ValidPersonDB(login=login, year=year, status=status)
+        session.add(person)
+        session.commit()
+        return person
+
+    @classmethod
+    def get_user_by_login(cls, login: str) -> Optional[ValidPersonDB]:
+        """Finds login from DB (without status check)"""
+        user = (
+            session.query(ValidPersonDB).filter(ValidPersonDB.login == login).one_or_none()
+        )
+
+        return user
+
+    def save_verified(self, discord_id: str) -> None:
+        """"Inserts login with discord name into database"""
+        session.add(PermitDB(login=self.login, discord_ID=discord_id))
+        self.status = 0
+        session.commit()
+
+    @classmethod
+    def get_user_by_id(self, discord_ID: str) -> Optional[ValidPersonDB]:
+        """Returns user specified by discord ID"""
+        return (
+            session.query(ValidPersonDB)
+            .outerjoin(PermitDB, PermitDB.login == ValidPersonDB.login)
+            .filter(PermitDB.discord_ID == str(discord_ID))
+            .one_or_none()
+        )
+
+    def save_sent_code(self, code: str) -> None:
+        """Updates a specified login with a new verification code"""
+        self.code = code
+        self.status = 2
+        session.commit()
 
 
 class DynamicVerifyDB(database.base):
@@ -69,7 +129,7 @@ class DynamicVerifyDB(database.base):
         ).scalar()
 
     @classmethod
-    def get_rule(cls, rule: str) -> Union[DynamicVerifyDB, None]:
+    def get_rule(cls, rule: str) -> Optional[DynamicVerifyDB]:
         return (
             session.query(cls)
             .filter(cls.id == rule)

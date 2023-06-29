@@ -15,14 +15,12 @@ from config.app_config import config
 from config.messages import Messages
 from features.base_feature import BaseFeature
 from features.verify_helper import VerifyHelper
-from repository.database.verification import ValidPersonDB
-from repository.user_repo import UserRepository, VerifyStatus
+from repository.database.verification import ValidPersonDB, VerifyStatus
 
 
 class Verification(BaseFeature):
     def __init__(self, bot: Bot):
         super().__init__(bot)
-        self.repo = UserRepository()
         self.helper = VerifyHelper(bot)
 
     def send_mail(self, receiver_email: str, contents: str, subject: str = "") -> None:
@@ -63,7 +61,7 @@ class Verification(BaseFeature):
             code = "".join(random.choices(string.ascii_uppercase + string.digits, k=6))
             mail_content = utils.fill_message("verify_mail_content", code=code)
             # Save the newly generated code into the database
-            self.repo.save_sent_code(user.login, code)
+            user.save_sent_code(code)
             self.send_mail(mail_address, mail_content, Messages.verify_subject)
 
         success_message = utils.fill_message(
@@ -91,7 +89,7 @@ class Verification(BaseFeature):
             if login[0] == "x":
                 # VUT
                 # Check if the login we got is in the database
-                user = self.repo.get_user_by_login(login)
+                user = ValidPersonDB.get_user_by_login(login)
 
                 if user is None:
                     msg = utils.fill_message(
@@ -131,7 +129,7 @@ class Verification(BaseFeature):
                     await self.log_verify_fail(inter, "getcode (MUNI)", str({"login": login}))
                     return
 
-                user = self.repo.get_user_by_login(login)
+                user = ValidPersonDB.get_user_by_login(login)
 
                 if user is not None and user.status != VerifyStatus.Unverified.value:
                     if user.status == VerifyStatus.InProcess.value:
@@ -150,9 +148,9 @@ class Verification(BaseFeature):
                     )
                     return
 
-                user = self.repo.get_user(login, status=VerifyStatus.Unverified.value)
+                user = ValidPersonDB.get_user(login, status=VerifyStatus.Unverified.value)
                 if user is None:
-                    user = self.repo.add_user(login, "MUNI", status=VerifyStatus.Unverified.value)
+                    user = ValidPersonDB.add_user(login, "MUNI", status=VerifyStatus.Unverified.value)
                 await self.gen_code_and_send_mail(inter, user, "mail.muni.cz")
         else:
             msg = utils.fill_message("verify_already_verified", user=inter.user.id, admin=config.admin_ids[0])
@@ -162,7 +160,7 @@ class Verification(BaseFeature):
         if await self.helper.has_role(inter.user, config.verification_role):
             return  # User is now verified.
 
-        user = self.repo.get_user_by_login(login)
+        user = ValidPersonDB.get_user_by_login(login)
         if user is None:
             raise Exception(
                 "The user requested to resend the verification code, but it does not exist in the DB."
@@ -220,7 +218,7 @@ class Verification(BaseFeature):
             )
             return
 
-        new_user: ValidPersonDB = self.repo.get_user(login)
+        new_user: ValidPersonDB = ValidPersonDB.get_user(login)
         if new_user is not None:
             if code != new_user.code:
                 await inter.response.send_message(Messages.verify_verify_wrong_code)
@@ -262,7 +260,7 @@ class Verification(BaseFeature):
             await member.add_roles(verify)
             await member.add_roles(year)
 
-            self.repo.save_verified(login, inter.user.id)
+            new_user.save_verified(inter.user.id)
 
             verify_success_msg = utils.fill_message("verify_verify_success", user=inter.user.id)
             try:
