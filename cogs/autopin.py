@@ -25,7 +25,6 @@ class AutoPin(Base, commands.Cog):
             minutes=config.autopin_warning_cooldown
         )
         self.bot = bot
-        self.pins_db = PinMapDB()
         self.check = room_check.RoomCheck(bot)
         self.pin_features = AutopinFeatures(bot)
 
@@ -67,7 +66,7 @@ class AutoPin(Base, commands.Cog):
                 await inter.send(Messages.autopin_max_pins_error)
                 return
 
-            self.pins_db.add_or_update_channel(str(message.channel.id), str(message.id))
+            PinMapDB.add_or_update_channel(str(message.channel.id), str(message.id))
 
             if not message.pinned:
                 await message.pin()
@@ -86,16 +85,16 @@ class AutoPin(Base, commands.Cog):
         if channel is None:
             channel = inter.channel
 
-        if self.pins_db.find_channel_by_id(str(channel.id)) is None:
+        if PinMapDB.find_channel_by_id(str(channel.id)) is None:
             await inter.send(utils.fill_message("autopin_remove_not_exists", channel_name=channel.mention))
             return
 
-        self.pins_db.remove_channel(str(channel.id))
+        PinMapDB.remove_channel(str(channel.id))
         await inter.send(Messages.autopin_remove_done)
 
     @pin_mod.sub_command(name="list", description=Messages.autopin_list_brief)
     async def get_list(self, inter: disnake.ApplicationCommandInteraction):
-        mappings: List[PinMapDB] = self.pins_db.get_mappings()
+        mappings: List[PinMapDB] = PinMapDB.get_mappings()
 
         if not mappings:
             await inter.send(Messages.autopin_no_messages)
@@ -107,7 +106,7 @@ class AutoPin(Base, commands.Cog):
                 channel = await utils.get_or_fetch_channel(self.bot, int(item.channel_id))
             except disnake.NotFound:
                 lines.append(utils.fill_message("autopin_list_unknown_channel", channel_id=item.channel_id))
-                self.pins_db.remove_channel(str(item.channel_id))
+                PinMapDB.remove_channel(str(item.channel_id))
                 continue
 
             try:
@@ -163,7 +162,7 @@ class AutoPin(Base, commands.Cog):
         """
         repin priority pin if new pin is added
         """
-        pin_map: PinMapDB = self.pins_db.find_channel_by_id(str(channel.id))
+        pin_map: PinMapDB = PinMapDB.find_channel_by_id(str(channel.id))
 
         # This channel is not used to check priority pins.
         if pin_map is None:
@@ -173,7 +172,7 @@ class AutoPin(Base, commands.Cog):
 
         # Mapped pin was removed. Remove from map.
         if not int(pin_map.message_id) in pins:
-            self.pins_db.remove_channel(str(channel.id))
+            PinMapDB.remove_channel(str(channel.id))
 
         # check priority pin is first
         elif pins[0] != int(pin_map.message_id):
@@ -181,7 +180,7 @@ class AutoPin(Base, commands.Cog):
 
             # Message doesn't exist. Remove from map.
             if message is None:
-                self.pins_db.remove_channel(str(channel.id))
+                PinMapDB.remove_channel(str(channel.id))
                 return
 
             await message.unpin()
@@ -192,12 +191,12 @@ class AutoPin(Base, commands.Cog):
         """
         if the priority pin is deleted remove it from the map
         """
-        pin_map: PinMapDB = self.pins_db.find_channel_by_id(str(payload.channel_id))
+        pin_map: PinMapDB = PinMapDB.find_channel_by_id(str(payload.channel_id))
 
         if pin_map is None or pin_map.message_id != str(payload.message_id):
             return
 
-        self.pins_db.remove_channel(str(payload.channel_id))
+        PinMapDB.remove_channel(str(payload.channel_id))
 
     async def handle_reaction(self, ctx):
         """
