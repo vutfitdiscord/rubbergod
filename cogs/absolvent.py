@@ -14,9 +14,7 @@ import utils
 from cogs.base import Base
 from config.app_config import config
 from config.messages import Messages
-from repository import user_repo
-
-user_r = user_repo.UserRepository()
+from repository.database.verification import ValidPersonDB
 
 
 class Absolvent(Base, commands.Cog):
@@ -70,7 +68,7 @@ class Absolvent(Base, commands.Cog):
             return only_ascii
 
         # get "surname name" for bot database fot the current command caller
-        name_from_db = user_r.get_user_by_id(inter.author.id).name
+        name_from_db = ValidPersonDB.get_user_by_id(inter.author.id).name
         # remove diacritics from the user-supplied name
         name_from_user_without_diacritics = remove_accents(f"{surname} {name}")
 

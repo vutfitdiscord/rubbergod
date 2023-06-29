@@ -10,13 +10,11 @@ from config.messages import Messages
 from features.base_feature import BaseFeature
 from features.verify_helper import VerifyHelper
 from repository.database.verification import DynamicVerifyDB
-from repository.user_repo import UserRepository
 
 
 class DynamicVerifyManager(BaseFeature):
     def __init__(self, bot: Bot) -> None:
         super().__init__(bot)
-        self.user_repo = UserRepository()
         self.verify_db = DynamicVerifyDB()
         self.helper = VerifyHelper(bot)
 
