@@ -10,7 +10,7 @@ from buttons.base import BaseView
 from config.app_config import config
 from config.messages import Messages
 from permissions import permission_check
-from repository.database.report import Answer, Report
+from repository.database.report import AnswerDB, ReportDB
 
 
 class ReportView(BaseView):
@@ -23,7 +23,7 @@ class ReportView(BaseView):
 
     async def set_view_resolved(self, embed: dict, author_id: int, report_id: int) -> disnake.Embed:
         """set the report as resolved or not resolved"""
-        report = Report.get_report(report_id)
+        report = ReportDB.get_report(report_id)
 
         if report.resolved:
             embed = await report_features.embed_resolved(self, "Anonym", embed, report.type, False)
@@ -36,7 +36,7 @@ class ReportView(BaseView):
     async def get_report_author(self, inter: disnake.MessageInteraction) -> disnake.User:
         """get the report author object from the report id"""
         report_id = report_features.extract_report_id(inter)
-        report_author_id = Report.get_report_author(report_id)
+        report_author_id = ReportDB.get_report_author(report_id)
         report_author = await self.bot.get_or_fetch_user(report_author_id)
         return report_author
 
@@ -44,14 +44,14 @@ class ReportView(BaseView):
         self,
         button: disnake.ui.Button,
         inter: disnake.MessageInteraction,
-        report: Report
+        report: ReportDB
     ) -> Tuple[str, disnake.Embed]:
         """Set the report as spam, change buttons and tag thread as spam"""
         resolved_author = f"{inter.author.mention} @{inter.author.name}"
         embed = inter.message.embeds[0].to_dict()
 
         if report.fake_report:
-            Report.set_fake_report(report.id, inter.author.id, False)
+            ReportDB.set_fake_report(report.id, inter.author.id, False)
             for child in self.children:
                 if child.custom_id == "report:resolve":
                     embed = await report_features.embed_resolved(
@@ -63,7 +63,7 @@ class ReportView(BaseView):
             await report_features.set_tag(self.report_channel, inter.message.channel, "open")
 
         else:
-            Report.set_fake_report(report.id, inter.author.id, True)
+            ReportDB.set_fake_report(report.id, inter.author.id, True)
             for child in self.children:
                 if child.custom_id == "report:resolve":
                     embed = await report_features.embed_resolved(
@@ -90,7 +90,7 @@ class ReportView(BaseView):
         await inter.response.defer()
         report_author = await self.get_report_author(inter)
         report_id = report_features.extract_report_id(inter)
-        report = Report.get_report(report_id)
+        report = ReportDB.get_report(report_id)
         embed = inter.message.embeds[0].to_dict()
         resolved_by = f"{inter.author.mention} @{inter.author.name}"
 
@@ -127,7 +127,7 @@ class ReportView(BaseView):
         """The report is a spam"""
         await inter.response.defer()
         report_id = report_features.extract_report_id(inter)
-        report = Report.get_report(report_id)
+        report = ReportDB.get_report(report_id)
         report_author = await self.get_report_author(inter)
         report_message = await report_features.convert_url(inter, report.report_url)
         message, embed = await self.set_spam(button, inter, report)
@@ -159,8 +159,8 @@ class ReportMessageView(ReportView):
         await inter.response.defer()
         button.disabled = True
         report_id = report_features.extract_report_id(inter)
-        report = Report.get_report(report_id)
-        message_url = Report.get_report(report_id).message_url
+        report = ReportDB.get_report(report_id)
+        message_url = ReportDB.get_report(report_id).message_url
         message = await report_features.convert_url(inter, message_url)
         report_message = await report_features.convert_url(inter, report.report_url)
 
@@ -187,7 +187,7 @@ class ReportAnonymView(BaseView):
 
     async def interaction_check(self, inter: disnake.Interaction) -> bool:
         report_id = report_features.extract_report_id(inter)
-        if Report.is_resolved(report_id):
+        if ReportDB.is_resolved(report_id):
             await inter.message.edit(view=None)
             await inter.send(Messages.report_already_solved.format(id=report_id), ephemeral=True)
             return False
@@ -202,7 +202,7 @@ class ReportAnonymView(BaseView):
     async def resolve(self, button: disnake.ui.Button, inter: disnake.MessageInteraction) -> None:
         await inter.response.defer()
         report_id = report_features.extract_report_id(inter)
-        report = Report.get_report(report_id)
+        report = ReportDB.get_report(report_id)
         report_message = await report_features.convert_url(inter, report.report_url)
         embed = report_message.embeds[0].to_dict()
 
@@ -279,7 +279,7 @@ class ReportAnswerModal(disnake.ui.Modal):
             components=components
         )
 
-    def answer_embed(self, inter: disnake.ModalInteraction, report: Report, answer: str) -> disnake.Embed:
+    def answer_embed(self, inter: disnake.ModalInteraction, report: ReportDB, answer: str) -> disnake.Embed:
         """creates an embed template for the submitted answer"""
         description = Messages.report_embed_answered.format(last_answer=report.last_answer, answer=answer)
         embed = disnake.Embed(
@@ -305,11 +305,11 @@ class ReportAnswerModal(disnake.ui.Modal):
 
     async def callback(self, inter: disnake.ModalInteraction) -> None:
         answer = inter.text_values['answer']
-        report = Report.get_report(self.report_id)
+        report = ReportDB.get_report(self.report_id)
         report_author = await self.bot.get_or_fetch_user(report.author_id)
         report_message = await report_features.convert_url(inter, report.report_url)
         embed = self.answer_embed(inter, report, answer)
-        Answer.add_answer(self.report_id, inter.author.id, answer)
+        AnswerDB.add_answer(self.report_id, inter.author.id, answer)
 
         # interaction in DMs
         if inter.channel.type == disnake.ChannelType.private:

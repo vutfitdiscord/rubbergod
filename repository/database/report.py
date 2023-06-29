@@ -7,20 +7,20 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from repository.database import database, session
 
 
-class Report(database.base):
+class ReportDB(database.base):
     __tablename__ = "report"
 
     id = Column(Integer, primary_key=True, nullable=False, unique=True, autoincrement=True)
     type = Column(String, default="general", nullable=False)
     datetime = Column(DateTime, default=datetime.now(), nullable=False)
-    author: Mapped["User"] = relationship(back_populates="reports")
+    author: Mapped["UserDB"] = relationship(back_populates="reports")
     author_id: Mapped[int] = mapped_column(ForeignKey("user.id"))
     target_user_id = Column(String, default="", nullable=False)
     moderator_id = Column(String, default="", nullable=False)
     message_url = Column(String, default="", nullable=False)
     report_url = Column(String, default="", nullable=False)
     reason = Column(String, nullable=False)
-    answers: Mapped[List["Answer"]] = relationship(back_populates="report")
+    answers: Mapped[List["AnswerDB"]] = relationship(back_populates="report")
     resolved = Column(Boolean, default=False, nullable=False)
     fake_report = Column(Boolean, default=False, nullable=False)
 
@@ -38,11 +38,11 @@ class Report(database.base):
         return report.resolved
 
     @classmethod
-    def get_report(cls, report_id: int) -> Optional["Report"]:
+    def get_report(cls, report_id: int) -> Optional["ReportDB"]:
         return session.query(cls).filter_by(id=int(report_id)).first()
 
     @classmethod
-    def get_report_author(cls, report_id: int) -> Optional["User"]:
+    def get_report_author(cls, report_id: int) -> Optional["UserDB"]:
         report = cls.get_report(report_id)
         return report.author_id
 
@@ -55,7 +55,7 @@ class Report(database.base):
         message_url: str = None,
         target_user_id: str = None
     ) -> int:
-        report = Report(
+        report = ReportDB(
             type=type,
             author_id=str(author_id),
             reason=reason,
@@ -84,7 +84,7 @@ class Report(database.base):
     def set_fake_report(cls, report_id: int, moderator_id: str, fake_report: bool) -> None:
         """Report is fake, no other action needed"""
         report = cls.get_report(int(report_id))
-        User.ban_user(report.author_id)
+        UserDB.ban_user(report.author_id)
         if report is None:
             return
 
@@ -113,20 +113,20 @@ class Report(database.base):
         session.commit()
 
 
-class User(database.base):
-    __tablename__ = "user"
+class UserDB(database.base):
+    __tablename__ = "report_user"
 
     id = Column(String, primary_key=True, nullable=False, unique=True)
-    reports: Mapped[List["Report"]] = relationship(back_populates="author")
+    reports: Mapped[List["ReportDB"]] = relationship(back_populates="author")
     banned = Column(Boolean, default=False, nullable=False)
 
     @classmethod
-    def get_user(cls, user_id: str) -> Optional["User"]:
+    def get_user(cls, user_id: str) -> Optional["UserDB"]:
         return session.query(cls).filter_by(id=str(user_id)).first()
 
     @classmethod
-    def get_fake_reports(cls, user_id: str) -> Optional[List["Report"]]:
-        return session.query(Report).filter_by(author_id=str(user_id), fake_report=True)
+    def get_fake_reports(cls, user_id: str) -> Optional[List["ReportDB"]]:
+        return session.query(ReportDB).filter_by(author_id=str(user_id), fake_report=True)
 
     @classmethod
     def is_banned(cls, user_id: str) -> bool:
@@ -142,7 +142,7 @@ class User(database.base):
         if exists is not None:
             return
 
-        user = User(id=str(user_id))
+        user = UserDB(id=str(user_id))
         session.add(user)
         session.commit()
 
@@ -159,7 +159,7 @@ class User(database.base):
     def ban_user(cls, user_id: str) -> None:
         """Ban user if he has more than 3 false reports"""
         user = cls.get_user(str(user_id))
-        fake_reports = session.query(Report).filter_by(author_id=str(user_id), fake_report=True).count()
+        fake_reports = session.query(ReportDB).filter_by(author_id=str(user_id), fake_report=True).count()
         if user is None:
             return
 
@@ -170,23 +170,23 @@ class User(database.base):
         session.commit()
 
 
-class Answer(database.base):
-    __tablename__ = "answer"
+class AnswerDB(database.base):
+    __tablename__ = "report_answer"
 
     id = Column(Integer, primary_key=True, nullable=False, unique=True)
     datetime = Column(DateTime, default=datetime.now(), nullable=False)
-    report: Mapped["Report"] = relationship(back_populates="answers")
+    report: Mapped["ReportDB"] = relationship(back_populates="answers")
     report_id: Mapped[int] = mapped_column(ForeignKey("report.id"))
     author_id = Column(String, nullable=False)
     content = Column(String, default="", nullable=False)
 
     @classmethod
-    def get_answer(cls, answer_id: int) -> Optional["Answer"]:
+    def get_answer(cls, answer_id: int) -> Optional["AnswerDB"]:
         return session.query(cls).filter_by(id=int(answer_id)).first()
 
     @classmethod
     def add_answer(cls, report_id: int, author_id: str, content: str) -> None:
-        answer = Answer(
+        answer = AnswerDB(
             report_id=int(report_id),
             author_id=str(author_id),
             content=content
