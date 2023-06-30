@@ -188,13 +188,13 @@ class Vote(Base, commands.Cog):
 
         if emoji_str not in vote.options:
             msg = await chan.fetch_message(payload.message_id)
-            usr = await self.bot.get_or_fetch_user(self.bot, payload.user_id)
+            usr = await self.bot.get_or_fetch_user(payload.user_id)
             await msg.remove_reaction(payload.emoji, usr)
             return
 
         if vote.is_one_of:
             msg: Message = await chan.fetch_message(payload.message_id)
-            usr = await self.bot.get_or_fetch_user(self.bot, payload.user_id)
+            usr = await self.bot.get_or_fetch_user(payload.user_id)
             for r in msg.reactions:
                 if str_emoji_id(r.emoji) == emoji_str:
                     continue
