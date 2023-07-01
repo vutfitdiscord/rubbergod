@@ -8,14 +8,14 @@ from disnake import AllowedMentions, Embed, HTTPException, Intents, TextChannel
 from disnake.errors import DiscordServerError
 from disnake.ext import commands
 
-import repository.db_migrations as migrations
+import database.db_migrations as migrations
 from buttons.report import (ReportAnonymView, ReportAnswerOnlyView,
                             ReportGeneralView, ReportMessageView)
 from config.app_config import config
 from config.messages import Messages
+from database import session
 from features import presence
 from features.error import ErrorLogger
-from repository.database import session
 
 logger = logging.getLogger('disnake')
 logger.setLevel(logging.WARNING)

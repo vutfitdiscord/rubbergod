@@ -14,8 +14,8 @@ from cogs.base import Base
 from config import cooldowns
 from config.app_config import config
 from config.messages import Messages
+from database.timeout import TimeoutDB as TimeoutDB
 from permissions import permission_check
-from repository.database.timeout import TimeoutDB as TimeoutDB
 
 timestamps = {
     "60s": 1/60,

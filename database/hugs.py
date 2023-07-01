@@ -7,7 +7,7 @@ import disnake
 from sqlalchemy import BIGINT, Column, Integer
 from sqlalchemy.orm import Query
 
-from repository.database import database, session
+from database import database, session
 
 Member = Union[disnake.Member, disnake.User]
 UserHugStats = namedtuple("UserHugStats", ("given", "received"))

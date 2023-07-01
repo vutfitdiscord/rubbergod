@@ -9,8 +9,8 @@ import utils
 from buttons.base import BaseView
 from config.app_config import config
 from config.messages import Messages
+from database.report import AnswerDB, ReportDB
 from permissions import permission_check
-from repository.database.report import AnswerDB, ReportDB
 
 
 class ReportView(BaseView):

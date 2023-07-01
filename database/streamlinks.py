@@ -5,7 +5,7 @@ from typing import List, Optional
 
 from sqlalchemy import BIGINT, Column, DateTime, String, desc, exists
 
-from repository.database import database, session
+from database import database, session
 
 
 class StreamLinkDB(database.base):

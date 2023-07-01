@@ -13,7 +13,7 @@ from sqlalchemy.schema import Table
 
 from config.app_config import config
 from config.messages import Messages
-from repository.database import cooldown, session
+from database import cooldown, session
 
 
 def generate_mention(user_id):

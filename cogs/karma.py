@@ -14,11 +14,11 @@ from cogs.grillbotapi import GrillbotApi
 from config import cooldowns
 from config.app_config import config
 from config.messages import Messages
+from database.karma import KarmaDB
 from features import karma
 from features.leaderboard import LeaderboardPageSource
 from features.reaction_context import ReactionContext
 from permissions import permission_check, room_check
-from repository.database.karma import KarmaDB
 
 
 class Karma(Base, commands.Cog):

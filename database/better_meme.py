@@ -4,7 +4,7 @@ from typing import List, Optional
 
 from sqlalchemy import Column, Integer, String
 
-from repository.database import database, session
+from database import database, session
 
 
 class BetterMemeDB(database.base):

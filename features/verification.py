@@ -13,9 +13,9 @@ import utils
 from buttons.verify import VerifyView, VerifyWithResendButtonView
 from config.app_config import config
 from config.messages import Messages
+from database.verification import ValidPersonDB, VerifyStatus
 from features.base_feature import BaseFeature
 from features.verify_helper import VerifyHelper
-from repository.database.verification import ValidPersonDB, VerifyStatus
 
 
 class Verification(BaseFeature):

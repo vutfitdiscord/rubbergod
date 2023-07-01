@@ -3,8 +3,8 @@ from typing import List, Union
 import disnake
 
 from config.messages import Messages
+from database.verification import DynamicVerifyDB
 from features.dynamic_verify import DynamicVerifyManager
-from repository.database.verification import DynamicVerifyDB
 
 
 class DynamicVerifyEditModal(disnake.ui.Modal):

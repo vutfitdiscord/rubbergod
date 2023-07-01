@@ -8,8 +8,8 @@ from disnake.ext import commands
 
 from cogs.base import Base
 from config.app_config import config
+from database import session
 from features.reaction_context import ReactionContext
-from repository.database import session
 from utils import is_command_message
 
 

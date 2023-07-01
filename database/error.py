@@ -5,7 +5,7 @@ from typing import Optional
 
 from sqlalchemy import Column, Date, Integer
 
-from repository.database import database, session
+from database import database, session
 
 
 class ErrorLog(database.base):

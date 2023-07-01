@@ -14,10 +14,10 @@ from cogs.base import Base
 from config import cooldowns
 from config.app_config import config
 from config.messages import Messages
+from database import session
+from database.verification import PermitDB, ValidPersonDB
 from features.list_message_sender import send_list_of_messages
 from permissions import permission_check
-from repository.database import session
-from repository.database.verification import PermitDB, ValidPersonDB
 
 
 def running_for(time):

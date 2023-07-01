@@ -21,8 +21,8 @@ from cogs.base import Base
 from config import cooldowns
 from config.app_config import config
 from config.messages import Messages
+from database.exams import ExamsTermsMessageDB
 from permissions import permission_check
-from repository.database.exams import ExamsTermsMessageDB
 
 year_regex = "[1-3][BM]IT"
 YEAR_LIST = ["1BIT", "2BIT", "3BIT", "1MIT", "2MIT"]

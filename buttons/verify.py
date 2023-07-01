@@ -1,8 +1,8 @@
 import disnake
 
+from database.verification import ValidPersonDB
 from features import verification
 from modals.verify import VerifyModal
-from repository.database.verification import ValidPersonDB
 
 
 class VerifyView(disnake.ui.View):

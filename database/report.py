@@ -4,7 +4,7 @@ from typing import List, Optional
 from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from repository.database import database, session
+from database import database, session
 
 
 class ReportDB(database.base):

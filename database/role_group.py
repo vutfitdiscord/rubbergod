@@ -6,7 +6,7 @@ from sqlalchemy import Column, String
 from sqlalchemy.ext.mutable import MutableList
 from sqlalchemy.types import PickleType
 
-from repository.database import database, session
+from database import database, session
 
 
 class RoleGroupDB(database.base):

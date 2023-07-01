@@ -5,8 +5,8 @@ import disnake
 import utils
 from buttons.embed import EmbedView
 from config.messages import Messages
+from database.review import ReviewDB, ReviewRelevanceDB
 from features.review import ReviewManager
-from repository.database.review import ReviewDB, ReviewRelevanceDB
 
 
 class ReviewView(EmbedView):

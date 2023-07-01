@@ -9,9 +9,9 @@ from cogs.base import Base
 from config import cooldowns
 from config.app_config import config
 from config.messages import Messages
+from database.report import UserDB
 from modals.report import ReportModal
 from permissions import permission_check
-from repository.database.report import UserDB
 
 
 class Report(Base, commands.Cog):

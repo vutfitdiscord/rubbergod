@@ -7,7 +7,7 @@ from typing import List
 from sqlalchemy import BigInteger, Column, DateTime, String
 from sqlalchemy.orm import Query
 
-from repository.database import database, session
+from database import database, session
 
 
 class ImageDB(database.base):

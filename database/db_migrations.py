@@ -1,26 +1,26 @@
 import re
 
 from config.app_config import config
-from repository.database import database, session
-from repository.database.better_meme import BetterMemeDB  # noqa: F401
-from repository.database.cooldown import Cooldown  # noqa: F401
-from repository.database.error import ErrorLog  # noqa: F401
-from repository.database.exams import ExamsTermsMessageDB  # noqa: F401
-from repository.database.hugs import HugsTableDB
-from repository.database.image import ImageDB  # noqa: F401
-from repository.database.karma import KarmaDB, KarmaEmojiDB
-from repository.database.meme_repost import MemeRepostDB  # noqa: F401
-from repository.database.pin_map import PinMapDB  # noqa: F401
-from repository.database.report import AnswerDB, ReportDB, UserDB  # noqa: F401
-from repository.database.review import ReviewDB  # noqa: F401
-from repository.database.review import ReviewRelevanceDB  # noqa: F401
-from repository.database.review import SubjectDetailsDB  # noqa: F401
-from repository.database.review import SubjectDB
-from repository.database.role_group import RoleGroupDB  # noqa: F401
-from repository.database.streamlinks import StreamLinkDB  # noqa: F401
-from repository.database.timeout import TimeoutDB  # noqa: F401
-from repository.database.verification import PermitDB, ValidPersonDB
-from repository.database.vote import VoteDB  # noqa: F401
+from database import database, session
+from database.better_meme import BetterMemeDB  # noqa: F401
+from database.cooldown import Cooldown  # noqa: F401
+from database.error import ErrorLog  # noqa: F401
+from database.exams import ExamsTermsMessageDB  # noqa: F401
+from database.hugs import HugsTableDB
+from database.image import ImageDB  # noqa: F401
+from database.karma import KarmaDB, KarmaEmojiDB
+from database.meme_repost import MemeRepostDB  # noqa: F401
+from database.pin_map import PinMapDB  # noqa: F401
+from database.report import AnswerDB, ReportDB, UserDB  # noqa: F401
+from database.review import ReviewDB  # noqa: F401
+from database.review import ReviewRelevanceDB  # noqa: F401
+from database.review import SubjectDetailsDB  # noqa: F401
+from database.review import SubjectDB
+from database.role_group import RoleGroupDB  # noqa: F401
+from database.streamlinks import StreamLinkDB  # noqa: F401
+from database.timeout import TimeoutDB  # noqa: F401
+from database.verification import PermitDB, ValidPersonDB
+from database.vote import VoteDB  # noqa: F401
 
 
 def init_db(commit: bool = True):
