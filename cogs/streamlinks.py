@@ -19,11 +19,11 @@ from cogs.base import Base
 from config import cooldowns
 from config.app_config import config
 from config.messages import Messages
+from database.review import SubjectDB
+from database.streamlinks import StreamLinkDB
 from features.list_message_sender import send_list_of_messages
 from features.prompt import PromptSession
 from permissions import permission_check, room_check
-from repository.database.review import SubjectDB
-from repository.database.streamlinks import StreamLinkDB
 
 # Pattern: "AnyText | [Subject] Page: CurrentPage / {TotalPages}"
 pagination_regex = re.compile(r'^\[([^\]]*)\]\s*Page:\s*(\d*)\s*\/\s*(\d*)')

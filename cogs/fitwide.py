@@ -12,10 +12,10 @@ import utils
 from cogs.base import Base
 from config import cooldowns
 from config.app_config import config
+from database import session
+from database.verification import PermitDB, ValidPersonDB
 from features import verification
 from permissions import permission_check, room_check
-from repository.database import session
-from repository.database.verification import PermitDB, ValidPersonDB
 
 
 class FitWide(Base, commands.Cog):

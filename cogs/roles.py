@@ -13,10 +13,10 @@ from cogs.base import Base
 from config.app_config import config
 # TODO: use messages for prints
 from config.messages import Messages
+from database.review import SubjectDetailsDB
+from database.role_group import RoleGroupDB
 from features.reaction_context import ReactionContext
 from permissions import permission_check
-from repository.database.review import SubjectDetailsDB
-from repository.database.role_group import RoleGroupDB
 
 
 class Roles(Base, commands.Cog):

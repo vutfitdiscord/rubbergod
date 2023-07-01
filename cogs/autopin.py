@@ -13,9 +13,9 @@ from cogs.base import Base
 from config import cooldowns
 from config.app_config import config
 from config.messages import Messages
+from database.pin_map import PinMapDB
 from features.autopin import AutopinFeatures, pin_channel_type
 from permissions import permission_check, room_check
-from repository.database.pin_map import PinMapDB
 
 
 class AutoPin(Base, commands.Cog):

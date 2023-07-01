@@ -11,9 +11,9 @@ from cogs.base import Base
 from config import cooldowns
 from config.app_config import config
 from config.messages import Messages
+from database.hugs import HugsTableDB
 from features.leaderboard import LeaderboardPageSource
 from permissions import room_check
-from repository.database.hugs import HugsTableDB
 from utils import make_pts_column_row_formatter
 
 

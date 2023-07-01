@@ -7,7 +7,7 @@ import features.report as report_features
 from buttons.report import ReportGeneralView, ReportMessageView
 from config.app_config import config
 from config.messages import Messages
-from repository.database.report import ReportDB, UserDB
+from database.report import ReportDB, UserDB
 
 
 class ReportModal(disnake.ui.Modal):

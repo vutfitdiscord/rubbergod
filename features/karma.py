@@ -9,8 +9,8 @@ import utils
 from cogs.grillbotapi import GrillbotApi
 from config.app_config import config as cfg
 from config.messages import Messages
+from database.karma import KarmaDB, KarmaEmojiDB
 from features.base_feature import BaseFeature
-from repository.database.karma import KarmaDB, KarmaEmojiDB
 
 
 def test_emoji(db_emoji: bytearray, server_emoji: Emoji):

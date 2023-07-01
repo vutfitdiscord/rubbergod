@@ -15,10 +15,9 @@ from cogs.base import Base
 from config import cooldowns
 from config.app_config import config
 from config.messages import Messages
+from database.review import ProgrammeDB, ReviewDB, SubjectDB, SubjectDetailsDB
 from features.review import ReviewManager
 from permissions import permission_check
-from repository.database.review import (ProgrammeDB, ReviewDB, SubjectDB,
-                                        SubjectDetailsDB)
 
 subjects = []
 programmes = []

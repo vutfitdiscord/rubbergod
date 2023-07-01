@@ -6,7 +6,7 @@ from typing import List, Optional
 
 from sqlalchemy import Boolean, Column, Integer, String, asc, exists
 
-from repository.database import database, session
+from database import database, session
 
 
 class VerifyStatus(IntEnum):

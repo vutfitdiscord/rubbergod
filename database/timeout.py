@@ -5,7 +5,7 @@ from typing import List
 
 from sqlalchemy import BigInteger, Boolean, Column, DateTime, Interval, String
 
-from repository.database import database, session
+from database import database, session
 
 
 class TimeoutDB(database.base):

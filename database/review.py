@@ -9,7 +9,7 @@ from sqlalchemy import (Boolean, Column, Date, ForeignKey, Integer,
 from sqlalchemy.engine import Row
 from sqlalchemy.orm import Query, relationship
 
-from repository.database import database, session
+from database import database, session
 
 
 class ReviewDB(database.base):

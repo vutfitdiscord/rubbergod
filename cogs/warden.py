@@ -16,8 +16,8 @@ import utils
 from cogs.base import Base
 from config.app_config import config
 from config.messages import Messages
+from database.image import ImageDB
 from permissions import permission_check
-from repository.database.image import ImageDB
 
 dhash.force_pil()
 

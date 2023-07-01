@@ -18,7 +18,7 @@ import utils
 from cogs.base import Base
 from config import cooldowns
 from config.messages import Messages
-from repository.database.vote import VoteDB
+from database.vote import VoteDB
 from utils import is_command_message, str_emoji_id
 
 

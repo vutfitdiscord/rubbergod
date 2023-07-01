@@ -4,7 +4,7 @@ from typing import List
 
 from sqlalchemy import Column, String
 
-from repository.database import database, session
+from database import database, session
 
 
 class PinMapDB(database.base):

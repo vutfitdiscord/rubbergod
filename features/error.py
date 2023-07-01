@@ -9,8 +9,8 @@ from PIL import Image, ImageDraw, ImageFont
 
 import utils
 from config.app_config import config
+from database.error import ErrorLog
 from features.imagehandler import ImageHandler
-from repository.database.error import ErrorLog
 
 
 class ErrorLogger:

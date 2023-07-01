@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from sqlalchemy import BigInteger, Column, String
 
-from repository.database import database
+from database import database
 
 
 class Cooldown(database.base):

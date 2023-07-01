@@ -7,10 +7,9 @@ from bs4 import BeautifulSoup
 
 import utils
 from config.app_config import config
+from database.review import (ProgrammeDB, ReviewDB, ReviewRelevanceDB,
+                             SubjectDB, SubjectDetailsDB)
 from features import sports
-from repository.database.review import (ProgrammeDB, ReviewDB,
-                                        ReviewRelevanceDB, SubjectDB,
-                                        SubjectDetailsDB)
 
 
 class ReviewManager:

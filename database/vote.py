@@ -6,7 +6,7 @@ from typing import List, Optional
 from sqlalchemy import BigInteger, Boolean, Column, DateTime
 from sqlalchemy.sql.expression import or_
 
-from repository.database import database, session
+from database import database, session
 
 
 class VoteDB(database.base):

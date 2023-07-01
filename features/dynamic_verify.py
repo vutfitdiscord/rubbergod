@@ -7,9 +7,9 @@ import utils
 from buttons.dynamic_verify import DynamicVerifyRequestView
 from config.app_config import config
 from config.messages import Messages
+from database.verification import DynamicVerifyDB
 from features.base_feature import BaseFeature
 from features.verify_helper import VerifyHelper
-from repository.database.verification import DynamicVerifyDB
 
 
 class DynamicVerifyManager(BaseFeature):

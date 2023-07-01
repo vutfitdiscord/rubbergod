@@ -13,12 +13,12 @@ from buttons.embed import EmbedView
 from cogs.base import Base
 from config.app_config import config
 from config.messages import Messages
+from database.better_meme import BetterMemeDB
+from database.karma import KarmaDB, KarmaEmojiDB
+from database.meme_repost import MemeRepostDB
 from features.leaderboard import LeaderboardPageSource
 from features.reaction_context import ReactionContext
 from permissions import room_check
-from repository.database.better_meme import BetterMemeDB
-from repository.database.karma import KarmaDB, KarmaEmojiDB
-from repository.database.meme_repost import MemeRepostDB
 
 
 def _leaderboard_formatter(entry: BetterMemeDB, **kwargs):
