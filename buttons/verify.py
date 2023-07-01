@@ -2,6 +2,7 @@ import disnake
 
 from features import verification
 from modals.verify import VerifyModal
+from repository.database.verification import ValidPersonDB
 
 
 class VerifyView(disnake.ui.View):
@@ -15,8 +16,7 @@ class VerifyView(disnake.ui.View):
         custom_id="verify:set_code",
     )
     async def code_success(self, button: disnake.ui.Button, inter: disnake.MessageInteraction):
-        service = verification.Verification(inter.bot)
-        user = service.repo.get_user_by_login(self.login)
+        user = ValidPersonDB.get_user_by_login(self.login)
 
         if user is None:
             raise Exception(f"Missing user {self.login} record in the database after sent mail.")

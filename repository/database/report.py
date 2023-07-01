@@ -14,7 +14,7 @@ class ReportDB(database.base):
     type = Column(String, default="general", nullable=False)
     datetime = Column(DateTime, default=datetime.now(), nullable=False)
     author: Mapped["UserDB"] = relationship(back_populates="reports")
-    author_id: Mapped[int] = mapped_column(ForeignKey("user.id"))
+    author_id: Mapped[int] = mapped_column(ForeignKey("report_user.id"))
     target_user_id = Column(String, default="", nullable=False)
     moderator_id = Column(String, default="", nullable=False)
     message_url = Column(String, default="", nullable=False)
