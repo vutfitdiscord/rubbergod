@@ -8,7 +8,7 @@ from repository.database.error import ErrorLog  # noqa: F401
 from repository.database.exams import ExamsTermsMessageDB  # noqa: F401
 from repository.database.hugs import HugsTableDB
 from repository.database.image import ImageDB  # noqa: F401
-from repository.database.karma import Karma, Karma_emoji
+from repository.database.karma import KarmaDB, KarmaEmojiDB
 from repository.database.meme_repost import MemeRepostDB  # noqa: F401
 from repository.database.pin_map import PinMapDB  # noqa: F401
 from repository.database.report import AnswerDB, ReportDB, UserDB  # noqa: F401
@@ -34,8 +34,8 @@ def init_db(commit: bool = True):
 def load_dump(filename: str):
     init_db(False)
 
-    session.query(Karma).delete()
-    session.query(Karma_emoji).delete()
+    session.query(KarmaDB).delete()
+    session.query(KarmaEmojiDB).delete()
     session.query(PermitDB).delete()
     session.query(ValidPersonDB).delete()
     session.query(HugsTableDB).delete()
@@ -60,23 +60,22 @@ def load_dump(filename: str):
             values = values.replace('(', '').replace(')', '')
             values = values.split(',')
             for i in range(0, len(values), 3):
-                karma_values.append(Karma(member_ID=values[i],
-                                          karma=values[i + 1]))
+                karma_values.append(KarmaDB(member_ID=values[i], karma=values[i + 1]))
         elif insert.startswith("INSERT INTO `bot_karma_giving`"):
             values = values[1:-2].replace('\'', '')
             values = values.replace('(', '').replace(')', '')
             values = values.split(',')
             for i in range(0, len(values), 4):
-                karma_values.append(Karma(member_ID=values[i],
-                                          positive=values[i + 1],
-                                          negative=values[i + 2]))
+                karma_values.append(KarmaDB(member_ID=values[i],
+                                            positive=values[i + 1],
+                                            negative=values[i + 2]))
         elif insert.startswith("INSERT INTO `bot_karma_emoji`"):
             values = values[1:-2].replace('\'', '')
             values = values.replace('(', '').replace(')', '')
             values = values.split(',')
             for i in range(0, len(values), 2):
-                session.add(Karma_emoji(emoji_ID=values[i],
-                                        value=values[i + 1]))
+                session.add(KarmaEmojiDB(emoji_ID=values[i],
+                                         value=values[i + 1]))
         elif insert.startswith("INSERT INTO `bot_permit`"):
             values = values[1:-2]
             values = values.replace('(', '').replace(')', '')

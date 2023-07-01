@@ -10,7 +10,7 @@ from cogs.grillbotapi import GrillbotApi
 from config.app_config import config as cfg
 from config.messages import Messages
 from features.base_feature import BaseFeature
-from repository.karma_repo import KarmaRepository
+from repository.database.karma import KarmaDB, KarmaEmojiDB
 
 
 def test_emoji(db_emoji: bytearray, server_emoji: Emoji):
@@ -31,9 +31,8 @@ def is_unicode(text):
 
 
 class Karma(BaseFeature):
-    def __init__(self, bot: Bot, karma_repository: KarmaRepository):
+    def __init__(self, bot: Bot):
         super().__init__(bot)
-        self.repo = karma_repository
         self.grillbot_api = GrillbotApi(bot)
 
     async def emoji_process_vote(self, inter, emoji):
@@ -73,7 +72,7 @@ class Karma(BaseFeature):
             return 0
 
     async def emoji_vote_value(self, inter):
-        emojis = self.repo.get_all_emojis()
+        emojis = KarmaEmojiDB.get_all_emojis()
 
         for server_emoji in inter.guild.emojis:
             if not server_emoji.animated:
@@ -83,7 +82,7 @@ class Karma(BaseFeature):
                         emojis))
 
                 if len(e) == 0:
-                    self.repo.set_emoji_value(server_emoji, 0)
+                    KarmaEmojiDB.set_emoji_value(server_emoji, 0)
                     vote_value = await self.emoji_process_vote(inter.channel,
                                                                server_emoji)
                     emoji = server_emoji  # Save for use outside loop
@@ -93,13 +92,13 @@ class Karma(BaseFeature):
             return
 
         if vote_value is None:
-            self.repo.remove_emoji(emoji)
+            KarmaEmojiDB.remove_emoji(emoji)
             await inter.channel.send(
                 Messages.karma_vote_notpassed(emote=str(emoji), minimum=str(cfg.vote_minimum))
             )
 
         else:
-            self.repo.set_emoji_value(emoji, vote_value)
+            KarmaEmojiDB.set_emoji_value(emoji, vote_value)
             await inter.channel.send(
                 Messages.karma_vote_result(emote=str(emoji), result=str(vote_value))
             )
@@ -119,7 +118,7 @@ class Karma(BaseFeature):
         vote_value = await self.emoji_process_vote(inter, emoji)
 
         if vote_value is not None:
-            self.repo.set_emoji_value(emoji, vote_value)
+            KarmaEmojiDB.set_emoji_value(emoji, vote_value)
             await inter.channel.send(
                 Messages.karma_vote_result(emote=str(emoji), result=str(vote_value))
             )
@@ -143,7 +142,7 @@ class Karma(BaseFeature):
                 )
                 return
 
-        val = self.repo.emoji_value_raw(emoji)
+        val = KarmaEmojiDB.emoji_value_raw(emoji)
 
         if val is not None:
             await inter.response.send_message(
@@ -197,9 +196,9 @@ class Karma(BaseFeature):
             except disnake.NotFound:
                 is_error = True
                 if isinstance(emoji_id, bytearray):
-                    self.repo.remove_emoji(emoji_id.decode())
+                    KarmaEmojiDB.remove_emoji(emoji_id.decode())
                 else:
-                    self.repo.remove_emoji(str(emoji_id))
+                    KarmaEmojiDB.remove_emoji(str(emoji_id))
 
         message.append(line)
         message = [line for line in message if line != ""]
@@ -210,7 +209,7 @@ class Karma(BaseFeature):
         for value in ['1', '-1']:
             emojis, is_error = await self.__make_emoji_list(
                     inter.guild,
-                    self.repo.get_ids_of_emojis_valued(value))
+                    KarmaEmojiDB.get_ids_of_emojis_valued(value))
             error |= is_error
             try:
                 await inter.followup.send("Hodnota " + value + ":", ephemeral=ephemeral)
@@ -226,7 +225,7 @@ class Karma(BaseFeature):
     async def karma_give(self, inter, members, karma):
         members = await utils.get_members_from_tag(inter.guild, members)
         for member in members:
-            members_update = self.repo.update_karma(member.id, inter.author.id, karma)
+            members_update = KarmaDB.update_karma(member.id, inter.author.id, karma)
             await self.grillbot_api.post_karma_store(members_update)
         if karma >= 0:
             await inter.send(
@@ -244,7 +243,7 @@ class Karma(BaseFeature):
             )
 
     async def karma_transfer(self, inter, from_user, to_user):
-        transfered, members_update = self.repo.transfer_karma(from_user, to_user)
+        transfered, members_update = KarmaDB.transfer_karma(from_user.id, to_user.id)
         if transfered is None:
             await inter.send(Messages.karma_transer_user_no_karma.format(user=from_user))
             return
@@ -262,7 +261,7 @@ class Karma(BaseFeature):
     def karma_get(self, author, target=None):
         if target is None:
             target = author
-        k = self.repo.get_karma(target.id)
+        k = KarmaDB.get_karma(target.id)
         return Messages.karma(
             user=author.id,
             karma=k.karma.value,
@@ -281,7 +280,7 @@ class Karma(BaseFeature):
         karma = 0
         for react in reactions:
             emoji = react.emoji
-            val = self.repo.emoji_value_raw(emoji)
+            val = KarmaEmojiDB.emoji_value_raw(emoji)
             if val == 1:
                 output['1'].append(emoji)
                 karma += react.count

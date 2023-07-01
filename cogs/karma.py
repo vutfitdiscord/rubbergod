@@ -18,22 +18,19 @@ from features import karma
 from features.leaderboard import LeaderboardPageSource
 from features.reaction_context import ReactionContext
 from permissions import permission_check, room_check
-from repository import karma_repo
-from repository.database.karma import Karma as Database_karma
-
-karma_r = karma_repo.KarmaRepository()
+from repository.database.karma import KarmaDB
 
 
 class Karma(Base, commands.Cog):
     def __init__(self, bot):
         super().__init__()
         self.bot = bot
-        self.karma_helper = karma.Karma(bot, karma_r)
+        self.karma_helper = karma.Karma(bot)
         self.check = room_check.RoomCheck(bot)
         self.grillbot_api = GrillbotApi(bot)
-        self._leaderboard_formatter = utils.make_pts_column_row_formatter(Database_karma.karma.name)
-        self._positive_formatter = utils.make_pts_column_row_formatter(Database_karma.positive.name)
-        self._negative_formatter = utils.make_pts_column_row_formatter(Database_karma.negative.name)
+        self._leaderboard_formatter = utils.make_pts_column_row_formatter(KarmaDB.karma.name)
+        self._positive_formatter = utils.make_pts_column_row_formatter(KarmaDB.positive.name)
+        self._negative_formatter = utils.make_pts_column_row_formatter(KarmaDB.negative.name)
 
     async def handle_reaction(self, ctx: ReactionContext):
         # handle karma vote
@@ -73,14 +70,10 @@ class Karma(Base, commands.Cog):
             and ctx.message.channel.id != config.meme_repost_room
             and config.karma_ban_role_id not in map(lambda x: x.id, ctx.member.roles)
         ):
-            if isinstance(ctx.emoji, str):
-                members_update = karma_r.karma_emoji(ctx.message.author.id, ctx.member.id, ctx.emoji)
-                if members_update is not None:
-                    await self.grillbot_api.post_karma_store(members_update)
-            else:
-                members_update = karma_r.karma_emoji(ctx.message.author.id, ctx.member.id, ctx.emoji.id)
-                if members_update is not None:
-                    await self.grillbot_api.post_karma_store(members_update)
+            emoji = utils.str_emoji_id(ctx.emoji)
+            members_update = KarmaDB.karma_emoji(ctx.message.author.id, ctx.member.id, emoji)
+            if members_update is not None:
+                await self.grillbot_api.post_karma_store(members_update)
 
     @commands.Cog.listener()
     async def on_raw_reaction_remove(self, payload):
@@ -95,18 +88,10 @@ class Karma(Base, commands.Cog):
             and ctx.message.channel.id != config.meme_repost_room
             and config.karma_ban_role_id not in map(lambda x: x.id, ctx.member.roles)
         ):
-            if isinstance(ctx.emoji, str):
-                members_update = karma_r.karma_emoji_remove(ctx.message.author.id, ctx.member.id, ctx.emoji)
-                if members_update is not None:
-                    await self.grillbot_api.post_karma_store(members_update)
-            else:
-                members_update = karma_r.karma_emoji_remove(
-                    ctx.message.author.id,
-                    ctx.member.id,
-                    ctx.emoji.id
-                )
-                if members_update is not None:
-                    await self.grillbot_api.post_karma_store(members_update)
+            emoji = utils.str_emoji_id(ctx.emoji)
+            members_update = KarmaDB.karma_emoji_remove(ctx.message.author.id, ctx.member.id, emoji)
+            if members_update is not None:
+                await self.grillbot_api.post_karma_store(members_update)
 
     @cooldowns.default_cooldown
     @commands.slash_command(name="karma", guild_ids=[config.guild_id])
@@ -187,11 +172,11 @@ class Karma(Base, commands.Cog):
         await inter.response.defer(ephemeral=self.check.botroom_check(inter))
 
         if direction == "descending":
-            query = karma_r.leaderboard_query(Database_karma.karma.desc())
+            query = KarmaDB.leaderboard_query(KarmaDB.karma.desc())
             title = "KARMA LEADERBOARD"
             emote = "trophy"
         else:
-            query = karma_r.leaderboard_query(Database_karma.karma.asc())
+            query = KarmaDB.leaderboard_query(KarmaDB.karma.asc())
             title = "KARMA LEADERBOARD REVERSED"
             emote = "coolStoryBob"
 
@@ -232,9 +217,9 @@ class Karma(Base, commands.Cog):
         """
         await inter.response.defer(ephemeral=self.check.botroom_check(inter))
 
-        karma_column = Database_karma.positive if karma == "positive" else Database_karma.negative
+        karma_column = KarmaDB.positive if karma == "positive" else KarmaDB.negative
         order_karma = karma_column.desc() if direction == "descending" else karma_column.asc()
-        query = karma_r.leaderboard_query(order_karma)
+        query = KarmaDB.leaderboard_query(order_karma)
         formatter = self._positive_formatter if karma == "positive" else self._negative_formatter
         title = "KARMA GIVINGBOARD" if karma == "positive" else "KARMA NEGATIVE GIVINGBOARD"
         emote = "peepolove" if karma == "positive" else "gasbutton"
