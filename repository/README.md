@@ -10,15 +10,19 @@ PostgreSQL prompt will open and you can now run any SQL (or Postgre-specific) co
 
 ## Create new table at the start of the Bot
 
-Create a new module with DB structure class ( example from `MemeRepost`):
+Create a new module with DB structure class (example from `MemeRepost`):
 
 ```python
+from __future__ import annotations
+
+from typing import Optional
+
 from sqlalchemy import Column, String
 
-from repository.database import database
+from repository.database import database, session
 
 
-class MemeRepost(database.base):
+class MemeRepostDB(database.base):
     __tablename__ = "bot_meme_reposts"
 
     original_message_id = Column(String, primary_key=True, nullable=False, unique=True)
@@ -30,7 +34,7 @@ class MemeRepost(database.base):
 Add the following into `repository/db_migrations.py`:
 
 ```python
-from repository.database.meme_repost import MemeRepost  # noqa: F401
+from repository.database.meme_repost import MemeRepostDB  # noqa: F401
 ```
 
 That way, the module gets imported on startup and creates the table automatically.
