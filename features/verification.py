@@ -78,13 +78,14 @@ class Verification(BaseFeature):
             view = VerifyView(user.login)
             await inter.response.edit_message(content=success_message, view=view)
 
-    async def send_code(self, login: str, inter: disnake.ApplicationCommandInteraction) -> None:
+    async def send_code(self, login: str, inter: disnake.ApplicationCommandInteraction) -> bool:
+        # return True if code was successfully sent
         # Check if the user doesn't have the verify role
         if not await self.helper.has_role(inter.user, config.verification_role):
             # Some of them will use 'xlogin00' as stated in help, cuz they dumb
             if login == "xlogin00":
                 await self.send_xlogin_info(inter)
-                return
+                return False
 
             if login[0] == "x":
                 # VUT
@@ -105,7 +106,7 @@ class Verification(BaseFeature):
                 elif user.status != VerifyStatus.Unverified.value:
                     if user.status == VerifyStatus.InProcess.value:
                         await self.gen_code_and_send_mail(inter, user, "stud.fit.vutbr.cz", dry_run=True)
-                        return
+                        return True
                     msg = utils.fill_message(
                         "verify_step_done",
                         user=inter.user.id,
@@ -119,6 +120,7 @@ class Verification(BaseFeature):
                     )
                 else:
                     await self.gen_code_and_send_mail(inter, user, "stud.fit.vutbr.cz")
+                    return True
             else:
                 # MUNI
                 try:
@@ -127,14 +129,14 @@ class Verification(BaseFeature):
                     msg = utils.fill_message("invalid_login", user=inter.user.id, admin=config.admin_ids[0])
                     await inter.edit_original_response(msg)
                     await self.log_verify_fail(inter, "getcode (MUNI)", str({"login": login}))
-                    return
+                    return False
 
                 user = ValidPersonDB.get_user_by_login(login)
 
                 if user is not None and user.status != VerifyStatus.Unverified.value:
                     if user.status == VerifyStatus.InProcess.value:
                         await self.gen_code_and_send_mail(inter, user, "mail.muni.cz", dry_run=True)
-                        return
+                        return True
                     msg = utils.fill_message(
                         "verify_step_done",
                         user=inter.user.id,
@@ -146,15 +148,18 @@ class Verification(BaseFeature):
                         "getcode (MUNI) - Invalid verify state",
                         str(user.__dict__),
                     )
-                    return
+                    return False
 
                 user = ValidPersonDB.get_user(login, status=VerifyStatus.Unverified.value)
                 if user is None:
                     user = ValidPersonDB.add_user(login, "MUNI", status=VerifyStatus.Unverified.value)
                 await self.gen_code_and_send_mail(inter, user, "mail.muni.cz")
+                return True
         else:
             msg = utils.fill_message("verify_already_verified", user=inter.user.id, admin=config.admin_ids[0])
             await inter.send(content=msg)
+
+        return False
 
     async def resend_code(self, login: str, inter: disnake.ApplicationCommandInteraction) -> None:
         if await self.helper.has_role(inter.user, config.verification_role):

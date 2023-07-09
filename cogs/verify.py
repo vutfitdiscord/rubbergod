@@ -43,8 +43,8 @@ class Verify(Base, commands.Cog):
         if await self.dynamic_verify_manager.can_apply_rule(inter.user, login):
             await self.dynamic_verify_manager.request_access(login, inter)
             return
-        await self.verification.clear_host_roles(inter)
-        await self.verification.send_code(login, inter)
+        if await self.verification.send_code(login, inter):
+            await self.verification.clear_host_roles(inter)
 
     @verify.error
     async def on_verification_error(self, inter: disnake.ApplicationCommandInteraction, error):
