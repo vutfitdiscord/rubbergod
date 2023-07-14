@@ -60,7 +60,7 @@ class Nameday(Base, commands.Cog):
         headers = {"ApiKey": config.grillbot_api_key, "Author": await self.owner_id()}
         async with aiohttp.ClientSession(timeout=aiohttp.ClientTimeout(total=10), headers=headers) as session:
             try:
-                url = "https://grillbot.cloud/api/user/birthday/today"
+                url = f"{config.grillbot_api_url}/user/birthday/today"
                 async with session.get(url) as resp:
                     birthday = await resp.json()
                     return birthday['message']
