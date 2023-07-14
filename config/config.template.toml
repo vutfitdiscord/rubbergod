@@ -111,6 +111,7 @@ mit_id_rnd = [15220]
 [grillbot]
 #      Production,         Development
 ids = [902678773307174943, 599119578811072523]
+api_url = "https://grillbot.eu/api"
 api_supported_methods = ["Help", "AutoPin"]
 api_key = ""
 

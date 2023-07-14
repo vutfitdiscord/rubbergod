@@ -123,6 +123,7 @@ class Config:
 
     # grillbot
     grillbot_ids: List[int] = get_attr(toml_dict, "grillbot", "ids")
+    grillbot_api_url: str = get_attr(toml_dict, "grillbot", "api_url")
     grillbot_api_supported_methods: List[str] = get_attr(toml_dict, "grillbot", "api_supported_methods")
     grillbot_api_key: str = get_attr(toml_dict, "grillbot", "api_key")
 
