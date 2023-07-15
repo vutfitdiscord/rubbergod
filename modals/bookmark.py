@@ -1,9 +1,8 @@
 import disnake
 
-import utils
 from buttons.bookmark import BookmarkView
-from features.bookmark import BookmarkFeatures
 from config.messages import Messages
+from features.bookmark import BookmarkFeatures
 
 
 class BookmarkModal(disnake.ui.Modal):

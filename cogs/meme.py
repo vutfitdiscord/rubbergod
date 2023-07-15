@@ -6,7 +6,6 @@ Cog for meme commands.
 import disnake
 from disnake.ext import commands
 
-import utils
 from cogs.base import Base
 from config.app_config import config
 from config.messages import Messages

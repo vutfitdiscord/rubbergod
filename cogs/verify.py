@@ -5,7 +5,6 @@ Cog for verification system. Enables users to verify themselves with xlogin00 an
 import disnake
 from disnake.ext import commands
 
-import utils
 from cogs.base import Base
 from config import cooldowns
 from config.app_config import config

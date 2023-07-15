@@ -2,7 +2,6 @@ import re
 
 import disnake
 
-import utils
 from config.messages import Messages
 from utils import split_to_parts
 

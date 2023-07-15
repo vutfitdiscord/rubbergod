@@ -2,7 +2,6 @@ from typing import List, Union
 
 import disnake
 
-import utils
 from config.messages import Messages
 from features.dynamic_verify import DynamicVerifyManager
 from repository.database.verification import DynamicVerifyDB

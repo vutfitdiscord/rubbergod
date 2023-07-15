@@ -12,7 +12,6 @@ import disnake
 import toml
 from disnake.ext import commands
 
-import utils
 from cogs.base import Base
 from config.app_config import config, config_get_keys, load_config
 from config.messages import Messages

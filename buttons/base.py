@@ -5,8 +5,8 @@ import disnake
 from disnake.ext import commands
 
 import utils
-from config.messages import Messages
 from config.app_config import config
+from config.messages import Messages
 from features.error import ErrorLogger
 from permissions import permission_check
 

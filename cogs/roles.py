@@ -56,8 +56,9 @@ class Roles(Base, commands.Cog):
                     line[0] = int(line[0])
                 except Exception:
                     if message.channel.id not in config.role_channels:
-                        msg = Messages.role_invalid_line(user=message.author.id,
-                                                         line=disnake.utils.escape_mentions(line[0]),
+                        msg = Messages.role_invalid_line(
+                            user=message.author.id,
+                            line=disnake.utils.escape_mentions(line[0]),
                         )
                         await message.channel.send(msg)
         return output
@@ -72,15 +73,19 @@ class Roles(Base, commands.Cog):
         for line in data:
             roles, channels = self.get_target(line[0], guild)
             if roles == [None] and channels == [None]:
-                msg = Messages.role_not_role(user=message.author.id, not_role=disnake.utils.escape_mentions(line[0]))
+                msg = Messages.role_not_role(
+                    user=message.author.id,
+                    not_role=disnake.utils.escape_mentions(line[0])
+                )
                 await message.channel.send(msg)
             else:
                 try:
                     await message.add_reaction(line[1])
                 except disnake.errors.HTTPException:
-                    msg = Messages.role_invalid_emote(user=message.author.id,
-                                                      not_emote=disnake.utils.escape_mentions(line[1]),
-                                                      role=disnake.utils.escape_mentions(line[0]),
+                    msg = Messages.role_invalid_emote(
+                        user=message.author.id,
+                        not_emote=disnake.utils.escape_mentions(line[1]),
+                        role=disnake.utils.escape_mentions(line[0]),
                     )
                     await message.channel.send(msg)
 
@@ -151,9 +156,10 @@ class Roles(Base, commands.Cog):
 
             if (idx % rate == 0):
                 await message.edit(
-                    Messages.role_create_progress(channel=channel.name,
-                                                  perms=total_overwrites,
-                                                  progress=utils.create_bar(idx + 1, total_overwrites),
+                    Messages.role_create_progress(
+                        channel=channel.name,
+                        perms=total_overwrites,
+                        progress=utils.create_bar(idx + 1, total_overwrites),
                     )
                 )
 
@@ -168,8 +174,9 @@ class Roles(Base, commands.Cog):
             await channel.set_permissions(item, overwrite=keep[item])
 
         await message.edit(
-            Messages.role_create_done(role=role.name,
-                                      perms=len(role.members)
+            Messages.role_create_done(
+                role=role.name,
+                perms=len(role.members)
             )
         )
         return role
@@ -364,9 +371,10 @@ class Roles(Base, commands.Cog):
                 )
 
         await inter.edit_original_response(
-            Messages.channel_create_done(channel=channel.mention,
-                                         role=role.name,
-                                         perms=len(role.members)
+            Messages.channel_create_done(
+                channel=channel.mention,
+                role=role.name,
+                perms=len(role.members)
             )
         )
 

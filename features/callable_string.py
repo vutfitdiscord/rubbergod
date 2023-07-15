@@ -1,5 +1,7 @@
 import disnake
+
 from utils import generate_mention
+
 
 class CallableString(str):
     to_escape = ["role", "not_role", "line"]
@@ -16,6 +18,7 @@ class CallableString(str):
                 kwargs[arg] = disnake.utils.escape_mentions(kwargs[arg])
 
         return self.format(**kwargs)
+
 
 class Formatable(type):
     def __init__(cls, clsname, superclasses, attributedict):
