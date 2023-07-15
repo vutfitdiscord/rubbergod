@@ -57,7 +57,7 @@ class StreamLinks(Base, commands.Cog):
     async def streamlinks(self, ctx: commands.Context):
         if ctx.invoked_subcommand is None:
             command_id = utils.get_command_id(self, "streamlinks")
-            await ctx.reply(utils.fill_message("moved_command", name="streamlinks", id=command_id))
+            await ctx.reply(Messages.moved_command(name="streamlinks", id=command_id))
 
     @cooldowns.default_cooldown
     @commands.slash_command(name="streamlinks", brief=Messages.streamlinks_brief)
@@ -127,7 +127,7 @@ class StreamLinks(Base, commands.Cog):
 
         if StreamLinkDB.exists_link(link):
             await inter.edit_original_response(
-                utils.fill_message('streamlinks_add_link_exists', user=inter.author.id)
+                Messages.streamlinks_add_link_exists(user=inter.author.id)
             )
             return
 
@@ -252,13 +252,13 @@ class StreamLinks(Base, commands.Cog):
         stream = StreamLinkDB.get_stream_by_id(id)
         link = stream.link
 
-        prompt_message = utils.fill_message('streamlinks_remove_prompt', link=link)
+        prompt_message = Messages.streamlinks_remove_prompt(link=link)
         result = await PromptSession(self.bot, inter, prompt_message, 60).run()
 
         if result:
             await self.log(stream, inter.author)
             stream.remove()
-            await inter.channel.send(utils.fill_message('streamlinks_remove_success', link=link))
+            await inter.channel.send(Messages.streamlinks_remove_success(link=link))
 
     async def log(self, stream, user):
         embed = disnake.Embed(title="Odkaz na stream byl smazán", color=disnake.Color.yellow())

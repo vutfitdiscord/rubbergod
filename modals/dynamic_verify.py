@@ -185,7 +185,7 @@ class DynamicVerifyEditModal(disnake.ui.Modal):
                 role = inter.guild.get_role(int(item))
                 if role is None:
                     await inter.response.send_message(
-                        utils.fill_message("dynamic_verify_role_not_exists", role=item)
+                        Messages.dynamic_verify_role_not_exists(role=item)
                     )
                     return None
                 roles.append(role)
@@ -194,7 +194,7 @@ class DynamicVerifyEditModal(disnake.ui.Modal):
                 role = disnake.utils.get(inter.guild.roles, name=item)
                 if role is None:
                     await inter.response.send_message(
-                        utils.fill_message("dynamic_verify_role_not_exists", role=item)
+                        Messages.dynamic_verify_role_not_exists(role=item)
                     )
                     return None
                 roles.append(role)

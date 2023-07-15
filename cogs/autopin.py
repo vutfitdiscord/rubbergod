@@ -86,7 +86,7 @@ class AutoPin(Base, commands.Cog):
             channel = inter.channel
 
         if PinMapDB.find_channel_by_id(str(channel.id)) is None:
-            await inter.send(utils.fill_message("autopin_remove_not_exists", channel_name=channel.mention))
+            await inter.send(Messages.autopin_remove_not_exists(channel_name=channel.mention))
             return
 
         PinMapDB.remove_channel(str(channel.id))
@@ -105,19 +105,15 @@ class AutoPin(Base, commands.Cog):
             try:
                 channel = await utils.get_or_fetch_channel(self.bot, int(item.channel_id))
             except disnake.NotFound:
-                lines.append(utils.fill_message("autopin_list_unknown_channel", channel_id=item.channel_id))
+                lines.append(Messages.autopin_list_unknown_channel(channel_id=item.channel_id))
                 PinMapDB.remove_channel(str(item.channel_id))
                 continue
 
             try:
                 message: disnake.Message = await channel.fetch_message(int(item.message_id))
-                msg: str = utils.fill_message(
-                    "autopin_list_item",
-                    channel=channel.mention,
-                    url=message.jump_url
-                )
+                msg: str = Messages.autopin_list_item(channel=channel.mention, url=message.jump_url)
             except disnake.NotFound:
-                msg: str = utils.fill_message("autopin_list_unknown_message", channel=channel.mention)
+                msg: str = Messages.autopin_list_unknown_message(channel=channel.mention)
             finally:
                 lines.append(msg)
 

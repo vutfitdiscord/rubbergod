@@ -59,22 +59,25 @@ class Verification(BaseFeature):
         if not dry_run:
             # Generate a verification code
             code = "".join(random.choices(string.ascii_uppercase + string.digits, k=6))
-            mail_content = utils.fill_message("verify_mail_content", code=code)
+            mail_content = Messages.verify_mail_content(code=code)
             # Save the newly generated code into the database
             user.save_sent_code(code)
             self.send_mail(mail_address, mail_content, Messages.verify_subject)
 
-        success_message = utils.fill_message(
-            "verify_resend_success" if is_resend else "verify_send_success",
-            user=inter.user.id,
-            mail=mail_address,
-            subject=Messages.verify_subject,
-        )
-
         if not is_resend:
+            success_message = Messages.verify_send_success(
+                user=inter.user.id,
+                mail=mail_address,
+                subject=Messages.verify_subject,
+            )
             view = VerifyWithResendButtonView(user.login)
             await inter.edit_original_response(content=success_message, view=view)
         else:
+            success_message = Messages.verify_resend_success(
+                user=inter.user.id,
+                mail=mail_address,
+                subject=Messages.verify_subject,
+            )
             view = VerifyView(user.login)
             await inter.response.edit_message(content=success_message, view=view)
 
@@ -93,8 +96,7 @@ class Verification(BaseFeature):
                 user = ValidPersonDB.get_user_by_login(login)
 
                 if user is None:
-                    msg = utils.fill_message(
-                        "verify_unknown_login",
+                    msg = Messages.verify_unknown_login(
                         user=inter.user.id,
                         admin=config.admin_ids[0],
                     )
@@ -107,8 +109,7 @@ class Verification(BaseFeature):
                     if user.status == VerifyStatus.InProcess.value:
                         await self.gen_code_and_send_mail(inter, user, "stud.fit.vutbr.cz", dry_run=True)
                         return True
-                    msg = utils.fill_message(
-                        "verify_step_done",
+                    msg = Messages.verify_step_done(
                         user=inter.user.id,
                         admin=config.admin_ids[0],
                     )
@@ -126,7 +127,7 @@ class Verification(BaseFeature):
                 try:
                     int(login)
                 except ValueError:
-                    msg = utils.fill_message("invalid_login", user=inter.user.id, admin=config.admin_ids[0])
+                    msg = Messages.invalid_login(user=inter.user.id, admin=config.admin_ids[0])
                     await inter.edit_original_response(msg)
                     await self.log_verify_fail(inter, "getcode (MUNI)", str({"login": login}))
                     return False
@@ -137,8 +138,7 @@ class Verification(BaseFeature):
                     if user.status == VerifyStatus.InProcess.value:
                         await self.gen_code_and_send_mail(inter, user, "mail.muni.cz", dry_run=True)
                         return True
-                    msg = utils.fill_message(
-                        "verify_step_done",
+                    msg = Messages.verify_step_done(
                         user=inter.user.id,
                         admin=config.admin_ids[0],
                     )
@@ -156,7 +156,7 @@ class Verification(BaseFeature):
                 await self.gen_code_and_send_mail(inter, user, "mail.muni.cz")
                 return True
         else:
-            msg = utils.fill_message("verify_already_verified", user=inter.user.id, admin=config.admin_ids[0])
+            msg = Messages.verify_already_verified(user=inter.user.id, admin=config.admin_ids[0])
             await inter.send(content=msg)
 
         return False
@@ -219,7 +219,7 @@ class Verification(BaseFeature):
     async def finish_verify(self, inter: disnake.ModalInteraction, code: str, login: str) -> None:
         if await self.helper.has_role(inter.user, config.verification_role):
             inter.response.send_message(
-                utils.fill_message("verify_already_verified", user=inter.user.id, admin=config.admin_ids[0])
+                Messages.verify_already_verified(user=inter.user.id, admin=config.admin_ids[0])
             )
             return
 
@@ -238,8 +238,7 @@ class Verification(BaseFeature):
             year = self.transform_year(new_user.year)
 
             if year is None:
-                msg = utils.fill_message(
-                    "verify_verify_manual",
+                msg = Messages.verify_verify_manual(
                     user=inter.user.id,
                     admin=config.admin_ids[0],
                     year=str(new_user.year),
@@ -267,7 +266,7 @@ class Verification(BaseFeature):
 
             new_user.save_verified(inter.user.id)
 
-            verify_success_msg = utils.fill_message("verify_verify_success", user=inter.user.id)
+            verify_success_msg = Messages.verify_verify_success(user=inter.user.id)
             try:
                 await member.send(verify_success_msg)
                 await member.send(Messages.verify_post_verify_info, suppress_embeds=True)
@@ -276,7 +275,7 @@ class Verification(BaseFeature):
                 self.send_mail_verified(mail, member)
             await inter.response.send_message(verify_success_msg)
         else:
-            msg = utils.fill_message("verify_verify_not_found", user=inter.user.id, admin=config.admin_ids[0])
+            msg = Messages.verify_verify_not_found(user=inter.user.id, admin=config.admin_ids[0])
             await inter.response.send_message(msg)
             await self.log_verify_fail(
                 inter, "Verify (with code) - Not exists in DB", str({"login": login, "code": code})
@@ -293,7 +292,7 @@ class Verification(BaseFeature):
         guild = self.bot.get_guild(config.guild_id)
         fp = await guild.fetch_emoji(585915845146968093)
         await inter.edit_original_response(
-            content=utils.fill_message("verify_send_dumbshit", user=inter.user.id, emote=str(fp))
+            content=Messages.verify_send_dumbshit(user=inter.user.id, emote=str(fp))
         )
 
     async def clear_host_roles(self, inter: disnake.ApplicationCommandInteraction):

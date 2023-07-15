@@ -74,7 +74,7 @@ class Error(Base, commands.Cog):
 
             if invoked in slash_comms:
                 command_id = utils.get_command_id(self, invoked)
-                await ctx.reply(utils.fill_message("moved_command", name=invoked, id=command_id))
+                await ctx.reply(Messages.moved_command(name=invoked, id=command_id))
             elif prefix not in config.ignored_prefixes:
                 await ctx.send(Messages.no_such_command)
             return
@@ -82,13 +82,13 @@ class Error(Base, commands.Cog):
         if isinstance(error, commands.CommandInvokeError):
             # bot cant send messages to user
             if "50007" in error.original.args[0]:
-                await ctx.send(utils.fill_message("blocked_bot", user=ctx.author.id))
+                await ctx.send(Messages.blocked_bot(user=ctx.author.id))
                 return
             await ctx.send(Messages.command_invoke_error)
             # no return here, because we want to log these errors
 
         if isinstance(error, commands.CommandOnCooldown):
-            await ctx.send(utils.fill_message("spamming", user=ctx.author.id, time=error.retry_after))
+            await ctx.send(Messages.spamming(user=ctx.author.id, time=error.retry_after))
             return
 
         if isinstance(error, commands.NoPrivateMessage):
@@ -96,7 +96,7 @@ class Error(Base, commands.Cog):
             return
 
         if isinstance(error, commands.CheckFailure):
-            await ctx.reply(utils.fill_message("missing_perms", user=ctx.author.id))
+            await ctx.reply(Messages.missing_perms(user=ctx.author.id))
             return
 
         output = "".join(traceback.format_exception(type(error), error, error.__traceback__))
@@ -145,14 +145,14 @@ class Error(Base, commands.Cog):
         if isinstance(error, commands.CommandInvokeError):
             # bot cant send messages to user
             if "50007" in error.original.args[0]:
-                await inter.send(utils.fill_message("blocked_bot", user=inter.author.id))
+                await inter.send(Messages.blocked_bot(user=inter.author.id))
                 return
             await inter.send(Messages.command_invoke_error)
             # no return here, because we want to log these errors
 
         if isinstance(error, commands.CommandOnCooldown):
             await inter.send(
-                utils.fill_message("spamming", user=inter.author.id, time=error.retry_after),
+                Messages.spamming(user=inter.author.id, time=error.retry_after),
                 ephemeral=True
             )
             return
@@ -163,7 +163,7 @@ class Error(Base, commands.Cog):
 
         if isinstance(error, commands.CheckFailure):
             await inter.send(
-                utils.fill_message("missing_perms", user=inter.author.id),
+                Messages.missing_perms(user=inter.author.id),
                 ephemeral=True
             )
             return
@@ -210,19 +210,19 @@ class Error(Base, commands.Cog):
         if isinstance(error, commands.CommandInvokeError):
             # bot cant send messages to user
             if "50007" in error.original.args[0]:
-                await inter.send(utils.fill_message("blocked_bot", user=inter.author.id))
+                await inter.send(Messages.blocked_bot(user=inter.author.id))
                 return
             await inter.send(Messages.command_invoke_error)
             # no return here, because we want to log these errors
 
         if isinstance(error, commands.CommandOnCooldown):
             await inter.send(
-                utils.fill_message("spamming", user=inter.author.id, time=error.retry_after),
+                Messages.spamming(user=inter.author.id, time=error.retry_after),
                 ephemeral=True
             )
             return
         if isinstance(error, commands.CheckFailure):
-            await inter.send(utils.fill_message("missing_perms", user=inter.author.id))
+            await inter.send(Messages.missing_perms(user=inter.author.id))
             return
 
         embed = self.logger.create_embed(
@@ -253,20 +253,20 @@ class Error(Base, commands.Cog):
         if isinstance(error, commands.CommandInvokeError):
             # bot cant send messages to user
             if "50007" in error.original.args[0]:
-                await inter.send(utils.fill_message("blocked_bot", user=inter.author.id))
+                await inter.send(Messages.blocked_bot(user=inter.author.id))
                 return
             await inter.send(Messages.command_invoke_error)
             # no return here, because we want to log these errors
 
         if isinstance(error, commands.CommandOnCooldown):
             await inter.send(
-                utils.fill_message("spamming", user=inter.author.id, time=error.retry_after),
+                Messages.spamming(user=inter.author.id, time=error.retry_after),
                 ephemeral=True
             )
             return
 
         if isinstance(error, commands.CheckFailure):
-            await inter.send(utils.fill_message("missing_perms", user=inter.author.id))
+            await inter.send(Messages.missing_perms(user=inter.author.id))
             return
 
         embed = self.logger.create_embed(

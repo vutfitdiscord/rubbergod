@@ -305,7 +305,7 @@ class Karma(Base, commands.Cog):
             await ctx.reply(Messages.server_warning)
             return
         command_id = utils.get_command_id(self, "karma")
-        await ctx.reply(utils.fill_message("moved_command", name="karma", id=command_id))
+        await ctx.reply(Messages.moved_command(name="karma", id=command_id))
 
     @revote.error
     @vote.error

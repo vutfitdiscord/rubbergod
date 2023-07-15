@@ -14,7 +14,7 @@ class BookmarkFeatures():
     async def create_image_embed(self, inter, image, title_name=None):
         """Create embed from image only"""
         if not title_name:
-            title_name = utils.fill_message("bookmark_title", server=inter.guild.name)
+            title_name = Messages.bookmark_title(server=inter.guild.name)
 
         author = inter.message.author
         embed = disnake.Embed(title=title_name, color=author.color)
@@ -28,7 +28,7 @@ class BookmarkFeatures():
 
     async def create_bookmark_embed(self, inter, title_name=None):
         if not title_name:
-            title_name = utils.fill_message("bookmark_title", server=inter.guild.name)
+            title_name = Messages.bookmark_title(server=inter.guild.name)
 
         author = inter.message.author
         embed = disnake.Embed(title=title_name, color=author.color)

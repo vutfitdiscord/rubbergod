@@ -76,7 +76,7 @@ class DynamicConfig(Base, commands.Cog):
             try:
                 regex = re.compile(regex)
             except re.error as ex:
-                await inter.send(utils.fill_message('config_list_invalid_regex', regex_err=str(ex)))
+                await inter.send(Messages.config_list_invalid_regex(regex_err=str(ex)))
                 return
 
         output = "```\n"

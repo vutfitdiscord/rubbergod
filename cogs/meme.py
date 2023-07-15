@@ -40,7 +40,7 @@ class Meme(Base, commands.Cog):
 
     @commands.slash_command(name="uhoh", description=Messages.uhoh_brief)
     async def uhoh(self, inter):
-        await inter.send(utils.fill_message("uhoh_counter", uhohs=uhoh_counter))
+        await inter.send(Messages.uhoh_counter(uhohs=uhoh_counter))
 
 
 def setup(bot):

@@ -74,7 +74,7 @@ class Verify(Base, commands.Cog):
         rule = self.dynamic_verify_manager.get_rule(rule_id)
         if rule is None:
             await inter.response.send_message(
-                utils.fill_message("dynamic_verify_missing_rule", rule_id=rule_id)
+                Messages.dynamic_verify_missing_rule(rule_id=rule_id)
             )
             return
         modal = DynamicVerifyEditModal(inter.guild, rule)
@@ -91,7 +91,7 @@ class Verify(Base, commands.Cog):
         rule = self.dynamic_verify_manager.get_rule(rule_id)
         if rule is None:
             await inter.response.send_message(
-                utils.fill_message("dynamic_verify_missing_rule", rule_id=rule_id)
+                Messages.dynamic_verify_missing_rule(rule_id=rule_id)
             )
             return
         rule.remove_rule()
