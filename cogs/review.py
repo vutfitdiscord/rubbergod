@@ -56,7 +56,7 @@ class Review(Base, commands.Cog):
         guild = inter.bot.get_guild(config.guild_id)
         member = guild.get_member(inter.author.id)
         if member is None:
-            await inter.send(utils.fill_message("review_not_on_server", user=inter.author.mention))
+            await inter.send(Messages.review_not_on_server(user=inter.author.mention))
             return False
         roles = member.roles
         verify = False
@@ -64,10 +64,10 @@ class Review(Base, commands.Cog):
             if config.verification_role_id == role.id:
                 verify = True
             if role.id in config.review_forbidden_roles:
-                await inter.send(utils.fill_message("review_add_denied", user=inter.author.id))
+                await inter.send(Messages.review_add_denied(user=inter.author.id))
                 return False
         if not verify:
-            await inter.send(utils.fill_message("review_add_denied", user=inter.author.id))
+            await inter.send(Messages.review_add_denied(user=inter.author.id))
             return False
         return True
 
@@ -132,7 +132,7 @@ class Review(Base, commands.Cog):
 
             # not admin
             await inter.send(
-                utils.fill_message("review_remove_denied", user=inter.author.id),
+                Messages.review_remove_denied(user=inter.author.id),
                 ephemeral=True
             )
             return

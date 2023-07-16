@@ -38,9 +38,9 @@ class Karma(BaseFeature):
 
     async def emoji_process_vote(self, inter, emoji):
         delay = cfg.vote_minutes * 60
-        message = utils.fill_message("karma_vote_message", emote=str(emoji))
+        message = Messages.karma_vote_message(emote=str(emoji))
         message += '\n'
-        message += utils.fill_message("karma_vote_info", delay=str(delay//60), minimum=str(cfg.vote_minimum))
+        message += Messages.karma_vote_info(delay=str(delay//60), minimum=str(cfg.vote_minimum))
         message = await inter.channel.send(message)
         await inter.send(Messages.karma_revote_started)
         await message.add_reaction("✅")
@@ -95,19 +95,13 @@ class Karma(BaseFeature):
         if vote_value is None:
             self.repo.remove_emoji(emoji)
             await inter.channel.send(
-                utils.fill_message(
-                    "karma_vote_notpassed",
-                    emote=str(emoji), minimum=str(cfg.vote_minimum)
-                )
+                Messages.karma_vote_notpassed(emote=str(emoji), minimum=str(cfg.vote_minimum))
             )
 
         else:
             self.repo.set_emoji_value(emoji, vote_value)
             await inter.channel.send(
-                utils.fill_message(
-                    "karma_vote_result",
-                    emote=str(emoji), result=str(vote_value)
-                )
+                Messages.karma_vote_result(emote=str(emoji), result=str(vote_value))
             )
 
     async def emoji_revote_value(self, inter, emoji):
@@ -119,7 +113,7 @@ class Karma(BaseFeature):
                 await inter.send(Messages.karma_revote_not_emoji)
                 return
             except disnake.NotFound:
-                await inter.send(utils.fill_message("emote_not_found", emote=emoji))
+                await inter.send(Messages.emote_not_found(emote=emoji))
                 return
 
         vote_value = await self.emoji_process_vote(inter, emoji)
@@ -127,17 +121,11 @@ class Karma(BaseFeature):
         if vote_value is not None:
             self.repo.set_emoji_value(emoji, vote_value)
             await inter.channel.send(
-                utils.fill_message(
-                    "karma_vote_result",
-                    emote=str(emoji), result=str(vote_value)
-                )
+                Messages.karma_vote_result(emote=str(emoji), result=str(vote_value))
             )
         else:
             await inter.channel.send(
-                utils.fill_message(
-                    "karma_vote_notpassed",
-                    emote=str(emoji), minimum=str(cfg.vote_minimum)
-                )
+                Messages.karma_vote_notpassed(emote=str(emoji), minimum=str(cfg.vote_minimum))
             )
 
     async def emoji_get_value(self, inter, emoji, ephemeral):
@@ -150,7 +138,7 @@ class Karma(BaseFeature):
                 return
             except disnake.NotFound:
                 await inter.response.send_message(
-                    utils.fill_message("emote_not_found", emote=emoji),
+                    Messages.emote_not_found(emote=emoji),
                     ephemeral=ephemeral
                 )
                 return
@@ -159,12 +147,12 @@ class Karma(BaseFeature):
 
         if val is not None:
             await inter.response.send_message(
-                utils.fill_message("karma_get", emote=str(emoji), value=str(val)),
+                Messages.karma_get(emote=str(emoji), value=str(val)),
                 ephemeral=ephemeral
             )
         else:
             await inter.response.send_message(
-                utils.fill_message("karma_get_emote_not_voted", emote=str(emoji)),
+                Messages.karma_get_emote_not_voted(emote=str(emoji)),
                 ephemeral=ephemeral
             )
 
@@ -261,8 +249,7 @@ class Karma(BaseFeature):
             await inter.send(Messages.karma_transer_user_no_karma.format(user=from_user))
             return
 
-        formated_message = utils.fill_message(
-            "karma_transfer_complete",
+        formated_message = Messages.karma_transfer_complete(
             from_user=from_user.name,
             to_user=to_user.name,
             karma=transfered.karma,
@@ -276,8 +263,7 @@ class Karma(BaseFeature):
         if target is None:
             target = author
         k = self.repo.get_karma(target.id)
-        return utils.fill_message(
-            "karma",
+        return Messages.karma(
             user=author.id,
             karma=k.karma.value,
             order=k.karma.position,

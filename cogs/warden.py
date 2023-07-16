@@ -229,13 +229,13 @@ class Warden(Base, commands.Cog):
             link = "404 <:sadcat:576171980118687754>"
             author = "_??? (404)_"
 
-        desc = utils.fill_message("repost_description", user=message.author.id, value=prob)
+        desc = Messages.repost_description(user=message.author.id, value=prob)
         embed = disnake.Embed(title=title, color=0xCB410B, description=desc, url=message.jump_url)
         embed.add_field(name=f"**{author}**, {timestamp}", value=link, inline=False)
 
         embed.add_field(
             name=Messages.repost_title,
-            value="_" + utils.fill_message("repost_content", limit=config.duplicate_limit) + "_",
+            value="_" + Messages.repost_content(limit=config.duplicate_limit) + "_",
         )
         embed.set_footer(text=message.id)
         send = await message.channel.send(embed=embed)

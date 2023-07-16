@@ -181,10 +181,7 @@ class Hugs(Base, commands.Cog):
         user: disnake.Member = None,
         intensity: int = commands.Param(
             name='intensity',
-            description=utils.fill_message(
-                "hug_intensity_description",
-                emoji_count=emoji_count
-            ),
+            description=Messages.hug_intensity_description(emoji_count=emoji_count),
             ge=1,
             le=emoji_count,
             default=1,

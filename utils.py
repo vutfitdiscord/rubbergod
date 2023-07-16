@@ -45,34 +45,6 @@ def has_role(user, role_name: str):
     return role_name.lower() in [x.name.lower() for x in user.roles]
 
 
-def fill_message(message_name, *args, **kwargs):
-    """Fills message template from messages by attempting to get the attr.
-    :param message_name: {str} message template name
-    :kwargs: {dict} data for formatting the template
-    :return: filled template
-    """
-
-    # Convert username/admin to a mention
-    if "user" in kwargs:
-        kwargs["user"] = generate_mention(kwargs["user"])
-
-    if "admin" in kwargs:
-        kwargs["admin"] = generate_mention(kwargs["admin"])
-
-    to_escape = ["role", "not_role", "line"]
-
-    for arg in to_escape:
-        if arg in kwargs:
-            kwargs[arg] = disnake.utils.escape_mentions(kwargs[arg])
-
-    # Attempt to get message template and fill
-    try:
-        template = getattr(Messages, message_name)
-        return template.format(*args, **kwargs)
-    except AttributeError:
-        raise ValueError("Invalid template {}".format(message_name))
-
-
 def pagination_next(id: str, page: int, max_page: int, roll_around: bool = True):
     if 'next' in id:
         next_page = page + 1

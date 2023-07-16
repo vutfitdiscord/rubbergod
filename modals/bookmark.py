@@ -1,7 +1,7 @@
 import disnake
 
-import utils
 from buttons.bookmark import BookmarkView
+from config.messages import Messages
 from features.bookmark import BookmarkFeatures
 
 
@@ -22,7 +22,7 @@ class BookmarkModal(disnake.ui.Modal):
 
     async def callback(self, inter: disnake.ModalInteraction) -> None:
         inter.message = self.message
-        title_name = utils.fill_message("bookmark_title", server=inter.guild.name)
+        title_name = Messages.bookmark_title(server=inter.guild.name)
 
         if not inter.text_values["name"] == "":
             title_name = inter.text_values["name"]
@@ -38,12 +38,12 @@ class BookmarkModal(disnake.ui.Modal):
                 files=files_attached
                 )
             await inter.response.send_message(
-                utils.fill_message("bookmark_created", title_name=title_name),
+                Messages.bookmark_created(title_name=title_name),
                 ephemeral=True
                 )
         except disnake.HTTPException as e:
             if e.code == 50007:
-                await inter.response.send_message(utils.fill_message("blocked_bot",
-                                                  user=inter.author.id), ephemeral=True)
+                await inter.response.send_message(Messages.blocked_bot(user=inter.author.id),
+                                                  ephemeral=True)
             else:
                 raise e

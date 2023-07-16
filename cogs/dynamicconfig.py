@@ -12,7 +12,6 @@ import disnake
 import toml
 from disnake.ext import commands
 
-import utils
 from cogs.base import Base
 from config.app_config import config, config_get_keys, load_config
 from config.messages import Messages
@@ -76,7 +75,7 @@ class DynamicConfig(Base, commands.Cog):
             try:
                 regex = re.compile(regex)
             except re.error as ex:
-                await inter.send(utils.fill_message('config_list_invalid_regex', regex_err=str(ex)))
+                await inter.send(Messages.config_list_invalid_regex(regex_err=str(ex)))
                 return
 
         output = "```\n"

@@ -112,10 +112,10 @@ class System(Base, commands.Cog):
     async def on_command_error(self, ctx: commands.Context, error):
         if isinstance(error, commands.errors.CommandInvokeError):
             if isinstance(error.__cause__, commands.errors.ExtensionAlreadyLoaded):
-                await ctx.send(utils.fill_message("cog_is_loaded", cog=error.__cause__.name))
+                await ctx.send(Messages.cog_is_loaded(cog=error.__cause__.name))
                 return True
             elif isinstance(error.__cause__, commands.errors.ExtensionNotLoaded):
-                await ctx.send(utils.fill_message("cog_is_unloaded", cog=error.__cause__.name))
+                await ctx.send(Messages.cog_is_unloaded(cog=error.__cause__.name))
                 return True
 
 

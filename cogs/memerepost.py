@@ -130,9 +130,8 @@ class MemeRepost(Base, commands.Cog):
             embed.timestamp = ctx.message.created_at
 
             # Create link to original post
-            link = utils.fill_message("meme_repost_link",
-                                      original_message_url=ctx.message.jump_url,
-                                      original_channel=config.meme_room)
+            link = Messages.meme_repost_link(original_message_url=ctx.message.jump_url,
+                                             original_channel=config.meme_room)
             embed.add_field(name="Link", value=link, inline=False)
 
             # Get all attachments of original post

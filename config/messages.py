@@ -1,7 +1,8 @@
 from config.app_config import config
+from features.callable_string import Formatable
 
 
-class Messages:
+class Messages(metaclass=Formatable):
     # GENERAL MESSAGES
     prefix = config.default_prefix
 

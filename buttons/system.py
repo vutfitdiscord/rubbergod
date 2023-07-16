@@ -5,6 +5,7 @@ import disnake
 import utils
 from buttons.base import BaseView
 from config.app_config import config
+from config.messages import Messages
 from permissions import permission_check
 
 
@@ -160,7 +161,7 @@ class Dropdown(disnake.ui.Select):
 
             for cog in self.unloadable_cogs:
                 if cog in self.values:
-                    await inter.send(utils.fill_message("cog_not_unloadable", cog=cog))
+                    await inter.send(Messages.cog_not_unloadable(cog=cog))
                     self.options = self.create_select()
                     self.values.remove(cog)
 
@@ -169,25 +170,26 @@ class Dropdown(disnake.ui.Select):
                     if cog in unloaded:
                         try:
                             self.bot.load_extension(f"cogs.{cog}")
-                            print(utils.fill_message("cog_loaded", cog=cog))
+                            print(Messages.cog_loaded(cog=cog))
                         except Exception as e:
                             await inter.send(f"Loading error\n`{e}`")
                     else:
                         try:
                             self.bot.unload_extension(f"cogs.{cog}")
-                            print(utils.fill_message("cog_unloaded", cog=cog))
+                            print(Messages.cog_unloaded(cog=cog))
                         except Exception as e:
                             await inter.send(f"Unloading error\n`{e}`")
             else:
                 for cog in self.values:
                     try:
                         self.bot.reload_extension(f"cogs.{cog}")
-                        print(utils.fill_message("cog_reloaded", cog=cog))
-                        await inter.channel.send(utils.fill_message("cog_reloaded", cog=cog))
+                        message = Messages.cog_reloaded(cog=cog)
+                        print(message)
+                        await inter.channel.send(message)
                     except Exception as e:
                         await inter.send(f"Reloading error\n`{e}`")
 
             self.options = self.create_select()
             await self.msg.edit(embed=self.create_embed(inter.author.color), view=self._view)
         else:
-            await inter.send(utils.fill_message("missing_perms", user=inter.author.id), ephemeral=True)
+            await inter.send(Messages.missing_perms(user=inter.author.id), ephemeral=True)

@@ -48,7 +48,7 @@ class FitRoom(Base, commands.Cog):
 
         if image is None or cursor is None:
             await inter.edit_original_response(
-                utils.fill_message("fit_room_room_not_on_plan", room=room[:1024])
+                Messages.fit_room_room_not_on_plan(room=room[:1024])
             )
             return
 

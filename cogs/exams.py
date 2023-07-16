@@ -54,7 +54,7 @@ class Exams(Base, commands.Cog):
     @terms.sub_command(name="update", description=Messages.exams_update_term_brief)
     async def update(self, inter: disnake.ApplicationCommandInteraction):
         updated_chans = await self.update_exam_terms(inter.guild, inter.author)
-        await inter.edit_original_response(utils.fill_message("exams_terms_updated", num_chan=updated_chans))
+        await inter.edit_original_response(Messages.exams_terms_updated(num_chan=updated_chans))
 
     @commands.check(permission_check.mod_plus)
     @terms.sub_command(name="remove_all", description=Messages.exams_remove_all_terms_brief)
@@ -79,7 +79,7 @@ class Exams(Base, commands.Cog):
     async def remove(self, inter: disnake.ApplicationCommandInteraction, channel: disnake.TextChannel):
         if not isinstance(channel, disnake.TextChannel):
             await inter.edit_original_response(
-                utils.fill_message("exams_channel_is_not_text_channel", chan_name=channel.name)
+                Messages.exams_channel_is_not_text_channel(chan_name=channel.name)
             )
             return
 
@@ -94,7 +94,7 @@ class Exams(Base, commands.Cog):
         if message_ids:
             await inter.send(Messages.exams_terms_removed)
         else:
-            await inter.send(utils.fill_message("exams_nothing_to_remove", chan_name=channel.name))
+            await inter.send(Messages.exams_nothing_to_remove(chan_name=channel.name))
 
     @commands.check(permission_check.mod_plus)
     @terms.sub_command(name="start", description=Messages.exams_start_terms_brief)
@@ -108,7 +108,7 @@ class Exams(Base, commands.Cog):
             # If task is already running update terms now
             await self.update_exam_terms(inter.guild)
 
-        await inter.send(utils.fill_message("exams_automatic_update_started", guild_name=inter.guild.name))
+        await inter.send(Messages.exams_automatic_update_started(guild_name=inter.guild.name))
 
     @commands.check(permission_check.mod_plus)
     @terms.sub_command(name="stop", description=Messages.exams_stop_terms_brief)
@@ -120,7 +120,7 @@ class Exams(Base, commands.Cog):
         if not self.subscribed_guilds:
             self.update_terms_task.cancel()
 
-        await inter.send(utils.fill_message("exams_automatic_update_stopped", guild_name=inter.guild.name))
+        await inter.send(Messages.exams_automatic_update_stopped(guild_name=inter.guild.name))
 
     @tasks.loop(hours=int(config.exams_terms_update_interval * 24))
     async def update_terms_task(self):

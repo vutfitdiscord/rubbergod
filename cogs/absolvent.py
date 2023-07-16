@@ -10,7 +10,6 @@ import requests
 from disnake.ext import commands
 from lxml import etree
 
-import utils
 from cogs.base import Base
 from config.app_config import config
 from config.messages import Messages
@@ -202,7 +201,7 @@ class Absolvent(Base, commands.Cog):
     @diplom.error
     async def diplom_error(self, inter: disnake.ApplicationCommandInteraction, error):
         await inter.edit_original_response(
-            utils.fill_message("absolvent_help", command=inter.application_command)
+            Messages.absolvent_help(user=inter.author.id)
         )
 
 

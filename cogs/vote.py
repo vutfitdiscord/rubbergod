@@ -19,7 +19,7 @@ from cogs.base import Base
 from config import cooldowns
 from config.messages import Messages
 from repository.database.vote import VoteDB
-from utils import fill_message, is_command_message, str_emoji_id
+from utils import is_command_message, str_emoji_id
 
 
 class VoteMessage:
@@ -143,7 +143,7 @@ class Vote(Base, commands.Cog):
             VoteDB.remove(ctx.message.id)
             del self.vote_cache[ctx.message.id]
             match = re.search(f"<:(.*):{ret}>", message)
-            await ctx.send(utils.fill_message("emote_not_found", emote=match.group(1)))
+            await ctx.send(Messages.emote_not_found(emote=match.group(1)))
         else:
             await ctx.send(Messages.vote_none)
 
@@ -248,28 +248,38 @@ class Vote(Base, commands.Cog):
         if len(all_most_voted) == 1:
             option = all_most_voted[0]
 
-            return singularise(
-                fill_message(
-                    "vote_result" if final else "vote_winning",
+            if final:
+                return singularise(Messages.vote_result(
                     winning_emoji=(
                         option.emoji if option.is_unicode else str(self.bot.get_emoji(int(option.emoji)))
                     ),
                     winning_option=option.message,
                     votes=option.count,
-                    question=vote.question,
-                )
-            )
+                    question=vote.question))
+            else:
+                return singularise(Messages.vote_winning(
+                    winning_emoji=(
+                        option.emoji if option.is_unicode else str(self.bot.get_emoji(int(option.emoji)))
+                    ),
+                    winning_option=option.message,
+                    votes=option.count))
         else:
             emoji_str = ""
             for e in all_most_voted:
                 emoji_str += (e.emoji if e.is_unicode else str(self.bot.get_emoji(int(e.emoji)))) + ", "
             emoji_str = emoji_str[:-2]
-            return singularise(fill_message(
-                "vote_result_multiple" if final else "vote_winning_multiple",
-                winning_emojis=emoji_str,
-                votes=most_voted,
-                question=vote.question
-            ))
+
+            if final:
+                return singularise(Messages.vote_result_multiple(
+                    winning_emojis=emoji_str,
+                    votes=most_voted,
+                    question=vote.question
+                ))
+            else:
+                return singularise(Messages.vote_winning_multiple(
+                    winning_emojis=emoji_str,
+                    votes=most_voted
+                ))
 
     async def update_bot_vote_message(self, vote_msg: Message, channel: TextChannel):
         vote = self.vote_cache[vote_msg.id]
