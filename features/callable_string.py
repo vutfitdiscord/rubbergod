@@ -1,17 +1,15 @@
 import disnake
 
-from utils import generate_mention
-
 
 class CallableString(str):
     to_escape = ["role", "not_role", "line"]
 
     def __call__(self, *args, **kwargs):
         if "user" in kwargs:
-            kwargs["user"] = generate_mention(kwargs["user"])
+            kwargs["user"] = f"<@{kwargs['user']}>"
 
         if "admin" in kwargs:
-            kwargs["admin"] = generate_mention(kwargs["admin"])
+            kwargs["admin"] = f"<@{kwargs['admin']}>"
 
         for arg in self.to_escape:
             if arg in kwargs:
