@@ -84,7 +84,8 @@ class Verification(BaseFeature):
     async def send_code(self, login: str, inter: disnake.ApplicationCommandInteraction) -> bool:
         # return True if code was successfully sent
         # Check if the user doesn't have the verify role
-        if not await self.helper.has_role(inter.user, config.verification_role):
+        if not await self.helper.has_role(inter.user, config.verification_role) or \
+           await self.helper.has_role(inter.user, "Host"):
             # Some of them will use 'xlogin00' as stated in help, cuz they dumb
             if login == "xlogin00":
                 await self.send_xlogin_info(inter)
