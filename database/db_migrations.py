@@ -74,8 +74,7 @@ def load_dump(filename: str):
             values = values.replace('(', '').replace(')', '')
             values = values.split(',')
             for i in range(0, len(values), 2):
-                session.add(KarmaEmojiDB(emoji_ID=values[i],
-                                         value=values[i + 1]))
+                session.add(KarmaEmojiDB(emoji_ID=values[i], value=values[i + 1]))
         elif insert.startswith("INSERT INTO `bot_permit`"):
             values = values[1:-2]
             values = values.replace('(', '').replace(')', '')

@@ -89,7 +89,7 @@ class Messages(metaclass=Formatable):
 
     karma_invalid_command = "Neznámý karma příkaz."
     karma_vote_message_hack = "Hlasování o karma ohodnocení emotu"
-    karma_vote_message = f"{karma_vote_message_hack} {{emote}}"
+    karma_vote_message = f"{karma_vote_message_hack} {{emote}}\n"
     karma_vote_info = "Hlasování skončí za **{delay}** " \
                       "minut a minimální počet hlasů je " \
                       "**{minimum}**."
