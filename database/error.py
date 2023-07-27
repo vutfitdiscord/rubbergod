@@ -25,10 +25,11 @@ class ErrorLogDB(database.base):
     @classmethod
     def init(cls) -> None:
         """initialize database with default values"""
-        last_error = cls()
-        start_streak = cls()
-        end_streak = cls()
-        session.add_all([last_error, start_streak, end_streak])
+        last_error = cls(id=ErrorRow.last_error)
+        start_streak = cls(id=ErrorRow.start_streak)
+        end_streak = cls(id=ErrorRow.end_streak)
+        for error in [last_error, start_streak, end_streak]:
+            session.merge(error)
         session.commit()
 
     @classmethod
@@ -42,7 +43,7 @@ class ErrorLogDB(database.base):
         if getattr(last_error, "date", None) == today:
             return False
 
-        if last_error is None:
+        if any(error is None for error in [last_error, start_streak, end_streak]):
             cls.init()
 
         current_streak = today - last_error.date
@@ -72,7 +73,7 @@ class ErrorLogDB(database.base):
         last_error, start_streak, end_streak = cls.get_all()
         today = date.today()
 
-        if last_error is None:
+        if any(error is None for error in [last_error, start_streak, end_streak]):
             cls.init()
             last_error, start_streak, end_streak = cls.get_all()
 
