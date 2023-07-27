@@ -73,7 +73,7 @@ class Review(Base, commands.Cog):
     @commands.slash_command(name="review")
     async def reviews(self, inter: disnake.ApplicationCommandInteraction):
         """Group of commands for reviews."""
-        await inter.response.defer()
+        pass
 
     @reviews.sub_command(name="get", description=Messages.review_get_brief)
     async def get(
@@ -82,6 +82,7 @@ class Review(Base, commands.Cog):
         subject: str = commands.Param(autocomplete=autocomp_subjects),
     ):
         """Get reviews"""
+        await inter.response.defer()
         embeds = self.manager.list_reviews(inter.author, subject.lower())
         if embeds is None or len(embeds) == 0:
             await inter.send(Messages.review_wrong_subject)
@@ -96,18 +97,16 @@ class Review(Base, commands.Cog):
         inter: disnake.ApplicationCommandInteraction,
         subject: str = commands.Param(autocomplete=autocomp_subjects),
         tier: int = commands.Param(le=4, ge=0, description=Messages.review_tier),
-        text: str = None
+        text: str = commands.Param(),
+        anonymous: bool = commands.Param(default=False)
     ):
         """Add new review for `subject`"""
         # TODO: use modal in future when disnake 2.8?? released
         # await inter.response.send_modal(modal=ReviewModal(self.bot))
+        await inter.response.defer(ephemeral=anonymous)
         if not await self.check_member(inter):
             return
-        author = inter.author.id
-        anonym = False
-        if not inter.guild:  # DM
-            anonym = True
-        if not self.manager.add_review(author, subject.lower(), tier, anonym, text):
+        if not self.manager.add_review(inter.author.id, subject.lower(), tier, anonymous, text):
             await inter.send(Messages.review_wrong_subject)
         else:
             await inter.send(Messages.review_added)
@@ -122,6 +121,7 @@ class Review(Base, commands.Cog):
         """Remove review from DB. User is just allowed to remove his own review
         For admin it is possible to use "id" as subject shortcut and delete review by its ID
         """
+        await inter.response.defer()
         if id is not None:
             if permission_check.is_bot_admin(inter, False):
                 review = ReviewDB.get_review_by_id(id)
@@ -147,6 +147,7 @@ class Review(Base, commands.Cog):
 
     @reviews.sub_command(name="list", description=Messages.review_list_brief)
     async def author_list(self, inter: disnake.ApplicationCommandInteraction):
+        await inter.response.defer()
         embed = self.manager.authored_reviews(inter.author.id)
         await inter.send(embed=embed)
 
