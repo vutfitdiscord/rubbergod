@@ -3,6 +3,8 @@ Cog containing commands that get basic information from other sources.
 examples - urban meaning of word, weather at location
 """
 
+from typing import Dict, List
+
 import disnake
 import requests
 from disnake.ext import commands
@@ -19,7 +21,7 @@ class Info(Base, commands.Cog):
         super().__init__()
         self.bot = bot
 
-    def urban_embeds(self, author, dict):
+    def urban_embeds(self, author: disnake.User, dict: Dict) -> List[disnake.Embed]:
         """Generate embeds from dictionary of resposes"""
         embed_list = []
 
@@ -50,14 +52,16 @@ class Info(Base, commands.Cog):
 
         return embed_list
 
-    async def urban_pages(self, inter, embeds):
+    async def urban_pages(
+        self, inter: disnake.ApplicationCommandInteraction, embeds: List[disnake.Embed]
+    ) -> None:
         """Send message and handle pagination for 300 seconds"""
         view = EmbedView(inter.author, embeds)
         view.message = await inter.edit_original_response(embed=embeds[0], view=view)
 
     @cooldowns.short_cooldown
     @commands.slash_command(name="urban", description=Messages.urban_brief)
-    async def urban(self, inter: disnake.ApplicationCommandInteraction, expression):
+    async def urban(self, inter: disnake.ApplicationCommandInteraction, expression) -> None:
         """Finding expression and shorcuts in urban directory"""
 
         await inter.response.defer(with_message=True)
@@ -79,10 +83,9 @@ class Info(Base, commands.Cog):
             await self.urban_pages(inter, embeds)
         else:
             await inter.edit_original_response(Messages.urban_not_found)
-        return
 
     @commands.slash_command(name="pocasi", description=Messages.weather_brief)
-    async def weather(self, inter: disnake.ApplicationCommandInteraction, place: str = "Brno"):
+    async def weather(self, inter: disnake.ApplicationCommandInteraction, place: str = "Brno") -> None:
         await inter.response.defer()
         token = self.config.weather_token
 
@@ -91,26 +94,22 @@ class Info(Base, commands.Cog):
             await inter.edit_original_response("Takhle se žádné město určitě nejmenuje.")
             return
 
-        url = (
-            "http://api.openweathermap.org/data/2.5/weather?q="
-            + place
-            + "&units=metric&lang=cz&appid="
-            + token
-        )
+        url = f"http://api.openweathermap.org/data/2.5/weather?q={place}&units=metric&lang=cz&appid={token}"
+
         res = requests.get(url, timeout=10).json()
 
         if str(res["cod"]) == "200":
-            description = "Aktuální počasí v městě " + res["name"] + ", " + res["sys"]["country"]
+            description = f"Aktuální počasí v městě {res['name']}, {res['sys']['country']}"
             embed = disnake.Embed(title="Počasí", description=description)
-            image = "http://openweathermap.org/img/w/" + res["weather"][0]["icon"] + ".png"
+            image = f"http://openweathermap.org/img/w/{res['weather'][0]['icon']}.png"
             embed.set_thumbnail(url=image)
-            weather = res["weather"][0]["main"] + " ( " + res["weather"][0]["description"] + " ) "
-            temp = str(res["main"]["temp"]) + "°C"
-            feels_temp = str(res["main"]["feels_like"]) + "°C"
-            humidity = str(res["main"]["humidity"]) + "%"
-            wind = str(res["wind"]["speed"]) + "m/s"
-            clouds = str(res["clouds"]["all"]) + "%"
-            visibility = str(res["visibility"] / 1000) + " km" if "visibility" in res else "bez dat"
+            weather = f"{res['weather'][0]['main']} ({res['weather'][0]['description']})"
+            temp = f"{res['main']['temp']}°C"
+            feels_temp = f"{res['main']['feels_like']}°C"
+            humidity = f"{res['main']['humidity']}%"
+            wind = f"{res['wind']['speed']}m/s"
+            clouds = f"{res['clouds']['all']}%"
+            visibility = f"{res['visibility'] / 1000} km" if "visibility" in res else "bez dat"
             embed.add_field(name="Počasí", value=weather, inline=False)
             embed.add_field(name="Teplota", value=temp, inline=True)
             embed.add_field(name="Pocitová teplota", value=feels_temp, inline=True)
@@ -129,11 +128,11 @@ class Info(Base, commands.Cog):
             await inter.edit_original_response("Rip token -> Rebel pls fix")
         else:
             await inter.edit_original_response(
-                "Město nenalezeno! <:pepeGun:484470874246742018> (" + res["message"] + ")"
+                f"Město nenalezeno! <:pepeGun:484470874246742018> ({res['message']})"
             )
 
     @commands.slash_command(name="kreditovy_strop", description=Messages.credit_limit_brief)
-    async def kreditovy_strop(self, inter):
+    async def kreditovy_strop(self, inter: disnake.ApplicationCommandInteraction) -> None:
         """
         Prints annual credit limit criteria
         """

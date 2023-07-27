@@ -91,7 +91,7 @@ class ReportModal(disnake.ui.Modal):
 
     async def report_message(self, inter: disnake.ModalInteraction) -> None:
         """add message report to db and send it to the report room"""
-        report_reason = Messages.report_message_embed.format(
+        report_reason = Messages.report_message_embed(
             content=self.message.content,
             reason=inter.text_values['reason']
         )

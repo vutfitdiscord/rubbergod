@@ -141,7 +141,7 @@ class Warden(Base, commands.Cog):
             "Processed **{}** of **{}** messages ({:.1f} %)\n"
             "Computed **{}** hashes"
         )
-        msg = await ctx.send(title.format(len(messages)))
+        msg = await ctx.send(title(len(messages)))
 
         ctr_nofile = 0
         ctr_hashes = 0
@@ -151,7 +151,7 @@ class Warden(Base, commands.Cog):
             # update info on every 10th message
             if i % 50 == 0:
                 await msg.edit(
-                    content=template.format(i, len(messages), (i / len(messages) * 100), ctr_hashes)
+                    content=template(i, len(messages), (i / len(messages) * 100), ctr_hashes)
                 )
 
             if len(message.attachments) == 0:

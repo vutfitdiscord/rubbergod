@@ -38,7 +38,7 @@ class Nameday(Base, commands.Cog):
                 names = []
                 for i in res:
                     names.append(i["name"])
-                return Messages.name_day_cz.format(name=", ".join(names))
+                return Messages.name_day_cz(name=", ".join(names))
             except (asyncio.exceptions.TimeoutError, aiohttp.client_exceptions.ClientConnectorError):
                 return "Website unreachable"
 
@@ -51,7 +51,7 @@ class Nameday(Base, commands.Cog):
                 names = []
                 for i in res:
                     names.append(i["name"])
-                return Messages.name_day_sk.format(name=", ".join(names))
+                return Messages.name_day_sk(name=", ".join(names))
             except (asyncio.exceptions.TimeoutError, aiohttp.client_exceptions.ClientConnectorError):
                 return "Website unreachable"
 

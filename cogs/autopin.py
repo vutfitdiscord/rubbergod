@@ -150,7 +150,7 @@ class AutoPin(Base, commands.Cog):
 
         channel_mention = channel.mention if hasattr(channel, "mention") else "**DM s botem**"
         await inter.send(file=file)
-        await inter.edit_original_response(Messages.autopin_get_all_done.format(channel_name=channel_mention))
+        await inter.edit_original_response(Messages.autopin_get_all_done(channel_name=channel_mention))
 
     @commands.Cog.listener()
     async def on_guild_channel_pins_update(self, channel: disnake.TextChannel, _):

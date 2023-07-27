@@ -226,13 +226,13 @@ class Karma(BaseFeature):
             await self.grillbot_api.post_karma_store(members_update)
         if karma >= 0:
             await inter.send(
-                Messages.karma_give_success.format(
+                Messages.karma_give_success(
                     user=" ".join([member.mention for member in members]), karma=karma
                 )
             )
         else:
             await inter.send(
-                Messages.karma_give_negative_success.format(
+                Messages.karma_give_negative_success(
                     user=" ".join([member.mention for member in members]), karma=karma
                 )
             )
@@ -242,7 +242,7 @@ class Karma(BaseFeature):
     ) -> None:
         transfered, members_update = KarmaDB.transfer_karma(from_user.id, to_user.id)
         if transfered is None:
-            await inter.send(Messages.karma_transer_user_no_karma.format(user=from_user))
+            await inter.send(Messages.karma_transer_user_no_karma(user=from_user))
             return
 
         formated_message = Messages.karma_transfer_complete(

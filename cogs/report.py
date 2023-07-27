@@ -63,7 +63,7 @@ class Report(Base, commands.Cog):
     @_report_mod.sub_command(name="unban", description=Messages.report_unban_user_brief)
     async def report_unban_user(self, inter: disnake.ApplicationCommandInteraction, user: disnake.User):
         UserDB.unban_user(user.id)
-        await inter.send(Messages.report_unban_user.format(user=user.mention))
+        await inter.send(Messages.report_unban_user(user=user.mention))
 
 
 def setup(bot):

@@ -169,13 +169,13 @@ class Review(Base, commands.Cog):
             # bachelor
             url = f"{programme_details_link}program/{self.config.subject_bit_id}/.cs"
             if not self.manager.update_subject_types(url, False):
-                reply += Messages.subject_update_error.format(url=url)
+                reply += Messages.subject_update_error(url=url)
             # engineer
             ids_list = list(range(self.config.subject_mit_id_start, self.config.subject_mit_id_end))
             for id in ids_list + self.config.subject_mit_id_rnd:
                 url = f"{programme_details_link}field/{id}/.cs"
                 if not self.manager.update_subject_types(url, True):
-                    reply += Messages.subject_update_error.format(url=url)
+                    reply += Messages.subject_update_error(url=url)
             # sports
             self.manager.update_sport_subjects()
             subjects = SubjectDB.get_all()

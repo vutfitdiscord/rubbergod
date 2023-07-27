@@ -277,7 +277,7 @@ class PersistentCooldown:
                 )
             )
         elif (time_passed := now - current_cooldown.timestamp) < self.limit:
-            raise PCommandOnCooldown(Messages.cooldown.format((self.limit - time_passed) / 1000))
+            raise PCommandOnCooldown(Messages.cooldown((self.limit - time_passed) / 1000))
         else:
             current_cooldown.timestamp = now
         session.commit()

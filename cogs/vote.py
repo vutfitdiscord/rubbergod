@@ -128,7 +128,7 @@ class Vote(Base, commands.Cog):
             await ctx.send(Messages.vote_bad_format)
             return
         except VoteMessage.NotEmojiError as e:
-            await ctx.send(Messages.vote_not_emoji.format(opt=str(e)))
+            await ctx.send(Messages.vote_not_emoji(opt=str(e)))
             return
 
         if parsed_vote.end_date is not None and parsed_vote.end_date < datetime.now():

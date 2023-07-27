@@ -63,7 +63,7 @@ class IconSelect(disnake.ui.Select):
         user = inter.user
         if await can_assign(icon, user):
             await inter.edit_original_response(
-                Messages.icon_set_success.format(user=inter.user, icon=icon_name(icon)), view=None
+                Messages.icon_set_success(user=inter.user, icon=icon_name(icon)), view=None
             )
             await do_set_icon(icon, user)
         else:
