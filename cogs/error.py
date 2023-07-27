@@ -17,7 +17,6 @@ from disnake.ext import commands
 
 import utils
 from cogs.base import Base
-from config.app_config import config
 from config.messages import Messages
 from database import session
 from features.error import ErrorLogger
@@ -75,7 +74,7 @@ class Error(Base, commands.Cog):
             if invoked in slash_comms:
                 command_id = utils.get_command_id(self, invoked)
                 await ctx.reply(Messages.moved_command(name=invoked, id=command_id))
-            elif prefix not in config.ignored_prefixes:
+            elif prefix not in self.config.ignored_prefixes:
                 await ctx.send(Messages.no_such_command)
             return
 
@@ -108,7 +107,7 @@ class Error(Base, commands.Cog):
             ctx.message.jump_url
         )
 
-        channel = self.bot.get_channel(config.bot_dev_channel)
+        channel = self.bot.get_channel(self.config.bot_dev_channel)
         await channel.send(embed=embed)
 
         await self.logger.send_output(output, channel)
@@ -176,11 +175,11 @@ class Error(Base, commands.Cog):
             f"https://discord.com/channels/{inter.guild_id}/{inter.channel_id}/{inter.id}",
         )
 
-        channel = self.bot.get_channel(config.bot_dev_channel)
+        channel = self.bot.get_channel(self.config.bot_dev_channel)
 
         # send context of command with personal information to DM
         if inter.data.name == "diplom":
-            channel_ctx = self.bot.get_user(config.admin_ids[0])
+            channel_ctx = self.bot.get_user(self.config.admin_ids[0])
         else:
             channel_ctx = channel
         await channel_ctx.send(embed=embed)
@@ -233,7 +232,7 @@ class Error(Base, commands.Cog):
             f"https://discord.com/channels/{inter.guild_id}/{inter.channel_id}/{inter.id}",
         )
 
-        channel = self.bot.get_channel(config.bot_dev_channel)
+        channel = self.bot.get_channel(self.config.bot_dev_channel)
         await channel.send(embed=embed)
 
         output = "".join(traceback.format_exception(type(error), error, error.__traceback__))
@@ -277,7 +276,7 @@ class Error(Base, commands.Cog):
             f"https://discord.com/channels/{inter.guild_id}/{inter.channel_id}/{inter.id}",
         )
 
-        channel = self.bot.get_channel(config.bot_dev_channel)
+        channel = self.bot.get_channel(self.config.bot_dev_channel)
         await channel.send(embed=embed)
 
         output = "".join(traceback.format_exception(type(error), error, error.__traceback__))

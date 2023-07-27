@@ -11,7 +11,6 @@ import utils
 from buttons.embed import EmbedView
 from cogs.base import Base
 from config import cooldowns
-from config.app_config import config
 from config.messages import Messages
 
 
@@ -85,7 +84,7 @@ class Info(Base, commands.Cog):
     @commands.slash_command(name="pocasi", description=Messages.weather_brief)
     async def weather(self, inter: disnake.ApplicationCommandInteraction, place: str = "Brno"):
         await inter.response.defer()
-        token = config.weather_token
+        token = self.config.weather_token
 
         place = place[:100]
         if "&" in place:

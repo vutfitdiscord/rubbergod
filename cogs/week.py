@@ -10,7 +10,6 @@ from disnake.ext import commands
 import utils
 from cogs.base import Base
 from config import cooldowns
-from config.app_config import config
 from config.messages import Messages
 
 
@@ -24,7 +23,7 @@ class Week(Base, commands.Cog):
     async def week(self, inter: disnake.ApplicationCommandInteraction):
         """See if the current week is odd or even"""
         cal_week = date.today().isocalendar()[1]
-        stud_week = (cal_week - config.starting_week) % 52
+        stud_week = (cal_week - self.config.starting_week) % 52
         even, odd = "sudý", "lichý"
         cal_type = even if cal_week % 2 == 0 else odd
 

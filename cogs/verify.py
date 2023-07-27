@@ -7,7 +7,6 @@ from disnake.ext import commands
 
 from cogs.base import Base
 from config import cooldowns
-from config.app_config import config
 from config.messages import Messages
 from features import verification
 from features.dynamic_verify import DynamicVerifyManager
@@ -28,7 +27,7 @@ class Verify(Base, commands.Cog):
         self.dynamic_verify_manager = DynamicVerifyManager(bot)
 
     def is_valid_guild(ctx: disnake.ApplicationCommandInteraction) -> bool:
-        return ctx.guild_id is None or ctx.guild_id == config.guild_id
+        return ctx.guild_id is None or ctx.guild_id == Base.config.guild_id
 
     @cooldowns.default_cooldown
     @commands.check(is_valid_guild)
@@ -52,7 +51,7 @@ class Verify(Base, commands.Cog):
             return True
 
     @commands.check(room_check.is_in_modroom)
-    @commands.slash_command(name="dynamic_verify", guild_ids=[config.guild_id])
+    @commands.slash_command(name="dynamic_verify", guild_ids=[Base.config.guild_id])
     async def dynamic_verify(self, inter: disnake.ApplicationCommandInteraction):
         """This method is only group for another commands. This function does nothing."""
         pass
@@ -97,11 +96,11 @@ class Verify(Base, commands.Cog):
         await inter.response.send_message(Messages.dynamic_verify_remove_success)
 
     @commands.check(permission_check.submod_plus)
-    @commands.user_command(name="Verify host", guild_ids=[config.guild_id])
+    @commands.user_command(name="Verify host", guild_ids=[Base.config.guild_id])
     async def verify_host(self, inter: disnake.UserCommandInteraction, member: disnake.Member):
         """add verify and host role to new member"""
-        host_id = inter.guild.get_role(config.verification_host_id)
-        verify_id = inter.guild.get_role(config.verification_role_id)
+        host_id = inter.guild.get_role(self.config.verification_host_id)
+        verify_id = inter.guild.get_role(self.config.verification_role_id)
 
         # check if user is still on server
         try:

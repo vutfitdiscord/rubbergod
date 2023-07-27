@@ -11,7 +11,6 @@ from disnake.ext import commands
 import utils
 from cogs.base import Base
 from config import cooldowns
-from config.app_config import config
 from config.messages import Messages
 from database.pin_map import PinMapDB
 from features.autopin import AutopinFeatures, pin_channel_type
@@ -22,7 +21,7 @@ class AutoPin(Base, commands.Cog):
     def __init__(self, bot):
         super().__init__()
         self.warning_time = datetime.datetime.utcnow() - datetime.timedelta(
-            minutes=config.autopin_warning_cooldown
+            minutes=self.config.autopin_warning_cooldown
         )
         self.bot = bot
         self.check = room_check.RoomCheck(bot)
@@ -200,22 +199,23 @@ class AutoPin(Base, commands.Cog):
         """
         message = ctx.message
         channel = ctx.channel
-        if ctx.emoji == "📌" and ctx.member.id in config.autopin_banned_users:
+        if ctx.emoji == "📌" and ctx.member.id in self.config.autopin_banned_users:
             await message.remove_reaction("📌", ctx.member)
             return
         for reaction in message.reactions:
             if (
                 reaction.emoji == "📌"
-                and reaction.count >= config.autopin_count
+                and reaction.count >= self.config.autopin_count
                 and not message.pinned
                 and not message.is_system()
-                and message.channel.id not in config.autopin_banned_channels
+                and message.channel.id not in self.config.autopin_banned_channels
             ):
                 # prevent spamming max_pins_error message in channel
                 pin_count = await channel.pins()
                 if len(pin_count) == 50:
                     now = datetime.datetime.utcnow()
-                    if self.warning_time + datetime.timedelta(minutes=config.autopin_warning_cooldown) < now:
+                    cooldown = datetime.timedelta(minutes=self.config.autopin_warning_cooldown)
+                    if self.warning_time + cooldown < now:
                         await channel.send(
                             f"{ctx.member.mention} {Messages.autopin_max_pins_error}\n{ctx.message.jump_url}"
                         )
@@ -241,7 +241,7 @@ class AutoPin(Base, commands.Cog):
             inline=False
         )
         embed.timestamp = datetime.datetime.now(tz=datetime.timezone.utc)
-        channel = self.bot.get_channel(config.log_channel)
+        channel = self.bot.get_channel(self.config.log_channel)
         await channel.send(embed=embed)
 
 

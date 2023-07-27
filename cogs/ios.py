@@ -12,7 +12,6 @@ from disnake.ext import commands, tasks
 import utils
 from cogs.base import Base
 from config import cooldowns
-from config.app_config import config
 from config.messages import Messages
 from database import session
 from database.verification import PermitDB, ValidPersonDB
@@ -241,12 +240,12 @@ class IOS(Base, commands.Cog):
 
     @cooldowns.default_cooldown
     @commands.check(permission_check.helper_plus)
-    @commands.slash_command(name="ios", description=Messages.ios_brief, guild_ids=[config.guild_id])
+    @commands.slash_command(name="ios", description=Messages.ios_brief, guild_ids=[Base.config.guild_id])
     async def ios(self, inter: disnake.ApplicationCommandInteraction):
         await inter.response.defer()
         await self.ios_task(inter)
 
-    @commands.slash_command(name="ios_task", guild_ids=[config.guild_id])
+    @commands.slash_command(name="ios_task", guild_ids=[Base.config.guild_id])
     async def _ios(self, inter):
         pass
 
@@ -277,10 +276,10 @@ class IOS(Base, commands.Cog):
         else:
             await inter.send(Messages.ios_task_stop_nothing_to_stop)
 
-    @tasks.loop(minutes=config.ios_looptime_minutes)
+    @tasks.loop(minutes=Base.config.ios_looptime_minutes)
     async def ios_task(self, inter: disnake.ApplicationCommandInteraction = None):
         # Respond to interaction if any, else print everything to #ios
-        channel = inter.channel if inter is not None else self.bot.get_channel(config.ios_channel_id)
+        channel = inter.channel if inter is not None else self.bot.get_channel(self.config.ios_channel_id)
         if inter is not None:
             await inter.edit_original_response(Messages.ios_howto_clean)
         else:

@@ -17,7 +17,6 @@ import utils
 from buttons.embed import EmbedView
 from cogs.base import Base
 from config import cooldowns
-from config.app_config import config
 from config.messages import Messages
 from database.review import SubjectDB
 from database.streamlinks import StreamLinkDB
@@ -232,7 +231,7 @@ class StreamLinks(Base, commands.Cog):
 
         utils.add_author_footer(embed, inter.author)
         embed.timestamp = datetime.utcnow()
-        channel = self.bot.get_channel(config.log_channel)
+        channel = self.bot.get_channel(self.config.log_channel)
         await channel.send(embed=embed)
         await inter.edit_original_response(content=Messages.streamlinks_update_success)
 
@@ -267,7 +266,7 @@ class StreamLinks(Base, commands.Cog):
         embed.add_field(name="Popis", value=stream.description[:1024])
         embed.add_field(name="Odkaz", value=f"[link]({stream.link})", inline=False)
         embed.timestamp = datetime.utcnow()
-        channel = self.bot.get_channel(config.log_channel)
+        channel = self.bot.get_channel(self.config.log_channel)
         await channel.send(embed=embed)
 
     async def get_user_string(self, user):
