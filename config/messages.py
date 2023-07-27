@@ -356,6 +356,7 @@ if ("Mám průměr pod 2.0")                                           \n  retur
     uptime_brief = "Vypíše čas spuštění a čas uplynulý od spuštění"
     uptime_title = "Uptime"
     upsince_title = "Up since"
+    longest_streak = "Longest streak without error"
 
     cogs_brief = "Vypíše seznam všech cogs a jejich stav"
     cog_is_loaded = "Toto rozšíření `{cog}` je již načtené."

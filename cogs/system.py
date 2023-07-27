@@ -15,6 +15,7 @@ from cogs.base import Base
 from config import cooldowns
 from config.app_config import config
 from config.messages import Messages
+from database.error import ErrorLogDB
 from features.error import ErrorLogger
 from features.git import Git
 from permissions import permission_check
@@ -102,8 +103,14 @@ class System(Base, commands.Cog):
             description=f"{count} days without an accident.",
             color=0xeee657,
         )
+        start_streak, end_streak = ErrorLogDB.get_longest_streak()
         embed.add_field(name=Messages.upsince_title, value=str(boottime))
         embed.add_field(name=Messages.uptime_title, value=str(delta))
+        embed.add_field(
+            name=Messages.longest_streak,
+            value=f"**{(end_streak - start_streak).days} day(s)**\n{start_streak} — {end_streak}",
+            inline=False
+        )
         self.error_log.set_image(embed, self.bot.user, count)
         await inter.send(embed=embed)
 
