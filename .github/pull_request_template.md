@@ -36,5 +36,6 @@ And when we merge the pull request, Github will automatically close the issue.
 - [ ] Update packages, libraries, etc.
 - [ ] Change config
 - [ ] Restart bot
+- [ ] Reload cog(s) [name(s)]
 
 ## [optional] If there are UI changes, please paste screenshot(s)
