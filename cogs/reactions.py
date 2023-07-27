@@ -7,7 +7,6 @@ import sqlalchemy
 from disnake.ext import commands
 
 from cogs.base import Base
-from config.app_config import config
 from database import session
 from features.reaction_context import ReactionContext
 from utils import is_command_message
@@ -46,19 +45,19 @@ class Reactions(Base, commands.Cog):
 
         if ctx.emoji == "📌":
             cogs.append(self.bot.get_cog("AutoPin"))
-        if ctx.channel.id not in config.role_channels:
+        if ctx.channel.id not in self.config.role_channels:
             cogs.append(self.bot.get_cog("Karma"))
         else:
             cogs.append(self.bot.get_cog("Roles"))
         if (
             ctx.emoji == "❎"
-            and payload.channel_id in config.deduplication_channels
+            and payload.channel_id in self.config.deduplication_channels
             and not payload.member.bot
             and ctx.message.author.bot
         ):
             cogs.append(self.bot.get_cog("Warden"))
 
-        if (ctx.channel.id == config.meme_room or ctx.channel.id == config.meme_repost_room) and \
+        if (ctx.channel.id == self.config.meme_room or ctx.channel.id == self.config.meme_repost_room) and \
                 ctx.message.author.id != ctx.member.id:
             cogs.append(self.bot.get_cog("MemeRepost"))
 

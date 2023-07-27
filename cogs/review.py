@@ -13,7 +13,6 @@ from buttons.embed import EmbedView
 from buttons.review import ReviewView
 from cogs.base import Base
 from config import cooldowns
-from config.app_config import config
 from config.messages import Messages
 from database.review import ProgrammeDB, ReviewDB, SubjectDB, SubjectDetailsDB
 from features.review import ReviewManager
@@ -52,7 +51,7 @@ class Review(Base, commands.Cog):
 
     async def check_member(self, inter: disnake.ApplicationCommandInteraction):
         """Check if user is allowed to add/remove new review."""
-        guild = inter.bot.get_guild(config.guild_id)
+        guild = inter.bot.get_guild(self.config.guild_id)
         member = guild.get_member(inter.author.id)
         if member is None:
             await inter.send(Messages.review_not_on_server(user=inter.author.mention))
@@ -60,9 +59,9 @@ class Review(Base, commands.Cog):
         roles = member.roles
         verify = False
         for role in roles:
-            if config.verification_role_id == role.id:
+            if self.config.verification_role_id == role.id:
                 verify = True
-            if role.id in config.review_forbidden_roles:
+            if role.id in self.config.review_forbidden_roles:
                 await inter.send(Messages.review_add_denied(user=inter.author.id))
                 return False
         if not verify:
@@ -168,12 +167,12 @@ class Review(Base, commands.Cog):
         reply = ""
         async with ctx.channel.typing():
             # bachelor
-            url = f"{programme_details_link}program/{config.subject_bit_id}/.cs"
+            url = f"{programme_details_link}program/{self.config.subject_bit_id}/.cs"
             if not self.manager.update_subject_types(url, False):
                 reply += Messages.subject_update_error.format(url=url)
             # engineer
-            ids_list = list(range(config.subject_mit_id_start, config.subject_mit_id_end))
-            for id in ids_list + config.subject_mit_id_rnd:
+            ids_list = list(range(self.config.subject_mit_id_start, self.config.subject_mit_id_end))
+            for id in ids_list + self.config.subject_mit_id_rnd:
                 url = f"{programme_details_link}field/{id}/.cs"
                 if not self.manager.update_subject_types(url, True):
                     reply += Messages.subject_update_error.format(url=url)
@@ -255,7 +254,7 @@ class Review(Base, commands.Cog):
 
         author = inter.author
         if not inter.guild:  # DM
-            guild = self.bot.get_guild(config.guild_id)
+            guild = self.bot.get_guild(self.config.guild_id)
             author = guild.get_member(author.id)
         if not year:
             for role in author.roles:

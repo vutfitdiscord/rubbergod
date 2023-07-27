@@ -8,7 +8,6 @@ from disnake.ext import commands
 import utils
 from buttons.icon import IconView
 from cogs.base import Base
-from config.app_config import config
 from config.messages import Messages
 
 
@@ -19,16 +18,16 @@ def remove_prefix(text, prefix):
 
 
 def icon_name(icon: disnake.Role):
-    return remove_prefix(icon.name, config.icon_role_prefix)
+    return remove_prefix(icon.name, Base.config.icon_role_prefix)
 
 
 def get_icon_roles(guild: disnake.Guild):
-    return [role for role in guild.roles if role.id in config.icon_roles]
+    return [role for role in guild.roles if role.id in Base.config.icon_roles]
 
 
 async def can_assign(icon: disnake.Role, user: disnake.Member):
     """Whether a given user can have a given icon"""
-    rules = config.icon_rules[icon.id]
+    rules = Base.config.icon_rules[icon.id]
     user_roles = {role.id for role in user.roles}
     allow = rules.get("allow")
     deny = rules.get("deny", [])
@@ -89,8 +88,8 @@ class Icons(Base, commands.Cog):
         super().__init__()
         self.bot = bot
 
-    @utils.PersistentCooldown(command_name="icon", limit=config.icon_ui_cooldown)
-    @commands.slash_command(description=Messages.icon_ui, guild_ids=[config.guild_id])
+    @utils.PersistentCooldown(command_name="icon", limit=Base.config.icon_ui_cooldown)
+    @commands.slash_command(description=Messages.icon_ui, guild_ids=[Base.config.guild_id])
     async def icon(self, inter: disnake.ApplicationCommandInteraction):
         await inter.response.defer(ephemeral=True)
         icon_roles = get_icon_roles(inter.guild)

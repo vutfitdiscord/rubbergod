@@ -10,7 +10,6 @@ from disnake.ext import commands
 
 import utils
 from cogs.base import Base
-from config.app_config import config
 # TODO: use messages for prints
 from config.messages import Messages
 from database.review import SubjectDetailsDB
@@ -41,7 +40,7 @@ class Roles(Base, commands.Cog):
                 out = [out[1], out[0]]
                 output.append(out)
             except Exception:
-                if message.channel.id not in config.role_channels:
+                if message.channel.id not in self.config.role_channels:
                     msg = Messages.role_invalid_line(user=message.author.id,
                                                      line=disnake.utils.escape_mentions(line))
                     await message.channel.send(msg)
@@ -54,7 +53,7 @@ class Roles(Base, commands.Cog):
                 try:
                     line[0] = int(line[0])
                 except Exception:
-                    if message.channel.id not in config.role_channels:
+                    if message.channel.id not in self.config.role_channels:
                         msg = Messages.role_invalid_line(
                             user=message.author.id,
                             line=disnake.utils.escape_mentions(line[0]),
@@ -66,7 +65,7 @@ class Roles(Base, commands.Cog):
     async def message_role_reactions(self, message, data):
         if message.channel.type is not disnake.ChannelType.text:
             await message.channel.send(Messages.role_not_on_server)
-            guild = self.bot.get_guild(config.guild_id)
+            guild = self.bot.get_guild(self.config.guild_id)
         else:
             guild = message.guild
         for line in data:
@@ -138,8 +137,8 @@ class Roles(Base, commands.Cog):
         default_perm.view_channel = True
         total_overwrites = len(channel.overwrites)
         rate = 50
-        guild = self.bot.get_guild(config.guild_id)
-        bot_dev = guild.get_channel(config.bot_dev_channel)
+        guild = self.bot.get_guild(self.config.guild_id)
+        bot_dev = guild.get_channel(self.config.bot_dev_channel)
         role = await guild.create_role(name=channel.name)
         message = await bot_dev.send(Messages.role_create_start(role=role.name))
         for idx, item in enumerate(channel.overwrites):
@@ -252,10 +251,10 @@ class Roles(Base, commands.Cog):
         return [role], [channel]
 
     @commands.check(permission_check.mod_plus)
-    @commands.slash_command(name="do_da_thing", description='hodi prdeli', guild_ids=[config.guild_id])
+    @commands.slash_command(name="do_da_thing", description='hodi prdeli', guild_ids=[Base.config.guild_id])
     async def do_da_thing(self, inter: disnake.ApplicationCommandInteraction):
-        guild = self.bot.get_guild(config.guild_id)
-        logChan = self.bot.get_channel(config.log_channel)
+        guild = self.bot.get_guild(self.config.guild_id)
+        logChan = self.bot.get_channel(self.config.log_channel)
         for channel in guild.channels:
             if channel.type == disnake.ChannelType.text:
                 boolik = '-' in channel.name
@@ -270,7 +269,7 @@ class Roles(Base, commands.Cog):
                         await channel.edit(topic=sub.name if not boolik else newName)
 
     @commands.check(permission_check.mod_plus)
-    @commands.slash_command(name="group", guild_ids=[config.guild_id])
+    @commands.slash_command(name="group", guild_ids=[Base.config.guild_id])
     async def group(self, inter):
         pass
 
@@ -324,7 +323,7 @@ class Roles(Base, commands.Cog):
         await inter.send("Done")
 
     @commands.check(permission_check.mod_plus)
-    @commands.slash_command(name="channel", guild_ids=[config.guild_id])
+    @commands.slash_command(name="channel", guild_ids=[Base.config.guild_id])
     async def channel(self, inter):
         pass
 
@@ -382,7 +381,7 @@ class Roles(Base, commands.Cog):
         if message.author.bot:
             return
 
-        if message.channel.id in config.role_channels:
+        if message.channel.id in self.config.role_channels:
             role_data = await self.get_join_role_data(message)
             await self.message_role_reactions(message, role_data)
 
@@ -401,7 +400,7 @@ class Roles(Base, commands.Cog):
         if ctx is None:
             return
 
-        if ctx.channel.id in config.role_channels:
+        if ctx.channel.id in self.config.role_channels:
             role_data = await self.get_join_role_data(ctx.message)
             for line in role_data:
                 if str(ctx.emoji) == line[1]:

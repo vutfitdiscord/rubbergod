@@ -12,7 +12,6 @@ import utils
 from buttons.embed import EmbedView
 from cogs.base import Base
 from config import cooldowns
-from config.app_config import config
 from config.messages import Messages
 from features.git import Git
 
@@ -36,7 +35,7 @@ class Help(Base, commands.Cog):
     def command_help(self, ctx: commands.Context, command: commands.Command):
         """Generate help for commands and subcommands"""
         current_page = list()
-        prefix = config.default_prefix
+        prefix = self.config.default_prefix
         if type(command) == commands.Group:
             # group command without invoked subcommand is separate command
             # e.g. karma, reviews
@@ -112,7 +111,7 @@ class Help(Base, commands.Cog):
         ctx = commands.Context(
             bot=self.bot,
             view=mock_view,
-            prefix=config.default_prefix,
+            prefix=self.config.default_prefix,
             message=mock_message,
         )
         if "command" in params and params["command"] is not None:
@@ -156,9 +155,9 @@ class Help(Base, commands.Cog):
                     if command_obj.usage is not None:
                         subcommands.append(command_obj.usage.replace('[', '').replace(']', ''))
                     subcommands += [subcommand.name for subcommand in command_obj.commands]
-                    text = f"`{config.default_prefix}{command_obj.name} [{', '.join(subcommands)}]`"
+                    text = f"`{self.config.default_prefix}{command_obj.name} [{', '.join(subcommands)}]`"
                 else:
-                    text = f"`{config.default_prefix}{command_obj} {command_obj.signature}`"
+                    text = f"`{self.config.default_prefix}{command_obj} {command_obj.signature}`"
                 if command_obj.description:
                     text += f"\n{command_obj.description}"
                 elif command_obj.brief:

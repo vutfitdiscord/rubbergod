@@ -11,7 +11,6 @@ from sqlalchemy.orm.exc import MultipleResultsFound, NoResultFound
 import utils
 from cogs.base import Base
 from config import cooldowns
-from config.app_config import config
 from database import session
 from database.verification import PermitDB, ValidPersonDB
 from features import verification
@@ -37,7 +36,7 @@ class FitWide(Base, commands.Cog):
         p_zapis: bool = False,
         p_debug: bool = True,
     ):
-        guild = self.bot.get_guild(config.guild_id)
+        guild = self.bot.get_guild(self.config.guild_id)
         members = guild.members
 
         verify = disnake.utils.get(guild.roles, name="Verify")

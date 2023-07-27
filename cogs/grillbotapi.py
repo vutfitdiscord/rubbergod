@@ -11,7 +11,6 @@ import disnake
 from disnake.ext import commands
 
 from cogs.base import Base
-from config.app_config import config
 
 
 class GrillbotApi(Base, commands.Cog):
@@ -28,10 +27,10 @@ class GrillbotApi(Base, commands.Cog):
 
     async def post_karma_store(self, karma_objects):
         """send karma objects to grillbot api"""
-        headers = {"ApiKey": config.grillbot_api_key, "Author": await self.owner_id()}
+        headers = {"ApiKey": self.config.grillbot_api_key, "Author": await self.owner_id()}
         async with aiohttp.ClientSession(timeout=aiohttp.ClientTimeout(total=10), headers=headers) as session:
             try:
-                url = f"{config.grillbot_api_url}/user/karma/store"
+                url = f"{self.config.grillbot_api_url}/user/karma/store"
                 data = [{
                         "member_ID": data.member_ID,
                         "karmaValue": data.karma,
@@ -46,7 +45,7 @@ class GrillbotApi(Base, commands.Cog):
     @commands.Cog.listener()
     async def on_message(self, message: disnake.Message):
         """Api point for grillbot"""
-        if message.author.id not in config.grillbot_ids:
+        if message.author.id not in self.config.grillbot_ids:
             return
 
         lines = message.content.split('\n')
@@ -55,7 +54,7 @@ class GrillbotApi(Base, commands.Cog):
         lines = lines[1:-1]
         content = '\n'.join(lines)
         request = json.loads(content)
-        if "method" not in request or request["method"] not in config.grillbot_api_supported_methods:
+        if "method" not in request or request["method"] not in self.config.grillbot_api_supported_methods:
             await message.reply("Unsupported method")
             return
         params = request["parameters"]

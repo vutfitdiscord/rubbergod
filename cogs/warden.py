@@ -14,7 +14,6 @@ from PIL import Image
 
 import utils
 from cogs.base import Base
-from config.app_config import config
 from config.messages import Messages
 from database.image import ImageDB
 from permissions import permission_check
@@ -37,7 +36,7 @@ class Warden(Base, commands.Cog):
 
     def doCheckRepost(self, message: disnake.Message):
         return (
-            message.channel.id in config.deduplication_channels
+            message.channel.id in self.config.deduplication_channels
             and message.attachments is not None
             and len(message.attachments) > 0
             and not message.author.bot
@@ -69,12 +68,12 @@ class Warden(Base, commands.Cog):
         """Delete duplicate embed if original is not a duplicate"""
         message = ctx.message
 
-        if ctx.member.id in config.repost_ignore_users:
+        if ctx.member.id in self.config.repost_ignore_users:
             await message.remove_reaction("❎", ctx.member)
             return
 
         for react in message.reactions:
-            if react.emoji == "❎" and react.count >= config.duplicate_limit:
+            if react.emoji == "❎" and react.count >= self.config.duplicate_limit:
                 try:
                     orig = message.embeds[0].footer.text
                     orig = await message.channel.fetch_message(int(orig))
@@ -220,7 +219,7 @@ class Warden(Base, commands.Cog):
         prob = "{:.1f} %".format((1 - hamming / 128) * 100)
         timestamp = utils.id_to_datetime(original.attachment_id).strftime("%Y-%m-%d %H:%M:%S")
 
-        src_chan = self.bot.get_guild(config.guild_id).get_channel(original.channel_id)
+        src_chan = self.bot.get_guild(self.config.guild_id).get_channel(original.channel_id)
         try:
             src_post = await src_chan.fetch_message(original.message_id)
             link = src_post.jump_url
@@ -235,7 +234,7 @@ class Warden(Base, commands.Cog):
 
         embed.add_field(
             name=Messages.repost_title,
-            value="_" + Messages.repost_content(limit=config.duplicate_limit) + "_",
+            value="_" + Messages.repost_content(limit=self.config.duplicate_limit) + "_",
         )
         embed.set_footer(text=message.id)
         send = await message.channel.send(embed=embed)

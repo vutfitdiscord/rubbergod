@@ -11,7 +11,6 @@ from disnake.ext import commands
 from lxml import etree
 
 from cogs.base import Base
-from config.app_config import config
 from config.messages import Messages
 from database.verification import ValidPersonDB
 
@@ -184,12 +183,12 @@ class Absolvent(Base, commands.Cog):
             await inter.edit_original_response(Messages.absolvent_diploma_error)
             return
 
-        guild = self.bot.get_guild(config.guild_id)
+        guild = self.bot.get_guild(self.config.guild_id)
         role = None
         if degree == "Bc.":
-            role = disnake.utils.get(guild.roles, id=config.bc_role_id)
+            role = disnake.utils.get(guild.roles, id=self.config.bc_role_id)
         if degree == "Ing.":
-            role = disnake.utils.get(guild.roles, id=config.ing_role_id)
+            role = disnake.utils.get(guild.roles, id=self.config.ing_role_id)
         if role:
             member = guild.get_member(inter.author.id)
             for drop_role in member.roles:

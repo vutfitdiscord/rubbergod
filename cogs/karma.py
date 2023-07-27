@@ -12,7 +12,6 @@ from buttons.embed import EmbedView
 from cogs.base import Base
 from cogs.grillbotapi import GrillbotApi
 from config import cooldowns
-from config.app_config import config
 from config.messages import Messages
 from database.karma import KarmaDB
 from features import karma
@@ -65,10 +64,10 @@ class Karma(Base, commands.Cog):
         # handle karma
         elif (
             ctx.member.id != ctx.message.author.id
-            and ctx.guild.id == config.guild_id
-            and ctx.message.channel.id not in config.karma_banned_channels
-            and ctx.message.channel.id != config.meme_repost_room
-            and config.karma_ban_role_id not in map(lambda x: x.id, ctx.member.roles)
+            and ctx.guild.id == self.config.guild_id
+            and ctx.message.channel.id not in self.config.karma_banned_channels
+            and ctx.message.channel.id != self.config.meme_repost_room
+            and self.config.karma_ban_role_id not in map(lambda x: x.id, ctx.member.roles)
         ):
             emoji = utils.str_emoji_id(ctx.emoji)
             members_update = KarmaDB.karma_emoji(ctx.message.author.id, ctx.member.id, emoji)
@@ -83,10 +82,10 @@ class Karma(Base, commands.Cog):
 
         if (
             ctx.member.id != ctx.message.author.id
-            and ctx.guild.id == config.guild_id
-            and ctx.message.channel.id not in config.karma_banned_channels
-            and ctx.message.channel.id != config.meme_repost_room
-            and config.karma_ban_role_id not in map(lambda x: x.id, ctx.member.roles)
+            and ctx.guild.id == self.config.guild_id
+            and ctx.message.channel.id not in self.config.karma_banned_channels
+            and ctx.message.channel.id != self.config.meme_repost_room
+            and self.config.karma_ban_role_id not in map(lambda x: x.id, ctx.member.roles)
         ):
             emoji = utils.str_emoji_id(ctx.emoji)
             members_update = KarmaDB.karma_emoji_remove(ctx.message.author.id, ctx.member.id, emoji)
@@ -94,7 +93,7 @@ class Karma(Base, commands.Cog):
                 await self.grillbot_api.post_karma_store(members_update)
 
     @cooldowns.default_cooldown
-    @commands.slash_command(name="karma", guild_ids=[config.guild_id])
+    @commands.slash_command(name="karma", guild_ids=[Base.config.guild_id])
     async def _karma(self, inter):
         pass
 
@@ -137,7 +136,7 @@ class Karma(Base, commands.Cog):
         )
 
     @cooldowns.long_cooldown
-    @commands.message_command(name="Karma zprávy", guild_ids=[config.guild_id])
+    @commands.message_command(name="Karma zprávy", guild_ids=[Base.config.guild_id])
     async def message_app(self, inter: disnake.MessageCommandInteraction, message: disnake.Message):
         await self._message(inter, message, ephemeral=self.check.botroom_check(inter))
 
@@ -181,7 +180,7 @@ class Karma(Base, commands.Cog):
             emote = "coolStoryBob"
 
         embed = disnake.Embed()
-        value_num = math.ceil(start / config.karma_grillbot_leaderboard_size)
+        value_num = math.ceil(start / self.config.karma_grillbot_leaderboard_size)
         value = Messages.karma_web if value_num == 1 else f"{Messages.karma_web}{value_num}"
         embed.add_field(name=Messages.karma_web_title, value=value)
         page_source = LeaderboardPageSource(
@@ -286,7 +285,7 @@ class Karma(Base, commands.Cog):
     @cooldowns.default_cooldown
     @commands.guild_only()
     async def karma(self, ctx: commands.Context):
-        if not (config.guild_id == ctx.guild.id):
+        if not (self.config.guild_id == ctx.guild.id):
             await ctx.reply(Messages.server_warning)
             return
         command_id = utils.get_command_id(self, "karma")
@@ -296,7 +295,7 @@ class Karma(Base, commands.Cog):
     @vote.error
     async def karma_error(self, inter: disnake.ApplicationCommandInteraction, error):
         if isinstance(error, commands.CheckFailure):
-            vote_room = self.bot.get_channel(config.vote_room)
+            vote_room = self.bot.get_channel(self.config.vote_room)
             await inter.send(Messages.vote_room_only.format(room=vote_room.mention))
             return True
 

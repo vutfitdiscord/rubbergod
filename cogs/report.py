@@ -7,7 +7,6 @@ from disnake.ext import commands
 
 from cogs.base import Base
 from config import cooldowns
-from config.app_config import config
 from config.messages import Messages
 from database.report import UserDB
 from modals.report import ReportModal
@@ -20,7 +19,7 @@ class Report(Base, commands.Cog):
         self.bot = bot
 
     @cooldowns.default_cooldown
-    @commands.message_command(name="Report message", guild_ids=[config.guild_id])
+    @commands.message_command(name="Report message", guild_ids=[Base.config.guild_id])
     async def app_report_message(self, inter: disnake.MessageCommandInteraction, message: disnake.Message):
         if UserDB.is_banned(inter.author.id):
             await inter.send(Messages.report_banned, ephemeral=True)
@@ -28,7 +27,9 @@ class Report(Base, commands.Cog):
         await inter.response.send_modal(modal=ReportModal(self.bot, "Message report", message))
 
     @cooldowns.default_cooldown
-    @commands.slash_command(name="report", description=Messages.report_brief, guild_ids=[config.guild_id])
+    @commands.slash_command(
+        name="report", description=Messages.report_brief, guild_ids=[Base.config.guild_id]
+    )
     async def _report(self, inter: disnake.ApplicationCommandInteraction):
         if UserDB.is_banned(inter.author.id):
             await inter.send(Messages.report_banned, ephemeral=True)

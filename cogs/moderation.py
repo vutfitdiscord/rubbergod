@@ -12,7 +12,6 @@ from disnake.ext import commands
 import utils
 from buttons.moderation import ModerationView
 from cogs.base import Base
-from config.app_config import config
 from config.messages import Messages
 from permissions import permission_check
 
@@ -83,11 +82,14 @@ class Moderation(Base, commands.Cog):
     async def on_message(self, message: disnake.Message):
         """Logs use of @mod, @submod and @helper tag and send message to designated room"""
 
-        if f"<@&{config.mod_role}>" in message.content:
-            await self.mod_tag(message, "@mod", self.bot.get_channel(config.mod_room))
+        for role in message.role_mentions:
+            if role.id == self.config.mod_role:
+                await self.mod_tag(message, "@mod", self.mod_room)
+                return
 
-        elif f"<@&{config.submod_role}>" in message.content or f"<@&{config.helper_role}>" in message.content:
-            await self.mod_tag(message, "@submod/@helper", self.bot.get_channel(config.submod_helper_room))
+            elif role.id in [self.config.submod_role, self.config.helper_role]:
+                await self.mod_tag(message, "@submod/@helper", self.submod_helper_room)
+                return
 
     @commands.Cog.listener()
     async def on_button_click(self, inter: disnake.MessageInteraction):
@@ -184,7 +186,7 @@ class Moderation(Base, commands.Cog):
             value=f"{curr_delay} seconds"
         )
         embed.timestamp = datetime.now(tz=timezone.utc)
-        channel = self.bot.get_channel(config.log_channel)
+        channel = self.bot.get_channel(self.config.log_channel)
         await channel.send(embed=embed)
 
 

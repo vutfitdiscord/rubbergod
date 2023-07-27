@@ -13,7 +13,6 @@ import utils
 from buttons.system import Dropdown, SystemView
 from cogs.base import Base
 from config import cooldowns
-from config.app_config import config
 from config.messages import Messages
 from database.error import ErrorLogDB
 from features.error import ErrorLogger
@@ -73,7 +72,7 @@ class System(Base, commands.Cog):
         return all_selects
 
     @commands.check(permission_check.is_bot_admin)
-    @commands.slash_command(name="cogs", description=Messages.cogs_brief, guild_ids=[config.guild_id])
+    @commands.slash_command(name="cogs", description=Messages.cogs_brief, guild_ids=[Base.config.guild_id])
     async def cogs(self, inter: disnake.ApplicationCommandInteraction):
         """
         Creates embed with button and select(s) to load/unload/reload cogs.

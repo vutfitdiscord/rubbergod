@@ -9,7 +9,6 @@ import utils
 from buttons.embed import EmbedView
 from cogs.base import Base
 from config import cooldowns
-from config.app_config import config
 from config.messages import Messages
 from database.hugs import HugsTableDB
 from features.leaderboard import LeaderboardPageSource
@@ -29,7 +28,7 @@ class Hugs(Base, commands.Cog):
     Hugging commands.
     """
 
-    emoji_count = len(config.hug_emojis)
+    emoji_count = len(Base.config.hug_emojis)
 
     def __init__(self, bot):
         super().__init__()
@@ -148,7 +147,7 @@ class Hugs(Base, commands.Cog):
         stats = self.hugs_db.get_members_stats(user.id)
         positions = self.hugs_db.get_member_position(stats)
         avg_position = int((positions[0] + positions[1]) // 2)
-        guild = self.bot.get_guild(config.guild_id)
+        guild = self.bot.get_guild(self.config.guild_id)
 
         embed = disnake.Embed(
             title=title.format(utils.get_emoji(guild, "peepoHugger") or ""),
@@ -197,7 +196,7 @@ class Hugs(Base, commands.Cog):
             user = inter.author
         elif user.bot:
             await inter.send(
-                utils.get_emoji(self.bot.get_guild(config.guild_id), "huggers") or ":people_hugging:"
+                utils.get_emoji(self.bot.get_guild(self.config.guild_id), "huggers") or ":people_hugging:"
             )
             return
 
@@ -209,7 +208,7 @@ class Hugs(Base, commands.Cog):
         # Convert a human-friendly intensity to an array index
         intensity -= 1
 
-        await inter.send(f"{config.hug_emojis[intensity]} **{user_str}**")
+        await inter.send(f"{self.config.hug_emojis[intensity]} **{user_str}**")
 
 
 def setup(bot):

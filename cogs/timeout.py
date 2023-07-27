@@ -12,7 +12,6 @@ from disnake.ext import commands, tasks
 import utils
 from cogs.base import Base
 from config import cooldowns
-from config.app_config import config
 from config.messages import Messages
 from database.timeout import TimeoutDB as TimeoutDB
 from permissions import permission_check
@@ -210,7 +209,7 @@ class Timeout(Base, commands.Cog):
         return endtime
 
     @commands.check(permission_check.submod_plus)
-    @commands.slash_command(name="timeout", guild_ids=[config.guild_id])
+    @commands.slash_command(name="timeout", guild_ids=[Base.config.guild_id])
     async def _timeout(self, inter: disnake.ApplicationCommandInteraction):
         await inter.response.defer()
 
@@ -325,7 +324,7 @@ class Timeout(Base, commands.Cog):
     @commands.slash_command(
         name="selftimeout",
         description=Messages.self_timeout,
-        guild_ids=[config.guild_id]
+        guild_ids=[Base.config.guild_id]
     )
     async def self_timeout(
         self,
@@ -362,7 +361,7 @@ class Timeout(Base, commands.Cog):
     async def update_timeout(self):
         """update all user's timeout in database and on server"""
         users = self.timeout_db.get_timeout_users()
-        guild = self.bot.get_guild(config.guild_id)
+        guild = self.bot.get_guild(self.config.guild_id)
 
         # find member and update timeout
         for user in users:

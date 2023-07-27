@@ -19,7 +19,6 @@ import utils
 from buttons.embed import EmbedView
 from cogs.base import Base
 from config import cooldowns
-from config.app_config import config
 from config.messages import Messages
 from database.exams import ExamsTermsMessageDB
 from permissions import permission_check
@@ -38,8 +37,8 @@ class Exams(Base, commands.Cog):
         self.bot = bot
 
         self.subscribed_guilds: List[int] = []
-        if config.exams_subscribe_default_guild:
-            self.subscribed_guilds.append(config.guild_id)
+        if self.config.exams_subscribe_default_guild:
+            self.subscribed_guilds.append(self.config.guild_id)
 
         if self.subscribed_guilds:
             self.tasks = [self.update_terms_task.start()]
@@ -63,7 +62,7 @@ class Exams(Base, commands.Cog):
             if not isinstance(channel, disnake.TextChannel):
                 continue
 
-            for channel_name in config.exams_term_channels:
+            for channel_name in self.config.exams_term_channels:
                 if channel_name.lower() == channel.name.lower():
                     message_ids = ExamsTermsMessageDB.remove_from_channel(channel.id)
                     for message_id in message_ids:
@@ -122,7 +121,7 @@ class Exams(Base, commands.Cog):
 
         await inter.send(Messages.exams_automatic_update_stopped(guild_name=inter.guild.name))
 
-    @tasks.loop(hours=int(config.exams_terms_update_interval * 24))
+    @tasks.loop(hours=int(Base.config.exams_terms_update_interval * 24))
     async def update_terms_task(self):
         for guild in self.subscribed_guilds:
             guild = disnake.utils.get(self.bot.guilds, id=guild)
@@ -168,7 +167,7 @@ class Exams(Base, commands.Cog):
             if not isinstance(channel, disnake.TextChannel):
                 continue
 
-            for channel_name in config.exams_term_channels:
+            for channel_name in self.config.exams_term_channels:
                 if channel_name.lower() == channel.name.lower():
                     if not channel_name[0].isdigit():
                         if channel_name[:3].upper() == "MIT":
@@ -281,7 +280,7 @@ class Exams(Base, commands.Cog):
         exams = body.find_all("tr")
 
         number_of_exams = len(exams)
-        bs = config.exams_page_size
+        bs = self.config.exams_page_size
         number_of_batches = math.ceil(number_of_exams / bs)
         exam_batches = [exams[i * bs: bs + i * bs] for i in range(number_of_batches)]
 
