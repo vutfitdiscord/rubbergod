@@ -2,10 +2,10 @@
 Cog for dynamically changing config.
 """
 
-import os
 import re
 import shlex
 from datetime import datetime
+from pathlib import Path
 from typing import List
 
 import disnake
@@ -26,6 +26,9 @@ class DynamicConfig(Base, commands.Cog):
     def __init__(self, bot):
         super().__init__()
         self.bot = bot
+        # /rubbergod/cogs/dynamicconfig.py -> /rubbergod/config
+        self.config_dir = Path(__file__).parent.parent.joinpath("config")
+        self.config_path = self.config_dir.joinpath("config.toml")
 
     @commands.check(permission_check.is_bot_admin)
     @commands.slash_command(name="config")
@@ -106,17 +109,16 @@ class DynamicConfig(Base, commands.Cog):
         """
         Create backup from current config. Backup filename will contain current date.
         """
-        config_path = os.path.dirname(__file__)[:-4] + "config/config_backup_"
-        config_path += str(datetime.now().date()) + ".toml"
-        with open(config_path, "w+", encoding="utf-8") as fd:
+        date = datetime.today()
+        backup_path = self.config_dir.joinpath(f"config_backup_{date}.toml")
+        with open(backup_path, "w+", encoding="utf-8") as fd:
             toml.dump(self.config.toml_dict, fd)
         await inter.send(Messages.config_backup_created)
 
     @config_cmd.sub_command(description=Messages.config_sync_template_brief)
     async def update(self, inter: disnake.ApplicationCommandInteraction):
-        path = os.path.dirname(__file__)[:-4]
-        config_path = f"{path}config/config.toml"
-        template = toml.load(f"{path}config/config.template.toml", _dict=dict)
+        template_path = self.config_dir.joinpath("config.template.toml")
+        template = toml.load(template_path, _dict=dict)
         for section in template:
             if section in self.config.toml_dict:
                 for key in template[section]:
@@ -124,7 +126,7 @@ class DynamicConfig(Base, commands.Cog):
                         self.config.toml_dict[section][key] = template[section][key]
             else:
                 self.config.toml_dict[section] = template[section]
-        with open(config_path, "w+", encoding="utf-8") as fd:
+        with open(self.config_path, "w+", encoding="utf-8") as fd:
             toml.dump(self.config.toml_dict, fd)
         load_config()
         await inter.send(Messages.config_updated)
@@ -148,7 +150,6 @@ class DynamicConfig(Base, commands.Cog):
         except Exception as e:
             await inter.send(e)
             return
-        config_path = os.path.dirname(__file__)[:-4] + "config/config.toml"
         key_toml = key
         key_split = key.split('_', 1)
         for section in self.config.toml_dict:
@@ -189,7 +190,7 @@ class DynamicConfig(Base, commands.Cog):
             await inter.send(Messages.config_wrong_key)
             return
         setattr(self.config, key, value)
-        with open(config_path, "w+", encoding="utf-8") as fd:
+        with open(self.config_path, "w+", encoding="utf-8") as fd:
             toml.dump(self.config.toml_dict, fd)
         await inter.send(Messages.config_updated)
 
