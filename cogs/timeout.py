@@ -71,14 +71,14 @@ class Timeout(Base, commands.Cog):
             embed = self.create_embed(author, title)
             for timeout in users_list:
                 embed.add_field(
-                    name=Messages.timeout_title.format(
+                    name=Messages.timeout_title(
                         member=await self.bot.get_or_fetch_user(timeout.user_id),
                         endtime=timeout.end.strftime('%d.%m.%Y %H:%M'),
                         length=f"{timeout.length.days}d, "
                                f"{timeout.length.seconds // 3600}h, "
                                f"{(timeout.length.seconds // 60) % 60}m"
                     ),
-                    value=Messages.timeout_field_text.format(
+                    value=Messages.timeout_field_text(
                         mod=await self.bot.get_or_fetch_user(timeout.mod_id),
                         starttime=timeout.start.strftime('%d.%m.%Y %H:%M'),
                         length=utils.get_discord_timestamp(timeout.end, "Relative Time"),
@@ -134,7 +134,7 @@ class Timeout(Base, commands.Cog):
         # print users that can't be found
         if not_found_members:
             await inter.send(
-                Messages.timeout_member_not_found.format(
+                Messages.timeout_member_not_found(
                     author=inter.author.mention,
                     members=", ".join(not_found_members)
                 ),
@@ -251,14 +251,14 @@ class Timeout(Base, commands.Cog):
                 cantBeTimeout.append(member)
 
             embed.add_field(
-                name=Messages.timeout_title.format(
+                name=Messages.timeout_title(
                     member=member,
                     endtime=endtime.strftime('%d.%m.%Y %H:%M'),
                     length=f"{length.days}d, "
                            f"{length.seconds // 3600}h, "
                            f"{(length.seconds // 60) % 60}m"
                 ),
-                value=Messages.timeout_field_text.format(
+                value=Messages.timeout_field_text(
                     mod=inter.author,
                     starttime=starttime.strftime('%d.%m.%Y %H:%M'),
                     length=utils.get_discord_timestamp(endtime, "Relative Time"),
@@ -281,7 +281,7 @@ class Timeout(Base, commands.Cog):
         # print users that can't be timed out
         if cantBeTimeout:
             await inter.send('\n'.join(
-                f'{Messages.timeout_permission.format(user=user)}' for user in self.perms_users)
+                f'{Messages.timeout_permission(user=user)}' for user in self.perms_users)
             )
 
     @_timeout.sub_command(name="remove", description=Messages.timeout_remove_brief)
@@ -353,7 +353,7 @@ class Timeout(Base, commands.Cog):
         )
 
         if not isSuccess:
-            await inter.send(content=Messages.timeout_permission.format(user=inter.user))
+            await inter.send(content=Messages.timeout_permission(user=inter.user))
             return
 
         await inter.send(content=Messages.self_timeout_success)
@@ -419,7 +419,7 @@ class Timeout(Base, commands.Cog):
     @timeout_user.error
     async def timeout_error(self, inter: disnake.ApplicationCommandInteraction, error):
         if isinstance(error, commands.BadArgument):
-            await inter.send(Messages.timeout_bad_format.format(format="\n".join(self.formats)))
+            await inter.send(Messages.timeout_bad_format(format="\n".join(self.formats)))
             return True
 
 

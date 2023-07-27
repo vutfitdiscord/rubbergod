@@ -457,7 +457,7 @@ class FitWide(Base, commands.Cog):
     @connect_login_to_user.error
     async def fitwide_checks_error(self, ctx, error):
         if isinstance(error, commands.CheckFailure):
-            await ctx.send("Nothing to see here comrade. " + "<:KKomrade:484470873001164817>")
+            await ctx.send("Nothing to see here comrade. <:KKomrade:484470873001164817>")
             return True
 
 

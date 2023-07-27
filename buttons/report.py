@@ -59,7 +59,7 @@ class ReportView(BaseView):
                     )
             button.label = "Mark spam"
             button.style = disnake.ButtonStyle.red
-            message = Messages.report_message_not_spam.format(id=report.id, author=inter.author.name)
+            message = Messages.report_message_not_spam(id=report.id, author=inter.author.name)
             await report_features.set_tag(self.report_channel, inter.message.channel, "open")
 
         else:
@@ -73,7 +73,7 @@ class ReportView(BaseView):
             button.disabled = False
             button.label = f"Spam marked by @{inter.author.name}"
             button.style = disnake.ButtonStyle.primary
-            message = Messages.report_message_spam.format(id=report.id, author=inter.author.name)
+            message = Messages.report_message_spam(id=report.id, author=inter.author.name)
             await report_features.set_tag(self.report_channel, inter.message.channel, "spam")
         return message, embed
 
@@ -166,10 +166,10 @@ class ReportMessageView(ReportView):
 
         if message is None:
             button.label = "Message not found"
-            delete_message = Messages.report_message_already_deleted.format(author=inter.author.name)
+            delete_message = Messages.report_message_already_deleted(author=inter.author.name)
         else:
             button.label = f"Deleted by @{inter.author.name}"
-            delete_message = Messages.report_message_deleted.format(author=inter.author.name)
+            delete_message = Messages.report_message_deleted(author=inter.author.name)
             await message.delete()
 
         await report_message.channel.send(delete_message)
@@ -189,7 +189,7 @@ class ReportAnonymView(BaseView):
         report_id = report_features.extract_report_id(inter)
         if ReportDB.is_resolved(report_id):
             await inter.message.edit(view=None)
-            await inter.send(Messages.report_already_solved.format(id=report_id), ephemeral=True)
+            await inter.send(Messages.report_already_solved(id=report_id), ephemeral=True)
             return False
         return True
 
@@ -260,7 +260,7 @@ class ReportAnswerModal(disnake.ui.Modal):
         self.bot = bot
         self.inter = inter
         self.report_id = report_id
-        self.title = Messages.report_answer_title.format(id=report_id)
+        self.title = Messages.report_answer_title(id=report_id)
         components = [
             disnake.ui.TextInput(
                 label=self.title,
@@ -281,7 +281,7 @@ class ReportAnswerModal(disnake.ui.Modal):
 
     def answer_embed(self, inter: disnake.ModalInteraction, report: ReportDB, answer: str) -> disnake.Embed:
         """creates an embed template for the submitted answer"""
-        description = Messages.report_embed_answered.format(last_answer=report.last_answer, answer=answer)
+        description = Messages.report_embed_answered(last_answer=report.last_answer, answer=answer)
         embed = disnake.Embed(
             title=self.title.format(id=report.id),
             description=description,

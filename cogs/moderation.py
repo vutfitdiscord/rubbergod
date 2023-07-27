@@ -139,7 +139,7 @@ class Moderation(Base, commands.Cog):
         prev_delay = channel.slowmode_delay
         await channel.edit(slowmode_delay=delay)
         await self.log(inter, prev_delay, curr_delay=delay, channel=channel)
-        await inter.edit_original_response(Messages.slowmode_set_success.format(
+        await inter.edit_original_response(Messages.slowmode_set_success(
                                             channel=channel.mention,
                                             delay=delay))
 
@@ -154,7 +154,7 @@ class Moderation(Base, commands.Cog):
         prev_delay = inter.channel.slowmode_delay
         await channel.edit(slowmode_delay=0)
         await self.log(inter, prev_delay, curr_delay=0, channel=channel)
-        await inter.edit_original_response(Messages.slowmode_remove_success.format(
+        await inter.edit_original_response(Messages.slowmode_remove_success(
                                             channel=channel.mention))
 
     async def log(

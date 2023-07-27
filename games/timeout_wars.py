@@ -79,7 +79,7 @@ class TimeoutWars(commands.Cog):
 
         for user in users:
             if self.get_immunity(user):
-                message.append(Messages.timeout_wars_user_immunity.format(
+                message.append(Messages.timeout_wars_user_immunity(
                     user=user,
                     time=(self.immunity[user.id] - datetime.now()).total_seconds()
                     )
@@ -87,7 +87,7 @@ class TimeoutWars(commands.Cog):
             else:
                 try:
                     await user.timeout(duration=duration, reason="Moderace lidu")
-                    message.append(Messages.timeout_wars_user.format(
+                    message.append(Messages.timeout_wars_user(
                         user=user.mention,
                         time=config.timeout_wars_timeout_time.total_seconds()//60)
                     )
@@ -108,7 +108,7 @@ class TimeoutWars(commands.Cog):
     ):
         """Mute user and send message to channel and log"""
         if self.get_immunity(user):
-            await channel.send(Messages.timeout_wars_user_immunity.format(
+            await channel.send(Messages.timeout_wars_user_immunity(
                     user=user,
                     time=(self.immunity[user.id] - datetime.now()).total_seconds()
                 )
@@ -117,12 +117,12 @@ class TimeoutWars(commands.Cog):
             try:
                 await user.timeout(duration=duration, reason=reason)
                 if reason == self.message_delete:
-                    await channel.send(Messages.timeout_wars_message_delete.format(
+                    await channel.send(Messages.timeout_wars_message_delete(
                         user=user.mention,
                         time=config.timeout_wars_timeout_time.total_seconds()//60
                     ))
                 else:
-                    await channel.send(Messages.timeout_wars_user.format(
+                    await channel.send(Messages.timeout_wars_user(
                             user=user.mention,
                             time=config.timeout_wars_timeout_time.total_seconds()//60)
                     )

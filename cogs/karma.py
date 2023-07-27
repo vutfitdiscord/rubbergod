@@ -296,7 +296,7 @@ class Karma(Base, commands.Cog):
     async def karma_error(self, inter: disnake.ApplicationCommandInteraction, error):
         if isinstance(error, commands.CheckFailure):
             vote_room = self.bot.get_channel(self.config.vote_room)
-            await inter.send(Messages.vote_room_only.format(room=vote_room.mention))
+            await inter.send(Messages.vote_room_only(room=vote_room.mention))
             return True
 
 
