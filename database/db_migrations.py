@@ -4,7 +4,7 @@ from config.app_config import config
 from database import database, session
 from database.better_meme import BetterMemeDB  # noqa: F401
 from database.cooldown import Cooldown  # noqa: F401
-from database.error import ErrorLog  # noqa: F401
+from database.error import ErrorLogDB  # noqa: F401
 from database.exams import ExamsTermsMessageDB  # noqa: F401
 from database.hugs import HugsTableDB
 from database.image import ImageDB  # noqa: F401

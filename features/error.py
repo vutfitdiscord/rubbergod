@@ -9,7 +9,7 @@ from PIL import Image, ImageDraw, ImageFont
 
 import utils
 from config.app_config import config
-from database.error import ErrorLog
+from database.error import ErrorLogDB, ErrorRow
 from features.imagehandler import ImageHandler
 
 
@@ -67,13 +67,13 @@ class ErrorLogger:
         """Log date of last exception and return number of days since last exception"""
         try:
             today = datetime.date.today()
-            last_exception = ErrorLog.get()
+            last_exception = ErrorLogDB.get(ErrorRow.last_error)
             if last_exception:
                 count = (today - last_exception.date).days
             else:
                 count = 0
             if set:
-                ErrorLog.set()
+                ErrorLogDB.set()
             return count
         except Exception:
             return 0
