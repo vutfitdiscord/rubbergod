@@ -5,7 +5,7 @@ from sqlalchemy import BigInteger, Column, String
 from database import database
 
 
-class Cooldown(database.base):
+class CooldownDB(database.base):
     __tablename__ = "cooldowns"
 
     command_name = Column(String, primary_key=True, nullable=False)
