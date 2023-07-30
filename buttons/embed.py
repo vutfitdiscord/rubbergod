@@ -102,6 +102,12 @@ class EmbedView(BaseView):
     def embed(self, value):
         self.embeds[self.page-1] = value
 
+    def add_item(self, item: disnake.ui.Item) -> None:
+        for child in self.children:
+            if item.emoji == child.emoji:
+                return
+        return super().add_item(item)
+
     async def interaction_check(self, interaction: disnake.MessageInteraction) -> None:
         if interaction.data.custom_id == "embed:lock":
             if interaction.author.id == self.author.id:

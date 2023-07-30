@@ -50,12 +50,6 @@ class ReviewView(EmbedView):
             for button in to_remove:
                 self.remove_item(button)
 
-    def add_item(self, item: disnake.ui.Item) -> None:
-        for child in self.children:
-            if item.emoji == child.emoji:
-                return
-        return super().add_item(item)
-
     @property
     def review_id(self):
         return self.embed.footer.text.split("|")[-1][5:]
