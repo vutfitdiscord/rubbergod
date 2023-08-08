@@ -9,7 +9,7 @@ class Messages(metaclass=Formatable):
     server_warning = "Tohle funguje jen na VUT FIT serveru."
 
     help_title = "Nápověda"
-    help_description = "Kompletní seznam lze také najít ve veřejné administraci bota (https://public.grillbot.cloud/)"
+    help_description = "Kompletní seznam lze také najít ve veřejné administraci bota (https://public.grillbot.eu/)"
 
     karma_get_missing = "Toaster pls, měl jsi bordel v DB. Musel jsem za tebe uklidit."
 
@@ -114,7 +114,7 @@ class Messages(metaclass=Formatable):
     karma_message_format = "Musíš zadat url zprávy"
     karma_leaderboard_offset_error = "{user} Špatný offset, zadej kladné číslo"
     karma_web_title = "Celý leaderboard"
-    karma_web = "https://karma.grillbot.cloud/"
+    karma_web = "https://karma.grillbot.eu/"
     karma_transfer_same_user = "Nelze převést karmu na stejného uživatele."
     karma_transer_user_no_karma = "{user} nemá žádnou karmu."
     karma_transfer_complete = "Karma byla úspěšně převedena z `{from_user}` na `{to_user}`:\n" \
