@@ -58,9 +58,12 @@ class Warden(Base, commands.Cog):
             for mess in messages:
                 if not mess.author.bot:
                     continue
+                if not mess.embeds:
+                    continue
                 try:
                     if str(message.id) == mess.embeds[0].footer.text:
                         await mess.delete()
+                        break
                 except disnake.NotFound:
                     continue
 
