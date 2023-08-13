@@ -100,8 +100,13 @@ def split(array, k) -> list:
     return lists
 
 
-def add_author_footer(embed: disnake.Embed, author: disnake.User,
-                      set_timestamp=True, additional_text: Iterable[str] = []):
+def add_author_footer(
+    embed: disnake.Embed,
+    author: disnake.User,
+    set_timestamp=True,
+    additional_text: Iterable[str] = [],
+    anonymous: bool = False
+):
     """
     Adds footer to the embed with author name and icon from ctx.
 
@@ -109,13 +114,21 @@ def add_author_footer(embed: disnake.Embed, author: disnake.User,
     :param embed: disnake.Embed object
     :param set_timestamp: bool, should the embed's timestamp be set
     :param additional_text: Iterable of strings that will be joined with author name by pipe symbol, eg.:
-    "john#2121 | text1 | text2".
+    :param anonymous: bool, show author as Anonymous
+    "john#2121 | text1 | text2" or "Anonymous | text1 | text2"
     """
 
     if set_timestamp:
         embed.timestamp = datetime.now(tz=timezone.utc)
 
-    embed.set_footer(icon_url=author.display_avatar.url, text=' | '.join((str(author), *additional_text)))
+    if anonymous:
+        display_name = "Anonymous"
+        display_avatar = author.default_avatar.url
+    else:
+        display_name = author
+        display_avatar = author.display_avatar.url
+
+    embed.set_footer(icon_url=display_avatar, text=' | '.join((str(display_name), *additional_text)))
 
 
 def get_emoji(guild: disnake.Guild, name: str) -> Optional[disnake.Emoji]:
