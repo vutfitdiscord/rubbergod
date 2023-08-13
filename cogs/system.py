@@ -105,6 +105,7 @@ class System(Base, commands.Cog):
         start_streak, end_streak = ErrorLogDB.get_longest_streak()
         embed.add_field(name=Messages.upsince_title, value=str(boottime))
         embed.add_field(name=Messages.uptime_title, value=str(delta))
+        embed.add_field(name=Messages.uptime_latency, value=f"{round (self.bot.latency * 1000)} ms")
         embed.add_field(
             name=Messages.longest_streak,
             value=f"**{(end_streak - start_streak).days} day(s)**\n{start_streak} — {end_streak}",
