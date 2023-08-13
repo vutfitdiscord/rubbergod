@@ -1,9 +1,9 @@
-from datetime import datetime, timezone
 from functools import cached_property
 
 import disnake
 
 import features.report as report_features
+import utils
 from buttons.report import ReportGeneralView, ReportMessageView
 from config.app_config import config
 from config.messages import Messages
@@ -40,7 +40,6 @@ class ReportModal(disnake.ui.Modal):
         report_id: int
     ) -> disnake.Embed:
         """creates an embed template for the report"""
-        display_avatar = inter.author.default_avatar.url
         embed = disnake.Embed(
             title=self.title,
             description=report_reason,
@@ -55,8 +54,12 @@ class ReportModal(disnake.ui.Modal):
             )
         embed.add_field(name="Resolved by", value="---", inline=False)
 
-        embed.timestamp = datetime.now(tz=timezone.utc)
-        embed.set_footer(icon_url=display_avatar, text=f"Anonym | ID: {report_id}")
+        utils.add_author_footer(
+            embed=embed,
+            author=inter.author,
+            additional_text=[f"ID: {report_id}"],
+            anonymous=True
+        )
         return embed
 
     @cached_property
