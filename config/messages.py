@@ -14,7 +14,7 @@ class Messages(metaclass=Formatable):
     karma_get_missing = "Toaster pls, měl jsi bordel v DB. Musel jsem za tebe uklidit."
 
     on_ready_message = "<:peepowave:693070888546861096>"
-    cooldown = "Příliš rychle, zkus to znovu za {:.3}s"
+    cooldown = "Příliš rychle, zkus to znovu za {time:.3}s"
     embed_not_author = "Hraj si na svém písečku s tebou zavolanými příkazy. <:pepeGun:826943455032901643>"
     base_leaderboard_format_str = "_{position}._ - **{member_name}**:"
 
