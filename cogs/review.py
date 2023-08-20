@@ -15,7 +15,7 @@ from cogs.base import Base
 from config import cooldowns
 from config.messages import Messages
 from database.review import ProgrammeDB, ReviewDB, SubjectDB, SubjectDetailsDB
-from features.review import ReviewManager
+from features.review import ReviewManager, TierEnum
 from permissions import permission_check
 
 subjects = []
@@ -96,14 +96,15 @@ class Review(Base, commands.Cog):
         self,
         inter: disnake.ApplicationCommandInteraction,
         subject: str = commands.Param(autocomplete=autocomp_subjects),
-        tier: int = commands.Param(le=4, ge=0, description=Messages.review_tier),
+        grade: str = commands.Param(choices=TierEnum._member_names_),
         text: str = commands.Param(),
         anonymous: bool = commands.Param(default=False)
     ):
         """Add new review for `subject`"""
-        # TODO: use modal in future when disnake 2.8?? released
+        # TODO: use modal in future when select in modal support release
         # await inter.response.send_modal(modal=ReviewModal(self.bot))
         await inter.response.defer(ephemeral=anonymous)
+        tier = getattr(TierEnum, grade).value
         if not await self.check_member(inter):
             return
         if not self.manager.add_review(inter.author.id, subject.lower(), tier, anonymous, text):
@@ -296,7 +297,9 @@ class Review(Base, commands.Cog):
             output = ""
             cnt = 1
             for line in board:
-                output += f"{cnt} - **{line.shortcut}**: {round(line.avg_tier, 1)}\n"
+                # grade fromat: "B (1.7)"
+                grade = f"{TierEnum(round(line.avg_tier)).name}({round(line.avg_tier + 1, 1)})"
+                output += f"{cnt} - **{line.shortcut}**: {grade}\n"
                 cnt += 1
             embed.description = output
             embeds.append(copy.copy(embed))
