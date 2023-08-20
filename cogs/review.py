@@ -96,7 +96,7 @@ class Review(Base, commands.Cog):
         self,
         inter: disnake.ApplicationCommandInteraction,
         subject: str = commands.Param(autocomplete=autocomp_subjects),
-        grade: str = commands.Param(choices=TierEnum._member_names_),
+        grade: str = commands.Param(choices=TierEnum._member_names_, description=Messages.review_grade_brief),
         text: str = commands.Param(),
         anonymous: bool = commands.Param(default=False)
     ):
@@ -297,8 +297,9 @@ class Review(Base, commands.Cog):
             output = ""
             cnt = 1
             for line in board:
-                # grade fromat: "B (1.7)"
-                grade = f"{TierEnum(round(line.avg_tier)).name}({round(line.avg_tier + 1, 1)})"
+                # grade format: "B (1.7)"
+                grade_num = TierEnum.tier_to_grade_num(line.avg_tier)
+                grade = f"{TierEnum(round(line.avg_tier)).name}({round(grade_num, 1)})"
                 output += f"{cnt} - **{line.shortcut}**: {grade}\n"
                 cnt += 1
             embed.description = output

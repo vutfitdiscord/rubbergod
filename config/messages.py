@@ -245,9 +245,9 @@ class Messages(metaclass=Formatable):
     review_remove_brief = "Odstraní hodnocení"
     review_list_brief = "Vypíše předměty, které si již ohodnotil"
     review_id_brief = "ID recenze, pouze pro administrátory"
+    review_grade_brief = "Známku, kterou by jsi dal předmětu od A-F (za organizaci, splnění očekávání, kvalitu výuky ...)"
 
     review_wrong_subject = "Nesprávná zkratka předmětu."
-    review_tier = "Známka je z rozsahu A-F, kde A je nejlepší."
     review_added = "Hodnocení předmětu bylo přidáno."
     reviews_reaction_help = "Pokud byla recenze užitečná dejte 👍, jinak 👎.\n" \
                             "Pro odstranění hlasu je možné použit 🛑.\n" \
@@ -261,13 +261,13 @@ class Messages(metaclass=Formatable):
     review_not_on_server = "{user}, na použití tohoto příkazu musíš být na FITwide serveru."
 
     # review embed
-    review_embed_description = "{name}\n**Průměrná známka:** {grade}"
-    review_embed_no_reviews = "*Zatim nic*"
+    review_embed_description = "{name}\n**Průměrná známka od studenta:** {grade}"
+    review_embed_no_reviews = "*Zatím nic*"
     review_text_label = "Text recenze"
     review_text_page_label = "Stránka textu"
-    review_author_lavel = "Autor"
-    review_grade_label = "Známka"
-    review_date_label = "Dátum"
+    review_author_label = "Autor"
+    review_grade_label = "Kvalita předmětu"
+    review_date_label = "Datum"
     review_other_reviews_label = "Další hodnocení"
     review_authored_list_label = "Ohodnotil jsi:"
 
