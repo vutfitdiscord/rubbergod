@@ -16,12 +16,16 @@ from features import sports
 
 class TierEnum(Enum):
     """Tier to grades mapping"""
-    A = 0
-    B = 1
-    C = 2
-    D = 3
-    E = 4
-    F = 5
+    A = 0  # 1
+    B = 1  # 1.5
+    C = 2  # 2
+    D = 3  # 2.5
+    E = 4  # 3
+    # skip 5 as there is no 3.5 grade
+    F = 6  # 4
+
+    def tier_to_grade_num(tier: int) -> int:
+        return 1 + tier/2
 
 
 class ReviewManager:
@@ -53,7 +57,7 @@ class ReviewManager:
             else:
                 guild = self.bot.get_guild(config.guild_id)
                 author = guild.get_member(int(review.member_ID))
-            embed.add_field(name=Messages.review_author_lavel, value=author)
+            embed.add_field(name=Messages.review_author_label, value=author)
             embed.add_field(name=Messages.review_grade_label, value=TierEnum(review.tier).name)
             embed.add_field(
                 name=Messages.review_date_label,
@@ -61,11 +65,14 @@ class ReviewManager:
             )
             text = review.text_review
             if text is not None:
-                text_len = len(text)
-                if text_len > 1024:
-                    pages = text_len // 1024 + (text_len % 1024 > 0)
-                    text = text[:1024]
-                    embed.add_field(name=Messages.review_text_page_label, value=f"1/{pages}", inline=False)
+                if len(text) > 1024:
+                    pages = utils.cut_string_by_words(text, 1000, " ")
+                    text = pages[0]
+                    embed.add_field(
+                        name=Messages.review_text_page_label,
+                        value=f"1/{len(pages)}",
+                        inline=False
+                    )
                 embed.add_field(name=Messages.review_text_label, value=text, inline=False)
             likes = ReviewRelevanceDB.get_votes_count(review.id, True)
             embed.add_field(name="👍", value=f"{likes}")
@@ -96,22 +103,17 @@ class ReviewManager:
         add_new_field = False
         fields_cnt = len(embed.fields)
         if text is not None:
-            text_len = len(text)
-            if text_len > 1024:
-                pages = text_len // 1024 + (text_len % 1024 > 0)
-                text_index = 1024 * (text_page - 1)
-                if len(review.text_review) < 1024 * text_page:
-                    text = review.text_review[text_index:]
-                else:
-                    text = review.text_review[text_index: 1024 * text_page]
+            if len(text) > 1024:
+                pages = utils.cut_string_by_words(text, 1000, " ")
+                text = pages[text_page - 1]
                 embed.set_field_at(
                     idx,
                     name=Messages.review_text_page_label,
-                    value=f"{text_page}/{pages}",
+                    value=f"{text_page}/{len(pages)}",
                     inline=False
                 )
                 idx += 1
-            embed.set_field_at(idx, name=Messages.review_text, value=text, inline=False)
+            embed.set_field_at(idx, name=Messages.review_text_label, value=text, inline=False)
             idx += 1
         likes = ReviewRelevanceDB.get_votes_count(review.id, True)
         embed.set_field_at(idx, name="👍", value=f"{likes}")
@@ -166,7 +168,8 @@ class ReviewManager:
             embeds = []
             for idx in range(reviews_cnt):
                 review = reviews[idx].ReviewDB
-                grade = TierEnum(round(reviews[idx].avg_tier)).name
+                grade_num = TierEnum.tier_to_grade_num(reviews[idx].avg_tier)
+                grade = f"{TierEnum(round(reviews[idx].avg_tier)).name}({round(grade_num, 1)})"
                 description = Messages.review_embed_description(name=name, grade=grade)
                 page = f"{idx+1}/{reviews_cnt}"
 

@@ -25,7 +25,10 @@ class ReviewView(EmbedView):
                 self.remove_item(button)
 
     def check_text_pages(self):
-        if len(self.embed.fields) > 3 and self.embed.fields[3].name == "Text page":
+        if (
+            len(self.embed.fields) > 3
+            and self.embed.fields[3].name == Messages.review_text_page_label
+        ):
             self.add_item(
                 disnake.ui.Button(
                     emoji="🔽",
@@ -96,7 +99,10 @@ class ReviewView(EmbedView):
                 # update view
                 await interaction.edit_original_response(view=self)
             return False
-        elif "text" in interaction.data.custom_id and self.embed.fields[3].name == "Text page":
+        elif (
+            "text" in interaction.data.custom_id and
+            self.embed.fields[3].name == Messages.review_text_page_label
+        ):
             if (self.perma_lock or self.locked) and interaction.author.id != self.author.id:
                 await interaction.send(Messages.embed_not_author, ephemeral=True)
                 return False
