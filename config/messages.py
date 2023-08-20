@@ -247,7 +247,7 @@ class Messages(metaclass=Formatable):
     review_id_brief = "ID recenze, pouze pro administrátory"
 
     review_wrong_subject = "Nesprávná zkratka předmětu."
-    review_tier = "Tier je z rozsahu 0-4, kde 0 je nejlepší."
+    review_tier = "Známka je z rozsahu A-F, kde A je nejlepší."
     review_added = "Hodnocení předmětu bylo přidáno."
     reviews_reaction_help = "Pokud byla recenze užitečná dejte 👍, jinak 👎.\n" \
                             "Pro odstranění hlasu je možné použit 🛑.\n" \
@@ -260,6 +260,17 @@ class Messages(metaclass=Formatable):
     review_add_denied = "{user}, na přidání hodnocení předmětu nemáš právo."
     review_not_on_server = "{user}, na použití tohoto příkazu musíš být na FITwide serveru."
 
+    # review embed
+    review_embed_description = "{name}\n**Průměrná známka:** {grade}"
+    review_embed_no_reviews = "*Zatim nic*"
+    review_text_label = "Text recenze"
+    review_text_page_label = "Stránka textu"
+    review_author_lavel = "Autor"
+    review_grade_label = "Známka"
+    review_date_label = "Dátum"
+    review_other_reviews_label = "Další hodnocení"
+    review_authored_list_label = "Ohodnotil jsi:"
+
     # review modal
     review_modal_title = "Přidat novou recenzi"
     review_subject_label = "Vyberte předmět"
@@ -271,7 +282,6 @@ class Messages(metaclass=Formatable):
     review_tier_2_desc = "Průměrný předmět"
     review_tier_3_desc = "Nic moc"
     review_tier_4_desc = "Nejhorší, celé zle"
-    review_text_label = "Text recenze"
 
     subject_update_biref = "Automaticky vyhledá a přidá předměty do reviews i subject databáze"
     subject_format = f"{prefix}subject [update]"
