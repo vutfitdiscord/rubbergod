@@ -347,6 +347,16 @@ Cog implementing information about office hours of the study department.\
     - /studijni
 ---
 
+### [Subscriptions](subscriptions.py)
+Cog implementing subscriptions to forum posts based on their tags. \
+**Commands:**
+
+    - /subscriptions add
+    - /subscriptions remove
+    - /subscriptions list
+
+---
+
 ### [System](system.py)
 
 Core cog for bot. Can't be unloaded. Contains commands for cog management.\
