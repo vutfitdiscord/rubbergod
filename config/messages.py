@@ -551,3 +551,18 @@ if ("Mám průměr pod 2.0")                                           \n  retur
     report_message_spam = "### Report #{id} marked as spam by @{author}"
     report_message_not_spam = "### Report #{id} unmarked as spam by @{author}"
     report_already_solved = "Report #{id} už byl uzavřen. V případě potřeby otevři další report"
+
+    # SUBSCRIPTIONS COG
+    subscription_add_brief = "Přidá odběr na vlákna se zvoleným tagem"
+    subscription_remove_brief = "Zruší odběr na vlákna se zvoleným tagem"
+    subscription_list_brief = "Zobrazí tvé odběry vláken"
+    subscription_tag_not_found = "Pro zvolené fórum {channel} nebyl nalezen tag `{tag}`"
+    subscription_added = "Odběr byl úspěšně nastaven pro {channel} s tagem `{tag}`"
+    subscription_removed = "Odběr byl úspěšně odebrán pro {channel} s tagem `{tag}`"
+    subscription_list_title = "Tvé odběry:"
+    subscription_already_subscribed = "Tento odběr již máš nastaven"
+    subscription_not_found = "Odběr s tímto tagem `{tag}` nebyl nalezen"
+    subscription_embed_title = "Nový odebíraný příspěvek"
+    subscription_embed_channel = "Příspěvek"
+    subscription_embed_tags = "Tagy"
+    subscription_embed_author = "Autor"

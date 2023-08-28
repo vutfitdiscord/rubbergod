@@ -18,6 +18,8 @@ from database.review import SubjectDetailsDB  # noqa: F401
 from database.review import SubjectDB
 from database.role_group import RoleGroupDB  # noqa: F401
 from database.streamlinks import StreamLinkDB  # noqa: F401
+from database.subscription import AlreadyNotifiedDB  # noqa: F401
+from database.subscription import SubscriptionDB  # noqa: F401
 from database.timeout import TimeoutDB  # noqa: F401
 from database.verification import PermitDB, ValidPersonDB
 from database.vote import VoteDB  # noqa: F401
