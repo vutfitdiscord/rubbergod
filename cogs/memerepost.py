@@ -3,7 +3,8 @@ Cog for handling memes with X number of reactions to be reposted to a specific c
 """
 
 import asyncio
-from typing import List, Union
+from functools import cached_property
+from typing import List
 
 import disnake
 from disnake.ext import commands
@@ -31,10 +32,13 @@ class MemeRepost(Base, commands.Cog):
         self.bot: commands.Bot = bot
 
         self.better_db = BetterMemeDB()
-        self.repost_channel: Union[disnake.TextChannel, None] = None
         self.check = room_check.RoomCheck(bot)
 
         self.repost_lock = asyncio.Lock()
+
+    @cached_property
+    def repost_channel(self):
+        return self.bot.get_channel(self.config.meme_repost_room)
 
     async def handle_reaction(self, ctx: ReactionContext):
         if ctx.channel.id == self.config.meme_room:
@@ -91,13 +95,9 @@ class MemeRepost(Base, commands.Cog):
 
     async def __repost_message(self, ctx: ReactionContext,
                                reactions: List[disnake.Reaction]):
-        if self.repost_channel is None and self.config.meme_repost_room != 0:
-            self.repost_channel = await self.bot.fetch_channel(self.config.meme_repost_room)
-
         # Invalid ID
         if self.repost_channel is None:
             return
-
         async with self.repost_lock:
             if MemeRepostDB.find_repost_by_original_message_id(ctx.message.id) is not None:
                 return
@@ -133,7 +133,13 @@ class MemeRepost(Base, commands.Cog):
                 content_type = attachment.content_type
                 if content_type is not None and content_type.split("/")[0] == "image" and main_image is None:
                     # Set main image if its image and main image is not set
-                    main_image = await attachment.to_file()
+                    if attachment.is_spoiler():
+                        # if image has spoiler it must be in other_attachments
+                        # because embeds don't support images with spoiler
+                        attachment_file = await attachment.to_file()
+                        other_attachments.append(attachment_file)
+                    else:
+                        main_image = await attachment.to_file()
                 else:
                     # Other attachments convert to file and append to list of attachments
                     attachment_file = await attachment.to_file()
