@@ -101,7 +101,7 @@ Either by clicking on notification or by clicking on arrows in left bottom corne
 This command should do the trick:
 
 ```bash
-docker compose up --build
+docker-compose up --build
 ```
 
 Docker will download all the necessary stuff and run the container. If you did everything correctly, bot will connect to the DB, load all the extensions and print `Ready` at the end. It will also send `:peepowave:` emoji to the `#bot-room` if you configured one. You're now all set!
@@ -115,7 +115,7 @@ If you didn't run the container in detached mode, just press `Ctrl+C` to stop it
 Try to tweak some command a little bit and run the bot again, this time in detached mode so it won't block your terminal:
 
 ```bash
-docker compose up --detach
+docker-compose up --detach
 ```
 
 > Your changes should be propagated to the server in a moment.
@@ -123,7 +123,7 @@ docker compose up --detach
 To stop the detached container, use this command:
 
 ```bash
-docker compose down
+docker-compose down
 ```
 
 ### Tips (optional)
