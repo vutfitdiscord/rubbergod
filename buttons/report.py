@@ -240,6 +240,11 @@ class ReportAnswerOnlyView(BaseView):
         self.bot = bot
 
     async def interaction_check(self, inter: disnake.Interaction) -> bool:
+        report_id = report_features.extract_report_id(inter)
+        if ReportDB.is_resolved(report_id):
+            await inter.message.edit(view=None)
+            await inter.send(Messages.report_already_solved(id=report_id), ephemeral=True)
+            return False
         return permission_check.submod_plus(inter)
 
     @disnake.ui.button(
