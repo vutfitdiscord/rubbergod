@@ -21,7 +21,7 @@ from cogs.base import Base
 from config.messages import Messages
 from database import session
 from features.error import ErrorLogger
-from permissions import permission_check
+from permissions import custom_errors, permission_check
 
 
 class Error(Base, commands.Cog):
@@ -60,6 +60,7 @@ class Error(Base, commands.Cog):
             or isinstance(error, permission_check.NotSubmodPlusError)
             or isinstance(error, permission_check.NotModPlusError)
             or isinstance(error, permission_check.NotAdminError)
+            or isinstance(error, custom_errors.InvalidTime)
         ):
             await ctx.send(error.message)
             return
@@ -144,6 +145,7 @@ class Error(Base, commands.Cog):
             or isinstance(error, permission_check.NotSubmodPlusError)
             or isinstance(error, permission_check.NotModPlusError)
             or isinstance(error, permission_check.NotAdminError)
+            or isinstance(error, custom_errors.InvalidTime)
         ):
             await inter.send(error.message)
             return
@@ -217,6 +219,7 @@ class Error(Base, commands.Cog):
             or isinstance(error, permission_check.NotSubmodPlusError)
             or isinstance(error, permission_check.NotModPlusError)
             or isinstance(error, permission_check.NotAdminError)
+            or isinstance(error, custom_errors.InvalidTime)
         ):
             await inter.send(error.message)
             return
@@ -277,6 +280,7 @@ class Error(Base, commands.Cog):
             or isinstance(error, permission_check.NotSubmodPlusError)
             or isinstance(error, permission_check.NotModPlusError)
             or isinstance(error, permission_check.NotAdminError)
+            or isinstance(error, custom_errors.InvalidTime)
         ):
             await inter.send(error.message)
             return

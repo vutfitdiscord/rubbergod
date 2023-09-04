@@ -17,6 +17,7 @@ class Messages(metaclass=Formatable):
     cooldown = "Příliš rychle, zkus to znovu za {time:.3}s"
     embed_not_author = "Hraj si na svém písečku s tebou zavolanými příkazy. <:pepeGun:826943455032901643>"
     base_leaderboard_format_str = "_{position}._ - **{member_name}**:"
+    invalid_time_format = "Neplatný formát času.\n{time_format}."
 
     # FITWIDE
     increment_roles_brief = "Aktualizuje role na serveru podle ročníku. Aktualizace školních roomek."
@@ -277,6 +278,25 @@ class Messages(metaclass=Formatable):
     dynamic_verify_role_not_exists = "Role `{role}` neexistuje."
     dynamic_verify_no_roles = "Nebyla nalezena žádná role."
     dynamic_verify_missing_rule = "Toto pravidlo (`{rule_id}`) neexistuje."
+
+    # POLL
+    poll_basic_brief = "Zahájí hlasování, ve kterém je možné zvolit více možností"
+    poll_thread = "### {username} hlasoval pro možnost `{option}`\n"
+    poll_already_voted = "Pro možnost `{option}` jsi již hlasoval"
+    poll_closed = "Hlasování s názvem `{title}` bylo ukončeno."
+    poll_embed_description = "{description}\n- Počet hlasů na uživatele: {votes}\n- Konec: {date}\n- " \
+                             "Anonymní hlasování: {anonymous}\n- Celkový počet hlasů: {all_votes}"
+    poll_boolean_title = "Otázka v hlasování"
+    poll_boolean_description = "Popis nebo další informace k hlasování"
+    poll_boolean_endtime = "Formát: `dd.mm.yyyy [HH:MM]` nebo `1(w)eek 2(M)onth 3(d)ay 4(h)our 5(m)inute 6(s)econd`"
+    poll_boolean_hide_results = "Skrýt výsledky hlasování do konce hlasování"
+    poll_boolean_image = "Přidat obrázek k hlasování"
+    poll_anonymous_vote = "Anonymní hlasování. Při neanonymním se vytvoří thread s hlasováním"
+    poll_voted = "Hlasoval jsi pro možnost `{option}`"
+    poll_vote_removed = "Tvůj hlas v hlasování `{title}` byl odebrán"
+    poll_vote_removed_thread = "### {username} zrušil svůj hlas pro možnost `{option}`\n"
+    poll_votes_removed_thread = "### {username} zrušil svůj hlas v tomto hlasování"
+    poll_endtime_short = "Konec hlasování je přílíš krátký. Minimální délka je 5 minut."
 
     # VOTE
     vote_brief = "Zahájí hlasování, ve kterém je možné zvolit více možností"
