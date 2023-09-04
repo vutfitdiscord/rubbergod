@@ -284,7 +284,7 @@ class Messages(metaclass=Formatable):
     review_tier_4_desc = "Nejhorší, celé zle"
 
     subject_update_biref = "Automaticky vyhledá a přidá předměty do reviews i subject databáze"
-    subject_format = f"{prefix}subject [update]"
+    subject_update_overwrite_brief = "Přepíše všechny informace o předmětech. Využít pouze v kombinaci s další aktualizací bez přepisu."
     subject_update_error = "Aktualizace se nezdařila pro <{url}>\n"
     subject_update_success = "Předměty byly aktualizovány."
     shortcut_brief = "Vrací stručné informace o předmětu"
