@@ -12,6 +12,7 @@ from database.image import ImageDB  # noqa: F401
 from database.karma import KarmaDB, KarmaEmojiDB
 from database.meme_repost import MemeRepostDB  # noqa: F401
 from database.pin_map import PinMapDB  # noqa: F401
+from database.poll import PollDB, PollOptionDB, VoterDB  # noqa: F401
 from database.report import AnswerDB, ReportDB, UserDB  # noqa: F401
 from database.review import ReviewDB  # noqa: F401
 from database.review import ReviewRelevanceDB  # noqa: F401

@@ -6,6 +6,9 @@ from datetime import datetime, timezone
 from typing import Callable, Iterable, List, Literal, Optional, Tuple, Union
 
 import disnake
+from dateutil import parser
+from dateutil.parser import ParserError
+from dateutil.relativedelta import relativedelta
 from disnake import Emoji, Member, PartialEmoji
 from disnake.ext import commands
 from genericpath import isfile
@@ -14,6 +17,7 @@ from sqlalchemy.schema import Table
 from config.app_config import config
 from config.messages import Messages
 from database import cooldown, session
+from permissions.custom_errors import InvalidTime
 
 
 def generate_mention(user_id):
@@ -411,3 +415,35 @@ async def parse_attachments(
             files.append(await attachment.to_file())
 
     return images, files, attachments_too_big
+
+
+def parse_time(time_string: str, time_format: str) -> datetime:
+    pattern = re.compile(r"(\d+)([yYMwdhms])")
+    matches = pattern.findall(time_string)
+
+    if matches:
+        time = datetime.now()
+        while matches:
+            match = matches.pop()
+            value, unit = match
+            if unit == "y" or unit == "Y" or unit == "r":
+                time += relativedelta(years=int(value))
+            elif unit == "M":
+                time += relativedelta(months=int(value))
+            elif unit == "w":
+                time += relativedelta(weeks=int(value))
+            elif unit == "d":
+                time += relativedelta(days=int(value))
+            elif unit == "h":
+                time += relativedelta(hours=int(value))
+            elif unit == "m":
+                time += relativedelta(minutes=int(value))
+            elif unit == "s":
+                time += relativedelta(seconds=int(value))
+    else:
+        try:
+            time = parser.parse(time_string)
+        except ParserError:
+            raise InvalidTime(time_format)
+
+    return time
