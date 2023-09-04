@@ -32,7 +32,7 @@ async def autocomp_subjects(inter: disnake.ApplicationCommandInteraction, user_i
 
 
 class Review(Base, commands.Cog):
-    def __init__(self, bot):
+    def __init__(self, bot: commands.Bot):
         global subjects, programmes
         super().__init__()
         self.bot = bot
@@ -153,38 +153,39 @@ class Review(Base, commands.Cog):
         await inter.send(embed=embed)
 
     @cooldowns.short_cooldown
-    @commands.group()
+    @commands.slash_command(name="subject")
     @commands.check(permission_check.is_bot_admin)
-    async def subject(self, ctx):
+    async def subject(self, inter: disnake.ApplicationCommandInteraction):
         """Group of commands for managing subjects in DB"""
-        if ctx.invoked_subcommand is None:
-            await ctx.reply(Messages.subject_format)
-            return
+        await inter.response.defer()
 
-    @subject.command(brief=Messages.subject_update_biref)
-    async def update(self, ctx):
+    @subject.sub_command(name="update", description=Messages.subject_update_biref)
+    async def update(
+        self,
+        inter: disnake.ApplicationCommandInteraction,
+        overwrite: bool = commands.Param(description=Messages.subject_update_overwrite_brief, default=False),
+    ):
         """Updates subjects from web"""
         global subjects, programmes
         programme_details_link = "https://www.fit.vut.cz/study/"
         reply = ""
-        async with ctx.channel.typing():
-            # bachelor
-            url = f"{programme_details_link}program/{self.config.subject_bit_id}/.cs"
-            if not self.manager.update_subject_types(url, False):
+        # bachelor
+        url = f"{programme_details_link}program/{self.config.subject_bit_id}/.cs"
+        if not self.manager.update_subject_types(url, False, overwrite):
+            reply += Messages.subject_update_error(url=url)
+        # engineer
+        ids_list = list(range(self.config.subject_mit_id_start, self.config.subject_mit_id_end))
+        for id in ids_list + self.config.subject_mit_id_rnd:
+            url = f"{programme_details_link}field/{id}/.cs"
+            if not self.manager.update_subject_types(url, True, overwrite):
                 reply += Messages.subject_update_error(url=url)
-            # engineer
-            ids_list = list(range(self.config.subject_mit_id_start, self.config.subject_mit_id_end))
-            for id in ids_list + self.config.subject_mit_id_rnd:
-                url = f"{programme_details_link}field/{id}/.cs"
-                if not self.manager.update_subject_types(url, True):
-                    reply += Messages.subject_update_error(url=url)
-            # sports
-            self.manager.update_sport_subjects()
-            subjects = SubjectDB.get_all()
-            programmes = ProgrammeDB.get_all()
-            self.get_all_options()
-            reply += Messages.subject_update_success
-            await ctx.reply(reply)
+        # sports
+        self.manager.update_sport_subjects()
+        subjects = SubjectDB.get_all()
+        programmes = ProgrammeDB.get_all()
+        self.get_all_options()
+        reply += Messages.subject_update_success
+        await inter.edit_original_response(reply)
 
     @commands.slash_command(name="wtf", description=Messages.shortcut_brief)
     async def shortcut(
@@ -207,7 +208,7 @@ class Review(Base, commands.Cog):
             embed = disnake.Embed(title=subject.shortcut, description=subject.name)
             if subject.semester == "L":
                 semester_value = "Letní"
-            if subject.semester == "Z":
+            elif subject.semester == "Z":
                 semester_value = "Zimní"
             else:
                 semester_value = "Zimní, Letní"
@@ -261,14 +262,10 @@ class Review(Base, commands.Cog):
         if not year:
             for role in author.roles:
                 if any(deg in role.name for deg in ["BIT", "MIT"]):
-                    if role.name == "4BIT+":
-                        year = "3BIT"
-                    elif role.name == "0BIT":
+                    if role.name == "0BIT":
                         year = "1BIT"
                     elif role.name == "0MIT":
                         year = "1MIT"
-                    elif role.name == "3MIT+":
-                        year = "2MIT"
                     else:
                         year = role.name
                     break
@@ -314,5 +311,5 @@ class Review(Base, commands.Cog):
         view.message = await inter.original_message()
 
 
-def setup(bot):
+def setup(bot: commands.Bot):
     bot.add_cog(Review(bot))

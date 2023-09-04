@@ -306,6 +306,7 @@ Cog implementing review system for subjects.\
     - /subject update
     - /wtf
     - /tierboard
+
 ---
 
 ### [Roles](roles.py)

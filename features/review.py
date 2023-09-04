@@ -204,12 +204,14 @@ class ReviewManager:
         if not relevance or relevance.vote != vote:
             ReviewRelevanceDB.add_vote(review_id, vote, author)
 
-    def update_subject_types(self, link: str, MIT: bool):
+    def update_subject_types(self, link: str, MIT: bool, overwrite: bool = False):
         """Send request to `link`, parse page and find all subjects.
         Add new subjects to DB, if subject already exists update its years.
         For MITAI links please set `MIT` to True.
         If update succeeded return True, otherwise False
         """
+        degree = "MIT" if MIT else "BIT"
+
         response = requests.get(link)
         if response.status_code != 200:
             return False
@@ -228,9 +230,16 @@ class ReviewManager:
         if not programmme_db or programmme_db.link != link:
             ProgrammeDB.set(specialization, full_specialization, link)
 
-        sem = 1
-        year = 1
         for table in tables:
+            header = table.select("h4")  # e.g. '1. ročník, zimní semestr' or 'libovolný ročník, ...'
+            if not header:
+                # other table
+                continue
+            header = header[0].get_text().split(',')
+            year = header[0].strip()[0].upper()
+            if year != 'L':
+                year = int(year)
+            sem = header[1].strip()[0].upper()
             rows = table.select("tbody tr")
             for row in rows:
                 shortcut = row.find_all("th")[0].get_text()
@@ -242,31 +251,19 @@ class ReviewManager:
                 if not SubjectDB.get(shortcut.lower()):
                     SubjectDB.add(shortcut.lower())
                 name = columns[0].get_text()
+                credit = columns[1].get_text()
                 type = columns[2].get_text()
-                degree = "BIT"
-                for_year = "VBIT"
+                for_year = "VMIT" if MIT else "VBIT"
                 if type == "P":
-                    if MIT and year > 2:
-                        # any year
-                        for_year = f"L{specialization}"
-                    else:
-                        for_year = f"{year}{specialization}"
-                else:
-                    if MIT:
-                        for_year = "VMIT"
-                if MIT:
-                    degree = "MIT"
+                    for_year = f"{year}{specialization}"
                 detail = SubjectDetailsDB.get(shortcut)
-                semester = "Z"
-                if sem == 2:
-                    semester = "L"
-                if not detail:
-                    # subject not in DB
+                if not detail or overwrite:
+                    # subject not in DB or overwrite requested
                     SubjectDetailsDB(
                         shortcut=shortcut,
                         name=name,
-                        credits=columns[1].get_text(),
-                        semester=semester,
+                        credits=credit,
+                        semester=sem,
                         end=columns[3].get_text(),
                         card=columns[0].find("a").attrs["href"],
                         type=type,
@@ -279,6 +276,9 @@ class ReviewManager:
                         # Update name mainly for courses that are not opened
                         detail.name = name
                         changed = True
+                    if credit != detail.credits:
+                        detail.credits = credit
+                        changed = True
                     if for_year not in detail.year.split(", "):
                         # subject already in DB with different year (applicable mainly for MIT)
                         if type not in detail.type.split(", "):
@@ -286,9 +286,9 @@ class ReviewManager:
                         if detail.year:
                             detail.year += f", {for_year}"
                         changed = True
-                    if semester not in detail.semester.split(", "):
+                    if sem not in detail.semester.split(", "):
                         # subject already in DB with different semester (e.g. RET)
-                        detail.semester += f", {semester}"
+                        detail.semester += f", {sem}"
                         changed = True
                     if degree not in detail.degree.split(", "):
                         # subject already in DB with different degree (e.g. RET)
@@ -300,10 +300,6 @@ class ReviewManager:
                         changed = True
                     if changed:
                         detail.update()
-            sem += 1
-            if sem == 3:
-                year += 1
-                sem = 1
         return True
 
     def update_sport_subjects(self):
