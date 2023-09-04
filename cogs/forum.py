@@ -17,6 +17,8 @@ class Forum(Base, commands.Cog):
     async def on_raw_message_delete(self, payload: disnake.RawMessageDeleteEvent):
         """If the original message is deleted and there are no more messages, delete the thread too"""
         guild: disnake.Guild = self.bot.get_guild(payload.guild_id)
+        if guild is None:
+            return
         thread = guild.get_channel_or_thread(payload.channel_id)
         if thread.parent_id not in self.config.forum_autoclose_forums:
             return
