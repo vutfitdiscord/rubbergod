@@ -227,13 +227,13 @@ class Karma(BaseFeature):
         if karma >= 0:
             await inter.send(
                 Messages.karma_give_success(
-                    user=" ".join([member.mention for member in members]), karma=karma
+                    user_list=" ".join([member.mention for member in members]), karma=karma
                 )
             )
         else:
             await inter.send(
                 Messages.karma_give_negative_success(
-                    user=" ".join([member.mention for member in members]), karma=karma
+                    user_list=" ".join([member.mention for member in members]), karma=karma
                 )
             )
 
