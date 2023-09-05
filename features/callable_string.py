@@ -3,13 +3,17 @@ import disnake
 
 class CallableString(str):
     to_escape = ["role", "not_role", "line"]
+    to_mention = ["user", "admin"]
 
     def __call__(self, *args, **kwargs):
-        if "user" in kwargs:
-            kwargs["user"] = f"<@{kwargs['user']}>"
+        for arg in self.to_mention:
+            if arg not in kwargs:
+                continue
 
-        if "admin" in kwargs:
-            kwargs["admin"] = f"<@{kwargs['admin']}>"
+            string = str(kwargs[arg])
+            if string.startswith("<@") and string.endswith(">"):
+                continue
+            kwargs[arg] = f"<@{kwargs[arg]}>"
 
         for arg in self.to_escape:
             if arg in kwargs:
