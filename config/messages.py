@@ -146,6 +146,20 @@ class Messages(metaclass=Formatable):
     role_migration_allert = "Přidání/Odebrání **{channel}** bude trvat déle než je obvyklé (až 30 min)." \
                             "Prosím o strpení. Opakované klikání na reakce nemá vliv na dobu zpracování přístupu."
 
+    channel_copy_start = "Probíhá kopírování kanálu"
+    channel_copy_done = "Práva byla zkopírována."
+    channel_clone_start = "Probíhá klonování kanálu"
+    channel_clone_done = "Kanál <#{id}> byl vytvořen."
+    channel_create_start = "Probíhá vytváření kanálu"
+    channel_create_done = "Vytvoření kanálu bylo úspěšné, kanál {channel} vytvořen s přístupem pro roli **{role}**.\n • Počet overwrites: **{perms}**"
+    channel_rate = "Po kolika částech aktualizovat progress bar."
+    channel_get_overwrites_brief = "Vypíše počet přístupových práv uživatelů pro všechny mistnosti"
+    channel_get_overwrites_start = "Probíhá získávání přístupových práv"
+    channel_get_overwrites_done = "Získávání přístupových práv bylo úspěšné"
+    channel_create_role_from_overwrites_brief = "Vytvoří roli z přístupových práv"
+    channel_create_role_from_overwrites_start = "Probíhá převádění přístupových práv na roli"
+    channel_create_role_from_overwrites_done = "Přístupová práva byla úspěšně převedena na roli"
+
     group_add = "Přidá skupinu"
     group_get = "Vypíše informace o skupině"
     group_delete = "Smaže skupinu"
@@ -392,15 +406,6 @@ if ("Mám průměr pod 2.0")                                           \n  retur
     config_backup_created = "Config backup created."
     config_list_invalid_regex = "Chybný regex\n`{regex_err}`"
     config_synced = "Config successfully synchronized."
-
-    # ROLES
-    channel_copy_start = "Probíhá kopírování kanálu"
-    channel_copy_done = "Práva byla zkopírována."
-    channel_clone_start = "Probíhá klonování kanálu"
-    channel_clone_done = "Kanál <#{id}> byl vytvořen."
-    channel_create_start = "Probíhá vytváření kanálu"
-    channel_create_done = "Vytvoření kanálu bylo úspěšné, kanál {channel} vytvořen s přístupem pro roli **{role}**.\n • Počet overwrites: **{perms}**"
-    channel_create_rate = "Po kolika perms updatovat progress bar."
 
     # WEEK
     week_brief = "Vypíše, kolikátý je zrovna týden a jestli je sudý nebo lichý"
