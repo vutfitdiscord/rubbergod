@@ -238,7 +238,6 @@ Cog for handling memes with X number of reactions to be reposted to a specific c
 **Commands:**
 
     - /better-meme leaderboard
-
 ---
 
 ### [Moderation](moderation.py)
@@ -249,7 +248,6 @@ Implemented logging for tagging @mods.\
 
     - /slowmode set
     - /slowmode remove
-
 ---
 
 ### [Nameday](nameday.py)
@@ -262,7 +260,6 @@ Cog for sending name days and birthdays.\
 **Tasks:**
 
     - send_names
-
 ---
 
 ### [Random](random.py)
@@ -273,7 +270,6 @@ Implementing commands using random module.\
     - /pick
     - /flip
     - /roll
-
 ---
 
 ### [Reactions](reactions.py)
@@ -292,7 +288,6 @@ Cog implementing anonymous reporting from users.
     - /report google_form
     - /report_mod unban
     - message_command Report message
-
 ---
 
 ### [Review](review.py)
@@ -306,7 +301,6 @@ Cog implementing review system for subjects.\
     - /subject update
     - /wtf
     - /tierboard
-
 ---
 
 ### [Roles](roles.py)
@@ -326,6 +320,8 @@ Cog implementing channels and roles management. Copying/creating channels with p
     - /channel copy
     - /channel clone
     - /channel create
+    - /channel get_overwrites
+    - /channel create_role_from_overwrites
 ---
 
 ### [StreamLinks](streamlinks.py)
@@ -349,13 +345,13 @@ Cog implementing information about office hours of the study department.\
 ---
 
 ### [Subscriptions](subscriptions.py)
+
 Cog implementing subscriptions to forum posts based on their tags. \
 **Commands:**
 
     - /subscriptions add
     - /subscriptions remove
     - /subscriptions list
-
 ---
 
 ### [System](system.py)

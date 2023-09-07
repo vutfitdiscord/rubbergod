@@ -3,6 +3,7 @@ Cog implementing channels and roles management. Copying/creating channels with p
 """
 
 import asyncio
+import io
 from typing import List, Tuple
 
 import disnake
@@ -352,7 +353,7 @@ class Roles(Base, commands.Cog):
         inter: disnake.ApplicationCommandInteraction,
         channel_name,
         role: disnake.Role,
-        rate: int = commands.Param(ge=1, description=Messages.channel_create_rate),
+        rate: int = commands.Param(ge=1, default=10, description=Messages.channel_rate),
         category: disnake.CategoryChannel = None
     ):
 
@@ -375,6 +376,70 @@ class Roles(Base, commands.Cog):
                 perms=len(role.members)
             )
         )
+
+    @channel.sub_command(name="get_overwrites", description=Messages.channel_get_overwrites_brief)
+    async def get_overwrites(
+        self,
+        inter: disnake.ApplicationCommandInteraction,
+        rate: int = commands.Param(ge=1, default=10, description=Messages.channel_rate),
+    ):
+        """Get channels and count of user overwrites with view_channel=True."""
+        await inter.send(Messages.channel_get_overwrites_start)
+        channels_output = {}
+        for index, channel in enumerate(inter.guild.channels):
+            channel_overwrites = {member: permission for member, permission in channel.overwrites.items()
+                                  if not isinstance(member, disnake.Role) and permission.view_channel}
+            channels_output[channel] = len(channel_overwrites)
+            if (index % rate == 0):
+                await inter.edit_original_response(
+                    f"• kanálů: {index+1}/{len(inter.guild.channels)}\n"
+                    f"{utils.create_bar(index+1, len(inter.guild.channels))}"
+                )
+        output = []
+        channels_output = dict(sorted(channels_output.items(), key=lambda item: item[1], reverse=True))
+        with io.StringIO() as output:
+            for channel, overwrites in channels_output.items():
+                if isinstance(channel, disnake.CategoryChannel):
+                    output.write(f"#{channel.name}(kategorie) - {overwrites}\n")
+                else:
+                    output.write(f"#{channel.name} - {overwrites}\n")
+            output.seek(0)
+
+            await inter.channel.send(file=disnake.File(output, filename="overwrites.txt"))
+        await inter.edit_original_response(Messages.channel_get_overwrites_done)
+
+    @channel.sub_command(
+        name="overwrites_to_role",
+        description=Messages.channel_create_role_from_overwrites_brief
+    )
+    async def create_role_from_overwrites(
+        self,
+        inter: disnake.ApplicationCommandInteraction,
+        channel: disnake.TextChannel,
+        rate: int = commands.Param(ge=1, default=10, description=Messages.channel_rate),
+    ):
+        """
+        Create a new role with the same name as channel name.
+        Give users with view_channel=True this role.
+        Remove overwrites.
+        """
+        await inter.send(Messages.channel_create_role_from_overwrites_start)
+        new_role = await inter.guild.create_role(name=channel.name)
+        await channel.set_permissions(
+            target=new_role,
+            overwrite=disnake.PermissionOverwrite(read_messages=True)
+        )
+        channel_overwrites = {member: permission for member, permission in channel.overwrites.items()
+                              if not isinstance(member, disnake.Role) and permission.view_channel}
+        for index, member in enumerate(channel_overwrites):
+            await channel.set_permissions(member, view_channel=None)
+            await member.add_roles(new_role)
+            if (index % rate == 0):
+                await inter.edit_original_response(
+                    f"• overwrites: {len(channel_overwrites)}\n"
+                    f"{utils.create_bar(index+1, len(channel_overwrites))}"
+                )
+        await inter.edit_original_response(Messages.channel_create_role_from_overwrites_done)
 
     @commands.Cog.listener()
     async def on_message(self, message):
