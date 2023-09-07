@@ -421,10 +421,10 @@ class Roles(Base, commands.Cog):
         await inter.edit_original_response(Messages.channel_get_overwrites_done)
 
     @channel.sub_command(
-        name="role_to_overwrites",
-        description=Messages.channel_role_to_overwrites_brief
+        name="overwrites_to_role",
+        description=Messages.channel_overwrites_to_role_brief
     )
-    async def role_to_overwrites(
+    async def overwrites_to_role(
         self,
         inter: disnake.ApplicationCommandInteraction,
         channel: disnake.TextChannel,
@@ -435,7 +435,7 @@ class Roles(Base, commands.Cog):
         Give users with view_channel=True this role.
         Remove overwrites.
         """
-        await inter.send(Messages.channel_role_to_overwrites_start)
+        await inter.send(Messages.channel_overwrites_to_role_start)
         new_role = await inter.guild.create_role(name=channel.name)
         await channel.set_permissions(
             target=new_role,
@@ -453,13 +453,13 @@ class Roles(Base, commands.Cog):
                     f"• overwrites: {index+1}/{len(channel_user_overwrites)}\n"
                     f"{utils.create_bar(index+1, len(channel_user_overwrites))}"
                 )
-        await inter.edit_original_response(Messages.channel_role_to_overwrites_done)
+        await inter.edit_original_response(Messages.channel_overwrites_to_role_done)
 
     @channel.sub_command(
-        name="overwrites_to_role",
-        description=Messages.channel_overwrites_to_role_brief
+        name="role_to_overwrites",
+        description=Messages.channel_role_to_overwrites_brief
     )
-    async def overwrites_to_role(
+    async def role_to_overwrites(
         self,
         inter: disnake.ApplicationCommandInteraction,
         role: disnake.Role,
@@ -471,7 +471,7 @@ class Roles(Base, commands.Cog):
         Give users view_channel=True who had this role.
         Remove role.
         """
-        await inter.send(Messages.channel_overwrites_to_role_start)
+        await inter.send(Messages.channel_role_to_overwrites_start)
         members = role.members
         await role.delete()
 
@@ -482,7 +482,7 @@ class Roles(Base, commands.Cog):
                     f"• overwrites: {index+1}/{len(members)}\n"
                     f"{utils.create_bar(index+1, len(members))}"
                 )
-        await inter.edit_original_response(Messages.channel_overwrites_to_role_done)
+        await inter.edit_original_response(Messages.channel_role_to_overwrites_done)
 
     @commands.Cog.listener()
     async def on_message(self, message):
