@@ -385,19 +385,31 @@ class Roles(Base, commands.Cog):
     ):
         """Get channels and count of user overwrites with view_channel=True."""
         await inter.send(Messages.channel_get_overwrites_start)
+        total_overwrites = 0
+        user_overwrites = 0
         channels_output = {}
         for index, channel in enumerate(inter.guild.channels):
-            channel_overwrites = {member: permission for member, permission in channel.overwrites.items()
-                                  if not isinstance(member, disnake.Role) and permission.view_channel}
-            channels_output[channel] = len(channel_overwrites)
+            channel_user_overwrites = {
+                member: permission for member, permission in channel.overwrites.items()
+                if not isinstance(member, disnake.Role) and permission.view_channel
+            }
+            channel_overwrites = {
+                role_or_member: permission for role_or_member, permission in channel.overwrites.items()
+            }
+            channels_output[channel] = f"user:{len(channel_user_overwrites)}, all: {len(channel_overwrites)}"
             if (index % rate == 0):
                 await inter.edit_original_response(
                     f"• kanálů: {index+1}/{len(inter.guild.channels)}\n"
                     f"{utils.create_bar(index+1, len(inter.guild.channels))}"
                 )
+            user_overwrites += len(channel_user_overwrites)
+            total_overwrites += len(channel_overwrites)
+
         output = []
         channels_output = dict(sorted(channels_output.items(), key=lambda item: item[1], reverse=True))
         with io.StringIO() as output:
+            output.write(f"User overwrites total:{user_overwrites}\n")
+            output.write(f"Total overwrites:{total_overwrites}\n\n")
             for channel, overwrites in channels_output.items():
                 if isinstance(channel, disnake.CategoryChannel):
                     output.write(f"#{channel.name}(kategorie) - {overwrites}\n")
@@ -409,10 +421,10 @@ class Roles(Base, commands.Cog):
         await inter.edit_original_response(Messages.channel_get_overwrites_done)
 
     @channel.sub_command(
-        name="overwrites_to_role",
-        description=Messages.channel_create_role_from_overwrites_brief
+        name="role_to_overwrites",
+        description=Messages.channel_role_to_overwrites_brief
     )
-    async def create_role_from_overwrites(
+    async def role_to_overwrites(
         self,
         inter: disnake.ApplicationCommandInteraction,
         channel: disnake.TextChannel,
@@ -423,23 +435,54 @@ class Roles(Base, commands.Cog):
         Give users with view_channel=True this role.
         Remove overwrites.
         """
-        await inter.send(Messages.channel_create_role_from_overwrites_start)
+        await inter.send(Messages.channel_role_to_overwrites_start)
         new_role = await inter.guild.create_role(name=channel.name)
         await channel.set_permissions(
             target=new_role,
-            overwrite=disnake.PermissionOverwrite(read_messages=True)
+            overwrite=disnake.PermissionOverwrite(view_channel=True)
         )
-        channel_overwrites = {member: permission for member, permission in channel.overwrites.items()
-                              if not isinstance(member, disnake.Role) and permission.view_channel}
-        for index, member in enumerate(channel_overwrites):
-            await channel.set_permissions(member, view_channel=None)
+        channel_user_overwrites = {
+            member: permission for member, permission in channel.overwrites.items()
+            if not isinstance(member, disnake.Role) and permission.view_channel
+        }
+        for index, member in enumerate(channel_user_overwrites):
+            await channel.set_permissions(member, overwrite=None)
             await member.add_roles(new_role)
             if (index % rate == 0):
                 await inter.edit_original_response(
-                    f"• overwrites: {len(channel_overwrites)}\n"
-                    f"{utils.create_bar(index+1, len(channel_overwrites))}"
+                    f"• overwrites: {index+1}/{len(channel_user_overwrites)}\n"
+                    f"{utils.create_bar(index+1, len(channel_user_overwrites))}"
                 )
-        await inter.edit_original_response(Messages.channel_create_role_from_overwrites_done)
+        await inter.edit_original_response(Messages.channel_role_to_overwrites_done)
+
+    @channel.sub_command(
+        name="overwrites_to_role",
+        description=Messages.channel_overwrites_to_role_brief
+    )
+    async def overwrites_to_role(
+        self,
+        inter: disnake.ApplicationCommandInteraction,
+        role: disnake.Role,
+        channel: disnake.TextChannel,
+        rate: int = commands.Param(ge=1, default=10, description=Messages.channel_rate),
+    ):
+        """
+        Create user overwrites from role for specific channel
+        Give users view_channel=True who had this role.
+        Remove role.
+        """
+        await inter.send(Messages.channel_overwrites_to_role_start)
+        members = role.members
+        await role.delete()
+
+        for index, member in enumerate(members):
+            await channel.set_permissions(member, view_channel=True)
+            if (index % rate == 0):
+                await inter.edit_original_response(
+                    f"• overwrites: {index+1}/{len(members)}\n"
+                    f"{utils.create_bar(index+1, len(members))}"
+                )
+        await inter.edit_original_response(Messages.channel_overwrites_to_role_done)
 
     @commands.Cog.listener()
     async def on_message(self, message):

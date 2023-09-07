@@ -321,7 +321,8 @@ Cog implementing channels and roles management. Copying/creating channels with p
     - /channel clone
     - /channel create
     - /channel get_overwrites
-    - /channel create_role_from_overwrites
+    - /channel overwrite_to_role
+    - /channel role_to_overwrites
 ---
 
 ### [StreamLinks](streamlinks.py)
