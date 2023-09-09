@@ -80,6 +80,8 @@ image_extensions = ["png", "jpg", "jpeg", "gif"]
 
 [meme]
 uhoh_string = 'uh oh'
+upgraded_pocitani_thread_id = 1082751957288100042
+upgraded_pocitani_start_num = 1
 hug_emojis = ["<:peepoHug:600435649786544151>",
     "<:peepoHugger:602052621007585280>",
     "<:huggers:602823825880514561>", "(っ˘̩╭╮˘̩)っ", "(っ´▽｀)っ",
