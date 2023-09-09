@@ -36,6 +36,14 @@ class Meme(Base, commands.Cog):
         elif message.content == "PR":
             await message.channel.send(Messages.pr_meme)
 
+    @commands.Cog.listener()
+    async def on_raw_message_delete(self, payload: disnake.RawMessageDeleteEvent):
+        if payload.channel_id == self.config.upgraded_pocitani_thread_id:
+            pocitani = self.bot.get_channel(payload.channel_id)
+            startnum = self.config.upgraded_pocitani_start_num
+            await pocitani.send(Messages.upgraded_pocitani_caught_deleting)
+            await pocitani.send(startnum)
+
     @commands.slash_command(name="uhoh", description=Messages.uhoh_brief)
     async def uhoh(self, inter):
         await inter.send(Messages.uhoh_counter(uhohs=uhoh_counter))

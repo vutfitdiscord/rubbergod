@@ -54,6 +54,7 @@ class Messages(metaclass=Formatable):
     hug_hugboard_brief = "Celková tabulka statistiky obejmutí"
     hug_huggersboard_brief = "Vypíše nejčastější objímače"
     hug_mosthugged_brief = "Vypíše nejvíce objímané lidi"
+    upgraded_pocitani_caught_deleting = "Podvádět mazáním zpráv je zakázáno. Začínáme znovu: "
 
     # IOS
     ios_brief = "Připomene všem prasatům, že si mají jít po sobě uklidit"

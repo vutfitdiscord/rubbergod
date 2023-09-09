@@ -117,6 +117,8 @@ class Config:
 
     # memes
     hug_emojis: List[str] = get_attr(toml_dict, "meme", "hug_emojis")
+    upgraded_pocitani_thread_id: int = get_attr(toml_dict, "meme", "upgraded_pocitani_thread_id")
+    upgraded_pocitani_start_num: int = get_attr(toml_dict, "meme", "upgraded_pocitani_start_num")
 
     # uh oh
     uhoh_string: str = get_attr(toml_dict, "meme", "uhoh_string")
