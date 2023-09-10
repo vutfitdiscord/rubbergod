@@ -85,24 +85,28 @@ Then, create the following 5 channels (or use one channel for all of them) on yo
 
 ### Docker setup (recommended)
 
-Install Docker Engine or (more full-featured) Docker Desktop by going to their [official documentation](https://docs.docker.com/engine/install/). Just select your OS and follow the steps.
+Install Docker & Docker Compose V2 by going to their [official documentation](https://docs.docker.com/engine/install/). Just select your OS and follow the steps.
 
-If you haven't already, run `docker` (`systemctl start docker.service`). To use Docker, you also need to be in `docker` group (eg. `sudo usermod -aG docker $USER && newgrp docker`).
+> You can also install Docker as a GUI App -- Docker Desktop -- which includes everything you need.
 
-> It might be necessary to log out and back in or even restart your system (to get all the permissions and other stuff right).
+- If you haven't already, enable `docker` service on startup: `sudo systemctl enable --now docker.service`. Most installers should do that automatically, though.
+- To use Docker without `sudo`, you also need to be in `docker` group (eg. `sudo usermod -aG docker $USER && newgrp docker`).
+- It's recommended to restart your system at this point (to get all the permissions and other stuff right).
 
-#### a. Dev containers in VS Code (one click run) - preferred option
+#### a. Dev containers in VS Code (one click run) -- preferred option
 
 If you are using VS Code, you can simply run Rubbergod by using the [Dev containers](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers) extension.
-Either by clicking on notification or by clicking on arrows in left bottom corner (Open a Remote Window) and choosing `Reopen in container`.
+Either by clicking on a notification or by clicking on arrows in bottom left corner (Open a Remote Window) and choosing `Reopen in container`.
 
-#### b. Docker Compose CLI - if you don't use VS Code
+#### b. Docker Compose CLI -- if you don't use VS Code
 
 This command should do the trick:
 
 ```bash
-docker-compose up --build
+docker compose up
 ```
+
+**Note:** We use the newer Compose V2 here. If the above command doesn't work, please install Compose V2: `docker-compose-plugin`. As a second option, you can install and use (now deprecated) `docker-compose` command instead.
 
 Docker will download all the necessary stuff and run the container. If you did everything correctly, bot will connect to the DB, load all the extensions and print `Ready` at the end. It will also send `:peepowave:` emoji to the `#bot-room` if you configured one. You're now all set!
 
@@ -112,18 +116,20 @@ Docker will download all the necessary stuff and run the container. If you did e
 
 If you didn't run the container in detached mode, just press `Ctrl+C` to stop it.
 
-Try to tweak some command a little bit and run the bot again, this time in detached mode so it won't block your terminal:
+Try to tweak some command a little bit and run the bot again, this time you can try to open it in detached mode so it won't block your terminal:
 
 ```bash
-docker-compose up --detach
+docker compose up --detach
 ```
 
-> Your changes should be propagated to the server in a moment.
+**Note:** You can use shorter `-d` instead of `--detach`.
+
+> If you changed some internal command logic, it should be applied instantly. If, however, your change involves Discord-side API changes -- command name change, for example -- it can take longer (few minutes to a few hours in extreme cases).
 
 To stop the detached container, use this command:
 
 ```bash
-docker-compose down
+docker compose down
 ```
 
 ### Tips (optional)
@@ -138,6 +144,10 @@ To enable command synchronization debug logging, change the following setting in
 command_sync_flags = commands.CommandSyncFlags()
 command_sync_flags.sync_commands_debug = False
 ```
+
+Database-related tips can be found in [database README](database/README.md).
+
+List with all cogs, their commands and tasks can be found in [cog README](cogs/README.md).
 
 --------------------------------------
 
@@ -202,9 +212,9 @@ You can discuss bot-related stuff in the [`#bot-development`](https://discord.co
 
 ## Other bots
 
-[GrillBot](https://github.com/GrillBot) - our 2nd Discord bot almost entirely developed and maintained by [@Misha12](https://github.com/Misha12) aka Hobit.
+[GrillBot](https://github.com/GrillBot) -- our 2nd Discord bot almost entirely developed and maintained by [@Misha12](https://github.com/Misha12) aka Hobit.
 
-[Pumpkin.py](https://github.com/pumpkin-py/pumpkin-py) - Highly modular Discord bot created by folks at BUT FEEC.
+[Pumpkin.py](https://github.com/pumpkin-py/pumpkin-py) -- Highly modular Discord bot created by folks at BUT FEEC.
 
 ## License
 
