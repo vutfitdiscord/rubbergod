@@ -11,6 +11,7 @@ from sqlalchemy.orm.exc import MultipleResultsFound, NoResultFound
 import utils
 from cogs.base import Base
 from config import cooldowns
+from config.messages import Messages
 from database import session
 from database.verification import PermitDB, ValidPersonDB
 from features import verification
@@ -167,53 +168,125 @@ class FitWide(Base, commands.Cog):
         await ctx.send(message)
         return
 
+    async def set_channel_permissions_for_new_students(
+        self,
+        guild: disnake.Guild,
+        bit0: disnake.Role,
+        mit0: disnake.Role,
+        bit_terminy_channels: list,
+        info_channels: list,
+    ) -> None:
+        """Set permissions for new 0bit and 0mit roles to see school channels"""
+        # Get all semester categories
+        categories_names = [
+            "1. semestr", "2. semestr", "3. semestr", "4. semestr", "5. semestr",
+            "zimni-volitelne", "letni-volitelne", "volitelne",
+            "zimni magistersky semestr", "letni magistersky semestr"
+        ]
+        categories = [
+            disnake.utils.get(guild.categories, name=semester_name) for semester_name in categories_names
+        ]
+
+        # give 0mit access to mit-general
+        mit_general = disnake.utils.get(guild.channels, name="mit-general")
+        await mit_general.set_permissions(mit0, read_messages=True)
+
+        mit_channels_names = ["mit-terminy", "mit-info"]
+        mit_channels = [
+            disnake.utils.get(guild.channels, name=channel_name) for channel_name in mit_channels_names
+        ]
+        for channel in mit_channels:
+            await channel.set_permissions(bit0, read_messages=True)
+            await channel.set_permissions(mit0, read_messages=True)
+
+        # Xbit-info channels overwrites
+        for channel in info_channels:
+            await channel.set_permissions(bit0, read_messages=True)
+
+        # Xbit-terminy overwrites
+        for terminy_channel in bit_terminy_channels:
+            await terminy_channel.set_permissions(bit0, read_messages=True)
+
+        # for every channel in category set overwrite
+        for category in categories:
+            for channel in category.channels:
+                await channel.set_permissions(bit0, read_messages=True)
+                await channel.set_permissions(mit0, read_messages=True)
+
+        # skolni-info, cvicici-info, stream-links, senat-unie-drby room overwrites
+        channel_names = ["skolni-info", "cvicici-info", "stream-links", "senat-unie-drby"]
+        channels = [
+            disnake.utils.get(guild.channels, name=channel_name) for channel_name in channel_names
+        ]
+        for channel in channels:
+            await channel.set_permissions(bit0, read_messages=True)
+            await channel.set_permissions(mit0, read_messages=True)
+
     @cooldowns.default_cooldown
     @commands.check(permission_check.is_bot_admin)
-    @commands.command()
-    async def increment_roles(self, ctx):
-        # guild = self.bot.get_guild(config.guild_id)
-        guild = ctx.guild
+    @commands.slash_command(name="increment_roles", description=Messages.increment_roles_brief)
+    async def increment_roles(self, inter: disnake.ApplicationCommandInteraction):
+        await inter.response.defer()
+        message = await inter.original_message()
+        guild = inter.guild
 
-        BIT_names = [str(x) + "BIT" + ("+" if x == 4 else "") for x in range(5)]
-        BIT = [disnake.utils.get(guild.roles, name=role_name) for role_name in BIT_names]
+        BIT_names = ["0BIT", "1BIT", "2BIT", "3BIT+"]
+        BIT_roles = [disnake.utils.get(guild.roles, name=role_name) for role_name in BIT_names]
 
-        MIT_names = [str(x) + "MIT" + ("+" if x == 3 else "") for x in range(4)]
-        MIT = [disnake.utils.get(guild.roles, name=role_name) for role_name in MIT_names]
+        MIT_names = ["0MIT", "1MIT", "2MIT+"]
+        MIT_roles = [disnake.utils.get(guild.roles, name=role_name) for role_name in MIT_names]
+        VUT = disnake.utils.get(guild.roles, name="VUT")
 
-        for member in BIT[3].members:
-            await member.add_roles(BIT[4])
-        for member in MIT[2].members:
-            await member.add_roles(MIT[3])
+        # create 4bit-1mit and add members
+        bit4_members = BIT_roles[3].members
+        bit4 = await guild.create_role(name="4bit-1mit")
+        for member in bit4_members:
+            await member.add_roles(bit4)
 
-        BIT_colors = [role.color for role in BIT]
-        await BIT[3].delete()
-        await BIT[2].edit(name="3BIT+", color=BIT_colors[3])
-        await BIT[1].edit(name="2BIT", color=BIT_colors[2])
-        await BIT[0].edit(name="1BIT", color=BIT_colors[1])
-        bit0 = await guild.create_role(name="0BIT", color=BIT_colors[0])
-        await bit0.edit(position=BIT[0].position - 1)
+        # give 3bit/2mit users 2bit/1mit role
+        for member in BIT_roles[3].members:
+            await member.add_roles(BIT_roles[2])
+        for member in MIT_roles[2].members:
+            await member.add_roles(MIT_roles[1])
 
-        MIT_colors = [role.color for role in MIT]
-        await MIT[2].delete()
-        await MIT[1].edit(name="2MIT+", color=MIT_colors[2])
-        await MIT[0].edit(name="1MIT", color=MIT_colors[1])
-        mit0 = await guild.create_role(name="0MIT", color=MIT_colors[0])
-        await mit0.edit(position=MIT[0].position - 1)
+        # increment roles and create 0bit and 0mit
+        BIT_COLORS = [role.color for role in BIT_roles]
+        await BIT_roles[3].delete()
+        await BIT_roles[2].edit(name="3BIT+", color=BIT_COLORS[3])
+        await BIT_roles[1].edit(name="2BIT", color=BIT_COLORS[2])
+        await BIT_roles[0].edit(name="1BIT", color=BIT_COLORS[1])
+        BIT_roles.insert(0, await guild.create_role(name="0BIT", color=BIT_COLORS[0]))
+        await BIT_roles[0].edit(position=BIT_roles[1].position - 1)
 
-        general_names = [str(x) + "bit-general" for x in range(4)]
-        terminy_names = [str(x) + "bit-terminy" for x in range(1, 3)]
+        MIT_COLORS = [role.color for role in MIT_roles]
+        await MIT_roles[2].delete()
+        await MIT_roles[1].edit(name="2MIT+", color=MIT_COLORS[2])
+        await MIT_roles[0].edit(name="1MIT", color=MIT_COLORS[1])
+        MIT_roles.insert(0, await guild.create_role(name="0MIT", color=MIT_COLORS[0]))
+        await MIT_roles[0].edit(position=MIT_roles[1].position - 1)
+
+        # status update
+        await message.edit(Messages.increment_roles_names)
+
+        # get channels by name
+        GENERAL_NAMES = ["0bit-general", "1bit-general", "2bit-general", "3bit-general"]
+        TERMINY_NAMES = ["1bit-terminy", "2bit-terminy", "3bit-terminy"]
+        INFO_NAMES = ["0bit-info", "1bit-info", "2bit-info", "3bit-info"]
         general_channels = [
-            disnake.utils.get(guild.channels, name=channel_name) for channel_name in general_names
+            disnake.utils.get(guild.channels, name=channel_name) for channel_name in GENERAL_NAMES
         ]
-        terminy_channels = [
-            disnake.utils.get(guild.channels, name=channel_name) for channel_name in terminy_names
+        bit_terminy_channels = [
+            disnake.utils.get(guild.channels, name=channel_name) for channel_name in TERMINY_NAMES
         ]
+        info_channels = [disnake.utils.get(guild.channels, name=channel_name) for channel_name in INFO_NAMES]
 
-        # move names
-        await general_channels[3].edit(name="4bit-general")
+        # increment channel names
+        overwrites = {bit4: disnake.PermissionOverwrite(read_messages=True, send_messages=True)}
+        await general_channels[3].edit(name="4bit-1mit-general", overwrites=overwrites)
         await general_channels[2].edit(name="3bit-general")
         await general_channels[1].edit(name="2bit-general")
         await general_channels[0].edit(name="1bit-general")
+
         # create 0bit-general
         overwrites = {
             guild.default_role: disnake.PermissionOverwrite(read_messages=False),
@@ -227,81 +300,42 @@ class FitWide(Base, commands.Cog):
             category=general_channels[0].category,
             position=general_channels[0].position - 1,
         )
-        # give 0mit access to mit-general
-        mit_general = disnake.utils.get(guild.channels, name="mit-general")
-        await mit_general.set_permissions(mit0, read_messages=True)
 
-        # delete 3bit-terminy
+        # status update
+        await message.edit(Messages.increment_roles_room_names)
+
+        # increment terminy and delete 3bit-terminy
+        bit_terminy_channels.pop(2)
         await disnake.utils.get(guild.channels, name="3bit-terminy").delete()
+        await bit_terminy_channels[1].edit(name="3bit-terminy")
+        await bit_terminy_channels[0].edit(name="2bit-terminy")
 
-        await terminy_channels[1].edit(name="3bit-terminy")
-        await terminy_channels[0].edit(name="2bit-terminy")
         # create 1bit-terminy
         overwrites = {
             guild.default_role: disnake.PermissionOverwrite(read_messages=False),
             disnake.utils.get(guild.roles, name="1BIT"): disnake.PermissionOverwrite(
                 read_messages=True, send_messages=False
             ),
+            BIT_roles[0]: disnake.PermissionOverwrite(read_messages=True),
+            BIT_roles[1]: disnake.PermissionOverwrite(read_messages=True),
+            BIT_roles[2]: disnake.PermissionOverwrite(read_messages=True),
+            BIT_roles[3]: disnake.PermissionOverwrite(read_messages=True),
+            VUT: disnake.PermissionOverwrite(read_messages=True),
         }
-        await guild.create_text_channel(
+
+        terminy_1bit_channel = await guild.create_text_channel(
             "1bit-terminy",
             overwrites=overwrites,
-            category=terminy_channels[0].category,
-            position=terminy_channels[0].position - 1,
+            category=bit_terminy_channels[0].category,
+            position=bit_terminy_channels[0].position - 1,
+        )
+        bit_terminy_channels.insert(0, terminy_1bit_channel)
+
+        await self.set_channel_permissions_for_new_students(
+            guild, BIT_roles[0], MIT_roles[0], bit_terminy_channels, info_channels
         )
 
-        # Give people the correct mandatory classes after increment
-        semester_names = [str(x) + ". Semestr" for x in range(1, 6)]
-        semester = [
-            disnake.utils.get(guild.categories, name=semester_name) for semester_name in semester_names
-        ]
-        await semester[0].set_permissions(disnake.utils.get(guild.roles, name="1BIT"), read_messages=True)
-        await semester[0].set_permissions(disnake.utils.get(guild.roles, name="2BIT"), overwrite=None)
-        await semester[1].set_permissions(disnake.utils.get(guild.roles, name="1BIT"), read_messages=True)
-        await semester[1].set_permissions(disnake.utils.get(guild.roles, name="2BIT"), overwrite=None)
-        await semester[2].set_permissions(disnake.utils.get(guild.roles, name="2BIT"), read_messages=True)
-        await semester[2].set_permissions(disnake.utils.get(guild.roles, name="3BIT+"), overwrite=None)
-        await semester[3].set_permissions(disnake.utils.get(guild.roles, name="2BIT"), read_messages=True)
-        await semester[3].set_permissions(disnake.utils.get(guild.roles, name="3BIT+"), overwrite=None)
-        await semester[4].set_permissions(disnake.utils.get(guild.roles, name="3BIT+"), read_messages=True)
-
-        # Warning: This was somehow ran before the semester permissions changed
-        # So just keep in mind that weird shit happens
-        for category in semester:
-            for channel in category.channels:
-                await channel.edit(sync_permissions=True)
-
-        # skolni-info override
-        skolni_info = disnake.utils.get(guild.channels, name="skolni-info")
-        await skolni_info.set_permissions(bit0, read_messages=True)
-        await skolni_info.set_permissions(mit0, read_messages=True)
-
-        await disnake.utils.get(guild.channels, name="cvicici-info").set_permissions(
-            disnake.utils.get(guild.roles, name="1BIT"), read_messages=True
-        )
-        await disnake.utils.get(guild.channels, name="cvicici-info").set_permissions(
-            disnake.utils.get(guild.roles, name="1MIT"), read_messages=True
-        )
-        await disnake.utils.get(guild.channels, name="1bit-info").set_permissions(
-            disnake.utils.get(guild.roles, name="1BIT"), read_messages=True
-        )
-        await disnake.utils.get(guild.channels, name="1bit-info").set_permissions(
-            disnake.utils.get(guild.roles, name="2BIT"), overwrite=None
-        )
-        await disnake.utils.get(guild.channels, name="2bit-info").set_permissions(
-            disnake.utils.get(guild.roles, name="2BIT"), read_messages=True
-        )
-        await disnake.utils.get(guild.channels, name="2bit-info").set_permissions(
-            disnake.utils.get(guild.roles, name="3BIT+"), overwrite=None
-        )
-        await disnake.utils.get(guild.channels, name="3bit-info").set_permissions(
-            disnake.utils.get(guild.roles, name="3BIT+"), read_messages=True
-        )
-        await disnake.utils.get(guild.channels, name="mit-info").set_permissions(
-            disnake.utils.get(guild.roles, name="1MIT"), read_messages=True
-        )
-
-        await ctx.send("Holy fuck, všechno se povedlo, " "tak zase za rok <:Cauec:602052606210211850>")
+        await inter.edit_original_response(Messages.increment_roles_success)
 
     @cooldowns.default_cooldown
     @commands.check(room_check.is_in_modroom)

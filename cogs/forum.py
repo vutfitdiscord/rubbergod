@@ -20,6 +20,8 @@ class Forum(Base, commands.Cog):
         if guild is None:
             return
         thread = guild.get_channel_or_thread(payload.channel_id)
+        if not isinstance(thread, disnake.Thread):
+            return
         if thread.parent_id not in self.config.forum_autoclose_forums:
             return
 
