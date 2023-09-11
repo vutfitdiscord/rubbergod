@@ -18,6 +18,13 @@ class Messages(metaclass=Formatable):
     embed_not_author = "Hraj si na svém písečku s tebou zavolanými příkazy. <:pepeGun:826943455032901643>"
     base_leaderboard_format_str = "_{position}._ - **{member_name}**:"
 
+    # FITWIDE
+    increment_roles_brief = "Aktualizuje role na serveru podle ročníku. Aktualizace školních roomek."
+    increment_roles_start = "Incrementing roles..."
+    increment_roles_names = "1/3 - Role úspěšně přejmenovány a 0bit a 0mit vytvořen"
+    increment_roles_room_names = "2/3 - Kanály úspěšně přejmenovány a 0bit a 0mit general vytvořen"
+    increment_roles_success = "3/3 - Holy fuck, všechno se povedlo, tak zase za rok <:Cauec:602052606210211850>"
+
     # ERROR
     moved_command = "Tento příkaz již není v textové formě podporován. Příkaz byl nahrazen příkazem </{name}:{id}>"
     no_such_command = "Takový příkaz neznám. <:sadcat:576171980118687754>"
