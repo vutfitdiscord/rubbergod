@@ -87,18 +87,18 @@ Then, create the following 5 channels (or use one channel for all of them) on yo
 
 Install Docker & Docker Compose V2 by going to their [official documentation](https://docs.docker.com/engine/install/). Just select your OS and follow the steps.
 
-> You can also install Docker as a GUI App -- Docker Desktop -- which includes everything you need.
+> You can also install Docker as a GUI App — Docker Desktop — which includes everything you need.
 
 - If you haven't already, enable `docker` service on startup: `sudo systemctl enable --now docker.service`. Most installers should do that automatically, though.
 - To use Docker without `sudo`, you also need to be in `docker` group (eg. `sudo usermod -aG docker $USER && newgrp docker`).
 - It's recommended to restart your system at this point (to get all the permissions and other stuff right).
 
-#### a. Dev containers in VS Code (one click run) -- preferred option
+#### a. Dev containers in VS Code (one click run) — preferred option
 
 If you are using VS Code, you can simply run Rubbergod by using the [Dev containers](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers) extension.
 Either by clicking on a notification or by clicking on arrows in bottom left corner (Open a Remote Window) and choosing `Reopen in container`.
 
-#### b. Docker Compose CLI -- if you don't use VS Code
+#### b. Docker Compose CLI — if you don't use VS Code
 
 This command should do the trick:
 
@@ -124,7 +124,7 @@ docker compose up --detach
 
 **Note:** You can use shorter `-d` instead of `--detach`.
 
-> If you changed some internal command logic, it should be applied instantly. If, however, your change involves Discord-side API changes -- command name change, for example -- it can take longer (few minutes to a few hours in extreme cases).
+> If you changed some internal command logic, it should be applied instantly. If, however, your change involves Discord-side API changes — command name change, for example — it can take longer (few minutes to a few hours in extreme cases).
 
 To stop the detached container, use this command:
 
@@ -176,7 +176,7 @@ postgresql
 postgresql-contrib
 libpq-dev
 ```
----------------------------------------
+--------------------------------------
 
 ## Contribution
 
@@ -212,9 +212,9 @@ You can discuss bot-related stuff in the [`#bot-development`](https://discord.co
 
 ## Other bots
 
-[GrillBot](https://github.com/GrillBot) -- our 2nd Discord bot almost entirely developed and maintained by [@Misha12](https://github.com/Misha12) aka Hobit.
+[GrillBot](https://github.com/GrillBot) — our 2nd Discord bot almost entirely developed and maintained by [@Misha12](https://github.com/Misha12) aka Hobit.
 
-[Pumpkin.py](https://github.com/pumpkin-py/pumpkin-py) -- Highly modular Discord bot created by folks at BUT FEEC.
+[Pumpkin.py](https://github.com/pumpkin-py/pumpkin-py) — Highly modular Discord bot created by folks at BUT FEEC.
 
 ## License
 
