@@ -99,6 +99,7 @@ class Verify(Base, commands.Cog):
     @commands.user_command(name="Verify host", guild_ids=[Base.config.guild_id])
     async def verify_host(self, inter: disnake.UserCommandInteraction, member: disnake.Member):
         """add verify and host role to new member"""
+        await inter.response.defer()
         host_id = inter.guild.get_role(self.config.verification_host_id)
         verify_id = inter.guild.get_role(self.config.verification_role_id)
 
@@ -108,7 +109,7 @@ class Verify(Base, commands.Cog):
         except AttributeError:
             raise commands.errors.MemberNotFound("Member not found")
         response_message = Messages.verify_verify_success(user=member.id)
-        await inter.response.send_message(response_message)
+        await inter.edit_original_response(response_message)
         await member.send(response_message)
 
 
