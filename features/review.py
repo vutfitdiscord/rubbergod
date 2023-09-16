@@ -1,5 +1,6 @@
 from datetime import datetime, time
 from enum import Enum
+from statistics import mean
 from typing import Union
 
 import disnake
@@ -158,7 +159,7 @@ class ReviewManager:
             if not subject_obj:
                 return None
         reviews = ReviewDB.get_subject_reviews(subject_obj.shortcut)
-        reviews_cnt = reviews.count()
+        reviews_cnt = len(reviews)
         subject_details = SubjectDetailsDB.get(subject_obj.shortcut) or subject_obj.shortcut
         name = getattr(subject_details, "name",  "")
         if reviews_cnt == 0:
@@ -166,10 +167,11 @@ class ReviewManager:
             return [self.make_embed(author, None, subject_details, description, "1/1")]
         else:
             embeds = []
+            avg_tier = mean([review.ReviewDB.tier for review in reviews])
             for idx in range(reviews_cnt):
                 review = reviews[idx].ReviewDB
-                grade_num = TierEnum.tier_to_grade_num(reviews[idx].avg_tier)
-                grade = f"{TierEnum(round(reviews[idx].avg_tier)).name}({round(grade_num, 1)})"
+                grade_num = TierEnum.tier_to_grade_num(avg_tier)
+                grade = f"{TierEnum(round(avg_tier)).name}({round(grade_num, 1)})"
                 description = Messages.review_embed_description(name=name, grade=grade)
                 page = f"{idx+1}/{reviews_cnt}"
 
