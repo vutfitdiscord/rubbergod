@@ -170,6 +170,7 @@ class FitWide(Base, commands.Cog):
 
     async def set_channel_permissions_for_new_students(
         self,
+        message: disnake.Message,
         guild: disnake.Guild,
         bit0: disnake.Role,
         mit0: disnake.Role,
@@ -208,7 +209,9 @@ class FitWide(Base, commands.Cog):
             await terminy_channel.set_permissions(bit0, read_messages=True)
 
         # for every channel in category set overwrite
-        for category in categories:
+        for index, category in enumerate(categories):
+            progress_bar = utils.create_bar(index, len(categories))
+            await message.edit(f"Přídávám práva pro roomky: {progress_bar}")
             for channel in category.channels:
                 await channel.set_permissions(bit0, read_messages=True)
                 await channel.set_permissions(mit0, read_messages=True)
@@ -226,7 +229,7 @@ class FitWide(Base, commands.Cog):
     @commands.check(permission_check.is_bot_admin)
     @commands.slash_command(name="increment_roles", description=Messages.increment_roles_brief)
     async def increment_roles(self, inter: disnake.ApplicationCommandInteraction):
-        await inter.response.defer()
+        await inter.send(Messages.increment_roles_start)
         message = await inter.original_message()
         guild = inter.guild
 
@@ -240,13 +243,23 @@ class FitWide(Base, commands.Cog):
         # create 4bit-1mit and add members
         bit4_members = BIT_roles[3].members
         bit4 = await guild.create_role(name="4bit-1mit")
-        for member in bit4_members:
+        for index, member in enumerate(bit4_members):
             await member.add_roles(bit4)
+            if (index % 50) == 0:
+                progress_bar = utils.create_bar(index, len(bit4_members))
+                await message.edit(f"Přidávání role 4bit-1mit: {progress_bar}")
 
         # give 3bit/2mit users 2bit/1mit role
-        for member in BIT_roles[3].members:
+        for index, member in enumerate(BIT_roles[3].members):
             await member.add_roles(BIT_roles[2])
-        for member in MIT_roles[2].members:
+            if (index % 50) == 0:
+                progress_bar = utils.create_bar(index, len(BIT_roles[3].members))
+                await message.edit(f"Přidávání role 3bit: {progress_bar}")
+
+        for index, member in enumerate(MIT_roles[2].members):
+            if (index % 50) == 0:
+                progress_bar = utils.create_bar(index, len(MIT_roles[2].members))
+                await message.edit(f"Přidávání role 2mit: {progress_bar}")
             await member.add_roles(MIT_roles[1])
 
         # increment roles and create 0bit and 0mit
@@ -332,7 +345,7 @@ class FitWide(Base, commands.Cog):
         bit_terminy_channels.insert(0, terminy_1bit_channel)
 
         await self.set_channel_permissions_for_new_students(
-            guild, BIT_roles[0], MIT_roles[0], bit_terminy_channels, info_channels
+            message, guild, BIT_roles[0], MIT_roles[0], bit_terminy_channels, info_channels
         )
 
         await inter.edit_original_response(Messages.increment_roles_success)
