@@ -29,17 +29,18 @@ class ReviewDB(database.base):
         return session.query(cls).filter(cls.id == id).one_or_none()
 
     @classmethod
-    def get_subject_reviews(cls, subject: str) -> List[ReviewDB]:
+    def get_subject_reviews(cls, subject: str) -> List[object]:
+        # return object with 'ReviewDB' and 'total' properties
         return (
             session.query(
                 cls,
-                func.avg(cls.tier).label("avg_tier"),
                 func.count(cls.relevance).filter(ReviewRelevanceDB.vote).label("total"),
             )
             .filter(cls.subject == subject)
             .outerjoin(cls.relevance)
             .group_by(cls)
             .order_by(desc("total"))
+            .all()
         )
 
     @classmethod
