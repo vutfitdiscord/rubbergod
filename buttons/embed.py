@@ -106,7 +106,11 @@ class EmbedView(BaseView):
         for child in self.children:
             if item.emoji == child.emoji:
                 return
-        return super().add_item(item)
+        try:
+            super().add_item(item)
+        except ValueError:
+            # catch random errors with adding buttons where we already have one
+            pass
 
     async def interaction_check(self, interaction: disnake.MessageInteraction) -> None:
         if interaction.data.custom_id == "embed:lock":
