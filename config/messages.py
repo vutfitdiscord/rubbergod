@@ -154,6 +154,12 @@ class Messages(metaclass=Formatable):
     role_migration_allert = "Přidání/Odebrání **{channel}** bude trvat déle než je obvyklé (až 30 min)." \
                             "Prosím o strpení. Opakované klikání na reakce nemá vliv na dobu zpracování přístupu."
 
+    remove_exclusive_roles = "Odstraní konflikty rolí, kdy má uživatel více exkluzivních rolí."
+    remove_exclusive_roles_start = "Probíhá odstraňování konfliktů rolí {role1} a {role2}"
+    role_no_exlusives = "Nebyly nalezeny žádné konflikty rolí"
+    remove_exclusive_roles_done = "Úspěšně odstraněny konflikty rolí"
+    role_to_remove = "Role, která se má odstranit"
+
     channel_copy_start = "Probíhá kopírování kanálu"
     channel_copy_done = "Práva byla zkopírována."
     channel_clone_start = "Probíhá klonování kanálu"
