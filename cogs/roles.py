@@ -484,6 +484,7 @@ class Roles(Base, commands.Cog):
                 )
         await inter.edit_original_response(Messages.channel_role_to_overwrites_done)
 
+    @commands.check(permission_check.mod_plus)
     @commands.slash_command(name="remove_exclusive_roles", description=Messages.remove_exclusive_roles)
     async def remove_exclusive_roles(
         self,
