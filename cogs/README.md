@@ -97,7 +97,7 @@ Cog implementing management of year roles and database of user logins.\
 **Commands:**
 
     - ?role_check
-    - ?increment_roles
+    - /increment_roles
     - ?update_db
     - ?get_db
     - ?get_user_login
@@ -323,6 +323,7 @@ Cog implementing channels and roles management. Copying/creating channels with p
     - /channel get_overwrites
     - /channel overwrite_to_role
     - /channel role_to_overwrites
+    - /remove_exclusive_roles
 ---
 
 ### [StreamLinks](streamlinks.py)

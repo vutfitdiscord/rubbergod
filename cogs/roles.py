@@ -484,6 +484,34 @@ class Roles(Base, commands.Cog):
                 )
         await inter.edit_original_response(Messages.channel_role_to_overwrites_done)
 
+    @commands.slash_command(name="remove_exclusive_roles", description=Messages.remove_exclusive_roles)
+    async def remove_exclusive_roles(
+        self,
+        inter: disnake.ApplicationCommandInteraction,
+        keep_role: disnake.Role,
+        remove_role: disnake.Role = commands.Param(description=Messages.role_to_remove),
+        rate: int = commands.Param(ge=1, default=10, description=Messages.channel_rate),
+    ):
+        """Find people who have both roles and remove their remove_role."""
+        await inter.send(Messages.remove_exclusive_roles_start(role1=keep_role.name, role2=remove_role.name))
+        role1_members = keep_role.members
+        role2_members = remove_role.members
+
+        members = set(role1_members).intersection(role2_members)
+
+        if not members:
+            await inter.send(Messages.role_no_exlusives)
+            return
+
+        for index, member in enumerate(members):
+            await member.remove_roles(remove_role)
+            if (index % rate == 0):
+                await inter.edit_original_response(
+                    f"• members: {index+1}/{len(members)}\n"
+                    f"{utils.create_bar(index+1, len(members))}"
+                )
+        await inter.edit_original_response(Messages.remove_exclusive_roles_done)
+
     @commands.Cog.listener()
     async def on_message(self, message):
         if message.author.bot:
