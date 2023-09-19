@@ -588,3 +588,13 @@ if ("Mám průměr pod 2.0")                                           \n  retur
     subscription_embed_channel = "Příspěvek"
     subscription_embed_tags = "Tagy"
     subscription_embed_author = "Autor"
+
+    # MESSAGE COG
+    message_send_brief = "Pošle zprávu do kanálu"
+    message_resend_brief = "Přepošle existující zprávu do kanálu"
+    message_channel_brief = "Kanál, do kterého se má zpráva poslat"
+    message_url_brief = "Url zprávy, která se má přeposlat"
+    message_edit_brief = "Upraví existující zprávu"
+    message_sent = "Zpráva byla odeslána do kanálu {channel}"
+    message_not_found = "Zpráva nebyla nalezena"
+    message_too_long = "Zpráva přesahuje limit 2000 znaků"
