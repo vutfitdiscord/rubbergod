@@ -240,6 +240,16 @@ Cog for handling memes with X number of reactions to be reposted to a specific c
     - /better-meme leaderboard
 ---
 
+### [Message](message.py)
+
+Cog for sending and managing messages sent by bot.\
+**Commands:**
+
+    - /message send
+    - /message resend
+    - /message edit
+---
+
 ### [Moderation](moderation.py)
 
 Cog implementing functions for server moderation and help functions for mods.
