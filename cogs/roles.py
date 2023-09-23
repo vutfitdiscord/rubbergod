@@ -139,9 +139,8 @@ class Roles(Base, commands.Cog):
         total_overwrites = len(channel.overwrites)
         rate = 50
         guild = self.bot.get_guild(self.config.guild_id)
-        bot_dev = guild.get_channel(self.config.bot_dev_channel)
         role = await guild.create_role(name=channel.name)
-        message = await bot_dev.send(Messages.role_create_start(role=role.name))
+        message = await self.bot_dev_channel.send(Messages.role_create_start(role=role.name))
         for idx, item in enumerate(channel.overwrites):
             if type(item) == disnake.Member:
                 if ignore and ignore.id == item.id:

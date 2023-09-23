@@ -29,6 +29,17 @@ class Error(Base, commands.Cog):
         self.bot = bot
         self.logger = ErrorLogger()
 
+    def create_error_embed(self, inter: disnake.ApplicationCommandInteraction, filled_options=None):
+        filled_options = filled_options or inter.filled_options
+        embed = self.logger.create_embed(
+            f"/{inter.application_command.qualified_name}",
+            filled_options,
+            inter.author,
+            inter.guild,
+            f"https://discord.com/channels/{inter.guild_id}/{inter.channel_id}/{inter.id}",
+        )
+        return embed
+
     @commands.Cog.listener()
     async def on_command_error(self, ctx, error):
         if isinstance(error, disnake.errors.DiscordServerError):
@@ -78,11 +89,12 @@ class Error(Base, commands.Cog):
                 await ctx.send(Messages.no_such_command)
             return
 
-        if isinstance(error, commands.CommandInvokeError):
+        if isinstance(error.original, disnake.errors.Forbidden):
             # bot cant send messages to user
-            if "50007" in error.original.args[0]:
-                await ctx.send(Messages.blocked_bot(user=ctx.author.id))
-                return
+            await ctx.channel.send(Messages.blocked_bot(user=ctx.author.id))
+            return
+
+        if isinstance(error, commands.CommandInvokeError):
             await ctx.send(Messages.command_invoke_error)
             # no return here, because we want to log these errors
 
@@ -107,10 +119,9 @@ class Error(Base, commands.Cog):
             ctx.message.jump_url
         )
 
-        channel = self.bot.get_channel(self.config.bot_dev_channel)
-        await channel.send(embed=embed)
+        await self.bot_dev_channel.send(embed=embed)
 
-        await self.logger.send_output(output, channel)
+        await self.logger.send_output(output, self.bot_dev_channel)
 
     @commands.Cog.listener()
     async def on_slash_command_error(self, inter: disnake.ApplicationCommandInteraction, error):
@@ -137,15 +148,18 @@ class Error(Base, commands.Cog):
             await inter.send(Messages.member_not_found(member=inter.author.mention))
             return
 
-        if isinstance(error, disnake.InteractionTimedOut):
-            await inter.send(Messages.command_timed_out)
+        if isinstance(error.original, disnake.errors.InteractionTimedOut):
+            embed = self.create_error_embed(inter, "Interaction timed out")
+            await self.bot_dev_channel.send(embed=embed)
             return
 
-        if isinstance(error, commands.CommandInvokeError):
+        if isinstance(error.original, disnake.errors.Forbidden):
             # bot cant send messages to user
-            if "50007" in error.original.args[0]:
-                await inter.send(Messages.blocked_bot(user=inter.author.id))
+            if error.original.code == 50007:
+                await inter.channel.send(Messages.blocked_bot(user=inter.author.id))
                 return
+
+        if isinstance(error, commands.CommandInvokeError):
             await inter.send(Messages.command_invoke_error)
             # no return here, because we want to log these errors
 
@@ -167,25 +181,15 @@ class Error(Base, commands.Cog):
             )
             return
 
-        embed = self.logger.create_embed(
-            f"/{inter.application_command.qualified_name}",
-            inter.filled_options,
-            inter.author,
-            inter.guild,
-            f"https://discord.com/channels/{inter.guild_id}/{inter.channel_id}/{inter.id}",
-        )
-
-        channel = self.bot.get_channel(self.config.bot_dev_channel)
-
         # send context of command with personal information to DM
         if inter.data.name == "diplom":
             channel_ctx = self.bot.get_user(self.config.admin_ids[0])
         else:
-            channel_ctx = channel
+            channel_ctx = self.bot_dev_channel
         await channel_ctx.send(embed=embed)
 
         output = "".join(traceback.format_exception(type(error), error, error.__traceback__))
-        await self.logger.send_output(output, channel)
+        await self.logger.send_output(output, self.bot_dev_channel)
 
     @commands.Cog.listener()
     async def on_user_command_error(self, inter: disnake.ApplicationCommandInteraction, error):
@@ -206,11 +210,18 @@ class Error(Base, commands.Cog):
             await inter.send(Messages.member_not_found(member=inter.author.mention))
             return
 
-        if isinstance(error, commands.CommandInvokeError):
+        if isinstance(error.original, disnake.errors.Forbidden):
             # bot cant send messages to user
-            if "50007" in error.original.args[0]:
-                await inter.send(Messages.blocked_bot(user=inter.author.id))
+            if error.original.code == 50007:
+                await inter.channel.send(Messages.blocked_bot(user=inter.author.id))
                 return
+
+        if isinstance(error.original, disnake.errors.InteractionTimedOut):
+            embed = self.create_error_embed(inter, "Interaction timed out")
+            await self.bot_dev_channel.send(embed=embed)
+            return
+
+        if isinstance(error, commands.CommandInvokeError):
             await inter.send(Messages.command_invoke_error)
             # no return here, because we want to log these errors
 
@@ -232,11 +243,10 @@ class Error(Base, commands.Cog):
             f"https://discord.com/channels/{inter.guild_id}/{inter.channel_id}/{inter.id}",
         )
 
-        channel = self.bot.get_channel(self.config.bot_dev_channel)
-        await channel.send(embed=embed)
+        await self.bot_dev_channel.send(embed=embed)
 
         output = "".join(traceback.format_exception(type(error), error, error.__traceback__))
-        await self.logger.send_output(output, channel)
+        await self.logger.send_output(output, self.bot_dev_channel)
 
     @commands.Cog.listener()
     async def on_message_command_error(self, inter: disnake.ApplicationCommandInteraction, error):
@@ -249,11 +259,18 @@ class Error(Base, commands.Cog):
             await inter.send(error.message)
             return
 
-        if isinstance(error, commands.CommandInvokeError):
+        if isinstance(error.original, disnake.errors.Forbidden):
             # bot cant send messages to user
-            if "50007" in error.original.args[0]:
-                await inter.send(Messages.blocked_bot(user=inter.author.id))
+            if error.original.code == 50007:
+                await inter.channel.send(Messages.blocked_bot(user=inter.author.id))
                 return
+
+        if isinstance(error.original, disnake.errors.InteractionTimedOut):
+            embed = self.create_error_embed(inter, "Interaction timed out")
+            await self.bot_dev_channel.send(embed=embed)
+            return
+
+        if isinstance(error, commands.CommandInvokeError):
             await inter.send(Messages.command_invoke_error)
             # no return here, because we want to log these errors
 
@@ -276,11 +293,10 @@ class Error(Base, commands.Cog):
             f"https://discord.com/channels/{inter.guild_id}/{inter.channel_id}/{inter.id}",
         )
 
-        channel = self.bot.get_channel(self.config.bot_dev_channel)
-        await channel.send(embed=embed)
+        await self.bot_dev_channel.send(embed=embed)
 
         output = "".join(traceback.format_exception(type(error), error, error.__traceback__))
-        await self.logger.send_output(output, channel)
+        await self.logger.send_output(output, self.bot_dev_channel)
 
 
 def setup(bot):
