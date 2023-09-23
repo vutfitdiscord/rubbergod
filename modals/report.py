@@ -1,6 +1,7 @@
 from functools import cached_property
 
 import disnake
+from disnake.ext import commands
 
 import features.report as report_features
 import utils
@@ -11,8 +12,15 @@ from database.report import ReportDB, UserDB
 
 
 class ReportModal(disnake.ui.Modal):
-    def __init__(self, bot, title="General report", message: disnake.Message = None) -> None:
+    def __init__(
+        self,
+        bot: commands.Bot,
+        dm_message: disnake.Message,
+        title="General report",
+        message: disnake.Message = None
+    ) -> None:
         self.bot = bot
+        self.dm_message = dm_message
         self.title = title
         self.message = message
         components = [
@@ -89,7 +97,7 @@ class ReportModal(disnake.ui.Modal):
         await message.pin()
         await report_features.set_tag(self.report_channel, message.channel, "open")
         ReportDB.set_report_url(report_id, message.jump_url)
-        await inter.author.send(embed=embed)
+        await self.dm_message.edit(content="", embed=embed)
         await inter.send(Messages.report_modal_success, ephemeral=True)
 
     async def report_message(self, inter: disnake.ModalInteraction) -> None:
@@ -118,5 +126,5 @@ class ReportModal(disnake.ui.Modal):
         await message.pin()
         await report_features.set_tag(self.report_channel, message.channel, "open")
         ReportDB.set_report_url(report_id, message.jump_url)
-        await inter.author.send(embed=embed)
+        await self.dm_message.edit(content="", embed=embed)
         await inter.send(Messages.report_modal_success, ephemeral=True)

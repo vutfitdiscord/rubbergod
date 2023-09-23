@@ -3,6 +3,7 @@ from functools import cached_property
 from typing import Tuple
 
 import disnake
+from disnake.ext import commands
 
 import features.report as report_features
 import utils
@@ -144,7 +145,7 @@ class ReportGeneralView(ReportView):
 
 
 class ReportMessageView(ReportView):
-    def __init__(self, bot):
+    def __init__(self, bot: commands.Bot):
         super().__init__()
         self.bot = bot
 
@@ -177,7 +178,7 @@ class ReportMessageView(ReportView):
 
 
 class ReportAnonymView(BaseView):
-    def __init__(self, bot):
+    def __init__(self, bot: commands.Bot):
         super().__init__(timeout=None)
         self.bot = bot
 
@@ -235,7 +236,7 @@ class ReportAnonymView(BaseView):
 
 
 class ReportAnswerOnlyView(BaseView):
-    def __init__(self, bot):
+    def __init__(self, bot: commands.Bot):
         super().__init__(timeout=None)
         self.bot = bot
 
@@ -260,7 +261,7 @@ class ReportAnswerOnlyView(BaseView):
 
 
 class ReportAnswerModal(disnake.ui.Modal):
-    def __init__(self, view, bot, inter: disnake.MessageInteraction, report_id: int) -> None:
+    def __init__(self, view, bot: commands.Bot, inter: disnake.MessageInteraction, report_id: int) -> None:
         self.view = view
         self.bot = bot
         self.inter = inter
@@ -325,4 +326,4 @@ class ReportAnswerModal(disnake.ui.Modal):
             await report_message.channel.send(embed=embed)
 
         await report_author.send(embed=embed, view=ReportAnonymView(self.bot))
-        await inter.send(Messages.report_modal_success, ephemeral=True)
+        await inter.send(Messages.report_answer_success, ephemeral=True)

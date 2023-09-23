@@ -573,6 +573,7 @@ if ("Mám průměr pod 2.0")                                           \n  retur
     report_message_spam = "### Report #{id} marked as spam by @{author}"
     report_message_not_spam = "### Report #{id} unmarked as spam by @{author}"
     report_already_solved = "Report #{id} už byl uzavřen. V případě potřeby otevři další report"
+    report_check_dm = "Odesílám report ..."
 
     # SUBSCRIPTIONS COG
     subscription_add_brief = "Přidá odběr na vlákna se zvoleným tagem"

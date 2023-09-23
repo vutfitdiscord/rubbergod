@@ -2,6 +2,8 @@
 Cog implementing anonymous reporting from users.
 """
 
+from typing import Optional
+
 import disnake
 from disnake.ext import commands
 
@@ -14,9 +16,17 @@ from permissions import permission_check
 
 
 class Report(Base, commands.Cog):
-    def __init__(self, bot):
+    def __init__(self, bot: commands.Bot):
         super().__init__()
         self.bot = bot
+
+    async def check_blocked_bot(self, inter: disnake.Interaction) -> Optional[disnake.Message]:
+        try:
+            dm_message = await inter.author.send(Messages.report_check_dm)
+            return dm_message
+        except disnake.Forbidden:
+            await inter.send(Messages.blocked_bot(user=inter.author.id), ephemeral=True)
+            return
 
     @cooldowns.default_cooldown
     @commands.message_command(name="Report message", guild_ids=[Base.config.guild_id])
@@ -24,7 +34,12 @@ class Report(Base, commands.Cog):
         if UserDB.is_banned(inter.author.id):
             await inter.send(Messages.report_banned, ephemeral=True)
             return
-        await inter.response.send_modal(modal=ReportModal(self.bot, "Message report", message))
+        dm_message = await self.check_blocked_bot(inter)
+        if dm_message is None:
+            return
+
+        modal = ReportModal(self.bot, dm_message, "Message report", message)
+        await inter.response.send_modal(modal=modal)
 
     @cooldowns.default_cooldown
     @commands.slash_command(
@@ -37,7 +52,11 @@ class Report(Base, commands.Cog):
 
     @_report.sub_command(name="general", description=Messages.report_general_brief)
     async def report_general(self, inter: disnake.ApplicationCommandInteraction):
-        await inter.response.send_modal(modal=ReportModal(self.bot))
+        dm_message = await self.check_blocked_bot(inter)
+        if dm_message is None:
+            return
+        modal = ReportModal(self.bot, dm_message)
+        await inter.response.send_modal(modal=modal)
 
     @_report.sub_command(name="message", description=Messages.report_message_brief)
     async def report_message(
@@ -50,7 +69,12 @@ class Report(Base, commands.Cog):
         except commands.MessageNotFound:
             await inter.send(Messages.report_message_not_found, ephemeral=True)
             return
-        await inter.response.send_modal(modal=ReportModal(self.bot, "Message report", message))
+        dm_message = await self.check_blocked_bot(inter)
+        if dm_message is None:
+            return
+
+        modal = ReportModal(self.bot, dm_message, "Message report", message)
+        await inter.response.send_modal(modal=modal)
 
     @_report.sub_command(name="google_form", description=Messages.report_google_form_brief)
     async def report_google_form(self, inter: disnake.ApplicationCommandInteraction):
