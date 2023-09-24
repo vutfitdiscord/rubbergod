@@ -3,6 +3,7 @@ import logging
 import sys
 import traceback
 
+import disnake
 import sqlalchemy
 from disnake import AllowedMentions, Embed, HTTPException, Intents, TextChannel
 from disnake.errors import DiscordServerError
@@ -96,6 +97,13 @@ async def on_ready():
 
     await presence.set_presence()
     print("Ready")
+
+
+@bot.event
+async def on_button_click(inter: disnake.MessageInteraction):
+    if inter.component.custom_id != "trash:delete":
+        return
+    await inter.message.delete()
 
 
 @bot.event

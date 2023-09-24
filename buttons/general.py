@@ -3,13 +3,12 @@ import disnake
 from buttons.base import BaseView
 
 
-class IconView(BaseView):
-
-    def __init__(self):
+class TrashView(BaseView):
+    def __init__(self, custom_id: str = "trash:delete"):
         super().__init__(timeout=None)
         self.add_item(disnake.ui.Button(
             emoji="🗑",
             style=disnake.ButtonStyle.danger,
-            custom_id="icon:delete",
-            row=1),
+            custom_id=custom_id
+            ),
         )

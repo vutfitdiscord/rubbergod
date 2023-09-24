@@ -6,7 +6,7 @@ import disnake
 from disnake.ext import commands
 
 import utils
-from buttons.icon import IconView
+from buttons.general import TrashView
 from cogs.base import Base
 from config.messages import Messages
 
@@ -101,7 +101,7 @@ class Icons(Base, commands.Cog):
             for icon in icon_roles
             if await can_assign(icon, user)
         ]
-        view = IconView()
+        view = TrashView("icon:delete")
         for start_i in range(0, len(options), 25):
             component = IconSelect(
                 placeholder=Messages.icon_ui_choose, options=options[start_i: start_i + 25], row=0,
