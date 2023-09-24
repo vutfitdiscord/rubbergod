@@ -27,6 +27,8 @@ class GrillbotApi(Base, commands.Cog):
 
     async def post_karma_store(self, karma_objects):
         """send karma objects to grillbot api"""
+        if len(karma_objects) == 0:
+            return
         headers = {"ApiKey": self.config.grillbot_api_key, "Author": await self.owner_id()}
         async with aiohttp.ClientSession(timeout=aiohttp.ClientTimeout(total=10), headers=headers) as session:
             try:
