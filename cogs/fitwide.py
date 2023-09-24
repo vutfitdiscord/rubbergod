@@ -294,7 +294,10 @@ class FitWide(Base, commands.Cog):
         info_channels = [disnake.utils.get(guild.channels, name=channel_name) for channel_name in INFO_NAMES]
 
         # increment channel names
-        overwrites = {bit4: disnake.PermissionOverwrite(read_messages=True, send_messages=True)}
+        overwrites = {
+            guild.default_role: disnake.PermissionOverwrite(read_messages=False),
+            bit4: disnake.PermissionOverwrite(read_messages=True, send_messages=True)
+        }
         await general_channels[3].edit(name="4bit-1mit-general", overwrites=overwrites)
         await general_channels[2].edit(name="3bit-general")
         await general_channels[1].edit(name="2bit-general")
@@ -325,9 +328,14 @@ class FitWide(Base, commands.Cog):
 
         # create 1bit-terminy
         overwrites = {
-            guild.default_role: disnake.PermissionOverwrite(read_messages=False),
+            guild.default_role: disnake.PermissionOverwrite(
+                read_messages=False,
+                send_messages=False,
+                create_private_threads=False,
+                create_public_threads=False
+            ),
             disnake.utils.get(guild.roles, name="1BIT"): disnake.PermissionOverwrite(
-                read_messages=True, send_messages=False
+                read_messages=True
             ),
             BIT_roles[0]: disnake.PermissionOverwrite(read_messages=True),
             BIT_roles[1]: disnake.PermissionOverwrite(read_messages=True),
