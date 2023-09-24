@@ -5,7 +5,7 @@ Cog implementing karma system. Users can give each other positive/negative karma
 import math
 
 import disnake
-from disnake.ext import commands
+from disnake.ext import commands, tasks
 
 import utils
 from buttons.embed import EmbedView
@@ -30,6 +30,7 @@ class Karma(Base, commands.Cog):
         self._leaderboard_formatter = utils.make_pts_column_row_formatter(KarmaDB.karma.name)
         self._positive_formatter = utils.make_pts_column_row_formatter(KarmaDB.positive.name)
         self._negative_formatter = utils.make_pts_column_row_formatter(KarmaDB.negative.name)
+        self.tasks = [self.sync_with_grillbot_task.start()]
 
     async def handle_reaction(self, ctx: ReactionContext):
         # handle karma vote
@@ -70,9 +71,7 @@ class Karma(Base, commands.Cog):
             and self.config.karma_ban_role_id not in map(lambda x: x.id, ctx.member.roles)
         ):
             emoji = utils.str_emoji_id(ctx.emoji)
-            members_update = KarmaDB.karma_emoji(ctx.message.author.id, ctx.member.id, emoji)
-            if members_update is not None:
-                await self.grillbot_api.post_karma_store(members_update)
+            KarmaDB.karma_emoji(ctx.message.author.id, ctx.member.id, emoji)
 
     @commands.Cog.listener()
     async def on_raw_reaction_remove(self, payload):
@@ -88,9 +87,7 @@ class Karma(Base, commands.Cog):
             and self.config.karma_ban_role_id not in map(lambda x: x.id, ctx.member.roles)
         ):
             emoji = utils.str_emoji_id(ctx.emoji)
-            members_update = KarmaDB.karma_emoji_remove(ctx.message.author.id, ctx.member.id, emoji)
-            if members_update is not None:
-                await self.grillbot_api.post_karma_store(members_update)
+            KarmaDB.karma_emoji_remove(ctx.message.author.id, ctx.member.id, emoji)
 
     @cooldowns.default_cooldown
     @commands.slash_command(name="karma", guild_ids=[Base.config.guild_id])
@@ -290,6 +287,12 @@ class Karma(Base, commands.Cog):
             return
         command_id = utils.get_command_id(self, "karma")
         await ctx.reply(Messages.moved_command(name="karma", id=command_id))
+
+    @tasks.loop(minutes=int(Base.config.grillbot_api_karma_sync_interval))
+    async def sync_with_grillbot_task(self):
+        items = list(KarmaDB.leaderboard_query(KarmaDB.karma.asc()))
+        for chunk in utils.split_to_parts(items, 500):
+            await self.grillbot_api.post_karma_store(chunk)
 
     @revote.error
     @vote.error

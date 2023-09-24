@@ -222,8 +222,7 @@ class Karma(BaseFeature):
     ) -> None:
         members = await utils.get_members_from_tag(inter.guild, members)
         for member in members:
-            members_update = KarmaDB.update_karma(member.id, inter.author.id, karma)
-            await self.grillbot_api.post_karma_store(members_update)
+            KarmaDB.update_karma(member.id, inter.author.id, karma)
         if karma >= 0:
             await inter.send(
                 Messages.karma_give_success(
@@ -240,7 +239,7 @@ class Karma(BaseFeature):
     async def karma_transfer(
         self, inter: disnake.ApplicationCommandInteraction, from_user: disnake.User, to_user: disnake.User
     ) -> None:
-        transfered, members_update = KarmaDB.transfer_karma(from_user.id, to_user.id)
+        transfered, _ = KarmaDB.transfer_karma(from_user.id, to_user.id)
         if transfered is None:
             await inter.send(Messages.karma_transer_user_no_karma(user=from_user))
             return
@@ -252,7 +251,6 @@ class Karma(BaseFeature):
             positive=transfered.positive,
             negative=transfered.negative,
         )
-        await self.grillbot_api.post_karma_store(members_update)
         await inter.send(formated_message)
 
     def karma_get(self, author: disnake.Member, target: Optional[disnake.Member] = None) -> str:
