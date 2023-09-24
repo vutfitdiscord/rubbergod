@@ -5,7 +5,7 @@ Cog implementing subscriptions to forum posts based on their tags
 import disnake
 from disnake.ext import commands
 
-from buttons.subscription import SubscriptionView
+from buttons.general import TrashView
 from cogs.base import Base
 from config import cooldowns
 from config.messages import Messages
@@ -77,12 +77,6 @@ class Subscriptions(Base, commands.Cog):
         await inter.edit_original_response(message)
 
     @commands.Cog.listener()
-    async def on_button_click(self, inter: disnake.MessageInteraction):
-        if inter.component.custom_id != "subscription:delete":
-            return
-        await inter.message.delete()
-
-    @commands.Cog.listener()
     async def on_thread_create(self, thread: disnake.Thread):
         if not thread.applied_tags:
             # thread without tags
@@ -131,7 +125,7 @@ class Subscriptions(Base, commands.Cog):
         tags = [f"`{tag.name}`" for tag in thread.applied_tags]
         embed.add_field(name=Messages.subscription_embed_tags, value=", ".join(tags))
         add_author_footer(embed, thread.owner)
-        await user.send(embed=embed, view=SubscriptionView())
+        await user.send(embed=embed, view=TrashView())
 
 
 def setup(bot: commands.Bot):

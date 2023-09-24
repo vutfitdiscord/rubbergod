@@ -7,6 +7,7 @@ from typing import Optional
 import disnake
 from disnake.ext import commands
 
+from buttons.general import TrashView
 from cogs.base import Base
 from config import cooldowns
 from config.messages import Messages
@@ -22,7 +23,7 @@ class Report(Base, commands.Cog):
 
     async def check_blocked_bot(self, inter: disnake.Interaction) -> Optional[disnake.Message]:
         try:
-            dm_message = await inter.author.send(Messages.report_check_dm)
+            dm_message = await inter.author.send(Messages.report_check_dm, view=TrashView())
             return dm_message
         except disnake.Forbidden:
             await inter.send(Messages.blocked_bot(user=inter.author.id), ephemeral=True)
