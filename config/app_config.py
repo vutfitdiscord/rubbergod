@@ -128,6 +128,7 @@ class Config:
     grillbot_api_url: str = get_attr(toml_dict, "grillbot", "api_url")
     grillbot_api_supported_methods: List[str] = get_attr(toml_dict, "grillbot", "api_supported_methods")
     grillbot_api_key: str = get_attr(toml_dict, "grillbot", "api_key")
+    grillbot_api_karma_sync_interval: int = get_attr(toml_dict, "grillbot", "karma_sync_interval")
 
     # weather token to openweather API
     weather_token: str = get_attr(toml_dict, "weather", "token")

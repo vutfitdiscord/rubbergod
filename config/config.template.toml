@@ -116,6 +116,7 @@ ids = [902678773307174943, 599119578811072523]
 api_url = "https://grillbot.eu/api"
 api_supported_methods = ["Help", "AutoPin"]
 api_key = ""
+karma_sync_interval = 60 # Update interval in minutes for automatic sync karma.
 
 [weather]
 token = "678a5932f6dd92ac668b20e9f89c0318"
