@@ -29,10 +29,15 @@ class Error(Base, commands.Cog):
         self.bot = bot
         self.logger = ErrorLogger()
 
-    def create_error_embed(self, inter: disnake.ApplicationCommandInteraction, filled_options=None):
+    def create_error_embed(
+        self,
+        inter: disnake.ApplicationCommandInteraction,
+        prefix: str,
+        filled_options=None
+    ):
         filled_options = filled_options or inter.filled_options
         embed = self.logger.create_embed(
-            f"/{inter.application_command.qualified_name}",
+            f"{prefix}{inter.application_command.qualified_name}",
             filled_options,
             inter.author,
             inter.guild,
@@ -149,7 +154,7 @@ class Error(Base, commands.Cog):
             return
 
         if isinstance(error.original, disnake.errors.InteractionTimedOut):
-            embed = self.create_error_embed(inter, "Interaction timed out")
+            embed = self.create_error_embed(inter, "/", "Interaction timed out")
             await self.bot_dev_channel.send(embed=embed)
             return
 
@@ -180,6 +185,14 @@ class Error(Base, commands.Cog):
                 ephemeral=True
             )
             return
+
+        embed = self.logger.create_embed(
+            f"/{inter.application_command.qualified_name}",
+            inter.filled_options,
+            inter.author,
+            inter.guild,
+            f"https://discord.com/channels/{inter.guild_id}/{inter.channel_id}/{inter.id}",
+        )
 
         # send context of command with personal information to DM
         if inter.data.name == "diplom":
@@ -217,7 +230,7 @@ class Error(Base, commands.Cog):
                 return
 
         if isinstance(error.original, disnake.errors.InteractionTimedOut):
-            embed = self.create_error_embed(inter, "Interaction timed out")
+            embed = self.create_error_embed(inter, "User command - ", "Interaction timed out")
             await self.bot_dev_channel.send(embed=embed)
             return
 
@@ -266,7 +279,7 @@ class Error(Base, commands.Cog):
                 return
 
         if isinstance(error.original, disnake.errors.InteractionTimedOut):
-            embed = self.create_error_embed(inter, "Interaction timed out")
+            embed = self.create_error_embed(inter, "Message command - ", "Interaction timed out")
             await self.bot_dev_channel.send(embed=embed)
             return
 
