@@ -126,5 +126,5 @@ class ReportModal(disnake.ui.Modal):
         await message.pin()
         await report_features.set_tag(self.report_channel, message.channel, "open")
         ReportDB.set_report_url(report_id, message.jump_url)
-        await self.dm_message.edit(content="", embed=embed)
+        await self.dm_message.edit(content="", embed=embed, view=None)
         await inter.send(Messages.report_modal_success, ephemeral=True)
