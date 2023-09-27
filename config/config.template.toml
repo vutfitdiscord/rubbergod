@@ -148,7 +148,7 @@ terms_update_interval = 0.5 # Update interval in days for automatic updating
 subscribe_default_guild = true
 
 [icons]
-icon_roles = [0,1]
+icon_roles = [0,1] # there must be 2 unique role IDs from server, because you need 2 values to create dropdown
 role_prefix = "Ikona: "
 ui_cooldown = 10.0
 [icons.rule.0]
