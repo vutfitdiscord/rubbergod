@@ -101,10 +101,11 @@ class Icons(Base, commands.Cog):
             for icon in icon_roles
             if await can_assign(icon, user)
         ]
-        view = TrashView("icon:delete")
-        for start_i in range(0, len(options), 25):
+        view = TrashView("icon:delete", row=4)      # makes it last row so it's always under the dropdown
+        for row, start_i in enumerate(range(0, len(options), 25)):
+            # 25 is the max number of options per select
             component = IconSelect(
-                placeholder=Messages.icon_ui_choose, options=options[start_i: start_i + 25], row=0,
+                placeholder=Messages.icon_ui_choose, options=options[start_i: start_i + 25], row=row,
             )
             view.add_item(component)
         await inter.edit_original_response(view=view)
