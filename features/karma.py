@@ -239,7 +239,7 @@ class Karma(BaseFeature):
     async def karma_transfer(
         self, inter: disnake.ApplicationCommandInteraction, from_user: disnake.User, to_user: disnake.User
     ) -> None:
-        transfered, _ = KarmaDB.transfer_karma(from_user.id, to_user.id)
+        transfered = KarmaDB.transfer_karma(from_user.id, to_user.id)
         if transfered is None:
             await inter.send(Messages.karma_transer_user_no_karma(user=from_user))
             return
