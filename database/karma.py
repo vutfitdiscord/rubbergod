@@ -117,7 +117,7 @@ class KarmaDB(database.base):
         return session.query(cls).order_by(atribute)
 
     @classmethod
-    def transfer_karma(cls, from_user: str, to_user: str):
+    def transfer_karma(cls, from_user: str, to_user: str) -> KarmaData:
         from_user_karma = cls.get_karma_object(from_user)
         to_user_karma = cls.get_karma_object(to_user)
 
@@ -144,7 +144,7 @@ class KarmaDB(database.base):
         from_user_karma.negative = 0
 
         session.commit()
-        return log_karma, [from_user_karma, to_user_karma]
+        return log_karma
 
 
 class KarmaEmojiDB(database.base):
