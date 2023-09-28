@@ -21,6 +21,12 @@ def icon_name(icon: disnake.Role):
     return remove_prefix(icon.name, Base.config.icon_role_prefix)
 
 
+def icon_emoji(bot: commands.Bot, icon_role: disnake.Role):
+    icon = icon_name(icon_role)
+    guild = bot.get_guild(Base.config.guild_id)
+    return utils.get_emoji(guild=guild, name=icon)
+
+
 def get_icon_roles(guild: disnake.Guild):
     return [role for role in guild.roles if role.id in Base.config.icon_roles]
 
@@ -50,8 +56,9 @@ async def do_set_icon(icon: disnake.Role, user: disnake.Member):
 
 
 class IconSelect(disnake.ui.Select):
-    def __init__(self, **kwargs) -> None:
+    def __init__(self, bot: commands.Bot, **kwargs) -> None:
         super().__init__(**kwargs)
+        self.bot = bot
 
     async def callback(self, inter: disnake.MessageInteraction):
         await inter.response.defer(ephemeral=True)
@@ -62,9 +69,10 @@ class IconSelect(disnake.ui.Select):
             return
         user = inter.user
         if await can_assign(icon, user):
-            await inter.edit_original_response(
-                Messages.icon_set_success(user=inter.user, icon=icon_name(icon)), view=None
-            )
+            await inter.edit_original_response(Messages.icon_set_success(
+                        user=inter.user,
+                        icon=icon_emoji(self.bot, icon) or icon_name(icon)),
+                        view=None)
             await do_set_icon(icon, user)
         else:
             await inter.edit_original_response(Messages.icon_ui_no_permission)
@@ -96,7 +104,7 @@ class Icons(Base, commands.Cog):
         user = inter.user
         options = [
             disnake.SelectOption(
-                label=icon_name(icon), value=str(icon.id), emoji=None
+                label=icon_name(icon), value=str(icon.id), emoji=icon_emoji(self.bot, icon)
             )
             for icon in icon_roles
             if await can_assign(icon, user)
@@ -105,7 +113,10 @@ class Icons(Base, commands.Cog):
         for row, start_i in enumerate(range(0, len(options), 25)):
             # 25 is the max number of options per select
             component = IconSelect(
-                placeholder=Messages.icon_ui_choose, options=options[start_i: start_i + 25], row=row,
+                bot=self.bot,
+                placeholder=Messages.icon_ui_choose,
+                options=options[start_i: start_i + 25],
+                row=row,
             )
             view.add_item(component)
         await inter.edit_original_response(view=view)

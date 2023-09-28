@@ -501,7 +501,7 @@ if ("Mám průměr pod 2.0")                                           \n  retur
 
     # ICONS
     icon_ui = "UI pro přiřazení ikony"
-    icon_set_success = "Užiteli {user} nastavena ikona {icon}"
+    icon_set_success = "Změna ikony na {icon} proběhla úspěšně"
     icon_set_no_role = "Vstup neodpovídá žádné možné ikoně"
     icon_ui_choose = "Vyber si ikonu"
     icon_ui_fail = "Nastavit ikonu se nepodařilo"
