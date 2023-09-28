@@ -116,7 +116,7 @@ class Icons(Base, commands.Cog):
         if inter.component.custom_id != "icon:delete":
             return
         await do_set_icon(None, inter.author)
-        await inter.send(content=Messages.icon_removed, ephemeral=True)
+        await inter.followup.send(content=Messages.icon_removed, ephemeral=True)
 
     async def cog_slash_command_error(
         self, inter: disnake.ApplicationCommandInteraction, error: Exception
