@@ -92,7 +92,7 @@ def get_icon_emoji(icon: disnake.Role):
 
 
 class Icons(Base, commands.Cog):
-    def __init__(self, bot):
+    def __init__(self, bot: commands.Bot):
         super().__init__()
         self.bot = bot
 
@@ -123,11 +123,10 @@ class Icons(Base, commands.Cog):
 
     @commands.Cog.listener()
     async def on_button_click(self, inter: disnake.MessageInteraction):
-        await inter.response.defer(ephemeral=True)
         if inter.component.custom_id != "icon:delete":
             return
         await do_set_icon(None, inter.author)
-        await inter.followup.send(content=Messages.icon_removed, ephemeral=True)
+        await inter.response.send_message(content=Messages.icon_removed, ephemeral=True)
 
     async def cog_slash_command_error(
         self, inter: disnake.ApplicationCommandInteraction, error: Exception
