@@ -153,16 +153,17 @@ class Error(Base, commands.Cog):
             await inter.send(Messages.member_not_found(member=inter.author.mention))
             return
 
-        if isinstance(error.original, disnake.errors.InteractionTimedOut):
-            embed = self.create_error_embed(inter, "/", "Interaction timed out")
-            await self.bot_dev_channel.send(embed=embed)
-            return
-
-        if isinstance(error.original, disnake.errors.Forbidden):
-            # bot cant send messages to user
-            if error.original.code == 50007:
-                await inter.channel.send(Messages.blocked_bot(user=inter.author.id))
+        if hasattr(error, "original"):
+            if isinstance(error.original, disnake.errors.InteractionTimedOut):
+                embed = self.create_error_embed(inter, "/", "Interaction timed out")
+                await self.bot_dev_channel.send(embed=embed)
                 return
+
+            if isinstance(error.original, disnake.errors.Forbidden):
+                # bot cant send messages to user
+                if error.original.code == 50007:
+                    await inter.channel.send(Messages.blocked_bot(user=inter.author.id))
+                    return
 
         if isinstance(error, commands.CommandInvokeError):
             await inter.send(Messages.command_invoke_error)
@@ -223,16 +224,17 @@ class Error(Base, commands.Cog):
             await inter.send(Messages.member_not_found(member=inter.author.mention))
             return
 
-        if isinstance(error.original, disnake.errors.Forbidden):
-            # bot cant send messages to user
-            if error.original.code == 50007:
-                await inter.channel.send(Messages.blocked_bot(user=inter.author.id))
+        if hasattr(error, "original"):
+            if hasattr(error, "original") and isinstance(error.original, disnake.errors.InteractionTimedOut):
+                embed = self.create_error_embed(inter, "User command - ", "Interaction timed out")
+                await self.bot_dev_channel.send(embed=embed)
                 return
 
-        if isinstance(error.original, disnake.errors.InteractionTimedOut):
-            embed = self.create_error_embed(inter, "User command - ", "Interaction timed out")
-            await self.bot_dev_channel.send(embed=embed)
-            return
+            if isinstance(error.original, disnake.errors.Forbidden):
+                # bot cant send messages to user
+                if error.original.code == 50007:
+                    await inter.channel.send(Messages.blocked_bot(user=inter.author.id))
+                    return
 
         if isinstance(error, commands.CommandInvokeError):
             await inter.send(Messages.command_invoke_error)
@@ -272,16 +274,17 @@ class Error(Base, commands.Cog):
             await inter.send(error.message)
             return
 
-        if isinstance(error.original, disnake.errors.Forbidden):
-            # bot cant send messages to user
-            if error.original.code == 50007:
-                await inter.channel.send(Messages.blocked_bot(user=inter.author.id))
+        if hasattr(error, "original"):
+            if isinstance(error.original, disnake.errors.InteractionTimedOut):
+                embed = self.create_error_embed(inter, "Message command - ", "Interaction timed out")
+                await self.bot_dev_channel.send(embed=embed)
                 return
 
-        if isinstance(error.original, disnake.errors.InteractionTimedOut):
-            embed = self.create_error_embed(inter, "Message command - ", "Interaction timed out")
-            await self.bot_dev_channel.send(embed=embed)
-            return
+            if isinstance(error.original, disnake.errors.Forbidden):
+                # bot cant send messages to user
+                if error.original.code == 50007:
+                    await inter.channel.send(Messages.blocked_bot(user=inter.author.id))
+                    return
 
         if isinstance(error, commands.CommandInvokeError):
             await inter.send(Messages.command_invoke_error)
