@@ -22,9 +22,21 @@ def icon_name(icon: disnake.Role):
 
 
 def icon_emoji(bot: commands.Bot, icon_role: disnake.Role):
+    emoji = icon_role.emoji
+    if emoji is not None:  # Return Role Emoji if it is a server emoji
+        return emoji
     icon = icon_name(icon_role)
     guild = bot.get_guild(Base.config.guild_id)
-    return utils.get_emoji(guild=guild, name=icon)
+    emoji = utils.get_emoji(guild=guild, name=icon)
+    if emoji is not None:
+        return emoji
+    try:
+        rules = Base.config.icon_rules[icon_role.id]
+        emoji_id = rules.get("emoji_id")
+        emoji = bot.get_emoji(emoji_id)
+        return emoji
+    except (AttributeError, KeyError):
+        return None
 
 
 def get_icon_roles(guild: disnake.Guild):
@@ -37,8 +49,10 @@ async def can_assign(icon: disnake.Role, user: disnake.Member):
     user_roles = {role.id for role in user.roles}
     allow = rules.get("allow")
     deny = rules.get("deny", [])
-    allowed_by_role = (allow is None or not user_roles.isdisjoint(allow)) and user_roles.isdisjoint(deny)
-    return allowed_by_role and user.id not in deny
+    allowed_by_role = allow is None or not user_roles.isdisjoint(allow)
+    allowed_by_user = allow is None or user.id in allow
+    denied = deny is not None and (not user_roles.isdisjoint(deny) or user.id in deny)
+    return (allowed_by_role or allowed_by_user) and not denied
 
 
 async def do_set_icon(icon: disnake.Role, user: disnake.Member):
