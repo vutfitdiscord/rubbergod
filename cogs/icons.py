@@ -2,6 +2,8 @@
 Cog implementing dynamic icon system. Users can assign themselves icons from a list of roles.
 """
 
+from typing import List, Optional, Union
+
 import disnake
 from disnake.ext import commands
 
@@ -11,17 +13,17 @@ from cogs.base import Base
 from config.messages import Messages
 
 
-def remove_prefix(text, prefix):
+def remove_prefix(text, prefix) -> str:
     if text.startswith(prefix):
         return text[len(prefix):]
     return text
 
 
-def icon_name(icon: disnake.Role):
+def icon_name(icon: disnake.Role) -> str:
     return remove_prefix(icon.name, Base.config.icon_role_prefix)
 
 
-def icon_emoji(bot: commands.Bot, icon_role: disnake.Role):
+def icon_emoji(bot: commands.Bot, icon_role: disnake.Role) -> Optional[disnake.PartialEmoji]:
     emoji = icon_role.emoji
     if emoji is not None:  # Return Role Emoji if it is a server emoji
         return emoji
@@ -39,11 +41,11 @@ def icon_emoji(bot: commands.Bot, icon_role: disnake.Role):
         return None
 
 
-def get_icon_roles(guild: disnake.Guild):
+def get_icon_roles(guild: disnake.Guild) -> List[disnake.Role]:
     return [role for role in guild.roles if role.id in Base.config.icon_roles]
 
 
-async def can_assign(icon: disnake.Role, user: disnake.Member):
+async def can_assign(icon: disnake.Role, user: disnake.Member) -> bool:
     """Whether a given user can have a given icon"""
     rules = Base.config.icon_rules[icon.id]
     user_roles = {role.id for role in user.roles}
@@ -55,7 +57,7 @@ async def can_assign(icon: disnake.Role, user: disnake.Member):
     return (allowed_by_role or allowed_by_user) and not denied
 
 
-async def do_set_icon(icon: disnake.Role, user: disnake.Member):
+async def do_set_icon(icon: disnake.Role, user: disnake.Member) -> None:
     """Set the icon to the user, removing any previous icons,
     without checking whether the user is allowed to have said icon
     """
@@ -92,13 +94,13 @@ class IconSelect(disnake.ui.Select):
             await inter.edit_original_response(Messages.icon_ui_no_permission)
 
 
-async def icon_autocomp(inter: disnake.ApplicationCommandInteraction, partial: str):
+async def icon_autocomp(inter: disnake.ApplicationCommandInteraction, partial: str) -> str:
     icon_roles = get_icon_roles(inter.guild)
     names = (icon_name(role) for role in icon_roles)
     return [name for name in names if partial.casefold() in name.casefold()]
 
 
-def get_icon_emoji(icon: disnake.Role):
+def get_icon_emoji(icon: disnake.Role) -> Union[str, disnake.Emoji, disnake.PartialEmoji]:
     emoji = getattr(icon, "_icon", None)
     if type(emoji) not in [str, disnake.Emoji, disnake.PartialEmoji]:
         emoji = None
