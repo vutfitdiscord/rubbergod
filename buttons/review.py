@@ -18,11 +18,8 @@ class ReviewView(EmbedView):
         self.check_text_pages()
         # if there aren't any reviews remove buttons
         if len(self.embed.fields) < 2:
-            to_remove = []
             for child in self.children:
-                to_remove.append(child)
-            for button in to_remove:
-                self.remove_item(button)
+                child.disabled = True
 
     def check_text_pages(self):
         if (
@@ -46,12 +43,9 @@ class ReviewView(EmbedView):
                 )
             )
         else:
-            to_remove = []
             for child in self.children:
                 if "text" in child.custom_id:
-                    to_remove.append(child)
-            for button in to_remove:
-                self.remove_item(button)
+                    child.disabled = True
 
     @property
     def review_id(self):

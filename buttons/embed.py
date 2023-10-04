@@ -105,6 +105,7 @@ class EmbedView(BaseView):
     def add_item(self, item: disnake.ui.Item) -> None:
         for child in self.children:
             if item.emoji == child.emoji:
+                child.disabled = False
                 return
         try:
             super().add_item(item)
