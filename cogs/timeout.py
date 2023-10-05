@@ -281,7 +281,7 @@ class Timeout(Base, commands.Cog):
         # print users that can't be timed out
         if cantBeTimeout:
             await inter.send('\n'.join(
-                f'{Messages.timeout_permission(user=user)}' for user in self.perms_users)
+                Messages.timeout_permission(user_list=user.name) for user in cantBeTimeout)
             )
 
     @_timeout.sub_command(name="remove", description=Messages.timeout_remove_brief)
@@ -353,7 +353,7 @@ class Timeout(Base, commands.Cog):
         )
 
         if not isSuccess:
-            await inter.send(content=Messages.timeout_permission(user=inter.user))
+            await inter.send(content=Messages.timeout_permission(user_list=inter.user.mention))
             return
 
         await inter.send(content=Messages.self_timeout_success)
