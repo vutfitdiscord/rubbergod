@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 
 import disnake
 
@@ -6,6 +6,11 @@ import utils
 from buttons.base import BaseView
 from config.messages import Messages
 from features.leaderboard import LeaderboardPageSource
+
+
+class ViewRowFull(Exception):
+    """Adding a Item to already filled row"""
+    pass
 
 
 class EmbedView(BaseView):
@@ -19,7 +24,8 @@ class EmbedView(BaseView):
         roll_arroud: bool = True,
         end_arrow: bool = True,
         page_source: LeaderboardPageSource = None,
-        timeout: int = 300
+        timeout: int = 300,
+        page: int = 1
     ):
         """Embed pagination view
 
@@ -31,8 +37,9 @@ class EmbedView(BaseView):
         param bool end_arrow: If true use also '⏩' button
         param LeaderboardPageSource page_source: Use for long leaderboards, embeds should contain one embed
         param int timeout: Seconds until disabling interaction, use None for always enabled
+        param int page: Starting page
         """
-        self.page = 1
+        self.page = page
         self.author = author
         self.locked = False
         self.page_source = page_source
@@ -103,17 +110,19 @@ class EmbedView(BaseView):
         self.embeds[self.page-1] = value
 
     def add_item(self, item: disnake.ui.Item) -> None:
+        row_cnt = 0
         for child in self.children:
             if item.emoji == child.emoji:
                 child.disabled = False
                 return
-        try:
-            super().add_item(item)
-        except ValueError:
-            # catch random errors with adding buttons where we already have one
-            pass
+            if item.row == child.row:
+                row_cnt += 1
+        if row_cnt >= 5:
+            # we are trying to add new button to already filled row
+            raise ViewRowFull
+        super().add_item(item)
 
-    async def interaction_check(self, interaction: disnake.MessageInteraction) -> None:
+    async def interaction_check(self, interaction: disnake.MessageInteraction) -> Optional[bool]:
         if interaction.data.custom_id == "embed:lock":
             if interaction.author.id == self.author.id:
                 self.locked = not self.locked
@@ -129,7 +138,7 @@ class EmbedView(BaseView):
             return False
         ids = ["embed:start_page", "embed:prev_page", "embed:next_page", "embed:end_page"]
         if interaction.data.custom_id not in ids or self.max_page <= 1:
-            return
+            return False
         if (self.perma_lock or self.locked) and interaction.author.id != self.author.id:
             await interaction.send(Messages.embed_not_author, ephemeral=True)
             return False
