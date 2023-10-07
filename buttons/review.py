@@ -3,7 +3,7 @@ from typing import List
 import disnake
 
 import utils
-from buttons.embed import EmbedView
+from buttons.embed import EmbedView, ViewRowFull
 from config.messages import Messages
 from database.review import ReviewDB, ReviewRelevanceDB
 from features.review import ReviewManager
@@ -11,10 +11,11 @@ from features.review import ReviewManager
 
 class ReviewView(EmbedView):
 
-    def __init__(self, author: disnake.User, bot: disnake.Client, embeds: List[disnake.Embed]):
+    def __init__(self, author: disnake.User, bot: disnake.Client, embeds: List[disnake.Embed], page: int = 1):
+        self.bot = bot
         self.manager = ReviewManager(bot)
         self.total_pages = len(embeds)
-        super().__init__(author, embeds, row=1, end_arrow=False, timeout=300)
+        super().__init__(author, embeds, row=1, end_arrow=False, timeout=300, page=page)
         self.check_text_pages()
         # if there aren't any reviews remove buttons
         if len(self.embed.fields) < 2:
@@ -87,11 +88,17 @@ class ReviewView(EmbedView):
             return False
         elif "review" not in interaction.data.custom_id:
             # pagination interaction from super class
-            await super().interaction_check(interaction)
-            if not ((self.perma_lock or self.locked) and interaction.author.id != self.author.id):
-                self.check_text_pages()
+            if await super().interaction_check(interaction) is not False:
+                # pagination has changed the page
+                try:
+                    self.check_text_pages()
+                    view = self
+                except ViewRowFull:
+                    # there was an issue while adding buttons; recreate view
+                    view = ReviewView(self.author, self.bot, self.embeds, page=self.page)
+                    # set the page of new view to the current one
                 # update view
-                await interaction.edit_original_response(view=self)
+                await interaction.edit_original_response(view=view)
             return False
         elif (
             "text" in interaction.data.custom_id and
