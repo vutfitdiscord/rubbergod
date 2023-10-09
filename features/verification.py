@@ -151,7 +151,7 @@ class Verification(BaseFeature):
                     )
                     return False
 
-                user = ValidPersonDB.get_user(login, status=VerifyStatus.Unverified.value)
+                user = ValidPersonDB.get_user_with_status(login, status=VerifyStatus.Unverified.value)
                 if user is None:
                     user = ValidPersonDB.add_user(login, "MUNI", status=VerifyStatus.Unverified.value)
                 await self.gen_code_and_send_mail(inter, user, "mail.muni.cz")
@@ -224,7 +224,7 @@ class Verification(BaseFeature):
             )
             return
 
-        new_user: ValidPersonDB = ValidPersonDB.get_user(login)
+        new_user: ValidPersonDB = ValidPersonDB.get_user_by_login(login)
         if new_user is not None:
             if code != new_user.code:
                 await inter.response.send_message(Messages.verify_verify_wrong_code)
