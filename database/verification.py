@@ -11,9 +11,9 @@ from database import database, session
 
 class VerifyStatus(IntEnum):
     """ Common enum to verification states. """
-    Verified = 0
-    Unverified = 1
-    InProcess = 2
+    Verified = 0        # verified
+    Unverified = 1      # unverified
+    InProcess = 2       # in process of verification (code sent)
 
 
 class PermitDB(database.base):
@@ -22,18 +22,50 @@ class PermitDB(database.base):
     login = Column(String, primary_key=True)
     discord_ID = Column(String)
 
+    @classmethod
+    def get_user_by_id(cls, discord_ID: str) -> Optional[PermitDB]:
+        user = session.query(PermitDB).filter(PermitDB.discord_ID == str(discord_ID)).one_or_none()
+        return user
+
+    @classmethod
+    def get_user_by_login(cls, login: str) -> Optional[PermitDB]:
+        user = session.query(PermitDB).filter(PermitDB.login == login).one_or_none()
+        return user
+
+    @classmethod
+    def get_all_users(cls) -> List[PermitDB]:
+        users = session.query(PermitDB).all()
+        return users
+
+    @classmethod
+    def get_all_logins(cls) -> List[PermitDB]:
+        users = session.query(PermitDB.login).all()
+        return users
+
+    @classmethod
+    def delete_user_by_login(cls, login: str) -> None:
+        user = cls.get_user_by_login(login).delete
+        session.delete(user)
+        session.commit()
+
+    @classmethod
+    def add_user(cls, login: str, discord_ID: str) -> None:
+        user = cls.get_user_by_login(login)
+        if user is not None:
+            raise Exception("User already exists")
+        user = cls(login=login, discord_ID=str(discord_ID))
+        session.add(user)
+        session.commit()
+
 
 class ValidPersonDB(database.base):
     __tablename__ = "bot_valid_persons"
-    # Status 0 = verified
-    # Status 1 = unverified
-    # Status 2 = in process of verification (code sent)
 
     login = Column(String, primary_key=True)
     name = Column(String)
     year = Column(String)
     code = Column(String)
-    status = Column(Integer, default=1)
+    status = Column(Integer, default=VerifyStatus.Unverified.value)
     mail = Column(String)
 
     def get_mail(self, fallback_domain: str) -> str:
@@ -42,15 +74,18 @@ class ValidPersonDB(database.base):
 
         if len(fallback_domain) == 0:
             raise Exception(
-                "The user does not have an e-mail address set "
-                + "up and a fallback domain has not been provided."
+                "The user does not have an e-mail address set up and a fallback domain has not been provided."
             )
 
         return f"{self.login}@{fallback_domain}"  # fallback
 
     @classmethod
-    def get_user(cls, login: str, status: int = 2) -> Optional[ValidPersonDB]:
-        """"Finds login from database"""
+    def get_user_with_status(
+        cls,
+        login: str,
+        status: int = VerifyStatus.InProcess.value
+    ) -> Optional[ValidPersonDB]:
+        """"Finds login from database and checks if status is correct"""
         user = (
             session.query(ValidPersonDB)
             .filter(ValidPersonDB.login == login, ValidPersonDB.status == status)
@@ -59,7 +94,7 @@ class ValidPersonDB(database.base):
         return user
 
     @classmethod
-    def add_user(cls, login: str, year: str, status: int = 1) -> ValidPersonDB:
+    def add_user(cls, login: str, year: str, status: int = VerifyStatus.Unverified.value) -> ValidPersonDB:
         """Add user to database"""
         person = ValidPersonDB(login=login, year=year, status=status)
         session.add(person)
@@ -69,10 +104,7 @@ class ValidPersonDB(database.base):
     @classmethod
     def get_user_by_login(cls, login: str) -> Optional[ValidPersonDB]:
         """Finds login from DB (without status check)"""
-        user = (
-            session.query(ValidPersonDB).filter(ValidPersonDB.login == login).one_or_none()
-        )
-
+        user = session.query(ValidPersonDB).filter(ValidPersonDB.login == login).one_or_none()
         return user
 
     def save_verified(self, discord_id: str) -> None:
@@ -91,10 +123,20 @@ class ValidPersonDB(database.base):
             .one_or_none()
         )
 
+    @classmethod
+    def get_all_logins(cls) -> List[str]:
+        """Returns all logins from database"""
+        return session.query(ValidPersonDB.login).all()
+
     def save_sent_code(self, code: str) -> None:
         """Updates a specified login with a new verification code"""
         self.code = code
         self.status = 2
+        session.commit()
+
+    def change_status(self, status: int) -> None:
+        """Changes status of specified login"""
+        self.status = status
         session.commit()
 
 
@@ -124,17 +166,11 @@ class DynamicVerifyDB(database.base):
 
     @classmethod
     def exists_rule(cls, rule: str) -> bool:
-        return session.query(
-            exists().where(cls.id == rule and cls.enabled)
-        ).scalar()
+        return session.query(exists().where(cls.id == rule and cls.enabled)).scalar()
 
     @classmethod
     def get_rule(cls, rule: str) -> Optional[DynamicVerifyDB]:
-        return (
-            session.query(cls)
-            .filter(cls.id == rule)
-            .one_or_none()
-        )
+        return session.query(cls).filter(cls.id == rule).one_or_none()
 
     @classmethod
     def get_rules(cls, limit: int) -> List[DynamicVerifyDB]:

@@ -6,30 +6,46 @@ import subprocess
 
 import disnake
 from disnake.ext import commands
-from sqlalchemy.orm.exc import MultipleResultsFound, NoResultFound
 
 import utils
 from cogs.base import Base
 from config import cooldowns
 from config.messages import Messages
 from database import session
-from database.verification import PermitDB, ValidPersonDB
-from features import verification
+from database.verification import PermitDB, ValidPersonDB, VerifyStatus
+from features.verification import Verification
 from permissions import permission_check, room_check
+
+user_logins = []
+
+
+async def autocomp_user_logins(inter: disnake.ApplicationCommandInteraction, user_input: str):
+    return [user for user in user_logins if user_input.lower() in user][:25]
 
 
 class FitWide(Base, commands.Cog):
     def __init__(self, bot):
         super().__init__()
         self.bot = bot
-        self.verification = verification.Verification(bot)
+        self.verification = Verification(bot)
+        self.get_all_logins()
+
+    def get_all_logins(self):
+        global user_logins
+        user_logins_verified = PermitDB.get_all_logins()
+        user_logins_not_verified = ValidPersonDB.get_all_logins()
+        verified_logins = [user[0] for user in user_logins_verified]
+        not_verified_logins = [user[0] for user in user_logins_not_verified]
+        user_logins = verified_logins + not_verified_logins
+        user_logins.sort()
 
     @cooldowns.default_cooldown
     @commands.check(permission_check.is_bot_admin)
-    @commands.command()
+    @commands.check(room_check.is_in_modroom)
+    @commands.slash_command(name="role_check", description=Messages.fitwide_role_check_brief)
     async def role_check(
         self,
-        ctx,
+        inter: disnake.ApplicationCommandInteraction,
         p_verified: bool = True,
         p_move: bool = False,
         p_status: bool = True,
@@ -37,7 +53,8 @@ class FitWide(Base, commands.Cog):
         p_zapis: bool = False,
         p_debug: bool = True,
     ):
-        guild = self.bot.get_guild(self.config.guild_id)
+        await inter.send(Messages.fitwide_role_check_start)
+        guild = inter.guild
         members = guild.members
 
         verify = disnake.utils.get(guild.roles, name="Verify")
@@ -75,21 +92,30 @@ class FitWide(Base, commands.Cog):
         for member in verified:
             if member.id not in permited_ids:
                 if p_verified:
-                    await ctx.send("Ve verified databázi jsem nenašel: " + utils.generate_mention(member.id))
+                    await inter.send(
+                        Messages.fitwide_role_check_user_not_found(user=member.id, id=member.id)
+                    )
             else:
-                try:
-                    login = session.query(PermitDB).filter(PermitDB.discord_ID == str(member.id)).one().login
-
-                    person = session.query(ValidPersonDB).filter(ValidPersonDB.login == login).one()
-                except NoResultFound:
+                user = PermitDB.get_user_by_id(member.id)
+                if user is None:
                     continue
-                except MultipleResultsFound:
-                    await ctx.send(f"{member.id} je v permit databazi vickrat?")
+                if len(user) > 1:
+                    await inter.send(
+                        Messages.fitwide_role_check_user_duplicate(user=member.id, id=member.id)
+                    )
+                    continue
+
+                person = ValidPersonDB.get_user_by_login(user.login)
+                if person is None:
                     continue
 
                 if person.status != 0:
                     if p_status:
-                        await ctx.send("Status nesedí u: " + login)
+                        await inter.send(
+                            Messages.fitwide_role_check_wrong_status(
+                                user=user.discord_ID, id=user.discord_ID
+                            )
+                        )
 
                 year = self.verification.transform_year(person.year)
 
@@ -125,21 +151,21 @@ class FitWide(Base, commands.Cog):
                     and int(source_year[0]) == int(target_year[0]) + 1
                 ):
                     message_prefix = (
-                        "Vypada ze do dalsiho rocniku se nezapsali "
+                        "Vypadá, že do dalšího ročníku se nezapsali "
                         f"(protoze na merlinovi maji {target_year}): "
                     )
-                    await self.send_masstag_messages(ctx, message_prefix, target_ids)
+                    await self.send_masstag_messages(inter, message_prefix, target_ids)
                 elif p_move and (
                     # presun bakalaru do 1MIT
                     ("BIT" in source_year and target_year == "1MIT")
                     or target_year == "Dropout"
                 ):
-                    await ctx.send(
-                        f"Přesouvám techle {len(target_members)} lidi z {source_year} do {target_year}:"
+                    await inter.send(
+                        f"Přesouvám tyto {len(target_members)} lidi z {source_year} do {target_year}:"
                     )
-                    await self.send_masstag_messages(ctx, "", target_ids)
+                    await self.send_masstag_messages(inter, "", target_ids)
                     if p_debug:
-                        await ctx.send("jk, debug mode")
+                        await inter.send("jk, debug mode")
                     else:
                         for member in target_members:
                             if not (target_role == dropout and any(
@@ -148,13 +174,13 @@ class FitWide(Base, commands.Cog):
                                 await member.add_roles(target_role)
                             await member.remove_roles(source_role)
                 elif p_role:
-                    await ctx.send(
-                        f"Nasel jsem {len(target_members)} lidi kteri maji na merlinovi "
+                    await inter.send(
+                        f"Našel jsem {len(target_members)} lidi, kteří mají na merlinovi "
                         f"{target_year} ale roli {source_year}:"
                     )
-                    await self.send_masstag_messages(ctx, "", target_ids)
+                    await self.send_masstag_messages(inter, "", target_ids)
 
-        await ctx.send("Done")
+        await inter.send("Done")
 
     async def send_masstag_messages(self, ctx, prefix, target_ids):
         message = prefix
@@ -360,15 +386,24 @@ class FitWide(Base, commands.Cog):
 
     @cooldowns.default_cooldown
     @commands.check(room_check.is_in_modroom)
-    @commands.command()
-    async def update_db(self, ctx, convert_0xit: bool = False):
+    @commands.slash_command(name="verify_db", description=Messages.fitwide_brief)
+    async def verify_db(self, inter: disnake.ApplicationCommandInteraction):
+        pass
+
+    @verify_db.sub_command(name="update", description=Messages.fitwide_update_db_brief)
+    async def update_db(
+        self,
+        inter: disnake.ApplicationCommandInteraction,
+        convert_to_0bit_0mit: bool = False
+    ):
+        await inter.send(Messages.fitwide_update_db_start)
         with open("merlin-latest", "r") as f:
             data = f.readlines()
 
         found_people = []
         found_logins = []
         new_logins = []
-        login_results = session.query(ValidPersonDB.login).all()
+        login_results = ValidPersonDB.get_all_logins()
         # Use unpacking on results
         old_logins = [value for value, in login_results]
 
@@ -383,8 +418,8 @@ class FitWide(Base, commands.Cog):
             except IndexError:
                 continue
 
-            if convert_0xit and year.endswith("1r"):
-                person = session.query(ValidPersonDB).filter(ValidPersonDB.login == login).one_or_none()
+            if convert_to_0bit_0mit and year.endswith("1r"):
+                person = ValidPersonDB.get_user_by_login(login)
                 if person is not None and person.year.endswith("0r"):
                     year = year.replace("1r", "0r")
 
@@ -395,7 +430,7 @@ class FitWide(Base, commands.Cog):
             if login not in old_logins:
                 new_logins.append(login)
 
-        await ctx.send(f"Našel jsem {len(new_logins)} nových loginů.")
+        await inter.send(Messages.fitwide_new_logins(new_logins=len(new_logins)))
 
         for person in found_people:
             session.merge(person)
@@ -409,110 +444,111 @@ class FitWide(Base, commands.Cog):
                     person.year = "MUNI"
                 except ValueError:
                     person.year = "dropout"
-            elif convert_0xit and person.login in new_logins:
+            elif convert_to_0bit_0mit and person.login in new_logins:
                 if person.year.endswith("1r"):
                     person.year = person.year.replace("1r", "0r")
                     cnt_new += 1
 
         session.commit()
 
-        await ctx.send("Aktualizace databáze proběhla úspěšně.")
-        if convert_0xit:
-            await ctx.send(f"Debug: Našel jsem {cnt_new} nových prvaků.")
+        await inter.send(Messages.fitwide_update_db_done)
+        if convert_to_0bit_0mit:
+            await inter.send(Messages.fitwide_db_debug(cnt_new=cnt_new))
 
-    @cooldowns.default_cooldown
-    @commands.check(room_check.is_in_modroom)
-    @commands.command()
-    async def get_db(self, ctx):
+    @verify_db.sub_command(name="pull", description=Messages.fitwide_pull_db_brief)
+    async def pull_db(self, inter: disnake.ApplicationCommandInteraction):
+        await inter.response.defer()
         process = subprocess.Popen(["ssh", "merlin"], stdout=subprocess.PIPE)
         try:
             output, error = process.communicate(timeout=15)
             if error:
-                await ctx.send("Stažené databáze nějak nefunguje.")
+                await inter.edit_original_response(Messages.fitwide_get_db_error)
                 return
         except subprocess.TimeoutExpired:
-            await ctx.send("Timeout při stahování databáze.")
+            await inter.edit_original_response(Messages.fitwide_get_db_timeout)
             return
         with open("merlin-latest", "w") as f:
             f.write(output.decode("utf-8"))
-        await ctx.send("Stažení databáze proběhlo úspěšně.")
+        await inter.edit_original_response(Messages.fitwide_get_db_success)
 
-    @cooldowns.default_cooldown
-    @commands.check(room_check.is_in_modroom)
-    @commands.command()
-    async def get_users_login(self, ctx, member: disnake.Member):
-        result = session.query(PermitDB).filter(PermitDB.discord_ID == str(member.id)).one_or_none()
+    @verify_db.sub_command(name="get_login", description=Messages.fitwide_get_login_brief)
+    async def get_login(self, inter: disnake.ApplicationCommandInteraction, member: disnake.Member):
+        await inter.response.defer()
+        result = PermitDB.get_user_by_id(member.id)
 
         if result is None:
-            await ctx.send("Uživatel není v databázi.")
+            await inter.edit_original_response(Messages.fitwide_login_not_found)
             return
 
-        person = session.query(ValidPersonDB).filter(ValidPersonDB.login == result.login).one_or_none()
+        person = ValidPersonDB.get_user_by_login(result.login)
 
         if person is None:
-            await ctx.send(result.login)
+            await inter.edit_original_response(result.login)
             return
 
-        await ctx.send(("Login: `{p.login}`\nJméno: `{p.name}`\n" "Ročník: `{p.year}`").format(p=person))
+        await inter.edit_original_response(Messages.fitwide_get_user_format)
 
-    @cooldowns.default_cooldown
-    @commands.check(room_check.is_in_modroom)
-    @commands.command()
-    async def get_logins_user(self, ctx, login):
-        result = session.query(PermitDB).filter(PermitDB.login == login).one_or_none()
+    @verify_db.sub_command(name="get_user", description=Messages.fitwide_get_user_brief)
+    async def get_user(
+        self,
+        inter: disnake.ApplicationCommandInteraction,
+        login: str = commands.Param(autocomplete=autocomp_user_logins)
+    ):
+        await inter.response.defer()
+        result = PermitDB.get_user_by_login(login)
 
         if result is None:
-            person = session.query(ValidPersonDB).filter(ValidPersonDB.login == login).one_or_none()
+            person = ValidPersonDB.get_user_by_login(login)
             if person is None:
-                await ctx.send("Uživatel není v databázi možných loginů.")
+                await inter.edit_original_response(Messages.fitwide_get_user_not_found)
             else:
-                await ctx.send(
-                    ("Login: `{p.login}`\nJméno: `{p.name}`\n" "Ročník: `{p.year}`\nNení na serveru.").format(
-                        p=person
-                    )
+                await inter.edit_original_response(
+                    Messages.fitwide_get_user_format(p=person) + "Není na serveru."
                 )
         else:
-            await ctx.send(utils.generate_mention(result.discord_ID))
+            await inter.edit_original_response(utils.generate_mention(result.discord_ID))
 
-    @cooldowns.default_cooldown
-    @commands.check(room_check.is_in_modroom)
-    @commands.command()
-    async def reset_login(self, ctx, login):
+    @verify_db.sub_command(name="reset_login", description=Messages.fitwide_reset_login_brief)
+    async def reset_login(
+        self,
+        inter: disnake.ApplicationCommandInteraction,
+        login: str = commands.Param(autocomplete=autocomp_user_logins)
+    ):
+        await inter.response.defer()
+        result = ValidPersonDB.get_user_by_login(login)
 
-        result = session.query(ValidPersonDB).filter(ValidPersonDB.login == login).one_or_none()
         if result is None:
-            await ctx.send("To není validní login.")
+            await inter.edit_original_response(Messages.fitwide_invalid_login)
         else:
-            session.query(PermitDB).filter(PermitDB.login == login).delete()
-            result.status = 1
-            session.commit()
-            await ctx.send("Hotovo.")
+            PermitDB.delete_user_by_login(login)
+            result.change_status(VerifyStatus.Unverified.value)
+            await inter.edit_original_response(Messages.fitwide_action_success)
 
-    @cooldowns.default_cooldown
-    @commands.check(room_check.is_in_modroom)
-    @commands.command()
-    async def connect_login_to_user(self, ctx, login, member: disnake.Member):
-
-        result = session.query(ValidPersonDB).filter(ValidPersonDB.login == login).one_or_none()
+    @verify_db.sub_command(name="link_login_user", description=Messages.fitwide_link_login_user_brief)
+    async def link_login_user(
+        self,
+        inter: disnake.ApplicationCommandInteraction,
+        member: disnake.Member,
+        login: str = commands.Param(autocomplete=autocomp_user_logins),
+    ):
+        await inter.response.defer()
+        result = ValidPersonDB.get_user_by_login(login)
         if result is None:
-            await ctx.send("To není validní login.")
+            await inter.edit_original_response(Messages.fitwide_invalid_login)
         else:
-            session.add(PermitDB(login=login, discord_ID=str(member.id)))
-            result.status = 0
-            session.commit()
-            await ctx.send("Hotovo.")
+            try:
+                PermitDB.add_user(login, str(member.id))
+            except Exception:
+                await inter.edit_original_response(Messages.fitwide_login_already_exists)
+                return
+            result.change_status(VerifyStatus.Verified.value)
+            await inter.edit_original_response(Messages.fitwide_action_success)
 
-    @get_users_login.error
-    @reset_login.error
-    @get_logins_user.error
+    @verify_db.error
     @role_check.error
-    @increment_roles.error
-    @update_db.error
-    @get_db.error
-    @connect_login_to_user.error
-    async def fitwide_checks_error(self, ctx, error):
+    async def fitwide_checks_error(self, inter: disnake.ApplicationCommandInteraction, error):
         if isinstance(error, commands.CheckFailure):
-            await ctx.send("Nothing to see here comrade. <:KKomrade:484470873001164817>")
+            await inter.send(Messages.fitwide_not_in_modroom)
             return True
 
 
