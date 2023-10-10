@@ -94,6 +94,7 @@ class System(Base, commands.Cog):
     @cooldowns.default_cooldown
     @commands.slash_command(name="uptime", description=Messages.uptime_brief)
     async def uptime(self, inter: disnake.ApplicationCommandInteraction):
+        await inter.response.defer()
         now = datetime.now().replace(microsecond=0)
         delta = now - boottime
         count = self.error_log.log_error_date(set=False)
@@ -112,7 +113,7 @@ class System(Base, commands.Cog):
             inline=False
         )
         self.error_log.set_image(embed, self.bot.user, count)
-        await inter.send(embed=embed)
+        await inter.edit_original_response(embed=embed)
 
     @pull.error
     @cogs.error
