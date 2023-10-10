@@ -315,7 +315,7 @@ class StreamLinks(Base, commands.Cog):
             if 'property' in meta.attrs and meta.attrs['property'] == 'og:image':
                 data['image'] = meta.attrs['content']
             if 'itemprop' in meta.attrs and meta.attrs['itemprop'] in ['datePublished', 'uploadDate']:
-                data['upload_date'] = datetime.strptime(meta.attrs['content'], '%Y-%m-%d')
+                data['upload_date'] = datetime.fromisoformat(meta.attrs['content'])
 
         return data
 
