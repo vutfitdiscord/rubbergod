@@ -486,7 +486,7 @@ class FitWide(Base, commands.Cog):
             await inter.edit_original_response(result.login)
             return
 
-        await inter.edit_original_response(Messages.fitwide_get_user_format)
+        await inter.edit_original_response(Messages.fitwide_get_user_format(p=person))
 
     @verify_db.sub_command(name="get_user", description=Messages.fitwide_get_user_brief)
     async def get_user(
