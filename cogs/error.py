@@ -10,6 +10,7 @@ CheckFailure must be last in the list of errors, because it is the most generic 
 """
 
 import traceback
+from datetime import datetime, timedelta
 
 import disnake
 import sqlalchemy
@@ -104,7 +105,9 @@ class Error(Base, commands.Cog):
             # no return here, because we want to log these errors
 
         if isinstance(error, commands.CommandOnCooldown):
-            await ctx.send(Messages.spamming(user=ctx.author.id, time=error.retry_after))
+            time = datetime.now() + timedelta(seconds=error.retry_after)
+            retry_after = utils.get_discord_timestamp(time, style="Relative Time")
+            await ctx.send(Messages.spamming(user=ctx.author.id, time=retry_after))
             return
 
         if isinstance(error, commands.NoPrivateMessage):
@@ -170,8 +173,10 @@ class Error(Base, commands.Cog):
             # no return here, because we want to log these errors
 
         if isinstance(error, commands.CommandOnCooldown):
+            time = datetime.now() + timedelta(seconds=error.retry_after)
+            retry_after = utils.get_discord_timestamp(time, style="Relative Time")
             await inter.send(
-                Messages.spamming(user=inter.author.id, time=error.retry_after),
+                Messages.spamming(user=inter.author.id, time=retry_after),
                 ephemeral=True
             )
             return
@@ -241,8 +246,10 @@ class Error(Base, commands.Cog):
             # no return here, because we want to log these errors
 
         if isinstance(error, commands.CommandOnCooldown):
+            time = datetime.now() + timedelta(seconds=error.retry_after)
+            retry_after = utils.get_discord_timestamp(time, style="Relative Time")
             await inter.send(
-                Messages.spamming(user=inter.author.id, time=error.retry_after),
+                Messages.spamming(user=inter.author.id, time=retry_after),
                 ephemeral=True
             )
             return
@@ -291,8 +298,10 @@ class Error(Base, commands.Cog):
             # no return here, because we want to log these errors
 
         if isinstance(error, commands.CommandOnCooldown):
+            time = datetime.now() + timedelta(seconds=error.retry_after)
+            retry_after = utils.get_discord_timestamp(time, style="Relative Time")
             await inter.send(
-                Messages.spamming(user=inter.author.id, time=error.retry_after),
+                Messages.spamming(user=inter.author.id, time=retry_after),
                 ephemeral=True
             )
             return
