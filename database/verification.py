@@ -44,7 +44,9 @@ class PermitDB(database.base):
 
     @classmethod
     def delete_user_by_login(cls, login: str) -> None:
-        user = cls.get_user_by_login(login).delete
+        user = cls.get_user_by_login(login)
+        if user is None:
+            raise Exception("User does not exist in PermitDB")
         session.delete(user)
         session.commit()
 
