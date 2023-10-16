@@ -36,8 +36,8 @@ class FitWide(Base, commands.Cog):
         user_logins_not_verified = ValidPersonDB.get_all_logins()
         verified_logins = [user[0] for user in user_logins_verified]
         not_verified_logins = [user[0] for user in user_logins_not_verified]
-        user_logins = verified_logins + not_verified_logins
-        user_logins.sort()
+        user_logins = set(verified_logins + not_verified_logins)
+        user_logins = sorted(user_logins)
 
     @cooldowns.default_cooldown
     @commands.check(permission_check.is_bot_admin)
@@ -243,7 +243,7 @@ class FitWide(Base, commands.Cog):
                 await channel.set_permissions(mit0, read_messages=True)
 
         # skolni-info, cvicici-info, stream-links, senat-unie-drby room overwrites
-        channel_names = ["skolni-info", "cvicici-info", "stream-links", "senat-unie-drby"]
+        channel_names = ["skolni-info", "cvicici-info", "stream-links", "senat-unie-drby", "bp-szz", "dp-szz"]
         channels = [
             disnake.utils.get(guild.channels, name=channel_name) for channel_name in channel_names
         ]
@@ -520,7 +520,11 @@ class FitWide(Base, commands.Cog):
         if result is None:
             await inter.edit_original_response(Messages.fitwide_invalid_login)
         else:
-            PermitDB.delete_user_by_login(login)
+            try:
+                PermitDB.delete_user_by_login(login)
+            except Exception:
+                await inter.edit_original_response(Messages.fitwide_login_not_found)
+                return
             result.change_status(VerifyStatus.Unverified.value)
             await inter.edit_original_response(Messages.fitwide_action_success)
 
