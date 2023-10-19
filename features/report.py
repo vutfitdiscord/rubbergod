@@ -59,8 +59,7 @@ async def embed_resolved(
 
 async def set_tag(forum: disnake.ForumChannel, forum_thread: disnake.Thread, tag_name: str) -> None:
     """Remove all tags and add the tag with the given name"""
-    await forum_thread.remove_tags(*forum_thread.applied_tags)
     for tag in forum.available_tags:
         if tag.name.lower() == tag_name:
-            await forum_thread.add_tags(tag)
-            return
+            await forum_thread.edit(applied_tags=[tag])
+            break
