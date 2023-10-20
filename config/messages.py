@@ -372,6 +372,8 @@ class Messages(metaclass=Formatable):
     absolvent_id_from_help = "Zadej svoje ID práce."
     absolvent_brief = "Příkaz pro ověření absolvování studia na FIT VUT"
     absolvent_help_brief = "Vypíše help k příkazu /diplom"
+    absolvent_not_in_db = "Tvůj login nebyl nalezen v databázi ověřených uživatelů. Použij příkaz `/verify` pro ověření (je zapotřebí školní email)."
+    absolvent_not_verified = "Pro zavolání tohoto příkazu je potřeba se ověřit pomocí příkazu `/verify`."
     absolvent_help = f"{absolvent_brief} - zadejte CASE-SENSITIVE údaje ve formátu:\n" \
         "/diplom <Titul.> <Jméno> <Příjmení> <Číslo diplomu> <ID kvalifikační práce z URL na webu knihovny VUT <https://dspace.vutbr.cz/handle/11012/19121> >\n" \
         "např: Bc. Josef Novák 123456/2019 99999\n" \
