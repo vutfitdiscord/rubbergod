@@ -45,6 +45,13 @@ class Absolvent(Base, commands.Cog):
             can be discovered via https://dspace.vutbr.cz/handle/11012/19121
         """
         await inter.response.defer(with_message=True, ephemeral=True)
+
+        # check whether the user is verified
+        verify_role = inter.guild.get_role(self.config.verification_role_id)
+        if verify_role not in inter.author.roles:
+            await inter.edit_original_response(Messages.absolvent_not_verified)
+            return
+
         if thesis_web_id == "19121":
             await inter.edit_original_response(Messages.absolvent_id_from_help)
             return
@@ -69,6 +76,10 @@ class Absolvent(Base, commands.Cog):
         name_from_db = ValidPersonDB.get_user_by_id(inter.author.id).name
         # remove diacritics from the user-supplied name
         name_from_user_without_diacritics = remove_accents(f"{surname} {name}")
+
+        if name_from_db is None:
+            await inter.edit_original_response(Messages.absolvent_not_in_db)
+            return
 
         if name_from_db != name_from_user_without_diacritics:
             await inter.edit_original_response(Messages.absolvent_wrong_name)
