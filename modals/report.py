@@ -45,14 +45,11 @@ class ReportModal(disnake.ui.Modal):
         self,
         inter: disnake.ModalInteraction,
         report_reason: str,
-        report_id: int
+        report_id: int,
+        first_image: disnake.File = None,
     ) -> disnake.Embed:
         """creates an embed template for the report"""
-        embed = disnake.Embed(
-            title=self.title,
-            description=report_reason,
-            color=disnake.Color.red()
-        )
+        embed = disnake.Embed(title=self.title, description=report_reason, color=disnake.Color.red())
 
         if isinstance(self.message, disnake.Message):
             embed.add_field(name="Message", value=f"{self.message.jump_url}\n{self.message.channel.name}")
@@ -60,6 +57,9 @@ class ReportModal(disnake.ui.Modal):
                 name="Reported user",
                 value=f"{self.message.author.mention}\n@{self.message.author}"
             )
+            if first_image is not None:
+                embed.set_image(file=first_image)
+
         embed.add_field(name="Resolved by", value="---", inline=False)
 
         utils.add_author_footer(
@@ -88,6 +88,7 @@ class ReportModal(disnake.ui.Modal):
 
         embed = self.report_embed(inter, report_reason, report_id)
 
+        await inter.send(Messages.report_modal_success, ephemeral=True)
         _, message = await self.report_channel.create_thread(
             name=f"Report #{report_id}",
             embed=embed,
@@ -97,11 +98,11 @@ class ReportModal(disnake.ui.Modal):
         await message.pin()
         await report_features.set_tag(self.report_channel, message.channel, "open")
         ReportDB.set_report_url(report_id, message.jump_url)
-        await self.dm_message.edit(content="", embed=embed)
-        await inter.send(Messages.report_modal_success, ephemeral=True)
+        await self.dm_message.edit(content="", embed=embed, view=None)
 
     async def report_message(self, inter: disnake.ModalInteraction) -> None:
         """add message report to db and send it to the report room"""
+        await inter.send(Messages.report_modal_success, ephemeral=True)
         report_reason = Messages.report_message_embed(
             content=self.message.content,
             reason=inter.text_values['reason']
@@ -115,16 +116,33 @@ class ReportModal(disnake.ui.Modal):
             target_user_id=self.message.author.id
         )
 
-        embed = self.report_embed(inter, report_reason, report_id)
+        images, files, attachments_too_big = await utils.parse_attachments(self.message)
 
-        _, message = await self.report_channel.create_thread(
+        first_image = None
+        if images:
+            first_image = images[0]
+            images.pop(0)
+
+        embed = self.report_embed(inter, report_reason, report_id, first_image)
+
+        thread, message = await self.report_channel.create_thread(
             name=f"Report #{report_id} - {self.message.author}",
             embed=embed,
-            view=ReportMessageView(self.bot)
+            view=ReportMessageView(self.bot),
         )
+
+        if attachments_too_big:
+            attachments_too_big = [f"[{attachment.filename}]({attachment.url})"
+                                   for attachment in attachments_too_big]
+        if any(inner_list for inner_list in [images, files, attachments_too_big]):
+            # if there are any attachments combine them
+            files = images + files if files + images else None
+            await thread.send(
+                content=Messages.report_files_too_big(files="\n- ".join(attachments_too_big)),
+                files=files
+            )
 
         await message.pin()
         await report_features.set_tag(self.report_channel, message.channel, "open")
         ReportDB.set_report_url(report_id, message.jump_url)
         await self.dm_message.edit(content="", embed=embed, view=None)
-        await inter.send(Messages.report_modal_success, ephemeral=True)

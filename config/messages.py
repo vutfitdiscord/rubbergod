@@ -600,6 +600,7 @@ if ("Mám průměr pod 2.0")                                           \n  retur
     report_message_not_spam = "### Report #{id} unmarked as spam by @{author}"
     report_already_solved = "Report #{id} už byl uzavřen. V případě potřeby otevři další report"
     report_check_dm = "Odesílám report ..."
+    report_files_too_big = "Soubory přesahující upload limit:\n- {files}"
 
     # SUBSCRIPTIONS COG
     subscription_add_brief = "Přidá odběr na vlákna se zvoleným tagem"

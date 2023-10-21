@@ -3,7 +3,7 @@ import os
 import re
 import time
 from datetime import datetime, timezone
-from typing import Callable, Iterable, Literal, Optional, Union
+from typing import Callable, Iterable, List, Literal, Optional, Tuple, Union
 
 import disnake
 from disnake import Emoji, Member, PartialEmoji
@@ -377,3 +377,36 @@ async def get_or_fetch_channel(bot, channel_id) -> disnake.TextChannel:
     if channel is None:
         channel: disnake.TextChannel = await bot.fetch_channel(channel_id)
     return channel
+
+
+async def parse_attachments(
+    message: disnake.Message
+) -> Tuple[List[disnake.File], List[disnake.File], List[disnake.Attachment]]:
+    """Parse attachments from message and return them as lists of disnake files
+
+    Returns
+    -------
+    Returns three lists containing disnake files or attachments.
+    - first list contains images
+    - second list contains files
+    - third list contains attachments that are over 25MB and can't be uploaded
+    """
+
+    images = []
+    files = []
+    attachments_too_big = []
+
+    if not message.attachments:
+        return [], [], []
+
+    for attachment in message.attachments:
+        if attachment.size > 25000000:      # 25MB
+            attachments_too_big.append(attachment)
+            continue
+
+        if "image" in attachment.content_type:
+            images.append(await attachment.to_file())
+        else:
+            files.append(await attachment.to_file())
+
+    return images, files, attachments_too_big

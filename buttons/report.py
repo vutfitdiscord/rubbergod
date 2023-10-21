@@ -310,6 +310,9 @@ class ReportAnswerModal(disnake.ui.Modal):
         return embed
 
     async def callback(self, inter: disnake.ModalInteraction) -> None:
+        # respond to interaction to prevent timeout
+        await inter.send(Messages.report_answer_success, ephemeral=True)
+
         answer = inter.text_values['answer']
         report = ReportDB.get_report(self.report_id)
         report_author = await self.bot.get_or_fetch_user(report.author_id)
@@ -317,13 +320,12 @@ class ReportAnswerModal(disnake.ui.Modal):
         embed = self.answer_embed(inter, report, answer)
         AnswerDB.add_answer(self.report_id, inter.author.id, answer)
 
-        # interaction in DMs
         if inter.channel.type == disnake.ChannelType.private:
+            # interaction in DMs
             await report_message.channel.send(embed=embed, view=ReportAnswerOnlyView(self.bot))
-            await inter.response.edit_message(view=None)
-        # interaction in forum thread
+            await inter.message.edit(view=None)
         else:
+            # interaction in forum thread
             await report_message.channel.send(embed=embed)
 
         await report_author.send(embed=embed, view=ReportAnonymView(self.bot))
-        await inter.send(Messages.report_answer_success, ephemeral=True)
