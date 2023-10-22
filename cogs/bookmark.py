@@ -41,12 +41,6 @@ class Bookmark(Base, commands.Cog):
             )
             await ctx.member.send(files=files_attached[10:])
 
-    @commands.Cog.listener()
-    async def on_button_click(self, inter: disnake.MessageInteraction):
-        if inter.component.custom_id != "bookmark:delete":
-            return
-        await inter.message.delete()
-
 
 def setup(bot):
     bot.add_cog(Bookmark(bot))
