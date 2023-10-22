@@ -80,15 +80,24 @@ class ReportModal(disnake.ui.Modal):
         else:
             await self.report_general(inter)
 
+    async def edit_or_send(self, inter: disnake.ModalInteraction, embed: disnake.Embed):
+        """edit or send embed to the user depends if user deleted the message or not"""
+        url = self.dm_message.jump_url
+        try:
+            message: disnake.Message = await commands.MessageConverter().convert(inter, url)
+            await message.edit(content="", embed=embed, view=None)
+        except commands.MessageNotFound:
+            await message.channel.send(content="", embed=embed, view=None)
+
     async def report_general(self, inter: disnake.ModalInteraction) -> None:
         """add general report to db and send it to the report room"""
+        await inter.send(Messages.report_modal_success, ephemeral=True)
         report_reason = inter.text_values['reason']
         UserDB.add_user(inter.author.id)
         report_id = ReportDB.add_report(type="general", author_id=inter.author.id, reason=report_reason)
 
         embed = self.report_embed(inter, report_reason, report_id)
 
-        await inter.send(Messages.report_modal_success, ephemeral=True)
         _, message = await self.report_channel.create_thread(
             name=f"Report #{report_id}",
             embed=embed,
@@ -98,7 +107,8 @@ class ReportModal(disnake.ui.Modal):
         await message.pin()
         await report_features.set_tag(self.report_channel, message.channel, "open")
         ReportDB.set_report_url(report_id, message.jump_url)
-        await self.dm_message.edit(content="", embed=embed, view=None)
+
+        self.edit_or_send(inter, embed)
 
     async def report_message(self, inter: disnake.ModalInteraction) -> None:
         """add message report to db and send it to the report room"""
@@ -137,12 +147,18 @@ class ReportModal(disnake.ui.Modal):
         if any(inner_list for inner_list in [images, files, attachments_too_big]):
             # if there are any attachments combine them
             files = images + files if files + images else None
-            await thread.send(
-                content=Messages.report_files_too_big(files="\n- ".join(attachments_too_big)),
-                files=files
-            )
+            content = ""
+
+            if attachments_too_big:
+                content = Messages.report_files_too_big(files="\n- ".join(attachments_too_big))
+
+            await thread.send(content=content, files=files)
+
+        # remove image from embed because of explicit content
+        embed.set_image(url=None)
 
         await message.pin()
         await report_features.set_tag(self.report_channel, message.channel, "open")
         ReportDB.set_report_url(report_id, message.jump_url)
-        await self.dm_message.edit(content="", embed=embed, view=None)
+
+        self.edit_or_send(inter, embed)

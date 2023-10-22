@@ -15,5 +15,5 @@ class BookmarkView(BaseView):
             emoji="🗑",
             label="Smazat záložku",
             style=disnake.ButtonStyle.danger,
-            custom_id="bookmark:delete")
+            custom_id="trash:delete")
             )

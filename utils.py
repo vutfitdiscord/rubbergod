@@ -383,6 +383,7 @@ async def parse_attachments(
     message: disnake.Message
 ) -> Tuple[List[disnake.File], List[disnake.File], List[disnake.Attachment]]:
     """Parse attachments from message and return them as lists of disnake files
+    and if they are over 25MB as attachments.
 
     Returns
     -------
