@@ -29,7 +29,7 @@ db_string = "postgresql://postgres:postgres@db:5432/postgres"
 extensions = ['karma', 'meme', 'memerepost', 'random', 'verify', 'fitwide', 'autopin',
     'help', 'review', 'vote', 'week', 'roles', 'error', 'absolvent', 'gif', 'reactions',
     'streamlinks', 'bookmark', 'latex', 'info', 'fun', 'moderation', 'message',
-    'timeout', 'forum', 'report']
+    'timeout', 'forum', 'report', 'contestvote']
 
 [config]
 static = ['config_static', 'toml_dict', 'key', 'weather_token', 'db_string']
@@ -46,6 +46,12 @@ grillbot_leaderboard_size = 50
 [vote]
 minimum = 20
 minutes = 2
+
+[contest_vote]
+channel = 0
+weight_1 = 2
+weight_2 = 1.5
+weight_3 = 1
 
 [autopin]
 count = 20

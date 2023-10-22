@@ -79,6 +79,12 @@ class Config:
     vote_minimum: int = get_attr(toml_dict, "vote", "minimum")
     vote_minutes: int = get_attr(toml_dict, "vote", "minutes")
 
+    # ContestVote
+    contest_vote_channel: int = get_attr(toml_dict, "contest_vote", "channel")
+    contest_vote_weight_1: int = get_attr(toml_dict, "contest_vote", "weight_1")
+    contest_vote_weight_2: int = get_attr(toml_dict, "contest_vote", "weight_1")
+    contest_vote_weight_3: int = get_attr(toml_dict, "contest_vote", "weight_1")
+
     # Pin emoji count to pin
     autopin_count: int = get_attr(toml_dict, "autopin", "count")
     autopin_banned_channels: List[int] = get_attr(toml_dict, "autopin", "banned_channels")

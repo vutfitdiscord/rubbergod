@@ -18,7 +18,7 @@ class Meme(Base, commands.Cog):
         self.bot = bot
 
     @commands.Cog.listener()
-    async def on_message(self, message: disnake.message):
+    async def on_message(self, message: disnake.Message):
         global uhoh_counter
 
         if message.author.bot:

@@ -273,6 +273,7 @@ class Messages(metaclass=Formatable):
     dynamic_verify_no_roles = "Nebyla nalezena žádná role."
     dynamic_verify_missing_rule = "Toto pravidlo (`{rule_id}`) neexistuje."
 
+    # VOTE
     vote_brief = "Zahájí hlasování, ve kterém je možné zvolit více možností"
     vote_one_of_brief = "Zahájí hlasování, ve kterém je možné zvolit pouze jednu možnost"
     vote_format = f"`{prefix}[single]vote [datum a čas konce]\n[otázka]\n[emoji] " \
@@ -295,6 +296,12 @@ class Messages(metaclass=Formatable):
                   "„{winning_option}“ s {votes} hlasy."
     vote_result_multiple = "V hlasování „{question}“ vyhrály možnosti {winning_emojis} s {votes} hlasy."
     vote_result_none = "V hlasování „{question}“ nikdo nehlasoval. <:sadcat:576171980118687754>"
+
+    # CONTESTVOTE
+    contest_vote_calculate_message_brief = "Spočítá počet hlasů a jejich celkovou váhu pro daný příspěvek"
+    contest_vote_winners_brief = "Zobrazí prvních 5 vítězných příspěvků"
+    contest_vote_no_reactions = "Tato zpráva nemá žádné reakce"
+    contest_vote_no_votes = "Na tuto zprávu nebyly přidány žádné hlasy"
 
     # REVIEW
     review_add_brief = "Přidá recenzi na předmět. Pokud jsi již recenzi na předmět napsal, bude nahrazena novou."

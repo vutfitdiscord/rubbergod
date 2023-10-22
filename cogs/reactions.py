@@ -61,6 +61,9 @@ class Reactions(Base, commands.Cog):
                 ctx.message.author.id != ctx.member.id:
             cogs.append(self.bot.get_cog("MemeRepost"))
 
+        if (ctx.channel.id == self.config.contest_vote_channel):
+            cogs.append(self.bot.get_cog("ContestVote"))
+
         if ctx.emoji == "🔇":
             cogs.append(self.bot.get_cog("TimeoutWars"))
 
