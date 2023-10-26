@@ -24,10 +24,10 @@ boottime = datetime.now().replace(microsecond=0)
 
 
 class System(Base, commands.Cog):
-    def __init__(self, bot):
+    def __init__(self, bot: commands.Bot):
         super().__init__()
         self.bot = bot
-        self.error_log = ErrorLogger()
+        self.error_log = ErrorLogger(bot)
         self.git = Git()
 
         self.unloadable_cogs = ["system"]
@@ -125,7 +125,7 @@ class System(Base, commands.Cog):
         await inter.response.defer()
         now = datetime.now().replace(microsecond=0)
         delta = now - boottime
-        count = self.error_log.log_error_date(set=False)
+        count = self.error_log.log_error_time(set=False)
         embed = disnake.Embed(
             title="Uptime",
             description=f"{count} days without an accident.",

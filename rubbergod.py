@@ -1,12 +1,8 @@
 import argparse
 import logging
-import sys
-import traceback
 
 import disnake
-import sqlalchemy
-from disnake import AllowedMentions, Embed, HTTPException, Intents, TextChannel
-from disnake.errors import DiscordServerError
+from disnake import AllowedMentions, Intents, TextChannel
 from disnake.ext import commands
 
 import database.db_migrations as migrations
@@ -16,7 +12,6 @@ from buttons.report import (ReportAnonymView, ReportAnswerOnlyView,
                             ReportGeneralView, ReportMessageView)
 from config.app_config import config
 from config.messages import Messages
-from database import session
 from features import presence
 from features.error import ErrorLogger
 
@@ -72,7 +67,7 @@ bot = commands.Bot(
 )
 
 presence = presence.Presence(bot)
-err_logger = ErrorLogger()
+err_logger = ErrorLogger(bot)
 
 
 @bot.event
@@ -114,105 +109,7 @@ async def on_button_click(inter: disnake.MessageInteraction):
 
 @bot.event
 async def on_error(event, *args, **kwargs):
-    e = sys.exc_info()[1]
-    if isinstance(e, DiscordServerError) and e.status == 503:
-        return
-
-    if isinstance(e, sqlalchemy.exc.InternalError):
-        session.rollback()
-        return
-
-    if isinstance(e, HTTPException):
-        # 50007: Cannot send messages to this user
-        if e.code == 50007:
-            return
-
-    channel_out = bot.get_channel(config.bot_dev_channel)
-    output = traceback.format_exc()
-    print(output)
-
-    embeds = []
-    guild = None
-    user = bot.user
-    for arg in args:
-        if event == "on_message":
-            message = arg.content
-            message_id = arg.id
-            channel = arg.channel
-            user = arg.author
-            if hasattr(arg, 'guild') and arg.guild:
-                event_guild = arg.guild.name
-                guild = arg.guild
-            else:
-                event_guild = "DM"
-
-        else:  # on_raw_reaction_add/remove
-            message_id = getattr(arg, 'message_id', None)
-            channel_id = getattr(arg, 'channel_id', None)
-            user_id = getattr(arg, 'user_id', None)
-            if hasattr(arg, 'guild_id'):
-                guild = bot.get_guild(arg.guild_id)
-                event_guild = guild.name
-                if channel_id:
-                    channel = guild.get_channel(channel_id)
-                    if message_id and channel:
-                        message = await channel.fetch_message(message_id)
-                        if message is not None:
-                            message = message.content[:1000]
-            else:
-                event_guild = "DM"
-                message = message_id
-
-            if user_id:
-                user = bot.get_user(arg.user_id)
-            if not user:
-                user = arg.user_id
-            else:
-                if channel_id:
-                    channel = bot.get_channel(channel_id)
-                    if channel and message_id:
-                        message = await channel.fetch_message(message_id)
-                        if message:
-                            if message.content:
-                                message = message.content[:1000]
-                            elif message.embeds:
-                                embeds.extend(message.embeds)
-                                message = "Embed v předchozí zprávě"
-                            elif message.attachments:
-                                message_out = ""
-                                for attachment in message.attachments:
-                                    message_out += f"{attachment.url}\n"
-                                message = message_out
-                    else:
-                        message = message_id
-
-        count = err_logger.log_error_date()
-        embed = Embed(
-            title=f"{count} days without an accident.\nIgnoring exception in event '{event}'",
-            color=0xFF0000,
-        )
-        embed.add_field(name="Zpráva", value=message, inline=False)
-        if not guild or guild.id != config.guild_id:
-            embed.add_field(name="Guild", value=event_guild)
-
-        if event != "on_message":
-            if hasattr(arg, 'member'):
-                reaction_from = str(arg.member)
-            else:
-                reaction_from = user
-            embed.add_field(name="Reakce od", value=reaction_from)
-            embed.add_field(name="Reaction", value=getattr(arg, 'emoji', None))
-            embed.add_field(name="Typ", value=getattr(arg, 'event_type', None))
-        if guild:
-            link = f"https://discord.com/channels/{guild.id}/{channel.id}/{message_id}"
-            embed.add_field(name="Link", value=link, inline=False)
-        err_logger.set_image(embed, user, count)
-        embeds.append(embed)
-
-    if channel_out is not None:
-        for embed in embeds:
-            await channel_out.send(embed=embed)
-        await err_logger.send_output(output, channel_out)
+    return await err_logger.handle_event_error(event, args)
 
 
 # Create missing tables at start

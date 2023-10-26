@@ -23,7 +23,7 @@ async def autocomp_keys(inter: disnake.ApplicationCommandInteraction, user_input
 
 
 class DynamicConfig(Base, commands.Cog):
-    def __init__(self, bot):
+    def __init__(self, bot: commands.Bot):
         super().__init__()
         self.bot = bot
         # /rubbergod/cogs/dynamicconfig.py -> /rubbergod/config
