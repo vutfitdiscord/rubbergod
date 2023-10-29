@@ -472,7 +472,7 @@ class FitWide(Base, commands.Cog):
         await inter.edit_original_response(Messages.fitwide_get_db_success)
 
     @verify_db.sub_command(name="get_login", description=Messages.fitwide_get_login_brief)
-    async def get_login(self, inter: disnake.ApplicationCommandInteraction, member: disnake.Member):
+    async def get_login(self, inter: disnake.ApplicationCommandInteraction, member: disnake.User):
         await inter.response.defer()
         result = PermitDB.get_user_by_id(member.id)
 
