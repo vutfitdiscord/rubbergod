@@ -3,6 +3,7 @@ import re
 from config.app_config import config
 from database import database, session
 from database.better_meme import BetterMemeDB  # noqa: F401
+from database.contestvote import ContestVoteDB  # noqa: F401
 from database.cooldown import CooldownDB  # noqa: F401
 from database.error import ErrorLogDB  # noqa: F401
 from database.exams import ExamsTermsMessageDB  # noqa: F401

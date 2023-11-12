@@ -50,6 +50,8 @@ Cog for handling vote reactions for contests.\
 
     - /contest calculate message
     - /contest winners
+    - /contest get_author
+    - /contest submit
 ---
 
 ### [DynamicConfig](dynamicconfig.py)

@@ -302,6 +302,14 @@ class Messages(metaclass=Formatable):
     contest_vote_winners_brief = "Zobrazí prvních 5 vítězných příspěvků"
     contest_vote_no_reactions = "Tato zpráva nemá žádné reakce"
     contest_vote_no_votes = "Na tuto zprávu nebyly přidány žádné hlasy"
+    contest_vote_submit_brief = "Vloží příspěvek do soutěže"
+    contest_vote_get_author_brief = "Vypíše autora příspěvku"
+    contest_vote_contribution_not_found = "Příspěvek nebyl nalezen"
+    contest_vote_file_too_big = "Soubor je příliš velký. Maximální velikost 25MB."
+    contest_vote_not_image = "Soubor není obrázek. Podporujeme pouze jpeg, jpg, png, gif."
+    contest_vote_submit_success = "Příspěvěk byl úspěšně přihlášen do soutěže."
+    contest_vote_contribution = "ID: {id}\nPopis:\n{description}\n"
+    contest_vote_max_contributions = "Maximální počet příspěvků je {max_contributions}."
 
     # REVIEW
     review_add_brief = "Přidá recenzi na předmět. Pokud jsi již recenzi na předmět napsal, bude nahrazena novou."
