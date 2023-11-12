@@ -99,14 +99,22 @@ class ReportView(BaseView):
             embed = await report_features.embed_resolved(self, resolved_by, embed, report.type, False)
             report.set_resolved(report_id, inter.author.id, False)
             await report_features.set_tag(self.report_channel, inter.message.channel, "open")
+            await report_author.send(Messages.report_unresolved(id=report_id, author=inter.author.name))
+            await inter.message.channel.send(
+                Messages.report_unresolved(id=report_id, author=inter.author.name)
+            )
         else:
             embed = await report_features.embed_resolved(self, resolved_by, embed, report.type, True)
             report.set_resolved(report_id, inter.author.id, True)
             await report_features.set_tag(self.report_channel, inter.message.channel, "resolved")
 
-        await report_author.send(embed=embed)
+        # dont send image to user
+        embed_user = embed.copy()
+        embed_user.set_image(url=None)
+
+        await report_author.send(embed=embed_user)
         await inter.message.channel.send(embed=embed)
-        await inter.edit_original_response(embed=embed, view=self)
+        await inter.edit_original_response(embed=embed, view=self, attachments=None)
 
     @disnake.ui.button(
         label="Send answer",
