@@ -608,7 +608,7 @@ if ("Mám průměr pod 2.0")                                           \n  retur
     report_message_spam = "### Report #{id}, označen jako spam uživatelem @{author}"
     report_message_not_spam = "### Report #{id}, označení jako spam bylo zrušeno uživatelem @{author}"
     report_already_solved = "Report #{id} už byl uzavřen. V případě potřeby otevři další report"
-    report_unresolved = "### Report #{id} was unresolved by @{author}"
+    report_unresolved = "### Report #{id}, byl znovu otevřen uživatelem @{author}"
     report_check_dm = "Odesílám report ..."
     report_files_too_big = "Soubory přesahující upload limit:\n- {files}"
 
