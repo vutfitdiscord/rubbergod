@@ -48,10 +48,12 @@ minimum = 20
 minutes = 2
 
 [contest_vote]
-channel = 0
+channel = 1165738008100737186
+filter_channel = 1166847009878192138
 weight_1 = 2
 weight_2 = 1.5
 weight_3 = 1
+max_contributions = 5
 
 [autopin]
 count = 20
