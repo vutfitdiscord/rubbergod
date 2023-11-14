@@ -3,6 +3,7 @@ Core cog for bot. Can't be unloaded. Contains commands for cog management.
 """
 
 import math
+import subprocess
 from datetime import datetime
 
 import disnake
@@ -48,6 +49,32 @@ class System(Base, commands.Cog):
 
         for part in pull_parts[1:]:
             await inter.send(f"```{part}```")
+
+    @commands.check(permission_check.is_bot_admin)
+    @commands.slash_command(name="get_logs", description=Messages.system_get_logs_brief)
+    async def get_logs(
+        self,
+        inter: disnake.ApplicationCommandInteraction,
+        lines: int = commands.Param(100, ge=0, description=Messages.system_get_logs_lines_brief)
+    ):
+        try:
+            result = subprocess.run(
+                f"journalctl --user -u rubbergod.service --no-pager -n {lines}",
+                check=True,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                text=True
+            )
+        except subprocess.CalledProcessError as error:
+            strings = utils.cut_string(error.stderr, 1900)
+            for string in strings:
+                await inter.send(f"```{string}```")
+            return
+
+        with open("service_logs.txt", "w") as file:
+            file.write(result.stdout)
+
+        await inter.send(file=disnake.File("service_logs.txt"))
 
     @commands.check(permission_check.is_bot_admin)
     @commands.slash_command(name="shutdown", description=Messages.shutdown_brief)
