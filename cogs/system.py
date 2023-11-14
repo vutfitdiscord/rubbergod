@@ -57,6 +57,7 @@ class System(Base, commands.Cog):
         inter: disnake.ApplicationCommandInteraction,
         lines: int = commands.Param(100, ge=0, description=Messages.system_get_logs_lines_brief)
     ):
+        await inter.response.defer()
         try:
             result = subprocess.run(
                 f"journalctl --user -u rubbergod.service --no-pager -n {lines}",
