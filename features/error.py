@@ -38,15 +38,16 @@ class ErrorLogger:
             background.paste(avatar, (560, 270), avatar)
 
             # set number
-            font_size = 70 if count >= 10 else 80
+            font_size = 80 if count >= 10 else 90
             W, H = (150, 150)
             font = ImageFont.truetype(str(image_path / "OpenSans-Regular.ttf"), font_size)
             img_txt = Image.new("RGBA", (W, H), color=(255, 255, 255, 0))
             draw_txt = ImageDraw.Draw(img_txt)
-            w, h = draw_txt.textsize(str(count), font=font)
-            draw_txt.text(((W - w) / 2, (H - h) / 2), str(count), font=font, fill="#000")
+            bbox = draw_txt.textbbox(xy=(0, 0), text=str(count), font=font)
+            width, height = bbox[2]-bbox[0], bbox[3]-bbox[1]
+            draw_txt.text(((W - width) / 2, (H - height) / 2), str(count), font=font, fill="#000")
             img_txt = img_txt.rotate(10, expand=1, fillcolor=255)
-            background.paste(img_txt, (1005, 145), img_txt)
+            background.paste(img_txt, (1000, 130), img_txt)
 
             # add upper layers
             background.paste(head, (0, 0), head)
