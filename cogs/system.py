@@ -60,6 +60,7 @@ class System(Base, commands.Cog):
         try:
             result = subprocess.run(
                 f"journalctl --user -u rubbergod.service --no-pager -n {lines}",
+                shell=True,
                 check=True,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
