@@ -108,7 +108,7 @@ class ReportModal(disnake.ui.Modal):
         await report_features.set_tag(self.report_channel, message.channel, "open")
         ReportDB.set_report_url(report_id, message.jump_url)
 
-        self.edit_or_send(inter, embed)
+        await self.edit_or_send(inter, embed)
 
     async def report_message(self, inter: disnake.ModalInteraction) -> None:
         """add message report to db and send it to the report room"""
