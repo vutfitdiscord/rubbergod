@@ -436,6 +436,8 @@ if ("Mám průměr pod 2.0")                                           \n  retur
     # SYSTEM
     shutdown_brief = "Vypne bota"
     git_pull_brief = "Stáhne aktuálni změny z repa"
+    system_get_logs_brief = "Získá logy bota z journalctl"
+    system_get_logs_lines_brief = "Počet řádků, které se mají zobrazit"
 
     uptime_brief = "Vypíše čas spuštění a čas uplynulý od spuštění"
     uptime_title = "Uptime"
