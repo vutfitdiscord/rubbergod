@@ -145,9 +145,12 @@ class Error(Base, commands.Cog):
             or isinstance(error, permission_check.NotSubmodPlusError)
             or isinstance(error, permission_check.NotModPlusError)
             or isinstance(error, permission_check.NotAdminError)
-            or isinstance(error, custom_errors.InvalidTime)
         ):
             await inter.send(error.message)
+            return
+
+        if isinstance(error, custom_errors.InvalidTime):
+            await inter.send(error.message, ephemeral=True)
             return
 
         if isinstance(error, commands.UserNotFound):
@@ -219,9 +222,12 @@ class Error(Base, commands.Cog):
             or isinstance(error, permission_check.NotSubmodPlusError)
             or isinstance(error, permission_check.NotModPlusError)
             or isinstance(error, permission_check.NotAdminError)
-            or isinstance(error, custom_errors.InvalidTime)
         ):
             await inter.send(error.message)
+            return
+
+        if isinstance(error, custom_errors.InvalidTime):
+            await inter.send(error.message, ephemeral=True)
             return
 
         if isinstance(error, commands.UserNotFound):
@@ -280,9 +286,12 @@ class Error(Base, commands.Cog):
             or isinstance(error, permission_check.NotSubmodPlusError)
             or isinstance(error, permission_check.NotModPlusError)
             or isinstance(error, permission_check.NotAdminError)
-            or isinstance(error, custom_errors.InvalidTime)
         ):
             await inter.send(error.message)
+            return
+
+        if isinstance(error, custom_errors.InvalidTime):
+            await inter.send(error.message, ephemeral=True)
             return
 
         if hasattr(error, "original"):

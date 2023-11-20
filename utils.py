@@ -417,29 +417,39 @@ async def parse_attachments(
     return images, files, attachments_too_big
 
 
-def parse_time(time_string: str, time_format: str) -> datetime:
+def parse_time(time_string: str, time_format: str) -> Optional[datetime]:
+    """Parse time from string using first regex for abbreviations and if it fails, use dateutil parser."""
+    options = ["Never", "Nikdy", "None", "0"]
+    if time_string in options:
+        return datetime(9999, 12, 31, 0, 0, 0)
+
     pattern = re.compile(r"(\d+)([yYMwdhms])")
     matches = pattern.findall(time_string)
 
     if matches:
         time = datetime.now()
+        timedelta = None
         while matches:
             match = matches.pop()
             value, unit = match
-            if unit == "y" or unit == "Y" or unit == "r":
-                time += relativedelta(years=int(value))
+            if unit.lower() in ["y", "r"]:
+                timedelta = relativedelta(years=int(value))
             elif unit == "M":
-                time += relativedelta(months=int(value))
+                timedelta = relativedelta(months=int(value))
             elif unit == "w":
-                time += relativedelta(weeks=int(value))
+                timedelta = relativedelta(weeks=int(value))
             elif unit == "d":
-                time += relativedelta(days=int(value))
+                timedelta = relativedelta(days=int(value))
             elif unit == "h":
-                time += relativedelta(hours=int(value))
+                timedelta = relativedelta(hours=int(value))
             elif unit == "m":
-                time += relativedelta(minutes=int(value))
+                timedelta = relativedelta(minutes=int(value))
             elif unit == "s":
-                time += relativedelta(seconds=int(value))
+                timedelta = relativedelta(seconds=int(value))
+            try:
+                time = time + timedelta
+            except ValueError:
+                raise InvalidTime(time_format)
     else:
         try:
             time = parser.parse(time_string)
@@ -447,3 +457,15 @@ def parse_time(time_string: str, time_format: str) -> datetime:
             raise InvalidTime(time_format)
 
     return time
+
+
+async def get_message_from_url(bot, message_url) -> Optional[disnake.Message]:
+    link = message_url.split('/')
+    msg_id = int(link[-1])
+    channel_id = int(link[-2])
+
+    channel = await get_or_fetch_channel(bot, channel_id)
+    message = disnake.TextChannel.get_partial_message(channel, msg_id)
+    message = await message.fetch()
+
+    return message
