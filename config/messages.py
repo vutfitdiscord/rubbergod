@@ -18,6 +18,7 @@ class Messages(metaclass=Formatable):
     embed_not_author = "Hraj si na svém písečku s tebou zavolanými příkazy. <:pepeGun:826943455032901643>"
     base_leaderboard_format_str = "_{position}._ - **{member_name}**:"
     invalid_time_format = "Neplatný formát času.\n{time_format}."
+    attachment_too_big = "Příloha je příliš velká. Maximální velikost je 25 MB."
 
     # FITWIDE
     increment_roles_brief = "Aktualizuje role na serveru podle ročníku. Aktualizace školních roomek."
@@ -281,22 +282,32 @@ class Messages(metaclass=Formatable):
 
     # POLL
     poll_basic_brief = "Zahájí hlasování, ve kterém je možné zvolit více možností"
+    poll_boolean_brief = "Zahájí hlasování, s možnostmi Ano, Ne. Pouze 1 hlas na uživatele."
+    poll_opinion_brief = "Zahájí hlasování, s možnostmi Souhlasím, Neutral, Nesouhlasím. Pouze 1 hlas na uživatele."
+    poll_list_brief = "Vypíše všechna hlasování"
+    poll_close_brief = "Ukončí hlasování"
     poll_thread = "### {username} hlasoval pro možnost `{option}`\n"
     poll_already_voted = "Pro možnost `{option}` jsi již hlasoval"
-    poll_closed = "Hlasování s názvem `{title}` bylo ukončeno."
+    poll_closed = "Hlasování s názvem [`{title}`]({url}) bylo ukončeno."
     poll_embed_description = "{description}\n- Počet hlasů na uživatele: {votes}\n- Konec: {date}\n- " \
                              "Anonymní hlasování: {anonymous}\n- Celkový počet hlasů: {all_votes}"
-    poll_boolean_title = "Otázka v hlasování"
-    poll_boolean_description = "Popis nebo další informace k hlasování"
-    poll_boolean_endtime = "Formát: `dd.mm.yyyy [HH:MM]` nebo `1(w)eek 2(M)onth 3(d)ay 4(h)our 5(m)inute 6(s)econd`"
+    poll_not_author = "Toto hlasování nemůžeš ukončit, protože nejsi jeho autorem."
+    poll_close_poll_url_param = "URL zprávy s hlasováním"
+    poll_title = "Otázka v hlasování"
+    poll_description = "Popis nebo další informace k hlasování"
+    poll_endtime = "Formát: `dd.mm.yyyy [HH:MM]` nebo `1(w)eek 2(M)onth 3(d)ay 4(h)our 5(m)inute 6(s)econd`"
     poll_boolean_hide_results = "Skrýt výsledky hlasování do konce hlasování"
-    poll_boolean_image = "Přidat obrázek k hlasování"
+    poll_attachment = "Přidat obrázek/video k hlasování"
     poll_anonymous_vote = "Anonymní hlasování. Při neanonymním se vytvoří thread s hlasováním"
     poll_voted = "Hlasoval jsi pro možnost `{option}`"
     poll_vote_removed = "Tvůj hlas v hlasování `{title}` byl odebrán"
+    poll_votes_removed = "Tvoje hlasy v hlasování `{title}` byly odebrány"
     poll_vote_removed_thread = "### {username} zrušil svůj hlas pro možnost `{option}`\n"
     poll_votes_removed_thread = "### {username} zrušil svůj hlas v tomto hlasování"
     poll_endtime_short = "Konec hlasování je přílíš krátký. Minimální délka je 5 minut."
+    poll_not_found = "Hlasování nebylo nalezeno."
+    poll_no_active_polls = "Nebylo nalezeno žádné aktivní hlasování."
+    poll_is_anonymous = "Hlasování je anonymní. Nelze zobrazit hlasy."
 
     # VOTE
     vote_brief = "Zahájí hlasování, ve kterém je možné zvolit více možností"

@@ -10,7 +10,8 @@ from disnake.errors import DiscordServerError
 from disnake.ext import commands
 
 import database.db_migrations as migrations
-from buttons.poll import PollBooleanView
+from buttons.poll import (PollBasicView, PollBooleanView, PollCloseView,
+                          PollOpinionView, PollVotersView)
 from buttons.report import (ReportAnonymView, ReportAnswerOnlyView,
                             ReportGeneralView, ReportMessageView)
 from config.app_config import config
@@ -88,7 +89,11 @@ async def on_ready():
         ReportMessageView(bot),
         ReportAnonymView(bot),
         ReportAnswerOnlyView(bot),
+        PollBasicView(bot),
         PollBooleanView(bot),
+        PollOpinionView(bot),
+        PollCloseView(bot),
+        PollVotersView(bot)
     ]
     for view in views:
         bot.add_view(view)
