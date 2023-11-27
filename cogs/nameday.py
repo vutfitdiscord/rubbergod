@@ -84,7 +84,7 @@ class Nameday(Base, commands.Cog):
         name_day_sk = await self._name_day_sk()
         birthday = await self._birthday()
 
-        await self.bot_room.send(f"{name_day_cz}\n{name_day_sk}\n{birthday}")
+        await self.bot_room.send(f"{name_day_cz}\n{name_day_sk}\n{birthday}", allowed_mentions=False)
 
 
 def setup(bot):
