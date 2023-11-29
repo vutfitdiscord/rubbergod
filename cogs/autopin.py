@@ -123,7 +123,7 @@ class AutoPin(Base, commands.Cog):
     @cooldowns.long_cooldown
     @commands.slash_command(name="pin")
     async def pin(self, inter: disnake.ApplicationCommandInteraction):
-        await inter.response.defer(ephemeral=self.check.botroom_check(inter))
+        await inter.response.defer(ephemeral=True)
 
     @pin.sub_command(name="get_all", description=Messages.autopin_get_all_brief)
     async def get_all(
