@@ -12,7 +12,6 @@ from config.messages import Messages
 from database.poll import PollDB, PollOptionDB
 from features.poll import (close_embed, extract_poll_id, list_voters,
                            update_embed)
-from permissions.permission_check import submod_plus
 
 
 class Action:
@@ -39,16 +38,32 @@ class ActionsCache:
             self.memory[poll_id][voter_id] = Action("add_multiple", poll_option_ids)
 
     async def remove_vote(self, poll_id: int, voter_id: str, poll_option_id: int) -> None:
+        """Remove vote from user on poll option in db"""
         async with self.lock:
             if not self.memory.get(poll_id):
                 self.memory[poll_id] = {}
             self.memory[poll_id][voter_id] = Action("remove", poll_option_id)
 
     async def remove_votes(self, poll_id: int, voter_id: str) -> None:
+        """Remove all votes from user on poll in db"""
         async with self.lock:
             if not self.memory.get(poll_id):
                 self.memory[poll_id] = {}
             self.memory[poll_id][voter_id] = Action("remove_all")
+
+    async def remove_voter_from_cache(self, poll_id: int, voter_id: str) -> None:
+        """Remove voter only from cache"""
+        async with self.lock:
+            poll_dict = self.memory.get(poll_id)
+            if poll_dict and voter_id in poll_dict:
+                poll_dict.pop(voter_id, None)
+
+    async def voter_in_cache(self, poll_id: int, voter_id: str) -> bool:
+        async with self.lock:
+            poll_dict = self.memory.get(poll_id)
+            if poll_dict and voter_id in poll_dict:
+                return True
+            return False
 
     async def apply_cache(self) -> Set[int]:
         async with self.lock:
@@ -84,9 +99,13 @@ class PollView(BaseView):
         self.action_cache = ActionsCache()
 
     async def interaction_check(self, inter: disnake.Interaction) -> bool:
-        bucket = self.button_cd.get_bucket(inter.message)
+        bucket = self.button_cd.get_bucket(inter)
+        retries = bucket.get_tokens()
         retry = bucket.update_rate_limit()
-        # prevent user from spamming buttons
+        if retries == 0:
+            await inter.send(Messages.poll_button_spam(time=bucket.get_retry_after()), ephemeral=True)
+            return
+
         if retry:
             return
 
@@ -232,6 +251,7 @@ class PollRemoveVoteView(PollView):
         super().__init__()
         self.action_cache = instance_parent.action_cache
         self.messages = instance_parent.messages
+        self.bot = instance_parent.bot
         self.poll = poll
         self.poll_option = poll_option
 
@@ -265,7 +285,15 @@ class PollRemoveVoteView(PollView):
             await inter.send(Messages.poll_closed(title=poll.title, url=poll.message_url), ephemeral=True)
             return
 
+        if (
+            not poll.has_voted(inter.author.id) and
+            not await self.action_cache.voter_in_cache(poll.id, str(inter.user.id))
+        ):
+            await inter.edit_original_message(Messages.poll_not_voted)
+            return
+
         if action == "remove_vote":
+            self.action_cache.remove_voter_from_cache(poll.id, str(inter.user.id))
             await self.action_cache.remove_vote(poll.id, str(inter.user.id), self.poll_option.id)
             await inter.edit_original_message(Messages.poll_vote_removed(title=self.poll.title), view=None)
             return
@@ -329,7 +357,7 @@ class PollCloseView(PollView):
     async def boolean_close(self, button: disnake.ui.Button, inter: disnake.MessageInteraction) -> None:
         await inter.response.defer()
         poll = PollDB.get(extract_poll_id(inter.message))
-        if poll.author_id != str(inter.author.id) and not submod_plus(inter, False):
+        if poll.author_id != str(inter.author.id):
             await inter.send(Messages.poll_not_author, ephemeral=True)
             return
 

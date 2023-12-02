@@ -115,6 +115,12 @@ class PollDB(database.base):
             option.add_voter(voter_id)
             session.commit()
 
+    def has_voted(self, voter_id: str) -> bool:
+        for option in self.options:
+            if str(voter_id) in option.voters_ids:
+                return True
+        return False
+
     def update_message_url(self, message_url: str) -> None:
         self.message_url = message_url
         session.commit()

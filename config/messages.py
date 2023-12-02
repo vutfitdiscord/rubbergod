@@ -306,6 +306,8 @@ class Messages(metaclass=Formatable):
     poll_votes_removed_thread = "### {username} zrušil svůj hlas v tomto hlasování"
     poll_endtime_short = "Konec hlasování je přílíš krátký. Minimální délka je 5 minut."
     poll_not_found = "Hlasování nebylo nalezeno."
+    poll_not_voted = "Nehlasoval jsi pro žádnou možnost."
+    poll_button_spam = "Nespamuj prosím. Počkej {time}, aby jsi mohl pokračovat."
     poll_no_active_polls = "Nebylo nalezeno žádné aktivní hlasování."
     poll_is_anonymous = "Hlasování je anonymní. Nelze zobrazit hlasy."
 
