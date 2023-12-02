@@ -133,9 +133,10 @@ async def list_voters(
     for poll_option, voters in voters.items():
         content += f"### **{poll_option.emoji} {poll_option.text}**\n"
         for index, voter in enumerate(voters):
-            voter = await bot.get_or_fetch_user(voter)
-            content += f"{voter.mention}  "
-            if index % 5 == 0 or index == len(voters):
+            voter = utils.generate_mention(voter)
+            content += f"{voter} "
+            if (index+1) % 5 == 0 and index != 0 or index == len(voters) - 1:
+                # only 5 mentions per line
                 content += "\n"
 
     content = utils.cut_string_by_words(content, 1900, "\n")

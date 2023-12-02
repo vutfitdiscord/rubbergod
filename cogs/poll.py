@@ -212,15 +212,17 @@ class Poll(Base, commands.Cog):
             return
 
         poll_view = None
+        authors_view = TrashView(row=1)
         if not poll.anonymous:
             poll_view = PollVotersView(self.bot)
+            authors_view.children.extend(poll_view.children)
         await message.edit(view=poll_view)
 
         if author is not None:
             await author.send(
                 content=Messages.poll_closed(title=message.embeds[0].title, url=poll.message_url),
                 embed=message.embeds[0],
-                view=TrashView()
+                view=authors_view
             )
 
     def task_generator(self, poll: PollDB) -> None:
