@@ -114,7 +114,7 @@ class ReportView(BaseView):
 
         await report_author.send(embed=embed_user)
         await inter.message.channel.send(embed=embed)
-        await inter.edit_original_response(embed=embed, view=self, attachments=None)
+        await inter.edit_original_response(content=None, embed=embed, view=self)
 
     @disnake.ui.button(
         label="Send answer",
