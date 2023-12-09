@@ -82,8 +82,7 @@ class System(Base, commands.Cog):
     @commands.slash_command(name="shutdown", description=Messages.shutdown_brief)
     async def shutdown(self, inter: disnake.ApplicationCommandInteraction):
         await inter.send("Shutting down...")
-        await self.bot.close()
-        exit(0)
+        exit(1)
 
     async def create_selects(self):
         """Slices dictionary of all cogs to chunks for select."""
