@@ -8,6 +8,11 @@ services:
         volumes:
             - postgres_data:/var/lib/postgresql/data/
     bot:
+        deploy:
+            restart_policy:
+                condition: unless-stopped
+                delay: 5s
+                window: 500s
         build: .
         volumes:
             - .:/rubbergod:Z
