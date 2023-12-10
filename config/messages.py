@@ -19,6 +19,7 @@ class Messages(metaclass=Formatable):
     base_leaderboard_format_str = "_{position}._ - **{member_name}**:"
     invalid_time_format = "Neplatný formát času.\n{time_format}."
     attachment_too_big = "Příloha je příliš velká. Maximální velikost je 25 MB."
+    api_error = "Nepovedlo se získat data z API\n{error}"
 
     # FITWIDE
     increment_roles_brief = "Aktualizuje role na serveru podle ročníku. Aktualizace školních roomek."

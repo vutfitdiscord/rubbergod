@@ -340,6 +340,10 @@ class ErrorLogger:
             await ctx.send(Messages.message_not_found, ephemeral=True)
             return True
 
+        if isinstance(error, custom_errors.ApiError):
+            await ctx.send(error.message)
+            return
+
         # LEGACY COMMANDS
         if (
             isinstance(error, commands.BadArgument)

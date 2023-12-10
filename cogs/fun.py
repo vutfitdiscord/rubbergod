@@ -7,8 +7,9 @@ import os
 import random
 import re
 from datetime import datetime
+from io import BytesIO
 from random import randint
-from typing import Dict, List
+from typing import Dict, List, Optional, Tuple
 
 import aiohttp
 import disnake
@@ -18,6 +19,7 @@ import utils
 from cogs.base import Base
 from config import cooldowns
 from config.messages import Messages
+from permissions.custom_errors import ApiError
 
 fuchs_list = os.listdir("images/fuchs/")
 
@@ -27,21 +29,33 @@ class Fun(Base, commands.Cog):
         super().__init__()
         self.bot = bot
 
-    def custom_footer(self, author, url):
+    def custom_footer(self, author, url) -> str:
         return f"📩 {author} | {url} • {datetime.now().strftime('%d.%m.%Y %H:%M')}"
 
-    async def get_image(self, inter, url):
+    async def get_image(self, inter, url) -> Optional[Tuple[BytesIO, str]]:
         async with aiohttp.ClientSession() as session:
+            # get random image url
             async with session.get(url) as response:
                 if response.status != 200:
-                    await inter.send(
-                        "Command encountered an error (E{code}).".format(code=response.status)
-                    )
-                    return
-                image_response = await response.json()
-        return image_response
+                    raise ApiError(response.status)
+                image = await response.json()
 
-    async def get_fact(self, url, key):
+            # get image url
+            if isinstance(image, list):
+                url = image[0]["url"]
+            else:
+                url = image.get("url")
+                if not url:
+                    url = image.get("image")
+
+            # get image bytes
+            async with session.get(url) as response:
+                if response.status != 200:
+                    raise ApiError(response.status)
+                file_name = url.split("/")[-1]
+                return BytesIO(await response.read()), file_name
+
+    async def get_fact(self, url, key) -> str:
         async with aiohttp.ClientSession() as session:
             with contextlib.suppress(OSError):
                 async with session.get(url) as response:
@@ -54,7 +68,8 @@ class Fun(Base, commands.Cog):
     @commands.slash_command(name="cat", description=Messages.fun_cat_brief)
     async def cat(self, inter):
         """Get random image of a cat"""
-        image_response = await self.get_image(inter, "https://api.thecatapi.com/v1/images/search")
+        image_bytes, file_name = await self.get_image(inter, "https://api.thecatapi.com/v1/images/search")
+        image_file = disnake.File(image_bytes, filename=file_name)
 
         fact_response: str = ""
         if random.randint(0, 9) == 1:
@@ -62,7 +77,7 @@ class Fun(Base, commands.Cog):
 
         image_embed = disnake.Embed(color=disnake.Color.blue())
         image_embed.set_footer(text=self.custom_footer(inter.author, "thecatapi.com"))
-        image_embed.set_image(url=image_response[0]["url"])
+        image_embed.set_image(file=image_file)
         embeds: List[disnake.Embed] = [image_embed]
 
         if fact_response:
@@ -80,7 +95,8 @@ class Fun(Base, commands.Cog):
     @commands.slash_command(name="dog", description=Messages.fun_dog_brief)
     async def dog(self, inter):
         """Get random image of a dog"""
-        image_response = await self.get_image(inter, "https://api.thedogapi.com/v1/images/search")
+        image_bytes, file_name = await self.get_image(inter, "https://api.thedogapi.com/v1/images/search")
+        image_file = disnake.File(image_bytes, filename=file_name)
 
         fact_response: str = ""
         if random.randint(0, 9) == 1:
@@ -88,7 +104,7 @@ class Fun(Base, commands.Cog):
 
         image_embed = disnake.Embed(color=disnake.Color.blue())
         image_embed.set_footer(text=self.custom_footer(inter.author, "thedogapi.com"))
-        image_embed.set_image(url=image_response[0]["url"])
+        image_embed.set_image(file=image_file)
         embeds: List[disnake.Embed] = [image_embed]
 
         if fact_response:
@@ -106,11 +122,12 @@ class Fun(Base, commands.Cog):
     @commands.slash_command(name="fox", description=Messages.fun_fox_brief)
     async def fox(self, inter):
         """Get random image of a fox"""
-        image_response = await self.get_image(inter, "https://randomfox.ca/floof/")
+        image_bytes, file_name = await self.get_image(inter, "https://randomfox.ca/floof/")
+        image_file = disnake.File(image_bytes, filename=file_name)
 
         embed = disnake.Embed(color=disnake.Color.blue())
         embed.set_footer(text=self.custom_footer(inter.author, "randomfox.ca"))
-        embed.set_image(url=image_response["image"])
+        embed.set_image(file=image_file)
 
         await inter.send(embed=embed)
 
@@ -118,11 +135,12 @@ class Fun(Base, commands.Cog):
     @commands.slash_command(name="duck", description=Messages.fun_duck_brief)
     async def duck(self, inter):
         """Get random image of a duck"""
-        image_response = await self.get_image(inter, "https://random-d.uk/api/v2/random")
+        image_bytes, file_name = await self.get_image(inter, "https://random-d.uk/api/v2/random")
+        image_file = disnake.File(image_bytes, filename=file_name)
 
         embed = disnake.Embed(color=disnake.Color.blue())
         embed.set_footer(text=self.custom_footer(inter.author, "random-d.uk"))
-        embed.set_image(url=image_response["url"])
+        embed.set_image(file=image_file)
 
         await inter.send(embed=embed)
 
@@ -147,6 +165,8 @@ class Fun(Base, commands.Cog):
 
         async with aiohttp.ClientSession() as session:
             async with session.get(url, headers=headers, params=params) as response:
+                if response.status != 200:
+                    raise ApiError(response.status)
                 fetched = await response.json()
 
         if keyword is not None:
@@ -181,10 +201,7 @@ class Fun(Base, commands.Cog):
         async with aiohttp.ClientSession() as session:
             async with session.get("https://api.yomomma.info/") as response:
                 if response.status != 200:
-                    await inter.send(
-                        "Command encountered an error (E{code}).".format(code=response.status)
-                    )
-                    return
+                    raise ApiError(response.status)
                 result = await response.json()
 
         embed = disnake.Embed(
