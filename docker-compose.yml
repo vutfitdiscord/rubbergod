@@ -10,10 +10,9 @@ services:
     bot:
         deploy:
             restart_policy:
-                condition: on-failure
+                condition: unless-stopped
                 delay: 5s
                 window: 20s
-                max_attempts: 3
         build: .
         volumes:
             - .:/rubbergod:Z
