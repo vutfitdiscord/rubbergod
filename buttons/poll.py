@@ -293,7 +293,7 @@ class PollRemoveVoteView(PollView):
             return
 
         if action == "remove_vote":
-            self.action_cache.remove_voter_from_cache(poll.id, str(inter.user.id))
+            await self.action_cache.remove_voter_from_cache(poll.id, str(inter.user.id))
             await self.action_cache.remove_vote(poll.id, str(inter.user.id), self.poll_option.id)
             await inter.edit_original_message(Messages.poll_vote_removed(title=self.poll.title), view=None)
             return
