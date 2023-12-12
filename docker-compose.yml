@@ -2,6 +2,11 @@ version: '3.8'
 
 services:
     db:
+        deploy:
+            restart_policy:
+                condition: unless-stopped
+                delay: 5s
+                window: 20s
         image: postgres:12-alpine
         environment:
             POSTGRES_HOST_AUTH_METHOD: "trust"
