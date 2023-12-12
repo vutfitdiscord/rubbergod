@@ -1,0 +1,13 @@
+[Unit]
+Description="Rubbergod log retrieval helper"
+
+[Service]
+ExecStart=/bin/bash -c "docker compose logs -ft >> service_logs.txt"
+Restart=always
+RestartSec=10
+StartLimitInterval=60
+StartLimitBurst=4
+WorkingDirectory=/home/rubbergod/rubbergod
+
+[Install]
+WantedBy=multi-user.target

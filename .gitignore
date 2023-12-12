@@ -8,3 +8,4 @@ __pycache__
 .vscode
 merlin-latest
 timeout_wars
+service_logs.txt
