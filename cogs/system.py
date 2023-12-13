@@ -60,7 +60,7 @@ class System(Base, commands.Cog):
         await inter.response.defer()
         try:
             result = subprocess.run(
-                f"journalctl --user -u rubbergod.service --no-pager -n {lines}",
+                f"touch service_logs.txt && tail -n {lines} service_logs.txt",
                 shell=True,
                 check=True,
                 stdout=subprocess.PIPE,
