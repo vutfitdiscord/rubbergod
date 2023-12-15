@@ -48,10 +48,13 @@ Cog controlling bookmarks. The bot will send copy of message to user.\
 Cog for handling vote reactions for contests.\
 **Commands:**
 
-    - /contest calculate message
-    - /contest winners
-    - /contest get_author
+    - /contest calculate_contribution
+    - /contest top_contributions
     - /contest submit
+    - /contest_mod get_author
+    - /contest_mod start
+    - /contest_mod end
+
 ---
 
 ### [DynamicConfig](dynamicconfig.py)

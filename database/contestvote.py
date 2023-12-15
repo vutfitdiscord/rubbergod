@@ -26,6 +26,11 @@ class ContestVoteDB(database.base):
         return user.contribution_id
 
     @classmethod
+    def delete_contribution(cls, contribution_id: int) -> None:
+        session.query(cls).filter_by(contribution_id=contribution_id).delete()
+        session.commit()
+
+    @classmethod
     def get_user(cls, user_id: str) -> ContestVoteDB:
         return session.query(cls).filter_by(user_id=str(user_id)).first()
 
