@@ -76,14 +76,14 @@ class ActionsCache:
                     if action.action == "add":
                         PollDB.get(poll_id).add_voter(user_id, action.value)
 
-                    if action.action == "add_multiple":
+                    elif action.action == "add_multiple":
                         # TODO - add multiple choice function in db
                         pass
 
-                    if action.action == "remove":
+                    elif action.action == "remove":
                         PollOptionDB.get(action.value).remove_voter(user_id)
 
-                    if action.action == "remove_all":
+                    elif action.action == "remove_all":
                         PollDB.get(poll_id).remove_voter(user_id)
                 except AttributeError:
                     pass
@@ -99,6 +99,7 @@ class PollView(BaseView):
         self.action_cache = ActionsCache()
 
     async def interaction_check(self, inter: disnake.Interaction) -> bool:
+        await inter.response.defer()
         bucket = self.button_cd.get_bucket(inter)
         retries = bucket.get_tokens()
         retry = bucket.update_rate_limit()
@@ -141,8 +142,6 @@ class PollView(BaseView):
             await message.edit(embed=embed, attachments=None)
 
     async def button_action(self, button: disnake.ui.Button, inter: disnake.MessageInteraction):
-        await inter.response.defer()
-
         poll_id = extract_poll_id(inter.message)
         poll = PollDB.get(poll_id)
 
@@ -256,6 +255,7 @@ class PollRemoveVoteView(PollView):
         self.poll_option = poll_option
 
     async def interaction_check(self, inter: disnake.Interaction) -> bool:
+        await inter.response.defer()
         return True
 
     async def button_action(
@@ -264,8 +264,6 @@ class PollRemoveVoteView(PollView):
         button: disnake.ui.Button,
         inter: disnake.MessageInteraction
     ) -> None:
-        await inter.response.defer()
-
         try:
             message = self.messages.get(self.poll.id)
             if not message:
@@ -328,6 +326,10 @@ class PollVotersView(PollView):
         super().__init__()
         self.bot = bot
 
+    async def interaction_check(self, inter: disnake.Interaction) -> bool:
+        await inter.response.defer(ephemeral=True)
+        return True
+
     @disnake.ui.button(
         label="Zobrazit hlasy",
         emoji="🗒️",
@@ -336,7 +338,6 @@ class PollVotersView(PollView):
         row=1
     )
     async def boolean_voters(self, button: disnake.ui.Button, inter: disnake.MessageInteraction) -> None:
-        await inter.response.defer(ephemeral=True)
         content = await list_voters(self.bot, inter, inter.message)
         for content_part in content:
             await inter.send(content_part, ephemeral=True)
@@ -355,7 +356,6 @@ class PollCloseView(PollView):
         row=1
     )
     async def boolean_close(self, button: disnake.ui.Button, inter: disnake.MessageInteraction) -> None:
-        await inter.response.defer()
         poll = PollDB.get(extract_poll_id(inter.message))
         if poll.author_id != str(inter.author.id):
             await inter.send(Messages.poll_not_author, ephemeral=True)
@@ -377,6 +377,10 @@ class PollCloseView(PollView):
             content=Messages.poll_closed(title=embed.title, url=poll.message_url),
             embed=embed,
             view=author_view
+        )
+        await inter.channel.send(
+            content=Messages.poll_closed(title=embed.title, url=poll.message_url),
+            view=poll_view
         )
 
 
