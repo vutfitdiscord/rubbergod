@@ -8,44 +8,25 @@ from functools import cached_property
 import disnake
 from disnake.ext import commands
 
+import utils
 from buttons.contestvote import ContestView
+from buttons.general import TrashView
 from cogs.base import Base
 from config import cooldowns
 from config.messages import Messages
 from database.contestvote import ContestVoteDB
+from features.contestvote import get_top_contributions
 from features.reaction_context import ReactionContext
+from modals.contestvote import DenyContributionModal
 from permissions.permission_check import submod_plus
-from utils import str_emoji_id
-
-
-class Image:
-    def __init__(self, message_url: str, emojis: list[Emoji]):
-        self.message_url: str = message_url
-        self.emojis: list[Emoji] = emojis
-
-    @property
-    def total_value(self):
-        total = 0
-        for emoji in self.emojis:
-            total += emoji.total_value
-        return total
-
-
-class Emoji:
-    def __init__(self, emoji: str, count: int, value: int):
-        self.emoji: str = emoji
-        self.count: int = count
-        self.value: int = value
-
-    @property
-    def total_value(self):
-        return self.count * self.value
+from permissions.room_check import RoomCheck
 
 
 class ContestVote(Base, commands.Cog):
-    def __init__(self, bot):
+    def __init__(self, bot: commands.Bot):
         super().__init__()
         self.bot = bot
+        self.check = RoomCheck(bot)
 
         self.emojis = {
             str("1️⃣"): self.config.contest_vote_weight_1,
@@ -61,92 +42,53 @@ class ContestVote(Base, commands.Cog):
     def contest_vote_channel(self) -> disnake.TextChannel:
         return self.bot.get_channel(self.config.contest_vote_channel)
 
-    @cooldowns.default_cooldown
     @commands.slash_command(name="contest",)
     async def contest(self, inter: disnake.ApplicationCommandInteraction):
         pass
 
-    @contest.sub_command(name="calculate_message", description=Messages.contest_vote_calculate_message_brief)
-    async def calculate_message(self, inter: disnake.ApplicationCommandInteraction, message_url: str):
-        await inter.response.defer()
-        try:
-            message: disnake.Message = await commands.MessageConverter().convert(inter, message_url)
-        except commands.MessageNotFound:
-            await inter.send(Messages.message_not_found)
-            return
+    @cooldowns.default_cooldown
+    @contest.sub_command(
+        name="calculate_contribution",
+        description=Messages.contest_vote_calculate_contribution_brief
+    )
+    async def calculate_message(
+        self,
+        inter: disnake.ApplicationCommandInteraction,
+        message_url: disnake.Message
+    ):
+        await inter.response.defer(ephemeral=self.check.botroom_check(inter))
 
-        if not message.reactions:
+        if not message_url.reactions:
             await inter.send(Messages.contest_vote_no_reactions)
             return
 
-        # Create an empty list to store Emoji objects for this message
-        emojis_for_message = []
+        contributions = await get_top_contributions(self, [message_url])
 
-        for r in message.reactions:
-            emoji = str_emoji_id(r.emoji)
-            if emoji in self.emojis:
-                emoji_obj = Emoji(emoji=emoji, count=r.count - 1, value=self.emojis[emoji])
-                emojis_for_message.append(emoji_obj)
-        image = Image(message.jump_url, emojis_for_message)
+        await inter.send(''.join(contributions))
 
-        # calculate values
-        if image.total_value == 0:
-            await inter.send(Messages.contest_vote_no_votes)
-            return
-        emoji_strings = [f"- {emoji.emoji}: Count: {emoji.count} - Total: {emoji.total_value}\n"
-                         for emoji in image.emojis]
-        message = f"{image.message_url} - Total: **{image.total_value}**\n{''.join(emoji_strings)}"
-
-        await inter.send(message)
-
-    @contest.sub_command(name="winners", description=Messages.contest_vote_winners_brief)
-    async def winners(self, inter: disnake.ApplicationCommandInteraction):
-        await inter.response.defer()
+    @commands.cooldown(rate=1, per=600.0, type=commands.BucketType.user)
+    @contest.sub_command(
+        name="top_contributions",
+        description=Messages.contest_vote_top_contributions_brief,
+    )
+    async def top_contributions(
+        self,
+        inter: disnake.ApplicationCommandInteraction,
+        number_of=commands.Param(default=5, gt=0, description=Messages.contest_vote_top_count_brief)
+    ):
+        await inter.response.defer(ephemeral=self.check.botroom_check(inter))
         messages = await self.contest_vote_channel.history().flatten()
-        images = []
 
-        # get all images and their votes
-        for message in messages:
-            # skip messages without reactions
-            if not message.reactions:
-                continue
+        contributions = await get_top_contributions(self, messages, number_of)
 
-            # Create an empty list to store Emoji objects for this message
-            emojis_for_message = []
+        await inter.send(
+            Messages.contest_vote_top_contributions(
+                number_of=number_of,
+                contributions="".join(contributions)
+            )
+        )
 
-            # iterate reactions and create Emoji objects for each reaction
-            for r in message.reactions:
-                emoji = str_emoji_id(r.emoji)
-                if emoji in self.emojis:
-                    emoji_obj = Emoji(emoji=emoji, count=r.count - 1, value=self.emojis[emoji])
-                    emojis_for_message.append(emoji_obj)
-            images.append(Image(message.jump_url, emojis_for_message))
-
-        messages = []
-        # Sort the images by total_value in descending order and get the top 5
-        sorted_images = sorted(images, key=lambda x: x.total_value, reverse=True)[:5]
-
-        # calculate values for each image
-        for image in sorted_images:
-            if image.total_value == 0:
-                continue
-            emoji_strings = [f"- {emoji.emoji}: Count: {emoji.count} - Total: {emoji.total_value}\n"
-                             for emoji in image.emojis]
-            messages.append(f"{image.message_url} - Total: **{image.total_value}**\n{''.join(emoji_strings)}")
-
-        await inter.send("".join(messages))
-
-    @commands.check(submod_plus)
-    @contest.sub_command(name="get_author", description=Messages.contest_vote_get_author_brief)
-    async def get_author(self, inter: disnake.ApplicationCommandInteraction, id: int):
-        await inter.response.defer(ephemeral=True)
-        contribution_author_id = ContestVoteDB.get_contribution_author(id)
-        if not contribution_author_id:
-            await inter.send(Messages.contest_vote_contribution_not_found)
-            return
-        user = await self.bot.get_or_fetch_user(contribution_author_id)
-        await inter.send(user.mention)
-
+    @cooldowns.default_cooldown
     @contest.sub_command(name="submit", description=Messages.contest_vote_submit_brief)
     async def submit(
         self,
@@ -174,23 +116,65 @@ class ContestVote(Base, commands.Cog):
             contribution_id = ContestVoteDB.add_contribution(inter.author.id)
 
         image = await image.to_file()
-        await self.filter_channel.send(
-            Messages.contest_vote_contribution(id=contribution_id, description=description), file=image,
-            view=ContestView(self.bot)
-        )
+
+        trash = TrashView(custom_id="contest:delete")
+        view = ContestView(self.bot)
+        view.children.extend(trash.children)
+
+        content = Messages.contest_vote_contribution(id=contribution_id)
+        if description:
+            content += f"Popis:\n{description}"
+
+        message = await self.filter_channel.send(content, file=image, view=view)
+        await message.pin()
         await inter.send(Messages.contest_vote_submit_success)
 
     def is_contest_room(self, ctx):
         return ctx.channel.id == self.config.contest_vote_channel
 
+    @cooldowns.default_cooldown
+    @commands.check(submod_plus)
+    @commands.slash_command(name="contest_mod")
+    async def contest_mod(self, inter: disnake.ApplicationCommandInteraction):
+        pass
+
+    @contest_mod.sub_command(name="get_author", description=Messages.contest_vote_get_author_brief)
+    async def get_author(self, inter: disnake.ApplicationCommandInteraction, id: int):
+        await inter.response.defer(ephemeral=True)
+        contribution_author_id = ContestVoteDB.get_contribution_author(id)
+        if not contribution_author_id:
+            await inter.send(Messages.contest_vote_contribution_not_found)
+            return
+        user = await self.bot.get_or_fetch_user(contribution_author_id)
+        await inter.send(user.mention)
+
+    @contest_mod.sub_command(name="start", description=Messages.contest_start_voting_brief)
+    async def start_contest(self, inter: disnake.ApplicationCommandInteraction):
+        await inter.response.defer(ephemeral=True)
+        messages = await self.contest_vote_channel.history().flatten()
+        for message in messages:
+            for emoji in self.emojis:
+                await message.add_reaction(emoji)
+
+        await inter.send(Messages.contest_vote_start_success)
+
+    @contest_mod.sub_command(name="end", description=Messages.contest_end_voting_brief)
+    async def end_contest(self, inter: disnake.ApplicationCommandInteraction):
+        await inter.send(Messages.contest_vote_ending)
+        messages = await self.contest_vote_channel.history().flatten()
+        contributions = await get_top_contributions(self, messages)
+        await self.contest_vote_channel.send(f"# Top 5 příspěvků\n{''.join(contributions)}")
+
+        message = await inter.original_message()
+        await message.edit(Messages.contest_vote_end_success)
+
     @commands.Cog.listener()
-    async def on_message(self, message: disnake.Message):
-        """Add reactions to contest vote messages"""
-        if not self.is_contest_room(message):
+    async def on_button_click(self, inter: disnake.MessageInteraction):
+        """Handle button clicks"""
+        if inter.component.custom_id != "contest:delete":
             return
 
-        for emoji in self.emojis:
-            await message.add_reaction(emoji)
+        await inter.response.send_modal(modal=DenyContributionModal(self.bot, inter))
 
     @commands.check(is_contest_room)
     async def handle_reaction(self, ctx: ReactionContext):
@@ -198,11 +182,11 @@ class ContestVote(Base, commands.Cog):
         if ctx is None:
             return
 
-        emoji_str = str_emoji_id(ctx.emoji)
-        message = await ctx.channel.fetch_message(ctx.message.id)
+        emoji_str = utils.str_emoji_id(ctx.emoji)
+        message = ctx.message
         user = await self.bot.get_or_fetch_user(ctx.member.id)
         for r in message.reactions:
-            if str_emoji_id(r.emoji) == emoji_str:
+            if utils.str_emoji_id(r.emoji) == emoji_str:
                 continue
             if await r.users().find(lambda x: x.id == user.id):
                 await message.remove_reaction(ctx.emoji, user)

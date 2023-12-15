@@ -336,6 +336,10 @@ class ErrorLogger:
             await ctx.send(Messages.member_not_found(member=ctx.author.mention))
             return True
 
+        if isinstance(error, commands.MessageNotFound):
+            await ctx.send(Messages.message_not_found, ephemeral=True)
+            return True
+
         # LEGACY COMMANDS
         if (
             isinstance(error, commands.BadArgument)

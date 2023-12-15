@@ -83,8 +83,8 @@ class Config:
     contest_vote_channel: int = get_attr(toml_dict, "contest_vote", "channel")
     contest_vote_filter_channel: int = get_attr(toml_dict, "contest_vote", "filter_channel")
     contest_vote_weight_1: int = get_attr(toml_dict, "contest_vote", "weight_1")
-    contest_vote_weight_2: int = get_attr(toml_dict, "contest_vote", "weight_1")
-    contest_vote_weight_3: int = get_attr(toml_dict, "contest_vote", "weight_1")
+    contest_vote_weight_2: int = get_attr(toml_dict, "contest_vote", "weight_2")
+    contest_vote_weight_3: int = get_attr(toml_dict, "contest_vote", "weight_3")
     contest_vote_max_contributions: int = get_attr(toml_dict, "contest_vote", "max_contributions")
 
     # Pin emoji count to pin
