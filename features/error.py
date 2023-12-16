@@ -23,6 +23,23 @@ from features.imagehandler import ImageHandler
 from permissions import custom_errors, permission_check
 
 
+class ContextMock:
+    """Create event context similar to commands.Context
+    This will be used in ignore_errors function"""
+
+    def __init__(self, bot: commands.Bot, arg):
+        self.channel = getattr(arg, "channel", bot.get_channel(arg.channel_id))
+        if hasattr(arg, "auhtor"):
+            self.author = arg.author
+        elif hasattr(arg, "member"):
+            self.author = arg.member
+        else:
+            self.author = bot.user
+
+    async def send(self, *args):
+        return await self.channel.send(*args)
+
+
 class ErrorLogger:
     def __init__(self, bot: commands.Bot):
         self.imagehandler = ImageHandler()
@@ -190,12 +207,14 @@ class ErrorLogger:
         arg = args[0]
         error = sys.exc_info()[1]
         author = getattr(arg, "author", self.bot.user)
-        await self.ignore_errors(None, error)
+        if await self.ignore_errors(ContextMock(self.bot, arg), error):
+            # error was handled
+            return
         if event == "on_message":
             message_id = arg.id
             if hasattr(arg, 'guild') and arg.guild:
                 event_guild = arg.guild.name
-                url = f"https://discord.com/channels/{event_guild}/{arg.channel.id}/{message_id}"
+                url = f"https://discord.com/channels/{arg.guild.id}/{arg.channel.id}/{message_id}"
             else:
                 event_guild = url = "DM"
             embeds = [self.create_embed(
@@ -305,11 +324,15 @@ class ErrorLogger:
 
     async def ignore_errors(
         self,
-        ctx: Union[disnake.ApplicationCommandInteraction, commands.Context],
+        ctx: Union[disnake.ApplicationCommandInteraction, commands.Context, ContextMock],
         error: Exception
     ) -> bool:
         """Handle general errors that can be ignored or responded to user
         Returns whether error was handled or not"""
+
+        # in following code 'ctx' is used for shared errors between text and slash commands
+        # if 'inter' is used then the error is specific for slash commands
+        # both classes have similar function so we are not differentiating them here
 
         # SHARED ERRORS
         if isinstance(error, disnake.errors.DiscordServerError):
@@ -317,6 +340,14 @@ class ErrorLogger:
 
         if isinstance(error, sqlalchemy.exc.InternalError):
             session.rollback()
+            return True
+
+        if isinstance(error, commands.CommandNotFound):
+            slash_comms = [command.name for command in self.bot.slash_commands]
+            invoked = ctx.message.content.split(" ")[0][1:]
+            if invoked in slash_comms:
+                command_id = utils.get_command_id(self, invoked)
+                await ctx.reply(Messages.moved_command(name=invoked, id=command_id))
             return True
 
         if (
@@ -369,6 +400,11 @@ class ErrorLogger:
                 if error.original.code == 50007:
                     await inter.channel.send(Messages.blocked_bot(user=inter.author.id))
                     return True
+        else:
+            if isinstance(error, disnake.errors.Forbidden):
+                if error.code == 50007:
+                    await ctx.send(Messages.blocked_bot(user=inter.author.id))
+                    return True
 
         if isinstance(error, custom_errors.InvalidTime):
             await inter.send(error.message, ephemeral=True)
@@ -386,7 +422,7 @@ class ErrorLogger:
             return True
 
         if isinstance(error, commands.NoPrivateMessage):
-            await inter.send(Messages.guild_only)
+            await ctx.send(Messages.guild_only)
             return True
 
         # CheckFailure must be last in the list of errors, because it is the most generic one.

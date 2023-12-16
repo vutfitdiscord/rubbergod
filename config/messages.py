@@ -56,7 +56,6 @@ class Messages(metaclass=Formatable):
 
     # ERROR
     moved_command = "Tento příkaz již není v textové formě podporován. Příkaz byl nahrazen příkazem </{name}:{id}>"
-    no_such_command = "Takový příkaz neznám. <:sadcat:576171980118687754>"
     command_timed_out = "Příkaz nereagoval a byl nečekaně ukončen."
     command_invoke_error = "Došlo k nečekané chybě, už na tom pracujeme <:notLikeRubbergod:1112395455142314044>"
     user_input_error = "Chyba ve vstupu, jestli vstup obsahuje `\"`, nahraď je za `'`"

@@ -32,7 +32,7 @@ class Error(Base, commands.Cog):
         traceback = ErrorEvent.get_traceback(id).traceback
         with BytesIO(bytes(traceback, 'utf-8')) as file_binary:
             file = disnake.File(fp=file_binary, filename="traceback.txt")
-        await inter.send(file=file)
+        await inter.send(file=file, ephemeral=True)
 
     @commands.Cog.listener()
     async def on_command_error(self, ctx: commands.Context, error: Exception):
