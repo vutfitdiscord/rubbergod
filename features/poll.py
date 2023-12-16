@@ -141,3 +141,16 @@ async def list_voters(
 
     content = utils.cut_string_by_words(content, 1900, "\n")
     return content
+
+
+def create_end_poll_message(poll: PollDB) -> str:
+    winning_option = poll.get_winning_option()
+    total_votes = poll.get_voters_count()
+    content = Messages.poll_closed(title=poll.title, url=poll.message_url)
+    if total_votes > 0:
+        content += Messages.poll_winning_option(
+            option=f"{winning_option.emoji} {winning_option.text}",
+            votes=total_votes,
+            percentage=round(winning_option.voters_count * 100),
+        )
+    return content

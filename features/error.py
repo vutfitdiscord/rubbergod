@@ -367,27 +367,24 @@ class ErrorLogger:
             await ctx.send(Messages.member_not_found(member=ctx.author.mention))
             return True
 
-        if isinstance(error, commands.MessageNotFound):
-            await ctx.send(Messages.message_not_found, ephemeral=True)
-            return True
-
         if isinstance(error, custom_errors.ApiError):
             await ctx.send(error.message)
             return
 
         # LEGACY COMMANDS
-        if (
-            isinstance(error, commands.BadArgument)
-            or isinstance(error, commands.MissingAnyRole)
-            or isinstance(error, commands.MissingRequiredArgument)
-        ) and hasattr(ctx.command, "on_error"):
-            return True
+        if isinstance(ctx, commands.Context):
+            if (
+                isinstance(error, commands.BadArgument)
+                or isinstance(error, commands.MissingAnyRole)
+                or isinstance(error, commands.MissingRequiredArgument)
+            ) and hasattr(ctx.command, "on_error"):
+                return True
 
-        if isinstance(error, commands.UserInputError):
-            await ctx.send(Messages.user_input_error)
-            return True
+            if isinstance(error, commands.UserInputError):
+                await ctx.send(Messages.user_input_error)
+                return True
 
-        # SLASH COMMANDS
+        # SLASH COMMANDS / INTERACTIONS
         inter = ctx
         if hasattr(error, "original"):
             if isinstance(error.original, disnake.errors.InteractionTimedOut):
@@ -409,6 +406,10 @@ class ErrorLogger:
         if isinstance(error, custom_errors.InvalidTime):
             await inter.send(error.message, ephemeral=True)
             return
+
+        if isinstance(error, commands.MessageNotFound):
+            await inter.send(Messages.message_not_found, ephemeral=True)
+            return True
 
         if isinstance(error, commands.CommandInvokeError):
             await inter.send(Messages.command_invoke_error)

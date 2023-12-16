@@ -466,6 +466,8 @@ async def get_message_from_url(bot, message_url) -> Optional[disnake.Message]:
 
     channel = await get_or_fetch_channel(bot, channel_id)
     message = disnake.TextChannel.get_partial_message(channel, msg_id)
+    if not message:
+        return
     message = await message.fetch()
 
     return message

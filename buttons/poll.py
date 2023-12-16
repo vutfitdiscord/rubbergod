@@ -10,8 +10,7 @@ from buttons.base import BaseView
 from buttons.general import TrashView
 from config.messages import Messages
 from database.poll import PollDB, PollOptionDB
-from features.poll import (close_embed, extract_poll_id, list_voters,
-                           update_embed)
+from features import poll as poll_features
 
 
 class Action:
@@ -22,6 +21,7 @@ class Action:
 
 class ActionsCache:
     def __init__(self) -> None:
+        # {poll_id: {voter_id: Action}}
         self.memory: Dict[int, Dict[int, Action]] = {}
         self.lock = asyncio.Lock()
 
@@ -65,38 +65,57 @@ class ActionsCache:
                 return True
             return False
 
+    def process_actions(self, poll_id: int, users_actions: dict) -> None:
+        for user_id, action in users_actions.items():
+            try:
+                if action.action == "add":
+                    PollDB.get(poll_id).add_voter(user_id, action.value)
+
+                elif action.action == "add_multiple":
+                    # TODO - add multiple choice function in db
+                    pass
+
+                elif action.action == "remove":
+                    PollOptionDB.get(action.value).remove_voter(user_id)
+
+                elif action.action == "remove_all":
+                    PollDB.get(poll_id).remove_voter(user_id)
+
+            except AttributeError:
+                pass
+
     async def apply_cache(self) -> Set[int]:
         async with self.lock:
             memory_copy = self.memory.copy()
 
         for poll_id, users_actions in memory_copy.items():
-            for user_id, action in users_actions.items():
-                # if option is removed runtime the vote action will be ignored
-                try:
-                    if action.action == "add":
-                        PollDB.get(poll_id).add_voter(user_id, action.value)
+            self.process_actions(poll_id, users_actions)
 
-                    elif action.action == "add_multiple":
-                        # TODO - add multiple choice function in db
-                        pass
-
-                    elif action.action == "remove":
-                        PollOptionDB.get(action.value).remove_voter(user_id)
-
-                    elif action.action == "remove_all":
-                        PollDB.get(poll_id).remove_voter(user_id)
-                except AttributeError:
-                    pass
+        async with self.lock:
+            self.memory = {}
 
         return set(memory_copy.keys())
 
+    async def end_poll(self, poll_id: int) -> None:
+        """End poll finish all actions in cache for it"""
+        async with self.lock:
+            memory_copy = self.memory.copy()
+
+        poll_cache = memory_copy.get(poll_id)
+        if not poll_cache:
+            return
+        self.process_actions(poll_id, poll_cache)
+        async with self.lock:
+            self.memory.pop(poll_id, None)
+
 
 class PollView(BaseView):
+    action_cache = ActionsCache()
+
     def __init__(self):
         super().__init__(timeout=None)
         self.button_cd = commands.CooldownMapping.from_cooldown(3, 10.0, commands.BucketType.user)
         self.messages: Dict[int, disnake.Message] = {}
-        self.action_cache = ActionsCache()
 
     async def interaction_check(self, inter: disnake.Interaction) -> bool:
         await inter.response.defer()
@@ -111,15 +130,16 @@ class PollView(BaseView):
             return
 
         # voters are always available
-        if inter.data.custom_id == "poll:boolean:voters":
+        if inter.data.custom_id == "poll:voters":
             return True
 
-        poll_id = extract_poll_id(inter.message)
+        poll_id = poll_features.extract_poll_id(inter.message)
         poll = PollDB.get(poll_id)
 
         if poll.is_endtime:
+            content = poll_features.create_end_poll_message(poll)
             await inter.message.edit(view=None)
-            await inter.send(Messages.poll_closed(title=poll.title, url=poll.message_url), ephemeral=True)
+            await inter.send(content=content, ephemeral=True)
             return False
 
         # everything ok
@@ -134,15 +154,15 @@ class PollView(BaseView):
             message = self.messages[poll_id]
 
             if poll.closed:
-                embed = close_embed(message.embeds[0], poll, poll.closed_by, poll.end_datetime)
+                embed = poll_features.close_embed(message.embeds[0], poll, poll.closed_by, poll.end_datetime)
                 await message.edit(embed=embed, attachments=None)
                 continue
 
-            embed = update_embed(message.embeds[0], poll)
+            embed = poll_features.update_embed(message.embeds[0], poll)
             await message.edit(embed=embed, attachments=None)
 
     async def button_action(self, button: disnake.ui.Button, inter: disnake.MessageInteraction):
-        poll_id = extract_poll_id(inter.message)
+        poll_id = poll_features.extract_poll_id(inter.message)
         poll = PollDB.get(poll_id)
 
         # find poll option matching label
@@ -271,16 +291,17 @@ class PollRemoveVoteView(PollView):
                 self.messages[self.poll.id] = message
 
         except commands.MessageNotFound:
-            await inter.send(Messages.message_not_found, ephemeral=True)
+            await inter.edit_original_message(Messages.message_not_found, ephemeral=True)
             return
 
         poll = PollDB.get(self.poll.id)
         if not poll:
-            await inter.send(Messages.poll_not_found, ephemeral=True)
+            await inter.edit_original_message(Messages.poll_not_found, ephemeral=True)
             return
 
         if poll.is_endtime or poll.closed:
-            await inter.send(Messages.poll_closed(title=poll.title, url=poll.message_url), ephemeral=True)
+            content = poll_features.create_end_poll_message(poll)
+            await inter.edit_original_message(content=content, ephemeral=True)
             return
 
         if (
@@ -334,11 +355,11 @@ class PollVotersView(PollView):
         label="Zobrazit hlasy",
         emoji="🗒️",
         style=disnake.ButtonStyle.grey,
-        custom_id="poll:boolean:voters",
+        custom_id="poll:voters",
         row=1
     )
     async def boolean_voters(self, button: disnake.ui.Button, inter: disnake.MessageInteraction) -> None:
-        content = await list_voters(self.bot, inter, inter.message)
+        content = await poll_features.list_voters(self.bot, inter, inter.message)
         for content_part in content:
             await inter.send(content_part, ephemeral=True)
 
@@ -352,36 +373,32 @@ class PollCloseView(PollView):
         label="Ukončit hlasování",
         emoji="🔒",
         style=disnake.ButtonStyle.grey,
-        custom_id="poll:boolean:close",
+        custom_id="poll:close",
         row=1
     )
     async def boolean_close(self, button: disnake.ui.Button, inter: disnake.MessageInteraction) -> None:
-        poll = PollDB.get(extract_poll_id(inter.message))
-        if poll.author_id != str(inter.author.id):
+        poll_id = poll_features.extract_poll_id(inter.message)
+        author_id = PollDB.get_author_id(poll_id)
+        if author_id != str(inter.author.id):
             await inter.send(Messages.poll_not_author, ephemeral=True)
             return
 
+        await self.action_cache.end_poll(poll_id)
+
+        poll = PollDB.get(poll_id)
         now = datetime.now()
-        poll.update_endtime(now)
-        poll.update_closed(True, inter.author.id)
         author = await self.bot.get_or_fetch_user(poll.author_id)
-        embed = close_embed(inter.message.embeds[0], poll, inter.author.id, now)
+        embed = poll_features.close_embed(inter.message.embeds[0], poll, inter.author.id, now)
         poll_view = None
         author_view = TrashView(row=1)
         if not poll.anonymous:
             poll_view = PollVotersView(self.bot)
             author_view.children.extend(poll_view.children)
 
+        content = poll_features.create_end_poll_message(poll)
         await inter.message.edit(embed=embed, view=poll_view, attachments=None)
-        await author.send(
-            content=Messages.poll_closed(title=embed.title, url=poll.message_url),
-            embed=embed,
-            view=author_view
-        )
-        await inter.channel.send(
-            content=Messages.poll_closed(title=embed.title, url=poll.message_url),
-            view=poll_view
-        )
+        await author.send(content=content, embed=embed, view=author_view)
+        await inter.channel.send(content=content, embed=embed, view=poll_view)
 
 
 class PollModal(disnake.ui.Modal):      # TODO
