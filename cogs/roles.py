@@ -142,7 +142,7 @@ class Roles(Base, commands.Cog):
         role = await guild.create_role(name=channel.name)
         message = await self.bot_dev_channel.send(Messages.role_create_start(role=role.name))
         for idx, item in enumerate(channel.overwrites):
-            if type(item) == disnake.Member:
+            if isinstance(item, disnake.Member):
                 if ignore and ignore.id == item.id:
                     pass
                 elif channel.overwrites[item] != default_perm:

@@ -10,7 +10,7 @@ class VerifyHelper:
         self.bot = bot
 
     async def has_role(self, user, role_name: str) -> bool:
-        if type(user) == Member:
+        if isinstance(user, Member):
             return utils.has_role(user, role_name)
         else:
             guild = await self.bot.fetch_guild(config.guild_id)

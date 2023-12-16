@@ -43,7 +43,7 @@ def str_emoji_id(emoji):
 
 
 def has_role(user, role_name: str):
-    if type(user) != Member:
+    if isinstance(user, Member):
         return None
 
     return role_name.lower() in [x.name.lower() for x in user.roles]

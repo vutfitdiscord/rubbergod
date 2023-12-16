@@ -36,7 +36,7 @@ class Help(Base, commands.Cog):
         """Generate help for commands and subcommands"""
         current_page = list()
         prefix = self.config.default_prefix
-        if type(command) == commands.Group:
+        if isinstance(command, commands.Group):
             # group command without invoked subcommand is separate command
             # e.g. karma, reviews
             if command.usage is not None:
@@ -150,7 +150,7 @@ class Help(Base, commands.Cog):
                 await ctx.send(Messages.help_command_not_found(command=command[:1024]))
             else:
                 # if command group, show all possible subcommands
-                if type(command_obj) == commands.Group:
+                if isinstance(command_obj, commands.Group):
                     subcommands = []
                     if command_obj.usage is not None:
                         subcommands.append(command_obj.usage.replace('[', '').replace(']', ''))
