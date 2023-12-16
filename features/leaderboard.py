@@ -94,7 +94,7 @@ class LeaderboardPageSource(DatabaseIteratorPageSource):
             ``member_id/_ID`` column.
         """
 
-        if type(row_formatter) == str:
+        if isinstance(row_formatter, str):
             self.row_formatter = lambda **kw: row_formatter.format_map(kw)
         elif callable(row_formatter):
             self.row_formatter = row_formatter

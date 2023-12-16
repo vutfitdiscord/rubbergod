@@ -44,7 +44,7 @@ class ReviewManager:
         page: str
     ):
         """Create new embed for reviews"""
-        if type(subject) == SubjectDetailsDB:
+        if isinstance(subject, SubjectDetailsDB):
             shortcut = getattr(subject, "shortcut")
         else:
             shortcut = subject
@@ -84,7 +84,7 @@ class ReviewManager:
                 embed.color = 0x34CB0B
             elif diff < 0:
                 embed.color = 0xCB410B
-        if type(subject) == SubjectDetailsDB and not subject.shortcut.lower().startswith("tv"):
+        if isinstance(subject, SubjectDetailsDB) and not subject.shortcut.lower().startswith("tv"):
             sem = 1 if subject.semester == "L" else 2
             subject_id = subject.card.split("/")[-2]
             vutis_link = "https://www.vut.cz/studis/student.phtml?script_name=anketa_statistiky"

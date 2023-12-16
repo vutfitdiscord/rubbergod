@@ -49,7 +49,7 @@ class MemeRepost(Base, commands.Cog):
             all_reactions: List[disnake.Reaction] = ctx.message.reactions
             for reac in all_reactions:
                 if reac.count >= self.config.repost_threshold:
-                    emoji_key = str(reac.emoji.id) if type(reac.emoji) != str else reac.emoji
+                    emoji_key = str(reac.emoji.id) if isinstance(reac.emoji, str) else reac.emoji
                     emoji_val = KarmaEmojiDB.emoji_value(emoji_key)
 
                     if int(emoji_val) >= 1:
