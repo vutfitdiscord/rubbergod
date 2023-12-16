@@ -99,6 +99,13 @@ class PollDB(database.base):
     def get_pending_polls_by_type(cls, type: PollType) -> List[PollDB]:
         return cls.get_pending_polls().filter(cls.poll_type == type).all()
 
+    @classmethod
+    def get_author_id(cls, poll_id: int) -> Optional[str]:
+        poll = cls.get(poll_id)
+        if not poll:
+            return
+        return poll.author_id
+
     def remove_voter(self, voter: VoterDB) -> None:
         for option in self.options:
             option.remove_voter(voter)
@@ -149,6 +156,10 @@ class PollDB(database.base):
         for option in self.options:
             voters_ids[option] = option.voters_ids
         return voters_ids
+
+    def get_winning_option(self) -> PollOptionDB:
+        winning_option = max(self.options, key=lambda option: option.voters_count)
+        return winning_option
 
 
 class PollOptionDB(database.base):

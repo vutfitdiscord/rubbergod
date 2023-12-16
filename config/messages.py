@@ -20,6 +20,7 @@ class Messages(metaclass=Formatable):
     invalid_time_format = "Neplatný formát času.\n{time_format}."
     attachment_too_big = "Příloha je příliš velká. Maximální velikost je 25 MB."
     api_error = "Nepovedlo se získat data z API\n{error}"
+    message_not_found = "Zpráva nebyla nalezena. Zkontroluj formát."
 
     # FITWIDE
     increment_roles_brief = "Aktualizuje role na serveru podle ročníku. Aktualizace školních roomek."
@@ -288,7 +289,8 @@ class Messages(metaclass=Formatable):
     poll_close_brief = "Ukončí hlasování"
     poll_thread = "### {username} hlasoval pro možnost `{option}`\n"
     poll_already_voted = "Pro možnost `{option}` jsi již hlasoval"
-    poll_closed = "Hlasování s názvem [`{title}`]({url}) bylo ukončeno."
+    poll_closed = "Hlasování s názvem [{title}]({url}) bylo ukončeno.\n"
+    poll_winning_option = "Vyhrála možnost `{option}` s **{votes} ({percentage}%) hlasy**."
     poll_embed_description = "{description}\n- Počet hlasů na uživatele: {votes}\n- Konec: {date}\n- " \
                              "Anonymní hlasování: {anonymous}\n- Celkový počet hlasů: {all_votes}"
     poll_not_author = "Toto hlasování nemůžeš ukončit, protože nejsi jeho autorem."
@@ -694,5 +696,4 @@ if ("Mám průměr pod 2.0")                                           \n  retur
     message_url_brief = "Url zprávy, která se má přeposlat"
     message_edit_brief = "Upraví existující zprávu"
     message_sent = "Zpráva byla odeslána do kanálu {channel}"
-    message_not_found = "Zpráva nebyla nalezena"
     message_too_long = "Zpráva přesahuje limit 2000 znaků"
