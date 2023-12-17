@@ -51,7 +51,7 @@ class ContestVote(Base, commands.Cog):
         name="calculate_contribution",
         description=Messages.contest_vote_calculate_contribution_brief
     )
-    async def calculate_message(
+    async def calculate_contribution(
         self,
         inter: disnake.ApplicationCommandInteraction,
         message_url: disnake.Message
@@ -74,12 +74,16 @@ class ContestVote(Base, commands.Cog):
     async def top_contributions(
         self,
         inter: disnake.ApplicationCommandInteraction,
-        number_of=commands.Param(default=5, gt=0, description=Messages.contest_vote_top_count_brief)
+        number_of: int = commands.Param(default=5, gt=0, description=Messages.contest_vote_top_count_brief)
     ):
         await inter.response.defer(ephemeral=self.check.botroom_check(inter))
         messages = await self.contest_vote_channel.history().flatten()
 
         contributions = await get_top_contributions(self, messages, number_of)
+
+        if not contributions:
+            await inter.send(Messages.contest_vote_no_contributions)
+            return
 
         await inter.send(
             Messages.contest_vote_top_contributions(

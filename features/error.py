@@ -137,7 +137,10 @@ class ErrorLogger:
             return "User command - "
         elif isinstance(command, commands.InvokableMessageCommand):
             return "Message command - "
-        elif isinstance(command, commands.InvokableSlashCommand):
+        elif (
+            isinstance(command, commands.InvokableSlashCommand)
+            or isinstance(command, commands.slash_core.SubCommand)
+        ):
             return "/"
         else:
             # some new command probably? there aren't other options at the moment
