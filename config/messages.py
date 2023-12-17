@@ -362,6 +362,7 @@ class Messages(metaclass=Formatable):
     contest_vote_top_count_brief = "Počet top příspěvků"
     contest_vote_top_contributions = "# Top {number_of} příspěvků\n{contributions}"
     contest_vote_invalid_votes = "**Počet neplatných hlasů (vybráno více možností): {invalid_votes}**"
+    contest_vote_no_contributions = "Nebyly nalezeny žádné příspěvky s body"
 
     # REVIEW
     review_add_brief = "Přidá recenzi na předmět. Pokud jsi již recenzi na předmět napsal, bude nahrazena novou."
