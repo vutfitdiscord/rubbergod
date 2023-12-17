@@ -51,10 +51,9 @@ cp config/config.template.toml config/config.toml
 Now open the `config.toml` file in your editor. Insert the Discord API key you obtained earlier in the setup process:
 ```
 1 [base]
-2 command_prefix = ['?', '!']
+2 command_prefix = ['?']
 3 default_prefix = '?'
-4 ignored_prefixes = ['!']
-5 key = '<Your Discord API key>'
+4 key = '<Your Discord API key>'
 ...
 ```
 

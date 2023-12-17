@@ -45,7 +45,6 @@ class Config:
     # Base bot behavior
     command_prefix: tuple = tuple(get_attr(toml_dict, "base", "command_prefix"))
     default_prefix: str = get_attr(toml_dict, "base", "default_prefix")
-    ignored_prefixes: tuple = tuple(get_attr(toml_dict, "base", "ignored_prefixes"))
 
     # Role IDs
     mod_role: int = get_attr(toml_dict, "base", "mod_role")
