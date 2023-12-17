@@ -129,7 +129,7 @@ def add_author_footer(
         display_name = "Anonymous"
         display_avatar = author.default_avatar.url
     else:
-        display_name = author
+        display_name = author.display_name
         display_avatar = author.display_avatar.url
 
     embed.set_footer(icon_url=display_avatar, text=' | '.join((str(display_name), *additional_text)))

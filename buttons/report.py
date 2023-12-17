@@ -48,7 +48,7 @@ class ReportView(BaseView):
         report: ReportDB
     ) -> Tuple[str, disnake.Embed]:
         """Set the report as spam, change buttons and tag thread as spam"""
-        resolved_author = f"{inter.author.mention} @{inter.author.name}"
+        resolved_author = f"{inter.author.mention} @{inter.author.display_name}"
         embed = inter.message.embeds[0].to_dict()
 
         if report.fake_report:
@@ -60,7 +60,11 @@ class ReportView(BaseView):
                     )
             button.label = "Mark spam"
             button.style = disnake.ButtonStyle.red
-            message = Messages.report_message_not_spam(id=report.id, author=inter.author.name)
+            message = Messages.report_message_not_spam(
+                id=report.id,
+                author=inter.author.mention,
+                author_name=inter.author.display_name
+            )
             await report_features.set_tag(self.report_channel, inter.message.channel, "open")
 
         else:
@@ -74,7 +78,11 @@ class ReportView(BaseView):
             button.disabled = False
             button.label = f"Spam marked by @{inter.author.name}"
             button.style = disnake.ButtonStyle.primary
-            message = Messages.report_message_spam(id=report.id, author=inter.author.name)
+            message = Messages.report_message_spam(
+                id=report.id,
+                author=inter.author.mention,
+                author_name=inter.author.display_name
+            )
             await report_features.set_tag(self.report_channel, inter.message.channel, "spam")
         return message, embed
 
@@ -93,16 +101,19 @@ class ReportView(BaseView):
         report_id = report_features.extract_report_id(inter)
         report = ReportDB.get_report(report_id)
         embed = inter.message.embeds[0].to_dict()
-        resolved_by = f"{inter.author.mention} @{inter.author.name}"
+        resolved_by = f"{inter.author.mention} @{inter.author.display_name}"
 
         if report.resolved:
             embed = await report_features.embed_resolved(self, resolved_by, embed, report.type, False)
             report.set_resolved(report_id, inter.author.id, False)
-            await report_features.set_tag(self.report_channel, inter.message.channel, "open")
-            await report_author.send(Messages.report_unresolved(id=report_id, author=inter.author.name))
-            await inter.message.channel.send(
-                Messages.report_unresolved(id=report_id, author=inter.author.name)
+            content = Messages.report_unresolved(
+                id=report_id,
+                author=inter.author.mention,
+                author_name=inter.author.display_name
             )
+            await report_features.set_tag(self.report_channel, inter.message.channel, "open")
+            await report_author.send(content)
+            await inter.message.channel.send(content, allowed_mentions=disnake.AllowedMentions.none())
         else:
             embed = await report_features.embed_resolved(self, resolved_by, embed, report.type, True)
             report.set_resolved(report_id, inter.author.id, True)
@@ -113,7 +124,7 @@ class ReportView(BaseView):
         embed_user.set_image(url=None)
 
         await report_author.send(embed=embed_user)
-        await inter.message.channel.send(embed=embed)
+        await inter.message.channel.send(embed=embed, allowed_mentions=disnake.AllowedMentions.none())
         await inter.edit_original_response(content=None, embed=embed, view=self)
 
     @disnake.ui.button(
@@ -142,7 +153,7 @@ class ReportView(BaseView):
         message, embed = await self.set_spam(button, inter, report)
 
         await report_author.send(message)
-        await report_message.channel.send(message)
+        await report_message.channel.send(message, allowed_mentions=disnake.AllowedMentions.none())
         await inter.edit_original_response(embed=embed, view=self)
 
 
@@ -175,13 +186,19 @@ class ReportMessageView(ReportView):
 
         if message is None:
             button.label = "Message not found"
-            delete_message = Messages.report_message_already_deleted(author=inter.author.name)
+            delete_message = Messages.report_message_already_deleted(
+                author=inter.author.mention,
+                author_name=inter.author.display_name
+            )
         else:
             button.label = f"Deleted by @{inter.author.name}"
-            delete_message = Messages.report_message_deleted(author=inter.author.name)
+            delete_message = Messages.report_message_deleted(
+                author=inter.author.mention,
+                author_name=inter.author.display_name
+            )
             await message.delete()
 
-        await report_message.channel.send(delete_message)
+        await report_message.channel.send(delete_message, allowed_mentions=disnake.AllowedMentions.none())
         await inter.edit_original_response(view=self)
 
 
@@ -311,7 +328,7 @@ class ReportAnswerModal(disnake.ui.Modal):
             )
 
         else:
-            author = f"{inter.author.mention} @{inter.author.name}"
+            author = f"{inter.author.mention} @{inter.author.display_name}"
             utils.add_author_footer(embed, inter.author, additional_text=[f"ID: {report.id}"])
 
         embed.add_field(name="Answered by", value=author, inline=False)

@@ -63,13 +63,8 @@ class Report(Base, commands.Cog):
     async def report_message(
         self,
         inter: disnake.ApplicationCommandInteraction,
-        message: str = commands.Param(description=Messages.report_message_param)
+        message: disnake.Message = commands.Param(description=Messages.report_message_param)
     ):
-        try:
-            message: disnake.Message = await commands.MessageConverter().convert(inter, message)
-        except commands.MessageNotFound:
-            await inter.send(Messages.report_message_not_found, ephemeral=True)
-            return
         dm_message = await self.check_blocked_bot(inter)
         if dm_message is None:
             return
