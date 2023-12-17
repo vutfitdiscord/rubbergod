@@ -55,5 +55,4 @@ class BaseView(disnake.ui.View):
         await channel_out.send(embed=embed, view=ErrorView())
 
         # remove interactions because of error
-        self.clear_items()
-        await self.message.edit(view=self)
+        await interaction.message.edit(view=None)
