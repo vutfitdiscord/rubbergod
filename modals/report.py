@@ -55,7 +55,7 @@ class ReportModal(disnake.ui.Modal):
             embed.add_field(name="Message", value=f"{self.message.jump_url}\n{self.message.channel.name}")
             embed.add_field(
                 name="Reported user",
-                value=f"{self.message.author.mention}\n@{self.message.author}"
+                value=f"{self.message.author.mention}\n`@{self.message.author.display_name}`"
             )
             if first_image is not None:
                 embed.set_image(file=first_image)
