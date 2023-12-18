@@ -49,7 +49,7 @@ class PollDB(database.base):
     end_datetime = Column(DateTime, nullable=True)
     closed = Column(Boolean, nullable=False, default=False)
     closed_by = Column(String, nullable=True)
-    options: Mapped[List[PollOptionDB]] = relationship(back_populates="poll")
+    options: Mapped[List[PollOptionDB]] = relationship(back_populates="poll", cascade="all,delete")
     max_votes = Column(Integer, nullable=False)
     anonymous = Column(Boolean, nullable=False)
 
@@ -168,7 +168,7 @@ class PollOptionDB(database.base):
     id = Column(Integer, primary_key=True)
     emoji = Column(String, nullable=True)
     text = Column(String, nullable=False)
-    voters = relationship(VoterDB, back_populates="poll_option", collection_class=set)
+    voters = relationship(VoterDB, back_populates="poll_option", cascade="all,delete", collection_class=set)
     poll: Mapped[PollDB] = relationship(back_populates="options")
     poll_id = mapped_column(ForeignKey("poll.id"), nullable=False)
 

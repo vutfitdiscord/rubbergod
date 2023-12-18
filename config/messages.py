@@ -289,7 +289,7 @@ class Messages(metaclass=Formatable):
     poll_close_brief = "Ukončí hlasování"
     poll_thread = "### {username} hlasoval pro možnost `{option}`\n"
     poll_already_voted = "Pro možnost `{option}` jsi již hlasoval"
-    poll_closed = "Hlasování s názvem [{title}]({url}) bylo ukončeno.\n"
+    poll_closed = "Hlasování s názvem `{title}` bylo ukončeno. {url}\n"
     poll_winning_option = "Vyhrála možnost `{option}` s **{votes} ({percentage}%) hlasy**."
     poll_embed_description = "{description}\n- Počet hlasů na uživatele: {votes}\n- Konec: {date}\n- " \
                              "Anonymní hlasování: {anonymous}\n- Celkový počet hlasů: {all_votes}"
@@ -312,6 +312,7 @@ class Messages(metaclass=Formatable):
     poll_button_spam = "Nespamuj prosím. Počkej {time}, aby jsi mohl pokračovat."
     poll_no_active_polls = "Nebylo nalezeno žádné aktivní hlasování."
     poll_is_anonymous = "Hlasování je anonymní. Nelze zobrazit hlasy."
+    poll_list_polls = "**ID: {id} | {url} ** - {title}\n"
 
     # VOTE
     vote_brief = "Zahájí hlasování, ve kterém je možné zvolit více možností"
