@@ -1,5 +1,5 @@
 import asyncio
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Dict, List, Set, Union
 
 import disnake
@@ -111,19 +111,21 @@ class ActionsCache:
 
 class PollView(BaseView):
     action_cache = ActionsCache()
+    messages: Dict[int, disnake.Message] = {}
 
     def __init__(self):
         super().__init__(timeout=None)
-        self.button_cd = commands.CooldownMapping.from_cooldown(3, 10.0, commands.BucketType.user)
-        self.messages: Dict[int, disnake.Message] = {}
+        self.button_cd = commands.CooldownMapping.from_cooldown(4, 10.0, commands.BucketType.user)
 
     async def interaction_check(self, inter: disnake.Interaction) -> bool:
         await inter.response.defer()
         bucket = self.button_cd.get_bucket(inter)
         retries = bucket.get_tokens()
         retry = bucket.update_rate_limit()
-        if retries == 0:
-            await inter.send(Messages.poll_button_spam(time=bucket.get_retry_after()), ephemeral=True)
+        if retries == 1:
+            time = datetime.now() + timedelta(seconds=bucket.get_retry_after())
+            timestamp = utils.get_discord_timestamp(time, style="Relative Time")
+            await inter.send(Messages.poll_button_spam(time=timestamp), ephemeral=True)
             return
 
         if retry:
