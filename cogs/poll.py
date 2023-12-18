@@ -14,11 +14,12 @@ import asyncio
 from datetime import datetime
 
 import disnake
-from disnake.ext import commands
+from disnake.ext import commands, tasks
 
 import utils
 from buttons.general import TrashView
-from buttons.poll import PollBooleanView, PollOpinionView, PollVotersView
+from buttons.poll import (PollBooleanView, PollOpinionView, PollView,
+                          PollVotersView)
 from cogs.base import Base
 from config import cooldowns
 from config.messages import Messages
@@ -261,6 +262,32 @@ class Poll(Base, commands.Cog):
         polls = PollDB.get_pending_polls()
         for poll in polls:
             self.task_generator(poll)
+
+        self.tasks = [PollTask().process_interactions.start()]
+
+
+class PollTask(PollView):
+    """Class only for having task loop"""
+    def __init__(self):
+        super().__init__()
+
+    @tasks.loop(seconds=10.0)
+    async def process_interactions(self):
+        update_ids = await self.action_cache.apply_cache()
+        for poll_id in update_ids:
+            poll = PollDB.get(poll_id)
+            message = self.messages.get(poll_id, None)
+
+            if not message:
+                continue
+
+            if poll.closed:
+                embed = poll_features.close_embed(message.embeds[0], poll, poll.closed_by, poll.end_datetime)
+                await message.edit(embed=embed, attachments=None)
+                continue
+
+            embed = poll_features.update_embed(message.embeds[0], poll)
+            await message.edit(embed=embed, attachments=None)
 
 
 def setup(bot):
