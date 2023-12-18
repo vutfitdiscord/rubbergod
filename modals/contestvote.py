@@ -19,7 +19,7 @@ class DenyContributionModal(disnake.ui.Modal):
                 placeholder=Messages.contest_modal_placeholder,
                 custom_id="contest:reason",
                 style=disnake.TextInputStyle.long,
-                required=True,
+                required=False,
                 max_length=1900,
             )
         ]
@@ -34,20 +34,24 @@ class DenyContributionModal(disnake.ui.Modal):
     async def callback(self, inter: disnake.ModalInteraction) -> None:
         contribution_author_id = ContestVoteDB.get_contribution_author(self.contribution_id)
         author = await self.bot.get_or_fetch_user(contribution_author_id)
-        ContestVoteDB.delete_contribution(self.contribution_id)
 
         trash = TrashView()
         file = await inter.message.attachments[0].to_file()
         reason = inter.text_values["contest:reason"]
-
         content = Messages.contest_contribution_denied(
             id=self.contribution_id,
             reason=reason,
             author=inter.author.display_name
         )
+        message = ""
+        if reason:
+            await author.send(inter.message.content, file=file, view=trash)
+            await author.send(content, view=trash)
+            message = Messages.contest_successful_deletion
+        else:
+            message = Messages.contest_successful_deletion_no_reason
 
-        await author.send(inter.message.content, file=file, view=trash)
-        await author.send(content, view=trash)
+        await inter.send(message, ephemeral=True)
         await inter.send(content)
-        await inter.send(Messages.contest_successful_deletion, ephemeral=True)
-        await inter.message.delete()
+        await inter.message.edit(view=None)
+        await inter.message.unpin()
