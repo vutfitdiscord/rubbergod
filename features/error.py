@@ -372,7 +372,7 @@ class ErrorLogger:
 
         if isinstance(error, custom_errors.ApiError):
             await ctx.send(error.message)
-            return
+            return True
 
         # LEGACY COMMANDS
         if isinstance(ctx, commands.Context):
@@ -408,7 +408,7 @@ class ErrorLogger:
 
         if isinstance(error, custom_errors.InvalidTime):
             await inter.send(error.message, ephemeral=True)
-            return
+            return True
 
         if isinstance(error, commands.MessageNotFound):
             await inter.send(Messages.message_not_found, ephemeral=True)
