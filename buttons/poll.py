@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 from typing import Dict, List, Set, Union
 
 import disnake
-from disnake.ext import commands, tasks
+from disnake.ext import commands
 
 import utils
 from buttons.base import BaseView
@@ -147,22 +147,6 @@ class PollView(BaseView):
         # everything ok
         return True
 
-    @tasks.loop(seconds=10.0)
-    async def process_interactions(self):
-        update_ids = await self.action_cache.apply_cache()
-
-        for poll_id in update_ids:
-            poll = PollDB.get(poll_id)
-            message = self.messages[poll_id]
-
-            if poll.closed:
-                embed = poll_features.close_embed(message.embeds[0], poll, poll.closed_by, poll.end_datetime)
-                await message.edit(embed=embed, attachments=None)
-                continue
-
-            embed = poll_features.update_embed(message.embeds[0], poll)
-            await message.edit(embed=embed, attachments=None)
-
     async def button_action(self, button: disnake.ui.Button, inter: disnake.MessageInteraction):
         poll_id = poll_features.extract_poll_id(inter.message)
         poll = PollDB.get(poll_id)
@@ -210,7 +194,6 @@ class PollBooleanView(PollView):
     def __init__(self, bot: commands.Bot):
         super().__init__()
         self.bot = bot
-        self.process_interactions.start()
         self.children.extend(PollCloseView(bot).children)
 
     @disnake.ui.button(
@@ -236,7 +219,6 @@ class PollOpinionView(PollView):
     def __init__(self, bot: commands.Bot):
         super().__init__()
         self.bot = bot
-        self.process_interactions.start()
         self.children.extend(PollCloseView(bot).children)
 
     @disnake.ui.button(
@@ -348,10 +330,6 @@ class PollVotersView(PollView):
     def __init__(self, bot: commands.Bot):
         super().__init__()
         self.bot = bot
-
-    async def interaction_check(self, inter: disnake.Interaction) -> bool:
-        await inter.response.defer(ephemeral=True)
-        return True
 
     @disnake.ui.button(
         label="Zobrazit hlasy",
