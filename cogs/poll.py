@@ -184,30 +184,36 @@ class Poll(Base, commands.Cog):
     ):
         await inter.response.defer(ephemeral=True)
         if not type:
-            content = "# Aktivní hlasování:\n"
+            header = "# Aktivní hlasování:\n"
             polls = PollDB.get_pending_polls()
         else:
-            content = f"# {type.capitalize()} aktivní hlasování:\n"
+            header = f"# {type.capitalize()} aktivní hlasování:\n"
             polls = PollDB.get_pending_polls_by_type(PollType[type].value)
         if not polls:
             await inter.send(Messages.poll_no_active_polls)
             return
 
+        content = ""
         for poll in polls:
             link = poll.message_url.split('/')
-            channel = await utils.get_or_fetch_channel(self.bot, int(link[-2]))
+            try:
+                channel = await utils.get_or_fetch_channel(self.bot, int(link[-2]))
+            except disnake.NotFound:
+                # If channel is not found, delete the poll
+                poll.remove()
+                continue
 
             users = {user.id for user in channel.members}
             if inter.author.id not in users:
                 continue
-            content += f"**ID: {poll.id} | {channel.mention}** - [{poll.title}]({poll.message_url})\n"
-        content = utils.cut_string_by_words(content, 1900, "\n")
-
+            content += Messages.poll_list_polls(id=poll.id, url=poll.message_url, title=poll.title)
         if not content:
             await inter.send(Messages.poll_no_active_polls)
+            return
 
+        content = utils.cut_string_by_words(header + content, 1900, "\n")
         for content_part in content:
-            await inter.send(content_part)
+            await inter.send(content_part, ephemeral=True)
 
     async def task_end_poll(self, poll: PollDB) -> None:
         """Ends the poll"""
@@ -229,8 +235,9 @@ class Poll(Base, commands.Cog):
 
         if author is not None:
             content = poll_features.create_end_poll_message(poll)
-            await author.send(content=content, embed=message.embeds[0], view=authors_view)
-            await message.channel.send(content=content, view=poll_view)
+            embed = message.embeds[0]
+            await author.send(content=content, embed=embed, view=authors_view)
+            await message.channel.send(content=content, embed=embed, view=poll_view)
 
     def task_generator(self, poll: PollDB) -> None:
         """Generator for tasks to close polls"""
