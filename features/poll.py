@@ -151,6 +151,6 @@ def create_end_poll_message(poll: PollDB) -> str:
         content += Messages.poll_winning_option(
             option=f"{winning_option.emoji} {winning_option.text}",
             votes=total_votes,
-            percentage=round(winning_option.voters_count * 100),
+            percentage=round(winning_option.voters_count / total_votes * 100),
         )
     return content
