@@ -1,11 +1,12 @@
 import disnake
 
+from buttons.base import BaseView
 from config.app_config import config
 from config.messages import Messages
 from features import dynamic_verify
 
 
-class DynamicVerifyRequestView(disnake.ui.View):
+class DynamicVerifyRequestView(BaseView):
     def __init__(self, rule_id: str, user_id: int):
         self.rule_id = rule_id
         self.user_id = user_id

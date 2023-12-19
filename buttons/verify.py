@@ -1,11 +1,12 @@
 import disnake
 
+from buttons.base import BaseView
 from database.verification import ValidPersonDB
 from features import verification
 from modals.verify import VerifyModal
 
 
-class VerifyView(disnake.ui.View):
+class VerifyView(BaseView):
     def __init__(self, login: str):
         super().__init__(timeout=None)
         self.login = login
