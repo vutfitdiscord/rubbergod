@@ -37,21 +37,19 @@ class DenyContributionModal(disnake.ui.Modal):
 
         trash = TrashView()
         file = await inter.message.attachments[0].to_file()
-        reason = inter.text_values["contest:reason"]
-        content = Messages.contest_contribution_denied(
-            id=self.contribution_id,
-            reason=reason,
-            author=inter.author.display_name
-        )
-        message = ""
-        if reason:
-            await author.send(inter.message.content, file=file, view=trash)
-            await author.send(content, view=trash)
-            message = Messages.contest_successful_deletion
-        else:
-            message = Messages.contest_successful_deletion_no_reason
+        reason = inter.text_values["contest:reason"].strip()
 
-        await inter.send(message, ephemeral=True)
-        await inter.send(content)
+        if reason:
+            message = Messages.contest_contribution_denied(
+                id=self.contribution_id,
+                reason=reason,
+                author=inter.author.display_name
+            )
+            await author.send(inter.message.content, file=file, view=trash)
+            await author.send(message, view=trash)
+        else:
+            message = Messages.contest_successful_deletion_no_reason(author=inter.author.display_name)
+
+        await inter.send(message)
         await inter.message.edit(view=None)
         await inter.message.unpin()
