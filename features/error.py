@@ -298,7 +298,7 @@ class ErrorLogger:
             "Reaction": getattr(arg, 'emoji', None)
         }
         url = event_guild if event_guild == "DM" else \
-            f"https://discord.com/channels/{event_guild}/{channel_id}/{message_id}"
+            f"https://discord.com/channels/{guild.id}/{channel_id}/{message_id}"
         embeds.append(self.create_embed(
             command=arg.event_type,
             args=message,
