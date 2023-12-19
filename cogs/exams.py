@@ -292,7 +292,7 @@ class Exams(Base, commands.Cog):
 
             for exam in exam_batch:
                 # Every exams row start with link tag
-                tag = exam.find("a") if str(exam).startswith("<tr><td><a") else None
+                tag = exam.find("a")
                 cols = exam.find_all("td")
 
                 # Check if tag is not None and get strong and normal subject tag
