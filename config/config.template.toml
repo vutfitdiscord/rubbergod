@@ -47,13 +47,15 @@ grillbot_leaderboard_size = 50
 minimum = 20
 minutes = 2
 
-[contest_vote]
+[contestvote]
 channel = 1165738008100737186
 filter_channel = 1166847009878192138
 weight_1 = 2
 weight_2 = 1.5
 weight_3 = 1
 max_contributions = 5
+no_limit_users = []
+banned_users = []
 
 [autopin]
 count = 20

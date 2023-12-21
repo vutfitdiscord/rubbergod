@@ -107,17 +107,24 @@ class ContestVote(Base, commands.Cog):
         if "image" not in image.content_type:
             await inter.send(Messages.contest_vote_not_image)
             return
+        if inter.author.id in self.config.contest_vote_banned_users:
+            await inter.send(Messages.contest_vote_banned_user)
+            return
 
         user_contribution = ContestVoteDB.get_user(inter.author.id)
         if not user_contribution:
             contribution_id = ContestVoteDB.add_contribution(inter.author.id)
         else:
-            if user_contribution.has_contributions >= self.config.contest_vote_max_contributions:
+            if inter.author.id in self.config.contest_vote_no_limit_users:
+                contribution_id = ContestVoteDB.add_contribution(inter.author.id)
+
+            elif user_contribution.has_contributions >= self.config.contest_vote_max_contributions:
                 await inter.send(Messages.contest_vote_max_contributions(
                     max_contributions=self.config.contest_vote_max_contributions)
                 )
                 return
-            contribution_id = ContestVoteDB.add_contribution(inter.author.id)
+            else:
+                contribution_id = ContestVoteDB.add_contribution(inter.author.id)
 
         image = await image.to_file()
 
@@ -131,6 +138,8 @@ class ContestVote(Base, commands.Cog):
 
         message = await self.filter_channel.send(content, file=image, view=view)
         await message.pin()
+        await message.add_reaction("👍")
+        await message.add_reaction("👎")
         await inter.send(Messages.contest_vote_submit_success)
 
     def is_contest_room(self, ctx):
