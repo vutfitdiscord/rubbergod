@@ -29,4 +29,5 @@ class ContestView(BaseView):
     async def answer(self, button: disnake.ui.Button, inter: disnake.MessageInteraction) -> None:
         file = await inter.message.attachments[0].to_file()
         await self.contest_vote_channel.send(inter.message.content, file=file)
-        await inter.message.delete()
+        await inter.message.edit(view=None)
+        await inter.message.unpin()

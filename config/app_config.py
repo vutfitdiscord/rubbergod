@@ -80,12 +80,14 @@ class Config:
     vote_minutes: int = get_attr(toml_dict, "vote", "minutes")
 
     # ContestVote
-    contest_vote_channel: int = get_attr(toml_dict, "contest_vote", "channel")
-    contest_vote_filter_channel: int = get_attr(toml_dict, "contest_vote", "filter_channel")
-    contest_vote_weight_1: int = get_attr(toml_dict, "contest_vote", "weight_1")
-    contest_vote_weight_2: int = get_attr(toml_dict, "contest_vote", "weight_2")
-    contest_vote_weight_3: int = get_attr(toml_dict, "contest_vote", "weight_3")
-    contest_vote_max_contributions: int = get_attr(toml_dict, "contest_vote", "max_contributions")
+    contest_vote_channel: int = get_attr(toml_dict, "contestvote", "channel")
+    contest_vote_filter_channel: int = get_attr(toml_dict, "contestvote", "filter_channel")
+    contest_vote_weight_1: int = get_attr(toml_dict, "contestvote", "weight_1")
+    contest_vote_weight_2: int = get_attr(toml_dict, "contestvote", "weight_2")
+    contest_vote_weight_3: int = get_attr(toml_dict, "contestvote", "weight_3")
+    contest_vote_max_contributions: int = get_attr(toml_dict, "contestvote", "max_contributions")
+    contest_vote_no_limit_users: List[int] = get_attr(toml_dict, "contestvote", "no_limit_users")
+    contest_vote_banned_users: List[int] = get_attr(toml_dict, "contestvote", "banned_users")
 
     # Pin emoji count to pin
     autopin_count: int = get_attr(toml_dict, "autopin", "count")
