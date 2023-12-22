@@ -1,4 +1,3 @@
-from datetime import datetime, timezone
 from functools import cached_property
 from typing import Tuple
 
@@ -6,7 +5,6 @@ import disnake
 from disnake.ext import commands
 
 import features.report as report_features
-import utils
 from buttons.base import BaseView
 from config.app_config import config
 from config.messages import Messages
@@ -21,6 +19,9 @@ class ReportView(BaseView):
     @cached_property
     def report_channel(self) -> disnake.ForumChannel:
         return self.bot.get_channel(config.report_channel)
+
+    async def interaction_check(self, inter: disnake.Interaction) -> bool:
+        return permission_check.submod_plus(inter, raise_exception=False)
 
     async def set_view_resolved(self, embed: dict, author_id: int, report_id: int) -> disnake.Embed:
         """set the report as resolved or not resolved"""
@@ -85,9 +86,6 @@ class ReportView(BaseView):
             )
             await report_features.set_tag(self.report_channel, inter.message.channel, "spam")
         return message, embed
-
-    async def interaction_check(self, inter: disnake.Interaction) -> bool:
-        return permission_check.submod_plus(inter)
 
     @disnake.ui.button(
         label="Resolve",
@@ -183,6 +181,7 @@ class ReportMessageView(ReportView):
         message_url = ReportDB.get_report(report_id).message_url
         message = await report_features.convert_url(inter, message_url)
         report_message = await report_features.convert_url(inter, report.report_url)
+        report_author = await self.get_report_author(inter)
 
         if message is None:
             button.label = "Message not found"
@@ -198,7 +197,9 @@ class ReportMessageView(ReportView):
             )
             await message.delete()
 
-        await report_message.channel.send(delete_message, allowed_mentions=disnake.AllowedMentions.none())
+        embed = report_features.deleted_message_embed(inter, report, delete_message)
+        await report_message.channel.send(embed=embed, allowed_mentions=disnake.AllowedMentions.none())
+        await report_author.send(embed=embed, view=ReportAnonymView(self.bot))
         await inter.edit_original_response(view=self)
 
 
@@ -232,15 +233,12 @@ class ReportAnonymView(BaseView):
         report_message = await report_features.convert_url(inter, report.report_url)
         embed = report_message.embeds[0].to_dict()
 
-        # remove buttons
-        self.children = []
-
         if report.type == "general":
             view = ReportGeneralView(self.bot)
-            embed = await view.set_view_resolved(embed, "", report_id)
         else:
             view = ReportMessageView(self.bot)
-            embed = await view.set_view_resolved(embed, "", report_id)
+
+        embed = await view.set_view_resolved(embed, "", report_id)
 
         await report_features.set_tag(self.report_channel, report_message.channel, "resolved")
         await report_message.edit(embed=embed, view=view)
@@ -310,30 +308,6 @@ class ReportAnswerModal(disnake.ui.Modal):
             components=components
         )
 
-    def answer_embed(self, inter: disnake.ModalInteraction, report: ReportDB, answer: str) -> disnake.Embed:
-        """creates an embed template for the submitted answer"""
-        description = Messages.report_embed_answered(last_answer=report.last_answer, answer=answer)
-        embed = disnake.Embed(
-            title=self.title.format(id=report.id),
-            description=description,
-            color=disnake.Color.yellow()
-        )
-
-        if inter.channel.type == disnake.ChannelType.private:
-            author = "Anonym"
-            embed.timestamp = datetime.now(tz=timezone.utc)
-            embed.set_footer(
-                icon_url=inter.author.default_avatar.url,
-                text=f"{author} | ID: {report.id}"
-            )
-
-        else:
-            author = f"{inter.author.mention} @{inter.author.display_name}"
-            utils.add_author_footer(embed, inter.author, additional_text=[f"ID: {report.id}"])
-
-        embed.add_field(name="Answered by", value=author, inline=False)
-        return embed
-
     async def callback(self, inter: disnake.ModalInteraction) -> None:
         # respond to interaction to prevent timeout
         await inter.send(Messages.report_answer_success, ephemeral=True)
@@ -342,7 +316,7 @@ class ReportAnswerModal(disnake.ui.Modal):
         report = ReportDB.get_report(self.report_id)
         report_author = await self.bot.get_or_fetch_user(report.author_id)
         report_message = await report_features.convert_url(inter, report.report_url)
-        embed = self.answer_embed(inter, report, answer)
+        embed = report_features.answer_embed(self.title, inter, report, answer)
         AnswerDB.add_answer(self.report_id, inter.author.id, answer)
 
         if inter.channel.type == disnake.ChannelType.private:

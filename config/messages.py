@@ -662,6 +662,7 @@ if ("Mám průměr pod 2.0")                                           \n  retur
     report_modal_success = "Report byl úspěšně odeslán"
     report_answer = "Zadej zprávu pro uživatele"
     report_answer_title = "Answer to report #{id}"
+    report_message_deleted_title = "Report #{id} - Message deleted"
     report_answer_success = "Zpráva byla úspěšně odeslána"
     report_banned = "Bylo ti zakázáno posílat reporty z důvodu spamu falešných reportů. Pro další řešení kontaktuj moderátory"
     report_unban_user_brief = "Povolí uživateli posílat reporty"
