@@ -145,11 +145,12 @@ bc_role_id = 0
 ing_role_id = 0
 
 [emote]
-loading="<a:loading:814969399442014259>"
+loading = "<a:loading:814969399442014259>"
 
 [util]
-ios_looptime_minutes=120
-ios_channel_id=534431057001316362
+ios_looptime_minutes = 120
+ios_channel_id = 534431057001316362
+ios_leakcheck_key_path = "/root/.ssh/leakcheck"
 
 [exams]
 page_size = 6
