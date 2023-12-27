@@ -55,7 +55,7 @@ async def send_list_of_messages(
         message_list: Iterable,
         max_msg_len: int = 1900,
         ephemeral: bool = False
-):
+) -> None:
     """Send bunch of messages at once
 
     Send all messages from message_list to channel. Each message from message_list will
