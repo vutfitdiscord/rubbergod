@@ -278,14 +278,17 @@ class IOS(Base, commands.Cog):
 
     @tasks.loop(minutes=Base.config.ios_looptime_minutes)
     async def ios_task(self, inter: disnake.ApplicationCommandInteraction = None):
-        # Respond to interaction if any, else print everything to #ios
+        # Respond to interaction if any, else print everything to #ios-private
         channel = inter.channel if inter is not None else self.bot.get_channel(self.config.ios_channel_id)
         if inter is not None:
             await inter.edit_original_response(Messages.ios_howto_clean)
         else:
             await channel.send(Messages.ios_howto_clean)
 
-        process = subprocess.Popen(["ssh", "merlin"], stdout=subprocess.PIPE)
+        process = subprocess.Popen(
+            ["ssh", "-i", self.config.ios_leakcheck_key_path, "merlin"],
+            stdout=subprocess.PIPE
+            )
         output, _ = process.communicate()
         memory, rest = output.decode('utf-8').split("semafory:\n")
         semaphores, processes = rest.split("procesy:\n")
@@ -305,7 +308,10 @@ class IOS(Base, commands.Cog):
             # Send it to bot-dev channel anyway
             raise e
 
-        process = subprocess.Popen(["ssh", "eva"], stdout=subprocess.PIPE)
+        process = subprocess.Popen(
+            ["ssh", "-i", self.config.ios_leakcheck_key_path, "eva"],
+            stdout=subprocess.PIPE
+            )
         output, _ = process.communicate()
 
         memory, rest = output.decode('utf-8').split("semafory:\n")

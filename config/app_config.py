@@ -161,6 +161,7 @@ class Config:
     # util
     ios_looptime_minutes: int = get_attr(toml_dict, "util", "ios_looptime_minutes")
     ios_channel_id: int = get_attr(toml_dict, "util", "ios_channel_id")
+    ios_leakcheck_key_path: str = get_attr(toml_dict, "util", "ios_leakcheck_key_path")
 
     # exams
     exams_page_size: int = get_attr(toml_dict, "exams", "page_size")

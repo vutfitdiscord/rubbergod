@@ -50,23 +50,28 @@ def merge_messages(message_list: Iterable, max_msg_len: int):
     return messages
 
 
-##
-# @brief Send bunch of messages at once
-#
-# Send all messages from @p message_list to @p channel. Each message from @p message_list will
-# have its own line but they will be merged message/s as large as possible limited by @p max_msg_len.
-# @p max_msg_len minimal value is 2 because new line chars are counted too.
-#
-# @param channel any text channel where messages will be send
-# @param message_list list of messages to send
-# @param max_msg_len maximal length of message
-#
 async def send_list_of_messages(
         ctx: Union[disnake.TextChannel, commands.Context, disnake.ApplicationCommandInteraction],
         message_list: Iterable,
         max_msg_len: int = 1900,
         ephemeral: bool = False
-):
+) -> None:
+    """Send bunch of messages at once
+
+    Send all messages from message_list to channel. Each message from message_list will
+    have its own line but they will be merged message/s as large as possible limited by max_msg_len.
+    max_msg_len minimal value is 2 because new line chars are counted too.
+
+    Parameters
+    ----------
+    channel : Union
+        Any text channel where messages will be send
+    message_list : Iterable
+        List of messages to send
+    max_msg_len : int
+        Maximum length of message
+    """
+
     assert isinstance(max_msg_len, int)
     if max_msg_len > 2000:
         max_msg_len = 2000
@@ -87,3 +92,5 @@ async def send_list_of_messages(
                 await ctx.channel.reply(message)
             else:
                 await ctx.channel.send(message)
+        elif isinstance(ctx, disnake.TextChannel):
+            await ctx.send(message)
