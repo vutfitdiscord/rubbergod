@@ -14,6 +14,7 @@ helper_role = 461550323727859712
 role = ''
 role_id = 591349196267716608
 host_id = 603673568051462144
+db_pull_merlin_key_path = '/root/.ssh/etc_passwd'
 
 [email]
 name = 'toasterrubbergod@gmail.com'
