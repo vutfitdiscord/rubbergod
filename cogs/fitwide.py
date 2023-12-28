@@ -458,7 +458,10 @@ class FitWide(Base, commands.Cog):
     @verify_db.sub_command(name="pull", description=Messages.fitwide_pull_db_brief)
     async def pull_db(self, inter: disnake.ApplicationCommandInteraction):
         await inter.response.defer()
-        process = subprocess.Popen(["ssh", "merlin"], stdout=subprocess.PIPE)
+        process = subprocess.Popen(
+            ["ssh", "-i", self.config.db_pull_merlin_key_path, "merlin"],
+            stdout=subprocess.PIPE
+            )
         try:
             output, error = process.communicate(timeout=15)
             if error:

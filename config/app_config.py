@@ -56,6 +56,7 @@ class Config:
     verification_role: str = get_attr(toml_dict, "verification", "role")
     verification_role_id: int = get_attr(toml_dict, "verification", "role_id")
     verification_host_id: int = get_attr(toml_dict, "verification", "host_id")
+    db_pull_merlin_key_path: str = get_attr(toml_dict, "verification", "db_pull_merlin_key_path")
 
     # Verification email sender settings
     email_name: str = get_attr(toml_dict, "email", "name")
