@@ -9,4 +9,7 @@ echo "y" | ssh-keygen -q -N "" -t ed25519 -f "\$SSH_DIR"/etc_passwd 1>/dev/null 
 echo "command=\"/homes/eva/xl/xlogin00/rubbergod/leakcheck\",no-port-forwarding,no-X11-forwarding,no-agent-forwarding,no-pty" "\$(cat "\$SSH_DIR"/leakcheck.pub)"
 echo "command=\"cat /etc/passwd\",no-port-forwarding,no-X11-forwarding,no-agent-forwarding,no-pty" "\$(cat "\$SSH_DIR"/leakcheck.pub)"
 EOF
-# Now, run this script and append its output to merlin:~/.ssh/authorized_keys
+# Now, run this script and append its output to merlin:~/.ssh/authorized_keys.
+# Don't forget to change the path of leakcheck script to your own.
+# It is also advised to change the comment on both keys to something meaningful
+# so you recognize it later.
