@@ -14,7 +14,7 @@ class ContestView(BaseView):
         self.bot = bot
 
     @cached_property
-    def contest_vote_channel(self) -> disnake.ForumChannel:
+    def contest_vote_channel(self) -> disnake.TextChannel:
         return self.bot.get_channel(config.contest_vote_channel)
 
     async def interaction_check(self, inter: disnake.Interaction) -> bool:
