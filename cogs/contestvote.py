@@ -181,6 +181,18 @@ class ContestVote(Base, commands.Cog):
         message = await inter.original_message()
         await message.edit(Messages.contest_vote_end_success)
 
+    @contest_mod.sub_command(name="approve", description=Messages.contest_vote_approve_brief)
+    async def approve(self, inter: disnake.ApplicationCommandInteraction, message: disnake.Message):
+        if inter.channel.id != self.config.contest_vote_filter_channel:
+            await inter.send(Messages.contest_vote_not_filter_channel, ephemeral=True)
+            return
+
+        file = await message.attachments[0].to_file()
+        await self.contest_vote_channel.send(message.content, file=file)
+        await message.edit(view=None)
+        await message.unpin()
+        await message.reply(Messages.contest_approve_success)
+
     @commands.Cog.listener()
     async def on_button_click(self, inter: disnake.MessageInteraction):
         """Handle button clicks"""

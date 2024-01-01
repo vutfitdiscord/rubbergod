@@ -48,7 +48,7 @@ minimum = 20
 minutes = 2
 
 [contestvote]
-channel = 1165738008100737186
+channel = 1185908476250161242
 filter_channel = 1166847009878192138
 weight_1 = 2
 weight_2 = 1.5
