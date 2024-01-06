@@ -25,7 +25,7 @@ Host eva merlin
     RequestTTY no
 
 Host merlin
-    ProxyCommand ssh -i /root/.ssh/nc_eva_merlin %r@eva nc %h %p
+    ProxyCommand ssh -i /root/.ssh/nc_eva_merlin %r@eva
 "
 
 # `ash` is not a mistake; Rubbergod Alpine does not have bash
