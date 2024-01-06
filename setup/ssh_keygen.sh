@@ -1,5 +1,12 @@
 #!/usr/bin/env bash
-# Generating keys for `/ios` and `/verify_db pull`
+
+# Generate ssh keys for `/ios` and `/verify_db pull`
+
+# Make sure the working dir is right
+olddir="$(pwd)"
+cd "$(dirname "$0")"
+cd ..
+
 printf "your xlogin00: "
 read xlogin
 # `ash` is not a mistake; Rubbergod Alpine does not have bash
@@ -13,6 +20,10 @@ echo "y" | ssh-keygen -q -N "" -t ed25519 -f "\$SSH_DIR"/etc_passwd 1>/dev/null 
 echo "command=\"/homes/eva/"${xlogin:0:2}"/${xlogin}/rubbergod/leakcheck\",no-port-forwarding,no-X11-forwarding,no-agent-forwarding,no-pty" "\$(cat "\$SSH_DIR"/leakcheck.pub)"
 echo "command=\"cat /etc/passwd\",no-port-forwarding,no-X11-forwarding,no-agent-forwarding,no-pty" "\$(cat "\$SSH_DIR"/leakcheck.pub)"
 EOF
+
+# Restore the working dir
+cd "$olddir"
+
 # Now, run this script and append its output to merlin:~/.ssh/authorized_keys.
 # Don't forget to change the path of leakcheck script to your own.
 # It is also advised to change the comment on both keys to something meaningful
