@@ -9,3 +9,6 @@ __pycache__
 merlin-latest
 timeout_wars
 service_logs.txt
+emojis.zip
+*sql
+*.bak
