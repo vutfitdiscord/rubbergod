@@ -49,7 +49,7 @@ class Absolvent(Base, commands.Cog):
         author = await self.base_guild.fetch_member(inter.author.id)
         if not author:
             # check whether the user is on server
-            await inter.edit_original_response(Messages.absolvent_not_on_server)
+            await inter.edit_original_response(Messages.absolvent_not_on_server(user=inter.author.id))
             return
 
         verify_role = self.base_guild.get_role(self.config.verification_role_id)
