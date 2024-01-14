@@ -202,11 +202,14 @@ class Verification(BaseFeature):
                 "NBIO", "NGRI", "NNET", "NVIZ", "NCPS", "NSEC", "NEMB",
                 "NHPC", "NISD", "NIDE", "NISY", "NMAL", "NMAT",
                 "NSEN", "NVER", "NSPE", "MGH",
+                "MITP-EN"
             ]:
                 return "2MIT+" if year_value >= 2 else f"{year_value}MIT"
-            elif year_parts[1] in ["DVI4", "DRH", "DITP"]:
+            elif year_parts[1] in ["DVI4", "DRH", "DITP", "DITP-EN"]:
                 return "Doktorand"
-        elif "FEKT" in year_parts:  # FEKT student
+        elif year_parts[0] in [
+            "FA", "FAST", "FAVU", "FCH", "FEKT", "FP", "FSI", "USI"
+        ]:  # Other VUT faculties
             return "VUT"
         elif len(year_parts) == 1 and year_parts[0] == "MUNI":  # Maybe MUNI?
             return "MUNI"
