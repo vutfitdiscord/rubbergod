@@ -18,36 +18,27 @@ from database.review import ProgrammeDB, ReviewDB, SubjectDB, SubjectDetailsDB
 from features.review import ReviewManager, TierEnum
 from permissions import permission_check
 
-subjects = []
-programmes = []
-subjects_programmes = []
+
+async def autocomp_subjects_programmes(
+    inter: disnake.ApplicationCommandInteraction,
+    user_input: str
+) -> list[str]:
+    input = user_input.lower()
+    subjects = SubjectDB.lookup(input)
+    programmes = ProgrammeDB.lookup(input)
+    subjects_programmes = sorted(subjects + programmes)
+    return subjects_programmes[:25]
 
 
-async def autocomp_subjects_programmes(inter: disnake.ApplicationCommandInteraction, user_input: str):
-    return [item for item in subjects_programmes if user_input.lower() in item][:25]
-
-
-async def autocomp_subjects(inter: disnake.ApplicationCommandInteraction, user_input: str):
-    return [subject for subject in subjects if user_input.lower() in subject][:25]
+async def autocomp_subjects(inter: disnake.ApplicationCommandInteraction, user_input: str) -> list[str]:
+    return SubjectDB.lookup(user_input.lower())
 
 
 class Review(Base, commands.Cog):
     def __init__(self, bot: commands.Bot):
-        global subjects, programmes
         super().__init__()
         self.bot = bot
         self.manager = ReviewManager(bot)
-        subjects = SubjectDB.get_all()
-        programmes = ProgrammeDB.get_all()
-        self.get_all_options()
-
-    def get_all_options(self):
-        global subjects, programmes, subjects_programmes
-        subjects = [subject[0] for subject in subjects]
-        programmes = [programme[0] for programme in programmes]
-        programmes = [programme.lower() for programme in programmes]
-        subjects_programmes = subjects + programmes
-        subjects_programmes.sort()
 
     async def check_member(self, inter: disnake.ApplicationCommandInteraction):
         """Check if user is allowed to add/remove new review."""
@@ -166,7 +157,6 @@ class Review(Base, commands.Cog):
         overwrite: bool = commands.Param(description=Messages.subject_update_overwrite_brief, default=False),
     ):
         """Updates subjects from web"""
-        global subjects, programmes
         programme_details_link = "https://www.fit.vut.cz/study/"
         reply = ""
         # bachelor
@@ -181,9 +171,6 @@ class Review(Base, commands.Cog):
                 reply += Messages.subject_update_error(url=url)
         # sports
         self.manager.update_sport_subjects()
-        subjects = SubjectDB.get_all()
-        programmes = ProgrammeDB.get_all()
-        self.get_all_options()
         reply += Messages.subject_update_success
         await inter.edit_original_response(reply)
 
