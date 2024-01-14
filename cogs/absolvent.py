@@ -93,7 +93,7 @@ class Absolvent(Base, commands.Cog):
 
         # CHECK OWNERSHIP, TYPE AND YEAR OF THE QUALIFICATION WORK / THESIS
 
-        thesis_url = f"https://dspace.vutbr.cz/handle/11012/{thesis_web_id}?locale-attribute=cs"
+        thesis_url = f"http://hdl.handle.net/11012/{thesis_web_id}?locale-attribute=cs"
 
         # download the page
         result_thesis = requests.get(thesis_url)
