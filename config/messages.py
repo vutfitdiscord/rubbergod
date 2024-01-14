@@ -448,9 +448,9 @@ class Messages(metaclass=Formatable):
     absolvent_not_in_db = "Tvůj login nebyl nalezen v databázi ověřených uživatelů. Použij příkaz `/verify` pro ověření (je zapotřebí školní email)."
     absolvent_not_verified = "Pro zavolání tohoto příkazu je potřeba se ověřit pomocí příkazu `/verify`."
     absolvent_help = f"{absolvent_brief} - zadejte CASE-SENSITIVE údaje ve formátu:\n" \
-        "/diplom <Titul.> <Jméno> <Příjmení> <Číslo diplomu> <ID kvalifikační práce z URL na webu knihovny VUT <https://dspace.vutbr.cz/handle/11012/19121> >\n" \
+        "/diplom <Titul.> <Jméno> <Příjmení> <Číslo diplomu> <ID kvalifikační práce, poslední kombinace čísel v kolonce URI na webu knihovny VUT <http://hdl.handle.net/11012/19121> >\n" \
         "např: Bc. Josef Novák 123456/2019 99999\n" \
-        "(při <https://dspace.vutbr.cz/handle/11012/99999>)\n" \
+        "(při <http://hdl.handle.net/11012/99999>)\n" \
         "Údaje slouží k jednorázovému ověření a nejsou nikam ukládány."
     absolvent_degree_param = "Dosažený titul - Bc./Ing."
     absolvent_name_param = "Křestní jméno např.: Josef"
