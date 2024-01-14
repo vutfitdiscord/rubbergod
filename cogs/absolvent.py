@@ -41,8 +41,8 @@ class Absolvent(Base, commands.Cog):
         :param surname: last name (case-sensitive)
         :param degree: strictly either "Bc." or "Ing." (case-sensitive)
         :param diploma_number: ID of diploma, in format NNNNNN/YYYY
-        :param thesis_web_id: ID from URL https://dspace.vutbr.cz/handle/11012/<num>
-            can be discovered via https://dspace.vutbr.cz/handle/11012/19121
+        :param thesis_web_id: ID from URL http://hdl.handle.net/11012/<num>
+            can be discovered via http://hdl.handle.net/11012/19121
         """
         await inter.response.defer(with_message=True, ephemeral=True)
 
