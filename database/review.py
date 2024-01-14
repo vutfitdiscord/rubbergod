@@ -127,6 +127,15 @@ class SubjectDB(database.base):
         return session.query(cls).filter(cls.shortcut == shortcut).first()
 
     @classmethod
+    def lookup(cls, shortcut: str) -> List[SubjectDB]:
+        subjects = session.scalars(
+            session.query(cls.shortcut)
+            .filter(cls.shortcut.ilike(f"{shortcut}%"))
+            .limit(25)
+        ).all()
+        return subjects
+
+    @classmethod
     def get_all(cls) -> List[SubjectDB]:
         return session.query(cls.shortcut).all()
 
@@ -211,6 +220,15 @@ class ProgrammeDB(database.base):
     @classmethod
     def get(cls, shortcut: str) -> Optional[ProgrammeDB]:
         return session.query(cls).filter(cls.shortcut == shortcut).first()
+
+    @classmethod
+    def lookup(cls, shortcut: str) -> List[SubjectDB]:
+        programmes = session.scalars(
+            session.query(cls.shortcut)
+            .filter(cls.shortcut.ilike(f"{shortcut}%"))
+            .limit(25)
+        ).all()
+        return programmes
 
     @classmethod
     def get_all(cls) -> List[ProgrammeDB]:
