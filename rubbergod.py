@@ -106,7 +106,10 @@ async def on_ready():
 @bot.event
 async def on_button_click(inter: disnake.MessageInteraction):
     if inter.component.custom_id in ["trash:delete", "bookmark:delete"]:
-        await inter.message.delete()
+        try:
+            await inter.message.delete()
+        except disnake.NotFound:
+            pass
 
 
 @bot.event
