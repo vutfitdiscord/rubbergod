@@ -46,9 +46,15 @@ class Absolvent(Base, commands.Cog):
         """
         await inter.response.defer(with_message=True, ephemeral=True)
 
-        # check whether the user is verified
-        verify_role = inter.guild.get_role(self.config.verification_role_id)
-        if verify_role not in inter.author.roles:
+        author = await self.base_guild.fetch_member(inter.author.id)
+        if not author:
+            # check whether the user is on server
+            await inter.edit_original_response(Messages.absolvent_not_on_server)
+            return
+
+        verify_role = self.base_guild.get_role(self.config.verification_role_id)
+        if verify_role not in author.roles:
+            # check whether the user is verified
             await inter.edit_original_response(Messages.absolvent_not_verified)
             return
 

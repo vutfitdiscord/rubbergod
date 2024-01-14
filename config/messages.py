@@ -457,6 +457,7 @@ class Messages(metaclass=Formatable):
     absolvent_surname_param = "Příjmení např.: Novák"
     absolvent_diploma_param = "Číslo diplomu např.: 123456/2019"
     absolvent_thesis_id_param = "ID kvalifikační práce z URL na webu knihovny VUT(dspace.vutbr.cz) např.: 99999"
+    absolvent_not_on_server = "{user}, na použití tohoto příkazu musíš být na FIT VUT serveru.\nhttps://discord.gg/vutfit"
 
     # INFO
     urban_brief = "Vyhledávaní výrazu v urban slovníku"
