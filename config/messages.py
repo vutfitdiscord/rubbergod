@@ -419,7 +419,7 @@ class Messages(metaclass=Formatable):
     subject_update_success = "Předměty byly aktualizovány."
     shortcut_brief = "Vrací stručné informace o předmětu"
     tierboard_brief = "Založeno na `reviews` z průměru tier hodnot"
-    tierboard_missing_year = f"Nezadal jsi ročník a nemáš školní roli"
+    tierboard_missing_year = f"Nemáš ročníkovou roli, prosím specifikuj ročník"
 
     # NAMEDAY
     name_day_cz = "Dnes má svátek {name}"
