@@ -268,7 +268,14 @@ class Verification(BaseFeature):
             await member.add_roles(verify)
             await member.add_roles(year)
 
-            new_user.save_verified(inter.user.id)
+            try:
+                new_user.save_verified(inter.user.id)
+            except Exception:
+                return await self.log_verify_fail(
+                    inter,
+                    "Verify (with code) (User already verified?)",
+                    str({"login": login, "year": new_user.year})
+                )
 
             verify_success_msg = Messages.verify_verify_success(user=inter.user.id)
             try:
