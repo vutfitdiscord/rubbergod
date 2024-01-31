@@ -111,7 +111,7 @@ class ValidPersonDB(database.base):
 
     def save_verified(self, discord_id: str) -> None:
         """"Inserts login with discord name into database"""
-        session.add(PermitDB(login=self.login, discord_ID=discord_id))
+        PermitDB.add_user(login=self.login, discord_ID=discord_id)
         self.status = 0
         session.commit()
 
