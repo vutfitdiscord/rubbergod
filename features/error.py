@@ -196,9 +196,9 @@ class ErrorLogger:
         )
         utils.add_author_footer(embed, author=ctx.author, additional_text=[f"ID: {error_log.id}"])
 
-        # send context of command with personal information to DM
+        # send context of command with personal information to logging channel
         if parsed_ctx['command'] == "/diplom":
-            channel = self.bot.get_user(config.admin_ids[0])
+            channel = self.bot.get_channel(config.log_channel)
             await channel.send(embed=embed, view=ErrorView())
             embed.remove_field(0)  # remove args from embed for sending to bot dev channel
 
