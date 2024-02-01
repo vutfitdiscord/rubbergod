@@ -211,7 +211,7 @@ class Fun(Base, commands.Cog):
         await inter.response.defer()
 
         async with aiohttp.ClientSession() as session:
-            async with session.get("https://api.yomomma.info/") as response:
+            async with session.get("https://www.yomama-jokes.com/api/v1/jokes/random/") as response:
                 if response.status != 200:
                     raise ApiError(response.status)
                 result = await response.json()
@@ -220,9 +220,11 @@ class Fun(Base, commands.Cog):
             title="Yo mamajoke",
             description=result["joke"],
             color=disnake.Color.blue(),
-            url="https://yomomma.info",
+            url="https://www.yomama-jokes.com",
         )
-        embed.set_footer(text=self.custom_footer(inter.author, "yomomma.info"))
+        embed.set_footer(
+            text=self.custom_footer(inter.author, "https://www.yomama-jokes.com/")
+        )
 
         await inter.send(embed=embed)
 
