@@ -29,7 +29,7 @@ class ContextMock:
 
     def __init__(self, bot: commands.Bot, arg):
         self.channel = getattr(arg, "channel", bot.get_channel(arg.channel_id))
-        if hasattr(arg, "auhtor"):
+        if hasattr(arg, "author"):
             self.author = arg.author
         elif hasattr(arg, "member"):
             self.author = arg.member
