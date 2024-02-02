@@ -58,13 +58,17 @@ class ContestVote(Base, commands.Cog):
     ):
         await inter.response.defer(ephemeral=self.check.botroom_check(inter))
 
+        if message_url.channel != self.contest_vote_channel:
+            await inter.send(Messages.contest_vote_not_contest_channel)
+            return
+
         if not message_url.reactions:
             await inter.send(Messages.contest_vote_no_reactions)
             return
 
         contributions = await get_top_contributions(self, [message_url])
 
-        await inter.send(''.join(contributions))
+        await inter.send("".join(contributions))
 
     @commands.cooldown(rate=1, per=600.0, type=commands.BucketType.user)
     @contest.sub_command(
@@ -74,7 +78,9 @@ class ContestVote(Base, commands.Cog):
     async def top_contributions(
         self,
         inter: disnake.ApplicationCommandInteraction,
-        number_of: int = commands.Param(default=5, gt=0, description=Messages.contest_vote_top_count_brief)
+        number_of: int = commands.Param(
+            default=5, gt=0, le=10, description=Messages.contest_vote_number_of_param
+        )
     ):
         await inter.response.defer(ephemeral=self.check.botroom_check(inter))
         messages = await self.contest_vote_channel.history().flatten()
@@ -85,12 +91,9 @@ class ContestVote(Base, commands.Cog):
             await inter.send(Messages.contest_vote_no_contributions)
             return
 
-        await inter.send(
-            Messages.contest_vote_top_contributions(
-                number_of=number_of,
-                contributions="".join(contributions)
-            )
-        )
+        await inter.send(Messages.contest_vote_top_contributions(number_of=number_of))
+        for index in range(0, len(contributions), 5):
+            await inter.send("".join(contributions[index:index+5]))
 
     @cooldowns.default_cooldown
     @contest.sub_command(name="submit", description=Messages.contest_vote_submit_brief)
