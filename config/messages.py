@@ -361,13 +361,14 @@ class Messages(metaclass=Formatable):
     contest_vote_start_success = "Hlasování bylo úspěšně spuštěno."
     contest_vote_ending = "Hlasování se ukončuje"
     contest_vote_end_success = "Hlasování bylo úspěšně ukončeno."
-    contest_vote_top_count_brief = "Počet top příspěvků"
-    contest_vote_top_contributions = "# Top {number_of} příspěvků\n{contributions}"
+    contest_vote_number_of_param = "Počet top příspěvků"
+    contest_vote_top_contributions = "# Top {number_of} příspěvků"
     contest_vote_invalid_votes = "**Počet neplatných hlasů (vybráno více možností): {invalid_votes}**"
     contest_vote_no_contributions = "Nebyly nalezeny žádné příspěvky s body"
     contest_vote_approve_brief = "Schválí příspěvek a pošle ho do contest kanálu"
     contest_approve_success = "Příspěvek byl úspěšně schválen a poslán do contest kanálu."
     contest_vote_not_filter_channel = "Tento příkaz lze použít pouze v contest kanálu."
+    contest_vote_not_contest_channel = "Tento příkaz lze použít pouze pro příspěvky v contest kanálu."
 
     # REVIEW
     review_add_brief = "Přidá recenzi na předmět. Pokud jsi již recenzi na předmět napsal, bude nahrazena novou."

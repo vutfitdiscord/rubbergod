@@ -41,7 +41,7 @@ def get_contribution_id(content: str) -> int:
     return int(contribution_id)
 
 
-async def get_top_contributions(self, messages: list[disnake.Message], number_of: int = 5) -> List[str]:
+async def get_top_contributions(self, messages: list[disnake.Message], number_of: int) -> List[str]:
     images = []
 
     # get all images and their votes
