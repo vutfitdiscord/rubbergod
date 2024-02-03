@@ -66,7 +66,7 @@ class ContestVote(Base, commands.Cog):
             await inter.send(Messages.contest_vote_no_reactions)
             return
 
-        contributions = await get_top_contributions(self, [message_url])
+        contributions = await get_top_contributions(self, [message_url], 1)
 
         await inter.send("".join(contributions))
 
