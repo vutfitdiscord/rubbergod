@@ -78,7 +78,7 @@ class Absolvent(Base, commands.Cog):
             only_ascii = nfkd_form.encode("ASCII", "ignore").decode("ASCII")
             return only_ascii
 
-        # get "surname name" for bot database fot the current command caller
+        # get "surname name" for bot database for the current command caller
         name_from_db = ValidPersonDB.get_user_by_id(inter.author.id).name
         # remove diacritics from the user-supplied name
         name_from_user_without_diacritics = remove_accents(f"{surname} {name}")

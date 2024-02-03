@@ -22,7 +22,7 @@ class Info(Base, commands.Cog):
         self.bot = bot
 
     def urban_embeds(self, author: disnake.User, dict: Dict) -> List[disnake.Embed]:
-        """Generate embeds from dictionary of resposes"""
+        """Generate embeds from dictionary of responses"""
         embed_list = []
 
         for idx, item in enumerate(dict["list"]):
@@ -62,7 +62,7 @@ class Info(Base, commands.Cog):
     @cooldowns.short_cooldown
     @commands.slash_command(name="urban", description=Messages.urban_brief)
     async def urban(self, inter: disnake.ApplicationCommandInteraction, expression) -> None:
-        """Finding expression and shorcuts in urban directory"""
+        """Finding expression and shortcuts in urban directory"""
 
         await inter.response.defer(with_message=True)
         embeds = None

@@ -32,7 +32,7 @@ class EmbedView(BaseView):
         param: disnake.User author: command author, used for locking pagination
         param: List[disnake.Embed] embeds: List of embed to be paginated
         param int row: On which row should be buttons added, defaults to first
-        param bool perma_lock: If true allow just message autor to change pages, without dynamic lock button
+        param bool perma_lock: If true allow just message author to change pages, without dynamic lock button
         param bool roll_arroud: After last page rollaround to first
         param bool end_arrow: If true use also '⏩' button
         param LeaderboardPageSource page_source: Use for long leaderboards, embeds should contain one embed

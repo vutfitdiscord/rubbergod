@@ -139,7 +139,7 @@ class DynamicConfig(Base, commands.Cog):
         append: bool
     ):
         """
-        Changes config atrribute specified by `key` to `value`.
+        Changes config attribute specified by `key` to `value`.
         If `append` values are appended to current setting.
         """
         if not hasattr(self.config, key) or key in self.config.config_static:

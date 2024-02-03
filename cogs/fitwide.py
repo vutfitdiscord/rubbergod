@@ -78,8 +78,8 @@ class FitWide(Base, commands.Cog):
             and vut not in member.roles
         ]
 
-        permited = session.query(PermitDB)
-        permited_ids = [int(person.discord_ID) for person in permited]
+        permitted = session.query(PermitDB)
+        permitted_ids = [int(person.discord_ID) for person in permitted]
 
         years = ["0BIT", "1BIT", "2BIT", "3BIT+", "0MIT", "1MIT", "2MIT+", "Doktorand", "VUT", "Dropout"]
 
@@ -90,7 +90,7 @@ class FitWide(Base, commands.Cog):
         }
 
         for member in verified:
-            if member.id not in permited_ids:
+            if member.id not in permitted_ids:
                 if p_verified:
                     await inter.send(
                         Messages.fitwide_role_check_user_not_found(user=member.id, id=member.id)

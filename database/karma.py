@@ -113,19 +113,19 @@ class KarmaDB(database.base):
         return result
 
     @classmethod
-    def leaderboard_query(cls, atribute: ColumnOperators) -> Query:
-        return session.query(cls).order_by(atribute)
+    def leaderboard_query(cls, attribute: ColumnOperators) -> Query:
+        return session.query(cls).order_by(attribute)
 
     @classmethod
     def transfer_karma(cls, from_user: str, to_user: str) -> KarmaData:
         from_user_karma = cls.get_karma_object(from_user)
         to_user_karma = cls.get_karma_object(to_user)
 
-        # transfering from user that is not in the database
+        # transferring from user that is not in the database
         if from_user_karma is None:
             return None
 
-        # transfering to user that is not in the database
+        # transferring to user that is not in the database
         if to_user_karma is None:
             to_user_karma = cls(member_ID=to_user)
             session.add(to_user_karma)

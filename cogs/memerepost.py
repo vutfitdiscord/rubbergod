@@ -151,7 +151,7 @@ class MemeRepost(Base, commands.Cog):
                 content_splits = ctx.message.content.split()
                 for content_split in content_splits:
                     if content_split.startswith("https://"):
-                        # Its attachement URL
+                        # Its attachment URL
                         for extension in self.config.meme_repost_image_extensions:
                             # Check for extension in URL
                             if f".{extension}" in content_split:
