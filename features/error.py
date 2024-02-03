@@ -341,9 +341,10 @@ class ErrorLogger:
         if isinstance(error, disnake.errors.DiscordServerError):
             return True
 
-        if isinstance(error, sqlalchemy.exc.InternalError):
+        if isinstance(error, (sqlalchemy.exc.InternalError, sqlalchemy.exc.PendingRollbackError)):
+            # rollback transaction that caused the error but continue with the log
             session.rollback()
-            return True
+            return False
 
         if isinstance(error, commands.CommandNotFound):
             slash_comms = [command.name for command in self.bot.slash_commands]
