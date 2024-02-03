@@ -22,7 +22,7 @@ class ReviewDB(database.base):
     tier = Column(Integer, default=0)
     text_review = Column(String, default=None)
     date = Column(Date)
-    relevance = relationship("ReviewRelevanceDB")
+    relevance = relationship("ReviewRelevanceDB", cascade="all, delete")
 
     @classmethod
     def get_review_by_id(cls, id: int) -> Optional[ReviewDB]:
