@@ -16,7 +16,7 @@ from config.messages import Messages
 from database.timeout import TimeoutDB
 from permissions import permission_check
 
-timestamps = {
+timestamps = [
     "60s",
     "5min",
     "10min",
@@ -32,7 +32,7 @@ timestamps = {
     "3weeks",
     "4weeks",
     "Forever",
-}
+]
 
 
 async def autocomplete_times(inter, input: str) -> List[str]:
