@@ -74,7 +74,7 @@ class AutopinFeatures():
                         files += f"![{file.filename}]({file.url}); \n"
                     else:
                         files += f"[{file.filename}]({file.url}); \n"
-                f.write(f"### Atachments\n\n{files}\n\n") if files else ...
+                f.write(f"### Attachments\n\n{files}\n\n") if files else ...
                 f.write("---\n\n")
             f.seek(0)
             return disnake.File(f, filename=f"{channel_name}_pins.md")

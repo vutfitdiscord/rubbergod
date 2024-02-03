@@ -108,9 +108,9 @@ def load_dump(filename: str):
 
 def load_subjects():
     """
-    Fills DB with subject shorcut from config file.
+    Fills DB with subject shortcut from config file.
     This is needed for reviews feature.
-    Run this just when you want to create DB fo reviews.
+    Run this just when you want to create DB for reviews.
     """
 
     # Remove duplicates

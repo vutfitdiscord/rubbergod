@@ -149,7 +149,7 @@ class Exams(Base, commands.Cog):
             try:
                 dest = await channel.fetch_message(message_id)
             except disnake.NotFound:
-                # If cant find message then remove it from database
+                # If can't find message then remove it from database
                 ExamsTermsMessageDB.remove_term_message(message_id)
 
             # If message is not found then set it to channel itself
@@ -226,7 +226,7 @@ class Exams(Base, commands.Cog):
 
         params:
             target:
-                Intercation: called from `exam` command
+                Interaction: called from `exam` command
                 TextChannel: called on `term` start command
                 Message: called on `term` update cron job
             year: one of `YEAR_LIST` or None, get just specified year info
@@ -334,7 +334,7 @@ class Exams(Base, commands.Cog):
                             date_offset = " " * (DATE_OFFSET - len(subject_tag))
                             time_offset = " " * (
                                 TIME_OFFSET - len(padded_term_date)
-                            )  # Here used aas data offset
+                            )  # Here used as data offset
                             term_string = f"{subject_tag}{date_offset}{padded_term_date}"
                             term_string += f"{time_offset}{col.contents[0]}"
 

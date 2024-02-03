@@ -397,7 +397,7 @@ class ErrorLogger:
                 return True
 
             if isinstance(error.original, disnake.errors.Forbidden):
-                # bot cant send messages to user
+                # bot can't send messages to user
                 if error.original.code == 50007:
                     await inter.channel.send(Messages.blocked_bot(user=inter.author.id))
                     return True

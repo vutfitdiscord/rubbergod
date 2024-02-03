@@ -180,7 +180,7 @@ class Review(Base, commands.Cog):
         inter: disnake.ApplicationCommandInteraction,
         shortcut: str = commands.Param(autocomplete=autocomp_subjects_programmes),
     ):
-        """Informations about subject specified by its shortcut"""
+        """Information about subject specified by its shortcut"""
         programme = ProgrammeDB.get(shortcut.upper())
         if programme:
             embed = disnake.Embed(title=programme.shortcut, description=programme.name)
