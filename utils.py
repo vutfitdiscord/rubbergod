@@ -419,8 +419,8 @@ async def parse_attachments(
 
 def parse_time(time_string: str, time_format: str) -> Optional[datetime]:
     """Parse time from string using first regex for abbreviations and if it fails, use dateutil parser."""
-    options = ["Never", "Nikdy", "None", "0"]
-    if time_string in options:
+    options = ["forever", "never", "nikdy", "none", "0"]
+    if time_string.lower() in options:
         return datetime(9999, 12, 31, 0, 0, 0)
 
     pattern = re.compile(r"(\d+)([yYMwdhms])")
