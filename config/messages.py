@@ -18,6 +18,7 @@ class Messages(metaclass=Formatable):
     embed_not_author = "Hraj si na svém písečku s tebou zavolanými příkazy. <:pepeGun:826943455032901643>"
     base_leaderboard_format_str = "_{position}._ - **{member_name}**:"
     invalid_time_format = "Neplatný formát času.\n{time_format}."
+    time_format = "Formát: `dd.mm.yyyy [HH:MM]` nebo `1(w)eek 2(M)onth 3(d)ay 4(h)our 5(m)inute 6(s)econd`"
     attachment_too_big = "Příloha je příliš velká. Maximální velikost je 25 MB."
     api_error = "Nepovedlo se získat data z API\n{error}"
     message_not_found = "Zpráva nebyla nalezena. Zkontroluj formát."
@@ -615,7 +616,6 @@ if ("Mám průměr pod 2.0")                                           \n  retur
 
     # TIMEOUT COG
     timeout_brief = "Dočasně zakáže uživateli interakce na serveru."
-    timeout_time = "Čas ve formátu dd.mm.yyyy nebo dd.mm.yyyy hh:mm. Základní jednotka je 1 hodina."
     timeout_reason = "Důvod dočasného umlčení uživatele."
     timeout_title = "{member} do {endtime} ({length})"
     timeout_field_text = "**Od:** {mod} | {starttime}\n**Navrácení:** {length}\n**Důvod:** {reason}"
