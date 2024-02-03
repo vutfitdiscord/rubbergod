@@ -298,7 +298,6 @@ class Messages(metaclass=Formatable):
     poll_close_poll_url_param = "URL zprávy s hlasováním"
     poll_title = "Otázka v hlasování"
     poll_description = "Popis nebo další informace k hlasování"
-    poll_endtime = "Formát: `dd.mm.yyyy [HH:MM]` nebo `1(w)eek 2(M)onth 3(d)ay 4(h)our 5(m)inute 6(s)econd`"
     poll_boolean_hide_results = "Skrýt výsledky hlasování do konce hlasování"
     poll_attachment = "Přidat obrázek/video k hlasování"
     poll_anonymous_vote = "Anonymní hlasování. Při neanonymním hlasování lze vypsat kdo pro co hlasoval"

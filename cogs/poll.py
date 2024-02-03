@@ -123,7 +123,7 @@ class Poll(Base, commands.Cog):
         ),
         endtime: str = commands.Param(
             default="1h",
-            description=Messages.poll_endtime,
+            description=Messages.time_format,
             max_length=40,
             autocomplete=time_choices
         ),
@@ -155,7 +155,7 @@ class Poll(Base, commands.Cog):
         ),
         endtime: str = commands.Param(
             default="1h",
-            description=Messages.poll_endtime,
+            description=Messages.time_format,
             max_length=40,
             autocomplete=time_choices
         ),
