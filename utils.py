@@ -6,6 +6,7 @@ from datetime import datetime, timezone
 from typing import Callable, Iterable, List, Literal, Optional, Tuple, Union
 
 import disnake
+import pytz
 from dateutil import parser
 from dateutil.parser import ParserError
 from dateutil.relativedelta import relativedelta
@@ -340,10 +341,6 @@ async def get_members_from_tag(guild, tag):
     return members
 
 
-def get_local_zone():
-    return datetime.now().astimezone().tzinfo
-
-
 time_types = Literal["Default", "Short Time", "Long Time", "Short Date", "Long Date",
                      "Short Date/Time", "Long Date/Time", "Relative Time"]
 
@@ -417,8 +414,18 @@ async def parse_attachments(
     return images, files, attachments_too_big
 
 
+def get_local_zone():
+    return pytz.timezone("Europe/Prague")
+
+
 def parse_time(time_string: str, time_format: str) -> Optional[datetime]:
-    """Parse time from string using first regex for abbreviations and if it fails, use dateutil parser."""
+    """Parse local time from string to datetime object.
+    Using first regex for abbreviations and if it fails, use dateutil parser.
+
+    Returns
+    -------
+    datetime object in UTC
+    """
     options = ["forever", "never", "nikdy", "none", "0"]
     if time_string.lower() in options:
         return datetime(9999, 12, 31, 0, 0, 0)
@@ -427,7 +434,7 @@ def parse_time(time_string: str, time_format: str) -> Optional[datetime]:
     matches = pattern.findall(time_string)
 
     if matches:
-        time = datetime.now()
+        time = datetime.now(timezone.utc)
         timedelta = None
         while matches:
             match = matches.pop()
@@ -452,11 +459,12 @@ def parse_time(time_string: str, time_format: str) -> Optional[datetime]:
                 raise InvalidTime(time_format)
     else:
         try:
-            time = parser.parse(time_string)
+            time = parser.parse(time_string, dayfirst=True)
+            time = time.astimezone(get_local_zone())
         except ParserError:
             raise InvalidTime(time_format)
 
-    return time
+    return time.astimezone(timezone.utc)
 
 
 async def get_message_from_url(bot, message_url) -> Optional[disnake.Message]:
