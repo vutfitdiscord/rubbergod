@@ -3,7 +3,7 @@ Cog implementing streamlinks system. List streams for a subject.
 """
 
 import re
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import List, Union
 
 import disnake
@@ -138,7 +138,7 @@ class StreamLinks(Base, commands.Cog):
             link_data['upload_date'] = datetime.strptime(date, '%d.%m.%Y')
         else:
             if link_data['upload_date'] is None:
-                link_data['upload_date'] = datetime.utcnow()
+                link_data['upload_date'] = datetime.now(timezone.utc)
 
         StreamLinkDB.create(
             subject.lower(),
@@ -230,7 +230,7 @@ class StreamLinks(Base, commands.Cog):
         stream.merge()
 
         utils.add_author_footer(embed, inter.author)
-        embed.timestamp = datetime.utcnow()
+        embed.timestamp = datetime.now(timezone.utc)
         channel = self.bot.get_channel(self.config.log_channel)
         await channel.send(embed=embed)
         await inter.edit_original_response(content=Messages.streamlinks_update_success)
@@ -265,7 +265,7 @@ class StreamLinks(Base, commands.Cog):
         embed.add_field(name="Od", value=stream.member_name)
         embed.add_field(name="Popis", value=stream.description[:1024])
         embed.add_field(name="Odkaz", value=f"[link]({stream.link})", inline=False)
-        embed.timestamp = datetime.utcnow()
+        embed.timestamp = datetime.now(timezone.utc)
         channel = self.bot.get_channel(self.config.log_channel)
         await channel.send(embed=embed)
 
@@ -336,7 +336,7 @@ class StreamLinks(Base, commands.Cog):
         )
         embed.add_field(name="Odkaz", value=f"[Link]({streamlink.link})", inline=False)
         embed.add_field(name="Popis", value=streamlink.description[:1024], inline=False)
-        embed.timestamp = datetime.utcnow()
+        embed.timestamp = datetime.now(timezone.utc)
         utils.add_author_footer(embed, author, additional_text=[
                                 f"[{streamlink.subject.upper()}] Page: {current_pos} / {links_count}"
                                 f" (#{streamlink.id})"])

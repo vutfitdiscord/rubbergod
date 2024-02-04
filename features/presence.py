@@ -14,7 +14,7 @@ class Presence(BaseFeature):
         self.git = Git()
 
         self.activity = disnake.Game(
-            start=datetime.datetime.utcnow(),
+            start=datetime.datetime.now(datetime.timezone.utc),
             name=config.default_prefix + 'god'
             f' | Running hash {self.git.short_hash()}')
 
