@@ -20,7 +20,7 @@ from permissions import permission_check, room_check
 class AutoPin(Base, commands.Cog):
     def __init__(self, bot):
         super().__init__()
-        self.warning_time = datetime.datetime.utcnow() - datetime.timedelta(
+        self.warning_time = datetime.datetime.now(datetime.timezone.utc) - datetime.timedelta(
             minutes=self.config.autopin_warning_cooldown
         )
         self.bot = bot
@@ -213,7 +213,7 @@ class AutoPin(Base, commands.Cog):
                 # prevent spamming max_pins_error message in channel
                 pin_count = await channel.pins()
                 if len(pin_count) == 50:
-                    now = datetime.datetime.utcnow()
+                    now = datetime.datetime.now(datetime.timezone.utc)
                     cooldown = datetime.timedelta(minutes=self.config.autopin_warning_cooldown)
                     if self.warning_time + cooldown < now:
                         await channel.send(
