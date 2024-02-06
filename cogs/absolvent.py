@@ -92,6 +92,7 @@ class Absolvent(Base, commands.Cog):
             return
 
         # CHECK OWNERSHIP, TYPE AND YEAR OF THE QUALIFICATION WORK / THESIS
+        original_msg = await self.append_response(inter, '', Messages.absolvent_status_thesis)
 
         thesis_url = f"http://hdl.handle.net/11012/{thesis_web_id}?locale-attribute=cs"
 
@@ -99,44 +100,29 @@ class Absolvent(Base, commands.Cog):
         result_thesis = requests.get(thesis_url)
         # parse it using lxml
         xDoc_thesis = etree.fromstring(result_thesis.text, htmlparser)
-        not_found = "".join(
-            xDoc_thesis.xpath('//*[@id="main-container"]//h2/text()')
+        not_found = "".join(xDoc_thesis.xpath('/html/body/p[4]/text()'))
+        breadcrumb_xpath = (
+            "/html/body/ds-app/ds-themed-root/ds-root/div/div/main"
+            "/ds-themed-breadcrumbs/ds-breadcrumbs/nav/ol"
+            "/li[{}]/div//a[.='{}']/text()"
         )
         master_thesis = "".join(
-            xDoc_thesis.xpath(
-               "/html/body/div[1]/div/div/div/ul[contains(@class,'breadcrumb')]"
-               "/li[3]/a[.='diplomové práce']/text()"
-            )
+            xDoc_thesis.xpath(breadcrumb_xpath.format(3, 'diplomové práce'))
         )
         bachelor_thesis = "".join(
-            xDoc_thesis.xpath(
-               "/html/body/div[1]/div/div/div/ul[contains(@class,'breadcrumb')]"
-               "/li[3]/a[.='bakalářské práce']/text()"
-            )
+            xDoc_thesis.xpath(breadcrumb_xpath.format(3, 'bakalářské práce'))
         )
         thesis_author_without_degree_surname_first = "".join(
-            xDoc_thesis.xpath(
-                '//*[@id="aspect_artifactbrowser_ItemViewer_div_item-view"]'
-                '/div/div[2]/div[1]/div[./h5/b="Autor"]/div/a/text()'
-            )
-        )
+            xDoc_thesis.xpath('//div[./h5/.="Authors"]//div/a/text()')
+        ).strip()
         habilitation_date = "".join(
-            xDoc_thesis.xpath(
-                '//*[@id="aspect_artifactbrowser_ItemViewer_div_item-view"]'
-                '/div/div[2]/div[2]/div[./h5="Termín obhajoby"]/span/text()'
-            )
+            xDoc_thesis.xpath('//div[./h5/.="Date of acceptance"]//div/span/text()')
         )
         result = "".join(
-            xDoc_thesis.xpath(
-                '//*[@id="aspect_artifactbrowser_ItemViewer_div_item-view"]'
-                '/div/div[2]/div[2]/div[./h5="Výsledek obhajoby"]/span/text()'
-            )
+            xDoc_thesis.xpath('//div[./h5/.="Result of defence"]//div/span/text()')
         )
         faculty = "".join(
-            xDoc_thesis.xpath(
-               "/html/body/div[1]/div/div/div/ul[contains(@class,'breadcrumb')]/"
-               "li[4]/a[.='Fakulta informačních technologií']/text()"
-            )
+            xDoc_thesis.xpath(breadcrumb_xpath.format(4, 'Fakulta informačních technologií'))
         )
 
         if "Page cannot be found" in not_found:
@@ -160,6 +146,7 @@ class Absolvent(Base, commands.Cog):
             return
 
         # DIPLOMA VALIDITY CHECK
+        original_msg = await self.append_response(inter, original_msg, Messages.absolvent_status_diploma)
 
         diplom_url1 = "https://www.vut.cz/overeni-diplomu"
         diplom_url2 = "https://www.vut.cz/overeni-diplomu?aid_redir=1"
@@ -200,6 +187,9 @@ class Absolvent(Base, commands.Cog):
             await inter.edit_original_response(Messages.absolvent_diploma_error)
             return
 
+        # Add according roles
+        original_msg = await self.append_response(inter, original_msg, Messages.absolvent_status_roles)
+
         guild = self.bot.get_guild(self.config.guild_id)
         role = None
         if degree == "Bc.":
@@ -212,7 +202,13 @@ class Absolvent(Base, commands.Cog):
                 if "Dropout" in drop_role.name:
                     await member.remove_roles(drop_role, reason="Diploma verification")
             await member.add_roles(role)
-            await inter.edit_original_response(Messages.absolvent_success)
+            await self.append_response(inter, original_msg, Messages.absolvent_success)
+
+    async def append_response(self, inter: disnake.ApplicationCommandInteraction, old: str, new: str) -> str:
+        """Append new string to the original message and send"""
+        msg = f"{old}\n{new}"
+        await inter.edit_original_response(msg)
+        return msg
 
     @diplom.error
     async def diplom_error(self, inter: disnake.ApplicationCommandInteraction, error):
