@@ -419,6 +419,7 @@ Containing timeout commands and manipulating with timeout.\
 **Commands:**
 
     - /timeout user
+    - /timeout get_user
     - /timeout remove
     - /timeout list
     - /selftimeout
