@@ -25,7 +25,8 @@ class EmbedView(BaseView):
         end_arrow: bool = True,
         page_source: LeaderboardPageSource = None,
         timeout: int = 300,
-        page: int = 1
+        page: int = 1,
+        show_page: bool = False,
     ):
         """Embed pagination view
 
@@ -38,6 +39,7 @@ class EmbedView(BaseView):
         param LeaderboardPageSource page_source: Use for long leaderboards, embeds should contain one embed
         param int timeout: Seconds until disabling interaction, use None for always enabled
         param int page: Starting page
+        param bool show_page: Show page number at the bottom of embed, e.g.: 2/4
         """
         self.page = page
         self.author = author
@@ -54,6 +56,8 @@ class EmbedView(BaseView):
         super().__init__(timeout=timeout)
         if self.max_page <= 1:
             return
+        if show_page:
+            self.add_page_numbers()
         self.add_item(
             disnake.ui.Button(
                 emoji="⏪",
@@ -121,6 +125,11 @@ class EmbedView(BaseView):
             # we are trying to add new button to already filled row
             raise ViewRowFull
         super().add_item(item)
+
+    def add_page_numbers(self):
+        """Set footers with page numbers for each embed in list"""
+        for page, embed in enumerate(self.embeds):
+            utils.add_author_footer(embed, self.author, additional_text=[f"Page {page+1}/{self.max_page}"])
 
     async def interaction_check(self, interaction: disnake.MessageInteraction) -> Optional[bool]:
         if interaction.data.custom_id == "embed:lock":
