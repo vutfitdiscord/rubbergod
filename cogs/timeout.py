@@ -1,6 +1,7 @@
 """
 Cog containing timeout commands and manipulating with timeout.
 """
+import math
 from datetime import datetime, time, timedelta, timezone
 
 import disnake
@@ -302,6 +303,16 @@ class Timeout(Base, commands.Cog):
             )
 
     @commands.Cog.listener()
+    async def on_automod_action_execution(self, execution: disnake.AutoModActionExecution):
+        """Add timeout to user if it was added by automod"""
+        if isinstance(execution.action, disnake.AutoModTimeoutAction):
+            rule = await execution.guild.fetch_automod_rule(execution.rule_id)
+            length = timedelta(seconds=execution.action.duration)
+            now = datetime.now(timezone.utc)
+            TimeoutDB.add_timeout(execution.user_id, 1, now, now + length, rule.name, execution.guild.id)
+            # automod actions are sent to submod_helper_room automatically
+
+    @commands.Cog.listener()
     async def on_audit_log_entry_create(self, entry: disnake.AuditLogEntry):
         """Remove timeout from user if it was removed manually. Send message to submod_helper_room"""
         if entry.action == disnake.AuditLogAction.member_update:
@@ -313,12 +324,44 @@ class Timeout(Base, commands.Cog):
                 and after_timeout is None
                 and entry.user.id != self.bot.user.id
             ):
+                # remove timeout manually
                 TimeoutDB.remove_timeout(entry.target.id)
-                embed = self.create_embed(entry.user, "Timeout remove")
+                embed = features_timeout.create_embed(entry.user, "Timeout remove")
                 embed.add_field(
                     name=entry.target.display_name,
                     value=Messages.timeout_manual_remove(member=entry.target.mention),
                     inline=False,
+                )
+
+                await self.submod_helper_room.send(embed=embed)
+
+            elif (
+                entry.user.current_timeout is None
+                and after_timeout is not None
+                and entry.user.id != self.bot.user.id
+            ):
+                # add timeout manually
+                length = entry.changes.after.timeout - entry.created_at
+                length = timedelta(seconds=math.ceil(length.total_seconds()))   # round up to seconds
+                reason = entry.reason or Messages.timeout_manual_timeout
+                TimeoutDB.add_timeout(
+                    entry.target.id,
+                    entry.user.id,
+                    entry.created_at,
+                    entry.created_at + length,
+                    reason,
+                    entry.guild.id,
+                )
+                embed = features_timeout.create_embed(entry.user, "Timeout")
+                features_timeout.add_field_timeout(
+                    embed=embed,
+                    title=entry.target.display_name,
+                    member=entry.target,
+                    author=entry.user,
+                    starttime=entry.created_at,
+                    endtime=entry.created_at + length,
+                    length=length,
+                    reason=reason,
                 )
 
                 await self.submod_helper_room.send(embed=embed)
