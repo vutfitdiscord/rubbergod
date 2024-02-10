@@ -1,19 +1,18 @@
 """
 Cog containing timeout commands and manipulating with timeout.
 """
-
-import shlex
-from datetime import datetime, time, timedelta
-from typing import List, Union
+from datetime import datetime, time, timedelta, timezone
 
 import disnake
 from disnake.ext import commands, tasks
 
+import features.timeout as features_timeout
 import utils
+from buttons.embed import EmbedView
 from cogs.base import Base
 from config import cooldowns
 from config.messages import Messages
-from database.timeout import TimeoutDB
+from database.timeout import TimeoutDB, TimeoutUserDB
 from permissions import permission_check
 
 timestamps = [
@@ -35,7 +34,7 @@ timestamps = [
 ]
 
 
-async def autocomplete_times(inter, input: str) -> List[str]:
+async def autocomplete_times(inter, input: str) -> list[str]:
     input = input.lower()
     return [endtime for endtime in timestamps if input in endtime.lower()]
 
@@ -46,96 +45,6 @@ class Timeout(Base, commands.Cog):
         self.bot = bot
         self.tasks = [self.refresh_timeout.start()]
 
-    def create_embed(self, author: disnake.User, title: str) -> disnake.Embed:
-        """Embed template for Timeout"""
-        embed = disnake.Embed(title=title, color=disnake.Color.yellow())
-        utils.add_author_footer(embed, author)
-        return embed
-
-    async def timeout_embed_listing(
-        self,
-        users: List[TimeoutDB],
-        title: str,
-        room: disnake.TextChannel,
-        author: disnake.User,
-    ) -> None:
-        """Embed for sending timeout updates on users"""
-        embeds = []
-        # max 25 fields per embed
-        users_lists = utils.split_to_parts(users, 25)
-        for users_list in users_lists:
-            embed = self.create_embed(author, title)
-            for timeout in users_list:
-                embed.add_field(
-                    name=Messages.timeout_title(
-                        member=await self.bot.get_or_fetch_user(timeout.user_id),
-                        endtime=timeout.end.strftime("%d.%m.%Y %H:%M"),
-                        length=f"{timeout.length.days}d, "
-                        f"{timeout.length.seconds // 3600}h, "
-                        f"{(timeout.length.seconds // 60) % 60}m",
-                    ),
-                    value=Messages.timeout_field_text(
-                        mod=await self.bot.get_or_fetch_user(timeout.mod_id),
-                        starttime=timeout.start.strftime("%d.%m.%Y %H:%M"),
-                        length=utils.get_discord_timestamp(timeout.end, "Relative Time"),
-                        reason=timeout.reason,
-                    ),
-                    inline=False,
-                )
-            embeds.append(embed)
-        await room.send(embeds=embeds)
-
-    async def timeout_perms(
-        self,
-        inter: disnake.ApplicationCommandInteraction,
-        member: disnake.Member,
-        starttime: datetime,
-        endtime: datetime,
-        length: timedelta,
-        reason: str,
-        isself: bool = False,
-    ) -> bool:
-        """Set timeout for member and update in db. Return True if successful, False otherwise."""
-        try:
-            if length == 0 or endtime is None:
-                await member.timeout(until=None, reason=reason)
-                TimeoutDB.remove_timeout(member.id)
-            elif length.days > 28:
-                await member.timeout(until=datetime.now() + timedelta(days=28), reason=reason)
-                TimeoutDB.add_timeout(member.id, inter.author.id, starttime, endtime, reason, isself)
-            else:
-                await member.timeout(until=endtime, reason=reason)
-                TimeoutDB.add_timeout(member.id, inter.author.id, starttime, endtime, reason, isself)
-            return True
-        except disnake.Forbidden:
-            return False
-
-    async def parse_members(
-        self, inter: disnake.ApplicationCommandInteraction, members_string: str
-    ) -> Union[List[disnake.Member], None]:
-        """Parse members from string and return list of members"""
-
-        member_string = shlex.split(members_string)
-        converter = commands.MemberConverter()
-        parsed_members = []
-        not_found_members = []
-
-        for member in member_string:
-            try:
-                parsed_members.append(await converter.convert(inter, member))
-            except commands.MemberNotFound:
-                not_found_members.append(member)
-
-        # print users that can't be found
-        if not_found_members:
-            await inter.send(
-                Messages.timeout_member_not_found(
-                    author=inter.author.mention, members=", ".join(not_found_members)
-                ),
-            )
-
-        return parsed_members or None
-
     @commands.check(permission_check.submod_plus)
     @commands.slash_command(name="timeout", guild_ids=[Base.config.guild_id])
     async def _timeout(self, inter: disnake.ApplicationCommandInteraction): ...
@@ -144,58 +53,53 @@ class Timeout(Base, commands.Cog):
     async def timeout_user(
         self,
         inter: disnake.ApplicationCommandInteraction,
-        user: str = commands.Param(max_length=1000, description=Messages.timeout_user_brief),
+        user: str = commands.Param(max_length=1000, description=Messages.timeout_user_param),
         endtime: str = commands.Param(
             autocomplete=autocomplete_times,
             max_length=50,
             description=Messages.time_format,
         ),
-        reason: str = commands.Param(max_length=256, description=Messages.timeout_reason),
+        reason: str = commands.Param(max_length=256, description=Messages.timeout_reason_param),
     ):
         """Set timeout for user(s)"""
-        embed = self.create_embed(inter.author, "Timeout")
-        parsed_members = await self.parse_members(inter, user)
-        cantBeTimeout = []
-        timeoutMembers = []
-
+        parsed_members = await features_timeout.parse_members(inter, user)
         if parsed_members is None:
             return
 
-        endtime = utils.parse_time(endtime, Messages.time_format)
-
+        endtime: datetime = utils.parse_time(endtime, Messages.time_format)
         await inter.response.defer()
 
-        # convert to local time and remove timezone info
-        endtime = endtime.replace(tzinfo=utils.get_local_zone()).replace(tzinfo=None)
-        starttime = inter.created_at.astimezone(tz=utils.get_local_zone()).replace(tzinfo=None)
-        length = endtime - starttime
+        embed = features_timeout.create_embed(inter.author, "Timeout")
+        cantBeTimeout = []
+        timeoutMembers = []
+
+        # convert to local time
+        endtime_local = endtime.astimezone(tz=utils.get_local_zone())
+        starttime_local = inter.created_at.astimezone(tz=utils.get_local_zone())
+        length = endtime - inter.created_at
 
         for member in parsed_members:
-            isSuccess = await self.timeout_perms(inter, member, starttime, endtime, length, reason)
+            isSuccess = await features_timeout.timeout_perms(
+                inter, member, inter.created_at, endtime, length, reason
+            )
             if isSuccess:
                 timeoutMembers.append(member)
             else:
                 cantBeTimeout.append(member)
 
-            embed.add_field(
-                name=Messages.timeout_title(
-                    member=member,
-                    endtime=endtime.strftime("%d.%m.%Y %H:%M"),
-                    length=f"{length.days}d, "
-                    f"{length.seconds // 3600}h, "
-                    f"{(length.seconds // 60) % 60}m",
-                ),
-                value=Messages.timeout_field_text(
-                    mod=inter.author,
-                    starttime=starttime.strftime("%d.%m.%Y %H:%M"),
-                    length=utils.get_discord_timestamp(endtime, "Relative Time"),
-                    reason=reason,
-                ),
-                inline=False,
+            features_timeout.add_field_timeout(
+                embed=embed,
+                title=member.display_name,
+                member=member,
+                author=inter.author,
+                starttime=starttime_local,
+                endtime=endtime_local,
+                length=length,
+                reason=reason
             )
 
-        # print users with timeout if any exists
         if timeoutMembers:
+            # print users with timeout if any exists
             message = await inter.original_message()
 
             await inter.send("".join(f"{member.mention}" for member in parsed_members), embed=embed)
@@ -205,8 +109,8 @@ class Timeout(Base, commands.Cog):
                 embed=embed
             )
 
-        # print users that can't be timed out
         if cantBeTimeout:
+            # print users that can't be timed out
             await inter.send(
                 "\n".join(
                     Messages.timeout_permission(user_list=user.name)
@@ -219,11 +123,12 @@ class Timeout(Base, commands.Cog):
     async def remove_timeout(
         self,
         inter: disnake.ApplicationCommandInteraction,
-        user: str = commands.Param(max_length=1000, description=Messages.timeout_user_brief),
+        user: str = commands.Param(max_length=1000, description=Messages.timeout_user_param),
+        remove_logs: bool = commands.Param(description=Messages.timeout_remove_logs_param),
     ):
         """Removes timeout from user(s)"""
-        embed = self.create_embed(inter.author, "Timeout remove")
-        parsed_members = await self.parse_members(inter, user)
+        embed = features_timeout.create_embed(inter.author, "Timeout remove")
+        parsed_members = await features_timeout.parse_members(inter, user)
 
         if parsed_members is None:
             return
@@ -231,8 +136,14 @@ class Timeout(Base, commands.Cog):
         await inter.response.defer()
 
         for member in parsed_members:
-            await self.timeout_perms(inter, member, None, None, None, "Předčasné odebrání")
-            embed.add_field(name=member, value="Předčasně odebráno", inline=False)
+            await features_timeout.timeout_perms(
+                inter, member, None, None, None, "Předčasně odebráno", remove_logs=remove_logs
+            )
+            embed.add_field(
+                name=member.display_name,
+                value=Messages.timeout_remove_reason(member=member.mention),
+                inline=False
+            )
 
         await self.submod_helper_room.send(embed=embed)
         await inter.send(embed=embed)
@@ -245,14 +156,73 @@ class Timeout(Base, commands.Cog):
     ):
         """List all timed out users"""
         await inter.response.defer()
+        users = TimeoutUserDB.get_active_timeouts(selftimeout)
         await self.update_timeout()
 
-        users = TimeoutDB.get_timeout_users_filter_self(selftimeout)
         if not users:
             await inter.send(Messages.timeout_list_none)
             return
 
-        await self.timeout_embed_listing(users, "Timeout list", inter, inter.author)
+        await features_timeout.timeout_embed_listing(self.bot, users, "Timeout list", inter, inter.author)
+
+    @_timeout.sub_command(name="get_user", description=Messages.timeout_get_user_brief)
+    async def get_user(
+        self,
+        inter: disnake.ApplicationCommandInteraction,
+        user: disnake.Member,
+    ):
+        """List history of timeouts for user"""
+        await inter.response.defer()
+        timeout_user = TimeoutUserDB.get_user(user.id)
+
+        if not timeout_user:
+            await inter.send(Messages.timeout_get_user_no_timeouts)
+            return
+
+        embeds = []
+
+        main_embed = features_timeout.create_embed(
+            inter.author,
+            f"`@{user.display_name}` timeouts",
+            user.mention,
+        )
+        main_embed.add_field(name="Timeouts count", value=f"{len(timeout_user.timeouts)}", inline=False)
+        recent_timeout = timeout_user.get_last_timeout()
+        starttime_local, endtime_local = recent_timeout.start_end_local
+        features_timeout.add_field_timeout(
+            embed=main_embed,
+            title="Recent timeout",
+            member=user,
+            author=inter.author,
+            starttime=starttime_local,
+            endtime=endtime_local,
+            length=recent_timeout.length,
+            reason=recent_timeout.reason
+        )
+        embeds.append(main_embed)
+
+        embed = features_timeout.create_embed(inter.author, f"`@{user.display_name}` timeouts")
+        for index, timeout in enumerate(timeout_user.timeouts[::-1]):           # from newest to oldest
+            if (index % 5) == 0 and index != 0:
+                embeds.append(embed)
+                embed = features_timeout.create_embed(inter.author, f"`@{user.display_name}` timeouts")
+
+            starttime_local, endtime_local = timeout.start_end_local
+            features_timeout.add_field_timeout(
+                embed=embed,
+                title=user.display_name,
+                member=user,
+                author=inter.author,
+                starttime=starttime_local,
+                endtime=endtime_local,
+                length=timeout.length,
+                reason=timeout.reason,
+            )
+        embeds.append(embed)
+
+        view = EmbedView(inter.author, embeds, show_page=True)
+        await inter.send(embed=embeds[0], view=view)
+        view.message = await inter.original_message()
 
     @cooldowns.default_cooldown
     @commands.slash_command(
@@ -273,21 +243,20 @@ class Timeout(Base, commands.Cog):
         Guild_ids is used to prevent users from bypassing timeout
         given by moderator and using selftimeout in DMs.
         """
-
         endtime = utils.parse_time(endtime, Messages.time_format)
         await inter.response.defer()
 
-        starttime = inter.created_at.astimezone(tz=utils.get_local_zone()).replace(tzinfo=None)
-        length = endtime - starttime
+        starttime_local = inter.created_at.astimezone(tz=utils.get_local_zone())
+        length = endtime - inter.created_at
 
-        isSuccess = await self.timeout_perms(
-            inter,
-            inter.user,
-            starttime,
-            endtime,
-            length,
-            Messages.self_timeout_reason,
-            True,
+        isSuccess = await features_timeout.timeout_perms(
+            inter=inter,
+            member=inter.user,
+            starttime=starttime_local,
+            endtime=endtime,
+            length=length,
+            reason=Messages.self_timeout_reason,
+            isself=True,
         )
 
         if not isSuccess:
@@ -298,34 +267,27 @@ class Timeout(Base, commands.Cog):
 
     async def update_timeout(self):
         """update all user's timeout in database and on server"""
-        users = TimeoutDB.get_timeout_users()
+        timeouts = TimeoutUserDB.get_active_timeouts()
         guild = self.bot.get_guild(self.config.guild_id)
 
-        # find member and update timeout
-        for user in users:
-            member = guild.get_member(user.user_id)
+        for timeout in timeouts:
+            # find member and update timeout
+            member = await guild.get_or_fetch_member(timeout.user_id)
 
-            # member left server
             if member is None:
-                if user.end < datetime.now():
-                    TimeoutDB.remove_timeout(user.user_id)
+                # member left server
                 continue
 
-            # someone removed timeout manually
             if member.current_timeout is None:
-                TimeoutDB.remove_timeout(user.user_id)
+                # someone removed timeout manually
+                TimeoutDB.remove_timeout(timeout.user_id)
                 continue
 
-            # get timezone aware datetime object
-            current_timeout = member.current_timeout.astimezone(
-                tz=utils.get_local_zone()
-            )
-            end_timeout = user.end.replace(tzinfo=utils.get_local_zone())
-
-            if (user.end - datetime.now()).days > 28:
-                await member.timeout(duration=timedelta(days=28), reason=user.reason)
-            elif current_timeout < end_timeout:
-                await member.timeout(until=user.end, reason=user.reason)
+            end = timeout.end.astimezone(tz=timezone.utc)
+            if (end - datetime.now(timezone.utc)).days > 28:
+                await member.timeout(duration=timedelta(days=28), reason=timeout.reason)
+            elif member.current_timeout < end:
+                await member.timeout(until=end, reason=timeout.reason)
 
     @tasks.loop(time=time(12, 0, tzinfo=utils.get_local_zone()))
     async def refresh_timeout(self):
@@ -333,10 +295,10 @@ class Timeout(Base, commands.Cog):
         await self.update_timeout()
 
         # send update
-        users = TimeoutDB.get_timeout_users_filter_self(isself=False)
+        users = TimeoutUserDB.get_active_timeouts(isself=False)
         if users:
-            await self.timeout_embed_listing(
-                users, "Timeout Update", self.log_channel, self.bot.user
+            await features_timeout.timeout_embed_listing(
+                self.bot, users, "Timeout update", self.log_channel, self.bot.user
             )
 
     @commands.Cog.listener()
@@ -354,7 +316,9 @@ class Timeout(Base, commands.Cog):
                 TimeoutDB.remove_timeout(entry.target.id)
                 embed = self.create_embed(entry.user, "Timeout remove")
                 embed.add_field(
-                    name=entry.target, value="Předčasně odebráno", inline=False
+                    name=entry.target.display_name,
+                    value=Messages.timeout_manual_remove(member=entry.target.mention),
+                    inline=False,
                 )
 
                 await self.submod_helper_room.send(embed=embed)

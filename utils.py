@@ -428,7 +428,7 @@ def parse_time(time_string: str, time_format: str) -> Optional[datetime]:
     """
     options = ["forever", "never", "nikdy", "none", "0"]
     if time_string.lower() in options:
-        return datetime(9999, 12, 31, 0, 0, 0)
+        return datetime(9999, 12, 31, 0, 0, 0, tzinfo=timezone.utc)
 
     pattern = re.compile(r"(\d+)([yYMwdhms])")
     matches = pattern.findall(time_string)
