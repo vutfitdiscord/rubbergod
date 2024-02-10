@@ -54,6 +54,7 @@ intents.message_content = True
 intents.reactions = True
 intents.presences = True
 intents.moderation = True
+intents.automod_execution = True
 
 command_sync_flags = commands.CommandSyncFlags()
 command_sync_flags.sync_commands_debug = False
