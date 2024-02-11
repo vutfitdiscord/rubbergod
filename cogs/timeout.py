@@ -13,6 +13,7 @@ from buttons.embed import EmbedView
 from cogs.base import Base
 from config import cooldowns
 from config.messages import Messages
+from database.report import ReportDB
 from database.timeout import TimeoutDB, TimeoutUserDB
 from permissions import permission_check
 
@@ -187,7 +188,8 @@ class Timeout(Base, commands.Cog):
             f"`@{user.display_name}` timeouts",
             user.mention,
         )
-        main_embed.add_field(name="Timeouts count", value=f"{len(timeout_user.timeouts)}", inline=False)
+        main_embed.add_field(name="Timeouts count", value=f"{len(timeout_user.timeouts)}", inline=True)
+        main_embed.add_field(name="Reports count", value=ReportDB.get_reports_on_user(user.id), inline=True)
         recent_timeout = timeout_user.get_last_timeout()
         starttime_local, endtime_local = recent_timeout.start_end_local
         features_timeout.add_field_timeout(
