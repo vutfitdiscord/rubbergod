@@ -114,6 +114,10 @@ class ReportDB(database.base):
         report.moderator_id = str(moderator_id)
         session.commit()
 
+    @classmethod
+    def get_reports_on_user(cls, user_id: str) -> int:
+        return session.query(cls).filter_by(target_user_id=str(user_id)).count()
+
 
 class UserDB(database.base):
     __tablename__ = "report_user"
