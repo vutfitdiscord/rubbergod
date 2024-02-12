@@ -1,13 +1,26 @@
+import json
+from functools import cached_property
+from io import BytesIO
+from typing import Optional
+
+import aiohttp
+import disnake
 from disnake import Member
 from disnake.ext.commands import Bot
 
 import utils
 from config.app_config import config
+from database import session
+from database.verification import ValidPersonDB, VerifyStatus
 
 
 class VerifyHelper:
     def __init__(self, bot: Bot) -> None:
         self.bot = bot
+
+    @cached_property
+    def log_channel(self):
+        return self.bot.get_channel(config.log_channel)
 
     async def has_role(self, user, role_name: str) -> bool:
         if isinstance(user, Member):
@@ -16,3 +29,69 @@ class VerifyHelper:
             guild = await self.bot.fetch_guild(config.guild_id)
             member = await guild.fetch_member(user.id)
             return utils.has_role(member, role_name)
+
+    async def get_user_details(self, id: str) -> Optional[dict]:
+        headers = {"Authorization": f"Bearer {config.vut_api_key}"}
+        url = f"https://www.vut.cz/api/person/v1/{id}/pusobeni-osoby"
+        async with aiohttp.ClientSession() as session:
+            async with session.get(url, headers=headers) as res:
+                if res.status != 200:
+                    if res.status in [401, 403]:
+                        raise Exception("Invalid API key")
+                    elif res.status == 429:
+                        raise Exception("Rate limit exceeded")
+                    # Login not found
+                    return None
+                return await res.json()
+
+    async def _parse_relation(self, user: dict) -> Optional[str]:
+        """Parse user relations and return year, programee and faculty for students,
+        `employee` for FIT employees, None for others."""
+        ret = None  # rule out students that are also employees or have multiple studies
+        for relation in user['vztahy']:
+            # student
+            if 'rok_studia' in relation.keys():
+                ret = f"{relation['fakulta']['zkratka']} {relation['obor']['zkratka']} " \
+                      f"{relation['rok_studia']}"
+                # do not return yet if not FIT, check for all relations if student has multiple studies
+                if relation['fakulta']['zkratka'] == "FIT":
+                    return ret
+            elif 'ustav' in relation.keys() and relation['ustav']['fakulta']['zkratka'] == "FIT":
+                # FIT employee, replace only if not student
+                ret = ret or 'employee'
+        if not ret:
+            await self.log_relation_error(user)
+        return ret
+
+    async def save_user_details(self, user: dict) -> ValidPersonDB:
+        """Save user details to database and return the user object."""
+        # search for login in database
+        person = ValidPersonDB.get_user_by_login(user['login'].strip())
+        if person is None:
+            # search for id in database
+            person = ValidPersonDB.get_user_by_login(str(user['id']))
+        if person is None:
+            # user not found in DB, add new user
+            person = ValidPersonDB(
+                login=user.get('login', str(user['id'])),
+                year=await self._parse_relation(user),
+                name=f"{user['jmeno_krestni']} {user['prijmeni']}",
+                mail=user['emaily'][0] if user.get('emaily', []) else "",
+                status=VerifyStatus.Unverified.value
+            )
+            session.add(person)
+            session.commit()
+        return person
+
+    async def check_api(self, id: str) -> Optional[dict]:
+        user = await self.get_user_details(id)
+        if user is None:
+            return None
+        person = await self.save_user_details(user)
+        return person
+
+    async def log_relation_error(self, user: dict) -> None:
+        name = user['login'] or user['id']
+        with BytesIO(bytes(json.dumps(user, indent=2, ensure_ascii=False), 'utf-8')) as file:
+            file = disnake.File(fp=file, filename=f"{name}.json")
+        await self.log_channel.send(f"Error parsing user relations for `{name}`", file=file)

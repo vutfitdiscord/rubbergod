@@ -235,7 +235,7 @@ class Messages(metaclass=Formatable):
 
     # VERIFY
     verify_brief = "Ověření studenta pro přístup na server."
-    verify_login_parameter = "Přihlašovací FIT login (nebo MUNI UČO). FIT login ve formátu `xlogin00`"
+    verify_login_parameter = "Přihlašovací FIT login (`xlogin00`), osobní 6 místné VUT číslo nebo MUNI UČO."
     verify_already_verified = "{user} Už jsi byl verifikován " \
                               "({admin} pls)."
     verify_send_dumbshit = "{user} Tvůj login. {emote}"
@@ -261,7 +261,6 @@ class Messages(metaclass=Formatable):
 
     verify_verify_not_found = "{user} Login nenalezen nebo jsi neprošel krokem `/verify`. Přečti si prosím <#591386755547136020>. ({admin} pls)."
     verify_verify_wrong_code = "Špatný kód."
-    verify_unknown_login = "{user} Tvůj login nebyl nalezen v databázi. ({admin} pls)"
     verify_step_done = "{user} Tímto krokem jsi už prošel. ({admin} pls)"
     verify_invalid_channel = "Tento příkaz je možné spustit pouze v DMs nebo na VUT FIT serveru."
     invalid_login = "{user} Neplatný login. Přečti si prosím <#591386755547136020>. ({admin} pls)"

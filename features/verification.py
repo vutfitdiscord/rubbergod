@@ -91,22 +91,10 @@ class Verification(BaseFeature):
                 await self.send_xlogin_info(inter)
                 return False
 
-            if login[0] == "x":
+            user = await self.helper.check_api(login)
+            if user is not None:
                 # VUT
-                # Check if the login we got is in the database
-                user = ValidPersonDB.get_user_by_login(login)
-
-                if user is None:
-                    msg = Messages.verify_unknown_login(
-                        user=inter.user.id,
-                        admin=config.admin_ids[0],
-                    )
-                    await inter.edit_original_response(content=msg)
-                    await inter.followup.send(content=msg)
-                    await self.log_verify_fail(
-                        inter, "getcode (xlogin) - Unknown login", str({"login": login})
-                    )
-                elif user.status != VerifyStatus.Unverified.value:
+                if user.status != VerifyStatus.Unverified.value:
                     if user.status == VerifyStatus.InProcess.value:
                         await self.gen_code_and_send_mail(inter, user, "stud.fit.vutbr.cz", dry_run=True)
                         return True
@@ -207,6 +195,8 @@ class Verification(BaseFeature):
                 return "2MIT+" if year_value >= 2 else f"{year_value}MIT"
             elif year_parts[1] in ["DVI4", "DRH", "DITP", "DITP-EN"]:
                 return "Doktorand"
+        elif year_parts[0] == "employee":
+            return "Vyucujici/Zamestnanec FIT"
         elif year_parts[0] in [
             "FA", "FAST", "FAVU", "FCH", "FEKT", "FP", "FSI", "USI"
         ]:  # Other VUT faculties
