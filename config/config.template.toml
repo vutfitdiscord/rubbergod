@@ -15,6 +15,7 @@ role = ''
 role_id = 591349196267716608
 host_id = 603673568051462144
 db_pull_merlin_key_path = '/root/.ssh/etc_passwd'
+vut_api_key = ''
 
 [email]
 name = 'toasterrubbergod@gmail.com'
