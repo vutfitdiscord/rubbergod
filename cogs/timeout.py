@@ -191,12 +191,13 @@ class Timeout(Base, commands.Cog):
         main_embed.add_field(name="Timeouts count", value=f"{len(timeout_user.timeouts)}", inline=True)
         main_embed.add_field(name="Reports count", value=ReportDB.get_reports_on_user(user.id), inline=True)
         recent_timeout = timeout_user.get_last_timeout()
+        mod = await self.bot.get_or_fetch_user(recent_timeout.mod_id)
         starttime_local, endtime_local = recent_timeout.start_end_local
         features_timeout.add_field_timeout(
             embed=main_embed,
             title="Recent timeout",
             member=user,
-            author=inter.author,
+            author=mod,
             starttime=starttime_local,
             endtime=endtime_local,
             length=recent_timeout.length,
@@ -210,12 +211,13 @@ class Timeout(Base, commands.Cog):
                 embeds.append(embed)
                 embed = features_timeout.create_embed(inter.author, f"`@{user.display_name}` timeouts")
 
+            mod = await self.bot.get_or_fetch_user(recent_timeout.mod_id)
             starttime_local, endtime_local = timeout.start_end_local
             features_timeout.add_field_timeout(
                 embed=embed,
                 title=user.display_name,
                 member=user,
-                author=inter.author,
+                author=mod,
                 starttime=starttime_local,
                 endtime=endtime_local,
                 length=timeout.length,
@@ -271,7 +273,7 @@ class Timeout(Base, commands.Cog):
     async def update_timeout(self):
         """update all user's timeout in database and on server"""
         timeouts = TimeoutUserDB.get_active_timeouts()
-        guild = self.bot.get_guild(self.config.guild_id)
+        guild = self.bot.get_guild(Base.config.guild_id)
 
         for timeout in timeouts:
             # find member and update timeout
