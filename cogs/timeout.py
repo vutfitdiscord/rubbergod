@@ -176,19 +176,16 @@ class Timeout(Base, commands.Cog):
         """List history of timeouts for user"""
         await inter.response.defer()
         timeout_user = TimeoutUserDB.get_user(user.id)
-
-        if not timeout_user:
-            await inter.send(Messages.timeout_get_user_no_timeouts)
-            return
+        timeouts_count = len(timeout_user.timeouts) if timeout_user else 0
 
         embeds = []
-
         main_embed = features_timeout.create_embed(
             inter.author,
             f"`@{user.display_name}` timeouts",
             user.mention,
         )
-        main_embed.add_field(name="Timeouts count", value=f"{len(timeout_user.timeouts)}", inline=True)
+
+        main_embed.add_field(name="Timeouts count", value=timeouts_count, inline=True)
         main_embed.add_field(name="Reports count", value=ReportDB.get_reports_on_user(user.id), inline=True)
         unverifies, warnings = await features_timeout.get_user_from_grillbot(self, inter.guild.id, user.id)
         main_embed.add_field(
@@ -202,40 +199,43 @@ class Timeout(Base, commands.Cog):
             inline=True
         )
 
-        recent_timeout = timeout_user.get_last_timeout()
-        mod = await self.bot.get_or_fetch_user(recent_timeout.mod_id)
-        starttime_local, endtime_local = recent_timeout.start_end_local
-        features_timeout.add_field_timeout(
-            embed=main_embed,
-            title="Recent timeout",
-            member=user,
-            author=mod,
-            starttime=starttime_local,
-            endtime=endtime_local,
-            length=recent_timeout.length,
-            reason=recent_timeout.reason
-        )
-        embeds.append(main_embed)
-
-        embed = features_timeout.create_embed(inter.author, f"`@{user.display_name}` timeouts")
-        for index, timeout in enumerate(timeout_user.timeouts[::-1]):           # from newest to oldest
-            if (index % 5) == 0 and index != 0:
-                embeds.append(embed)
-                embed = features_timeout.create_embed(inter.author, f"`@{user.display_name}` timeouts")
-
+        if timeout_user:
+            recent_timeout = timeout_user.get_last_timeout()
             mod = await self.bot.get_or_fetch_user(recent_timeout.mod_id)
-            starttime_local, endtime_local = timeout.start_end_local
+            starttime_local, endtime_local = recent_timeout.start_end_local
             features_timeout.add_field_timeout(
-                embed=embed,
-                title=user.display_name,
+                embed=main_embed,
+                title="Recent timeout",
                 member=user,
                 author=mod,
                 starttime=starttime_local,
                 endtime=endtime_local,
-                length=timeout.length,
-                reason=timeout.reason,
+                length=recent_timeout.length,
+                reason=recent_timeout.reason
             )
-        embeds.append(embed)
+            embeds.append(main_embed)
+
+            embed = features_timeout.create_embed(inter.author, f"`@{user.display_name}` timeouts")
+            for index, timeout in enumerate(timeout_user.timeouts[::-1]):           # from newest to oldest
+                if (index % 5) == 0 and index != 0:
+                    embeds.append(embed)
+                    embed = features_timeout.create_embed(inter.author, f"`@{user.display_name}` timeouts")
+
+                mod = await self.bot.get_or_fetch_user(recent_timeout.mod_id)
+                starttime_local, endtime_local = timeout.start_end_local
+                features_timeout.add_field_timeout(
+                    embed=embed,
+                    title=user.display_name,
+                    member=user,
+                    author=mod,
+                    starttime=starttime_local,
+                    endtime=endtime_local,
+                    length=timeout.length,
+                    reason=timeout.reason,
+                )
+            embeds.append(embed)
+        else:
+            embeds.append(main_embed)
 
         view = EmbedView(inter.author, embeds, show_page=True)
         await inter.send(embed=embeds[0], view=view)
