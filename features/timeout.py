@@ -60,7 +60,7 @@ async def timeout_embed_listing(
     for users_list in users_lists:
         embed = create_embed(author, title)
         for timeout in users_list:
-            starttime_local, endtime_local = timeout.local_time
+            starttime_local, endtime_local = timeout.start_end_local
             member = await bot.get_or_fetch_user(timeout.user_id)
             add_field_timeout(
                 embed=embed,
