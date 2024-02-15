@@ -100,6 +100,7 @@ async def on_ready():
     if bot_room is not None:
         await bot_room.send(Messages.on_ready_message)
 
+    await bot.application_info()
     await presence.set_presence()
     print("Ready")
 

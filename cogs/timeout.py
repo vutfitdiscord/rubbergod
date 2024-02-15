@@ -190,6 +190,18 @@ class Timeout(Base, commands.Cog):
         )
         main_embed.add_field(name="Timeouts count", value=f"{len(timeout_user.timeouts)}", inline=True)
         main_embed.add_field(name="Reports count", value=ReportDB.get_reports_on_user(user.id), inline=True)
+        unverifies, warnings = await features_timeout.get_user_from_grillbot(self, inter.guild.id, user.id)
+        main_embed.add_field(
+            name="Unverifies count",
+            value=f"[{unverifies}](https://private.grillbot.eu/admin/unverify/logs)",
+            inline=True
+        )
+        main_embed.add_field(
+            name="Warnings count",
+            value=f"[{warnings}](https://private.grillbot.eu/admin/userMeasures)",
+            inline=True
+        )
+
         recent_timeout = timeout_user.get_last_timeout()
         mod = await self.bot.get_or_fetch_user(recent_timeout.mod_id)
         starttime_local, endtime_local = recent_timeout.start_end_local
