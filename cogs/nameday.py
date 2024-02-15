@@ -19,15 +19,8 @@ class Nameday(Base, commands.Cog):
     def __init__(self, bot):
         super().__init__()
         self.bot = bot
-        self._owner_id = bot.owner_id
         self.check = room_check.RoomCheck(bot)
         self.tasks = [self.send_names.start()]
-
-    async def owner_id(self):
-        if not self._owner_id:
-            app_info = await self.bot.application_info()
-            self._owner_id = app_info.owner.id
-        return str(self._owner_id)
 
     async def _name_day_cz(self):
         async with aiohttp.ClientSession(timeout=aiohttp.ClientTimeout(total=10)) as session:
@@ -56,7 +49,7 @@ class Nameday(Base, commands.Cog):
                 return "Website unreachable"
 
     async def _birthday(self):
-        headers = {"ApiKey": self.config.grillbot_api_key, "Author": await self.owner_id()}
+        headers = {"ApiKey": self.config.grillbot_api_key, "Author": str(self.bot.owner_id)}
         async with aiohttp.ClientSession(timeout=aiohttp.ClientTimeout(total=10), headers=headers) as session:
             try:
                 url = f"{self.config.grillbot_api_url}/user/birthday/today"
