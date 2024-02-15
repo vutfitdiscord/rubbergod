@@ -110,7 +110,11 @@ class Verify(Base, commands.Cog):
             raise commands.errors.MemberNotFound("Member not found")
         response_message = Messages.verify_verify_success(user=member.id)
         await inter.edit_original_response(response_message)
-        await member.send(response_message)
+
+        try:
+            await member.send(response_message)
+        except disnake.Forbidden:
+            await inter.send(Messages.blocked_bot(user=member.id))
 
 
 def setup(bot):
