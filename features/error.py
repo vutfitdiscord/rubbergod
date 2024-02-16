@@ -122,7 +122,7 @@ class ErrorLogger:
         )
         if args:
             embed.add_field(name="Args", value=args)
-        embed.add_field(name="Autor", value=str(author))
+        embed.add_field(name="Autor", value=author.mention)
         if guild and getattr(guild, "id", None) != config.guild_id:
             embed.add_field(name="Guild", value=getattr(guild, "name", guild))
         embed.add_field(name="Link", value=jump_url, inline=False)
