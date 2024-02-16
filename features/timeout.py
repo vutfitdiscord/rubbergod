@@ -150,4 +150,4 @@ async def get_user_from_grillbot(self, guild_id: str, user_id: str) -> tuple[int
                 user = await resp.json()
                 return user.get("unverifyCount", "Missing"), user.get("warningCount", "Missing")
         except (asyncio.exceptions.TimeoutError, aiohttp.client_exceptions.ClientConnectorError) as e:
-            return ApiError(e)
+            raise ApiError(e)
