@@ -61,12 +61,12 @@ class Review(Base, commands.Cog):
         return True
 
     @cooldowns.short_cooldown
-    @commands.slash_command(name="review")
+    @commands.slash_command(name='review')
     async def reviews(self, inter: disnake.ApplicationCommandInteraction):
         """Group of commands for reviews."""
         pass
 
-    @reviews.sub_command(name="get", description=Messages.review_get_brief)
+    @reviews.sub_command(name='get', description=Messages.review_get_brief)
     async def get(
         self,
         inter: disnake.ApplicationCommandInteraction,
@@ -82,7 +82,7 @@ class Review(Base, commands.Cog):
         await inter.edit_original_response(embed=embeds[0], view=view)
         view.message = await inter.original_message()
 
-    @reviews.sub_command(name="add", description=Messages.review_add_brief)
+    @reviews.sub_command(name='add', description=Messages.review_add_brief)
     async def add(
         self,
         inter: disnake.ApplicationCommandInteraction,
@@ -103,7 +103,7 @@ class Review(Base, commands.Cog):
         else:
             await inter.send(Messages.review_added)
 
-    @reviews.sub_command(name="remove", description=Messages.review_remove_brief)
+    @reviews.sub_command(name='remove', description=Messages.review_remove_brief)
     async def remove(
         self,
         inter: disnake.ApplicationCommandInteraction,
@@ -137,36 +137,36 @@ class Review(Base, commands.Cog):
                 return
         await inter.send(Messages.review_not_found)
 
-    @reviews.sub_command(name="list", description=Messages.review_list_brief)
+    @reviews.sub_command(name='list', description=Messages.review_list_brief)
     async def author_list(self, inter: disnake.ApplicationCommandInteraction):
         await inter.response.defer()
         embed = self.manager.authored_reviews(inter.author.id)
         await inter.send(embed=embed)
 
     @cooldowns.short_cooldown
-    @commands.slash_command(name="subject")
+    @commands.slash_command(name='subject')
     @commands.check(permission_check.is_bot_admin)
     async def subject(self, inter: disnake.ApplicationCommandInteraction):
         """Group of commands for managing subjects in DB"""
         await inter.response.defer()
 
-    @subject.sub_command(name="update", description=Messages.subject_update_biref)
+    @subject.sub_command(name='update', description=Messages.subject_update_biref)
     async def update(
         self,
         inter: disnake.ApplicationCommandInteraction,
         overwrite: bool = commands.Param(description=Messages.subject_update_overwrite_brief, default=False),
     ):
         """Updates subjects from web"""
-        programme_details_link = "https://www.fit.vut.cz/study/"
-        reply = ""
+        programme_details_link = 'https://www.fit.vut.cz/study/'
+        reply = ''
         # bachelor
-        url = f"{programme_details_link}program/{self.config.subject_bit_id}/.cs"
+        url = f'{programme_details_link}program/{self.config.subject_bit_id}/.cs'
         if not self.manager.update_subject_types(url, False, overwrite):
             reply += Messages.subject_update_error(url=url)
         # engineer
         ids_list = list(range(self.config.subject_mit_id_start, self.config.subject_mit_id_end))
         for id in ids_list + self.config.subject_mit_id_rnd:
-            url = f"{programme_details_link}field/{id}/.cs"
+            url = f'{programme_details_link}field/{id}/.cs'
             if not self.manager.update_subject_types(url, True, overwrite):
                 reply += Messages.subject_update_error(url=url)
         # sports
@@ -174,7 +174,7 @@ class Review(Base, commands.Cog):
         reply += Messages.subject_update_success
         await inter.edit_original_response(reply)
 
-    @commands.slash_command(name="wtf", description=Messages.shortcut_brief)
+    @commands.slash_command(name='wtf', description=Messages.shortcut_brief)
     async def shortcut(
         self,
         inter: disnake.ApplicationCommandInteraction,
@@ -184,59 +184,59 @@ class Review(Base, commands.Cog):
         programme = ProgrammeDB.get(shortcut.upper())
         if programme:
             embed = disnake.Embed(title=programme.shortcut, description=programme.name)
-            embed.add_field(name="Link", value=programme.link)
+            embed.add_field(name='Link', value=programme.link)
         else:
             subject = SubjectDetailsDB.get(shortcut)
             if not subject:
-                subject = SubjectDetailsDB.get(f"TV-{shortcut}")
+                subject = SubjectDetailsDB.get(f'TV-{shortcut}')
                 if not subject:
                     await inter.response.send_message(Messages.review_wrong_subject)
                     return
             embed = disnake.Embed(title=subject.shortcut, description=subject.name)
-            if subject.semester == "L":
-                semester_value = "Letní"
-            elif subject.semester == "Z":
-                semester_value = "Zimní"
+            if subject.semester == 'L':
+                semester_value = 'Letní'
+            elif subject.semester == 'Z':
+                semester_value = 'Zimní'
             else:
-                semester_value = "Zimní, Letní"
-            embed.add_field(name="Semestr", value=semester_value)
-            embed.add_field(name="Typ", value=subject.type)
+                semester_value = 'Zimní, Letní'
+            embed.add_field(name='Semestr', value=semester_value)
+            embed.add_field(name='Typ', value=subject.type)
             if subject.year:
-                embed.add_field(name="Ročník", value=subject.year)
-            embed.add_field(name="Kredity", value=subject.credits)
-            embed.add_field(name="Ukončení", value=subject.end)
-            if "*" in subject.name:
-                embed.add_field(name="Upozornění", value="Předmět není v tomto roce otevřen", inline=False)
-            if subject.shortcut.startswith("TV-"):
+                embed.add_field(name='Ročník', value=subject.year)
+            embed.add_field(name='Kredity', value=subject.credits)
+            embed.add_field(name='Ukončení', value=subject.end)
+            if '*' in subject.name:
+                embed.add_field(name='Upozornění', value='Předmět není v tomto roce otevřen', inline=False)
+            if subject.shortcut.startswith('TV-'):
                 embed.add_field(
-                    name="Rozvrh předmětu v IS",
-                    value="https://www.vut.cz/studis/student.phtml?sn=rozvrhy&action=gm_rozvrh_predmetu"
-                    f"&operation=rozvrh&predmet_id={subject.card}&fakulta_id=814",
+                    name='Rozvrh předmětu v IS',
+                    value='https://www.vut.cz/studis/student.phtml?sn=rozvrhy&action=gm_rozvrh_predmetu'
+                    f'&operation=rozvrh&predmet_id={subject.card}&fakulta_id=814',
                     inline=False
                 )
             else:
                 embed.add_field(
-                    name="Karta předmětu",
-                    value=f"https://www.fit.vut.cz/study/course/{subject.shortcut}/.cs",
+                    name='Karta předmětu',
+                    value=f'https://www.fit.vut.cz/study/course/{subject.shortcut}/.cs',
                     inline=False
                 )
                 embed.add_field(
-                    name="Statistika úspěšnosti předmětu",
-                    value=f"http://fit.nechutny.net/?detail={subject.shortcut}",
+                    name='Statistika úspěšnosti předmětu',
+                    value=f'http://fit.nechutny.net/?detail={subject.shortcut}',
                     inline=False,
                 )
 
         utils.add_author_footer(embed, inter.author)
         await inter.response.send_message(embed=embed)
 
-    @commands.slash_command(name="tierboard", description=Messages.tierboard_brief)
+    @commands.slash_command(name='tierboard', description=Messages.tierboard_brief)
     async def tierboard(
         self,
         inter: disnake.ApplicationCommandInteraction,
-        type: str = commands.Param(name="typ", choices=["P", "PVT", "PVA", "V"]),
-        sem: str = commands.Param(name="semestr", choices=["Z", "L"]),
+        type: str = commands.Param(name='typ', choices=['P', 'PVT', 'PVA', 'V']),
+        sem: str = commands.Param(name='semestr', choices=['Z', 'L']),
         year: str = commands.Param(
-            name="rocnik", choices=["1BIT", "2BIT", "3BIT", "1MIT", "2MIT"], default=""
+            name='rocnik', choices=['1BIT', '2BIT', '3BIT', '1MIT', '2MIT'], default=''
         )
     ):
         """Board of suject based on average tier from reviews"""
@@ -248,49 +248,49 @@ class Review(Base, commands.Cog):
             author = guild.get_member(author.id)
         if not year:
             for role in author.roles:
-                if any(deg in role.name for deg in ["BIT", "MIT"]):
-                    if role.name == "0BIT":
-                        year = "1BIT"
-                    elif role.name == "0MIT":
-                        year = "1MIT"
+                if any(deg in role.name for deg in ['BIT', 'MIT']):
+                    if role.name == '0BIT':
+                        year = '1BIT'
+                    elif role.name == '0MIT':
+                        year = '1MIT'
                     else:
                         year = role.name
                     break
-        if "BIT" in year:
-            degree = "BIT"
-        if "MIT" in year:
-            degree = "MIT"
+        if 'BIT' in year:
+            degree = 'BIT'
+        if 'MIT' in year:
+            degree = 'MIT'
         if not degree and not year:
             await inter.send(Messages.tierboard_missing_year, ephemeral=True)
             return
         embeds = []
-        embed = disnake.Embed(title="Tierboard")
+        embed = disnake.Embed(title='Tierboard')
         embed.timestamp = datetime.datetime.now(tz=datetime.timezone.utc)
-        embed.add_field(name="Typ", value=type)
-        embed.add_field(name="Semestr", value="Letní" if sem == "L" else "Zimní")
-        if type != "P":
-            embed.add_field(name="Program", value=degree)
-            year = ""
+        embed.add_field(name='Typ', value=type)
+        embed.add_field(name='Semestr', value='Letní' if sem == 'L' else 'Zimní')
+        if type != 'P':
+            embed.add_field(name='Program', value=degree)
+            year = ''
         else:
-            embed.add_field(name="Ročník", value=year)
+            embed.add_field(name='Ročník', value=year)
         utils.add_author_footer(embed, author)
 
         pages_total = SubjectDetailsDB.get_tierboard_page_count(type, sem, degree, year)
         for page in range(pages_total):
             board = SubjectDetailsDB.get_tierboard(type, sem, degree, year, page*10)
-            output = ""
+            output = ''
             cnt = 1
             for line in board:
                 # grade format: "B (1.7)"
                 grade_num = TierEnum.tier_to_grade_num(line.avg_tier)
-                grade = f"{TierEnum(round(line.avg_tier)).name}({round(grade_num, 1)})"
-                output += f"{cnt} - **{line.shortcut}**: {grade}\n"
+                grade = f'{TierEnum(round(line.avg_tier)).name}({round(grade_num, 1)})'
+                output += f'{cnt} - **{line.shortcut}**: {grade}\n'
                 cnt += 1
             embed.description = output
             embeds.append(copy.copy(embed))
 
         if pages_total == 0:
-            embed.description = ""
+            embed.description = ''
             embeds.append(embed)
 
         view = EmbedView(inter.author, embeds)

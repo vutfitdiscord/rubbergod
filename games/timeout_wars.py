@@ -25,8 +25,8 @@ class TimeoutWars(commands.Cog):
         self.immunity: dict[int, datetime] = {}
         self.ignored_messages = set()
 
-    log_file = "timeout_wars"
-    message_delete = "Smazání zprávy"
+    log_file = 'timeout_wars'
+    message_delete = 'Smazání zprávy'
 
     @cached_property
     def timeout_wars_channel(self):
@@ -35,22 +35,22 @@ class TimeoutWars(commands.Cog):
     @commands.Cog.listener()
     async def on_ready(self):
         """create file if not exists on startup"""
-        header = ["timeout_user(s)_id", "reacted_user(s)_id", "original_message_author", "reason", "datetime"]
+        header = ['timeout_user(s)_id', 'reacted_user(s)_id', 'original_message_author', 'reason', 'datetime']
         if not os.path.isfile(self.log_file):
-            with open(self.log_file, "w") as f:
-                writer = csv.writer(f, delimiter=";")
+            with open(self.log_file, 'w') as f:
+                writer = csv.writer(f, delimiter=';')
                 writer.writerow(header)
 
     def write_log(self, timeout_users, reacted_users, original_message_author, reason):
         """write log to csv file"""
-        with open(self.log_file, "a") as f:
-            writer = csv.writer(f, delimiter=";")
+        with open(self.log_file, 'a') as f:
+            writer = csv.writer(f, delimiter=';')
             writer.writerow([timeout_users, reacted_users, original_message_author, reason, datetime.now()])
 
     async def send_embed_log(self, original_message, user: Union[list, disnake.Member], reason=None):
         """Embed template for Timeout wars"""
         embed = disnake.Embed(
-            title="Moderace lidu",
+            title='Moderace lidu',
             color=disnake.Color.yellow()
         )
 
@@ -58,16 +58,16 @@ class TimeoutWars(commands.Cog):
         if isinstance(user, list):
             for user in user:
                 message.append(user.mention)
-            embed.add_field(name="Umlčení uživatelé", value="\n".join(message), inline=False)
+            embed.add_field(name='Umlčení uživatelé', value='\n'.join(message), inline=False)
         else:
-            embed.add_field(name="Umlčený uživatel", value=user.mention, inline=False)
+            embed.add_field(name='Umlčený uživatel', value=user.mention, inline=False)
 
         if reason == self.message_delete:
-            embed.add_field(name="Důvod", value=reason, inline=False)
+            embed.add_field(name='Důvod', value=reason, inline=False)
 
         embed.add_field(
-            name="Link",
-            value=f"[#{original_message.channel.name}]({original_message.jump_url})",
+            name='Link',
+            value=f'[#{original_message.channel.name}]({original_message.jump_url})',
             inline=False
         )
         utils.add_author_footer(embed, original_message.author)
@@ -86,7 +86,7 @@ class TimeoutWars(commands.Cog):
                 )
             else:
                 try:
-                    await user.timeout(duration=duration, reason="Moderace lidu")
+                    await user.timeout(duration=duration, reason='Moderace lidu')
                     message.append(Messages.timeout_wars_user(
                         user=user.mention,
                         time=config.timeout_wars_timeout_time.total_seconds()//60)
@@ -104,7 +104,7 @@ class TimeoutWars(commands.Cog):
         channel,
         user: disnake.Member,
         duration,
-        reason="Moderace lidu"
+        reason='Moderace lidu'
     ):
         """Mute user and send message to channel and log"""
         if self.get_immunity(user):
@@ -159,7 +159,7 @@ class TimeoutWars(commands.Cog):
             if not self.get_immunity(user):
                 self.give_immunity(user, config.timeout_wars_immunity_time)
                 timeouted.append(user.id)
-        self.write_log(timeouted, [user.id for user in users], ctx.message.author.id, "all mute")
+        self.write_log(timeouted, [user.id for user in users], ctx.message.author.id, 'all mute')
 
     async def random_mute(self, ctx, reaction):
         """
@@ -173,7 +173,7 @@ class TimeoutWars(commands.Cog):
         if not self.get_immunity(user):
             self.give_immunity(user, config.timeout_wars_immunity_time)
             timeouted.append(user.id)
-        self.write_log(timeouted, [user.id for user in users], ctx.message.author.id, "random mute")
+        self.write_log(timeouted, [user.id for user in users], ctx.message.author.id, 'random mute')
 
     async def author_mute(self, ctx, reaction):
         """
@@ -192,7 +192,7 @@ class TimeoutWars(commands.Cog):
         if not self.get_immunity(author):
             self.give_immunity(author, config.timeout_wars_immunity_time)
             timeouted.append(author.id)
-        self.write_log(timeouted, [user.id for user in reaction_users], author.id, "author mute")
+        self.write_log(timeouted, [user.id for user in reaction_users], author.id, 'author mute')
 
     async def handle_reaction(self, ctx):
         """
@@ -208,7 +208,7 @@ class TimeoutWars(commands.Cog):
 
         # find mute reaction
         for reaction in message.reactions:
-            if reaction.emoji == "🔇":
+            if reaction.emoji == '🔇':
                 mute_reaction = reaction
                 break
 
@@ -243,7 +243,7 @@ class TimeoutWars(commands.Cog):
         if payload.cached_message is None:
             return
         for reaction in payload.cached_message.reactions:
-            if reaction.emoji == "🔇":
+            if reaction.emoji == '🔇':
                 await self.mute_user(
                     payload.cached_message,
                     payload.cached_message.channel,

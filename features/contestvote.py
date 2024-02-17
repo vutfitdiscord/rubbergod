@@ -37,7 +37,7 @@ class Emoji:
 
 def get_contribution_id(content: str) -> int:
     """extracts the contribution id from the string"""
-    contribution_id = re.match(r".*ID: (\d+).*", content).group(1)
+    contribution_id = re.match(r'.*ID: (\d+).*', content).group(1)
     return int(contribution_id)
 
 
@@ -74,7 +74,7 @@ async def get_top_contributions(self, messages: list[disnake.Message], number_of
     # Sort the images by total_value in descending order and get the top n
     sorted_images = sorted(images, key=lambda x: x.total_value, reverse=True)[:number_of]
 
-    emoji_string = "- {emoji.emoji}: Count: {emoji.count} - Total: {emoji.total_value}\n"
+    emoji_string = '- {emoji.emoji}: Count: {emoji.count} - Total: {emoji.total_value}\n'
     # calculate values for each image
     for image in sorted_images:
         if image.total_value == 0:

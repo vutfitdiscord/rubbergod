@@ -10,22 +10,22 @@ class BookmarkModal(disnake.ui.Modal):
         self.message = message
         components = [
             disnake.ui.TextInput(
-                label="Bookmark name",
-                placeholder="Bookmark name",
-                custom_id="name",
+                label='Bookmark name',
+                placeholder='Bookmark name',
+                custom_id='name',
                 style=disnake.TextInputStyle.short,
                 required=False,
                 max_length=100,
             ),
         ]
-        super().__init__(title="Bookmark", custom_id="bookmark_tag", timeout=300, components=components)
+        super().__init__(title='Bookmark', custom_id='bookmark_tag', timeout=300, components=components)
 
     async def callback(self, inter: disnake.ModalInteraction) -> None:
         inter.message = self.message
         title_name = Messages.bookmark_title(server=inter.guild.name)
 
-        if not inter.text_values["name"] == "":
-            title_name = inter.text_values["name"]
+        if not inter.text_values['name'] == '':
+            title_name = inter.text_values['name']
         embed, images, files_attached = await BookmarkFeatures.create_bookmark_embed(self, inter, title_name)
 
         try:

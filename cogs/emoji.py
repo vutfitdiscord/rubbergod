@@ -27,37 +27,37 @@ class Emoji(Base, commands.Cog):
         """Download all emojis from server and save them to zip file"""
         emojis = await guild.fetch_emojis()
         stickers = await guild.fetch_stickers()
-        with zipfile.ZipFile("emojis.zip", "w") as zip_file:
+        with zipfile.ZipFile('emojis.zip', 'w') as zip_file:
             for emoji in emojis:
                 with io.BytesIO() as image_binary:
                     if emoji.animated:
-                        emoji_name = f"emojis/{emoji.name}.gif"
+                        emoji_name = f'emojis/{emoji.name}.gif'
                     else:
-                        emoji_name = f"emojis/{emoji.name}.png"
+                        emoji_name = f'emojis/{emoji.name}.png'
                     await emoji.save(image_binary)
                     zip_file.writestr(emoji_name, image_binary.getvalue())
 
             for sticker in stickers:
                 with io.BytesIO() as image_binary:
-                    sticker_name = f"stickers/{sticker.name}.{sticker.format.name}"
+                    sticker_name = f'stickers/{sticker.name}.{sticker.format.name}'
                     await sticker.save(image_binary)
                     zip_file.writestr(sticker_name, image_binary.getvalue())
 
     @cooldowns.default_cooldown
-    @commands.slash_command(name="emoji")
+    @commands.slash_command(name='emoji')
     async def emoji(self, inter: disnake.ApplicationCommandInteraction):
         await inter.response.defer(ephemeral=self.check.botroom_check(inter))
 
     @cooldowns.default_cooldown
-    @emoji.sub_command(name="get_emojis", description=Messages.emoji_get_emojis_brief)
+    @emoji.sub_command(name='get_emojis', description=Messages.emoji_get_emojis_brief)
     async def get_emojis(self, inter: disnake.ApplicationCommandInteraction):
         """Get all emojis from server"""
-        if not os.path.exists("emojis.zip"):
+        if not os.path.exists('emojis.zip'):
             await self.download_emojis(self.base_guild)
-        await inter.send(file=disnake.File("emojis.zip"))
+        await inter.send(file=disnake.File('emojis.zip'))
 
     @cooldowns.default_cooldown
-    @emoji.sub_command(name="get_emoji", description=Messages.emoji_get_emoji_brief)
+    @emoji.sub_command(name='get_emoji', description=Messages.emoji_get_emoji_brief)
     async def get_emoji(self, inter: disnake.ApplicationCommandInteraction, emoji: disnake.PartialEmoji):
         """Get emoji in full size"""
         await inter.send(emoji.url)

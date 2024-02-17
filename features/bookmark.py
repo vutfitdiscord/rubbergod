@@ -20,8 +20,8 @@ class BookmarkFeatures():
         embed.set_author(name=author, icon_url=author.display_avatar.url)
         embed.set_image(image)
         embed.add_field(
-            name="Channel",
-            value=f"{inter.message.channel.mention} - #{inter.message.channel}"
+            name='Channel',
+            value=f'{inter.message.channel.mention} - #{inter.message.channel}'
         )
         return embed
 
@@ -33,7 +33,7 @@ class BookmarkFeatures():
         embed = disnake.Embed(title=title_name, color=author.color)
         embed.set_author(name=author, icon_url=author.display_avatar.url)
 
-        content = ""
+        content = ''
         if inter.message.embeds:
             for embed in inter.message.embeds:
                 embed.title, embed.color = title_name, author.color
@@ -42,7 +42,7 @@ class BookmarkFeatures():
         if inter.message.content:
             content = inter.message.content
         else:
-            content += "*Empty*"
+            content += '*Empty*'
 
         # create list of attachments
         upload_limit = False
@@ -54,7 +54,7 @@ class BookmarkFeatures():
                 if attachment.size > max_upload_size:
                     upload_limit = True
                     continue
-                if re.search(r"\.png|\.jpg|\.jpeg|\.gif$", str(attachment)):
+                if re.search(r'\.png|\.jpg|\.jpeg|\.gif$', str(attachment)):
                     images.append(attachment)
                 else:
                     files_attached.append(await attachment.to_file())
@@ -70,14 +70,14 @@ class BookmarkFeatures():
         if len(content) > 1024:
             parts = split_to_parts(content, 1024)
             for msg in parts:
-                embed.add_field(name="Původní zpráva", value=msg, inline=False)
+                embed.add_field(name='Původní zpráva', value=msg, inline=False)
         else:
-            embed.add_field(name="Původní zpráva", value=content, inline=False)
+            embed.add_field(name='Původní zpráva', value=content, inline=False)
 
         if upload_limit:
-            embed.add_field(name="Poznámka", value=Messages.bookmark_upload_limit, inline=False)
+            embed.add_field(name='Poznámka', value=Messages.bookmark_upload_limit, inline=False)
         embed.add_field(
-            name="Channel",
-            value=f"{inter.message.channel.mention} - #{inter.message.channel}"
+            name='Channel',
+            value=f'{inter.message.channel.mention} - #{inter.message.channel}'
         )
         return ([embed], images, files_attached)

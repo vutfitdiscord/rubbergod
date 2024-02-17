@@ -12,13 +12,13 @@ from PIL import Image, ImageDraw
 class ImageHandler:
     def square_to_circle(self, image: Image.Image) -> Image.Image:
         width, height = image.size
-        mask = Image.new("L", (width, height), 0)
+        mask = Image.new('L', (width, height), 0)
         draw = ImageDraw.Draw(mask)
         draw.ellipse((0, 0, width, height), fill=255)
-        alpha = image.getchannel("A")
-        circle_alpha = Image.new("L", (width, height), 0)
+        alpha = image.getchannel('A')
+        circle_alpha = Image.new('L', (width, height), 0)
         circle_alpha.paste(alpha, mask=mask)
-        result = Image.new("RGBA", (width, height), (0, 0, 0, 0))
+        result = Image.new('RGBA', (width, height), (0, 0, 0, 0))
         result.paste(image, (0, 0), mask=circle_alpha)
         return result
 
@@ -27,12 +27,12 @@ class ImageHandler:
         hop_size = 4
         frame_count = 11
 
-        image_path = Path(__file__).parent.parent / "images" / "cat_steal"
+        image_path = Path(__file__).parent.parent / 'images' / 'cat_steal'
 
-        im = Image.new("RGBA", (150, 200), (0, 0, 0, 0))
+        im = Image.new('RGBA', (150, 200), (0, 0, 0, 0))
 
-        background = Image.open(image_path / "catyay.png").convert("RGBA")
-        catpaw = Image.open(image_path / "catpaw.png").convert("RGBA")
+        background = Image.open(image_path / 'catyay.png').convert('RGBA')
+        catpaw = Image.open(image_path / 'catpaw.png').convert('RGBA')
 
         x, y = avatar_offset
         width, height = 150, 150
@@ -43,22 +43,22 @@ class ImageHandler:
 
         frames = []
         for i in range(frame_count):
-            im = im.convert("RGBA")
-            frame = Image.new("RGBA", (width, height), (0, 0, 0, 0))
+            im = im.convert('RGBA')
+            frame = Image.new('RGBA', (width, height), (0, 0, 0, 0))
             hop = 12 if i % 2 else 12+hop_size
             frame.paste(im, (i*10 - 50, hop - 50), im)
             frames.append(frame)
             del frame
         for i in range(frame_count):
-            im2 = im2.convert("RGBA")
-            frame = Image.new("RGBA", (width, height), (0, 0, 0, 0))
+            im2 = im2.convert('RGBA')
+            frame = Image.new('RGBA', (width, height), (0, 0, 0, 0))
             hop = 12+hop_size if i % 2 else 12
             frame.paste(im2, ((10-i)*10 - 50, hop - 50), im2)
             frames.append(frame)
 
         frames[0].save(
             image_binary,
-            format="GIF",
+            format='GIF',
             save_all=True,
             append_images=frames[1:],
             duration=speed,
@@ -78,11 +78,11 @@ class ImageHandler:
         avatar = self.square_to_circle(avatar.resize((100, 100)))
 
         for i in range(8):
-            img = "%02d" % (i + 1)
-            frame = Image.new("RGBA", (width, height), (0, 0, 0, 0))
-            bat = Image.open(f"images/bonk/{img}.png").convert("RGBA")
+            img = '%02d' % (i + 1)
+            frame = Image.new('RGBA', (width, height), (0, 0, 0, 0))
+            bat = Image.open(f'images/bonk/{img}.png').convert('RGBA')
             avatar = avatar.resize((100, 100 - deformation[i]))
-            frame_avatar = avatar.convert("P", palette=Image.ADAPTIVE, colors=200).convert("RGBA")
+            frame_avatar = avatar.convert('P', palette=Image.ADAPTIVE, colors=200).convert('RGBA')
 
             frame.paste(frame_avatar, (80, 60 + deformation[i]), frame_avatar)
             frame.paste(bat, (10, 5), bat)

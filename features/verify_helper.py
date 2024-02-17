@@ -31,15 +31,15 @@ class VerifyHelper:
             return utils.has_role(member, role_name)
 
     async def get_user_details(self, id: str) -> Optional[dict]:
-        headers = {"Authorization": f"Bearer {config.vut_api_key}"}
-        url = f"https://www.vut.cz/api/person/v1/{id}/pusobeni-osoby"
+        headers = {'Authorization': f'Bearer {config.vut_api_key}'}
+        url = f'https://www.vut.cz/api/person/v1/{id}/pusobeni-osoby'
         async with aiohttp.ClientSession() as session:
             async with session.get(url, headers=headers) as res:
                 if res.status != 200:
                     if res.status in [401, 403]:
-                        raise Exception("Invalid API key")
+                        raise Exception('Invalid API key')
                     elif res.status == 429:
-                        raise Exception("Rate limit exceeded")
+                        raise Exception('Rate limit exceeded')
                     # Login not found
                     return None
                 return await res.json()
@@ -54,9 +54,9 @@ class VerifyHelper:
                 ret = f"{relation['fakulta']['zkratka']} {relation['obor']['zkratka']} " \
                       f"{relation['rok_studia']}"
                 # do not return yet if not FIT, check for all relations if student has multiple studies
-                if relation['fakulta']['zkratka'] == "FIT":
+                if relation['fakulta']['zkratka'] == 'FIT':
                     return ret
-            elif 'ustav' in relation.keys() and relation['ustav']['fakulta']['zkratka'] == "FIT":
+            elif 'ustav' in relation.keys() and relation['ustav']['fakulta']['zkratka'] == 'FIT':
                 # FIT employee, replace only if not student
                 ret = ret or 'employee'
         if not ret:
@@ -76,7 +76,7 @@ class VerifyHelper:
                 login=user.get('login', str(user['id'])),
                 year=await self._parse_relation(user),
                 name=f"{user['jmeno_krestni']} {user['prijmeni']}",
-                mail=user['emaily'][0] if user.get('emaily', []) else "",
+                mail=user['emaily'][0] if user.get('emaily', []) else '',
                 status=VerifyStatus.Unverified.value
             )
             session.add(person)
@@ -93,5 +93,5 @@ class VerifyHelper:
     async def log_relation_error(self, user: dict) -> None:
         name = user['login'] or user['id']
         with BytesIO(bytes(json.dumps(user, indent=2, ensure_ascii=False), 'utf-8')) as file:
-            file = disnake.File(fp=file, filename=f"{name}.json")
-        await self.log_channel.send(f"Error parsing user relations for `{name}`", file=file)
+            file = disnake.File(fp=file, filename=f'{name}.json')
+        await self.log_channel.send(f'Error parsing user relations for `{name}`', file=file)

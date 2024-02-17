@@ -29,12 +29,12 @@ def merge_messages(message_list: Iterable, max_msg_len: int):
 
     messages = []
 
-    output_message = ""
+    output_message = ''
     for msg in message_list:
         if len(msg) > max_msg_len:
             return []
-        if output_message and output_message[-1] != "\n":
-            output_message += "\n"
+        if output_message and output_message[-1] != '\n':
+            output_message += '\n'
 
         tmp_msg = output_message + msg
 
@@ -44,7 +44,7 @@ def merge_messages(message_list: Iterable, max_msg_len: int):
         else:
             output_message = tmp_msg
 
-    if output_message != "":
+    if output_message != '':
         messages.append(output_message.rstrip())
 
     return messages

@@ -34,7 +34,7 @@ def icon_emoji(bot: commands.Bot, icon_role: disnake.Role) -> Optional[disnake.P
         return emoji
     try:
         rules = Base.config.icon_rules[icon_role.id]
-        emoji_id = rules.get("emoji_id")
+        emoji_id = rules.get('emoji_id')
         emoji = bot.get_emoji(emoji_id)
         return emoji
     except (AttributeError, KeyError):
@@ -49,8 +49,8 @@ async def can_assign(icon: disnake.Role, user: disnake.Member) -> bool:
     """Whether a given user can have a given icon"""
     rules = Base.config.icon_rules[icon.id]
     user_roles = {role.id for role in user.roles}
-    allow = rules.get("allow")
-    deny = rules.get("deny", [])
+    allow = rules.get('allow')
+    deny = rules.get('deny', [])
     allowed_by_role = allow is None or not user_roles.isdisjoint(allow)
     allowed_by_user = allow is None or user.id in allow
     denied = deny is not None and (not user_roles.isdisjoint(deny) or user.id in deny)
@@ -101,7 +101,7 @@ async def icon_autocomp(inter: disnake.ApplicationCommandInteraction, partial: s
 
 
 def get_icon_emoji(icon: disnake.Role) -> Union[str, disnake.Emoji, disnake.PartialEmoji]:
-    emoji = getattr(icon, "_icon", None)
+    emoji = getattr(icon, '_icon', None)
     if type(emoji) not in [str, disnake.Emoji, disnake.PartialEmoji]:
         emoji = None
     return emoji
@@ -112,7 +112,7 @@ class Icons(Base, commands.Cog):
         super().__init__()
         self.bot = bot
 
-    @utils.PersistentCooldown(command_name="icon", limit=Base.config.icon_ui_cooldown)
+    @utils.PersistentCooldown(command_name='icon', limit=Base.config.icon_ui_cooldown)
     @commands.slash_command(description=Messages.icon_ui, guild_ids=[Base.config.guild_id])
     async def icon(self, inter: disnake.ApplicationCommandInteraction):
         await inter.response.defer(ephemeral=True)
@@ -125,7 +125,7 @@ class Icons(Base, commands.Cog):
             for icon in icon_roles
             if await can_assign(icon, user)
         ]
-        view = TrashView("icon:delete", row=4)      # makes it last row so it's always under the dropdown
+        view = TrashView('icon:delete', row=4)      # makes it last row so it's always under the dropdown
         for row, start_i in enumerate(range(0, len(options), 25)):
             # 25 is the max number of options per select
             component = IconSelect(
@@ -139,7 +139,7 @@ class Icons(Base, commands.Cog):
 
     @commands.Cog.listener()
     async def on_button_click(self, inter: disnake.MessageInteraction):
-        if inter.component.custom_id != "icon:delete":
+        if inter.component.custom_id != 'icon:delete':
             return
         await do_set_icon(None, inter.author)
         await inter.response.send_message(content=Messages.icon_removed, ephemeral=True)

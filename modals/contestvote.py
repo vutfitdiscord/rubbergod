@@ -17,7 +17,7 @@ class DenyContributionModal(disnake.ui.Modal):
             disnake.ui.TextInput(
                 label=self.title,
                 placeholder=Messages.contest_modal_placeholder,
-                custom_id="contest:reason",
+                custom_id='contest:reason',
                 style=disnake.TextInputStyle.long,
                 required=False,
                 max_length=1900,
@@ -26,7 +26,7 @@ class DenyContributionModal(disnake.ui.Modal):
 
         super().__init__(
             title=self.title,
-            custom_id="contest_vote_modal",
+            custom_id='contest_vote_modal',
             timeout=900,
             components=components
         )
@@ -37,7 +37,7 @@ class DenyContributionModal(disnake.ui.Modal):
 
         trash = TrashView()
         file = await inter.message.attachments[0].to_file()
-        reason = inter.text_values["contest:reason"].strip()
+        reason = inter.text_values['contest:reason'].strip()
 
         if reason:
             message = Messages.contest_contribution_denied(

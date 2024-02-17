@@ -29,27 +29,27 @@ class ActionsCache:
         async with self.lock:
             if not self.memory.get(poll_id):
                 self.memory[poll_id] = {}
-            self.memory[poll_id][voter_id] = Action("add", poll_option_id)
+            self.memory[poll_id][voter_id] = Action('add', poll_option_id)
 
     async def add_multiple_choice(self, poll_id: int, voter_id: str, poll_option_ids: List[int]) -> None:
         async with self.lock:
             if not self.memory.get(poll_id):
                 self.memory[poll_id] = {}
-            self.memory[poll_id][voter_id] = Action("add_multiple", poll_option_ids)
+            self.memory[poll_id][voter_id] = Action('add_multiple', poll_option_ids)
 
     async def remove_vote(self, poll_id: int, voter_id: str, poll_option_id: int) -> None:
         """Remove vote from user on poll option in db"""
         async with self.lock:
             if not self.memory.get(poll_id):
                 self.memory[poll_id] = {}
-            self.memory[poll_id][voter_id] = Action("remove", poll_option_id)
+            self.memory[poll_id][voter_id] = Action('remove', poll_option_id)
 
     async def remove_votes(self, poll_id: int, voter_id: str) -> None:
         """Remove all votes from user on poll in db"""
         async with self.lock:
             if not self.memory.get(poll_id):
                 self.memory[poll_id] = {}
-            self.memory[poll_id][voter_id] = Action("remove_all")
+            self.memory[poll_id][voter_id] = Action('remove_all')
 
     async def remove_voter_from_cache(self, poll_id: int, voter_id: str) -> None:
         """Remove voter only from cache"""
@@ -68,17 +68,17 @@ class ActionsCache:
     def process_actions(self, poll_id: int, users_actions: dict) -> None:
         for user_id, action in users_actions.items():
             try:
-                if action.action == "add":
+                if action.action == 'add':
                     PollDB.get(poll_id).add_voter(user_id, action.value)
 
-                elif action.action == "add_multiple":
+                elif action.action == 'add_multiple':
                     # TODO - add multiple choice function in db
                     pass
 
-                elif action.action == "remove":
+                elif action.action == 'remove':
                     PollOptionDB.get(action.value).remove_voter(user_id)
 
-                elif action.action == "remove_all":
+                elif action.action == 'remove_all':
                     PollDB.get(poll_id).remove_voter(user_id)
 
             except AttributeError:
@@ -124,7 +124,7 @@ class PollView(BaseView):
         retry = bucket.update_rate_limit()
         if retries == 1:
             time = datetime.now() + timedelta(seconds=bucket.get_retry_after())
-            timestamp = utils.get_discord_timestamp(time, style="Relative Time")
+            timestamp = utils.get_discord_timestamp(time, style='Relative Time')
             await inter.send(Messages.poll_button_spam(time=timestamp), ephemeral=True)
             return
 
@@ -132,7 +132,7 @@ class PollView(BaseView):
             return
 
         # voters are always available
-        if inter.data.custom_id == "poll:voters":
+        if inter.data.custom_id == 'poll:voters':
             return True
 
         poll_id = poll_features.extract_poll_id(inter.message)
@@ -158,7 +158,7 @@ class PollView(BaseView):
 
         if vote_check:
             await inter.send(
-                Messages.poll_already_voted(option=f"{button.emoji} {button.label}"),
+                Messages.poll_already_voted(option=f'{button.emoji} {button.label}'),
                 ephemeral=True,
                 view=PollRemoveVoteView(self, poll, poll_option)
             )
@@ -168,7 +168,7 @@ class PollView(BaseView):
         self.messages[poll_id] = inter.message
 
         await inter.send(
-            Messages.poll_voted(option=f"{button.emoji} {button.label}"),
+            Messages.poll_voted(option=f'{button.emoji} {button.label}'),
             ephemeral=True,
             view=PollRemoveVoteView(self, poll, poll_option)
         )
@@ -197,19 +197,19 @@ class PollBooleanView(PollView):
         self.children.extend(PollCloseView(bot).children)
 
     @disnake.ui.button(
-        label="Ano",
-        emoji="✅",
+        label='Ano',
+        emoji='✅',
         style=disnake.ButtonStyle.primary,
-        custom_id="poll:boolean:yes"
+        custom_id='poll:boolean:yes'
     )
     async def boolean_yes(self, button: disnake.ui.Button, inter: disnake.MessageInteraction) -> None:
         await self.button_action(button, inter)
 
     @disnake.ui.button(
-        label="Ne",
-        emoji="❌",
+        label='Ne',
+        emoji='❌',
         style=disnake.ButtonStyle.primary,
-        custom_id="poll:boolean:no"
+        custom_id='poll:boolean:no'
     )
     async def boolean_no(self, button: disnake.ui.Button, inter: disnake.MessageInteraction) -> None:
         await self.button_action(button, inter)
@@ -222,28 +222,28 @@ class PollOpinionView(PollView):
         self.children.extend(PollCloseView(bot).children)
 
     @disnake.ui.button(
-        label="Souhlasím",
-        emoji="✅",
+        label='Souhlasím',
+        emoji='✅',
         style=disnake.ButtonStyle.primary,
-        custom_id="poll:opinion:agree"
+        custom_id='poll:opinion:agree'
     )
     async def opinion_agree(self, button: disnake.ui.Button, inter: disnake.MessageInteraction) -> None:
         await self.button_action(button, inter)
 
     @disnake.ui.button(
-        label="Neutral",
-        emoji="😐",
+        label='Neutral',
+        emoji='😐',
         style=disnake.ButtonStyle.primary,
-        custom_id="poll:opinion:neutral"
+        custom_id='poll:opinion:neutral'
     )
     async def opinion_neutral(self, button: disnake.ui.Button, inter: disnake.MessageInteraction) -> None:
         await self.button_action(button, inter)
 
     @disnake.ui.button(
-        label="Nesouhlasím",
-        emoji="❌",
+        label='Nesouhlasím',
+        emoji='❌',
         style=disnake.ButtonStyle.primary,
-        custom_id="poll:opinion:disagree"
+        custom_id='poll:opinion:disagree'
     )
     async def opinion_disagree(self, button: disnake.ui.Button, inter: disnake.MessageInteraction) -> None:
         await self.button_action(button, inter)
@@ -295,12 +295,12 @@ class PollRemoveVoteView(PollView):
             await inter.edit_original_message(Messages.poll_not_voted)
             return
 
-        if action == "remove_vote":
+        if action == 'remove_vote':
             await self.action_cache.remove_voter_from_cache(poll.id, str(inter.user.id))
             await self.action_cache.remove_vote(poll.id, str(inter.user.id), self.poll_option.id)
             await inter.edit_original_message(Messages.poll_vote_removed(title=self.poll.title), view=None)
             return
-        elif action == "remove_votes":
+        elif action == 'remove_votes':
             await self.action_cache.remove_votes(poll.id, str(inter.user.id))
             await inter.edit_original_message(Messages.poll_votes_removed(title=self.poll.title), view=None)
             return
@@ -308,13 +308,13 @@ class PollRemoveVoteView(PollView):
         # TODO - raise error
 
     @disnake.ui.button(
-        label="Odstranit hlas",
-        emoji="🗑️",
+        label='Odstranit hlas',
+        emoji='🗑️',
         style=disnake.ButtonStyle.danger,
-        custom_id="poll:remove:vote"
+        custom_id='poll:remove:vote'
     )
     async def remove_vote(self, button: disnake.ui.Button, inter: disnake.MessageInteraction) -> None:
-        await self.button_action("remove_vote", button, inter)
+        await self.button_action('remove_vote', button, inter)
 
     # @disnake.ui.button(
     #     label="Odstranit všechny moje hlasy",
@@ -332,10 +332,10 @@ class PollVotersView(PollView):
         self.bot = bot
 
     @disnake.ui.button(
-        label="Zobrazit hlasy",
-        emoji="🗒️",
+        label='Zobrazit hlasy',
+        emoji='🗒️',
         style=disnake.ButtonStyle.grey,
-        custom_id="poll:voters",
+        custom_id='poll:voters',
         row=1
     )
     async def boolean_voters(self, button: disnake.ui.Button, inter: disnake.MessageInteraction) -> None:
@@ -350,10 +350,10 @@ class PollCloseView(PollView):
         self.bot = bot
 
     @disnake.ui.button(
-        label="Ukončit hlasování",
-        emoji="🔒",
+        label='Ukončit hlasování',
+        emoji='🔒',
         style=disnake.ButtonStyle.grey,
-        custom_id="poll:close",
+        custom_id='poll:close',
         row=1
     )
     async def boolean_close(self, button: disnake.ui.Button, inter: disnake.MessageInteraction) -> None:
@@ -392,7 +392,7 @@ class PollModal(disnake.ui.Modal):      # TODO
             disnake.ui.TextInput(
                 label=self.title,
                 placeholder=Messages.report_answer,
-                custom_id="answer",
+                custom_id='answer',
                 style=disnake.TextInputStyle.long,
                 required=True,
                 max_length=2000,
@@ -401,7 +401,7 @@ class PollModal(disnake.ui.Modal):      # TODO
 
         super().__init__(
             title=self.title,
-            custom_id="poll_modal",
+            custom_id='poll_modal',
             timeout=900,
             components=components
         )

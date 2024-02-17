@@ -25,38 +25,38 @@ class Latex(Base, commands.Cog):
     @cooldowns.default_cooldown
     @commands.command(brief=Messages.latex_desc, description=Messages.latex_help)
     async def latex(self, ctx, *args):
-        foreground = "White"
+        foreground = 'White'
 
         if len(args) < 1:
-            await ctx.send(f"{Messages.latex_help}\n{Messages.latex_colors}")
+            await ctx.send(f'{Messages.latex_help}\n{Messages.latex_colors}')
             return
-        if "?fg=" in args[0]:
+        if '?fg=' in args[0]:
             foreground = args[0][4:]
             args = args[1:]
 
-        eq = " ".join(args)
+        eq = ' '.join(args)
         channel = ctx.channel
         async with ctx.typing():
             eq = urllib.parse.quote(eq)
-            imgURL = f"http://www.sciweavers.org/tex2img.php?eq={eq}&fc={foreground}&im=png&fs=25&edit=0"
+            imgURL = f'http://www.sciweavers.org/tex2img.php?eq={eq}&fc={foreground}&im=png&fs=25&edit=0'
 
             async with aiohttp.ClientSession(timeout=aiohttp.ClientTimeout(total=10)) as session:
                 try:
                     async with session.get(imgURL) as resp:
 
                         if resp.status != 200:
-                            await ctx.send("Could not get image.")
+                            await ctx.send('Could not get image.')
                             return
 
                         data = await resp.read()
                         if not data.startswith(PNG_HEADER):
-                            await ctx.send("Could not get image.")
+                            await ctx.send('Could not get image.')
                             return
 
                         datastream = io.BytesIO(data)
-                        await channel.send(file=disnake.File(datastream, "latex.png"))
+                        await channel.send(file=disnake.File(datastream, 'latex.png'))
                 except (asyncio.exceptions.TimeoutError, aiohttp.client_exceptions.ClientConnectorError):
-                    await channel.send("Website unreachable")
+                    await channel.send('Website unreachable')
 
 
 def setup(bot):

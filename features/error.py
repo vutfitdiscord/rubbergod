@@ -28,10 +28,10 @@ class ContextMock:
     This will be used in ignore_errors function"""
 
     def __init__(self, bot: commands.Bot, arg):
-        self.channel = getattr(arg, "channel", bot.get_channel(arg.channel_id))
-        if hasattr(arg, "author"):
+        self.channel = getattr(arg, 'channel', bot.get_channel(arg.channel_id))
+        if hasattr(arg, 'author'):
             self.author = arg.author
-        elif hasattr(arg, "member"):
+        elif hasattr(arg, 'member'):
             self.author = arg.member
         else:
             self.author = bot.user
@@ -51,18 +51,18 @@ class ErrorLogger:
 
     def set_image(self, embed: disnake.Embed, user: disnake.User, count: int):
         try:
-            image_path = Path(__file__).parent.parent / "images/accident"
-            background = Image.open(image_path / "xDaysBackground.png")
-            head = Image.open(image_path / "xDaysHead.png")
-            pliers = Image.open(image_path / "xDaysPliers.png")
+            image_path = Path(__file__).parent.parent / 'images/accident'
+            background = Image.open(image_path / 'xDaysBackground.png')
+            head = Image.open(image_path / 'xDaysHead.png')
+            pliers = Image.open(image_path / 'xDaysPliers.png')
 
             # add avatar
-            url = user.display_avatar.replace(size=256, format="png")
+            url = user.display_avatar.replace(size=256, format='png')
             response = requests.get(url, timeout=10)
             avatar = Image.open(BytesIO(response.content))
 
             if not user.avatar:
-                avatar = avatar.convert("RGB")
+                avatar = avatar.convert('RGB')
 
             avatar = self.imagehandler.square_to_circle(avatar)
             avatar = avatar.resize((230, 230))
@@ -72,12 +72,12 @@ class ErrorLogger:
             # set number
             font_size = 80 if count >= 10 else 90
             W, H = (150, 150)
-            font = ImageFont.truetype(str(image_path / "OpenSans-Regular.ttf"), font_size)
-            img_txt = Image.new("RGBA", (W, H), color=(255, 255, 255, 0))
+            font = ImageFont.truetype(str(image_path / 'OpenSans-Regular.ttf'), font_size)
+            img_txt = Image.new('RGBA', (W, H), color=(255, 255, 255, 0))
             draw_txt = ImageDraw.Draw(img_txt)
             bbox = draw_txt.textbbox(xy=(0, 0), text=str(count), font=font)
             width, height = bbox[2]-bbox[0], bbox[3]-bbox[1]
-            draw_txt.text(((W - width) / 2, (H - height) / 2), str(count), font=font, fill="#000")
+            draw_txt.text(((W - width) / 2, (H - height) / 2), str(count), font=font, fill='#000')
             img_txt = img_txt.rotate(10, expand=1, fillcolor=255)
             background.paste(img_txt, (1000, 130), img_txt)
 
@@ -87,13 +87,13 @@ class ErrorLogger:
 
             # add image to embed
             with BytesIO() as image_binary:
-                background.save(image_binary, format="png")
+                background.save(image_binary, format='png')
                 image_binary.seek(0)
-                file = disnake.File(fp=image_binary, filename="accident.png")
+                file = disnake.File(fp=image_binary, filename='accident.png')
 
             embed.set_image(file=file)
         except Exception as error:
-            output = "".join(traceback.format_exception(type(error), error, error.__traceback__))
+            output = ''.join(traceback.format_exception(type(error), error, error.__traceback__))
             print(output)
 
     def log_error_time(self, set=True) -> int:
@@ -117,15 +117,15 @@ class ErrorLogger:
     ):
         count = self.log_error_time()
         embed = disnake.Embed(
-            title=f"{count} days without an accident.\nIgnoring exception in {command}",
+            title=f'{count} days without an accident.\nIgnoring exception in {command}',
             color=0xFF0000,
         )
         if args:
-            embed.add_field(name="Args", value=args)
-        embed.add_field(name="Autor", value=author.mention)
-        if guild and getattr(guild, "id", None) != config.guild_id:
-            embed.add_field(name="Guild", value=getattr(guild, "name", guild))
-        embed.add_field(name="Link", value=jump_url, inline=False)
+            embed.add_field(name='Args', value=args)
+        embed.add_field(name='Autor', value=author.mention)
+        if guild and getattr(guild, 'id', None) != config.guild_id:
+            embed.add_field(name='Guild', value=getattr(guild, 'name', guild))
+        embed.add_field(name='Link', value=jump_url, inline=False)
         self.set_image(embed, author, count)
         if extra_fields:
             for name, value in extra_fields.items():
@@ -134,14 +134,14 @@ class ErrorLogger:
 
     def _get_app_cmd_prefix(self, command: commands.InvokableApplicationCommand):
         if isinstance(command, commands.InvokableUserCommand):
-            return "User command - "
+            return 'User command - '
         elif isinstance(command, commands.InvokableMessageCommand):
-            return "Message command - "
+            return 'Message command - '
         elif (
             isinstance(command, commands.InvokableSlashCommand)
             or isinstance(command, commands.slash_core.SubCommand)
         ):
-            return "/"
+            return '/'
         else:
             # some new command probably? there aren't other options at the moment
             raise NotImplementedError
@@ -151,20 +151,20 @@ class ErrorLogger:
         ctx: Union[disnake.ApplicationCommandInteraction, commands.Context]
     ):
         if isinstance(ctx, disnake.ApplicationCommandInteraction):
-            args = ' '.join(f"{key}={item}" for key, item in ctx.filled_options.items())
+            args = ' '.join(f'{key}={item}' for key, item in ctx.filled_options.items())
             prefix = self._get_app_cmd_prefix(ctx.application_command)
             return {
                 'args': args,
                 'cog': ctx.application_command.cog_name,
-                'command': f"{prefix}{ctx.application_command.qualified_name}",
-                'url': getattr(ctx.channel, "jump_url", "DM"),
+                'command': f'{prefix}{ctx.application_command.qualified_name}',
+                'url': getattr(ctx.channel, 'jump_url', 'DM'),
             }
         elif isinstance(ctx, commands.Context):
             return {
                 'args': ctx.message.content,
                 'cog': ctx.cog.qualified_name,
-                'command': f"?{ctx.command.qualified_name}",
-                'url': getattr(ctx.message, "jump_url", "DM"),
+                'command': f'?{ctx.command.qualified_name}',
+                'url': getattr(ctx.message, 'jump_url', 'DM'),
             }
         else:
             raise NotImplementedError
@@ -180,7 +180,7 @@ class ErrorLogger:
         parsed_ctx = await self._parse_context(ctx)
         embed = self.create_embed(
             parsed_ctx['command'],
-            parsed_ctx["args"][:1000],
+            parsed_ctx['args'][:1000],
             ctx.author,
             ctx.guild,
             parsed_ctx['url']
@@ -190,14 +190,14 @@ class ErrorLogger:
             cog=parsed_ctx['cog'],
             datetime=datetime.datetime.now(),
             user_id=str(ctx.author.id),
-            args=parsed_ctx["args"],
+            args=parsed_ctx['args'],
             exception=type(error).__name__,
-            traceback="\n".join(traceback.format_exception(type(error), error, error.__traceback__)),
+            traceback='\n'.join(traceback.format_exception(type(error), error, error.__traceback__)),
         )
-        utils.add_author_footer(embed, author=ctx.author, additional_text=[f"ID: {error_log.id}"])
+        utils.add_author_footer(embed, author=ctx.author, additional_text=[f'ID: {error_log.id}'])
 
         # send context of command with personal information to logging channel
-        if parsed_ctx['command'] == "/diplom":
+        if parsed_ctx['command'] == '/diplom':
             channel = self.bot.get_channel(config.log_channel)
             await channel.send(embed=embed, view=ErrorView())
             embed.remove_field(0)  # remove args from embed for sending to bot dev channel
@@ -209,25 +209,25 @@ class ErrorLogger:
         # there is usually just one arg
         arg = args[0]
         error = sys.exc_info()[1]
-        author = getattr(arg, "author", self.bot.user)
+        author = getattr(arg, 'author', self.bot.user)
         if await self.ignore_errors(ContextMock(self.bot, arg), error):
             # error was handled
             return
-        if event == "on_message":
+        if event == 'on_message':
             message_id = arg.id
             if hasattr(arg, 'guild') and arg.guild:
                 event_guild = arg.guild.name
-                url = f"https://discord.com/channels/{arg.guild.id}/{arg.channel.id}/{message_id}"
+                url = f'https://discord.com/channels/{arg.guild.id}/{arg.channel.id}/{message_id}'
             else:
-                event_guild = url = "DM"
+                event_guild = url = 'DM'
             embeds = [self.create_embed(
-                command="on_message",
+                command='on_message',
                 args=arg.content,
                 author=author,
                 guild=event_guild,
                 jump_url=url,
             )]
-        elif event in ["on_raw_reaction_add", "on_raw_reaction_remove"]:
+        elif event in ['on_raw_reaction_add', 'on_raw_reaction_remove']:
             embeds = await self.handle_reaction_error(arg)
         else:
             embeds = [self.create_embed(
@@ -239,17 +239,17 @@ class ErrorLogger:
             )]
         error_log = ErrorEvent.log(
             event_name=event,
-            cog="System",  # log all events under system cog as it is hard to find actaull cog
+            cog='System',  # log all events under system cog as it is hard to find actaull cog
             datetime=datetime.datetime.now(),
             user_id=author.id,
             args=str(args),
             exception=type(error).__name__,
-            traceback="\n".join(traceback.format_exception(type(error), error, error.__traceback__)),
+            traceback='\n'.join(traceback.format_exception(type(error), error, error.__traceback__)),
         )
         utils.add_author_footer(
             embeds[-1],
             author=author,
-            additional_text=[f"ID: {error_log.id}"]
+            additional_text=[f'ID: {error_log.id}']
         )
         await self.bot_dev_channel.send(embeds=embeds, view=ErrorView())
 
@@ -270,7 +270,7 @@ class ErrorLogger:
                     if message is not None:
                         message = message.content[:1000]
             else:
-                event_guild = "DM"
+                event_guild = 'DM'
                 message = message_id
         if user_id:
             user = self.bot.get_user(arg.user_id)
@@ -286,19 +286,19 @@ class ErrorLogger:
                             message = message.content[:1000]
                         elif message.embeds:
                             embeds.extend(message.embeds)
-                            message = "Embed v předchozí zprávě"
+                            message = 'Embed v předchozí zprávě'
                         elif message.attachments:
-                            message_out = ""
+                            message_out = ''
                             for attachment in message.attachments:
-                                message_out += f"{attachment.url}\n"
+                                message_out += f'{attachment.url}\n'
                             message = message_out
                 else:
                     message = message_id
         extra_fields = {
-            "Reaction": getattr(arg, 'emoji', None)
+            'Reaction': getattr(arg, 'emoji', None)
         }
-        url = event_guild if event_guild == "DM" else \
-            f"https://discord.com/channels/{guild.id}/{channel_id}/{message_id}"
+        url = event_guild if event_guild == 'DM' else \
+            f'https://discord.com/channels/{guild.id}/{channel_id}/{message_id}'
         embeds.append(self.create_embed(
             command=arg.event_type,
             args=message,
@@ -317,11 +317,11 @@ class ErrorLogger:
     ):
         filled_options = filled_options or inter.filled_options
         embed = self.create_embed(
-            f"{prefix}{inter.application_command.qualified_name}",
+            f'{prefix}{inter.application_command.qualified_name}',
             filled_options,
             inter.author,
             inter.guild,
-            f"https://discord.com/channels/{inter.guild_id}/{inter.channel_id}/{inter.id}",
+            f'https://discord.com/channels/{inter.guild_id}/{inter.channel_id}/{inter.id}',
         )
         return embed
 
@@ -348,7 +348,7 @@ class ErrorLogger:
 
         if isinstance(error, commands.CommandNotFound):
             slash_comms = [command.name for command in self.bot.slash_commands]
-            invoked = ctx.message.content.split(" ")[0][1:]
+            invoked = ctx.message.content.split(' ')[0][1:]
             if invoked in slash_comms:
                 command_id = utils.get_command_id(self, invoked)
                 await ctx.reply(Messages.moved_command(name=invoked, id=command_id))
@@ -381,7 +381,7 @@ class ErrorLogger:
                 isinstance(error, commands.BadArgument)
                 or isinstance(error, commands.MissingAnyRole)
                 or isinstance(error, commands.MissingRequiredArgument)
-            ) and hasattr(ctx.command, "on_error"):
+            ) and hasattr(ctx.command, 'on_error'):
                 return True
 
             if isinstance(error, commands.UserInputError):
@@ -390,9 +390,9 @@ class ErrorLogger:
 
         # SLASH COMMANDS / INTERACTIONS
         inter = ctx
-        if hasattr(error, "original"):
+        if hasattr(error, 'original'):
             if isinstance(error.original, disnake.errors.InteractionTimedOut):
-                embed = self.create_error_embed(inter, "/", "Interaction timed out")
+                embed = self.create_error_embed(inter, '/', 'Interaction timed out')
                 await self.bot_dev_channel.send(embed=embed)
                 return True
 
@@ -422,7 +422,7 @@ class ErrorLogger:
 
         if isinstance(error, commands.CommandOnCooldown):
             time = datetime.datetime.now() + datetime.timedelta(seconds=error.retry_after)
-            retry_after = utils.get_discord_timestamp(time, style="Relative Time")
+            retry_after = utils.get_discord_timestamp(time, style='Relative Time')
             await ctx.send(Messages.spamming(user=ctx.author.id, time=retry_after))
             return True
 

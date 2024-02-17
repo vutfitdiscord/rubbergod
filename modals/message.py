@@ -19,8 +19,8 @@ class MessageModal(disnake.ui.Modal):
         self.edit = edit
         components = [
             disnake.ui.TextInput(
-                label="Message content",
-                custom_id="content",
+                label='Message content',
+                custom_id='content',
                 style=disnake.TextInputStyle.long,
                 required=True,
                 value=self.message.content if edit else None,
@@ -30,16 +30,16 @@ class MessageModal(disnake.ui.Modal):
 
         super().__init__(
             title=self.title,
-            custom_id="message_modal",
+            custom_id='message_modal',
             timeout=900,
             components=components
         )
 
     async def callback(self, inter: disnake.ModalInteraction) -> None:
         if self.edit:
-            await self.message.edit(inter.text_values["content"])
+            await self.message.edit(inter.text_values['content'])
             await inter.send(Messages.message_sent(channel=self.message.channel.mention), ephemeral=True)
             return
 
-        await self.channel.send(inter.text_values["content"])
+        await self.channel.send(inter.text_values['content'])
         await inter.send(Messages.message_sent(channel=self.channel.mention), ephemeral=True)

@@ -29,28 +29,28 @@ class ReviewView(EmbedView):
         ):
             self.add_item(
                 disnake.ui.Button(
-                    emoji="🔽",
-                    custom_id="review:next_text",
+                    emoji='🔽',
+                    custom_id='review:next_text',
                     style=disnake.ButtonStyle.primary,
                     row=1
                 )
             )
             self.add_item(
                 disnake.ui.Button(
-                    emoji="🔼",
-                    custom_id="review:prev_text",
+                    emoji='🔼',
+                    custom_id='review:prev_text',
                     style=disnake.ButtonStyle.primary,
                     row=1
                 )
             )
         else:
             for child in self.children:
-                if "text" in child.custom_id:
+                if 'text' in child.custom_id:
                     child.disabled = True
 
     @property
     def review_id(self):
-        return self.embed.footer.text.split("|")[-1][5:]
+        return self.embed.footer.text.split('|')[-1][5:]
 
     async def handle_vote(self, interaction: disnake.MessageInteraction, vote: bool = None):
         review = ReviewDB.get_review_by_id(self.review_id)
@@ -66,27 +66,27 @@ class ReviewView(EmbedView):
             self.embed = self.manager.update_embed(self.embed, review)
             await interaction.response.edit_message(embed=self.embed)
 
-    @disnake.ui.button(emoji="👍", custom_id="review:like", style=disnake.ButtonStyle.success, row=0)
+    @disnake.ui.button(emoji='👍', custom_id='review:like', style=disnake.ButtonStyle.success, row=0)
     async def like(self, button: disnake.ui.Button, interaction: disnake.MessageInteraction):
         await self.handle_vote(interaction, True)
 
-    @disnake.ui.button(emoji="🛑", custom_id="review:vote_remove", row=0)
+    @disnake.ui.button(emoji='🛑', custom_id='review:vote_remove', row=0)
     async def vote_remove(self, button: disnake.ui.Button, interaction: disnake.MessageInteraction):
         await self.handle_vote(interaction)
 
-    @disnake.ui.button(emoji="👎", custom_id="review:dislike", style=disnake.ButtonStyle.danger, row=0)
+    @disnake.ui.button(emoji='👎', custom_id='review:dislike', style=disnake.ButtonStyle.danger, row=0)
     async def dislike(self, button: disnake.ui.Button, interaction: disnake.MessageInteraction):
         await self.handle_vote(interaction, False)
 
-    @disnake.ui.button(emoji="❔", custom_id="review:help", style=disnake.ButtonStyle.primary, row=0)
+    @disnake.ui.button(emoji='❔', custom_id='review:help', style=disnake.ButtonStyle.primary, row=0)
     async def help(self, button: disnake.ui.Button, interaction: disnake.MessageInteraction):
         await interaction.send(Messages.reviews_reaction_help, ephemeral=True)
 
     async def interaction_check(self, interaction: disnake.MessageInteraction) -> None:
-        if interaction.data.custom_id == "embed:lock":
+        if interaction.data.custom_id == 'embed:lock':
             await super().interaction_check(interaction)
             return False
-        elif "review" not in interaction.data.custom_id:
+        elif 'review' not in interaction.data.custom_id:
             # pagination interaction from super class
             if await super().interaction_check(interaction) is not False:
                 # pagination has changed the page
@@ -101,7 +101,7 @@ class ReviewView(EmbedView):
                 await interaction.edit_original_response(view=view)
             return False
         elif (
-            "text" in interaction.data.custom_id and
+            'text' in interaction.data.custom_id and
             self.embed.fields[3].name == Messages.review_text_page_label
         ):
             if (self.perma_lock or self.locked) and interaction.author.id != self.author.id:
@@ -110,7 +110,7 @@ class ReviewView(EmbedView):
             # text page pagination
             review = ReviewDB.get_review_by_id(self.review_id)
             if review:
-                pages = self.embed.fields[3].value.split("/")
+                pages = self.embed.fields[3].value.split('/')
                 text_page = int(pages[0])
                 max_text_page = int(pages[1])
                 next_text_page = utils.pagination_next(interaction.data.custom_id, text_page, max_text_page)

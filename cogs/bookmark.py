@@ -16,7 +16,7 @@ class Bookmark(Base, commands.Cog):
         super().__init__()
         self.bot = bot
 
-    @commands.message_command(name="Bookmark", guild_ids=[Base.config.guild_id])
+    @commands.message_command(name='Bookmark', guild_ids=[Base.config.guild_id])
     async def bookmark(self, inter: disnake.ApplicationCommandInteraction, message: disnake.Message):
         """Send modal with input for bookmark name and then send to user"""
         await inter.response.send_modal(modal=BookmarkModal(message))

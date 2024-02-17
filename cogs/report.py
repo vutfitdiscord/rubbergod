@@ -30,7 +30,7 @@ class Report(Base, commands.Cog):
             return
 
     @cooldowns.default_cooldown
-    @commands.message_command(name="Report message", guild_ids=[Base.config.guild_id])
+    @commands.message_command(name='Report message', guild_ids=[Base.config.guild_id])
     async def app_report_message(self, inter: disnake.MessageCommandInteraction, message: disnake.Message):
         if UserDB.is_banned(inter.author.id):
             await inter.send(Messages.report_banned, ephemeral=True)
@@ -39,19 +39,19 @@ class Report(Base, commands.Cog):
         if dm_message is None:
             return
 
-        modal = ReportModal(self.bot, dm_message, "Message report", message)
+        modal = ReportModal(self.bot, dm_message, 'Message report', message)
         await inter.response.send_modal(modal=modal)
 
     @cooldowns.default_cooldown
     @commands.slash_command(
-        name="report", description=Messages.report_brief, guild_ids=[Base.config.guild_id]
+        name='report', description=Messages.report_brief, guild_ids=[Base.config.guild_id]
     )
     async def _report(self, inter: disnake.ApplicationCommandInteraction):
         if UserDB.is_banned(inter.author.id):
             await inter.send(Messages.report_banned, ephemeral=True)
             return
 
-    @_report.sub_command(name="general", description=Messages.report_general_brief)
+    @_report.sub_command(name='general', description=Messages.report_general_brief)
     async def report_general(self, inter: disnake.ApplicationCommandInteraction):
         dm_message = await self.check_blocked_bot(inter)
         if dm_message is None:
@@ -59,7 +59,7 @@ class Report(Base, commands.Cog):
         modal = ReportModal(self.bot, dm_message)
         await inter.response.send_modal(modal=modal)
 
-    @_report.sub_command(name="message", description=Messages.report_message_brief)
+    @_report.sub_command(name='message', description=Messages.report_message_brief)
     async def report_message(
         self,
         inter: disnake.ApplicationCommandInteraction,
@@ -69,18 +69,18 @@ class Report(Base, commands.Cog):
         if dm_message is None:
             return
 
-        modal = ReportModal(self.bot, dm_message, "Message report", message)
+        modal = ReportModal(self.bot, dm_message, 'Message report', message)
         await inter.response.send_modal(modal=modal)
 
-    @_report.sub_command(name="google_form", description=Messages.report_google_form_brief)
+    @_report.sub_command(name='google_form', description=Messages.report_google_form_brief)
     async def report_google_form(self, inter: disnake.ApplicationCommandInteraction):
         await inter.send(Messages.report_google_form, ephemeral=True)
 
     @commands.check(permission_check.submod_plus)
-    @commands.slash_command(name="report_mod", description=Messages.report_brief)
+    @commands.slash_command(name='report_mod', description=Messages.report_brief)
     async def _report_mod(self, inter: disnake.ApplicationCommandInteraction): ...
 
-    @_report_mod.sub_command(name="unban", description=Messages.report_unban_user_brief)
+    @_report_mod.sub_command(name='unban', description=Messages.report_unban_user_brief)
     async def report_unban_user(self, inter: disnake.ApplicationCommandInteraction, user: disnake.User):
         UserDB.unban_user(user.id)
         await inter.send(Messages.report_unban_user(user=user.mention))

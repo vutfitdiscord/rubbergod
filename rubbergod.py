@@ -40,7 +40,7 @@ elif args.load_subjects:
     exit(0)
 elif args.init_db:
     migrations.init_db()
-    print("Init complete")
+    print('Init complete')
     exit(0)
 
 is_initialized = False
@@ -102,12 +102,12 @@ async def on_ready():
 
     await bot.application_info()
     await presence.set_presence()
-    print("Ready")
+    print('Ready')
 
 
 @bot.event
 async def on_button_click(inter: disnake.MessageInteraction):
-    if inter.component.custom_id in ["trash:delete", "bookmark:delete"]:
+    if inter.component.custom_id in ['trash:delete', 'bookmark:delete']:
         try:
             await inter.message.delete()
         except disnake.NotFound:
@@ -122,11 +122,11 @@ async def on_error(event, *args, **kwargs):
 # Create missing tables at start
 migrations.init_db()
 
-bot.load_extension("cogs.system")
-print("System cog loaded")
+bot.load_extension('cogs.system')
+print('System cog loaded')
 
 for extension in config.extensions:
-    bot.load_extension(f"cogs.{extension}")
-    print(f"{extension} loaded")
+    bot.load_extension(f'cogs.{extension}')
+    print(f'{extension} loaded')
 
 bot.run(config.key)

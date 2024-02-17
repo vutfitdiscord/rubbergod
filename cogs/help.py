@@ -26,10 +26,10 @@ class Help(Base, commands.Cog):
 
     def command_details(self, prefix: str, command: commands.Command):
         return {
-            "command": f"{prefix}{command.name}",
-            "signature": command.signature,
-            "description": command.brief,
-            "aliases": command.aliases,
+            'command': f'{prefix}{command.name}',
+            'signature': command.signature,
+            'description': command.brief,
+            'aliases': command.aliases,
         }
 
     def command_help(self, ctx: commands.Context, command: commands.Command):
@@ -41,7 +41,7 @@ class Help(Base, commands.Cog):
             # e.g. karma, reviews
             if command.usage is not None:
                 current_page.append(self.command_details(prefix, command))
-            key_prefix = f"{prefix}{command.name} "
+            key_prefix = f'{prefix}{command.name} '
             for subcommand in command.commands:
                 for check in subcommand.checks:
                     try:
@@ -71,9 +71,9 @@ class Help(Base, commands.Cog):
                     current_page += self.command_help(ctx, command)
             if current_page:
                 pages.append({
-                    "commands": current_page,
-                    "description": cog.description,
-                    "groupName": name
+                    'commands': current_page,
+                    'description': cog.description,
+                    'groupName': name
                 })
 
         return pages
@@ -85,7 +85,7 @@ class Help(Base, commands.Cog):
             color=0xeee657
         )
         embed.set_thumbnail(url=self.bot.user.display_avatar.url)
-        self.add_fields(embed, page["commands"])
+        self.add_fields(embed, page['commands'])
         return embed
 
     def add_fields(self, embed, items):
@@ -96,36 +96,36 @@ class Help(Base, commands.Cog):
         for item in items:
             value = ''
             name = f'{item["command"]}'
-            if item["signature"] and item["signature"] != ' ':
+            if item['signature'] and item['signature'] != ' ':
                 name += f' `{item["signature"]}`'
-            if item["aliases"]:
+            if item['aliases']:
                 value += f'**Alias: **{", ".join(item["aliases"])}\n'
-            value += item["description"] if item["description"] else ''
+            value += item['description'] if item['description'] else ''
             embed.add_field(name=name, value=value if value else None, inline=False)
 
     async def api(self, message: commands.Context, params: list):
         """Sending commands help to grillbot"""
         mock_message = copy.copy(message)
-        mock_view = commands.view.StringView("")
-        mock_message.author = self.bot.get_user(params.get("user_id"))
+        mock_view = commands.view.StringView('')
+        mock_message.author = self.bot.get_user(params.get('user_id'))
         ctx = commands.Context(
             bot=self.bot,
             view=mock_view,
             prefix=self.config.default_prefix,
             message=mock_message,
         )
-        if "command" in params and params["command"] is not None:
-            if params["command"] == "slash_commands":
+        if 'command' in params and params['command'] is not None:
+            if params['command'] == 'slash_commands':
                 res = {}
                 for slash in self.bot.slash_commands:
                     res[slash.name] = {
-                        "id": utils.get_command_id(self, slash.name),
-                        "children": list(slash.children.keys())
+                        'id': utils.get_command_id(self, slash.name),
+                        'children': list(slash.children.keys())
                     }
                 return 0, res
-            command = self.bot.get_command(params["command"])
+            command = self.bot.get_command(params['command'])
             if not command:
-                return 1, "Command not found"
+                return 1, 'Command not found'
             help = {}
             for check in command.checks:
                 try:
@@ -157,11 +157,11 @@ class Help(Base, commands.Cog):
                     subcommands += [subcommand.name for subcommand in command_obj.commands]
                     text = f"`{self.config.default_prefix}{command_obj.name} [{', '.join(subcommands)}]`"
                 else:
-                    text = f"`{self.config.default_prefix}{command_obj} {command_obj.signature}`"
+                    text = f'`{self.config.default_prefix}{command_obj} {command_obj.signature}`'
                 if command_obj.description:
-                    text += f"\n{command_obj.description}"
+                    text += f'\n{command_obj.description}'
                 elif command_obj.brief:
-                    text += f"\n{command_obj.brief}"
+                    text += f'\n{command_obj.brief}'
                 await ctx.send(text)
             return
 
@@ -173,7 +173,7 @@ class Help(Base, commands.Cog):
         for idx, page in enumerate(pages):
             embed = self.generate_embed(page)
             if pages_total > 1:
-                footer_text = f"Strana {idx+1}/{pages_total}"
+                footer_text = f'Strana {idx+1}/{pages_total}'
             embed.set_footer(text=footer_text, icon_url=ctx.author.display_avatar.url)
             embeds.append(embed)
 

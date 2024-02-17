@@ -24,16 +24,16 @@ class Meme(Base, commands.Cog):
         if message.author.bot:
             if (
                 message.author.id in self.config.grillbot_ids
-                and message.content.startswith("<:")
-                and message.content.endswith(">")
+                and message.content.startswith('<:')
+                and message.content.endswith('>')
             ):
                 await message.channel.send(message.content)
             return
 
         elif self.config.uhoh_string in message.content.lower():
-            await message.channel.send("uh oh")
+            await message.channel.send('uh oh')
             uhoh_counter += 1
-        elif message.content == "PR":
+        elif message.content == 'PR':
             await message.channel.send(Messages.pr_meme)
 
     @commands.Cog.listener()
@@ -44,7 +44,7 @@ class Meme(Base, commands.Cog):
             await pocitani.send(Messages.upgraded_pocitani_caught_deleting)
             await pocitani.send(startnum)
 
-    @commands.slash_command(name="uhoh", description=Messages.uhoh_brief)
+    @commands.slash_command(name='uhoh', description=Messages.uhoh_brief)
     async def uhoh(self, inter):
         await inter.send(Messages.uhoh_counter(uhohs=uhoh_counter))
 

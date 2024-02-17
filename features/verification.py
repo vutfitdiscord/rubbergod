@@ -23,12 +23,12 @@ class Verification(BaseFeature):
         super().__init__(bot)
         self.helper = VerifyHelper(bot)
 
-    def send_mail(self, receiver_email: str, contents: str, subject: str = "") -> None:
-        msg = MIMEText(contents, "plain", "utf-8")
-        msg["Subject"] = subject
-        msg["To"] = receiver_email
-        msg["Date"] = datetime.now().isoformat()
-        msg["From"] = config.email_addr
+    def send_mail(self, receiver_email: str, contents: str, subject: str = '') -> None:
+        msg = MIMEText(contents, 'plain', 'utf-8')
+        msg['Subject'] = subject
+        msg['To'] = receiver_email
+        msg['Date'] = datetime.now().isoformat()
+        msg['From'] = config.email_addr
 
         with smtplib.SMTP_SSL(
             config.email_smtp_server,
@@ -43,7 +43,7 @@ class Verification(BaseFeature):
         self.send_mail(
             receiver_email,
             Messages.verify_post_verify_info_mail,
-            f"{user} {Messages.verify_verify_success_mail}",
+            f'{user} {Messages.verify_verify_success_mail}',
         )
 
     async def gen_code_and_send_mail(
@@ -58,7 +58,7 @@ class Verification(BaseFeature):
 
         if not dry_run:
             # Generate a verification code
-            code = "".join(random.choices(string.ascii_uppercase + string.digits, k=6))
+            code = ''.join(random.choices(string.ascii_uppercase + string.digits, k=6))
             mail_content = Messages.verify_mail_content(code=code)
             # Save the newly generated code into the database
             user.save_sent_code(code)
@@ -85,9 +85,9 @@ class Verification(BaseFeature):
         # return True if code was successfully sent
         # Check if the user doesn't have the verify role
         if not await self.helper.has_role(inter.user, config.verification_role) or \
-           await self.helper.has_role(inter.user, "Host"):
+           await self.helper.has_role(inter.user, 'Host'):
             # Some of them will use 'xlogin00' as stated in help, cuz they dumb
-            if login == "xlogin00":
+            if login == 'xlogin00':
                 await self.send_xlogin_info(inter)
                 return False
 
@@ -96,7 +96,7 @@ class Verification(BaseFeature):
                 # VUT
                 if user.status != VerifyStatus.Unverified.value:
                     if user.status == VerifyStatus.InProcess.value:
-                        await self.gen_code_and_send_mail(inter, user, "stud.fit.vutbr.cz", dry_run=True)
+                        await self.gen_code_and_send_mail(inter, user, 'stud.fit.vutbr.cz', dry_run=True)
                         return True
                     msg = Messages.verify_step_done(
                         user=inter.user.id,
@@ -105,11 +105,11 @@ class Verification(BaseFeature):
                     await inter.edit_original_response(content=msg)
                     await self.log_verify_fail(
                         inter,
-                        "getcode (xlogin) - Invalid verify state",
+                        'getcode (xlogin) - Invalid verify state',
                         str(user.__dict__),
                     )
                 else:
-                    await self.gen_code_and_send_mail(inter, user, "stud.fit.vutbr.cz")
+                    await self.gen_code_and_send_mail(inter, user, 'stud.fit.vutbr.cz')
                     return True
             else:
                 # MUNI
@@ -118,14 +118,14 @@ class Verification(BaseFeature):
                 except ValueError:
                     msg = Messages.invalid_login(user=inter.user.id, admin=config.admin_ids[0])
                     await inter.edit_original_response(msg)
-                    await self.log_verify_fail(inter, "getcode (MUNI)", str({"login": login}))
+                    await self.log_verify_fail(inter, 'getcode (MUNI)', str({'login': login}))
                     return False
 
                 user = ValidPersonDB.get_user_by_login(login)
 
                 if user is not None and user.status != VerifyStatus.Unverified.value:
                     if user.status == VerifyStatus.InProcess.value:
-                        await self.gen_code_and_send_mail(inter, user, "mail.muni.cz", dry_run=True)
+                        await self.gen_code_and_send_mail(inter, user, 'mail.muni.cz', dry_run=True)
                         return True
                     msg = Messages.verify_step_done(
                         user=inter.user.id,
@@ -134,15 +134,15 @@ class Verification(BaseFeature):
                     await inter.send(content=msg)
                     await self.log_verify_fail(
                         inter,
-                        "getcode (MUNI) - Invalid verify state",
+                        'getcode (MUNI) - Invalid verify state',
                         str(user.__dict__),
                     )
                     return False
 
                 user = ValidPersonDB.get_user_with_status(login, status=VerifyStatus.Unverified.value)
                 if user is None:
-                    user = ValidPersonDB.add_user(login, "MUNI", status=VerifyStatus.Unverified.value)
-                await self.gen_code_and_send_mail(inter, user, "mail.muni.cz")
+                    user = ValidPersonDB.add_user(login, 'MUNI', status=VerifyStatus.Unverified.value)
+                await self.gen_code_and_send_mail(inter, user, 'mail.muni.cz')
                 return True
         else:
             msg = Messages.verify_already_verified(user=inter.user.id, admin=config.admin_ids[0])
@@ -157,7 +157,7 @@ class Verification(BaseFeature):
         user = ValidPersonDB.get_user_by_login(login)
         if user is None:
             raise Exception(
-                "The user requested to resend the verification code, but it does not exist in the DB."
+                'The user requested to resend the verification code, but it does not exist in the DB.'
             )
 
         mail_postfix = self.get_mail_postfix(login)
@@ -167,48 +167,48 @@ class Verification(BaseFeature):
     def transform_year(raw_year: str):
         """Parses year string originally from /etc/passwd into a role name"""
 
-        if raw_year.lower() == "dropout":
-            return "Dropout"
+        if raw_year.lower() == 'dropout':
+            return 'Dropout'
 
         year_parts = list(filter(lambda x: len(x.strip()) > 0, raw_year.split()))
 
-        if year_parts[0] == "FIT":  # FIT student, or some VUT student.
+        if year_parts[0] == 'FIT':  # FIT student, or some VUT student.
             if len(year_parts) != 3:
                 # ['FIT'], ['FIT', '1r'], .... Who knows. Other faculty students, dropouts, ...
                 return None
 
-            year_value_match = re.search(r"(\d*)r", year_parts[2])
+            year_value_match = re.search(r'(\d*)r', year_parts[2])
             year_value = int(year_value_match.group(1))
 
-            if year_parts[1] in ["BIT", "BITP"]:
-                return "3BIT+" if year_value >= 3 else f"{year_value}BIT"
-            elif year_parts[1] in ["BCH", "CZV"]:
-                return "1BIT"  # TODO: fix erasmus students (BCH)
+            if year_parts[1] in ['BIT', 'BITP']:
+                return '3BIT+' if year_value >= 3 else f'{year_value}BIT'
+            elif year_parts[1] in ['BCH', 'CZV']:
+                return '1BIT'  # TODO: fix erasmus students (BCH)
             elif year_parts[1] in [
-                "MBS", "MBI", "MIS", "MIN", "MMI", "MMM", "MGM", "MGMe",
-                "MPV", "MSK", "NADE",
-                "NBIO", "NGRI", "NNET", "NVIZ", "NCPS", "NSEC", "NEMB",
-                "NHPC", "NISD", "NIDE", "NISY", "NMAL", "NMAT",
-                "NSEN", "NVER", "NSPE", "MGH",
-                "MITP-EN"
+                'MBS', 'MBI', 'MIS', 'MIN', 'MMI', 'MMM', 'MGM', 'MGMe',
+                'MPV', 'MSK', 'NADE',
+                'NBIO', 'NGRI', 'NNET', 'NVIZ', 'NCPS', 'NSEC', 'NEMB',
+                'NHPC', 'NISD', 'NIDE', 'NISY', 'NMAL', 'NMAT',
+                'NSEN', 'NVER', 'NSPE', 'MGH',
+                'MITP-EN'
             ]:
-                return "2MIT+" if year_value >= 2 else f"{year_value}MIT"
-            elif year_parts[1] in ["DVI4", "DRH", "DITP", "DITP-EN"]:
-                return "Doktorand"
-        elif year_parts[0] == "employee":
-            return "Vyucujici/Zamestnanec FIT"
+                return '2MIT+' if year_value >= 2 else f'{year_value}MIT'
+            elif year_parts[1] in ['DVI4', 'DRH', 'DITP', 'DITP-EN']:
+                return 'Doktorand'
+        elif year_parts[0] == 'employee':
+            return 'Vyucujici/Zamestnanec FIT'
         elif year_parts[0] in [
-            "FA", "FAST", "FAVU", "FCH", "FEKT", "FP", "FSI", "USI"
+            'FA', 'FAST', 'FAVU', 'FCH', 'FEKT', 'FP', 'FSI', 'USI'
         ]:  # Other VUT faculties
-            return "VUT"
-        elif len(year_parts) == 1 and year_parts[0] == "MUNI":  # Maybe MUNI?
-            return "MUNI"
+            return 'VUT'
+        elif len(year_parts) == 1 and year_parts[0] == 'MUNI':  # Maybe MUNI?
+            return 'MUNI'
 
         return None
 
     @staticmethod
     def get_mail_postfix(login: str):
-        return "mail.muni.cz" if login[0] != "x" and login.isnumeric() else "stud.fit.vutbr.cz"
+        return 'mail.muni.cz' if login[0] != 'x' and login.isnumeric() else 'stud.fit.vutbr.cz'
 
     async def finish_verify(self, inter: disnake.ModalInteraction, code: str, login: str) -> None:
         if await self.helper.has_role(inter.user, config.verification_role):
@@ -223,8 +223,8 @@ class Verification(BaseFeature):
                 await inter.response.send_message(Messages.verify_verify_wrong_code)
                 await self.log_verify_fail(
                     inter,
-                    "Verify (with code) - Wrong code",
-                    str({"login": login, "code(Input)": code, "code(DB)": new_user.code}),
+                    'Verify (with code) - Wrong code',
+                    str({'login': login, 'code(Input)': code, 'code(DB)': new_user.code}),
                 )
                 return
 
@@ -239,7 +239,7 @@ class Verification(BaseFeature):
                 )
                 await inter.response.send_message(msg)
                 await self.log_verify_fail(
-                    inter, "Verify (with code) (Invalid year)", str({"login": login, "year": new_user.year})
+                    inter, 'Verify (with code) (Invalid year)', str({'login': login, 'year': new_user.year})
                 )
                 return
 
@@ -263,8 +263,8 @@ class Verification(BaseFeature):
             except Exception:
                 return await self.log_verify_fail(
                     inter,
-                    "Verify (with code) (User already verified?)",
-                    str({"login": login, "year": new_user.year})
+                    'Verify (with code) (User already verified?)',
+                    str({'login': login, 'year': new_user.year})
                 )
 
             verify_success_msg = Messages.verify_verify_success(user=inter.user.id)
@@ -279,14 +279,14 @@ class Verification(BaseFeature):
             msg = Messages.verify_verify_not_found(user=inter.user.id, admin=config.admin_ids[0])
             await inter.response.send_message(msg)
             await self.log_verify_fail(
-                inter, "Verify (with code) - Not exists in DB", str({"login": login, "code": code})
+                inter, 'Verify (with code) - Not exists in DB', str({'login': login, 'code': code})
             )
 
     async def log_verify_fail(self, inter: disnake.ApplicationCommand, phase: str, data: str):
-        embed = disnake.Embed(title="Neúspěšný pokus o verify", color=0xEEE657)
-        embed.add_field(name="User", value=utils.generate_mention(inter.user.id))
-        embed.add_field(name="Verify phase", value=phase)
-        embed.add_field(name="Data", value=data, inline=False)
+        embed = disnake.Embed(title='Neúspěšný pokus o verify', color=0xEEE657)
+        embed.add_field(name='User', value=utils.generate_mention(inter.user.id))
+        embed.add_field(name='Verify phase', value=phase)
+        embed.add_field(name='Data', value=data, inline=False)
         await self.bot.get_channel(config.log_channel).send(embed=embed)
 
     async def send_xlogin_info(self, inter: disnake.ApplicationCommandInteraction):
@@ -300,11 +300,11 @@ class Verification(BaseFeature):
         """Removes host roles (Host, Zajemce o studium, Verify)"""
         guild = self.bot.get_guild(config.guild_id)
         member = inter.user if isinstance(inter.user, disnake.Member) else guild.get_member(inter.user.id)
-        host = disnake.utils.get(guild.roles, name="Host")
+        host = disnake.utils.get(guild.roles, name='Host')
 
         if host not in member.roles:
             return
 
-        verify = disnake.utils.get(guild.roles, name="Verify")
-        zajemce = disnake.utils.get(guild.roles, name="ZajemceoStudium")
-        await member.remove_roles(host, verify, zajemce, reason="Reverify user")
+        verify = disnake.utils.get(guild.roles, name='Verify')
+        zajemce = disnake.utils.get(guild.roles, name='ZajemceoStudium')
+        await member.remove_roles(host, verify, zajemce, reason='Reverify user')

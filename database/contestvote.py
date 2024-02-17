@@ -8,7 +8,7 @@ from database import database, session
 
 
 class ContestVoteDB(database.base):
-    __tablename__ = "contest_vote"
+    __tablename__ = 'contest_vote'
 
     user_id = Column(String, nullable=False)
     contribution_id = Column(BigInteger, primary_key=True, nullable=False, autoincrement=True)

@@ -12,7 +12,7 @@ from database import database, session
 
 
 class TimeoutDB(database.base):
-    __tablename__ = "timeout"
+    __tablename__ = 'timeout'
 
     id = Column(BigInteger, primary_key=True)
     mod_id = Column(String)                     # For automod this value is 1
@@ -21,8 +21,8 @@ class TimeoutDB(database.base):
     reason = Column(String)
     guild_id = Column(String)
     isself = Column(Boolean, default=False)
-    user: Mapped[TimeoutUserDB] = relationship(back_populates="timeouts")
-    user_id: Mapped[String] = mapped_column(ForeignKey("timeout_user.id"))
+    user: Mapped[TimeoutUserDB] = relationship(back_populates='timeouts')
+    user_id: Mapped[String] = mapped_column(ForeignKey('timeout_user.id'))
 
     @hybrid_property
     def is_active(self) -> bool:
@@ -109,10 +109,10 @@ class TimeoutDB(database.base):
 
 
 class TimeoutUserDB(database.base):
-    __tablename__ = "timeout_user"
+    __tablename__ = 'timeout_user'
 
     id = Column(String, primary_key=True)
-    timeouts: Mapped[list[TimeoutDB]] = relationship(back_populates="user")
+    timeouts: Mapped[list[TimeoutDB]] = relationship(back_populates='user')
 
     @property
     def timeout_count(self) -> int:

@@ -29,15 +29,15 @@ class GrillbotApi(Base, commands.Cog):
         """send karma objects to grillbot api"""
         if len(karma_objects) == 0:
             return
-        headers = {"ApiKey": self.config.grillbot_api_key, "Author": await self.owner_id()}
+        headers = {'ApiKey': self.config.grillbot_api_key, 'Author': await self.owner_id()}
         async with aiohttp.ClientSession(timeout=aiohttp.ClientTimeout(total=10), headers=headers) as session:
             try:
-                url = f"{self.config.grillbot_api_url}/user/karma/store"
+                url = f'{self.config.grillbot_api_url}/user/karma/store'
                 data = [{
-                        "member_ID": data.member_ID,
-                        "karmaValue": data.karma,
-                        "positive": data.positive,
-                        "negative": data.negative
+                        'member_ID': data.member_ID,
+                        'karmaValue': data.karma,
+                        'positive': data.positive,
+                        'negative': data.negative
                         } for data in karma_objects]
                 async with session.post(url, json=data):
                     pass
@@ -56,11 +56,11 @@ class GrillbotApi(Base, commands.Cog):
         lines = lines[1:-1]
         content = '\n'.join(lines)
         request = json.loads(content)
-        if "method" not in request or request["method"] not in self.config.grillbot_api_supported_methods:
-            await message.reply("Unsupported method")
+        if 'method' not in request or request['method'] not in self.config.grillbot_api_supported_methods:
+            await message.reply('Unsupported method')
             return
-        params = request["parameters"]
-        cog = self.bot.get_cog(request["method"])
+        params = request['parameters']
+        cog = self.bot.get_cog(request['method'])
         # check if cog is loaded
         if cog:
             status, content = await cog.api(message, params)
@@ -72,9 +72,9 @@ class GrillbotApi(Base, commands.Cog):
                 return
             res_json = json.dumps(content)
             with BytesIO(bytes(res_json, 'utf-8')) as file_binary:
-                await message.reply(file=disnake.File(fp=file_binary, filename="res.json"))
+                await message.reply(file=disnake.File(fp=file_binary, filename='res.json'))
         else:
-            await message.reply("Extension not loaded")
+            await message.reply('Extension not loaded')
 
 
 def setup(bot):

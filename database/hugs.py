@@ -10,11 +10,11 @@ from sqlalchemy.orm import Query
 from database import database, session
 
 Member = Union[disnake.Member, disnake.User]
-UserHugStats = namedtuple("UserHugStats", ("given", "received"))
+UserHugStats = namedtuple('UserHugStats', ('given', 'received'))
 
 
 class HugsTableDB(database.base):
-    __tablename__ = "bot_hugs"
+    __tablename__ = 'bot_hugs'
 
     member_id = Column(BIGINT, primary_key=True, nullable=False, unique=True, autoincrement=False)
 

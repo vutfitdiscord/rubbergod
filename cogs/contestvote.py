@@ -29,9 +29,9 @@ class ContestVote(Base, commands.Cog):
         self.check = RoomCheck(bot)
 
         self.emojis = {
-            str("1️⃣"): self.config.contest_vote_weight_1,
-            str("2️⃣"): self.config.contest_vote_weight_2,
-            str("3️⃣"): self.config.contest_vote_weight_3
+            str('1️⃣'): self.config.contest_vote_weight_1,
+            str('2️⃣'): self.config.contest_vote_weight_2,
+            str('3️⃣'): self.config.contest_vote_weight_3
         }
 
     @cached_property
@@ -42,13 +42,13 @@ class ContestVote(Base, commands.Cog):
     def contest_vote_channel(self) -> disnake.TextChannel:
         return self.bot.get_channel(self.config.contest_vote_channel)
 
-    @commands.slash_command(name="contest",)
+    @commands.slash_command(name='contest',)
     async def contest(self, inter: disnake.ApplicationCommandInteraction):
         pass
 
     @cooldowns.default_cooldown
     @contest.sub_command(
-        name="calculate_contribution",
+        name='calculate_contribution',
         description=Messages.contest_vote_calculate_contribution_brief
     )
     async def calculate_contribution(
@@ -68,11 +68,11 @@ class ContestVote(Base, commands.Cog):
 
         contributions = await get_top_contributions(self, [message_url], 1)
 
-        await inter.send("".join(contributions))
+        await inter.send(''.join(contributions))
 
     @commands.cooldown(rate=1, per=600.0, type=commands.BucketType.user)
     @contest.sub_command(
-        name="top_contributions",
+        name='top_contributions',
         description=Messages.contest_vote_top_contributions_brief,
     )
     async def top_contributions(
@@ -93,10 +93,10 @@ class ContestVote(Base, commands.Cog):
 
         await inter.send(Messages.contest_vote_top_contributions(number_of=number_of))
         for index in range(0, len(contributions), 5):
-            await inter.send("".join(contributions[index:index+5]))
+            await inter.send(''.join(contributions[index:index+5]))
 
     @cooldowns.default_cooldown
-    @contest.sub_command(name="submit", description=Messages.contest_vote_submit_brief)
+    @contest.sub_command(name='submit', description=Messages.contest_vote_submit_brief)
     async def submit(
         self,
         inter: disnake.ApplicationCommandInteraction,
@@ -107,7 +107,7 @@ class ContestVote(Base, commands.Cog):
         if image.size > 25000000:   # 25MB
             await inter.send(Messages.contest_vote_file_too_big)
             return
-        if "image" not in image.content_type:
+        if 'image' not in image.content_type:
             await inter.send(Messages.contest_vote_not_image)
             return
         if inter.author.id in self.config.contest_vote_banned_users:
@@ -131,18 +131,18 @@ class ContestVote(Base, commands.Cog):
 
         image = await image.to_file()
 
-        trash = TrashView(custom_id="contest:delete")
+        trash = TrashView(custom_id='contest:delete')
         view = ContestView(self.bot)
         view.children.extend(trash.children)
 
         content = Messages.contest_vote_contribution(id=contribution_id)
         if description:
-            content += f"Popis:\n{description}"
+            content += f'Popis:\n{description}'
 
         message = await self.filter_channel.send(content, file=image, view=view)
         await message.pin()
-        await message.add_reaction("👍")
-        await message.add_reaction("👎")
+        await message.add_reaction('👍')
+        await message.add_reaction('👎')
         await inter.send(Messages.contest_vote_submit_success)
 
     def is_contest_room(self, ctx):
@@ -150,11 +150,11 @@ class ContestVote(Base, commands.Cog):
 
     @cooldowns.default_cooldown
     @commands.check(submod_plus)
-    @commands.slash_command(name="contest_mod")
+    @commands.slash_command(name='contest_mod')
     async def contest_mod(self, inter: disnake.ApplicationCommandInteraction):
         pass
 
-    @contest_mod.sub_command(name="get_author", description=Messages.contest_vote_get_author_brief)
+    @contest_mod.sub_command(name='get_author', description=Messages.contest_vote_get_author_brief)
     async def get_author(self, inter: disnake.ApplicationCommandInteraction, id: int):
         await inter.response.defer(ephemeral=True)
         contribution_author_id = ContestVoteDB.get_contribution_author(id)
@@ -164,7 +164,7 @@ class ContestVote(Base, commands.Cog):
         user = await self.bot.get_or_fetch_user(contribution_author_id)
         await inter.send(user.mention)
 
-    @contest_mod.sub_command(name="start", description=Messages.contest_start_voting_brief)
+    @contest_mod.sub_command(name='start', description=Messages.contest_start_voting_brief)
     async def start_contest(self, inter: disnake.ApplicationCommandInteraction):
         await inter.response.defer(ephemeral=True)
         messages = await self.contest_vote_channel.history().flatten()
@@ -174,7 +174,7 @@ class ContestVote(Base, commands.Cog):
 
         await inter.send(Messages.contest_vote_start_success)
 
-    @contest_mod.sub_command(name="end", description=Messages.contest_end_voting_brief)
+    @contest_mod.sub_command(name='end', description=Messages.contest_end_voting_brief)
     async def end_contest(self, inter: disnake.ApplicationCommandInteraction):
         await inter.send(Messages.contest_vote_ending)
         messages = await self.contest_vote_channel.history().flatten()
@@ -184,7 +184,7 @@ class ContestVote(Base, commands.Cog):
         message = await inter.original_message()
         await message.edit(Messages.contest_vote_end_success)
 
-    @contest_mod.sub_command(name="approve", description=Messages.contest_vote_approve_brief)
+    @contest_mod.sub_command(name='approve', description=Messages.contest_vote_approve_brief)
     async def approve(self, inter: disnake.ApplicationCommandInteraction, message: disnake.Message):
         if inter.channel.id != self.config.contest_vote_filter_channel:
             await inter.send(Messages.contest_vote_not_filter_channel, ephemeral=True)
@@ -199,7 +199,7 @@ class ContestVote(Base, commands.Cog):
     @commands.Cog.listener()
     async def on_button_click(self, inter: disnake.MessageInteraction):
         """Handle button clicks"""
-        if inter.component.custom_id != "contest:delete":
+        if inter.component.custom_id != 'contest:delete':
             return
 
         await inter.response.send_modal(modal=DenyContributionModal(self.bot, inter))

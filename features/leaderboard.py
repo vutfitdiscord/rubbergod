@@ -73,7 +73,7 @@ class LeaderboardPageSource(DatabaseIteratorPageSource):
         emote_name: str = None,
         per_page: int = 10,
         base_embed: disnake.Embed = None,
-        member_id_col_name: str = "member_id",
+        member_id_col_name: str = 'member_id',
     ):
         """
         Initialize this page source.
@@ -99,7 +99,7 @@ class LeaderboardPageSource(DatabaseIteratorPageSource):
         elif callable(row_formatter):
             self.row_formatter = row_formatter
         else:
-            raise Exception("row_formatter has invalid type, should be str or callable.")
+            raise Exception('row_formatter has invalid type, should be str or callable.')
 
         self.bot = bot
         self.author = author
@@ -118,14 +118,14 @@ class LeaderboardPageSource(DatabaseIteratorPageSource):
         if emote_name.startswith('<') and emote_name.endswith('>'):
             emote = emote_name
         else:
-            emote = self.get_default_emoji(emote_name) or f":{emote_name}:"
-        return f"{emote} {board_name} {emote}"
+            emote = self.get_default_emoji(emote_name) or f':{emote_name}:'
+        return f'{emote} {board_name} {emote}'
 
     def _get_member_name(self, member_id: Union[str, int]) -> str:
         guild = self.bot.get_guild(config.guild_id)
         member = guild.get_member(int(member_id))
         if not member:
-            return "_User left_"
+            return '_User left_'
         return disnake.utils.escape_markdown(member.display_name)
 
     def _format_row(self, entry: Table, position: int) -> str:
@@ -144,7 +144,7 @@ class LeaderboardPageSource(DatabaseIteratorPageSource):
 
         member_name = self._get_member_name(member_id)
 
-        kwargs = {"position": position, "member_name": member_name, "entry": entry}
+        kwargs = {'position': position, 'member_name': member_name, 'entry': entry}
         return self.row_formatter(**kwargs)
 
     def format_page(self, page: DatabasePage) -> Union[str, disnake.Embed, dict]:
@@ -155,13 +155,13 @@ class LeaderboardPageSource(DatabaseIteratorPageSource):
                 entry=entry, position=(self.current_page * self.per_page) + i + 1
             ))
 
-        self.base_embed.description = "\n" + "\n".join(board_lines)
+        self.base_embed.description = '\n' + '\n'.join(board_lines)
 
         # possibility to optimize, author could be set only once
         utils.add_author_footer(
             self.base_embed,
             self.author,
-            additional_text=(f"{self.current_page + 1}/{self.get_max_pages()} pages.",),
+            additional_text=(f'{self.current_page + 1}/{self.get_max_pages()} pages.',),
         )
 
         return self.base_embed

@@ -26,8 +26,8 @@ class PromptSession:
 
         self.reactions = OrderedDict(
             {
-                "✅": True,
-                "❌": False
+                '✅': True,
+                '❌': False
             }
         )
 
@@ -35,7 +35,7 @@ class PromptSession:
         if self.__running:
             return False
 
-        em = disnake.Embed(title="Potvrzení", color=self.color)
+        em = disnake.Embed(title='Potvrzení', color=self.color)
         em.description = self.message
 
         self.__running = True

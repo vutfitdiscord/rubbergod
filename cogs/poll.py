@@ -27,7 +27,7 @@ from database.poll import PollDB, PollType
 from features import poll as poll_features
 from permissions.room_check import RoomCheck
 
-time_choices = ["1y 1M 1w 1d 1h 1m 1s", "DD.MM.YYYY HH:MM", "DD.MM.YYYY", "HH:MM", "Never"]
+time_choices = ['1y 1M 1w 1d 1h 1m 1s', 'DD.MM.YYYY HH:MM', 'DD.MM.YYYY', 'HH:MM', 'Never']
 
 
 class Poll(Base, commands.Cog):
@@ -37,10 +37,10 @@ class Poll(Base, commands.Cog):
         self.check = RoomCheck(bot)
 
     async def poll_create(self, args: dict, poll_options: dict, poll_view: disnake.ui.View):
-        inter = args.get("inter")
-        attachment = args.get("attachment")
-        anonymous = args.get("anonymous")
-        endtime = args.get("endtime")
+        inter = args.get('inter')
+        attachment = args.get('attachment')
+        anonymous = args.get('anonymous')
+        endtime = args.get('endtime')
 
         endtime_check, endtime = poll_features.check_endtime(inter, endtime)
         if endtime_check:
@@ -52,19 +52,19 @@ class Poll(Base, commands.Cog):
             return
 
         type, attachment = await poll_features.parse_attachment(attachment)
-        file = [attachment] if type == "file" else []
+        file = [attachment] if type == 'file' else []
 
-        args["author"] = inter.author
-        args["author_id"] = inter.author.id
-        args["image"] = attachment if type == "image" else None
-        args["end_datetime"] = endtime
-        args["poll_options"] = poll_options
-        args["poll_type"] = PollType.boolean.value
-        args["max_votes"] = 1
-        args["message_url"] = ""
+        args['author'] = inter.author
+        args['author_id'] = inter.author.id
+        args['image'] = attachment if type == 'image' else None
+        args['end_datetime'] = endtime
+        args['poll_options'] = poll_options
+        args['poll_type'] = PollType.boolean.value
+        args['max_votes'] = 1
+        args['message_url'] = ''
 
         poll = PollDB.add(**args)
-        args["poll_id"] = poll.id
+        args['poll_id'] = poll.id
 
         embed = poll_features.create_embed(**args)
 
@@ -79,7 +79,7 @@ class Poll(Base, commands.Cog):
         poll.update_message_url(message_url=message.jump_url)
         self.task_generator(poll)
 
-    @commands.slash_command(name="poll")
+    @commands.slash_command(name='poll')
     async def _poll(self, inter): ...
 
     # TODO
@@ -111,18 +111,18 @@ class Poll(Base, commands.Cog):
     #     await inter.send("asdf", view=PollBasicView(self.bot))
 
     @cooldowns.long_cooldown
-    @_poll.sub_command(name="boolean", description=Messages.poll_boolean_brief)
+    @_poll.sub_command(name='boolean', description=Messages.poll_boolean_brief)
     async def boolean(
         self,
         inter: disnake.ApplicationCommandInteraction,
         title: str = commands.Param(description=Messages.poll_title, max_length=256),
         description: str = commands.Param(
-            default="",
+            default='',
             description=Messages.poll_description,
             max_length=3000
         ),
         endtime: str = commands.Param(
-            default="1h",
+            default='1h',
             description=Messages.time_format,
             max_length=40,
             autocomplete=time_choices
@@ -134,27 +134,27 @@ class Poll(Base, commands.Cog):
     ):
         await inter.response.defer()
         args = locals()
-        args.pop("self")
+        args.pop('self')
 
         await self.poll_create(
             args,
-            poll_options={"✅": "Ano", "❌": "Ne"},
+            poll_options={'✅': 'Ano', '❌': 'Ne'},
             poll_view=PollBooleanView(self.bot)
         )
 
     @cooldowns.long_cooldown
-    @_poll.sub_command(name="opinion", description=Messages.poll_opinion_brief)
+    @_poll.sub_command(name='opinion', description=Messages.poll_opinion_brief)
     async def opinion(
         self,
         inter: disnake.ApplicationCommandInteraction,
         title: str = commands.Param(description=Messages.poll_title, max_length=256),
         description: str = commands.Param(
-            default="",
+            default='',
             description=Messages.poll_description,
             max_length=3000
         ),
         endtime: str = commands.Param(
-            default="1h",
+            default='1h',
             description=Messages.time_format,
             max_length=40,
             autocomplete=time_choices
@@ -166,16 +166,16 @@ class Poll(Base, commands.Cog):
     ):
         await inter.response.defer()
         args = locals()
-        args.pop("self")
+        args.pop('self')
 
         await self.poll_create(
             args,
-            poll_options={"✅": "Souhlasím", "😐": "Neutral", "❌": "Nesouhlasím"},
+            poll_options={'✅': 'Souhlasím', '😐': 'Neutral', '❌': 'Nesouhlasím'},
             poll_view=PollOpinionView(self.bot)
         )
 
     @cooldowns.default_cooldown
-    @_poll.sub_command(name="list", description=Messages.poll_list_brief)
+    @_poll.sub_command(name='list', description=Messages.poll_list_brief)
     async def list_polls(
         self,
         inter: disnake.ApplicationCommandInteraction,
@@ -185,16 +185,16 @@ class Poll(Base, commands.Cog):
     ):
         await inter.response.defer(ephemeral=True)
         if not type:
-            header = "# Aktivní hlasování:\n"
+            header = '# Aktivní hlasování:\n'
             polls = PollDB.get_pending_polls()
         else:
-            header = f"# {type.capitalize()} aktivní hlasování:\n"
+            header = f'# {type.capitalize()} aktivní hlasování:\n'
             polls = PollDB.get_pending_polls_by_type(PollType[type].value)
         if not polls:
             await inter.send(Messages.poll_no_active_polls)
             return
 
-        content = ""
+        content = ''
         for poll in polls:
             link = poll.message_url.split('/')
             try:
@@ -212,7 +212,7 @@ class Poll(Base, commands.Cog):
             await inter.send(Messages.poll_no_active_polls)
             return
 
-        content = utils.cut_string_by_words(header + content, 1900, "\n")
+        content = utils.cut_string_by_words(header + content, 1900, '\n')
         for content_part in content:
             await inter.send(content_part, ephemeral=True)
 

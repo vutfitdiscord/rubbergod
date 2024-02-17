@@ -11,7 +11,7 @@ from database import database, session
 class Event(database.base):
     __tablename__ = 'stats_event'
     # events are shared between the cogs, so constraint key is needed here
-    __table_args__ = (PrimaryKeyConstraint("name", "cog", name="id"),)
+    __table_args__ = (PrimaryKeyConstraint('name', 'cog', name='id'),)
 
     name = Column(String)  # command or event name
     cog = Column(String)  # can be cog or event in button, select etc.
@@ -34,10 +34,10 @@ class ErrorEvent(database.base):
     __tablename__ = 'stats_error_event'
     _table_args__ = (
         ForeignKeyConstraint(
-            ["event_name", "cog"],
-            ["stats_event.name", "stats_event.cog"],
-            ondelete="CASCADE",
-            onupdate="CASCADE",
+            ['event_name', 'cog'],
+            ['stats_event.name', 'stats_event.cog'],
+            ondelete='CASCADE',
+            onupdate='CASCADE',
         ),
     )
 

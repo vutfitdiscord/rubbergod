@@ -21,7 +21,7 @@ class Random(Base, commands.Cog):
         self.check = room_check.RoomCheck(bot)
 
     @cooldowns.short_cooldown
-    @commands.slash_command(name="pick", description=Messages.random_pick_brief)
+    @commands.slash_command(name='pick', description=Messages.random_pick_brief)
     async def pick(
         self,
         inter: disnake.ApplicationCommandInteraction,
@@ -39,7 +39,7 @@ class Random(Base, commands.Cog):
             return
 
         for i, arg in enumerate(args):
-            if "?" in arg:
+            if '?' in arg:
                 args = args[i + 1:]
                 break
 
@@ -47,18 +47,18 @@ class Random(Base, commands.Cog):
             await inter.send(Messages.random_pick_empty)
             return
         option = disnake.utils.escape_mentions(random.choice(args))
-        await inter.send(f"{option} {inter.author.mention}", ephemeral=self.check.botroom_check(inter))
+        await inter.send(f'{option} {inter.author.mention}', ephemeral=self.check.botroom_check(inter))
 
     @cooldowns.short_cooldown
-    @commands.slash_command(name="flip", description=Messages.random_flip_brief)
+    @commands.slash_command(name='flip', description=Messages.random_flip_brief)
     async def flip(self, inter: disnake.ApplicationCommandInteraction):
         await inter.send(
-            random.choice(["True", "False"]),
+            random.choice(['True', 'False']),
             ephemeral=self.check.botroom_check(inter)
         )
 
     @cooldowns.short_cooldown
-    @commands.slash_command(name="roll", description=Messages.rng_generator_format)
+    @commands.slash_command(name='roll', description=Messages.rng_generator_format)
     async def roll(self, inter: disnake.ApplicationCommandInteraction, first: int, second: int = 0):
         if first > second:
             first, second = second, first

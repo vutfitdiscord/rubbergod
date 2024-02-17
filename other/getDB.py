@@ -1,8 +1,8 @@
-f = open("data.txt", "r")
+f = open('data.txt', 'r')
 database = []
 for line in f:
     try:
-        line = line.split(":")
+        line = line.split(':')
         login = line[0]
         line = line[4]
         line = line.split(',')
@@ -16,22 +16,22 @@ for line in f:
     except IndexError:
         continue
 f.close()
-f = open("database.sql", "w")
-f.write("USE `rubbergod`;\n")
-f.write("INSERT INTO `bot_valid_persons`(\n")
-f.write("`login`,\n")
-f.write("`name`,\n")
-f.write("`year`,\n")
-f.write("`status`\n)\n")
-f.write("VALUES\n")
-string = ""
+f = open('database.sql', 'w')
+f.write('USE `rubbergod`;\n')
+f.write('INSERT INTO `bot_valid_persons`(\n')
+f.write('`login`,\n')
+f.write('`name`,\n')
+f.write('`year`,\n')
+f.write('`status`\n)\n')
+f.write('VALUES\n')
+string = ''
 for line in database:
-    string = string + "(\n"
+    string = string + '(\n'
     string = string + "'" + line[0] + "',\n"
     string = string + "'" + line[2] + "',\n"
     string = string + "'" + line[1] + "',\n"
-    string = string + "1" + "\n"
-    string = string + "),\n"
+    string = string + '1' + '\n'
+    string = string + '),\n'
 string = string[:-2]
-string = string + ";\n"
+string = string + ';\n'
 f.write(string)

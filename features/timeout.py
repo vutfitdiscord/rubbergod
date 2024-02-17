@@ -36,14 +36,14 @@ def add_field_timeout(
     embed.add_field(
         name=title,
         value=Messages.timeout_field_text(
-            member=f"{member.mention} ({member.display_name})",
-            mod=f"{author.mention} ({author.display_name})",
-            starttime=starttime.strftime("%d.%m.%Y %H:%M"),
-            endtime=endtime.strftime("%d.%m.%Y %H:%M"),
-            length=f"{length.days}d, "
-            f"{length.seconds // 3600}h, "
-            f"{(length.seconds // 60) % 60}m",
-            timestamp=utils.get_discord_timestamp(endtime, "Relative Time"),
+            member=f'{member.mention} ({member.display_name})',
+            mod=f'{author.mention} ({author.display_name})',
+            starttime=starttime.strftime('%d.%m.%Y %H:%M'),
+            endtime=endtime.strftime('%d.%m.%Y %H:%M'),
+            length=f'{length.days}d, '
+            f'{length.seconds // 3600}h, '
+            f'{(length.seconds // 60) % 60}m',
+            timestamp=utils.get_discord_timestamp(endtime, 'Relative Time'),
             reason=reason,
         ),
         inline=False,
@@ -132,7 +132,7 @@ async def parse_members(
         # print users that can't be found
         await inter.send(
             Messages.timeout_member_not_found(
-                author=inter.author.mention, members=", ".join(not_found_members)
+                author=inter.author.mention, members=', '.join(not_found_members)
             ),
             ephemeral=True
         )
@@ -142,12 +142,12 @@ async def parse_members(
 
 async def get_user_from_grillbot(self, guild_id: str, user_id: str) -> tuple[int, int]:
     """Get unverify count and warning count"""
-    headers = {"ApiKey": self.config.grillbot_api_key, "Author": str(self.bot.owner_id)}
+    headers = {'ApiKey': self.config.grillbot_api_key, 'Author': str(self.bot.owner_id)}
     async with aiohttp.ClientSession(timeout=aiohttp.ClientTimeout(total=10), headers=headers) as session:
         try:
-            url = f"{self.config.grillbot_api_url}/user/info/{guild_id}/{user_id}"
+            url = f'{self.config.grillbot_api_url}/user/info/{guild_id}/{user_id}'
             async with session.get(url) as resp:
                 user = await resp.json()
-                return user.get("unverifyCount", "Missing"), user.get("warningCount", "Missing")
+                return user.get('unverifyCount', 'Missing'), user.get('warningCount', 'Missing')
         except (asyncio.exceptions.TimeoutError, aiohttp.client_exceptions.ClientConnectorError) as e:
             raise ApiError(e)

@@ -22,17 +22,17 @@ class SystemView(BaseView):
             self.selects.append(Dropdown(bot, self, cogs[i]))
             self.add_item(self.selects[i])
 
-    @disnake.ui.button(label="Reload off", style=disnake.ButtonStyle.secondary)
+    @disnake.ui.button(label='Reload off', style=disnake.ButtonStyle.secondary)
     async def reload_button(self, button: disnake.ui.Button, inter: disnake.MessageInteraction):
         for i, cogs in enumerate(self.selects):
             self.selects[i].reload = not self.selects[i].reload
 
         if self.selects[0].reload:
             button.style = disnake.ButtonStyle.green
-            button.label = "Reload on"
+            button.label = 'Reload on'
         else:
             button.style = disnake.ButtonStyle.secondary
-            button.label = "Reload off"
+            button.label = 'Reload off'
 
         await inter.response.edit_message(view=self)
 
@@ -55,7 +55,7 @@ class Dropdown(disnake.ui.Select):
         self.cogs = cogs
         self.reload = False
         self.msg = None
-        self.unloadable_cogs = ["system"]
+        self.unloadable_cogs = ['system']
 
         super().__init__(
             placeholder=self.get_initials(),
@@ -68,7 +68,7 @@ class Dropdown(disnake.ui.Select):
         """Creates placeholder for selects from names of cogs."""
         first = self.cogs[1][0]
         last = self.cogs[1][-1]
-        return f"{first} - {last}"
+        return f'{first} - {last}'
 
     def create_select(self):
         """Creates one singular select from cogs"""
@@ -88,9 +88,9 @@ class Dropdown(disnake.ui.Select):
 
         for file, cog in dict_of_cogs.items():
             if cog in loaded:
-                options.append(disnake.SelectOption(label=cog, value=file, emoji="✅"))
+                options.append(disnake.SelectOption(label=cog, value=file, emoji='✅'))
             else:
-                options.append(disnake.SelectOption(label=cog, value=file, emoji="❌"))
+                options.append(disnake.SelectOption(label=cog, value=file, emoji='❌'))
         return options
 
     def create_cog_lists(self):
@@ -111,7 +111,7 @@ class Dropdown(disnake.ui.Select):
         return unloaded
 
     def create_embed(self, author_color):
-        embed = disnake.Embed(title="Cogs information and loading", color=author_color)
+        embed = disnake.Embed(title='Cogs information and loading', color=author_color)
         all_cogs = utils.get_all_cogs()
 
         cog_loaded = []
@@ -119,21 +119,21 @@ class Dropdown(disnake.ui.Select):
         for file, class_cog in all_cogs.items():
             if class_cog in self.bot.cogs:
                 if file not in config.extensions:
-                    cog_loaded.append(f"✅ **{class_cog}**\n\n")
+                    cog_loaded.append(f'✅ **{class_cog}**\n\n')
                 else:
-                    cog_loaded.append(f"✅ {class_cog}\n\n")
+                    cog_loaded.append(f'✅ {class_cog}\n\n')
             else:
                 if file in config.extensions:
-                    cog_unloaded.append(f"❌ **{class_cog}**\n\n")
+                    cog_unloaded.append(f'❌ **{class_cog}**\n\n')
                 else:
-                    cog_unloaded.append(f"❌ {class_cog}\n\n")
+                    cog_unloaded.append(f'❌ {class_cog}\n\n')
 
         cog_list = cog_loaded + cog_unloaded
         cog_sum = len(cog_loaded) + len(cog_unloaded)
 
         embed.add_field(
-            name="Loaded/Unloaded/All",
-            value=f"**{len(cog_loaded)} / {len(cog_unloaded)} / {cog_sum}**",
+            name='Loaded/Unloaded/All',
+            value=f'**{len(cog_loaded)} / {len(cog_unloaded)} / {cog_sum}**',
             inline=False
         )
 
@@ -141,16 +141,16 @@ class Dropdown(disnake.ui.Select):
         cog_lists = list(utils.split(cog_loaded, chunks))
         for cog_list in cog_lists:
             if cog_list:
-                embed.add_field(name="\u200b", value="".join(cog_list), inline=True)
+                embed.add_field(name='\u200b', value=''.join(cog_list), inline=True)
 
         if cog_unloaded:
-            embed.add_field(name="\u200b", value="\u200b", inline=False)
+            embed.add_field(name='\u200b', value='\u200b', inline=False)
             cog_lists = list(utils.split(cog_unloaded, chunks))
             for cog_list in cog_lists:
                 if cog_list:
-                    embed.add_field(name="\u200b", value="".join(cog_list), inline=True)
+                    embed.add_field(name='\u200b', value=''.join(cog_list), inline=True)
 
-        embed.set_footer(text="Bold items are overrides of config.extension")
+        embed.set_footer(text='Bold items are overrides of config.extension')
         return embed
 
     async def callback(self, inter: disnake.MessageInteraction):
@@ -169,25 +169,25 @@ class Dropdown(disnake.ui.Select):
                 for cog in self.values:
                     if cog in unloaded:
                         try:
-                            self.bot.load_extension(f"cogs.{cog}")
+                            self.bot.load_extension(f'cogs.{cog}')
                             print(Messages.cog_loaded(cog=cog))
                         except Exception as e:
-                            await inter.send(f"Loading error\n`{e}`")
+                            await inter.send(f'Loading error\n`{e}`')
                     else:
                         try:
-                            self.bot.unload_extension(f"cogs.{cog}")
+                            self.bot.unload_extension(f'cogs.{cog}')
                             print(Messages.cog_unloaded(cog=cog))
                         except Exception as e:
-                            await inter.send(f"Unloading error\n`{e}`")
+                            await inter.send(f'Unloading error\n`{e}`')
             else:
                 for cog in self.values:
                     try:
-                        self.bot.reload_extension(f"cogs.{cog}")
+                        self.bot.reload_extension(f'cogs.{cog}')
                         message = Messages.cog_reloaded(cog=cog)
                         print(message)
                         await inter.channel.send(message)
                     except Exception as e:
-                        await inter.send(f"Reloading error\n`{e}`")
+                        await inter.send(f'Reloading error\n`{e}`')
 
             self.options = self.create_select()
             await self.msg.edit(embed=self.create_embed(inter.author.color), view=self._view)

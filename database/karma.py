@@ -101,9 +101,9 @@ class KarmaDB(database.base):
         if karma_object is None:
             karma_object = cls(karma=0, positive=0, negative=0)
 
-        order = cls.get_karma_position("karma", karma_object.karma)
-        pos_order = cls.get_karma_position("positive", karma_object.positive)
-        neg_order = cls.get_karma_position("negative", karma_object.negative)
+        order = cls.get_karma_position('karma', karma_object.karma)
+        pos_order = cls.get_karma_position('positive', karma_object.positive)
+        neg_order = cls.get_karma_position('negative', karma_object.negative)
 
         karma = KarmaRowData(karma_object.karma, order)
         positive = KarmaRowData(karma_object.positive, pos_order)

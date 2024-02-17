@@ -21,10 +21,10 @@ class ContestView(BaseView):
         return permission_check.submod_plus(inter)
 
     @disnake.ui.button(
-        label="Přijmout návrh",
-        emoji="✅",
+        label='Přijmout návrh',
+        emoji='✅',
         style=disnake.ButtonStyle.secondary,
-        custom_id="contestvote:accept"
+        custom_id='contestvote:accept'
     )
     async def answer(self, button: disnake.ui.Button, inter: disnake.MessageInteraction) -> None:
         file = await inter.message.attachments[0].to_file()

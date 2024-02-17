@@ -30,28 +30,28 @@ class System(Base, commands.Cog):
         self.error_log = ErrorLogger(bot)
         self.git = Git()
 
-        self.unloadable_cogs = ["system"]
+        self.unloadable_cogs = ['system']
 
     @commands.check(permission_check.is_bot_admin)
-    @commands.slash_command(name="git")
+    @commands.slash_command(name='git')
     async def git(self, inter):
         pass
 
-    @git.sub_command(name="pull", description=Messages.git_pull_brief)
+    @git.sub_command(name='pull', description=Messages.git_pull_brief)
     async def pull(self, inter: disnake.ApplicationCommandInteraction):
-        await inter.send("Pulling...")
+        await inter.send('Pulling...')
         message: Message = await inter.original_message()
 
         pull_result = await self.git.pull()
         pull_parts = utils.cut_string(pull_result, 1900)
 
-        await message.edit(content=f"```{pull_parts[0]}```")
+        await message.edit(content=f'```{pull_parts[0]}```')
 
         for part in pull_parts[1:]:
-            await inter.send(f"```{part}```")
+            await inter.send(f'```{part}```')
 
     @commands.check(permission_check.is_bot_admin)
-    @commands.slash_command(name="get_logs", description=Messages.system_get_logs_brief)
+    @commands.slash_command(name='get_logs', description=Messages.system_get_logs_brief)
     async def get_logs(
         self,
         inter: disnake.ApplicationCommandInteraction,
@@ -60,7 +60,7 @@ class System(Base, commands.Cog):
         await inter.response.defer()
         try:
             result = subprocess.run(
-                f"touch service_logs.txt && tail -n {lines} service_logs.txt",
+                f'touch service_logs.txt && tail -n {lines} service_logs.txt',
                 shell=True,
                 check=True,
                 stdout=subprocess.PIPE,
@@ -70,18 +70,18 @@ class System(Base, commands.Cog):
         except subprocess.CalledProcessError as error:
             strings = utils.cut_string(error.stderr, 1900)
             for string in strings:
-                await inter.send(f"```{string}```")
+                await inter.send(f'```{string}```')
             return
 
-        with open("service_logs.txt", "w") as file:
+        with open('service_logs.txt', 'w') as file:
             file.write(result.stdout)
 
-        await inter.send(file=disnake.File("service_logs.txt"))
+        await inter.send(file=disnake.File('service_logs.txt'))
 
     @commands.check(permission_check.is_bot_admin)
-    @commands.slash_command(name="shutdown", description=Messages.shutdown_brief)
+    @commands.slash_command(name='shutdown', description=Messages.shutdown_brief)
     async def shutdown(self, inter: disnake.ApplicationCommandInteraction):
-        await inter.send("Shutting down...")
+        await inter.send('Shutting down...')
         exit(1)
 
     async def create_selects(self):
@@ -100,7 +100,7 @@ class System(Base, commands.Cog):
         return all_selects
 
     @commands.check(permission_check.is_bot_admin)
-    @commands.slash_command(name="cogs", description=Messages.cogs_brief, guild_ids=[Base.config.guild_id])
+    @commands.slash_command(name='cogs', description=Messages.cogs_brief, guild_ids=[Base.config.guild_id])
     async def cogs(self, inter: disnake.ApplicationCommandInteraction):
         """
         Creates embed with button and select(s) to load/unload/reload cogs.
@@ -120,24 +120,24 @@ class System(Base, commands.Cog):
             view.selects[i].msg = message
 
     @cooldowns.default_cooldown
-    @commands.slash_command(name="uptime", description=Messages.uptime_brief)
+    @commands.slash_command(name='uptime', description=Messages.uptime_brief)
     async def uptime(self, inter: disnake.ApplicationCommandInteraction):
         await inter.response.defer()
         now = datetime.now().replace(microsecond=0)
         delta = now - boottime
         count = self.error_log.log_error_time(set=False)
         embed = disnake.Embed(
-            title="Uptime",
-            description=f"{count} days without an accident.",
+            title='Uptime',
+            description=f'{count} days without an accident.',
             color=0xeee657,
         )
         start_streak, end_streak = ErrorLogDB.get_longest_streak()
         embed.add_field(name=Messages.upsince_title, value=str(boottime))
         embed.add_field(name=Messages.uptime_title, value=str(delta))
-        embed.add_field(name=Messages.uptime_latency, value=f"{round(self.bot.latency * 1000)} ms")
+        embed.add_field(name=Messages.uptime_latency, value=f'{round(self.bot.latency * 1000)} ms')
         embed.add_field(
             name=Messages.longest_streak,
-            value=f"**{(end_streak - start_streak).days} day(s)**\n{start_streak} — {end_streak}",
+            value=f'**{(end_streak - start_streak).days} day(s)**\n{start_streak} — {end_streak}',
             inline=False
         )
         self.error_log.set_image(embed, self.bot.user, count)

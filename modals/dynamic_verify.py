@@ -12,7 +12,7 @@ class DynamicVerifyEditModal(disnake.ui.Modal):
         self.rule = rule
 
         selected_roles = rule.get_role_ids() if self.is_edit() else []
-        guild_roles = list(filter(lambda x: x.name != "@everyone" and x.is_assignable(), guild.roles))
+        guild_roles = list(filter(lambda x: x.name != '@everyone' and x.is_assignable(), guild.roles))
 
         selected_roles_data = list(
             map(
@@ -27,18 +27,18 @@ class DynamicVerifyEditModal(disnake.ui.Modal):
 
         components = [
             disnake.ui.TextInput(
-                label="Identifikátor",
-                placeholder="Identifikátor",
-                custom_id="id",
+                label='Identifikátor',
+                placeholder='Identifikátor',
+                custom_id='id',
                 style=disnake.TextInputStyle.short,
                 required=True,
                 value=rule.id if self.is_edit() else None,
                 min_length=2,
             ),
             disnake.ui.TextInput(
-                label="Název",
-                placeholder="Název",
-                custom_id="name",
+                label='Název',
+                placeholder='Název',
+                custom_id='name',
                 style=disnake.TextInputStyle.short,
                 required=True,
                 value=rule.name if self.is_edit() else None,
@@ -54,9 +54,9 @@ class DynamicVerifyEditModal(disnake.ui.Modal):
             #    ],
             # ),
             disnake.ui.TextInput(
-                label="Stav (True/False = Zapnuto/Vypnuto)",
-                placeholder="Stav (True/False = Zapnuto/Vypnuto)",
-                custom_id="enabled",
+                label='Stav (True/False = Zapnuto/Vypnuto)',
+                placeholder='Stav (True/False = Zapnuto/Vypnuto)',
+                custom_id='enabled',
                 style=disnake.TextInputStyle.short,
                 min_length=4,
                 max_length=5,
@@ -65,9 +65,9 @@ class DynamicVerifyEditModal(disnake.ui.Modal):
             ),
             # TODO: switch to select when supported
             disnake.ui.TextInput(
-                label="Vyžaduje potvrzení (True/False)",
-                placeholder="Stav (True/False = Zapnuto/Vypnuto)",
-                custom_id="mod_check",
+                label='Vyžaduje potvrzení (True/False)',
+                placeholder='Stav (True/False = Zapnuto/Vypnuto)',
+                custom_id='mod_check',
                 style=disnake.TextInputStyle.short,
                 min_length=4,
                 max_length=5,
@@ -75,12 +75,12 @@ class DynamicVerifyEditModal(disnake.ui.Modal):
                 value=str(rule.mod_check) if self.is_edit() else str(True),
             ),
             disnake.ui.TextInput(
-                label="Role (zadávej názvy, nebo ID; odděluj čárkou)",
-                placeholder="Zadej role (zadávej názvy, nebo ID; odděluj čárkou)",
-                custom_id="roles",
+                label='Role (zadávej názvy, nebo ID; odděluj čárkou)',
+                placeholder='Zadej role (zadávej názvy, nebo ID; odděluj čárkou)',
+                custom_id='roles',
                 style=disnake.TextInputStyle.single_line,
                 required=True,
-                value=",".join([role.name for role in selected_roles_data]),
+                value=','.join([role.name for role in selected_roles_data]),
             ),
         ]
 
@@ -110,10 +110,10 @@ class DynamicVerifyEditModal(disnake.ui.Modal):
         #     )
 
         super().__init__(
-            title="Modifikace verifikačního pravidla"
+            title='Modifikace verifikačního pravidla'
             if self.is_edit()
-            else "Vytvoření verifikačního pravidla",
-            custom_id="dynamic_verify_edit",
+            else 'Vytvoření verifikačního pravidla',
+            custom_id='dynamic_verify_edit',
             timeout=300,
             components=components,
         )
@@ -124,8 +124,8 @@ class DynamicVerifyEditModal(disnake.ui.Modal):
     async def callback(self, inter: disnake.ModalInteraction) -> None:
         manager = DynamicVerifyManager(inter.bot)
         rule_id = await self.get_rule_id(inter, manager)
-        name = str(inter.text_values["name"]).strip()
-        enabled = await self.get_bool_state(inter, "enabled")
+        name = str(inter.text_values['name']).strip()
+        enabled = await self.get_bool_state(inter, 'enabled')
         roles = await self.get_roles(inter)
 
         if rule_id is None or enabled is None or roles is None:
@@ -136,7 +136,7 @@ class DynamicVerifyEditModal(disnake.ui.Modal):
         rule.id = rule_id
         rule.name = name
         rule.enabled = enabled
-        rule.mod_check = await self.get_bool_state(inter, "mod_check")
+        rule.mod_check = await self.get_bool_state(inter, 'mod_check')
         rule.set_role_ids([role.id for role in roles])
 
         rule.update_rule()
@@ -147,9 +147,9 @@ class DynamicVerifyEditModal(disnake.ui.Modal):
     async def get_rule_id(
         self, inter: disnake.ModalInteraction, manager: DynamicVerifyManager
     ) -> Union[str, None]:
-        rule_id = str(inter.text_values["id"]).strip()
+        rule_id = str(inter.text_values['id']).strip()
 
-        if rule_id == "None":
+        if rule_id == 'None':
             await inter.response.send_message(Messages.dynamic_verify_rule_missing)
             return None
 
@@ -165,16 +165,16 @@ class DynamicVerifyEditModal(disnake.ui.Modal):
     async def get_bool_state(self, inter: disnake.ModalInteraction, state_id: str) -> Union[bool, None]:
         state = str(inter.text_values[state_id]).strip()
 
-        if state.lower() == "true":
+        if state.lower() == 'true':
             return True
-        elif state.lower() == "false":
+        elif state.lower() == 'false':
             return False
         else:
             await inter.response.send_message(Messages.dynamic_verify_invalid_state)
             return None
 
     async def get_roles(self, inter: disnake.ModalInteraction) -> Union[List[disnake.Role], None]:
-        role_data = str(inter.text_values["roles"]).strip().split(",")
+        role_data = str(inter.text_values['roles']).strip().split(',')
         role_data = [role.strip() for role in role_data]
         roles = []
 

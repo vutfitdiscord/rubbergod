@@ -13,16 +13,16 @@ from database import database, session
 
 
 class ReviewDB(database.base):
-    __tablename__ = "bot_review"
+    __tablename__ = 'bot_review'
 
     id = Column(Integer, primary_key=True)
     member_ID = Column(String)
     anonym = Column(Boolean, default=True)
-    subject = Column(String, ForeignKey("bot_subjects.shortcut", ondelete="CASCADE"))
+    subject = Column(String, ForeignKey('bot_subjects.shortcut', ondelete='CASCADE'))
     tier = Column(Integer, default=0)
     text_review = Column(String, default=None)
     date = Column(Date)
-    relevance = relationship("ReviewRelevanceDB", cascade="all, delete")
+    relevance = relationship('ReviewRelevanceDB', cascade='all, delete')
 
     @classmethod
     def get_review_by_id(cls, id: int) -> Optional[ReviewDB]:
@@ -34,12 +34,12 @@ class ReviewDB(database.base):
         return (
             session.query(
                 cls,
-                func.count(cls.relevance).filter(ReviewRelevanceDB.vote).label("total"),
+                func.count(cls.relevance).filter(ReviewRelevanceDB.vote).label('total'),
             )
             .filter(cls.subject == subject)
             .outerjoin(cls.relevance)
             .group_by(cls)
-            .order_by(desc("total"))
+            .order_by(desc('total'))
             .all()
         )
 
@@ -82,12 +82,12 @@ class ReviewDB(database.base):
 
 
 class ReviewRelevanceDB(database.base):
-    __tablename__ = "bot_review_relevance"
-    __table_args__ = (PrimaryKeyConstraint("review", "member_ID", name="key"),)
+    __tablename__ = 'bot_review_relevance'
+    __table_args__ = (PrimaryKeyConstraint('review', 'member_ID', name='key'),)
 
     member_ID = Column(String)
     vote = Column(Boolean, default=False)
-    review = Column(Integer, ForeignKey("bot_review.id", ondelete="CASCADE"))
+    review = Column(Integer, ForeignKey('bot_review.id', ondelete='CASCADE'))
 
     @classmethod
     def get_votes_count(cls, review_id: int, vote: bool) -> int:
@@ -117,10 +117,10 @@ class ReviewRelevanceDB(database.base):
 
 
 class SubjectDB(database.base):
-    __tablename__ = "bot_subjects"
+    __tablename__ = 'bot_subjects'
 
     shortcut = Column(String, primary_key=True)
-    reviews = relationship("ReviewDB")
+    reviews = relationship('ReviewDB')
 
     @classmethod
     def get(cls, shortcut: str) -> Optional[SubjectDB]:
@@ -130,7 +130,7 @@ class SubjectDB(database.base):
     def lookup(cls, shortcut: str) -> List[SubjectDB]:
         subjects = session.scalars(
             session.query(cls.shortcut)
-            .filter(cls.shortcut.ilike(f"{shortcut}%"))
+            .filter(cls.shortcut.ilike(f'{shortcut}%'))
             .limit(25)
         ).all()
         return subjects
@@ -147,7 +147,7 @@ class SubjectDB(database.base):
 
 
 class SubjectDetailsDB(database.base):
-    __tablename__ = "bot_subjects_details"
+    __tablename__ = 'bot_subjects_details'
 
     shortcut = Column(String, primary_key=True)
     name = Column(String)
@@ -174,7 +174,7 @@ class SubjectDetailsDB(database.base):
     @classmethod
     def gen_tierboard_subquery(cls, type: str, sem: str, degree: str, year: str) -> Query:
         return (
-            session.query(SubjectDB.reviews, SubjectDetailsDB, func.avg(ReviewDB.tier).label("avg_tier"))
+            session.query(SubjectDB.reviews, SubjectDetailsDB, func.avg(ReviewDB.tier).label('avg_tier'))
             .outerjoin(SubjectDB.reviews)
             .group_by(SubjectDB)
             .outerjoin(SubjectDetailsDB, SubjectDetailsDB.shortcut.ilike(SubjectDB.shortcut))
@@ -193,7 +193,7 @@ class SubjectDetailsDB(database.base):
         return (
             session.query(subquery.c.shortcut, subquery.c.avg_tier)
             .filter(subquery.c.avg_tier != None)  # noqa: E711
-            .order_by(asc("avg_tier"))
+            .order_by(asc('avg_tier'))
             .offset(offset)
             .limit(10)
             .all()
@@ -205,13 +205,13 @@ class SubjectDetailsDB(database.base):
         return math.ceil((
             session.query(subquery.c.shortcut, subquery.c.avg_tier)
             .filter(subquery.c.avg_tier != None)  # noqa: E711
-            .order_by(asc("avg_tier"))
+            .order_by(asc('avg_tier'))
             .count()
         )/10)
 
 
 class ProgrammeDB(database.base):
-    __tablename__ = "bot_programme"
+    __tablename__ = 'bot_programme'
 
     shortcut = Column(String, primary_key=True)
     name = Column(String)
@@ -225,7 +225,7 @@ class ProgrammeDB(database.base):
     def lookup(cls, shortcut: str) -> List[SubjectDB]:
         programmes = session.scalars(
             session.query(cls.shortcut)
-            .filter(cls.shortcut.ilike(f"{shortcut}%"))
+            .filter(cls.shortcut.ilike(f'{shortcut}%'))
             .limit(25)
         ).all()
         return programmes

@@ -17,7 +17,7 @@ class VerifyStatus(IntEnum):
 
 
 class PermitDB(database.base):
-    __tablename__ = "bot_permit"
+    __tablename__ = 'bot_permit'
 
     login = Column(String, primary_key=True)
     discord_ID = Column(String)
@@ -46,7 +46,7 @@ class PermitDB(database.base):
     def delete_user_by_login(cls, login: str) -> None:
         user = cls.get_user_by_login(login)
         if user is None:
-            raise Exception("User does not exist in PermitDB")
+            raise Exception('User does not exist in PermitDB')
         session.delete(user)
         session.commit()
 
@@ -54,14 +54,14 @@ class PermitDB(database.base):
     def add_user(cls, login: str, discord_ID: str) -> None:
         user = cls.get_user_by_login(login)
         if user is not None:
-            raise Exception("User already exists")
+            raise Exception('User already exists')
         user = cls(login=login, discord_ID=str(discord_ID))
         session.add(user)
         session.commit()
 
 
 class ValidPersonDB(database.base):
-    __tablename__ = "bot_valid_persons"
+    __tablename__ = 'bot_valid_persons'
 
     login = Column(String, primary_key=True)
     name = Column(String)
@@ -76,10 +76,10 @@ class ValidPersonDB(database.base):
 
         if len(fallback_domain) == 0:
             raise Exception(
-                "The user does not have an e-mail address set up and a fallback domain has not been provided."
+                'The user does not have an e-mail address set up and a fallback domain has not been provided.'
             )
 
-        return f"{self.login}@{fallback_domain}"  # fallback
+        return f'{self.login}@{fallback_domain}'  # fallback
 
     @classmethod
     def get_user_with_status(
@@ -143,13 +143,13 @@ class ValidPersonDB(database.base):
 
 
 class DynamicVerifyDB(database.base):
-    __tablename__ = "dynamic_verify_rules"
+    __tablename__ = 'dynamic_verify_rules'
 
     id = Column(String, primary_key=True)
     name = Column(String, index=True, nullable=False)
     enabled = Column(Boolean, default=True, nullable=False)
     mod_check = Column(Boolean, default=True, nullable=False)
-    role_ids = Column(String, nullable=False, default="[]")
+    role_ids = Column(String, nullable=False, default='[]')
 
     def get_role_ids(self) -> List[int]:
         data = json.loads(self.role_ids)
@@ -176,4 +176,4 @@ class DynamicVerifyDB(database.base):
 
     @classmethod
     def get_rules(cls, limit: int) -> List[DynamicVerifyDB]:
-        return session.query(cls).order_by(asc("id")).limit(limit).all()
+        return session.query(cls).order_by(asc('id')).limit(limit).all()

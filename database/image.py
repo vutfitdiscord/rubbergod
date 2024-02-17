@@ -11,7 +11,7 @@ from database import database, session
 
 
 class ImageDB(database.base):
-    __tablename__ = "images"
+    __tablename__ = 'images'
 
     attachment_id = Column(BigInteger, primary_key=True)
     message_id = Column(BigInteger)

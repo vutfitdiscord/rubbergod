@@ -28,9 +28,9 @@ def running_for(time):
         return hours * 60 + minutes
     else:
         try:
-            date = datetime.datetime.strptime(time[0], "%b%d")
+            date = datetime.datetime.strptime(time[0], '%b%d')
         except ValueError:
-            date = datetime.datetime.strptime(time[0], "%a%d")
+            date = datetime.datetime.strptime(time[0], '%a%d')
             date = date.replace(year=now.year, month=now.month)
         minutes = (now - date.replace(year=now.year)).total_seconds() // 60
         # subtracting a day as to assume it was ran right before midnight
@@ -56,7 +56,7 @@ def filter_year(resources):
     out_res = {res_type: {} for res_type in resources.keys()}
     for res_type, res_data in resources.items():
         for login, data in res_data.items():
-            if not people.get(login) or "BIT" in people[login].year or "FEKT" in people[login].year:
+            if not people.get(login) or 'BIT' in people[login].year or 'FEKT' in people[login].year:
                 out_res[res_type][login] = data
     return out_res
 
@@ -68,7 +68,7 @@ def parse_memory(memory):
         login = line[1]
         if not login.startswith('x'):
             continue
-        last_change = " ".join(line[-3:])
+        last_change = ' '.join(line[-3:])
         since_last_change = unchanged_for(last_change, '%b %d %H:%M:%S')
         if since_last_change > 10:
             if login not in parsed:
@@ -80,17 +80,17 @@ def parse_memory(memory):
 def parse_semaphores(semaphores):
     parsed = {}
     parsed_files = {}
-    if "soubory semaforu" in semaphores:
-        semaphores, files = semaphores.split("soubory semaforu:\n")
+    if 'soubory semaforu' in semaphores:
+        semaphores, files = semaphores.split('soubory semaforu:\n')
     else:
-        files = ""
+        files = ''
 
     for line in semaphores.strip().splitlines():
         line = line.split()
         login = line[1]
         if not login.startswith('x'):
             continue
-        last_change = " ".join(line[-4:-1])
+        last_change = ' '.join(line[-4:-1])
         since_last_change = unchanged_for(last_change, '%b %d %H:%M:%S')
         if since_last_change > 10:
             if login not in parsed:
@@ -102,9 +102,9 @@ def parse_semaphores(semaphores):
         login = line[2]
         if not login.startswith('x'):
             continue
-        last_change = " ".join(line[5:7])
+        last_change = ' '.join(line[5:7])
         name = line[7]
-        since_last_change = unchanged_for(last_change, "%m-%d %H:%M")
+        since_last_change = unchanged_for(last_change, '%m-%d %H:%M')
         if since_last_change > 10 or login not in name:
             if login not in parsed_files:
                 parsed_files[login] = [list(), False]
@@ -134,9 +134,9 @@ def parse_processes(processes):
 def filter_processes(processes):
     out = []
     for line in processes.strip().splitlines():
-        if re.search(r"/[a-zA-Z0-9.]+ \d+ \d+ \d+ \d+ \d+$", line):
+        if re.search(r'/[a-zA-Z0-9.]+ \d+ \d+ \d+ \d+ \d+$', line):
             out.append(line)
-    return "\n".join(out)
+    return '\n'.join(out)
 
 
 def format_time(minutes):
@@ -147,16 +147,16 @@ def format_time(minutes):
     years = months / 12
 
     if years >= 1:
-        return f"{round(years, 1)} roků"
+        return f'{round(years, 1)} roků'
     elif months >= 1:
-        return f"{round(months, 1)} měsíců"
+        return f'{round(months, 1)} měsíců'
     elif weeks >= 1:
-        return f"{round(weeks, 1)} týdnů"
+        return f'{round(weeks, 1)} týdnů'
     elif days >= 1:
-        return f"{round(days, 1)} dní"
+        return f'{round(days, 1)} dní'
     elif hours >= 1:
-        return f"{round(hours, 1)} hodin"
-    return f"{round(minutes, 1)} minut"
+        return f'{round(hours, 1)} hodin'
+    return f'{round(minutes, 1)} minut'
 
 
 class RESOURCE_TYPE:
@@ -180,16 +180,16 @@ def insult_login(parsed_items, system, res_type):
         user = session.query(PermitDB).filter(PermitDB.login == login).one_or_none()
 
         if not user:
-            msg = f"Na {system} leží {_inflected_resources[res_type][0]} " \
-                f"nějakého `{login}`, co není na serveru."
+            msg = f'Na {system} leží {_inflected_resources[res_type][0]} ' \
+                f'nějakého `{login}`, co není na serveru.'
         else:
             count = len(array)
             avg_time = int(sum(array) // count)
 
             msg = (
-                f"{utils.generate_mention(user.discord_ID)} máš na "
-                f"{system} `{count}` {_inflected_resources[res_type][1]}, "
-                f"{_inflected_resources[res_type][2]} průměrně `{format_time(avg_time)}`, ty prase."
+                f'{utils.generate_mention(user.discord_ID)} máš na '
+                f'{system} `{count}` {_inflected_resources[res_type][1]}, '
+                f'{_inflected_resources[res_type][2]} průměrně `{format_time(avg_time)}`, ty prase.'
             )
         output_array += [msg]
     return output_array
@@ -202,18 +202,18 @@ def insult_login_shm(parsed_files, system):
         array, login_not_in_name = data
 
         if not user:
-            msg = f"Na {system} leží soubory semaforů nějakého `{login}`, co není na serveru."
+            msg = f'Na {system} leží soubory semaforů nějakého `{login}`, co není na serveru.'
         else:
             count = len(array)
             avg_time = float(sum(array)) // count
 
             msg = (
-                f"{utils.generate_mention(user.discord_ID)} "
-                f"máš na {system} (`/dev/shm`) `{count}` souborů semaforů.")
+                f'{utils.generate_mention(user.discord_ID)} '
+                f'máš na {system} (`/dev/shm`) `{count}` souborů semaforů.')
             if avg_time > 9:
-                msg += f"\n\t\tLeží ti tam průměrně už `{format_time(avg_time)}`, ty prase."
+                msg += f'\n\t\tLeží ti tam průměrně už `{format_time(avg_time)}`, ty prase.'
             if login_not_in_name:
-                msg += "\n\t\tNemáš v názvu tvůj login, takže můžeš mit kolize s ostatními, ty prase."
+                msg += '\n\t\tNemáš v názvu tvůj login, takže můžeš mit kolize s ostatními, ty prase.'
         output_array += [msg]
     return output_array
 
@@ -227,7 +227,7 @@ async def print_output(bot, channel, system, resources):
         out_arr += insult_login_shm(shm_resources, system)
 
     if not any(resources.values()):
-        await channel.send(f"Na {system} uklizeno <:HYPERS:493154327318233088>")
+        await channel.send(f'Na {system} uklizeno <:HYPERS:493154327318233088>')
     else:
         await send_list_of_messages(channel, out_arr)
 
@@ -240,17 +240,17 @@ class IOS(Base, commands.Cog):
 
     @cooldowns.default_cooldown
     @commands.check(permission_check.helper_plus)
-    @commands.slash_command(name="ios", description=Messages.ios_brief, guild_ids=[Base.config.guild_id])
+    @commands.slash_command(name='ios', description=Messages.ios_brief, guild_ids=[Base.config.guild_id])
     async def ios(self, inter: disnake.ApplicationCommandInteraction):
         await inter.response.defer()
         await self.ios_task(inter)
 
-    @commands.slash_command(name="ios_task", guild_ids=[Base.config.guild_id])
+    @commands.slash_command(name='ios_task', guild_ids=[Base.config.guild_id])
     async def _ios(self, inter):
         pass
 
     @commands.check(permission_check.is_bot_admin)
-    @_ios.sub_command(name="start", description=Messages.ios_task_start_brief)
+    @_ios.sub_command(name='start', description=Messages.ios_task_start_brief)
     async def ios_task_start(self, inter: disnake.ApplicationCommandInteraction):
         try:
             self.ios_task.start()
@@ -259,7 +259,7 @@ class IOS(Base, commands.Cog):
             await inter.send(Messages.ios_task_start_already_set)
 
     @commands.check(permission_check.is_bot_admin)
-    @_ios.sub_command(name="stop", description=Messages.ios_task_stop_brief)
+    @_ios.sub_command(name='stop', description=Messages.ios_task_stop_brief)
     async def ios_task_stop(self, inter: disnake.ApplicationCommandInteraction):
         if self.ios_task.is_running():
             self.ios_task.stop()
@@ -268,7 +268,7 @@ class IOS(Base, commands.Cog):
             await inter.send(Messages.ios_task_stop_nothing_to_stop)
 
     @commands.check(permission_check.is_bot_admin)
-    @_ios.sub_command(name="cancel", description=Messages.ios_task_cancel_brief)
+    @_ios.sub_command(name='cancel', description=Messages.ios_task_cancel_brief)
     async def ios_task_cancel(self, inter: disnake.ApplicationCommandInteraction):
         if self.ios_task.is_running():
             self.ios_task.cancel()
@@ -286,12 +286,12 @@ class IOS(Base, commands.Cog):
             await channel.send(Messages.ios_howto_clean)
 
         process = subprocess.Popen(
-            ["ssh", "-i", self.config.ios_leakcheck_key_path, "merlin"],
+            ['ssh', '-i', self.config.ios_leakcheck_key_path, 'merlin'],
             stdout=subprocess.PIPE
             )
         output, _ = process.communicate()
-        memory, rest = output.decode('utf-8').split("semafory:\n")
-        semaphores, processes = rest.split("procesy:\n")
+        memory, rest = output.decode('utf-8').split('semafory:\n')
+        semaphores, processes = rest.split('procesy:\n')
         try:
             parsed_memory = parse_memory(memory)
             parsed_semaphores, parsed_files = parse_semaphores(semaphores)
@@ -302,20 +302,20 @@ class IOS(Base, commands.Cog):
                 RESOURCE_TYPE.FILE:      parsed_files,
                 RESOURCE_TYPE.PROCESS:   parsed_processes,
             }
-            await print_output(self.bot, channel, "merlinovi", filter_year(parsed_resources))
+            await print_output(self.bot, channel, 'merlinovi', filter_year(parsed_resources))
         except (IndexError, ValueError) as e:
             await channel.send(Messages.ios_parsing_error)
             # Send it to bot-dev channel anyway
             raise e
 
         process = subprocess.Popen(
-            ["ssh", "-i", self.config.ios_leakcheck_key_path, "eva"],
+            ['ssh', '-i', self.config.ios_leakcheck_key_path, 'eva'],
             stdout=subprocess.PIPE
             )
         output, _ = process.communicate()
 
-        memory, rest = output.decode('utf-8').split("semafory:\n")
-        semaphores, processes = rest.split("procesy:\n")
+        memory, rest = output.decode('utf-8').split('semafory:\n')
+        semaphores, processes = rest.split('procesy:\n')
         # remove unwanted processes
         processes = filter_processes(processes)
         try:
@@ -327,7 +327,7 @@ class IOS(Base, commands.Cog):
                 RESOURCE_TYPE.SEMAPHORE: parsed_semaphores,
                 RESOURCE_TYPE.PROCESS:   parsed_processes,
             }
-            await print_output(self.bot, channel, "evě", filter_year(parsed_resources))
+            await print_output(self.bot, channel, 'evě', filter_year(parsed_resources))
         except (IndexError, ValueError) as e:
             await channel.send(Messages.ios_parsing_error)
             # Send it to bot-dev channel anyway

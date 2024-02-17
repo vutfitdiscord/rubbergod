@@ -27,18 +27,18 @@ class DynamicConfig(Base, commands.Cog):
         super().__init__()
         self.bot = bot
         # /rubbergod/cogs/dynamicconfig.py -> /rubbergod/config
-        self.config_dir = Path(__file__).parent.parent.joinpath("config")
-        self.config_path = self.config_dir.joinpath("config.toml")
+        self.config_dir = Path(__file__).parent.parent.joinpath('config')
+        self.config_path = self.config_dir.joinpath('config.toml')
 
     @commands.check(permission_check.is_bot_admin)
-    @commands.slash_command(name="config")
+    @commands.slash_command(name='config')
     async def config_cmd(self, inter):
         """
         Group of commands for dynamically changing config
         """
         pass
 
-    @config_cmd.sub_command(name="set", description=Messages.config_set_brief)
+    @config_cmd.sub_command(name='set', description=Messages.config_set_brief)
     async def set_value(
         self,
         inter: disnake.ApplicationCommandInteraction,
@@ -72,7 +72,7 @@ class DynamicConfig(Base, commands.Cog):
         load_config()
         await inter.send(Messages.config_loaded)
 
-    @config_cmd.sub_command(name="list", description=Messages.config_list_brief)
+    @config_cmd.sub_command(name='list', description=Messages.config_list_brief)
     async def list_all(self, inter: disnake.ApplicationCommandInteraction, regex: str = None):
         if regex is not None:
             try:
@@ -81,11 +81,11 @@ class DynamicConfig(Base, commands.Cog):
                 await inter.send(Messages.config_list_invalid_regex(regex_err=str(ex)))
                 return
 
-        output = "```\n"
+        output = '```\n'
         for key in config_get_keys()[:]:
             if regex is None or regex.match(key) is not None:
-                output += key + "\n"
-        output += "```"
+                output += key + '\n'
+        output += '```'
         await inter.send(output)
 
     @config_cmd.sub_command(description=Messages.config_get_brief)
@@ -110,14 +110,14 @@ class DynamicConfig(Base, commands.Cog):
         Create backup from current config. Backup filename will contain current date.
         """
         date = datetime.today()
-        backup_path = self.config_dir.joinpath(f"config_backup_{date}.toml")
-        with open(backup_path, "w+", encoding="utf-8") as fd:
+        backup_path = self.config_dir.joinpath(f'config_backup_{date}.toml')
+        with open(backup_path, 'w+', encoding='utf-8') as fd:
             toml.dump(self.config.toml_dict, fd)
         await inter.send(Messages.config_backup_created)
 
     @config_cmd.sub_command(description=Messages.config_sync_template_brief)
     async def update(self, inter: disnake.ApplicationCommandInteraction):
-        template_path = self.config_dir.joinpath("config.template.toml")
+        template_path = self.config_dir.joinpath('config.template.toml')
         template = toml.load(template_path, _dict=dict)
         for section in template:
             if section in self.config.toml_dict:
@@ -126,7 +126,7 @@ class DynamicConfig(Base, commands.Cog):
                         self.config.toml_dict[section][key] = template[section][key]
             else:
                 self.config.toml_dict[section] = template[section]
-        with open(self.config_path, "w+", encoding="utf-8") as fd:
+        with open(self.config_path, 'w+', encoding='utf-8') as fd:
             toml.dump(self.config.toml_dict, fd)
         load_config()
         await inter.send(Messages.config_updated)
@@ -170,9 +170,9 @@ class DynamicConfig(Base, commands.Cog):
                 elif isinstance(attr, tuple) and append:
                     value = tuple(list(attr) + value)
                 elif isinstance(attr, str):
-                    value = " ".join(value)
+                    value = ' '.join(value)
                 elif isinstance(attr, bool):
-                    if value[0].lower() == "false":
+                    if value[0].lower() == 'false':
                         value = False
                     else:
                         value = True
@@ -190,7 +190,7 @@ class DynamicConfig(Base, commands.Cog):
             await inter.send(Messages.config_wrong_key)
             return
         setattr(self.config, key, value)
-        with open(self.config_path, "w+", encoding="utf-8") as fd:
+        with open(self.config_path, 'w+', encoding='utf-8') as fd:
             toml.dump(self.config.toml_dict, fd)
         await inter.send(Messages.config_updated)
 

@@ -8,6 +8,6 @@ class BaseFeature:
 
     async def reply_to_channel(self, channel: TextChannel, message: str = None, embed: Embed = None):
         if message is None and embed is None:
-            raise ValueError("Reply required message or embed")
+            raise ValueError('Reply required message or embed')
 
         await channel.send(message, embed=embed)

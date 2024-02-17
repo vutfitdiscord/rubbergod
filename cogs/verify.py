@@ -31,7 +31,7 @@ class Verify(Base, commands.Cog):
 
     @cooldowns.default_cooldown
     @commands.check(is_valid_guild)
-    @commands.slash_command(name="verify", description=Messages.verify_brief, dm_permission=True)
+    @commands.slash_command(name='verify', description=Messages.verify_brief, dm_permission=True)
     async def verify(
         self,
         inter: disnake.ApplicationCommandInteraction,
@@ -51,17 +51,17 @@ class Verify(Base, commands.Cog):
             return True
 
     @commands.check(room_check.is_in_modroom)
-    @commands.slash_command(name="dynamic_verify", guild_ids=[Base.config.guild_id])
+    @commands.slash_command(name='dynamic_verify', guild_ids=[Base.config.guild_id])
     async def dynamic_verify(self, inter: disnake.ApplicationCommandInteraction):
         """This method is only group for another commands. This function does nothing."""
         pass
 
-    @dynamic_verify.sub_command(name="create", description=Messages.dynamic_verify_create_brief)
+    @dynamic_verify.sub_command(name='create', description=Messages.dynamic_verify_create_brief)
     async def dynamic_verify_create(self, inter: disnake.ApplicationCommandInteraction):
         modal = DynamicVerifyEditModal(inter.guild, None)
         await inter.response.send_modal(modal)
 
-    @dynamic_verify.sub_command(name="edit", description=Messages.dynamic_verify_edit_brief)
+    @dynamic_verify.sub_command(name='edit', description=Messages.dynamic_verify_edit_brief)
     async def dynamic_verify_edit(
         self,
         inter: disnake.ApplicationCommandInteraction,
@@ -78,7 +78,7 @@ class Verify(Base, commands.Cog):
         modal = DynamicVerifyEditModal(inter.guild, rule)
         await inter.response.send_modal(modal)
 
-    @dynamic_verify.sub_command(name="remove", description=Messages.dynamic_verify_remove_brief)
+    @dynamic_verify.sub_command(name='remove', description=Messages.dynamic_verify_remove_brief)
     async def dynamic_verify_remove(
         self,
         inter: disnake.ApplicationCommandInteraction,
@@ -96,7 +96,7 @@ class Verify(Base, commands.Cog):
         await inter.response.send_message(Messages.dynamic_verify_remove_success)
 
     @commands.check(permission_check.submod_plus)
-    @commands.user_command(name="Verify host", guild_ids=[Base.config.guild_id])
+    @commands.user_command(name='Verify host', guild_ids=[Base.config.guild_id])
     async def verify_host(self, inter: disnake.UserCommandInteraction, member: disnake.Member):
         """add verify and host role to new member"""
         await inter.response.defer()
@@ -107,7 +107,7 @@ class Verify(Base, commands.Cog):
         try:
             await member.add_roles(host_id, verify_id)
         except AttributeError:
-            raise commands.errors.MemberNotFound("Member not found")
+            raise commands.errors.MemberNotFound('Member not found')
         response_message = Messages.verify_verify_success(user=member.id)
         await inter.edit_original_response(response_message)
 

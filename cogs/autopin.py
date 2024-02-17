@@ -29,29 +29,29 @@ class AutoPin(Base, commands.Cog):
 
     async def api(self, message: commands.Context, params: list):
         """Sending pins from channel to grillbot"""
-        if "command" in params and params["command"] is not None:
-            if params["command"] == "pin_get_all":
-                channel = self.bot.get_channel(int(params["channel"]))
+        if 'command' in params and params['command'] is not None:
+            if params['command'] == 'pin_get_all':
+                channel = self.bot.get_channel(int(params['channel']))
                 if channel is None:
-                    return 1, "Channel not found"
+                    return 1, 'Channel not found'
                 pins = await channel.pins()
                 if not pins:
                     return 0, Messages.autopin_no_pins
-                if params["type"] == "markdown":
+                if params['type'] == 'markdown':
                     res = await self.pin_features.create_markdown_file(channel, pins)
                     return 0, res
                 else:
                     res = await self.pin_features.create_json_file(channel, pins)
                     return 0, res
-        return 1, "Command not found"
+        return 1, 'Command not found'
 
     @commands.guild_only()
     @commands.check(permission_check.helper_plus)
-    @commands.slash_command(name="pin_mod")
+    @commands.slash_command(name='pin_mod')
     async def pin_mod(self, inter: disnake.ApplicationCommandInteraction):
         await inter.response.defer()
 
-    @pin_mod.sub_command(name="add", description=Messages.autopin_add_brief)
+    @pin_mod.sub_command(name='add', description=Messages.autopin_add_brief)
     async def add(self, inter: disnake.ApplicationCommandInteraction, message_url: str):
         try:
             converter = commands.MessageConverter()
@@ -75,7 +75,7 @@ class AutoPin(Base, commands.Cog):
             await inter.send(Messages.autopin_add_unknown_message)
             return
 
-    @pin_mod.sub_command(name="remove", description=Messages.autopin_remove_brief)
+    @pin_mod.sub_command(name='remove', description=Messages.autopin_remove_brief)
     async def remove(
         self,
         inter: disnake.ApplicationCommandInteraction,
@@ -91,7 +91,7 @@ class AutoPin(Base, commands.Cog):
         PinMapDB.remove_channel(str(channel.id))
         await inter.send(Messages.autopin_remove_done)
 
-    @pin_mod.sub_command(name="list", description=Messages.autopin_list_brief)
+    @pin_mod.sub_command(name='list', description=Messages.autopin_list_brief)
     async def get_list(self, inter: disnake.ApplicationCommandInteraction):
         mappings: List[PinMapDB] = PinMapDB.get_mappings()
 
@@ -118,22 +118,22 @@ class AutoPin(Base, commands.Cog):
 
         await inter.send(Messages.autopin_list_info)
         for part in utils.split_to_parts(lines, 10):
-            await inter.channel.send("\n".join(part))
+            await inter.channel.send('\n'.join(part))
 
     @cooldowns.long_cooldown
-    @commands.slash_command(name="pin")
+    @commands.slash_command(name='pin')
     async def pin(self, inter: disnake.ApplicationCommandInteraction):
         await inter.response.defer(ephemeral=True)
 
-    @pin.sub_command(name="get_all", description=Messages.autopin_get_all_brief)
+    @pin.sub_command(name='get_all', description=Messages.autopin_get_all_brief)
     async def get_all(
         self,
         inter: disnake.ApplicationCommandInteraction,
         channel: pin_channel_type = None,
         type: str = commands.Param(
-            description="Typ výstupu. Markdown/JSON",
-            choices=["json", "markdown"],
-            default="markdown"
+            description='Typ výstupu. Markdown/JSON',
+            choices=['json', 'markdown'],
+            default='markdown'
         )
     ):
         """Get all pins from channel and send it to user in markdown file"""
@@ -143,12 +143,12 @@ class AutoPin(Base, commands.Cog):
             await inter.send(Messages.autopin_no_pins)
             return
 
-        if type == "markdown":
+        if type == 'markdown':
             file = await self.pin_features.create_markdown_file(channel, pins)
         else:
             file = await self.pin_features.create_json_file(channel, pins)
 
-        channel_mention = channel.mention if hasattr(channel, "mention") else "**DM s botem**"
+        channel_mention = channel.mention if hasattr(channel, 'mention') else '**DM s botem**'
         await inter.send(file=file)
         await inter.edit_original_response(Messages.autopin_get_all_done(channel_name=channel_mention))
 
@@ -199,12 +199,12 @@ class AutoPin(Base, commands.Cog):
         """
         message = ctx.message
         channel = ctx.channel
-        if ctx.emoji == "📌" and ctx.member.id in self.config.autopin_banned_users:
-            await message.remove_reaction("📌", ctx.member)
+        if ctx.emoji == '📌' and ctx.member.id in self.config.autopin_banned_users:
+            await message.remove_reaction('📌', ctx.member)
             return
         for reaction in message.reactions:
             if (
-                reaction.emoji == "📌"
+                reaction.emoji == '📌'
                 and reaction.count >= self.config.autopin_count
                 and not message.pinned
                 and not message.is_system()
@@ -217,7 +217,7 @@ class AutoPin(Base, commands.Cog):
                     cooldown = datetime.timedelta(minutes=self.config.autopin_warning_cooldown)
                     if self.warning_time + cooldown < now:
                         await channel.send(
-                            f"{ctx.member.mention} {Messages.autopin_max_pins_error}\n{ctx.message.jump_url}"
+                            f'{ctx.member.mention} {Messages.autopin_max_pins_error}\n{ctx.message.jump_url}'
                         )
                         self.warning_time = now
                     return
@@ -225,19 +225,19 @@ class AutoPin(Base, commands.Cog):
                 users = await reaction.users().flatten()
                 await self.log(message, users)
                 await message.pin()
-                await message.clear_reaction("📌")
+                await message.clear_reaction('📌')
                 break
 
     async def log(self, message, users):
         """
         Logging message link and users that pinned message
         """
-        embed = disnake.Embed(title="📌 Auto pin message log", color=disnake.Colour.yellow())
-        user_names = ", ".join([f"{user.mention}({user.name})" for user in users])
-        embed.add_field(name="Users", value=user_names if len(user_names) > 0 else "**Missing users**")
+        embed = disnake.Embed(title='📌 Auto pin message log', color=disnake.Colour.yellow())
+        user_names = ', '.join([f'{user.mention}({user.name})' for user in users])
+        embed.add_field(name='Users', value=user_names if len(user_names) > 0 else '**Missing users**')
         embed.add_field(
-            name="Message in channel",
-            value=f"[#{message.channel.name}]({message.jump_url})",
+            name='Message in channel',
+            value=f'[#{message.channel.name}]({message.jump_url})',
             inline=False
         )
         embed.timestamp = datetime.datetime.now(tz=datetime.timezone.utc)

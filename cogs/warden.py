@@ -72,19 +72,19 @@ class Warden(Base, commands.Cog):
         message = ctx.message
 
         if ctx.member.id in self.config.repost_ignore_users:
-            await message.remove_reaction("❎", ctx.member)
+            await message.remove_reaction('❎', ctx.member)
             return
 
         for react in message.reactions:
-            if react.emoji == "❎" and react.count >= self.config.duplicate_limit:
+            if react.emoji == '❎' and react.count >= self.config.duplicate_limit:
                 try:
                     orig = message.embeds[0].footer.text
                     orig = await message.channel.fetch_message(int(orig))
-                    await orig.remove_reaction("♻️", self.bot.user)
-                    await orig.remove_reaction("🤷🏻", self.bot.user)
-                    await orig.remove_reaction("🤔", self.bot.user)
+                    await orig.remove_reaction('♻️', self.bot.user)
+                    await orig.remove_reaction('🤷🏻', self.bot.user)
+                    await orig.remove_reaction('🤔', self.bot.user)
                 except Exception as e:
-                    print("Warden:on_raw_reaction_add", "Could not remove bot's emote", e)
+                    print('Warden:on_raw_reaction_add', "Could not remove bot's emote", e)
                 try:
                     await message.delete()
                 except disnake.errors.NotFound:
@@ -119,13 +119,13 @@ class Warden(Base, commands.Cog):
     @commands.guild_only()
     @commands.max_concurrency(1, per=commands.BucketType.default, wait=False)
     @commands.bot_has_permissions(read_message_history=True)
-    @scan.command(name="history", brief=Messages.warden_scan_brief)
+    @scan.command(name='history', brief=Messages.warden_scan_brief)
     async def scan_history(self, ctx, limit):
         """Scan current channel for images and save them as hashes
         limit: [all | <int>]
         """
         # parse parameter
-        if limit == "all":
+        if limit == 'all':
             limit = None
         else:
             try:
@@ -137,12 +137,12 @@ class Warden(Base, commands.Cog):
 
         messages = await ctx.channel.history(limit=limit).flatten()
 
-        title = "**INITIATING...**\n\nLoaded {} messages"
+        title = '**INITIATING...**\n\nLoaded {} messages'
         await asyncio.sleep(0.5)
         template = (
-            "**SCANNING IN PROGRESS**\n\n"
-            "Processed **{}** of **{}** messages ({:.1f} %)\n"
-            "Computed **{}** hashes"
+            '**SCANNING IN PROGRESS**\n\n'
+            'Processed **{}** of **{}** messages ({:.1f} %)\n'
+            'Computed **{}** hashes'
         )
         msg = await ctx.send(title(len(messages)))
 
@@ -165,12 +165,12 @@ class Warden(Base, commands.Cog):
             ctr_hashes += len(hashes)
 
         await msg.edit(
-            content="**SCAN COMPLETE**\n\n"
-            f"Processed **{len(messages)}** messages.\n"
-            f"Computed **{ctr_hashes}** hashes in {(time.time() - now):.1f} seconds."
+            content='**SCAN COMPLETE**\n\n'
+            f'Processed **{len(messages)}** messages.\n'
+            f'Computed **{ctr_hashes}** hashes in {(time.time() - now):.1f} seconds.'
         )
 
-    @scan.command(name="message")
+    @scan.command(name='message')
     async def scan_message(self, ctx, link):
         """Scan message attachments in whole database"""
         # TODO: implement
@@ -211,16 +211,16 @@ class Warden(Base, commands.Cog):
         hamming: Hamming distance between the image and closest database entry
         """
         if hamming <= self.limit_full:
-            title = "**♻️ To je repost!**"
-            reaction = "♻️"
+            title = '**♻️ To je repost!**'
+            reaction = '♻️'
         elif hamming <= self.limit_hard:
-            title = "**♻️ To je asi repost**"
-            reaction = "🤔"
+            title = '**♻️ To je asi repost**'
+            reaction = '🤔'
         else:
-            title = "To je možná repost"
-            reaction = "🤷🏻"
-        prob = "{:.1f} %".format((1 - hamming / 128) * 100)
-        timestamp = utils.id_to_datetime(original.attachment_id).strftime("%Y-%m-%d %H:%M:%S")
+            title = 'To je možná repost'
+            reaction = '🤷🏻'
+        prob = '{:.1f} %'.format((1 - hamming / 128) * 100)
+        timestamp = utils.id_to_datetime(original.attachment_id).strftime('%Y-%m-%d %H:%M:%S')
 
         src_chan = self.bot.get_guild(self.config.guild_id).get_channel(original.channel_id)
         try:
@@ -228,16 +228,16 @@ class Warden(Base, commands.Cog):
             link = src_post.jump_url
             author = disnake.utils.escape_markdown(src_post.author.display_name)
         except disnake.NotFound:
-            link = "404 <:sadcat:576171980118687754>"
-            author = "_??? (404)_"
+            link = '404 <:sadcat:576171980118687754>'
+            author = '_??? (404)_'
 
         desc = Messages.repost_description(user=message.author.id, value=prob)
         embed = disnake.Embed(title=title, color=0xCB410B, description=desc, url=message.jump_url)
-        embed.add_field(name=f"**{author}**, {timestamp}", value=link, inline=False)
+        embed.add_field(name=f'**{author}**, {timestamp}', value=link, inline=False)
 
         embed.add_field(
             name=Messages.repost_title,
-            value="_" + Messages.repost_content(limit=self.config.duplicate_limit) + "_",
+            value='_' + Messages.repost_content(limit=self.config.duplicate_limit) + '_',
         )
         embed.set_footer(text=message.id)
         send = await message.channel.send(embed=embed)
@@ -246,7 +246,7 @@ class Warden(Base, commands.Cog):
         except disnake.errors.NotFound:
             await send.delete()
             return
-        await send.add_reaction("❎")
+        await send.add_reaction('❎')
 
 
 def setup(bot):

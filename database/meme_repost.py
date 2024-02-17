@@ -8,7 +8,7 @@ from database import database, session
 
 
 class MemeRepostDB(database.base):
-    __tablename__ = "bot_meme_reposts"
+    __tablename__ = 'bot_meme_reposts'
 
     original_message_id = Column(String, primary_key=True, nullable=False, unique=True)
     author_id = Column(String, nullable=False)

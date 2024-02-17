@@ -13,11 +13,11 @@ from database import database, session
 
 
 class VoterDB(database.base):
-    __tablename__ = "voter"
+    __tablename__ = 'voter'
 
     id = Column(String, primary_key=True)
-    poll_option_id = Column(Integer, ForeignKey("poll_option.id"), nullable=False, primary_key=True)
-    poll_option = relationship("PollOptionDB", back_populates="voters")
+    poll_option_id = Column(Integer, ForeignKey('poll_option.id'), nullable=False, primary_key=True)
+    poll_option = relationship('PollOptionDB', back_populates='voters')
 
     @classmethod
     def add(cls, voter_id: str, poll_option_id: int) -> VoterDB:
@@ -39,7 +39,7 @@ class PollType(IntEnum):
 
 
 class PollDB(database.base):
-    __tablename__ = "poll"
+    __tablename__ = 'poll'
 
     id = Column(Integer, primary_key=True)
     title = Column(String, nullable=False)
@@ -49,7 +49,7 @@ class PollDB(database.base):
     end_datetime = Column(DateTime, nullable=True)
     closed = Column(Boolean, nullable=False, default=False)
     closed_by = Column(String, nullable=True)
-    options: Mapped[List[PollOptionDB]] = relationship(back_populates="poll", cascade="all,delete")
+    options: Mapped[List[PollOptionDB]] = relationship(back_populates='poll', cascade='all,delete')
     max_votes = Column(Integer, nullable=False)
     anonymous = Column(Boolean, nullable=False)
 
@@ -118,7 +118,7 @@ class PollDB(database.base):
         option = session.query(PollOptionDB).get(poll_option_id)
         if option:
             if option not in self.options:
-                raise ValueError("Poll option does not belong to this poll.")
+                raise ValueError('Poll option does not belong to this poll.')
             option.add_voter(voter_id)
             session.commit()
 
@@ -163,18 +163,18 @@ class PollDB(database.base):
 
 
 class PollOptionDB(database.base):
-    __tablename__ = "poll_option"
+    __tablename__ = 'poll_option'
 
     id = Column(Integer, primary_key=True)
     emoji = Column(String, nullable=True)
     text = Column(String, nullable=False)
-    voters = relationship(VoterDB, back_populates="poll_option", cascade="all,delete", collection_class=set)
-    poll: Mapped[PollDB] = relationship(back_populates="options")
-    poll_id = mapped_column(ForeignKey("poll.id"), nullable=False)
+    voters = relationship(VoterDB, back_populates='poll_option', cascade='all,delete', collection_class=set)
+    poll: Mapped[PollDB] = relationship(back_populates='options')
+    poll_id = mapped_column(ForeignKey('poll.id'), nullable=False)
 
     # unique text for options per poll
     __table_args__ = (
-        UniqueConstraint("text", "poll_id"),
+        UniqueConstraint('text', 'poll_id'),
     )
 
     @property

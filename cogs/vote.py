@@ -142,7 +142,7 @@ class Vote(Base, commands.Cog):
             # init_failed: remove vote from DB and cache
             VoteDB.remove(ctx.message.id)
             del self.vote_cache[ctx.message.id]
-            match = re.search(f"<:(.*):{ret}>", message)
+            match = re.search(f'<:(.*):{ret}>', message)
             await ctx.send(Messages.emote_not_found(emote=match.group(1)))
         else:
             await ctx.send(Messages.vote_none)
@@ -237,7 +237,7 @@ class Vote(Base, commands.Cog):
 
     def get_message(self, vote: VoteMessage, final: bool):
         def singularise(msg: str):
-            return msg.replace(" 1 hlasy.", " 1 hlasem.")
+            return msg.replace(' 1 hlasy.', ' 1 hlasem.')
 
         most_voted = max(vote.options.values(), key=lambda x: x.count).count
         all_most_voted = list(filter(lambda x: x.count == most_voted, vote.options.values()))
@@ -264,9 +264,9 @@ class Vote(Base, commands.Cog):
                     winning_option=option.message,
                     votes=option.count))
         else:
-            emoji_str = ""
+            emoji_str = ''
             for e in all_most_voted:
-                emoji_str += (e.emoji if e.is_unicode else str(self.bot.get_emoji(int(e.emoji)))) + ", "
+                emoji_str += (e.emoji if e.is_unicode else str(self.bot.get_emoji(int(e.emoji)))) + ', '
             emoji_str = emoji_str[:-2]
 
             if final:

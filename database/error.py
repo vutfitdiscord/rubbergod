@@ -17,7 +17,7 @@ class ErrorRow(IntEnum):
 
 
 class ErrorLogDB(database.base):
-    __tablename__ = "bot_error_log"
+    __tablename__ = 'bot_error_log'
 
     id = Column(Integer, primary_key=True)
     date = Column(Date, default=date.today())
@@ -40,7 +40,7 @@ class ErrorLogDB(database.base):
         last_error, start_streak, end_streak = cls.get_all()
         today = date.today()
 
-        if getattr(last_error, "date", None) == today:
+        if getattr(last_error, 'date', None) == today:
             return False
 
         if any(error is None for error in [last_error, start_streak, end_streak]):

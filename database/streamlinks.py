@@ -58,7 +58,7 @@ class StreamLinkDB(database.base):
     def get_streamlinks_of_subject(cls, subject: str) -> List[StreamLinkDB]:
         return list(session.query(cls)
                     .filter(cls.subject == subject)
-                    .order_by(desc("created_at"))
+                    .order_by(desc('created_at'))
                     .all()
                     )
 

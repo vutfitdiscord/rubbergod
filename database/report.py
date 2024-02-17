@@ -10,19 +10,19 @@ from database import database, session
 
 
 class ReportDB(database.base):
-    __tablename__ = "report"
+    __tablename__ = 'report'
 
     id = Column(Integer, primary_key=True, nullable=False, unique=True, autoincrement=True)
-    type = Column(String, default="general", nullable=False)
+    type = Column(String, default='general', nullable=False)
     datetime = Column(DateTime, default=datetime.now(), nullable=False)
-    author: Mapped[UserDB] = relationship(back_populates="reports")
-    author_id: Mapped[String] = mapped_column(ForeignKey("report_user.id"))
-    target_user_id = Column(String, default="", nullable=False)
-    moderator_id = Column(String, default="", nullable=False)
-    message_url = Column(String, default="", nullable=False)
-    report_url = Column(String, default="", nullable=False)
+    author: Mapped[UserDB] = relationship(back_populates='reports')
+    author_id: Mapped[String] = mapped_column(ForeignKey('report_user.id'))
+    target_user_id = Column(String, default='', nullable=False)
+    moderator_id = Column(String, default='', nullable=False)
+    message_url = Column(String, default='', nullable=False)
+    report_url = Column(String, default='', nullable=False)
     reason = Column(String, nullable=False)
-    answers: Mapped[List[AnswerDB]] = relationship(back_populates="report")
+    answers: Mapped[List[AnswerDB]] = relationship(back_populates='report')
     resolved = Column(Boolean, default=False, nullable=False)
     fake_report = Column(Boolean, default=False, nullable=False)
 
@@ -120,10 +120,10 @@ class ReportDB(database.base):
 
 
 class UserDB(database.base):
-    __tablename__ = "report_user"
+    __tablename__ = 'report_user'
 
     id = Column(String, primary_key=True, nullable=False, unique=True)
-    reports: Mapped[List[ReportDB]] = relationship(back_populates="author")
+    reports: Mapped[List[ReportDB]] = relationship(back_populates='author')
     banned = Column(Boolean, default=False, nullable=False)
 
     @classmethod
@@ -177,14 +177,14 @@ class UserDB(database.base):
 
 
 class AnswerDB(database.base):
-    __tablename__ = "report_answer"
+    __tablename__ = 'report_answer'
 
     id = Column(Integer, primary_key=True, nullable=False, unique=True)
     datetime = Column(DateTime, default=datetime.now(), nullable=False)
-    report: Mapped[ReportDB] = relationship(back_populates="answers")
-    report_id: Mapped[Integer] = mapped_column(ForeignKey("report.id"))
+    report: Mapped[ReportDB] = relationship(back_populates='answers')
+    report_id: Mapped[Integer] = mapped_column(ForeignKey('report.id'))
     author_id = Column(String, nullable=False)
-    content = Column(String, default="", nullable=False)
+    content = Column(String, default='', nullable=False)
 
     @classmethod
     def get_answer(cls, answer_id: int) -> Optional[AnswerDB]:

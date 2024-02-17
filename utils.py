@@ -22,7 +22,7 @@ from permissions.custom_errors import InvalidTime
 
 
 def generate_mention(user_id):
-    return f"<@{user_id}>"
+    return f'<@{user_id}>'
 
 
 def id_to_datetime(snowflake_id: int):
@@ -127,7 +127,7 @@ def add_author_footer(
         embed.timestamp = datetime.now(tz=timezone.utc)
 
     if anonymous:
-        display_name = "Anonymous"
+        display_name = 'Anonymous'
         display_avatar = author.default_avatar.url
     else:
         display_name = author.display_name
@@ -147,7 +147,7 @@ def get_emoji(guild: disnake.Guild, name: str) -> Optional[disnake.Emoji]:
 
 
 def get_username(user: Union[disnake.User, disnake.Member]) -> str:
-    return disnake.utils.escape_markdown(user.display_name).replace("@", "@ ")
+    return disnake.utils.escape_markdown(user.display_name).replace('@', '@ ')
 
 
 def get_command_group_signature(ctx: commands.Context):
@@ -173,15 +173,15 @@ def get_command_signature(ctx: commands.Context):
     """Return signature of command in group
     `?(group sub)command [args]`
     """
-    return f"{ctx.prefix}{ctx.command} {ctx.command.signature}"
+    return f'{ctx.prefix}{ctx.command} {ctx.command.signature}'
 
 
 def clear_link_escape(link: str):
     """Removes < and > escapes from link."""
 
-    if (link.startswith("<")):
+    if (link.startswith('<')):
         link = link[1:]
-    if (link.endswith(">")):
+    if (link.endswith('>')):
         link = link[:-1]
 
     return link
@@ -203,7 +203,7 @@ def is_command_message(cmd: str, msg: str, require_space=True) -> bool:
     msg_len = len(msg)
 
     for prefix in config.command_prefix:
-        cmd_p = f"{prefix}{cmd}"
+        cmd_p = f'{prefix}{cmd}'
         cmd_p_len = len(cmd_p)
 
         if msg.find(cmd_p) == 0:
@@ -220,7 +220,7 @@ def make_pts_column_row_formatter(pts_column_name: str):
 
     def formatter(entry: Table, **kwargs):
         return Messages.base_leaderboard_format_str.format_map(
-            kwargs) + " {} pts".format(getattr(entry, pts_column_name))
+            kwargs) + ' {} pts'.format(getattr(entry, pts_column_name))
 
     return formatter
 
@@ -228,18 +228,18 @@ def make_pts_column_row_formatter(pts_column_name: str):
 def get_all_cogs():
     """Returns all available cogs with their class names as ordered dict."""
     all_cogs = {}
-    ignored = ["__init__.py", "base.py"]
-    cog_pattern = re.compile(r"class\s+(\w+)\((?:\w+,\s)*commands\.Cog")
+    ignored = ['__init__.py', 'base.py']
+    cog_pattern = re.compile(r'class\s+(\w+)\((?:\w+,\s)*commands\.Cog')
 
-    for name in os.listdir("./cogs"):
-        filepath = f"./cogs/{name}"
+    for name in os.listdir('./cogs'):
+        filepath = f'./cogs/{name}'
 
         # ignore __init__.py, non-python files and folders/non-existent files
-        if name in ignored or not name.endswith(".py") or not isfile(filepath):
+        if name in ignored or not name.endswith('.py') or not isfile(filepath):
             continue
 
         # get all cog classes
-        with open(os.path.join("./cogs", name), "r") as file:
+        with open(os.path.join('./cogs', name), 'r') as file:
             contents = file.read()
             match = cog_pattern.findall(contents)
             if match:
@@ -254,19 +254,19 @@ def create_bar(value, total) -> str:
     creates progress bar
     returns string like this: ▓▓▓▓▓░░░░░ 50%
     """
-    prog_bar_str = ""
+    prog_bar_str = ''
     prog_bar_length = 10
     percentage = 0
     if total != 0:
         percentage = value / total
         for i in range(prog_bar_length):
             if round(percentage, 1) <= 1 / prog_bar_length * i:
-                prog_bar_str += "░"
+                prog_bar_str += '░'
             else:
-                prog_bar_str += "▓"
+                prog_bar_str += '▓'
     else:
-        prog_bar_str = "░" * prog_bar_length
-    prog_bar_str = prog_bar_str + f" {round(percentage * 100)}%"
+        prog_bar_str = '░' * prog_bar_length
+    prog_bar_str = prog_bar_str + f' {round(percentage * 100)}%'
     return prog_bar_str
 
 
@@ -312,7 +312,7 @@ def get_command_id(self, name):
     if command is None:
         guild = self.bot.get_guild(config.guild_id)
         command = guild.get_command_named(name)
-    return getattr(command, "id", None)
+    return getattr(command, 'id', None)
 
 
 async def get_users_from_tag(self, tag):
@@ -341,23 +341,23 @@ async def get_members_from_tag(guild, tag):
     return members
 
 
-time_types = Literal["Default", "Short Time", "Long Time", "Short Date", "Long Date",
-                     "Short Date/Time", "Long Date/Time", "Relative Time"]
+time_types = Literal['Default', 'Short Time', 'Long Time', 'Short Date', 'Long Date',
+                     'Short Date/Time', 'Long Date/Time', 'Relative Time']
 
 
 time_types_dict = {
-    "Default": "",
-    "Short Time": ":t",
-    "Long Time": ":T",
-    "Short Date": ":d",
-    "Long Date": ":D",
-    "Short Date/Time": ":f",
-    "Long Date/Time": ":F",
-    "Relative Time": ":R"
+    'Default': '',
+    'Short Time': ':t',
+    'Long Time': ':T',
+    'Short Date': ':d',
+    'Long Date': ':D',
+    'Short Date/Time': ':f',
+    'Long Date/Time': ':F',
+    'Relative Time': ':R'
 }
 
 
-def get_discord_timestamp(dt: datetime, style: time_types = "Default") -> str:
+def get_discord_timestamp(dt: datetime, style: time_types = 'Default') -> str:
     """get unix timestamp from datetime object and return it as discord timestamp
     more about discord timestamps: https://gist.github.com/LeviSnoot/d9147767abeef2f770e9ddcd91eb85aa
 
@@ -369,8 +369,8 @@ def get_discord_timestamp(dt: datetime, style: time_types = "Default") -> str:
     <t:unix_time[:type]>
     """
     if style not in time_types_dict:
-        raise ValueError(f"Invalid timestamp style: {style}")
-    return f"<t:{int(dt.timestamp())}{time_types_dict[style]}>"
+        raise ValueError(f'Invalid timestamp style: {style}')
+    return f'<t:{int(dt.timestamp())}{time_types_dict[style]}>'
 
 
 async def get_or_fetch_channel(bot, channel_id) -> disnake.TextChannel:
@@ -406,7 +406,7 @@ async def parse_attachments(
             attachments_too_big.append(attachment)
             continue
 
-        if "image" in attachment.content_type:
+        if 'image' in attachment.content_type:
             images.append(await attachment.to_file())
         else:
             files.append(await attachment.to_file())
@@ -415,7 +415,7 @@ async def parse_attachments(
 
 
 def get_local_zone():
-    return pytz.timezone("Europe/Prague")
+    return pytz.timezone('Europe/Prague')
 
 
 def parse_time(time_string: str, time_format: str) -> Optional[datetime]:
@@ -426,11 +426,11 @@ def parse_time(time_string: str, time_format: str) -> Optional[datetime]:
     -------
     datetime object in UTC
     """
-    options = ["forever", "never", "nikdy", "none"]
+    options = ['forever', 'never', 'nikdy', 'none']
     if time_string.lower() in options:
         return datetime(9999, 12, 30, 0, 0, 0, tzinfo=timezone.utc)
 
-    pattern = re.compile(r"(\d+)([yYMwdhms])")
+    pattern = re.compile(r'(\d+)([yYMwdhms])')
     matches = pattern.findall(time_string)
 
     if matches:
@@ -439,19 +439,19 @@ def parse_time(time_string: str, time_format: str) -> Optional[datetime]:
         while matches:
             match = matches.pop()
             value, unit = match
-            if unit.lower() in ["y", "r"]:
+            if unit.lower() in ['y', 'r']:
                 timedelta = relativedelta(years=int(value))
-            elif unit == "M":
+            elif unit == 'M':
                 timedelta = relativedelta(months=int(value))
-            elif unit == "w":
+            elif unit == 'w':
                 timedelta = relativedelta(weeks=int(value))
-            elif unit == "d":
+            elif unit == 'd':
                 timedelta = relativedelta(days=int(value))
-            elif unit == "h":
+            elif unit == 'h':
                 timedelta = relativedelta(hours=int(value))
-            elif unit == "m":
+            elif unit == 'm':
                 timedelta = relativedelta(minutes=int(value))
-            elif unit == "s":
+            elif unit == 's':
                 timedelta = relativedelta(seconds=int(value))
             try:
                 time = time + timedelta

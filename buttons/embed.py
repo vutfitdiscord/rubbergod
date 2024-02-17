@@ -60,24 +60,24 @@ class EmbedView(BaseView):
             self.add_page_numbers()
         self.add_item(
             disnake.ui.Button(
-                emoji="⏪",
-                custom_id="embed:start_page",
+                emoji='⏪',
+                custom_id='embed:start_page',
                 row=row,
                 style=disnake.ButtonStyle.primary
             )
         )
         self.add_item(
             disnake.ui.Button(
-                emoji="◀",
-                custom_id="embed:prev_page",
+                emoji='◀',
+                custom_id='embed:prev_page',
                 row=row,
                 style=disnake.ButtonStyle.primary
             )
         )
         self.add_item(
             disnake.ui.Button(
-                emoji="▶",
-                custom_id="embed:next_page",
+                emoji='▶',
+                custom_id='embed:next_page',
                 row=row,
                 style=disnake.ButtonStyle.primary
             )
@@ -85,8 +85,8 @@ class EmbedView(BaseView):
         if end_arrow:
             self.add_item(
                 disnake.ui.Button(
-                    emoji="⏩",
-                    custom_id="embed:end_page",
+                    emoji='⏩',
+                    custom_id='embed:end_page',
                     row=row,
                     style=disnake.ButtonStyle.primary
                 )
@@ -94,8 +94,8 @@ class EmbedView(BaseView):
         if not perma_lock:
             # if permanent lock is applied, dynamic lock is removed from buttons
             self.lock_button = disnake.ui.Button(
-                emoji="🔓",
-                custom_id="embed:lock",
+                emoji='🔓',
+                custom_id='embed:lock',
                 row=0,
                 style=disnake.ButtonStyle.success
             )
@@ -129,23 +129,23 @@ class EmbedView(BaseView):
     def add_page_numbers(self):
         """Set footers with page numbers for each embed in list"""
         for page, embed in enumerate(self.embeds):
-            utils.add_author_footer(embed, self.author, additional_text=[f"Page {page+1}/{self.max_page}"])
+            utils.add_author_footer(embed, self.author, additional_text=[f'Page {page+1}/{self.max_page}'])
 
     async def interaction_check(self, interaction: disnake.MessageInteraction) -> Optional[bool]:
-        if interaction.data.custom_id == "embed:lock":
+        if interaction.data.custom_id == 'embed:lock':
             if interaction.author.id == self.author.id:
                 self.locked = not self.locked
                 if self.locked:
                     self.lock_button.style = disnake.ButtonStyle.danger
-                    self.lock_button.emoji = "🔒"
+                    self.lock_button.emoji = '🔒'
                 else:
                     self.lock_button.style = disnake.ButtonStyle.success
-                    self.lock_button.emoji = "🔓"
+                    self.lock_button.emoji = '🔓'
                 await interaction.response.edit_message(view=self)
             else:
                 await interaction.send(Messages.embed_not_author, ephemeral=True)
             return False
-        ids = ["embed:start_page", "embed:prev_page", "embed:next_page", "embed:end_page"]
+        ids = ['embed:start_page', 'embed:prev_page', 'embed:next_page', 'embed:end_page']
         if interaction.data.custom_id not in ids or self.max_page <= 1:
             return False
         if (self.perma_lock or self.locked) and interaction.author.id != self.author.id:

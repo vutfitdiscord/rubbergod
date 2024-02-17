@@ -24,47 +24,47 @@ class Reactions(Base, commands.Cog):
         if ctx is None:
             return
 
-        if self.bot.get_cog("Vote") is not None and (
-            is_command_message("vote", ctx.message.content)
-            or is_command_message("singlevote", ctx.message.content, False)
+        if self.bot.get_cog('Vote') is not None and (
+            is_command_message('vote', ctx.message.content)
+            or is_command_message('singlevote', ctx.message.content, False)
         ):
             try:
-                await self.bot.get_cog("Vote").handle_raw_reaction_add(payload)
+                await self.bot.get_cog('Vote').handle_raw_reaction_add(payload)
             except sqlalchemy.exc.InternalError:
                 session.rollback()
             return
 
         cogs = []
         # send embed to user where he left reading
-        if ctx.emoji == "🔖":
+        if ctx.emoji == '🔖':
             try:
-                await self.bot.get_cog("Bookmark").bookmark_reaction(ctx)
+                await self.bot.get_cog('Bookmark').bookmark_reaction(ctx)
             except AttributeError:
                 pass  # cog not loaded
             return
 
-        if ctx.emoji == "📌":
-            cogs.append(self.bot.get_cog("AutoPin"))
+        if ctx.emoji == '📌':
+            cogs.append(self.bot.get_cog('AutoPin'))
         if (ctx.channel.id == self.config.contest_vote_channel):
-            cogs.append(self.bot.get_cog("ContestVote"))
+            cogs.append(self.bot.get_cog('ContestVote'))
         if ctx.channel.id not in self.config.role_channels:
-            cogs.append(self.bot.get_cog("Karma"))
+            cogs.append(self.bot.get_cog('Karma'))
         else:
-            cogs.append(self.bot.get_cog("Roles"))
+            cogs.append(self.bot.get_cog('Roles'))
         if (
-            ctx.emoji == "❎"
+            ctx.emoji == '❎'
             and payload.channel_id in self.config.deduplication_channels
             and not payload.member.bot
             and ctx.message.author.bot
         ):
-            cogs.append(self.bot.get_cog("Warden"))
+            cogs.append(self.bot.get_cog('Warden'))
 
         if (ctx.channel.id == self.config.meme_room or ctx.channel.id == self.config.meme_repost_room) and \
                 ctx.message.author.id != ctx.member.id:
-            cogs.append(self.bot.get_cog("MemeRepost"))
+            cogs.append(self.bot.get_cog('MemeRepost'))
 
-        if ctx.emoji == "🔇":
-            cogs.append(self.bot.get_cog("TimeoutWars"))
+        if ctx.emoji == '🔇':
+            cogs.append(self.bot.get_cog('TimeoutWars'))
 
         for cog in cogs:
             # check if cog is loaded

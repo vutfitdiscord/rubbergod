@@ -39,7 +39,7 @@ class DynamicVerifyManager(BaseFeature):
         await self.log_attempt(rule, inter, user_id)
         member = await guild.get_or_fetch_member(user_id)
         for role in list(filter(lambda x: x is not None, roles)):
-            await member.add_roles(role, reason=f"Dynamic verification - Rule {rule.name} ({rule.id})")
+            await member.add_roles(role, reason=f'Dynamic verification - Rule {rule.name} ({rule.id})')
 
         try:
             await member.send(Messages.verify_verify_success(user=user_id))
@@ -53,11 +53,11 @@ class DynamicVerifyManager(BaseFeature):
     async def request_verification(
         self, rule: DynamicVerifyDB, inter: disnake.ApplicationCommandInteraction
     ) -> None:
-        embed = disnake.Embed(title="Žádost o dynamickou verifikaci", color=0xEEE657)
-        embed.add_field("Pravidlo", f"{rule.name} ({rule.id})")
+        embed = disnake.Embed(title='Žádost o dynamickou verifikaci', color=0xEEE657)
+        embed.add_field('Pravidlo', f'{rule.name} ({rule.id})')
         embed.add_field(
-            "Uživatel",
-            f"{inter.user.display_name} ({utils.generate_mention(inter.user.id)})",
+            'Uživatel',
+            f'{inter.user.display_name} ({utils.generate_mention(inter.user.id)})',
         )
 
         channel = self.bot.get_channel(config.mod_room)
@@ -67,10 +67,10 @@ class DynamicVerifyManager(BaseFeature):
     async def log_attempt(
         self, rule: DynamicVerifyDB, inter: disnake.ApplicationCommandInteraction, target_id: int,
     ) -> None:
-        embed = disnake.Embed(title="Dynamická verifikace", color=0xEEE657)
-        embed.add_field("Pravidlo", f"{rule.name} ({rule.id})")
-        embed.add_field("Potvrdil", utils.generate_mention(inter.user.id))
-        embed.add_field("Uživatel", utils.generate_mention(target_id))
+        embed = disnake.Embed(title='Dynamická verifikace', color=0xEEE657)
+        embed.add_field('Pravidlo', f'{rule.name} ({rule.id})')
+        embed.add_field('Potvrdil', utils.generate_mention(inter.user.id))
+        embed.add_field('Uživatel', utils.generate_mention(target_id))
 
         channel = self.bot.get_channel(config.log_channel)
         await channel.send(embed=embed)

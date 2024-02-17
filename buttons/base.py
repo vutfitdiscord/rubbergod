@@ -27,30 +27,30 @@ class BaseView(disnake.ui.View):
 
         channel_out = interaction.bot.get_channel(config.bot_dev_channel)
         embed = self.error_log.create_embed(
-            command="on_button_error",
+            command='on_button_error',
             args=interaction.data.custom_id,
             author=interaction.author,
             guild=interaction.guild,
             jump_url=interaction.message.jump_url,
             extra_fields={
-                "Message content": interaction.message.content,
-                "Expirace (UTC)": interaction.expires_at.strftime("%Y-%m-%d %H:%M:%S"),
-                "Item": item,
+                'Message content': interaction.message.content,
+                'Expirace (UTC)': interaction.expires_at.strftime('%Y-%m-%d %H:%M:%S'),
+                'Item': item,
             }
         )
         error_log = ErrorEvent.log(
-            event_name="on_button_error",
+            event_name='on_button_error',
             cog=self.__class__.__name__,
             datetime=datetime.datetime.now(),
             user_id=interaction.author.id,
             args=str(item),
             exception=type(error).__name__,
-            traceback="\n".join(traceback.format_exception(type(error), error, error.__traceback__)),
+            traceback='\n'.join(traceback.format_exception(type(error), error, error.__traceback__)),
         )
         utils.add_author_footer(
             embed,
             author=interaction.author,
-            additional_text=[f"ID: {error_log.id}"]
+            additional_text=[f'ID: {error_log.id}']
         )
         await channel_out.send(embed=embed, view=ErrorView())
 

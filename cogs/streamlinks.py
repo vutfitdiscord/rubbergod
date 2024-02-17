@@ -50,19 +50,19 @@ class StreamLinks(Base, commands.Cog):
 
     @cooldowns.default_cooldown
     @commands.group(aliases=[
-        "streamlist", "steamlink", "streamlink", "steamlinks", "stream", "steam", "links", "sl"]
+        'streamlist', 'steamlink', 'streamlink', 'steamlinks', 'stream', 'steam', 'links', 'sl']
         )
     async def streamlinks(self, ctx: commands.Context):
         if ctx.invoked_subcommand is None:
-            command_id = utils.get_command_id(self, "streamlinks")
-            await ctx.reply(Messages.moved_command(name="streamlinks", id=command_id))
+            command_id = utils.get_command_id(self, 'streamlinks')
+            await ctx.reply(Messages.moved_command(name='streamlinks', id=command_id))
 
     @cooldowns.default_cooldown
-    @commands.slash_command(name="streamlinks", brief=Messages.streamlinks_brief)
+    @commands.slash_command(name='streamlinks', brief=Messages.streamlinks_brief)
     async def _streamlinks(self, inter: disnake.ApplicationCommandInteraction):
         await inter.response.defer(ephemeral=self.check.botroom_check(inter))
 
-    @_streamlinks.sub_command(name="get", description=Messages.streamlinks_brief)
+    @_streamlinks.sub_command(name='get', description=Messages.streamlinks_brief)
     async def streamlinks_get(
         self,
         inter: disnake.ApplicationCommandInteraction,
@@ -80,7 +80,7 @@ class StreamLinks(Base, commands.Cog):
         view = EmbedView(inter.author, embeds, timeout=180)
         view.message = await inter.edit_original_response(embed=embeds[0], view=view)
 
-    @_streamlinks.sub_command(name="list", description=Messages.streamlinks_list_brief)
+    @_streamlinks.sub_command(name='list', description=Messages.streamlinks_list_brief)
     async def streamlinks_list(
         self,
         inter: disnake.ApplicationCommandInteraction,
@@ -92,20 +92,20 @@ class StreamLinks(Base, commands.Cog):
             await inter.send(content=Messages.streamlinks_no_stream)
             return
 
-        messages = [f"Streamy k **{subject.upper()}**:"]
+        messages = [f'Streamy k **{subject.upper()}**:']
         for stream in streamlinks:
-            date = stream.created_at.strftime("%d. %m. %Y")
-            messages.append(f"**{stream.member_name}** ({date}) - [{stream.description}](<{stream.link}>)\n")
+            date = stream.created_at.strftime('%d. %m. %Y')
+            messages.append(f'**{stream.member_name}** ({date}) - [{stream.description}](<{stream.link}>)\n')
 
         await send_list_of_messages(inter, messages, ephemeral=self.check.botroom_check(inter))
 
     @cooldowns.default_cooldown
-    @commands.slash_command(name="streamlinks_mod", brief=Messages.streamlinks_brief)
+    @commands.slash_command(name='streamlinks_mod', brief=Messages.streamlinks_brief)
     async def _streamlinks_mod(self, inter: disnake.ApplicationCommandInteraction):
         await inter.response.defer()
 
     @commands.check(permission_check.helper_plus)
-    @_streamlinks_mod.sub_command(name="add", description=Messages.streamlinks_add_brief)
+    @_streamlinks_mod.sub_command(name='add', description=Messages.streamlinks_add_brief)
     async def streamlinks_add(
         self,
         inter: disnake.ApplicationCommandInteraction,
@@ -130,7 +130,7 @@ class StreamLinks(Base, commands.Cog):
             return
 
         # str is discord tag so fetch user and get his name, or multiple users
-        if "@" in user:
+        if '@' in user:
             user = await self.get_user_string(user)
 
         link_data = self.get_link_data(link)
@@ -151,7 +151,7 @@ class StreamLinks(Base, commands.Cog):
         await inter.edit_original_response(content=Messages.streamlinks_add_success)
 
     @commands.check(permission_check.helper_plus)
-    @_streamlinks_mod.sub_command(name="update", description=Messages.streamlinks_update_brief)
+    @_streamlinks_mod.sub_command(name='update', description=Messages.streamlinks_update_brief)
     async def streamlinks_update(
         self,
         inter: disnake.ApplicationCommandInteraction,
@@ -164,9 +164,9 @@ class StreamLinks(Base, commands.Cog):
     ):
         parameter = False
 
-        embed = disnake.Embed(title="Odkaz na stream byl změněn", color=disnake.Color.yellow())
+        embed = disnake.Embed(title='Odkaz na stream byl změněn', color=disnake.Color.yellow())
         stream = StreamLinkDB.get_stream_by_id(id)
-        embed.add_field(name="Provedl", value=inter.author)
+        embed.add_field(name='Provedl', value=inter.author)
 
         if stream is None:
             await inter.edit_original_response(content=Messages.streamlinks_not_exists)
@@ -175,7 +175,7 @@ class StreamLinks(Base, commands.Cog):
         if description is not None:
             parameter = True
             embed.add_field(
-                name="Popis",
+                name='Popis',
                 value=self.gen_change_string(stream.description[:1024], description)
             )
             stream.description = description
@@ -189,8 +189,8 @@ class StreamLinks(Base, commands.Cog):
                 await inter.edit_original_response(Messages.streamlinks_invalid_link)
                 return
             embed.add_field(
-                name="Odkaz",
-                value=f"[link]({stream.link}) -> [link]({link})",
+                name='Odkaz',
+                value=f'[link]({stream.link}) -> [link]({link})',
                 inline=False
             )
             stream.link = link
@@ -200,17 +200,17 @@ class StreamLinks(Base, commands.Cog):
 
         if user is not None:
             parameter = True
-            if "@" in user:
+            if '@' in user:
                 # str is discord tag so fetch user and get his name
                 user = await self.get_user_string(user)
-            embed.add_field(name="Od", value=self.gen_change_string(stream.member_name, user))
+            embed.add_field(name='Od', value=self.gen_change_string(stream.member_name, user))
             stream.member_name = user
 
         if date is not None:
             parameter = True
             date = datetime.strptime(date, '%d.%m.%Y')
             embed.add_field(
-                name="Datum vydání:",
+                name='Datum vydání:',
                 value=self.gen_change_string(
                     stream.created_at.strftime('%Y-%m-%d'),
                     date.strftime('%Y-%m-%d')
@@ -220,7 +220,7 @@ class StreamLinks(Base, commands.Cog):
 
         if subject is not None:
             parameter = True
-            embed.add_field(name="Předmět", value=self.gen_change_string(stream.subject, subject.upper()))
+            embed.add_field(name='Předmět', value=self.gen_change_string(stream.subject, subject.upper()))
             stream.subject = subject.lower()
 
         if not parameter:
@@ -236,7 +236,7 @@ class StreamLinks(Base, commands.Cog):
         await inter.edit_original_response(content=Messages.streamlinks_update_success)
 
     @commands.check(permission_check.helper_plus)
-    @_streamlinks_mod.sub_command(name="remove", description=Messages.streamlinks_remove_brief)
+    @_streamlinks_mod.sub_command(name='remove', description=Messages.streamlinks_remove_brief)
     async def streamlinks_remove(
         self,
         inter: disnake.ApplicationCommandInteraction,
@@ -259,12 +259,12 @@ class StreamLinks(Base, commands.Cog):
             await inter.channel.send(Messages.streamlinks_remove_success(link=link))
 
     async def log(self, stream, user):
-        embed = disnake.Embed(title="Odkaz na stream byl smazán", color=disnake.Color.yellow())
-        embed.add_field(name="Provedl", value=user.name)
-        embed.add_field(name="Předmět", value=stream.subject.upper())
-        embed.add_field(name="Od", value=stream.member_name)
-        embed.add_field(name="Popis", value=stream.description[:1024])
-        embed.add_field(name="Odkaz", value=f"[link]({stream.link})", inline=False)
+        embed = disnake.Embed(title='Odkaz na stream byl smazán', color=disnake.Color.yellow())
+        embed.add_field(name='Provedl', value=user.name)
+        embed.add_field(name='Předmět', value=stream.subject.upper())
+        embed.add_field(name='Od', value=stream.member_name)
+        embed.add_field(name='Popis', value=stream.description[:1024])
+        embed.add_field(name='Odkaz', value=f'[link]({stream.link})', inline=False)
         embed.timestamp = datetime.now(timezone.utc)
         channel = self.bot.get_channel(self.config.log_channel)
         await channel.send(embed=embed)
@@ -272,7 +272,7 @@ class StreamLinks(Base, commands.Cog):
     async def get_user_string(self, user):
         users = await utils.get_users_from_tag(self, user)
         users = [user.name for user in users]
-        user = " & ".join(users)
+        user = ' & '.join(users)
         return user
 
     def get_link_data(self, link: str):
@@ -304,7 +304,7 @@ class StreamLinks(Base, commands.Cog):
             for par in params:
                 if 'name' in par.attrs:
                     pars[par.attrs['name']] = par.attrs['value']
-            session.post("https://consent.youtube.com/s", data=pars)
+            session.post('https://consent.youtube.com/s', data=pars)
             response = session.get(link)
             if response.status_code != 200:
                 return None
@@ -322,29 +322,29 @@ class StreamLinks(Base, commands.Cog):
     def create_embed_of_link(self, streamlink: StreamLinkDB, author: Union[disnake.User, disnake.Member],
                              links_count: int, current_pos: int) -> disnake.Embed:
         embed = disnake.Embed(color=disnake.Color.yellow())
-        embed.set_author(name="Streamlinks")
+        embed.set_author(name='Streamlinks')
 
         if streamlink.thumbnail_url is not None:
             embed.set_image(url=streamlink.thumbnail_url)
 
-        embed.add_field(name="Předmět", value=streamlink.subject.upper(), inline=True)
-        embed.add_field(name="Od", value=streamlink.member_name, inline=True)
+        embed.add_field(name='Předmět', value=streamlink.subject.upper(), inline=True)
+        embed.add_field(name='Od', value=streamlink.member_name, inline=True)
         embed.add_field(
-            name="Datum vydání",
-            value=utils.get_discord_timestamp(streamlink.created_at, "Short Date"),
+            name='Datum vydání',
+            value=utils.get_discord_timestamp(streamlink.created_at, 'Short Date'),
             inline=True
         )
-        embed.add_field(name="Odkaz", value=f"[Link]({streamlink.link})", inline=False)
-        embed.add_field(name="Popis", value=streamlink.description[:1024], inline=False)
+        embed.add_field(name='Odkaz', value=f'[Link]({streamlink.link})', inline=False)
+        embed.add_field(name='Popis', value=streamlink.description[:1024], inline=False)
         embed.timestamp = datetime.now(timezone.utc)
         utils.add_author_footer(embed, author, additional_text=[
-                                f"[{streamlink.subject.upper()}] Page: {current_pos} / {links_count}"
-                                f" (#{streamlink.id})"])
+                                f'[{streamlink.subject.upper()}] Page: {current_pos} / {links_count}'
+                                f' (#{streamlink.id})'])
 
         return embed
 
     def gen_change_string(self, old: str, new: str):
-        return f"`{old}` -> `{new}`"
+        return f'`{old}` -> `{new}`'
 
 
 def setup(bot):

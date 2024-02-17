@@ -2,8 +2,8 @@ import disnake
 
 
 class CallableString(str):
-    to_escape = ["role", "not_role", "line"]
-    to_mention = ["user", "admin"]
+    to_escape = ['role', 'not_role', 'line']
+    to_mention = ['user', 'admin']
 
     def __call__(self, *args, **kwargs):
         for arg in self.to_mention:
@@ -11,9 +11,9 @@ class CallableString(str):
                 continue
 
             string = str(kwargs[arg])
-            if string.startswith("<@") and string.endswith(">"):
+            if string.startswith('<@') and string.endswith('>'):
                 continue
-            kwargs[arg] = f"<@{kwargs[arg]}>"
+            kwargs[arg] = f'<@{kwargs[arg]}>'
 
         for arg in self.to_escape:
             if arg in kwargs:
@@ -30,4 +30,4 @@ class Formatable(type):
         try:
             return CallableString(object.__getattribute__(cls, key))
         except AttributeError:
-            raise AttributeError(f"{cls.clsname} class has no attribute {key}")
+            raise AttributeError(f'{cls.clsname} class has no attribute {key}')

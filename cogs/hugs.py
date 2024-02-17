@@ -19,7 +19,7 @@ from utils import make_pts_column_row_formatter
 def _tophugs_formatter(entry: HugsTableDB, **kwargs):
     return (
         Messages.base_leaderboard_format_str.format_map(kwargs)
-        + f" _Given:_ **{entry.given}** - _Received:_** {entry.received}**"
+        + f' _Given:_ **{entry.given}** - _Received:_** {entry.received}**'
     )
 
 
@@ -38,12 +38,12 @@ class Hugs(Base, commands.Cog):
         self._tophuggers_formatter = make_pts_column_row_formatter(HugsTableDB.given.name)
         self._tophugged_formatter = make_pts_column_row_formatter(HugsTableDB.received.name)
 
-    @commands.slash_command(name="hug")
+    @commands.slash_command(name='hug')
     async def _hug(self, inter):
         pass
 
     @cooldowns.default_cooldown
-    @_hug.sub_command(name="hugboard", description=Messages.hug_hugboard_brief)
+    @_hug.sub_command(name='hugboard', description=Messages.hug_hugboard_brief)
     async def hugboard(
         self,
         inter: disnake.ApplicationCommandInteraction
@@ -70,7 +70,7 @@ class Hugs(Base, commands.Cog):
         view.message = await inter.edit_original_response(embed=embed, view=view)
 
     @cooldowns.default_cooldown
-    @_hug.sub_command(name="huggersboard", description=Messages.hug_huggersboard_brief)
+    @_hug.sub_command(name='huggersboard', description=Messages.hug_huggersboard_brief)
     async def huggersboard(
         self,
         inter: disnake.ApplicationCommandInteraction
@@ -97,7 +97,7 @@ class Hugs(Base, commands.Cog):
         view.message = await inter.edit_original_response(embed=embed, view=view)
 
     @cooldowns.default_cooldown
-    @_hug.sub_command(name="mosthugged", description=Messages.hug_mosthugged_brief)
+    @_hug.sub_command(name='mosthugged', description=Messages.hug_mosthugged_brief)
     async def mosthugged(
         self,
         inter: disnake.ApplicationCommandInteraction
@@ -124,7 +124,7 @@ class Hugs(Base, commands.Cog):
         view.message = await inter.edit_original_response(embed=embed, view=view)
 
     @cooldowns.default_cooldown
-    @_hug.sub_command(name="me", description=Messages.hug_stats_brief)
+    @_hug.sub_command(name='me', description=Messages.hug_stats_brief)
     async def stats(
         self,
         inter: disnake.ApplicationCommandInteraction,
@@ -139,7 +139,7 @@ class Hugs(Base, commands.Cog):
         if user is None or user == inter.author:
             user = inter.author
             user_str = utils.get_username(user)
-            title = "{0} Your Lovely Hug Stats {0}"
+            title = '{0} Your Lovely Hug Stats {0}'
         else:
             user_str = utils.get_username(user)
             title = f"{{0}} {user_str}'s Lovely Hug Stats {{0}}"
@@ -150,13 +150,13 @@ class Hugs(Base, commands.Cog):
         guild = self.bot.get_guild(self.config.guild_id)
 
         embed = disnake.Embed(
-            title=title.format(utils.get_emoji(guild, "peepoHugger") or ""),
-            description=" | ".join(
+            title=title.format(utils.get_emoji(guild, 'peepoHugger') or ''),
+            description=' | '.join(
                 (
-                    "**Ranks**",
-                    f"Given: **{positions[0]}.**",
-                    f"Received: **{positions[1]}.**",
-                    f"Avg: **{avg_position}.**",
+                    '**Ranks**',
+                    f'Given: **{positions[0]}.**',
+                    f'Received: **{positions[1]}.**',
+                    f'Avg: **{avg_position}.**',
                 )
             ),
         )
@@ -164,16 +164,16 @@ class Hugs(Base, commands.Cog):
         embed.set_author(name=user_str, icon_url=user.avatar.url)
         utils.add_author_footer(embed, inter.author)
 
-        given_emoji = utils.get_emoji(guild, "peepohugs") or ""
-        recv_emoji = utils.get_emoji(guild, "huggers") or ""
+        given_emoji = utils.get_emoji(guild, 'peepohugs') or ''
+        recv_emoji = utils.get_emoji(guild, 'huggers') or ''
 
-        embed.add_field(name=f"{given_emoji} Given", value=str(stats.given))
-        embed.add_field(name=f"{recv_emoji} Received", value=str(stats.received))
+        embed.add_field(name=f'{given_emoji} Given', value=str(stats.given))
+        embed.add_field(name=f'{recv_emoji} Received', value=str(stats.received))
 
         await inter.edit_original_response(embed=embed)
 
     @cooldowns.short_cooldown
-    @_hug.sub_command(name="give", description=Messages.hug_give_brief)
+    @_hug.sub_command(name='give', description=Messages.hug_give_brief)
     async def give(
         self,
         inter: disnake.ApplicationCommandInteraction,
@@ -196,7 +196,7 @@ class Hugs(Base, commands.Cog):
             user = inter.author
         elif user.bot:
             await inter.send(
-                utils.get_emoji(self.bot.get_guild(self.config.guild_id), "huggers") or ":people_hugging:"
+                utils.get_emoji(self.bot.get_guild(self.config.guild_id), 'huggers') or ':people_hugging:'
             )
             return
 
@@ -208,7 +208,7 @@ class Hugs(Base, commands.Cog):
         # Convert a human-friendly intensity to an array index
         intensity -= 1
 
-        await inter.send(f"{self.config.hug_emojis[intensity]} **{user_str}**")
+        await inter.send(f'{self.config.hug_emojis[intensity]} **{user_str}**')
 
 
 def setup(bot):

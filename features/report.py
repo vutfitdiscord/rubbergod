@@ -12,7 +12,7 @@ from database.report import ReportDB
 
 def extract_report_id(inter: disnake.MessageInteraction) -> int:
     """extracts the report id from the footer of the report embed"""
-    report_id = re.match(r".+ \| ID: (\d+).*", inter.message.embeds[0].footer.text).group(1)
+    report_id = re.match(r'.+ \| ID: (\d+).*', inter.message.embeds[0].footer.text).group(1)
     return int(report_id)
 
 
@@ -42,30 +42,30 @@ async def embed_resolved(
 ) -> disnake.Embed:
     """Changes the embed to a resolved embed or back to a report embed"""
     if resolved:
-        embed["color"] = disnake.Color.green()
-        embed["title"] = "Resolved"
-        for field in embed["fields"]:
-            if field["name"] == "Resolved by":
-                field["value"] = author
+        embed['color'] = disnake.Color.green()
+        embed['title'] = 'Resolved'
+        for field in embed['fields']:
+            if field['name'] == 'Resolved by':
+                field['value'] = author
         for child in self.children:
             child.disabled = True
-            if child.custom_id == "report:resolve":
-                child.label = "Resolved"
+            if child.custom_id == 'report:resolve':
+                child.label = 'Resolved'
                 child.style = disnake.ButtonStyle.green
-                child.emoji = "✅"
+                child.emoji = '✅'
                 child.disabled = False
     else:
-        embed["color"] = disnake.Color.red()
-        embed["title"] = f"{report_type.capitalize()} report"
-        for field in embed["fields"]:
-            if field["name"] == "Resolved by":
-                field["value"] = "---"
+        embed['color'] = disnake.Color.red()
+        embed['title'] = f'{report_type.capitalize()} report'
+        for field in embed['fields']:
+            if field['name'] == 'Resolved by':
+                field['value'] = '---'
         for child in self.children:
             child.disabled = False
-            if child.custom_id == "report:resolve":
-                child.label = "Resolve"
+            if child.custom_id == 'report:resolve':
+                child.label = 'Resolve'
                 child.style = disnake.ButtonStyle.grey
-                child.emoji = "❌"
+                child.emoji = '❌'
     embed = disnake.Embed.from_dict(embed)
     return embed
 
@@ -80,18 +80,18 @@ def answer_embed(title, inter: disnake.ModalInteraction, report: ReportDB, answe
     )
 
     if inter.channel.type == disnake.ChannelType.private:
-        author = "Anonym"
+        author = 'Anonym'
         embed.timestamp = datetime.now(tz=timezone.utc)
         embed.set_footer(
             icon_url=inter.author.default_avatar.url,
-            text=f"{author} | ID: {report.id}"
+            text=f'{author} | ID: {report.id}'
         )
 
     else:
-        author = f"{inter.author.mention} @{inter.author.display_name}"
-        utils.add_author_footer(embed, inter.author, additional_text=[f"ID: {report.id}"])
+        author = f'{inter.author.mention} @{inter.author.display_name}'
+        utils.add_author_footer(embed, inter.author, additional_text=[f'ID: {report.id}'])
 
-    embed.add_field(name="Answered by", value=author, inline=False)
+    embed.add_field(name='Answered by', value=author, inline=False)
     return embed
 
 
@@ -107,5 +107,5 @@ def deleted_message_embed(
         color=disnake.Color.yellow()
     )
 
-    utils.add_author_footer(embed, inter.author, additional_text=[f"ID: {report.id}"])
+    utils.add_author_footer(embed, inter.author, additional_text=[f'ID: {report.id}'])
     return embed

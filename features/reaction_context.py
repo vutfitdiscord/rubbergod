@@ -33,7 +33,7 @@ class ReactionContext():
         else:
             guild = bot.get_guild(config.guild_id)
             if guild is None:
-                raise Exception("Nemůžu najít guildu podle config.guild_id")
+                raise Exception('Nemůžu najít guildu podle config.guild_id')
 
         member = payload.member if payload.member is not None else guild.get_member(payload.user_id)
         if member is None or member.bot:

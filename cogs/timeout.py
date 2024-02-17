@@ -18,21 +18,21 @@ from database.timeout import TimeoutDB, TimeoutUserDB
 from permissions import permission_check
 
 timestamps = [
-    "60s",
-    "5min",
-    "10min",
-    "1hour",
-    "4hours",
-    "8hours",
-    "12hours",
-    "16hours",
-    "1day",
-    "3days",
-    "1week",
-    "2weeks",
-    "3weeks",
-    "4weeks",
-    "Forever",
+    '60s',
+    '5min',
+    '10min',
+    '1hour',
+    '4hours',
+    '8hours',
+    '12hours',
+    '16hours',
+    '1day',
+    '3days',
+    '1week',
+    '2weeks',
+    '3weeks',
+    '4weeks',
+    'Forever',
 ]
 
 
@@ -48,10 +48,10 @@ class Timeout(Base, commands.Cog):
         self.tasks = [self.refresh_timeout.start()]
 
     @commands.check(permission_check.submod_plus)
-    @commands.slash_command(name="timeout", guild_ids=[Base.config.guild_id])
+    @commands.slash_command(name='timeout', guild_ids=[Base.config.guild_id])
     async def _timeout(self, inter: disnake.ApplicationCommandInteraction): ...
 
-    @_timeout.sub_command(name="user", description=Messages.timeout_brief)
+    @_timeout.sub_command(name='user', description=Messages.timeout_brief)
     async def timeout_user(
         self,
         inter: disnake.ApplicationCommandInteraction,
@@ -71,7 +71,7 @@ class Timeout(Base, commands.Cog):
         endtime: datetime = utils.parse_time(endtime, Messages.time_format)
         await inter.response.defer()
 
-        embed = features_timeout.create_embed(inter.author, "Timeout")
+        embed = features_timeout.create_embed(inter.author, 'Timeout')
         cantBeTimeout = []
         timeoutMembers = []
 
@@ -104,24 +104,24 @@ class Timeout(Base, commands.Cog):
             # print users with timeout if any exists
             message = await inter.original_message()
 
-            await inter.send("".join(f"{member.mention}" for member in parsed_members), embed=embed)
-            embed.add_field(name="Link", value=f"[#{inter.channel.name}]({message.jump_url})")
+            await inter.send(''.join(f'{member.mention}' for member in parsed_members), embed=embed)
+            embed.add_field(name='Link', value=f'[#{inter.channel.name}]({message.jump_url})')
             await self.submod_helper_room.send(
-                "".join(f"{member.mention}" for member in parsed_members),
+                ''.join(f'{member.mention}' for member in parsed_members),
                 embed=embed
             )
 
         if cantBeTimeout:
             # print users that can't be timed out
             await inter.send(
-                "\n".join(
+                '\n'.join(
                     Messages.timeout_permission(user_list=user.name)
                     for user in cantBeTimeout
                 ),
                 ephemeral=True,
             )
 
-    @_timeout.sub_command(name="remove", description=Messages.timeout_remove_brief)
+    @_timeout.sub_command(name='remove', description=Messages.timeout_remove_brief)
     async def remove_timeout(
         self,
         inter: disnake.ApplicationCommandInteraction,
@@ -129,7 +129,7 @@ class Timeout(Base, commands.Cog):
         remove_logs: bool = commands.Param(description=Messages.timeout_remove_logs_param),
     ):
         """Removes timeout from user(s)"""
-        embed = features_timeout.create_embed(inter.author, "Timeout remove")
+        embed = features_timeout.create_embed(inter.author, 'Timeout remove')
         parsed_members = await features_timeout.parse_members(inter, user)
 
         if parsed_members is None:
@@ -139,7 +139,7 @@ class Timeout(Base, commands.Cog):
 
         for member in parsed_members:
             await features_timeout.timeout_perms(
-                inter, member, None, None, None, "Předčasně odebráno", remove_logs=remove_logs
+                inter, member, None, None, None, 'Předčasně odebráno', remove_logs=remove_logs
             )
             embed.add_field(
                 name=member.display_name,
@@ -150,7 +150,7 @@ class Timeout(Base, commands.Cog):
         await self.submod_helper_room.send(embed=embed)
         await inter.send(embed=embed)
 
-    @_timeout.sub_command(name="list", description=Messages.timeout_list_brief)
+    @_timeout.sub_command(name='list', description=Messages.timeout_list_brief)
     async def timeout_list(
         self,
         inter: disnake.ApplicationCommandInteraction,
@@ -165,9 +165,9 @@ class Timeout(Base, commands.Cog):
             await inter.send(Messages.timeout_list_none)
             return
 
-        await features_timeout.timeout_embed_listing(self.bot, users, "Timeout list", inter, inter.author)
+        await features_timeout.timeout_embed_listing(self.bot, users, 'Timeout list', inter, inter.author)
 
-    @_timeout.sub_command(name="get_user", description=Messages.timeout_get_user_brief)
+    @_timeout.sub_command(name='get_user', description=Messages.timeout_get_user_brief)
     async def get_user(
         self,
         inter: disnake.ApplicationCommandInteraction,
@@ -181,21 +181,21 @@ class Timeout(Base, commands.Cog):
         embeds = []
         main_embed = features_timeout.create_embed(
             inter.author,
-            f"`@{user.display_name}` timeouts",
+            f'`@{user.display_name}` timeouts',
             user.mention,
         )
 
-        main_embed.add_field(name="Timeouts count", value=timeouts_count, inline=True)
-        main_embed.add_field(name="Reports count", value=ReportDB.get_reports_on_user(user.id), inline=True)
+        main_embed.add_field(name='Timeouts count', value=timeouts_count, inline=True)
+        main_embed.add_field(name='Reports count', value=ReportDB.get_reports_on_user(user.id), inline=True)
         unverifies, warnings = await features_timeout.get_user_from_grillbot(self, inter.guild.id, user.id)
         main_embed.add_field(
-            name="Unverifies count",
-            value=f"[{unverifies}](https://private.grillbot.eu/admin/unverify/logs)",
+            name='Unverifies count',
+            value=f'[{unverifies}](https://private.grillbot.eu/admin/unverify/logs)',
             inline=True
         )
         main_embed.add_field(
-            name="Warnings count",
-            value=f"[{warnings}](https://private.grillbot.eu/admin/userMeasures)",
+            name='Warnings count',
+            value=f'[{warnings}](https://private.grillbot.eu/admin/userMeasures)',
             inline=True
         )
 
@@ -205,7 +205,7 @@ class Timeout(Base, commands.Cog):
             starttime_local, endtime_local = recent_timeout.start_end_local
             features_timeout.add_field_timeout(
                 embed=main_embed,
-                title="Recent timeout",
+                title='Recent timeout',
                 member=user,
                 author=mod,
                 starttime=starttime_local,
@@ -215,11 +215,11 @@ class Timeout(Base, commands.Cog):
             )
             embeds.append(main_embed)
 
-            embed = features_timeout.create_embed(inter.author, f"`@{user.display_name}` timeouts")
+            embed = features_timeout.create_embed(inter.author, f'`@{user.display_name}` timeouts')
             for index, timeout in enumerate(timeout_user.timeouts[::-1]):           # from newest to oldest
                 if (index % 5) == 0 and index != 0:
                     embeds.append(embed)
-                    embed = features_timeout.create_embed(inter.author, f"`@{user.display_name}` timeouts")
+                    embed = features_timeout.create_embed(inter.author, f'`@{user.display_name}` timeouts')
 
                 mod = await self.bot.get_or_fetch_user(recent_timeout.mod_id)
                 starttime_local, endtime_local = timeout.start_end_local
@@ -243,7 +243,7 @@ class Timeout(Base, commands.Cog):
 
     @cooldowns.default_cooldown
     @commands.slash_command(
-        name="selftimeout",
+        name='selftimeout',
         description=Messages.self_timeout,
         guild_ids=[Base.config.guild_id],
     )
@@ -315,7 +315,7 @@ class Timeout(Base, commands.Cog):
         users = TimeoutUserDB.get_active_timeouts(isself=False)
         if users:
             await features_timeout.timeout_embed_listing(
-                self.bot, users, "Timeout update", self.log_channel, self.bot.user
+                self.bot, users, 'Timeout update', self.log_channel, self.bot.user
             )
 
     @commands.Cog.listener()
@@ -332,8 +332,8 @@ class Timeout(Base, commands.Cog):
     async def on_audit_log_entry_create(self, entry: disnake.AuditLogEntry):
         """Remove timeout from user if it was removed manually. Send message to submod_helper_room"""
         if entry.action == disnake.AuditLogAction.member_update:
-            before_timeout = getattr(entry.changes.before, "timeout", None)
-            after_timeout = getattr(entry.changes.after, "timeout", None)
+            before_timeout = getattr(entry.changes.before, 'timeout', None)
+            after_timeout = getattr(entry.changes.after, 'timeout', None)
 
             if (
                 before_timeout is not None
@@ -342,7 +342,7 @@ class Timeout(Base, commands.Cog):
             ):
                 # remove timeout manually
                 TimeoutDB.remove_timeout(entry.target.id)
-                embed = features_timeout.create_embed(entry.user, "Timeout remove")
+                embed = features_timeout.create_embed(entry.user, 'Timeout remove')
                 embed.add_field(
                     name=entry.target.display_name,
                     value=Messages.timeout_manual_remove(member=entry.target.mention),
@@ -368,7 +368,7 @@ class Timeout(Base, commands.Cog):
                     reason,
                     entry.guild.id,
                 )
-                embed = features_timeout.create_embed(entry.user, "Timeout")
+                embed = features_timeout.create_embed(entry.user, 'Timeout')
                 features_timeout.add_field_timeout(
                     embed=embed,
                     title=entry.target.display_name,

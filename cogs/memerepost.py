@@ -23,7 +23,7 @@ from permissions import room_check
 
 def _leaderboard_formatter(entry: BetterMemeDB, **kwargs):
     return Messages.base_leaderboard_format_str.format_map(
-        kwargs) + f" **{entry.posts}** posts **{entry.total_karma}** pts"
+        kwargs) + f' **{entry.posts}** posts **{entry.total_karma}** pts'
 
 
 class MemeRepost(Base, commands.Cog):
@@ -103,14 +103,14 @@ class MemeRepost(Base, commands.Cog):
                 return
 
             # Generate string with all reactions on post at the time
-            title_string = ""
+            title_string = ''
             for reaction in reactions:
                 if not isinstance(reaction.emoji, str):
                     # Remove all emoji reactions that are not from current server
                     if disnake.utils.get(ctx.guild.emojis, id=reaction.emoji.id) is None:
                         continue
 
-                tmp_string = title_string + f"{reaction.count}x{reaction.emoji} "
+                tmp_string = title_string + f'{reaction.count}x{reaction.emoji} '
 
                 if len(tmp_string) >= 255:
                     break
@@ -124,14 +124,14 @@ class MemeRepost(Base, commands.Cog):
             # Create link to original post
             link = Messages.meme_repost_link(original_message_url=ctx.message.jump_url,
                                              original_channel=self.config.meme_room)
-            embed.add_field(name="Link", value=link, inline=False)
+            embed.add_field(name='Link', value=link, inline=False)
 
             # Get all attachments of original post
             main_image = None
             other_attachments = []
             for attachment in ctx.message.attachments:
                 content_type = attachment.content_type
-                if content_type is not None and content_type.split("/")[0] == "image" and main_image is None:
+                if content_type is not None and content_type.split('/')[0] == 'image' and main_image is None:
                     # Set main image if its image and main image is not set
                     if attachment.is_spoiler():
                         # if image has spoiler it must be in other_attachments
@@ -150,11 +150,11 @@ class MemeRepost(Base, commands.Cog):
             if ctx.message.content:
                 content_splits = ctx.message.content.split()
                 for content_split in content_splits:
-                    if content_split.startswith("https://"):
+                    if content_split.startswith('https://'):
                         # Its attachment URL
                         for extension in self.config.meme_repost_image_extensions:
                             # Check for extension in URL
-                            if f".{extension}" in content_split:
+                            if f'.{extension}' in content_split:
                                 if main_image is None:
                                     main_image = content_split
                                 else:
@@ -164,12 +164,12 @@ class MemeRepost(Base, commands.Cog):
                             other_attachments.append(content_split)
 
                 content = ctx.message.content[:900]
-                embed.add_field(name="Obsah", value=content)
+                embed.add_field(name='Obsah', value=content)
 
             # Set main image if present
             if main_image is not None:
                 if isinstance(main_image, disnake.File):
-                    embed.set_image(url=f"attachment://{main_image.filename}")
+                    embed.set_image(url=f'attachment://{main_image.filename}')
                 elif isinstance(main_image, str):
                     embed.set_image(url=main_image)
                     main_image = None
@@ -189,7 +189,7 @@ class MemeRepost(Base, commands.Cog):
 
                     # And urls as string in separated message
                     urls = [file for file in other_attachments if isinstance(file, str)]
-                    urls = "\n".join(urls) if urls else None
+                    urls = '\n'.join(urls) if urls else None
 
                     secondary_message = await self.repost_channel.send(urls, files=files)
                     secondary_message_id = secondary_message.id
@@ -210,15 +210,15 @@ class MemeRepost(Base, commands.Cog):
 
             BetterMemeDB.add_post_to_repo(ctx.message.author.id, total_karma)
 
-    @commands.slash_command(name="better-meme", guild_ids=[Base.config.guild_id])
+    @commands.slash_command(name='better-meme', guild_ids=[Base.config.guild_id])
     async def _better_meme(self, inter):
         pass
 
-    @_better_meme.sub_command(name="leaderboard", description=Messages.meme_leaderboard_brief)
+    @_better_meme.sub_command(name='leaderboard', description=Messages.meme_leaderboard_brief)
     async def leaderboard(
         self,
         inter: disnake.ApplicationCommandInteraction,
-        order_by: str = commands.Param(name='order_by', choices=["total_karma", "posts"], default="posts"),
+        order_by: str = commands.Param(name='order_by', choices=['total_karma', 'posts'], default='posts'),
         start: int = commands.Param(default=1, gt=0, lt=100000000, description=Messages.karma_board_start)
     ):
         await inter.response.defer(ephemeral=self.check.botroom_check(inter))
