@@ -175,5 +175,5 @@ class DynamicVerifyDB(database.base):
         return session.query(cls).filter(cls.id == rule).one_or_none()
 
     @classmethod
-    def get_rules(cls, limit: int) -> List[DynamicVerifyDB]:
+    def get_rules(cls, limit: int = None) -> List[DynamicVerifyDB]:
         return session.query(cls).order_by(asc("id")).limit(limit).all()
