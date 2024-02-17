@@ -1,6 +1,7 @@
 """
 Cog for verification system. Enables users to verify themselves with xlogin00 and gain access to server.
 """
+from io import BytesIO
 
 import disnake
 from disnake.ext import commands
@@ -8,8 +9,10 @@ from disnake.ext import commands
 from cogs.base import Base
 from config import cooldowns
 from config.messages import Messages
+from database.verification import DynamicVerifyDB
 from features import verification
 from features.dynamic_verify import DynamicVerifyManager
+from features.table_generator import TableGenerator
 from modals.dynamic_verify import DynamicVerifyEditModal
 from permissions import permission_check, room_check
 
@@ -37,6 +40,7 @@ class Verify(Base, commands.Cog):
         inter: disnake.ApplicationCommandInteraction,
         login: str = commands.Param(description=Messages.verify_login_parameter),
     ):
+        login = login.lower()
         await inter.response.defer(ephemeral=True)
         if await self.dynamic_verify_manager.can_apply_rule(inter.user, login):
             await self.dynamic_verify_manager.request_access(login, inter)
@@ -60,6 +64,19 @@ class Verify(Base, commands.Cog):
     async def dynamic_verify_create(self, inter: disnake.ApplicationCommandInteraction):
         modal = DynamicVerifyEditModal(inter.guild, None)
         await inter.response.send_modal(modal)
+
+    @dynamic_verify.sub_command(name="list", description=Messages.dynamic_verify_list_brief)
+    async def dynamic_verify_list(self, inter: disnake.ApplicationCommandInteraction):
+        matrix = []
+        for rule in DynamicVerifyDB.get_rules():
+            roles = [inter.guild.get_role(role_id).name for role_id in rule.get_role_ids()]
+            matrix.append([rule.id, rule.name, str(rule.enabled), str(rule.mod_check), ", ".join(roles)])
+        generator = TableGenerator(header=["ID", "Name", "Enabled", "Mod check", "Roles"])
+        generator.align(["c", "l", "c", "c", "l"])
+        table = generator.generate_table(matrix)
+        with BytesIO(bytes(table, "utf-8")) as file:
+            file = disnake.File(fp=file, filename="dynamic_verify_list.txt")
+        await inter.response.send_message(file=file)
 
     @dynamic_verify.sub_command(name="edit", description=Messages.dynamic_verify_edit_brief)
     async def dynamic_verify_edit(
