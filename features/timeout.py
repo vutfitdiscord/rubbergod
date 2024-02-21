@@ -26,18 +26,20 @@ def create_embed(
 def add_field_timeout(
     embed: disnake.Embed,
     title: str,
-    member: disnake.Member,
-    author: disnake.Member,
+    member: disnake.User,
+    author: disnake.User,
     starttime: datetime,
     endtime: datetime,
     length: timedelta,
     reason: str,
 ):
+    mod = f"{author.mention} ({author.display_name})" if author else "Automod"
+
     embed.add_field(
         name=title,
         value=Messages.timeout_field_text(
             member=f"{member.mention} ({member.display_name})",
-            mod=f"{author.mention} ({author.display_name})",
+            mod=mod,
             starttime=starttime.strftime("%d.%m.%Y %H:%M"),
             endtime=endtime.strftime("%d.%m.%Y %H:%M"),
             length=f"{length.days}d, "
@@ -63,13 +65,14 @@ async def timeout_embed_listing(
     for users_list in users_lists:
         embed = create_embed(author, title)
         for timeout in users_list:
+            mod = await bot.get_or_fetch_user(timeout.mod_id)
             starttime_local, endtime_local = timeout.start_end_local
             member = await bot.get_or_fetch_user(timeout.user_id)
             add_field_timeout(
                 embed=embed,
                 title=member.display_name,
                 member=member,
-                author=author,
+                author=mod,
                 starttime=starttime_local,
                 endtime=endtime_local,
                 length=timeout.length,
@@ -92,7 +95,7 @@ async def timeout_perms(
 ) -> bool:
     """Set timeout for member and update in db. Return True if successful, False otherwise."""
     try:
-        if length == 0 or endtime is None:
+        if endtime is None:
             await member.timeout(until=None, reason=reason)
             TimeoutDB.remove_timeout(member.id, remove_logs)
         elif length.days > 28:

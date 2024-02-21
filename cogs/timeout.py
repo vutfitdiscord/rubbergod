@@ -69,16 +69,19 @@ class Timeout(Base, commands.Cog):
             return
 
         endtime: datetime = utils.parse_time(endtime, Messages.time_format)
-        await inter.response.defer()
-
-        embed = features_timeout.create_embed(inter.author, "Timeout")
-        cantBeTimeout = []
-        timeoutMembers = []
-
         # convert to local time
         endtime_local = endtime.astimezone(tz=utils.get_local_zone())
         starttime_local = inter.created_at.astimezone(tz=utils.get_local_zone())
         length = endtime - inter.created_at
+
+        if length.seconds < 30:
+            await inter.send(Messages.timeout_too_short, ephemeral=True)
+            return
+
+        await inter.response.defer()
+        embed = features_timeout.create_embed(inter.author, "Timeout")
+        cantBeTimeout = []
+        timeoutMembers = []
 
         for member in parsed_members:
             isSuccess = await features_timeout.timeout_perms(
@@ -199,15 +202,15 @@ class Timeout(Base, commands.Cog):
             inline=True
         )
 
-        if timeout_user:
-            recent_timeout = timeout_user.get_last_timeout()
-            mod = await self.bot.get_or_fetch_user(recent_timeout.mod_id)
+        recent_timeout = timeout_user.get_last_timeout()
+        if timeout_user and recent_timeout is not None:
+            author = await self.bot.get_or_fetch_user(recent_timeout.mod_id)
             starttime_local, endtime_local = recent_timeout.start_end_local
             features_timeout.add_field_timeout(
                 embed=main_embed,
                 title="Recent timeout",
                 member=user,
-                author=mod,
+                author=author,
                 starttime=starttime_local,
                 endtime=endtime_local,
                 length=recent_timeout.length,
@@ -221,13 +224,13 @@ class Timeout(Base, commands.Cog):
                     embeds.append(embed)
                     embed = features_timeout.create_embed(inter.author, f"`@{user.display_name}` timeouts")
 
-                mod = await self.bot.get_or_fetch_user(recent_timeout.mod_id)
+                author = await self.bot.get_or_fetch_user(timeout.mod_id)
                 starttime_local, endtime_local = timeout.start_end_local
                 features_timeout.add_field_timeout(
                     embed=embed,
                     title=user.display_name,
                     member=user,
-                    author=mod,
+                    author=author,
                     starttime=starttime_local,
                     endtime=endtime_local,
                     length=timeout.length,
@@ -261,11 +264,14 @@ class Timeout(Base, commands.Cog):
         given by moderator and using selftimeout in DMs.
         """
         endtime = utils.parse_time(endtime, Messages.time_format)
-        await inter.response.defer()
-
         starttime_local = inter.created_at.astimezone(tz=utils.get_local_zone())
         length = endtime - inter.created_at
 
+        if length.seconds < 30:
+            await inter.send(Messages.timeout_too_short, ephemeral=True)
+            return
+
+        await inter.response.defer()
         isSuccess = await features_timeout.timeout_perms(
             inter=inter,
             member=inter.user,
