@@ -114,9 +114,9 @@ class TimeoutUserDB(database.base):
     id = Column(String, primary_key=True)
     timeouts: Mapped[list[TimeoutDB]] = relationship(back_populates="user")
 
-    @property
+    @hybrid_property
     def timeout_count(self) -> int:
-        return len(self.timeouts)
+        return session.query(TimeoutDB).filter_by(user_id=self.id, isself=False).count()
 
     @classmethod
     def add_user(cls, user_id: str) -> None:
@@ -136,5 +136,5 @@ class TimeoutUserDB(database.base):
     def get_active_timeout(cls, user_id: str) -> TimeoutDB | None:
         return session.query(TimeoutDB).filter_by(user_id=str(user_id), is_active=True).first()
 
-    def get_last_timeout(self) -> TimeoutDB:
+    def get_last_timeout(self) -> TimeoutDB | None:
         return session.query(TimeoutDB).filter_by(user_id=self.id).order_by(TimeoutDB.start.desc()).first()

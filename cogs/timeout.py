@@ -179,7 +179,7 @@ class Timeout(Base, commands.Cog):
         """List history of timeouts for user"""
         await inter.response.defer()
         timeout_user = TimeoutUserDB.get_user(user.id)
-        timeouts_count = len(timeout_user.timeouts) if timeout_user else 0
+        timeouts_count = timeout_user.timeout_count if timeout_user else 0
 
         embeds = []
         main_embed = features_timeout.create_embed(
