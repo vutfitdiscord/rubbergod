@@ -625,6 +625,7 @@ if ("Mám průměr pod 2.0")                                           \n  retur
     timeout_permission = "Na umlčení **{user_list}** nemám práva."
     timeout_user_param = "Použij tag uživatele/uživatelů"
     timeout_list_none = "Nenalezeny žádné umlčení."
+    timeout_too_short = "Délka umlčení je příliš krátká. Musí být alespoň 30s."
     timeout_member_not_found = "{author} `{members}` jsem na serveru nenašel. Ujisti se, že jsi uživatele zadal správně pomocí @tag | name | ID."
     timeout_remove_logs_param = "Odstraní záznam z databáze."
     timeout_remove_reason = "{member}\nPředčasně odebráno"
