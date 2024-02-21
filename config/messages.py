@@ -619,7 +619,7 @@ if ("Mám průměr pod 2.0")                                           \n  retur
     # TIMEOUT COG
     timeout_brief = "Dočasně zakáže uživateli interakce na serveru."
     timeout_reason_param = "Důvod umlčení uživatele."
-    timeout_field_text = "**Kdo:** {member}\n**Od:** {mod}\n**Délka:** {starttime} - {endtime} ({length})\n**Navrácení:** {timestamp}\n**Důvod:** {reason}\n"
+    timeout_field_text = "**Kdo:** {member}\n**Od:** {author}\n**Délka:** {starttime} - {endtime} ({length})\n**Navrácení:** {timestamp}\n**Důvod:** {reason}\n"
     timeout_list_brief = "Vypíše uživatele se zatlumením."
     timeout_remove_brief = "Předčasně odebere umlčení uživateli."
     timeout_permission = "Na umlčení **{user_list}** nemám práva."
