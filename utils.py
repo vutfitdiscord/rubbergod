@@ -6,7 +6,6 @@ from datetime import datetime, timezone
 from typing import Callable, Iterable, List, Literal, Optional, Tuple, Union
 
 import disnake
-import pytz
 from dateutil import parser
 from dateutil.parser import ParserError
 from dateutil.relativedelta import relativedelta
@@ -415,7 +414,8 @@ async def parse_attachments(
 
 
 def get_local_zone():
-    return pytz.timezone("Europe/Prague")
+    """Return local timezone"""
+    return datetime.now().astimezone().tzinfo
 
 
 def parse_time(time_string: str, time_format: str) -> Optional[datetime]:
