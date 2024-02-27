@@ -179,7 +179,12 @@ class Timeout(Base, commands.Cog):
         """List history of timeouts for user"""
         await inter.response.defer()
         timeout_user = TimeoutUserDB.get_user(user.id)
-        timeouts_count = timeout_user.timeout_count if timeout_user else 0
+        if timeout_user:
+            timeouts_count = timeout_user.timeout_count
+            recent_timeout = timeout_user.get_last_timeout()
+        else:
+            timeouts_count = 0
+            recent_timeout = None
 
         embeds = []
         main_embed = features_timeout.create_embed(
@@ -202,7 +207,6 @@ class Timeout(Base, commands.Cog):
             inline=True
         )
 
-        recent_timeout = timeout_user.get_last_timeout()
         if timeout_user and recent_timeout is not None:
             author = await self.bot.get_or_fetch_user(recent_timeout.mod_id)
             starttime_local, endtime_local = recent_timeout.start_end_local
@@ -219,7 +223,7 @@ class Timeout(Base, commands.Cog):
             embeds.append(main_embed)
 
             embed = features_timeout.create_embed(inter.author, f"`@{user.display_name}` timeouts")
-            for index, timeout in enumerate(timeout_user.timeouts[::-1]):           # from newest to oldest
+            for index, timeout in enumerate(timeout_user.get_all_timeouts()):
                 if (index % 5) == 0 and index != 0:
                     embeds.append(embed)
                     embed = features_timeout.create_embed(inter.author, f"`@{user.display_name}` timeouts")

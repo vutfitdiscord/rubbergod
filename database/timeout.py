@@ -130,11 +130,22 @@ class TimeoutUserDB(database.base):
 
     @classmethod
     def get_active_timeouts(cls, isself: bool = False) -> list[TimeoutDB]:
-        return session.query(TimeoutDB).filter_by(isself=isself, is_active=True).all()
+        if isself:
+            return session.query(TimeoutDB).filter_by(isself=True, is_active=True).all()
+        return session.query(TimeoutDB).filter_by(is_active=True).all()
 
     @classmethod
     def get_active_timeout(cls, user_id: str) -> TimeoutDB | None:
         return session.query(TimeoutDB).filter_by(user_id=str(user_id), is_active=True).first()
 
-    def get_last_timeout(self) -> TimeoutDB | None:
-        return session.query(TimeoutDB).filter_by(user_id=self.id).order_by(TimeoutDB.start.desc()).first()
+    def get_all_timeouts(self, isself: bool = False, descending: bool = True) -> list[TimeoutDB]:
+        if descending:
+            timeouts_query = session.query(TimeoutDB).filter_by(user_id=self.id, isself=isself)
+            return timeouts_query.order_by(TimeoutDB.start.desc()).all()
+
+        timeouts_query = session.query(TimeoutDB).filter_by(user_id=self.id, isself=isself)
+        return timeouts_query.order_by(TimeoutDB.start.asc()).all()
+
+    def get_last_timeout(self, isself: bool = False) -> TimeoutDB | None:
+        return session.query(TimeoutDB).filter_by(
+            user_id=self.id, isself=isself).order_by(TimeoutDB.start.desc()).first()
