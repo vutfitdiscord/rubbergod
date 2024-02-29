@@ -66,10 +66,8 @@ class VerifyHelper:
     async def save_user_details(self, user: dict) -> ValidPersonDB:
         """Save user details to database and return the user object."""
         # search for login in database
-        person = ValidPersonDB.get_user_by_login(user['login'].strip())
-        if person is None:
-            # search for id in database
-            person = ValidPersonDB.get_user_by_login(str(user['id']))
+        login = user['login'].strip() if user.get('login') else str(user.get('id'))
+        person = ValidPersonDB.get_user_by_login(login)
         if person is None:
             # user not found in DB, add new user
             person = ValidPersonDB(
