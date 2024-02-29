@@ -154,3 +154,18 @@ async def get_user_from_grillbot(self, guild_id: str, user_id: str) -> tuple[int
                 return user.get("unverifyCount", "Missing"), user.get("warningCount", "Missing")
         except (asyncio.exceptions.TimeoutError, aiohttp.client_exceptions.ClientConnectorError) as e:
             raise ApiError(e)
+
+
+async def time_check(
+    inter: disnake.ApplicationCommandInteraction,
+    endtime: datetime,
+    length: timedelta
+) -> bool:
+    if endtime < inter.created_at:
+        await inter.send(Messages.timeout_past_time, ephemeral=True)
+        return True
+
+    if length.seconds < 30:
+        await inter.send(Messages.timeout_too_short, ephemeral=True)
+        return True
+    return False

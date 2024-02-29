@@ -130,9 +130,7 @@ class TimeoutUserDB(database.base):
 
     @classmethod
     def get_active_timeouts(cls, isself: bool = False) -> list[TimeoutDB]:
-        if isself:
-            return session.query(TimeoutDB).filter_by(isself=True, is_active=True).all()
-        return session.query(TimeoutDB).filter_by(is_active=True).all()
+        return session.query(TimeoutDB).filter_by(isself=isself, is_active=True).all()
 
     @classmethod
     def get_active_timeout(cls, user_id: str) -> TimeoutDB | None:

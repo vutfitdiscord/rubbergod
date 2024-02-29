@@ -74,8 +74,7 @@ class Timeout(Base, commands.Cog):
         starttime_local = inter.created_at.astimezone(tz=utils.get_local_zone())
         length = endtime - inter.created_at
 
-        if length.seconds < 30:
-            await inter.send(Messages.timeout_too_short, ephemeral=True)
+        if await features_timeout.time_check(inter, endtime, length):
             return
 
         await inter.response.defer()
@@ -271,8 +270,7 @@ class Timeout(Base, commands.Cog):
         starttime_local = inter.created_at.astimezone(tz=utils.get_local_zone())
         length = endtime - inter.created_at
 
-        if length.seconds < 30:
-            await inter.send(Messages.timeout_too_short, ephemeral=True)
+        if await features_timeout.time_check(inter, endtime, length):
             return
 
         await inter.response.defer()
