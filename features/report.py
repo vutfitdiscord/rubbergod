@@ -95,14 +95,15 @@ def answer_embed(title, inter: disnake.ModalInteraction, report: ReportDB, answe
     return embed
 
 
-def deleted_message_embed(
+def info_message_embed(
     inter: disnake.ModalInteraction,
     report: ReportDB,
+    title: str,
     description: str
 ) -> disnake.Embed:
-    """creates an embed template for the submitted answer"""
+    """creates info embed for the report"""
     embed = disnake.Embed(
-        title=Messages.report_message_deleted_title(id=report.id),
+        title=title,
         description=description,
         color=disnake.Color.yellow()
     )

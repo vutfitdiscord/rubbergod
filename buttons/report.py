@@ -148,10 +148,12 @@ class ReportView(BaseView):
         report = ReportDB.get_report(report_id)
         report_author = await self.get_report_author(inter)
         report_message = await report_features.convert_url(inter, report.report_url)
-        message, embed = await self.set_spam(button, inter, report)
+        description, embed = await self.set_spam(button, inter, report)
+        title = Messages.report_message_spam_title(id=report_id)
+        spam_embed = report_features.info_message_embed(inter, report, title, description)
 
-        await report_author.send(message)
-        await report_message.channel.send(message, allowed_mentions=disnake.AllowedMentions.none())
+        await report_author.send(embed=spam_embed)
+        await report_message.channel.send(embed=spam_embed, allowed_mentions=disnake.AllowedMentions.none())
         await inter.edit_original_response(embed=embed, view=self)
 
 
@@ -185,19 +187,21 @@ class ReportMessageView(ReportView):
 
         if message is None:
             button.label = "Message not found"
-            delete_message = Messages.report_message_already_deleted(
+            description = Messages.report_message_already_deleted(
                 author=inter.author.mention,
                 author_name=inter.author.name
             )
         else:
             button.label = f"Deleted by @{inter.author.name}"
-            delete_message = Messages.report_message_deleted(
+            description = Messages.report_message_deleted(
                 author=inter.author.mention,
                 author_name=inter.author.name
             )
             await message.delete()
 
-        embed = report_features.deleted_message_embed(inter, report, delete_message)
+        title = Messages.report_message_deleted_title(id=report_id)
+        embed = report_features.info_message_embed(inter, report, title, description)
+
         await report_message.channel.send(embed=embed, allowed_mentions=disnake.AllowedMentions.none())
         await report_author.send(embed=embed, view=ReportAnonymView(self.bot))
         await inter.edit_original_response(view=self)
