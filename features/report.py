@@ -88,7 +88,7 @@ def answer_embed(title, inter: disnake.ModalInteraction, report: ReportDB, answe
         )
 
     else:
-        author = f"{inter.author.mention} @{inter.author.display_name}"
+        author = f"{inter.author.mention} `@{inter.author.name}`"
         utils.add_author_footer(embed, inter.author, additional_text=[f"ID: {report.id}"])
 
     embed.add_field(name="Answered by", value=author, inline=False)

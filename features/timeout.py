@@ -33,12 +33,12 @@ def add_field_timeout(
     length: timedelta,
     reason: str,
 ):
-    author = f"{author.mention} ({author.display_name})" if author else "Automod"
+    author = f"{author.mention} (`{author.name}`)" if author else "Automod"
 
     embed.add_field(
         name=title,
         value=Messages.timeout_field_text(
-            member=f"{member.mention} ({member.display_name})",
+            member=f"{member.mention} (`{member.name}`)",
             author=author,
             starttime=starttime.strftime("%d.%m.%Y %H:%M"),
             endtime=endtime.strftime("%d.%m.%Y %H:%M"),

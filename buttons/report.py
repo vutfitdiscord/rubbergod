@@ -49,7 +49,7 @@ class ReportView(BaseView):
         report: ReportDB
     ) -> Tuple[str, disnake.Embed]:
         """Set the report as spam, change buttons and tag thread as spam"""
-        resolved_author = f"{inter.author.mention} @{inter.author.display_name}"
+        resolved_author = f"{inter.author.mention} `@{inter.author.name}`"
         embed = inter.message.embeds[0].to_dict()
 
         if report.fake_report:
@@ -64,7 +64,7 @@ class ReportView(BaseView):
             message = Messages.report_message_not_spam(
                 id=report.id,
                 author=inter.author.mention,
-                author_name=inter.author.display_name
+                author_name=inter.author.name
             )
             await report_features.set_tag(self.report_channel, inter.message.channel, "open")
 
@@ -82,7 +82,7 @@ class ReportView(BaseView):
             message = Messages.report_message_spam(
                 id=report.id,
                 author=inter.author.mention,
-                author_name=inter.author.display_name
+                author_name=inter.author.name
             )
             await report_features.set_tag(self.report_channel, inter.message.channel, "spam")
         return message, embed
@@ -99,7 +99,7 @@ class ReportView(BaseView):
         report_id = report_features.extract_report_id(inter)
         report = ReportDB.get_report(report_id)
         embed = inter.message.embeds[0].to_dict()
-        resolved_by = f"{inter.author.mention} @{inter.author.display_name}"
+        resolved_by = f"{inter.author.mention} `@{inter.author.name}`"
 
         if report.resolved:
             embed = await report_features.embed_resolved(self, resolved_by, embed, report.type, False)
@@ -107,7 +107,7 @@ class ReportView(BaseView):
             content = Messages.report_unresolved(
                 id=report_id,
                 author=inter.author.mention,
-                author_name=inter.author.display_name
+                author_name=inter.author.name
             )
             await report_features.set_tag(self.report_channel, inter.message.channel, "open")
             await report_author.send(content)
@@ -187,13 +187,13 @@ class ReportMessageView(ReportView):
             button.label = "Message not found"
             delete_message = Messages.report_message_already_deleted(
                 author=inter.author.mention,
-                author_name=inter.author.display_name
+                author_name=inter.author.name
             )
         else:
             button.label = f"Deleted by @{inter.author.name}"
             delete_message = Messages.report_message_deleted(
                 author=inter.author.mention,
-                author_name=inter.author.display_name
+                author_name=inter.author.name
             )
             await message.delete()
 
