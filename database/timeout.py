@@ -26,7 +26,8 @@ class TimeoutDB(database.base):
 
     @hybrid_property
     def is_active(self) -> bool:
-        return self.end > datetime.now(timezone.utc)
+        now = datetime.now(timezone.utc).replace(tzinfo=None)   # can't compare timezone aware and unaware
+        return self.end > now
 
     @hybrid_property
     def length(self) -> timedelta:
