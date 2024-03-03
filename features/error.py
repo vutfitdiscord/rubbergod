@@ -423,7 +423,7 @@ class ErrorLogger:
         if isinstance(error, commands.CommandOnCooldown):
             time = datetime.datetime.now() + datetime.timedelta(seconds=error.retry_after)
             retry_after = utils.get_discord_timestamp(time, style="Relative Time")
-            await ctx.send(Messages.spamming(user=ctx.author.id, time=retry_after))
+            await ctx.send(Messages.spamming(user=ctx.author.id, time=retry_after), ephemeral=True)
             return True
 
         if isinstance(error, commands.NoPrivateMessage):
