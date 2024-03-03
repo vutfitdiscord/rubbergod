@@ -51,7 +51,7 @@ def merge_messages(message_list: Iterable, max_msg_len: int):
 
 
 async def send_list_of_messages(
-        ctx: Union[disnake.TextChannel, commands.Context, disnake.ApplicationCommandInteraction],
+        ctx: Union[disnake.ApplicationCommandInteraction, commands.Context, disnake.abc.Messageable],
         message_list: Iterable,
         max_msg_len: int = 1900,
         ephemeral: bool = False
@@ -92,5 +92,5 @@ async def send_list_of_messages(
                 await ctx.channel.reply(message)
             else:
                 await ctx.channel.send(message)
-        elif isinstance(ctx, disnake.TextChannel):
+        elif isinstance(ctx, disnake.abc.Messageable):
             await ctx.send(message)
