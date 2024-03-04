@@ -165,7 +165,7 @@ async def time_check(
         await inter.send(Messages.timeout_past_time, ephemeral=True)
         return True
 
-    if length.seconds < 30:
+    if length.total_seconds() < 30:
         await inter.send(Messages.timeout_too_short, ephemeral=True)
         return True
     return False
