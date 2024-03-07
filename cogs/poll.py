@@ -179,35 +179,34 @@ class Poll(Base, commands.Cog):
     async def list_polls(
         self,
         inter: disnake.ApplicationCommandInteraction,
-        type: str = commands.Param(
+        poll_type: str = commands.Param(
             default=None,
             choices=[PollType.basic.name, PollType.boolean.name, PollType.opinion.name])
     ):
         await inter.response.defer(ephemeral=True)
-        if not type:
+        if not poll_type:
             header = "# Aktivní hlasování:\n"
             polls = PollDB.get_pending_polls()
         else:
-            header = f"# {type.capitalize()} aktivní hlasování:\n"
-            polls = PollDB.get_pending_polls_by_type(PollType[type].value)
+            header = f"# {poll_type.capitalize()} aktivní hlasování:\n"
+            polls = PollDB.get_pending_polls_by_type(PollType[poll_type].value)
+
         if not polls:
             await inter.send(Messages.poll_no_active_polls)
             return
 
         content = ""
         for poll in polls:
-            link = poll.message_url.split('/')
-            try:
-                channel = await utils.get_or_fetch_channel(self.bot, int(link[-2]))
-            except disnake.NotFound:
-                # If channel is not found, delete the poll
+            message = await utils.get_message_from_url(self.bot, poll.message_url)
+            if not message:
+                # If the poll is not found, delete the poll
                 poll.remove()
                 continue
 
-            users = {user.id for user in channel.members}
-            if inter.author.id not in users:
-                continue
-            content += Messages.poll_list_polls(id=poll.id, url=poll.message_url, title=poll.title)
+            permission = message.channel.permissions_for(inter.author)
+            if permission.view_channel:
+                content += Messages.poll_list_polls(id=poll.id, url=poll.message_url, title=poll.title)
+
         if not content:
             await inter.send(Messages.poll_no_active_polls)
             return

@@ -467,15 +467,16 @@ def parse_time(time_string: str, time_format: str) -> Optional[datetime]:
     return time.astimezone(timezone.utc)
 
 
-async def get_message_from_url(bot, message_url) -> Optional[disnake.Message]:
+async def get_message_from_url(bot: commands.Bot, message_url: str) -> disnake.Message | None:
     link = message_url.split('/')
     msg_id = int(link[-1])
     channel_id = int(link[-2])
+    guild_id = int(link[-3])
 
-    channel = await get_or_fetch_channel(bot, channel_id)
-    message = disnake.TextChannel.get_partial_message(channel, msg_id)
-    if not message:
+    try:
+        guild = bot.get_guild(guild_id)
+        channel = guild.get_channel_or_thread(channel_id)
+        message = await channel.fetch_message(msg_id)
+        return message
+    except disnake.NotFound:
         return
-    message = await message.fetch()
-
-    return message
