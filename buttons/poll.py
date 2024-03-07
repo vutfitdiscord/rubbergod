@@ -1,6 +1,6 @@
 import asyncio
 from datetime import datetime, timedelta
-from typing import Dict, List, Set, Union
+from typing import Union
 
 import disnake
 from disnake.ext import commands
@@ -14,7 +14,7 @@ from features import poll as poll_features
 
 
 class Action:
-    def __init__(self, action: str, value: Union[int, List[int]] = None):
+    def __init__(self, action: str, value: Union[int, list[int]] = None):
         self.action = action
         self.value = value
 
@@ -22,7 +22,7 @@ class Action:
 class ActionsCache:
     def __init__(self) -> None:
         # {poll_id: {voter_id: Action}}
-        self.memory: Dict[int, Dict[int, Action]] = {}
+        self.memory: dict[int, dict[int, Action]] = {}
         self.lock = asyncio.Lock()
 
     async def add_vote(self, poll_id: int, voter_id: str, poll_option_id: int) -> None:
@@ -31,7 +31,7 @@ class ActionsCache:
                 self.memory[poll_id] = {}
             self.memory[poll_id][voter_id] = Action("add", poll_option_id)
 
-    async def add_multiple_choice(self, poll_id: int, voter_id: str, poll_option_ids: List[int]) -> None:
+    async def add_multiple_choice(self, poll_id: int, voter_id: str, poll_option_ids: list[int]) -> None:
         async with self.lock:
             if not self.memory.get(poll_id):
                 self.memory[poll_id] = {}
@@ -84,7 +84,7 @@ class ActionsCache:
             except AttributeError:
                 pass
 
-    async def apply_cache(self) -> Set[int]:
+    async def apply_cache(self) -> set[int]:
         async with self.lock:
             memory_copy = self.memory.copy()
 
@@ -111,7 +111,7 @@ class ActionsCache:
 
 class PollView(BaseView):
     action_cache = ActionsCache()
-    messages: Dict[int, disnake.Message] = {}
+    messages: dict[int, disnake.Message] = {}
 
     def __init__(self):
         super().__init__(timeout=None)
