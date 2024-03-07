@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from datetime import datetime
 from enum import IntEnum
-from typing import Dict, List, Optional, Set, Union
+from typing import List, Union
 
 from sqlalchemy import (Boolean, Column, DateTime, ForeignKey, Integer, String,
                         UniqueConstraint)
@@ -27,7 +27,7 @@ class VoterDB(database.base):
         return voter
 
     @classmethod
-    def get(cls, voter_id: str, poll_option_id: int) -> Optional[VoterDB]:
+    def get(cls, voter_id: str, poll_option_id: int) -> VoterDB | None:
         return session.query(cls).get((str(voter_id), poll_option_id))
 
 
@@ -88,19 +88,19 @@ class PollDB(database.base):
         return new_poll
 
     @classmethod
-    def get(cls, poll_id: int) -> Optional[PollDB]:
+    def get(cls, poll_id: int) -> PollDB | None:
         return session.query(cls).get(poll_id)
 
     @classmethod
-    def get_pending_polls(cls) -> List[PollDB]:
+    def get_pending_polls(cls) -> list[PollDB]:
         return session.query(cls).filter(or_(cls.end_datetime is None, cls.end_datetime >= datetime.now()))
 
     @classmethod
-    def get_pending_polls_by_type(cls, type: PollType) -> List[PollDB]:
+    def get_pending_polls_by_type(cls, type: PollType) -> list[PollDB]:
         return cls.get_pending_polls().filter(cls.poll_type == type).all()
 
     @classmethod
-    def get_author_id(cls, poll_id: int) -> Optional[str]:
+    def get_author_id(cls, poll_id: int) -> str | None:
         poll = cls.get(poll_id)
         if not poll:
             return
@@ -151,13 +151,13 @@ class PollDB(database.base):
             voters_count += option.voters_count
         return voters_count
 
-    def get_voters(self) -> Dict[PollOptionDB, Set[str]]:
+    def get_voters(self) -> dict[PollOptionDB, set[str]]:
         voters_ids = {}
         for option in self.options:
             voters_ids[option] = option.voters_ids
         return voters_ids
 
-    def get_winning_option(self) -> PollOptionDB:
+    def get_winning_options(self) -> list[PollOptionDB]:
         winning_option = max(self.options, key=lambda option: option.voters_count)
         return winning_option
 
@@ -186,7 +186,7 @@ class PollOptionDB(database.base):
         return {voter.id for voter in self.voters}
 
     @classmethod
-    def get(cls, poll_option_id: int) -> Optional[PollOptionDB]:
+    def get(cls, poll_option_id: int) -> PollOptionDB | None:
         return session.query(cls).get(poll_option_id)
 
     @classmethod
@@ -210,7 +210,7 @@ class PollOptionDB(database.base):
         self.voters.add(voter)
         session.commit()
 
-    def add_voters(self, voters_ids: List[str]):
+    def add_voters(self, voters_ids: list[str]):
         voters = []
         for voter_id in voters_ids:
             voter = VoterDB.get(voter_id, self.id)

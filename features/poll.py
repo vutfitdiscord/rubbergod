@@ -16,7 +16,7 @@ def extract_poll_id(message: disnake.Message) -> int:
     return int(poll_id)
 
 
-def check_endtime(inter, endtime: str) -> bool:
+def check_endtime(inter, endtime: str) -> tuple[bool, datetime]:
     """Check if endtime is valid and above 5min from now"""
     endtime = utils.parse_time(endtime, Messages.poll_endtime)
     now = inter.created_at.astimezone(

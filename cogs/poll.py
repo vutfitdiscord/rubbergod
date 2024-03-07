@@ -80,7 +80,7 @@ class Poll(Base, commands.Cog):
         self.task_generator(poll)
 
     @commands.slash_command(name="poll")
-    async def _poll(self, inter): ...
+    async def _poll(self, inter: disnake.GuildCommandInteraction): ...
 
     # TODO
     # @cooldowns.long_cooldown
