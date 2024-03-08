@@ -118,12 +118,8 @@ def create_embed(
     return embed
 
 
-async def list_voters(
-    bot: commands.Bot,
-    inter: disnake.ApplicationCommandInteraction,
-    poll_message: disnake.Message
-) -> List[str]:
-    poll = PollDB.get(extract_poll_id(poll_message))
+async def list_voters(inter: disnake.ApplicationCommandInteraction) -> List[str]:
+    poll = PollDB.get(extract_poll_id(inter.message))
 
     if poll is None:
         await inter.send(Messages.poll_not_found)
@@ -153,10 +149,22 @@ async def list_voters(
 
 
 def create_end_poll_message(poll: PollDB) -> str:
-    winning_option = poll.get_winning_option()
+    winning_options = poll.get_winning_options()
     total_votes = poll.get_voters_count()
     content = Messages.poll_closed(title=poll.title, url=poll.message_url)
-    if total_votes > 0:
+
+    if total_votes <= 0:
+        return content
+
+    if len(winning_options) > 1:
+        options = "".join([f"\n{option.emoji} {option.text}" for option in winning_options])
+        content += Messages.poll_tie_options(
+            options=options,
+            votes=winning_options[0].voters_count,
+            percentage=round(winning_options[0].voters_count / total_votes * 100),
+        )
+    else:
+        winning_option = winning_options[0]
         content += Messages.poll_winning_option(
             option=f"{winning_option.emoji} {winning_option.text}",
             votes=winning_option.voters_count,

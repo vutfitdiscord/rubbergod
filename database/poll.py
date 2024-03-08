@@ -163,8 +163,9 @@ class PollDB(database.base):
         return voters_ids
 
     def get_winning_options(self) -> list[PollOptionDB]:
-        winning_option = max(self.options, key=lambda option: option.voters_count)
-        return winning_option
+        max_votes = max(option.voters_count for option in self.options)
+        winning_options = [option for option in self.options if option.voters_count == max_votes]
+        return winning_options
 
 
 class PollOptionDB(database.base):

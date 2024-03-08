@@ -292,6 +292,7 @@ class Messages(metaclass=Formatable):
     poll_already_voted = "Pro možnost `{option}` jsi již hlasoval"
     poll_closed = "Hlasování s názvem `{title}` bylo ukončeno. {url}\n"
     poll_winning_option = "Vyhrála možnost `{option}` s **{votes} ({percentage}%) hlasy**."
+    poll_tie_options = "Remíza mezi možnostmi `{options}`\ns **{votes} ({percentage}%) hlasy**."
     poll_embed_description = "{description}\n- Počet hlasů na uživatele: {votes}\n- Konec: {date}\n- " \
                              "Anonymní hlasování: {anonymous}\n- Celkový počet hlasů: {all_votes}"
     poll_not_author = "Toto hlasování nemůžeš ukončit, protože nejsi jeho autorem."
