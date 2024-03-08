@@ -1,6 +1,5 @@
 import asyncio
 from datetime import datetime, timezone
-from typing import Union
 
 import disnake
 from disnake.ext import commands
@@ -14,7 +13,7 @@ from features import poll as poll_features
 
 
 class Action:
-    def __init__(self, action: str, value: Union[int, list[int]] = None):
+    def __init__(self, action: str, value: int | list[int] = None):
         self.action = action
         self.value = value
 
@@ -44,13 +43,6 @@ class ActionsCache:
                 self.memory[poll_id] = {}
             self.memory[poll_id][voter_id] = Action("remove", poll_option_id)
 
-    async def remove_votes(self, poll_id: int, voter_id: str) -> None:
-        """Remove all votes from user on poll in db"""
-        async with self.lock:
-            if not self.memory.get(poll_id):
-                self.memory[poll_id] = {}
-            self.memory[poll_id][voter_id] = Action("remove_all")
-
     async def remove_voter_from_cache(self, poll_id: int, voter_id: str) -> None:
         """Remove voter only from cache"""
         async with self.lock:
@@ -76,9 +68,6 @@ class ActionsCache:
                     pass
 
                 elif action.action == "remove":
-                    PollOptionDB.get(action.value).remove_voter(user_id)
-
-                elif action.action == "remove_all":
                     PollDB.get(poll_id).remove_voter(user_id)
 
             except AttributeError:

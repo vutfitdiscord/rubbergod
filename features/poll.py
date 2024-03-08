@@ -157,7 +157,7 @@ def create_end_poll_message(poll: PollDB) -> str:
         return content
 
     if len(winning_options) > 1:
-        options = "".join([f"\n{option.emoji} {option.text}" for option in winning_options])
+        options = "".join([f"\n## {option.emoji} {option.text}" for option in winning_options])
         content += Messages.poll_tie_options(
             options=options,
             votes=winning_options[0].voters_count,
@@ -166,7 +166,7 @@ def create_end_poll_message(poll: PollDB) -> str:
     else:
         winning_option = winning_options[0]
         content += Messages.poll_winning_option(
-            option=f"{winning_option.emoji} {winning_option.text}",
+            option=f"\n## {winning_option.emoji} {winning_option.text}",
             votes=winning_option.voters_count,
             percentage=round(winning_option.voters_count / total_votes * 100),
         )
