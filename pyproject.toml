@@ -1,0 +1,20 @@
+[tool.ruff]
+line-length = 110
+indent-width = 4
+lint.extend-select = ["I"]
+exclude = [
+    ".git",
+    ".venv",
+    "__pycache__",
+    "config/messages.py",
+]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+line-ending = "auto"
+
+[tool.codespell]
+write-changes = false
+skip = ".*/venv,.*log,.*/__pycache__,merlin-latest,.*/messages.py"
+ignore-words-list = "autor,studis,mis"
