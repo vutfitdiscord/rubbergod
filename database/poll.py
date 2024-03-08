@@ -1,11 +1,11 @@
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import datetime, timezone
 from enum import IntEnum
-from typing import List, Union
 
 from sqlalchemy import (Boolean, Column, DateTime, ForeignKey, Integer, String,
                         UniqueConstraint)
+from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.sql.expression import or_
 
@@ -49,15 +49,17 @@ class PollDB(database.base):
     end_datetime = Column(DateTime, nullable=True)
     closed = Column(Boolean, nullable=False, default=False)
     closed_by = Column(String, nullable=True)
-    options: Mapped[List[PollOptionDB]] = relationship(back_populates="poll", cascade="all,delete")
+    options: Mapped[list[PollOptionDB]] = relationship(back_populates="poll", cascade="all,delete")
     max_votes = Column(Integer, nullable=False)
     anonymous = Column(Boolean, nullable=False)
 
-    @property
-    def is_endtime(self) -> bool:
-        if self.end_datetime is None:
+    @hybrid_property
+    def is_active(self) -> bool:
+        if self.closed:
             return False
-        return self.end_datetime < datetime.now()
+
+        now = datetime.now(timezone.utc).replace(tzinfo=None)
+        return self.endtime > now
 
     @classmethod
     def add(
@@ -181,7 +183,7 @@ class PollOptionDB(database.base):
     def voters_count(self) -> int:
         return len(self.voters)
 
-    @property
+    @hybrid_property
     def voters_ids(self) -> set[str]:
         return {voter.id for voter in self.voters}
 
@@ -195,7 +197,7 @@ class PollOptionDB(database.base):
         session.add(vote)
         session.commit()
 
-    def remove_voter(self, voter: Union[VoterDB, str]) -> None:
+    def remove_voter(self, voter: VoterDB | str) -> None:
         if isinstance(voter, str):
             voter = VoterDB.get(voter, self.id)
 
