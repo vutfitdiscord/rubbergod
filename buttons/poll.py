@@ -297,15 +297,12 @@ class PollRemoveVoteView(PollView):
             await inter.edit_original_message(Messages.poll_not_voted)
             return
 
-        if action == "remove_vote":
-            await self.action_cache.remove_voter_from_cache(poll.id, str(inter.user.id))
-            await self.action_cache.remove_vote(poll.id, str(inter.user.id), self.poll_option.id)
-            await inter.edit_original_message(Messages.poll_vote_removed(title=self.poll.title), view=None)
-            return
-        elif action == "remove_votes":
-            await self.action_cache.remove_votes(poll.id, str(inter.user.id))
-            await inter.edit_original_message(Messages.poll_votes_removed(title=self.poll.title), view=None)
-            return
+        await self.action_cache.remove_voter_from_cache(poll.id, str(inter.user.id))
+        await self.action_cache.remove_vote(poll.id, str(inter.user.id), self.poll_option.id)
+        await inter.edit_original_message(
+            Messages.poll_vote_removed(title=self.poll.title, url=message.jump_url),
+            view=None
+        )
 
         # TODO - raise error
 

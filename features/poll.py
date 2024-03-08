@@ -16,12 +16,21 @@ def extract_poll_id(message: disnake.Message) -> int:
     return int(poll_id)
 
 
-def check_endtime(inter, endtime: str) -> tuple[bool, datetime]:
-    """Check if endtime is valid and above 5min from now"""
-    endtime = utils.parse_time(endtime, Messages.poll_endtime)
-    now = inter.created_at.astimezone(
-        tz=utils.get_local_zone()).replace(tzinfo=None) + timedelta(minutes=5)
-    return endtime < now, endtime
+async def check_end(
+    inter: disnake.ApplicationCommandInteraction,
+    end: str
+) -> tuple[bool, datetime]:
+    """Check if end is valid and above 5min from now"""
+    end: datetime = utils.parse_time(end, Messages.time_format)
+    now = inter.created_at + timedelta(minutes=5)
+
+    if (end - now) > timedelta(days=365):
+        await inter.send(Messages.poll_end_long, ephemeral=True)
+        return False, end
+    elif end < now:
+        await inter.send(Messages.poll_end_short, ephemeral=True)
+        return False, end
+    return True, end
 
 
 async def parse_attachment(attachment: disnake.Attachment) -> Union[str, disnake.File, None]:
@@ -75,7 +84,7 @@ def create_embed(
     title: str,
     description: str,
     author: Union[disnake.User, disnake.Member],
-    end_datetime: datetime,
+    end: datetime,
     poll_id: int,
     poll_options: list = [],
     max_votes: int = 1,
@@ -84,11 +93,11 @@ def create_embed(
     **kwargs
 ) -> disnake.Embed:
     """Embed template for Poll"""
-    end_datetime = utils.get_discord_timestamp(end_datetime, style="Relative Time")
+    end = utils.get_discord_timestamp(end, style="Relative Time")
     description = Messages.poll_embed_description(
         description=description,
         votes=max_votes,
-        date=end_datetime,
+        date=end,
         anonymous=anonymous,
         all_votes=0,
     )

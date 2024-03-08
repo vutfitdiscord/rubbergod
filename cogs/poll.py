@@ -3,7 +3,7 @@ Cog implementing polls feature.
 
 Title - Title/Question of the poll
 Description - Add a description to your poll
-end_time - How long/until what time can people vote in this poll?
+end - How long/until what time can people vote in this poll?
 Max_votes - The maximum number of votes per user
 Open_Poll - Allow people to add their own options to the poll
 Image or Attachment - Add an image or attachment to the poll
@@ -26,7 +26,7 @@ from database.poll import PollDB, PollType
 from features import poll as poll_features
 from permissions.room_check import RoomCheck
 
-time_choices = ["1y 1M 1w 1d 1h 1m 1s", "DD.MM.YYYY HH:MM", "DD.MM.YYYY", "HH:MM", "Never"]
+time_choices = ["1y 1M 1w 1d 1h 1m 1s", "DD.MM.YYYY HH:MM", "DD.MM.YYYY", "HH:MM"]
 
 
 class Poll(Base, commands.Cog):
@@ -35,15 +35,14 @@ class Poll(Base, commands.Cog):
         self.bot = bot
         self.check = RoomCheck(bot)
 
-    async def poll_create(self, args: dict, poll_options: dict, poll_view: disnake.ui.View):
-        inter = args.get("inter")
-        attachment = args.get("attachment")
-        anonymous = args.get("anonymous")
-        endtime = args.get("endtime")
+    async def poll_create(self, poll_args: dict, poll_options: dict, poll_view: disnake.ui.View,):
+        inter = poll_args.get("inter")
+        attachment = poll_args.get("attachment")
+        anonymous = poll_args.get("anonymous")
+        end = poll_args.get("end")
 
-        endtime_check, endtime = poll_features.check_endtime(inter, endtime)
-        if endtime_check:
-            await inter.send(Messages.poll_endtime_short, ephemeral=True)
+        is_end_valid, end = await poll_features.check_end(inter, end)
+        if not is_end_valid:
             return
 
         if attachment and attachment.size > 25000000:       # 25MB
@@ -53,19 +52,19 @@ class Poll(Base, commands.Cog):
         type, attachment = await poll_features.parse_attachment(attachment)
         file = [attachment] if type == "file" else []
 
-        args["author"] = inter.author
-        args["author_id"] = inter.author.id
-        args["image"] = attachment if type == "image" else None
-        args["end_datetime"] = endtime
-        args["poll_options"] = poll_options
-        args["poll_type"] = PollType.boolean.value
-        args["max_votes"] = 1
-        args["message_url"] = ""
+        poll_args["author"] = inter.author
+        poll_args["author_id"] = inter.author.id
+        poll_args["image"] = attachment if type == "image" else None
+        poll_args["end"] = end
+        poll_args["poll_options"] = poll_options
+        poll_args["poll_type"] = PollType.boolean.value
+        poll_args["max_votes"] = 1
+        poll_args["message_url"] = ""
 
-        poll = PollDB.add(**args)
-        args["poll_id"] = poll.id
+        poll = PollDB.add(**poll_args)
+        poll_args["poll_id"] = poll.id
 
-        embed = poll_features.create_embed(**args)
+        embed = poll_features.create_embed(**poll_args)
 
         if anonymous:
             await inter.send(embed=embed, view=poll_view, files=file)
@@ -93,9 +92,9 @@ class Poll(Base, commands.Cog):
     #         description=Messages.poll_description,
     #         max_length=3000
     #     ),
-    #     endtime: str = commands.Param(
+    #     end: str = commands.Param(
     #         default="1h",
-    #         description=Messages.poll_endtime,
+    #         description=Messages.time_format,
     #         max_length=40,
     #         autocomplete=time_choices
     #     ),
@@ -120,7 +119,7 @@ class Poll(Base, commands.Cog):
             description=Messages.poll_description,
             max_length=3000
         ),
-        endtime: str = commands.Param(
+        end: str = commands.Param(
             default="1h",
             description=Messages.time_format,
             max_length=40,
@@ -136,7 +135,7 @@ class Poll(Base, commands.Cog):
         args.pop("self")
 
         await self.poll_create(
-            args,
+            poll_args=args,
             poll_options={"✅": "Ano", "❌": "Ne"},
             poll_view=PollBooleanView(self.bot)
         )
@@ -152,7 +151,7 @@ class Poll(Base, commands.Cog):
             description=Messages.poll_description,
             max_length=3000
         ),
-        endtime: str = commands.Param(
+        end: str = commands.Param(
             default="1h",
             description=Messages.time_format,
             max_length=40,
@@ -168,7 +167,7 @@ class Poll(Base, commands.Cog):
         args.pop("self")
 
         await self.poll_create(
-            args,
+            poll_args=args,
             poll_options={"✅": "Souhlasím", "😐": "Neutral", "❌": "Nesouhlasím"},
             poll_view=PollOpinionView(self.bot)
         )
@@ -243,8 +242,8 @@ class Poll(Base, commands.Cog):
     def task_generator(self, poll: PollDB) -> None:
         """Generator for tasks to close polls"""
         current_time = datetime.now(timezone.utc)
-        end_time = poll.end_datetime.time()
-        target_datetime = datetime.combine(current_time.date(), end_time)
+        end = poll.end.time()
+        target_datetime = datetime.combine(current_time.date(), end).replace(tzinfo=timezone.utc)
         time_until = (target_datetime - current_time).total_seconds()
 
         if time_until < 0:
@@ -283,8 +282,12 @@ class PollTask(PollView):
                 continue
 
             if poll.closed:
-                embed = poll_features.close_embed(message.embeds[0], poll, poll.closed_by, poll.end_datetime)
-                await message.edit(embed=embed, attachments=None)
+                embed = poll_features.close_embed(message.embeds[0], poll, poll.closed_by, poll.end)
+                try:
+                    await message.edit(embed=embed, attachments=None)
+                except disnake.NotFound:
+                    # message was deleted
+                    poll.remove()
                 continue
 
             embed = poll_features.update_embed(message.embeds[0], poll)
