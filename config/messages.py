@@ -283,16 +283,14 @@ class Messages(metaclass=Formatable):
     dynamic_verify_missing_rule = "Toto pravidlo (`{rule_id}`) neexistuje."
 
     # POLL
-    poll_basic_brief = "Zahájí hlasování, ve kterém je možné zvolit více možností"
+    poll_basic_brief = "Zahájí hlasování, s vlastními možnostmi."
     poll_boolean_brief = "Zahájí hlasování, s možnostmi Ano, Ne. Pouze 1 hlas na uživatele."
     poll_opinion_brief = "Zahájí hlasování, s možnostmi Souhlasím, Neutral, Nesouhlasím. Pouze 1 hlas na uživatele."
     poll_list_brief = "Vypíše všechna hlasování"
-    poll_close_brief = "Ukončí hlasování"
-    poll_thread = "### {username} hlasoval pro možnost {option}\n"
     poll_already_voted = "Pro možnost **{option}** jsi již hlasoval"
-    poll_closed = "Hlasování s názvem `{title}` bylo ukončeno. {url}\n"
-    poll_winning_option = "Vyhrála možnost {option}\ns **{votes} ({percentage}%) hlasy**."
-    poll_tie_options = "Remíza mezi možnostmi {options}\ns **{votes} ({percentage}%) hlasy**."
+    poll_closed = "Hlasování s názvem **{title}** bylo ukončeno. {url}\n"
+    poll_winning_option = "Vyhrála možnost\n{option} - {votes} hlasů ({percentage}%)"
+    poll_tie_options = "Remíza mezi možnostmi {options}"
     poll_embed_description = "{description}\n- Počet hlasů na uživatele: {votes}\n- Konec: {date}\n- " \
                              "Anonymní hlasování: {anonymous}\n- Celkový počet hlasů: {all_votes}"
     poll_not_author = "Toto hlasování nemůžeš ukončit, protože nejsi jeho autorem."
