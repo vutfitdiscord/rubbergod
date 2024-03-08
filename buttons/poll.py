@@ -1,5 +1,5 @@
 import asyncio
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timezone
 from typing import Union
 
 import disnake
@@ -119,21 +119,12 @@ class PollView(BaseView):
         self.button_cd = commands.CooldownMapping.from_cooldown(4, 10.0, commands.BucketType.user)
 
     async def interaction_check(self, inter: disnake.Interaction) -> bool:
+        if await poll_features.has_cooldown(inter, self.button_cd):
+            return False
+
         await inter.response.defer()
-        bucket = self.button_cd.get_bucket(inter)
-        retries = bucket.get_tokens()
-        retry = bucket.update_rate_limit()
-        if retries == 1:
-            time = datetime.now() + timedelta(seconds=bucket.get_retry_after())
-            timestamp = utils.get_discord_timestamp(time, style="Relative Time")
-            await inter.send(Messages.poll_button_spam(time=timestamp), ephemeral=True)
-            return
-
-        if retry:
-            return
-
-        # voters are always available
         if inter.data.custom_id == "poll:voters":
+            # voters are always available
             return True
 
         poll_id = poll_features.extract_poll_id(inter.message)
@@ -156,9 +147,7 @@ class PollView(BaseView):
         # find poll option matching label
         poll_option = next((option for option in poll.options if option.text == button.label), None)
 
-        vote_check = self.check_duplicate_vote(inter, poll_option)
-
-        if vote_check:
+        if str(inter.author.id) in poll_option.voters_ids:
             await inter.send(
                 Messages.poll_already_voted(option=f"{button.emoji} {button.label}"),
                 ephemeral=True,
@@ -174,16 +163,6 @@ class PollView(BaseView):
             ephemeral=True,
             view=PollRemoveVoteView(self, poll, poll_option)
         )
-
-    def check_duplicate_vote(
-        self,
-        inter: disnake.MessageInteraction,
-        poll_option: PollOptionDB
-    ) -> bool:
-        """Check if user already voted for this option"""
-        if str(inter.author.id) in poll_option.voters_ids:
-            return True
-        return False
 
 
 class PollBasicView(PollView):      # TODO
