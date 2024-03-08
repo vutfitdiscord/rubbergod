@@ -163,3 +163,22 @@ def create_end_poll_message(poll: PollDB) -> str:
             percentage=round(winning_option.voters_count / total_votes * 100),
         )
     return content
+
+
+async def has_cooldown(
+    inter: disnake.ApplicationCommandInteraction,
+    button_cd: commands.CooldownMapping
+) -> bool:
+    bucket = button_cd.get_bucket(inter)
+    retries = bucket.get_tokens()
+    retry = bucket.update_rate_limit()
+    if retries == 1:
+        time = datetime.now() + timedelta(seconds=bucket.get_retry_after())
+        timestamp = utils.get_discord_timestamp(time, style="Relative Time")
+        await inter.send(Messages.poll_button_spam(time=timestamp), ephemeral=True)
+        return True
+
+    if retry:
+        return True
+
+    return False
