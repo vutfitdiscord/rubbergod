@@ -12,3 +12,4 @@ service_logs.txt
 emojis.zip
 *sql
 *.bak
+.ruff_cache

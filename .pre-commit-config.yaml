@@ -1,17 +1,13 @@
 repos:
-- repo: https://github.com/PyCQA/flake8
-  rev: 7.0.0
+- repo: https://github.com/astral-sh/ruff-pre-commit
+  rev: v0.3.1
   hooks:
-    - id: flake8
-      name: Flake8
-      description: This hook runs flake8 within our project's environment.
-
-- repo: https://github.com/PyCQA/isort
-  rev: 5.13.2
-  hooks:
-    - id: isort
-      name: isort
-      description: This hook runs isort within our project's environment.
+    - id: ruff
+      name: ruff
+      description: This hook runs ruff linter.
+    - id: ruff-format
+      name: ruff-format
+      description: This hook runs ruff formatter.
 
 - repo: https://github.com/pre-commit/pre-commit-hooks
   rev: v4.5.0
@@ -24,3 +20,5 @@ repos:
   hooks:
   - id: codespell
     exclude: .*/messages.py
+    additional_dependencies:
+      - tomli

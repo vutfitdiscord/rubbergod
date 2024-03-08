@@ -1,4 +1,0 @@
-[codespell]
-write-changes = true
-skip = .*/messages.py
-ignore-words-list = autor,studis,mis
