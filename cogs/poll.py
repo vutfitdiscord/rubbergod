@@ -222,7 +222,12 @@ class Poll(Base, commands.Cog):
         author = await self.bot.get_or_fetch_user(poll.author_id)
         await PollView.action_cache.end_poll(poll.id)
 
-        if not message or not message.embeds:
+        if not message:
+            poll.remove()
+            return
+
+        if not message.embeds:
+            await message.delete()
             poll.remove()
             return
 
@@ -231,13 +236,17 @@ class Poll(Base, commands.Cog):
         if not poll.anonymous:
             poll_view = PollVotersView(self.bot)
             authors_view.children.extend(poll_view.children)
-        await message.edit(view=poll_view)
+
+        content = poll_features.create_end_poll_message(poll)
+        embed = poll_features.update_embed(message.embeds[0], poll)
+        await message.edit(content=content, embed=embed, view=poll_view)
 
         if author is not None:
-            content = poll_features.create_end_poll_message(poll)
-            embed = message.embeds[0]
-            await author.send(content=content, embed=embed, view=authors_view)
-            await message.channel.send(content=content, embed=embed, view=poll_view)
+            try:
+                await author.send(content=content, embed=embed, view=authors_view)
+            except disnake.Forbidden:
+                pass
+            await message.reply(content=content, embed=embed, view=poll_view)
 
     def task_generator(self, poll: PollDB) -> None:
         """Generator for tasks to close polls"""
@@ -273,12 +282,16 @@ class PollTask(PollView):
 
     @tasks.loop(seconds=10.0)
     async def process_interactions(self):
+        """Process all cached polls.
+
+        Using try excepts is better than fetching messages in loop.
+        """
         update_ids = await self.action_cache.apply_cache()
         for poll_id in update_ids:
             poll = PollDB.get(poll_id)
             message = self.messages.get(poll_id, None)
 
-            if not message:
+            if not message or not message.embeds:
                 continue
 
             if poll.closed:
@@ -291,7 +304,11 @@ class PollTask(PollView):
                 continue
 
             embed = poll_features.update_embed(message.embeds[0], poll)
-            await message.edit(embed=embed, attachments=None)
+            try:
+                await message.edit(embed=embed, attachments=None)
+            except disnake.NotFound:
+                # message was deleted
+                pass
 
 
 def setup(bot):
