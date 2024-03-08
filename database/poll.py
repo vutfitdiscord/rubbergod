@@ -46,9 +46,11 @@ class PollDB(database.base):
     author_id = Column(String, nullable=False)
     message_url = Column(String, nullable=False)
     poll_type = Column(Integer, nullable=False)
-    end_datetime = Column(DateTime, nullable=True)
-    closed = Column(Boolean, nullable=False, default=False)
-    closed_by = Column(String, nullable=True)
+    start = Column(DateTime, nullable=False, default=datetime.now(timezone.utc))
+    end = Column(DateTime)      # in UTC
+    closed = Column(Boolean, nullable=True, default=False)
+    closed_by = Column(String, nullable=True, default=None)
+    closed_datetime = Column(DateTime, nullable=True, default=None)     # in UTC
     options: Mapped[list[PollOptionDB]] = relationship(back_populates="poll", cascade="all,delete")
     max_votes = Column(Integer, nullable=False)
     anonymous = Column(Boolean, nullable=False)
@@ -59,7 +61,7 @@ class PollDB(database.base):
             return False
 
         now = datetime.now(timezone.utc).replace(tzinfo=None)
-        return self.endtime > now
+        return self.end > now
 
     @classmethod
     def add(
@@ -68,7 +70,7 @@ class PollDB(database.base):
         author_id: str,
         message_url: str,
         poll_type: PollType,
-        end_datetime: datetime,
+        end: datetime,
         anonymous: bool,
         poll_options: dict,
         max_votes: int = 1,
@@ -79,7 +81,7 @@ class PollDB(database.base):
             author_id=author_id,
             message_url=message_url,
             poll_type=poll_type,
-            end_datetime=end_datetime,
+            end=end,
             anonymous=anonymous,
             max_votes=max_votes,
         )
@@ -95,7 +97,7 @@ class PollDB(database.base):
 
     @classmethod
     def get_pending_polls(cls) -> list[PollDB]:
-        return session.query(cls).filter(or_(cls.end_datetime is None, cls.end_datetime >= datetime.now()))
+        return session.query(cls).filter(or_(cls.end is None, cls.end > datetime.now(timezone.utc)))
 
     @classmethod
     def get_pending_polls_by_type(cls, type: PollType) -> list[PollDB]:
@@ -134,13 +136,14 @@ class PollDB(database.base):
         self.message_url = message_url
         session.commit()
 
-    def update_endtime(self, end_datetime: datetime) -> None:
-        self.end_datetime = end_datetime
+    def update_end(self, end: datetime) -> None:
+        self.end = end
         session.commit()
 
-    def update_closed(self, closed: bool, author: str) -> None:
+    def update_closed(self, closed: bool, author_id: str, time: datetime) -> None:
         self.closed = closed
-        self.closed_by = author
+        self.closed_by = str(author_id)
+        self.closed_datetime = time
         session.commit()
 
     def remove(self) -> None:
