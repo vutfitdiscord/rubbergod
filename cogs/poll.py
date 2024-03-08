@@ -113,10 +113,10 @@ class Poll(Base, commands.Cog):
     async def boolean(
         self,
         inter: disnake.ApplicationCommandInteraction,
-        title: str = commands.Param(description=Messages.poll_title, max_length=256),
+        title: str = commands.Param(description=Messages.poll_title_param, max_length=256),
         description: str = commands.Param(
             default="",
-            description=Messages.poll_description,
+            description=Messages.poll_description_param,
             max_length=3000
         ),
         end: str = commands.Param(
@@ -126,9 +126,9 @@ class Poll(Base, commands.Cog):
             autocomplete=time_choices
         ),
         attachment: disnake.Attachment = commands.Param(
-            default=None, description=Messages.poll_attachment
+            default=None, description=Messages.poll_attachment_param
         ),
-        anonymous: bool = commands.Param(default=False, description=Messages.poll_anonymous_vote),
+        anonymous: bool = commands.Param(default=False, description=Messages.poll_anonymous_param),
     ):
         await inter.response.defer()
         args = locals()
@@ -145,10 +145,10 @@ class Poll(Base, commands.Cog):
     async def opinion(
         self,
         inter: disnake.ApplicationCommandInteraction,
-        title: str = commands.Param(description=Messages.poll_title, max_length=256),
+        title: str = commands.Param(description=Messages.poll_title_param, max_length=256),
         description: str = commands.Param(
             default="",
-            description=Messages.poll_description,
+            description=Messages.poll_description_param,
             max_length=3000
         ),
         end: str = commands.Param(
@@ -158,9 +158,9 @@ class Poll(Base, commands.Cog):
             autocomplete=time_choices
         ),
         attachment: disnake.Attachment = commands.Param(
-            default=None, description=Messages.poll_attachment
+            default=None, description=Messages.poll_attachment_param
         ),
-        anonymous: bool = commands.Param(default=False, description=Messages.poll_anonymous_vote),
+        anonymous: bool = commands.Param(default=False, description=Messages.poll_anonymous_param),
     ):
         await inter.response.defer()
         args = locals()
@@ -291,7 +291,12 @@ class PollTask(PollView):
             poll = PollDB.get(poll_id)
             message = self.messages.get(poll_id, None)
 
-            if not message or not message.embeds:
+            if not message or not poll:
+                continue
+
+            if not message.embeds:
+                await message.delete()
+                poll.remove()
                 continue
 
             if poll.closed:
@@ -308,7 +313,7 @@ class PollTask(PollView):
                 await message.edit(embed=embed, attachments=None)
             except disnake.NotFound:
                 # message was deleted
-                pass
+                poll.remove()
 
 
 def setup(bot):
