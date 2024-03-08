@@ -122,6 +122,10 @@ class PollView(BaseView):
         if await poll_features.has_cooldown(inter, self.button_cd):
             return False
 
+        if not inter.message.embeds:
+            await inter.message.delete()
+            return False
+
         await inter.response.defer()
         if inter.data.custom_id == "poll:voters":
             # voters are always available
@@ -249,31 +253,31 @@ class PollRemoveVoteView(PollView):
         button: disnake.ui.Button,
         inter: disnake.MessageInteraction
     ) -> None:
-        try:
-            message = self.messages.get(self.poll.id)
+        message = self.messages.get(self.poll.id)
+        if not message:
+            message: disnake.Message = await utils.get_message_from_url(self.bot, self.poll.message_url)
             if not message:
-                message: disnake.Message = await utils.get_message_from_url(self.bot, self.poll.message_url)
-                self.messages[self.poll.id] = message
-
-        except commands.MessageNotFound:
-            await inter.edit_original_message(Messages.message_not_found, ephemeral=True)
-            return
+                # poll message not found
+                await inter.edit_original_message(Messages.message_not_found)
+                return
+            self.messages[self.poll.id] = message
 
         poll = PollDB.get(self.poll.id)
         if not poll:
-            await inter.edit_original_message(Messages.poll_not_found, ephemeral=True)
+            await inter.edit_original_message(Messages.poll_not_found, view=None)
             return
 
         if not poll.is_active:
             content = poll_features.create_end_poll_message(poll)
-            await inter.edit_original_message(content=content, ephemeral=True)
+            await inter.edit_original_message(content=content, view=None)
             return
 
         if (
             not poll.has_voted(inter.author.id) and
             not await self.action_cache.voter_in_cache(poll.id, str(inter.user.id))
         ):
-            await inter.edit_original_message(Messages.poll_not_voted)
+            # user wants to remove his vote but there is no vote to remove
+            await inter.edit_original_message(Messages.poll_not_voted, view=None)
             return
 
         await self.action_cache.remove_voter_from_cache(poll.id, str(inter.user.id))
@@ -356,9 +360,12 @@ class PollCloseView(PollView):
             author_view.children.extend(poll_view.children)
 
         content = poll_features.create_end_poll_message(poll)
-        await inter.message.edit(embed=embed, view=poll_view, attachments=None)
-        await author.send(content=content, embed=embed, view=author_view)
-        await inter.channel.send(content=content, embed=embed, view=poll_view)
+        await inter.message.edit(content=content, embed=embed, view=poll_view, attachments=None)
+        try:
+            await author.send(content=content, embed=embed, view=author_view)
+        except disnake.Forbidden:
+            pass
+        await inter.message.reply(content=content, embed=embed, view=poll_view)
 
 
 class PollModal(disnake.ui.Modal):      # TODO
