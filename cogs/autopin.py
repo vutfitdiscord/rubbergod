@@ -45,10 +45,9 @@ class AutoPin(Base, commands.Cog):
                     return 0, res
         return 1, "Command not found"
 
-    @commands.guild_only()
     @commands.check(permission_check.helper_plus)
     @commands.slash_command(name="pin_mod")
-    async def pin_mod(self, inter: disnake.ApplicationCommandInteraction):
+    async def pin_mod(self, inter: disnake.GuildCommandInteraction):
         await inter.response.defer()
 
     @pin_mod.sub_command(name="add", description=Messages.autopin_add_brief)
