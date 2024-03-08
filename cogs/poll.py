@@ -49,6 +49,7 @@ class Poll(Base, commands.Cog):
             await inter.send(Messages.attachment_too_big, ephemeral=True)
             return
 
+        await inter.response.defer()
         type, attachment = await poll_features.parse_attachment(attachment)
         file = [attachment] if type == "file" else []
 
@@ -130,7 +131,6 @@ class Poll(Base, commands.Cog):
         ),
         anonymous: bool = commands.Param(default=False, description=Messages.poll_anonymous_param),
     ):
-        await inter.response.defer()
         args = locals()
         args.pop("self")
 
@@ -162,7 +162,6 @@ class Poll(Base, commands.Cog):
         ),
         anonymous: bool = commands.Param(default=False, description=Messages.poll_anonymous_param),
     ):
-        await inter.response.defer()
         args = locals()
         args.pop("self")
 
