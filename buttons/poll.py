@@ -321,7 +321,7 @@ class PollVotersView(PollView):
         row=1
     )
     async def boolean_voters(self, button: disnake.ui.Button, inter: disnake.MessageInteraction) -> None:
-        content = await poll_features.list_voters(self.bot, inter, inter.message)
+        content = await poll_features.list_voters(inter)
         for content_part in content:
             await inter.send(content_part, ephemeral=True)
 
