@@ -139,7 +139,8 @@ class PollView(BaseView):
         poll_id = poll_features.extract_poll_id(inter.message)
         poll = PollDB.get(poll_id)
 
-        if poll.is_endtime:
+        if not poll.is_active:
+            # poll ended or closed
             content = poll_features.create_end_poll_message(poll)
             await inter.message.edit(view=None)
             await inter.send(content=content, ephemeral=True)
@@ -284,7 +285,7 @@ class PollRemoveVoteView(PollView):
             await inter.edit_original_message(Messages.poll_not_found, ephemeral=True)
             return
 
-        if poll.is_endtime or poll.closed:
+        if not poll.is_active:
             content = poll_features.create_end_poll_message(poll)
             await inter.edit_original_message(content=content, ephemeral=True)
             return
