@@ -1,5 +1,5 @@
 import asyncio
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import Union
 
 import disnake
@@ -112,6 +112,7 @@ class ActionsCache:
 class PollView(BaseView):
     action_cache = ActionsCache()
     messages: dict[int, disnake.Message] = {}
+    tasks = {}
 
     def __init__(self):
         super().__init__(timeout=None)
@@ -356,7 +357,7 @@ class PollCloseView(PollView):
         custom_id="poll:close",
         row=1
     )
-    async def boolean_close(self, button: disnake.ui.Button, inter: disnake.MessageInteraction) -> None:
+    async def poll_close(self, button: disnake.ui.Button, inter: disnake.MessageInteraction) -> None:
         poll_id = poll_features.extract_poll_id(inter.message)
         author_id = PollDB.get_author_id(poll_id)
         if author_id != str(inter.author.id):
@@ -364,10 +365,12 @@ class PollCloseView(PollView):
             return
 
         await self.action_cache.end_poll(poll_id)
+        self.tasks[poll_id].cancel()
 
         poll = PollDB.get(poll_id)
         now = datetime.now()
         author = await self.bot.get_or_fetch_user(poll.author_id)
+        poll.update_closed(True, inter.author.id, datetime.now(timezone.utc))
         embed = poll_features.close_embed(inter.message.embeds[0], poll, inter.author.id, now)
         poll_view = None
         author_view = TrashView(row=1)

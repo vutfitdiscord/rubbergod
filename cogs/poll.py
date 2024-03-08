@@ -10,8 +10,7 @@ Image or Attachment - Add an image or attachment to the poll
 Anonymous - Hide who voted for what option
 """
 
-import asyncio
-from datetime import datetime
+from datetime import datetime, timezone
 
 import disnake
 from disnake.ext import commands, tasks
@@ -198,7 +197,7 @@ class Poll(Base, commands.Cog):
         content = ""
         for poll in polls:
             message = await utils.get_message_from_url(self.bot, poll.message_url)
-            if not message:
+            if not message or not message.embeds:
                 # If the poll is not found, delete the poll
                 poll.remove()
                 continue
@@ -222,8 +221,10 @@ class Poll(Base, commands.Cog):
 
         message = await utils.get_message_from_url(self.bot, poll.message_url)
         author = await self.bot.get_or_fetch_user(poll.author_id)
+        await PollView.action_cache.end_poll(poll.id)
 
-        if message is None:
+        if not message or not message.embeds:
+            poll.remove()
             return
 
         poll_view = None
@@ -241,7 +242,7 @@ class Poll(Base, commands.Cog):
 
     def task_generator(self, poll: PollDB) -> None:
         """Generator for tasks to close polls"""
-        current_time = datetime.now()
+        current_time = datetime.now(timezone.utc)
         end_time = poll.end_datetime.time()
         target_datetime = datetime.combine(current_time.date(), end_time)
         time_until = (target_datetime - current_time).total_seconds()
@@ -249,12 +250,13 @@ class Poll(Base, commands.Cog):
         if time_until < 0:
             return
 
-        t = self.bot.loop.call_later(
-            time_until,
-            asyncio.ensure_future,
-            self.task_end_poll(poll)
-        )
-        self.tasks.append(t)
+        def wrapper():
+            self.bot.loop.create_task(self.task_end_poll(poll))
+
+        task = self.bot.loop.call_later(time_until, wrapper)
+
+        self.tasks.append(task)
+        PollView.tasks[poll.id] = task
 
     def cog_load(self) -> None:
         """Generate tasks on cog load to close active polls"""
