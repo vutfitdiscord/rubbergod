@@ -70,19 +70,13 @@ class Help(Base, commands.Cog):
                 else:
                     current_page += self.command_help(ctx, command)
             if current_page:
-                pages.append({
-                    "commands": current_page,
-                    "description": cog.description,
-                    "groupName": name
-                })
+                pages.append({"commands": current_page, "description": cog.description, "groupName": name})
 
         return pages
 
     def generate_embed(self, page):
         embed = disnake.Embed(
-            title=Messages.help_title,
-            description=Messages.help_description,
-            color=0xeee657
+            title=Messages.help_title, description=Messages.help_description, color=0xEEE657
         )
         embed.set_thumbnail(url=self.bot.user.display_avatar.url)
         self.add_fields(embed, page["commands"])
@@ -94,13 +88,13 @@ class Help(Base, commands.Cog):
         param: items: List of dict with commands
         """
         for item in items:
-            value = ''
+            value = ""
             name = f'{item["command"]}'
-            if item["signature"] and item["signature"] != ' ':
+            if item["signature"] and item["signature"] != " ":
                 name += f' `{item["signature"]}`'
             if item["aliases"]:
                 value += f'**Alias: **{", ".join(item["aliases"])}\n'
-            value += item["description"] if item["description"] else ''
+            value += item["description"] if item["description"] else ""
             embed.add_field(name=name, value=value if value else None, inline=False)
 
     async def api(self, message: commands.Context, params: list):
@@ -120,7 +114,7 @@ class Help(Base, commands.Cog):
                 for slash in self.bot.slash_commands:
                     res[slash.name] = {
                         "id": utils.get_command_id(self, slash.name),
-                        "children": list(slash.children.keys())
+                        "children": list(slash.children.keys()),
                     }
                 return 0, res
             command = self.bot.get_command(params["command"])
@@ -140,10 +134,10 @@ class Help(Base, commands.Cog):
         return 0, help
 
     @cooldowns.default_cooldown
-    @commands.command(aliases=['god'], brief=Messages.help_title)
+    @commands.command(aliases=["god"], brief=Messages.help_title)
     async def help(self, ctx: commands.Context, *command):
         # Subcommand help
-        command = ' '.join(command)
+        command = " ".join(command)
         if command:
             command_obj = self.bot.get_command(command)
             if not command_obj:
@@ -153,7 +147,7 @@ class Help(Base, commands.Cog):
                 if isinstance(command_obj, commands.Group):
                     subcommands = []
                     if command_obj.usage is not None:
-                        subcommands.append(command_obj.usage.replace('[', '').replace(']', ''))
+                        subcommands.append(command_obj.usage.replace("[", "").replace("]", ""))
                     subcommands += [subcommand.name for subcommand in command_obj.commands]
                     text = f"`{self.config.default_prefix}{command_obj.name} [{', '.join(subcommands)}]`"
                 else:

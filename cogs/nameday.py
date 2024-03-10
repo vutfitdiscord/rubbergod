@@ -55,7 +55,7 @@ class Nameday(Base, commands.Cog):
                 url = f"{self.config.grillbot_api_url}/user/birthday/today"
                 async with session.get(url) as resp:
                     birthday = await resp.json()
-                    return birthday['message']
+                    return birthday["message"]
             except (asyncio.exceptions.TimeoutError, aiohttp.client_exceptions.ClientConnectorError):
                 return Messages.birthday_api_error
 

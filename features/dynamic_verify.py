@@ -65,7 +65,10 @@ class DynamicVerifyManager(BaseFeature):
         view.message = await channel.send(embed=embed, view=view)
 
     async def log_attempt(
-        self, rule: DynamicVerifyDB, inter: disnake.ApplicationCommandInteraction, target_id: int,
+        self,
+        rule: DynamicVerifyDB,
+        inter: disnake.ApplicationCommandInteraction,
+        target_id: int,
     ) -> None:
         embed = disnake.Embed(title="Dynamická verifikace", color=0xEEE657)
         embed.add_field("Pravidlo", f"{rule.name} ({rule.id})")

@@ -33,15 +33,17 @@ class HugsTableDB(database.base):
 
     def get_member_position(self, member_stats: UserHugStats) -> Tuple[int, int]:
         if member_stats.given > 0:
-            give_position = 1 + session.query(HugsTableDB).filter(
-                HugsTableDB.given > member_stats.given).count()
+            give_position = (
+                1 + session.query(HugsTableDB).filter(HugsTableDB.given > member_stats.given).count()
+            )
         else:
             # zero means you are last
             give_position = self._get_count(order_by=HugsTableDB.given)
 
         if member_stats.received > 0:
-            recv_position = 1 + session.query(HugsTableDB).filter(
-                HugsTableDB.received > member_stats.received).count()
+            recv_position = (
+                1 + session.query(HugsTableDB).filter(HugsTableDB.received > member_stats.received).count()
+            )
         else:
             recv_position = self._get_count(order_by=HugsTableDB.received)
 

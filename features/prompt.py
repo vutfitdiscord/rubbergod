@@ -12,7 +12,7 @@ class PromptSession:
         inter: disnake.ApplicationCommandInteraction,
         message: str,
         timeout=60,
-        color=disnake.Color.orange()
+        color=disnake.Color.orange(),
     ):
         self.bot = bot
         self.inter = inter
@@ -24,12 +24,7 @@ class PromptSession:
         self.__running = False
         self.__prompt_instance = None
 
-        self.reactions = OrderedDict(
-            {
-                "✅": True,
-                "❌": False
-            }
-        )
+        self.reactions = OrderedDict({"✅": True, "❌": False})
 
     async def __show_prompt(self):
         if self.__running:
@@ -62,9 +57,8 @@ class PromptSession:
         try:
             # waits for reaction using react_check
             reaction, user = await self.inter.bot.wait_for(
-                'reaction_add',
-                check=self.__react_check,
-                timeout=self.timeout)
+                "reaction_add", check=self.__react_check, timeout=self.timeout
+            )
         except asyncio.TimeoutError:
             try:
                 await self.__close()

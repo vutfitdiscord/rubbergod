@@ -49,10 +49,7 @@ class TimeoutWars(commands.Cog):
 
     async def send_embed_log(self, original_message, user: Union[list, disnake.Member], reason=None):
         """Embed template for Timeout wars"""
-        embed = disnake.Embed(
-            title="Moderace lidu",
-            color=disnake.Color.yellow()
-        )
+        embed = disnake.Embed(title="Moderace lidu", color=disnake.Color.yellow())
 
         message = []
         if isinstance(user, list):
@@ -68,7 +65,7 @@ class TimeoutWars(commands.Cog):
         embed.add_field(
             name="Link",
             value=f"[#{original_message.channel.name}]({original_message.jump_url})",
-            inline=False
+            inline=False,
         )
         utils.add_author_footer(embed, original_message.author)
         await self.timeout_wars_channel.send(embed=embed)
@@ -79,52 +76,50 @@ class TimeoutWars(commands.Cog):
 
         for user in users:
             if self.get_immunity(user):
-                message.append(Messages.timeout_wars_user_immunity(
-                    user=user,
-                    time=(self.immunity[user.id] - datetime.now()).total_seconds()
+                message.append(
+                    Messages.timeout_wars_user_immunity(
+                        user=user, time=(self.immunity[user.id] - datetime.now()).total_seconds()
                     )
                 )
             else:
                 try:
                     await user.timeout(duration=duration, reason="Moderace lidu")
-                    message.append(Messages.timeout_wars_user(
-                        user=user.mention,
-                        time=config.timeout_wars_timeout_time.total_seconds()//60)
+                    message.append(
+                        Messages.timeout_wars_user(
+                            user=user.mention, time=config.timeout_wars_timeout_time.total_seconds() // 60
+                        )
                     )
                 except disnake.Forbidden:
                     pass
 
         if message:
-            await channel.send('\n'.join(message))
+            await channel.send("\n".join(message))
         await self.send_embed_log(original_message, users)
 
     async def mute_user(
-        self,
-        original_message,
-        channel,
-        user: disnake.Member,
-        duration,
-        reason="Moderace lidu"
+        self, original_message, channel, user: disnake.Member, duration, reason="Moderace lidu"
     ):
         """Mute user and send message to channel and log"""
         if self.get_immunity(user):
-            await channel.send(Messages.timeout_wars_user_immunity(
-                    user=user,
-                    time=(self.immunity[user.id] - datetime.now()).total_seconds()
+            await channel.send(
+                Messages.timeout_wars_user_immunity(
+                    user=user, time=(self.immunity[user.id] - datetime.now()).total_seconds()
                 )
             )
         else:
             try:
                 await user.timeout(duration=duration, reason=reason)
                 if reason == self.message_delete:
-                    await channel.send(Messages.timeout_wars_message_delete(
-                        user=user.mention,
-                        time=config.timeout_wars_timeout_time.total_seconds()//60
-                    ))
+                    await channel.send(
+                        Messages.timeout_wars_message_delete(
+                            user=user.mention, time=config.timeout_wars_timeout_time.total_seconds() // 60
+                        )
+                    )
                 else:
-                    await channel.send(Messages.timeout_wars_user(
-                            user=user.mention,
-                            time=config.timeout_wars_timeout_time.total_seconds()//60)
+                    await channel.send(
+                        Messages.timeout_wars_user(
+                            user=user.mention, time=config.timeout_wars_timeout_time.total_seconds() // 60
+                        )
                     )
                 await self.send_embed_log(original_message, user, reason)
             except disnake.Forbidden:
@@ -213,10 +208,7 @@ class TimeoutWars(commands.Cog):
                 break
 
         # skip if there is less than timeout_wars_reaction_count reactions
-        if (
-            mute_reaction is None or
-            mute_reaction.count < config.timeout_wars_reaction_count
-        ):
+        if mute_reaction is None or mute_reaction.count < config.timeout_wars_reaction_count:
             return
 
         # add this message to ignorelist
@@ -249,7 +241,7 @@ class TimeoutWars(commands.Cog):
                     payload.cached_message.channel,
                     payload.cached_message.author,
                     config.timeout_wars_timeout_time,
-                    reason=self.message_delete
+                    reason=self.message_delete,
                 )
 
 

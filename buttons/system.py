@@ -61,7 +61,7 @@ class Dropdown(disnake.ui.Select):
             placeholder=self.get_initials(),
             min_values=1,
             max_values=len(self.cogs[0]),
-            options=self.create_select()
+            options=self.create_select(),
         )
 
     def get_initials(self):
@@ -134,10 +134,10 @@ class Dropdown(disnake.ui.Select):
         embed.add_field(
             name="Loaded/Unloaded/All",
             value=f"**{len(cog_loaded)} / {len(cog_unloaded)} / {cog_sum}**",
-            inline=False
+            inline=False,
         )
 
-        chunks = math.ceil(len(cog_list)/20)
+        chunks = math.ceil(len(cog_list) / 20)
         cog_lists = list(utils.split(cog_loaded, chunks))
         for cog_list in cog_lists:
             if cog_list:

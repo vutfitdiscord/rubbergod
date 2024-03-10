@@ -48,17 +48,19 @@ class VerifyHelper:
         """Parse user relations and return year, programee and faculty for students,
         `employee` for FIT employees, None for others."""
         ret = None  # rule out students that are also employees or have multiple studies
-        for relation in user['vztahy']:
+        for relation in user["vztahy"]:
             # student
-            if 'rok_studia' in relation.keys():
-                ret = f"{relation['fakulta']['zkratka']} {relation['obor']['zkratka']} " \
-                      f"{relation['rok_studia']}"
+            if "rok_studia" in relation.keys():
+                ret = (
+                    f"{relation['fakulta']['zkratka']} {relation['obor']['zkratka']} "
+                    f"{relation['rok_studia']}"
+                )
                 # do not return yet if not FIT, check for all relations if student has multiple studies
-                if relation['fakulta']['zkratka'] == "FIT":
+                if relation["fakulta"]["zkratka"] == "FIT":
                     return ret
-            elif 'ustav' in relation.keys() and relation['ustav']['fakulta']['zkratka'] == "FIT":
+            elif "ustav" in relation.keys() and relation["ustav"]["fakulta"]["zkratka"] == "FIT":
                 # FIT employee, replace only if not student
-                ret = ret or 'employee'
+                ret = ret or "employee"
         if not ret:
             await self.log_relation_error(user)
         return ret
@@ -67,19 +69,19 @@ class VerifyHelper:
         """Save user details to database and return the user object."""
         # search for login in database
         person = None
-        if user.get('login') is not None:
-            person = ValidPersonDB.get_user_by_login(user['login'].strip())
+        if user.get("login") is not None:
+            person = ValidPersonDB.get_user_by_login(user["login"].strip())
         if person is None:
             # search for id in database
-            person = ValidPersonDB.get_user_by_login(str(user['id']))
+            person = ValidPersonDB.get_user_by_login(str(user["id"]))
         if person is None:
             # user not found in DB, add new user
             person = ValidPersonDB(
-                login=user.get('login') or str(user['id']),
+                login=user.get("login") or str(user["id"]),
                 year=await self._parse_relation(user),
                 name=f"{user['jmeno_krestni']} {user['prijmeni']}",
-                mail=user['emaily'][0] if user.get('emaily', []) else "",
-                status=VerifyStatus.Unverified.value
+                mail=user["emaily"][0] if user.get("emaily", []) else "",
+                status=VerifyStatus.Unverified.value,
             )
             session.add(person)
             session.commit()
@@ -93,7 +95,7 @@ class VerifyHelper:
         return person
 
     async def log_relation_error(self, user: dict) -> None:
-        name = user['login'] or user['id']
-        with BytesIO(bytes(json.dumps(user, indent=2, ensure_ascii=False), 'utf-8')) as file:
+        name = user["login"] or user["id"]
+        with BytesIO(bytes(json.dumps(user, indent=2, ensure_ascii=False), "utf-8")) as file:
             file = disnake.File(fp=file, filename=f"{name}.json")
         await self.log_channel.send(f"Error parsing user relations for `{name}`", file=file)

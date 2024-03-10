@@ -10,7 +10,6 @@ from features.review import ReviewManager
 
 
 class ReviewView(EmbedView):
-
     def __init__(self, author: disnake.User, bot: disnake.Client, embeds: List[disnake.Embed], page: int = 1):
         self.bot = bot
         self.manager = ReviewManager(bot)
@@ -23,24 +22,15 @@ class ReviewView(EmbedView):
                 child.disabled = True
 
     def check_text_pages(self):
-        if (
-            len(self.embed.fields) > 3
-            and self.embed.fields[3].name == Messages.review_text_page_label
-        ):
+        if len(self.embed.fields) > 3 and self.embed.fields[3].name == Messages.review_text_page_label:
             self.add_item(
                 disnake.ui.Button(
-                    emoji="🔽",
-                    custom_id="review:next_text",
-                    style=disnake.ButtonStyle.primary,
-                    row=1
+                    emoji="🔽", custom_id="review:next_text", style=disnake.ButtonStyle.primary, row=1
                 )
             )
             self.add_item(
                 disnake.ui.Button(
-                    emoji="🔼",
-                    custom_id="review:prev_text",
-                    style=disnake.ButtonStyle.primary,
-                    row=1
+                    emoji="🔼", custom_id="review:prev_text", style=disnake.ButtonStyle.primary, row=1
                 )
             )
         else:
@@ -101,8 +91,8 @@ class ReviewView(EmbedView):
                 await interaction.edit_original_response(view=view)
             return False
         elif (
-            "text" in interaction.data.custom_id and
-            self.embed.fields[3].name == Messages.review_text_page_label
+            "text" in interaction.data.custom_id
+            and self.embed.fields[3].name == Messages.review_text_page_label
         ):
             if (self.perma_lock or self.locked) and interaction.author.id != self.author.id:
                 await interaction.send(Messages.embed_not_author, ephemeral=True)

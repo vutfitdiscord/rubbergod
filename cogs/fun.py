@@ -222,9 +222,7 @@ class Fun(Base, commands.Cog):
             color=disnake.Color.blue(),
             url="https://www.yomama-jokes.com",
         )
-        embed.set_footer(
-            text=self.custom_footer(inter.author, "https://www.yomama-jokes.com/")
-        )
+        embed.set_footer(text=self.custom_footer(inter.author, "https://www.yomama-jokes.com/"))
 
         await inter.send(embed=embed)
 
@@ -250,7 +248,7 @@ class Fun(Base, commands.Cog):
 
         utils.add_author_footer(embed, inter.author, additional_text=[f" (hláškaid: #{str(index)})"])
 
-        with open("images/fuchs/" + str(index) + ".png", 'rb') as fp:
+        with open("images/fuchs/" + str(index) + ".png", "rb") as fp:
             await inter.send(embed=embed, file=disnake.File(fp=fp, filename=str(index) + ".png"))
 
 

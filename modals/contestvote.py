@@ -24,12 +24,7 @@ class DenyContributionModal(disnake.ui.Modal):
             )
         ]
 
-        super().__init__(
-            title=self.title,
-            custom_id="contest_vote_modal",
-            timeout=900,
-            components=components
-        )
+        super().__init__(title=self.title, custom_id="contest_vote_modal", timeout=900, components=components)
 
     async def callback(self, inter: disnake.ModalInteraction) -> None:
         contribution_author_id = ContestVoteDB.get_contribution_author(self.contribution_id)
@@ -41,9 +36,7 @@ class DenyContributionModal(disnake.ui.Modal):
 
         if reason:
             message = Messages.contest_contribution_denied(
-                id=self.contribution_id,
-                reason=reason,
-                author=inter.author.display_name
+                id=self.contribution_id, reason=reason, author=inter.author.display_name
             )
             await author.send(inter.message.content, file=file, view=trash)
             await author.send(message, view=trash)

@@ -11,6 +11,7 @@ from database import database, session
 
 class ErrorRow(IntEnum):
     """Enum for error log rows. Represents ids in the database."""
+
     last_error = 1
     start_streak = 2
     end_streak = 3

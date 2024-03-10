@@ -10,13 +10,13 @@ from bs4 import BeautifulSoup
 import utils
 from config.app_config import config
 from config.messages import Messages
-from database.review import (ProgrammeDB, ReviewDB, ReviewRelevanceDB,
-                             SubjectDB, SubjectDetailsDB)
+from database.review import ProgrammeDB, ReviewDB, ReviewRelevanceDB, SubjectDB, SubjectDetailsDB
 from features import sports
 
 
 class TierEnum(Enum):
     """Tier to grades mapping"""
+
     A = 0  # 1
     B = 1  # 1.5
     C = 2  # 2
@@ -26,7 +26,7 @@ class TierEnum(Enum):
     F = 6  # 4
 
     def tier_to_grade_num(tier: int) -> int:
-        return 1 + tier/2
+        return 1 + tier / 2
 
 
 class ReviewManager:
@@ -41,7 +41,7 @@ class ReviewManager:
         review: ReviewDB,
         subject: Union[SubjectDetailsDB, str],
         description: str,
-        page: str
+        page: str,
     ):
         """Create new embed for reviews"""
         if isinstance(subject, SubjectDetailsDB):
@@ -62,7 +62,9 @@ class ReviewManager:
             embed.add_field(name=Messages.review_grade_label, value=TierEnum(review.tier).name)
             embed.add_field(
                 name=Messages.review_date_label,
-                value=utils.get_discord_timestamp(datetime.combine(review.date, time(12, 0)), "Relative Time")
+                value=utils.get_discord_timestamp(
+                    datetime.combine(review.date, time(12, 0)), "Relative Time"
+                ),
             )
             text = review.text_review
             if text is not None:
@@ -70,9 +72,7 @@ class ReviewManager:
                     pages = utils.cut_string_by_words(text, 1000, " ")
                     text = pages[0]
                     embed.add_field(
-                        name=Messages.review_text_page_label,
-                        value=f"1/{len(pages)}",
-                        inline=False
+                        name=Messages.review_text_page_label, value=f"1/{len(pages)}", inline=False
                     )
                 embed.add_field(name=Messages.review_text_label, value=text, inline=False)
             likes = ReviewRelevanceDB.get_votes_count(review.id, True)
@@ -108,10 +108,7 @@ class ReviewManager:
                 pages = utils.cut_string_by_words(text, 1000, " ")
                 text = pages[text_page - 1]
                 embed.set_field_at(
-                    idx,
-                    name=Messages.review_text_page_label,
-                    value=f"{text_page}/{len(pages)}",
-                    inline=False
+                    idx, name=Messages.review_text_page_label, value=f"{text_page}/{len(pages)}", inline=False
                 )
                 idx += 1
             embed.set_field_at(idx, name=Messages.review_text_label, value=text, inline=False)
@@ -161,7 +158,7 @@ class ReviewManager:
         reviews = ReviewDB.get_subject_reviews(subject_obj.shortcut)
         reviews_cnt = len(reviews)
         subject_details = SubjectDetailsDB.get(subject_obj.shortcut) or subject_obj.shortcut
-        name = getattr(subject_details, "name",  "")
+        name = getattr(subject_details, "name", "")
         if reviews_cnt == 0:
             description = f"{name}\n{Messages.review_embed_no_reviews}"
             return [self.make_embed(author, None, subject_details, description, "1/1")]
@@ -195,7 +192,7 @@ class ReviewManager:
         if reviews_cnt == 0:
             description = Messages.review_embed_no_reviews
         else:
-            description = '\n'.join(map(lambda x: x.subject.upper(), reviews))
+            description = "\n".join(map(lambda x: x.subject.upper(), reviews))
 
         embed = disnake.Embed(title=Messages.review_authored_list_label, description=description)
         return embed
@@ -237,9 +234,9 @@ class ReviewManager:
             if not header:
                 # other table
                 continue
-            header = header[0].get_text().split(',')
+            header = header[0].get_text().split(",")
             year = header[0].strip()[0].upper()
-            if year != 'L':
+            if year != "L":
                 year = int(year)
             sem = header[1].strip()[0].upper()
             rows = table.select("tbody tr")

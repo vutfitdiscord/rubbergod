@@ -17,7 +17,7 @@ class ReportModal(disnake.ui.Modal):
         bot: commands.Bot,
         dm_message: disnake.Message,
         title="General report",
-        message: disnake.Message = None
+        message: disnake.Message = None,
     ) -> None:
         self.bot = bot
         self.dm_message = dm_message
@@ -34,12 +34,7 @@ class ReportModal(disnake.ui.Modal):
             )
         ]
 
-        super().__init__(
-            title=self.title,
-            custom_id="report_modal",
-            timeout=900,
-            components=components
-        )
+        super().__init__(title=self.title, custom_id="report_modal", timeout=900, components=components)
 
     def report_embed(
         self,
@@ -54,8 +49,7 @@ class ReportModal(disnake.ui.Modal):
         if isinstance(self.message, disnake.Message):
             embed.add_field(name="Message", value=f"{self.message.jump_url}\n{self.message.channel.name}")
             embed.add_field(
-                name="Reported user",
-                value=f"{self.message.author.mention}\n`@{self.message.author.name}`"
+                name="Reported user", value=f"{self.message.author.mention}\n`@{self.message.author.name}`"
             )
             if first_image is not None:
                 embed.set_image(file=first_image)
@@ -63,10 +57,7 @@ class ReportModal(disnake.ui.Modal):
         embed.add_field(name="Resolved by", value="---", inline=False)
 
         utils.add_author_footer(
-            embed=embed,
-            author=inter.author,
-            additional_text=[f"ID: {report_id}"],
-            anonymous=True
+            embed=embed, author=inter.author, additional_text=[f"ID: {report_id}"], anonymous=True
         )
         return embed
 
@@ -92,16 +83,14 @@ class ReportModal(disnake.ui.Modal):
     async def report_general(self, inter: disnake.ModalInteraction) -> None:
         """add general report to db and send it to the report room"""
         await inter.send(Messages.report_modal_success, ephemeral=True)
-        report_reason = inter.text_values['reason']
+        report_reason = inter.text_values["reason"]
         UserDB.add_user(inter.author.id)
         report_id = ReportDB.add_report(type="general", author_id=inter.author.id, reason=report_reason)
 
         embed = self.report_embed(inter, report_reason, report_id)
 
         _, message = await self.report_channel.create_thread(
-            name=f"Report #{report_id}",
-            embed=embed,
-            view=ReportGeneralView(self.bot)
+            name=f"Report #{report_id}", embed=embed, view=ReportGeneralView(self.bot)
         )
 
         await message.pin()
@@ -114,16 +103,15 @@ class ReportModal(disnake.ui.Modal):
         """add message report to db and send it to the report room"""
         await inter.send(Messages.report_modal_success, ephemeral=True)
         report_reason = Messages.report_message_embed(
-            content=self.message.content,
-            reason=inter.text_values['reason']
+            content=self.message.content, reason=inter.text_values["reason"]
         )
         UserDB.add_user(inter.author.id)
         report_id = ReportDB.add_report(
             type="message",
             author_id=inter.author.id,
-            reason=inter.text_values['reason'],
+            reason=inter.text_values["reason"],
             message_url=self.message.jump_url,
-            target_user_id=self.message.author.id
+            target_user_id=self.message.author.id,
         )
 
         images, files, attachments_too_big = await utils.parse_attachments(self.message)
@@ -142,8 +130,9 @@ class ReportModal(disnake.ui.Modal):
         )
 
         if attachments_too_big:
-            attachments_too_big = [f"[{attachment.filename}]({attachment.url})"
-                                   for attachment in attachments_too_big]
+            attachments_too_big = [
+                f"[{attachment.filename}]({attachment.url})" for attachment in attachments_too_big
+            ]
         if any(inner_list for inner_list in [images, files, attachments_too_big]):
             # if there are any attachments combine them
             files = images + files if files + images else None

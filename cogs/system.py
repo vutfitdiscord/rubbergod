@@ -55,7 +55,7 @@ class System(Base, commands.Cog):
     async def get_logs(
         self,
         inter: disnake.ApplicationCommandInteraction,
-        lines: int = commands.Param(100, ge=0, description=Messages.system_get_logs_lines_brief)
+        lines: int = commands.Param(100, ge=0, description=Messages.system_get_logs_lines_brief),
     ):
         await inter.response.defer()
         try:
@@ -65,7 +65,7 @@ class System(Base, commands.Cog):
                 check=True,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
-                text=True
+                text=True,
             )
         except subprocess.CalledProcessError as error:
             strings = utils.cut_string(error.stderr, 1900)
@@ -91,7 +91,7 @@ class System(Base, commands.Cog):
         all_selects = []
 
         # 25 is max number of options for one select
-        chunks = math.ceil(len(cog_files)/25)
+        chunks = math.ceil(len(cog_files) / 25)
         cog_files = list(utils.split(cog_files, chunks))
         cog_names = list(utils.split(cog_names, chunks))
         for i in range(0, chunks):
@@ -129,7 +129,7 @@ class System(Base, commands.Cog):
         embed = disnake.Embed(
             title="Uptime",
             description=f"{count} days without an accident.",
-            color=0xeee657,
+            color=0xEEE657,
         )
         start_streak, end_streak = ErrorLogDB.get_longest_streak()
         embed.add_field(name=Messages.upsince_title, value=str(boottime))
@@ -138,7 +138,7 @@ class System(Base, commands.Cog):
         embed.add_field(
             name=Messages.longest_streak,
             value=f"**{(end_streak - start_streak).days} day(s)**\n{start_streak} — {end_streak}",
-            inline=False
+            inline=False,
         )
         self.error_log.set_image(embed, self.bot.user, count)
         await inter.edit_original_response(embed=embed)

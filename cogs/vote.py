@@ -36,7 +36,7 @@ class VoteMessage:
     class NotEmojiError(Exception):
         pass
 
-    emoji_regex = re.compile('^<:.*:([0-9]+)>(.+)')
+    emoji_regex = re.compile("^<:.*:([0-9]+)>(.+)")
 
     @classmethod
     def parse_option(cls, opt_line: str) -> VoteOption:
@@ -44,9 +44,9 @@ class VoteMessage:
         if matches is None:
             # it is not a disnake emoji, try unicode
             emojis = emoji.emoji_list(opt_line)
-            if len(emojis) > 0 and emojis[0]['match_start'] == 0:
-                opt_emoji = emojis[0]['emoji']
-                opt_message = opt_line[len(opt_emoji):].strip()
+            if len(emojis) > 0 and emojis[0]["match_start"] == 0:
+                opt_emoji = emojis[0]["emoji"]
+                opt_message = opt_line[len(opt_emoji) :].strip()
             else:
                 raise cls.NotEmojiError(opt_line)
         else:
@@ -57,8 +57,8 @@ class VoteMessage:
 
     def __init__(self, message: str, is_one_of: bool):
         self.is_one_of = is_one_of
-        if is_command_message('vote', message) or is_command_message('singlevote', message):
-            message = message[(message.index('vote') + 4):]
+        if is_command_message("vote", message) or is_command_message("singlevote", message):
+            message = message[(message.index("vote") + 4) :]
 
         # If date/time line is present:
         # line 1: date
@@ -84,7 +84,7 @@ class VoteMessage:
 
         self.question = lines[0]
         parsed_opts = [self.parse_option(x.strip()) for x in lines[1:]]
-        self.options: Dict[str, 'VoteMessage.VoteOption'] = {x.emoji: x for x in parsed_opts}
+        self.options: Dict[str, "VoteMessage.VoteOption"] = {x.emoji: x for x in parsed_opts}
         # Check if emojis are unique
         if len(self.options) != len(set(self.options.keys())):
             raise self.ParseError()
@@ -113,8 +113,12 @@ class Vote(Base, commands.Cog):
         await self.handle_vote_command(ctx, message, False)
 
     @cooldowns.short_cooldown
-    @commands.command(rest_is_raw=True, name='singlevote', description=Messages.vote_format,
-                      brief=Messages.vote_one_of_brief)
+    @commands.command(
+        rest_is_raw=True,
+        name="singlevote",
+        description=Messages.vote_format,
+        brief=Messages.vote_one_of_brief,
+    )
     async def vote_one_of(self, ctx, *, message):
         await self.handle_vote_command(ctx, message, True)
 
@@ -249,20 +253,26 @@ class Vote(Base, commands.Cog):
             option = all_most_voted[0]
 
             if final:
-                return singularise(Messages.vote_result(
-                    winning_emoji=(
-                        option.emoji if option.is_unicode else str(self.bot.get_emoji(int(option.emoji)))
-                    ),
-                    winning_option=option.message,
-                    votes=option.count,
-                    question=vote.question))
+                return singularise(
+                    Messages.vote_result(
+                        winning_emoji=(
+                            option.emoji if option.is_unicode else str(self.bot.get_emoji(int(option.emoji)))
+                        ),
+                        winning_option=option.message,
+                        votes=option.count,
+                        question=vote.question,
+                    )
+                )
             else:
-                return singularise(Messages.vote_winning(
-                    winning_emoji=(
-                        option.emoji if option.is_unicode else str(self.bot.get_emoji(int(option.emoji)))
-                    ),
-                    winning_option=option.message,
-                    votes=option.count))
+                return singularise(
+                    Messages.vote_winning(
+                        winning_emoji=(
+                            option.emoji if option.is_unicode else str(self.bot.get_emoji(int(option.emoji)))
+                        ),
+                        winning_option=option.message,
+                        votes=option.count,
+                    )
+                )
         else:
             emoji_str = ""
             for e in all_most_voted:
@@ -270,23 +280,17 @@ class Vote(Base, commands.Cog):
             emoji_str = emoji_str[:-2]
 
             if final:
-                return singularise(Messages.vote_result_multiple(
-                    winning_emojis=emoji_str,
-                    votes=most_voted,
-                    question=vote.question
-                ))
+                return singularise(
+                    Messages.vote_result_multiple(
+                        winning_emojis=emoji_str, votes=most_voted, question=vote.question
+                    )
+                )
             else:
-                return singularise(Messages.vote_winning_multiple(
-                    winning_emojis=emoji_str,
-                    votes=most_voted
-                ))
+                return singularise(Messages.vote_winning_multiple(winning_emojis=emoji_str, votes=most_voted))
 
     async def update_bot_vote_message(self, vote_msg: Message, channel: TextChannel):
         vote = self.vote_cache[vote_msg.id]
-        bot_msg = await channel.history(
-            limit=3,
-            after=vote_msg.created_at
-        ).get(author__id=self.bot.user.id)
+        bot_msg = await channel.history(limit=3, after=vote_msg.created_at).get(author__id=self.bot.user.id)
 
         if bot_msg is None:
             return

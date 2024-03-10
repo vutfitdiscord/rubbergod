@@ -10,10 +10,11 @@ from database import database, session
 
 
 class VerifyStatus(IntEnum):
-    """ Common enum to verification states. """
-    Verified = 0        # verified
-    Unverified = 1      # unverified
-    InProcess = 2       # in process of verification (code sent)
+    """Common enum to verification states."""
+
+    Verified = 0  # verified
+    Unverified = 1  # unverified
+    InProcess = 2  # in process of verification (code sent)
 
 
 class PermitDB(database.base):
@@ -83,11 +84,9 @@ class ValidPersonDB(database.base):
 
     @classmethod
     def get_user_with_status(
-        cls,
-        login: str,
-        status: int = VerifyStatus.InProcess.value
+        cls, login: str, status: int = VerifyStatus.InProcess.value
     ) -> Optional[ValidPersonDB]:
-        """"Finds login from database and checks if status is correct"""
+        """ "Finds login from database and checks if status is correct"""
         user = (
             session.query(ValidPersonDB)
             .filter(ValidPersonDB.login == login, ValidPersonDB.status == status)
@@ -110,7 +109,7 @@ class ValidPersonDB(database.base):
         return user
 
     def save_verified(self, discord_id: str) -> None:
-        """"Inserts login with discord name into database"""
+        """ "Inserts login with discord name into database"""
         PermitDB.add_user(login=self.login, discord_ID=discord_id)
         self.status = 0
         session.commit()

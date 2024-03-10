@@ -10,13 +10,13 @@ import utils
 from database import database, session
 
 
-class KarmaRowData():
+class KarmaRowData:
     def __init__(self, value: int, position: int):
         self.value: int = value
         self.position: int = position
 
 
-class KarmaData():
+class KarmaData:
     def __init__(self, karma: KarmaRowData, positive: KarmaRowData, negative: KarmaRowData):
         self.karma: KarmaRowData = karma
         self.positive: KarmaRowData = positive
@@ -24,7 +24,7 @@ class KarmaData():
 
 
 class KarmaDB(database.base):
-    __tablename__ = 'bot_karma'
+    __tablename__ = "bot_karma"
 
     member_ID = Column(String, primary_key=True)
     karma = Column(Integer, default=0)
@@ -58,11 +58,11 @@ class KarmaDB(database.base):
     @classmethod
     def update_karma_give(cls, giver_id: str, emoji_value: int, remove: bool) -> KarmaDB:
         if emoji_value > 0:
-            column = 'negative' if remove else 'positive'
+            column = "negative" if remove else "positive"
         else:
-            column = 'positive' if remove else 'negative'
+            column = "positive" if remove else "negative"
 
-        if column == 'negative':
+        if column == "negative":
             emoji_value *= -1
 
         giver_karma = cls.get_karma_object(giver_id)
@@ -148,7 +148,7 @@ class KarmaDB(database.base):
 
 
 class KarmaEmojiDB(database.base):
-    __tablename__ = 'bot_karma_emoji'
+    __tablename__ = "bot_karma_emoji"
     emoji_ID = Column(String, primary_key=True)
     value = Column(Integer, default=0)
 

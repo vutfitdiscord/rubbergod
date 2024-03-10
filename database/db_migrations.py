@@ -14,14 +14,10 @@ from database.meme_repost import MemeRepostDB  # noqa: F401
 from database.pin_map import PinMapDB  # noqa: F401
 from database.poll import PollDB, PollOptionDB, VoterDB  # noqa: F401
 from database.report import AnswerDB, ReportDB, UserDB  # noqa: F401
-from database.review import ReviewDB  # noqa: F401
-from database.review import ReviewRelevanceDB  # noqa: F401
-from database.review import SubjectDetailsDB  # noqa: F401
-from database.review import SubjectDB
+from database.review import ReviewDB, ReviewRelevanceDB, SubjectDB, SubjectDetailsDB  # noqa: F401
 from database.role_group import RoleGroupDB  # noqa: F401
 from database.streamlinks import StreamLinkDB  # noqa: F401
-from database.subscription import AlreadyNotifiedDB  # noqa: F401
-from database.subscription import SubscriptionDB  # noqa: F401
+from database.subscription import AlreadyNotifiedDB, SubscriptionDB  # noqa: F401
 from database.timeout import TimeoutDB, TimeoutUserDB  # noqa: F401
 from database.verification import PermitDB, ValidPersonDB
 from database.vote import VoteDB  # noqa: F401
@@ -45,13 +41,13 @@ def load_dump(filename: str):
     session.query(HugsTableDB).delete()
     session.commit()
 
-    print(f'Loading dump from {filename}')
+    print(f"Loading dump from {filename}")
 
     data = database.base.metadata.tables.keys()
     for row in data:
         print(row)
 
-    with open(filename, "r", encoding='utf-8') as backup_file:
+    with open(filename, "r", encoding="utf-8") as backup_file:
         data = backup_file.readlines()
 
     inserts = [line for line in data if line.startswith("INSERT")]
@@ -60,44 +56,45 @@ def load_dump(filename: str):
     for insert in inserts:
         values = insert.split("VALUES", 1)[1]
         if insert.startswith("INSERT INTO `bot_karma`"):
-            values = values[1:-2].replace('\'', '')
-            values = values.replace('(', '').replace(')', '')
-            values = values.split(',')
+            values = values[1:-2].replace("'", "")
+            values = values.replace("(", "").replace(")", "")
+            values = values.split(",")
             for i in range(0, len(values), 3):
                 karma_values.append(KarmaDB(member_ID=values[i], karma=values[i + 1]))
         elif insert.startswith("INSERT INTO `bot_karma_giving`"):
-            values = values[1:-2].replace('\'', '')
-            values = values.replace('(', '').replace(')', '')
-            values = values.split(',')
+            values = values[1:-2].replace("'", "")
+            values = values.replace("(", "").replace(")", "")
+            values = values.split(",")
             for i in range(0, len(values), 4):
-                karma_values.append(KarmaDB(member_ID=values[i],
-                                            positive=values[i + 1],
-                                            negative=values[i + 2]))
+                karma_values.append(
+                    KarmaDB(member_ID=values[i], positive=values[i + 1], negative=values[i + 2])
+                )
         elif insert.startswith("INSERT INTO `bot_karma_emoji`"):
-            values = values[1:-2].replace('\'', '')
-            values = values.replace('(', '').replace(')', '')
-            values = values.split(',')
+            values = values[1:-2].replace("'", "")
+            values = values.replace("(", "").replace(")", "")
+            values = values.split(",")
             for i in range(0, len(values), 2):
                 session.add(KarmaEmojiDB(emoji_ID=values[i], value=values[i + 1]))
         elif insert.startswith("INSERT INTO `bot_permit`"):
             values = values[1:-2]
-            values = values.replace('(', '').replace(')', '')
-            values = re.split(r',(?=\')', values)
-            values = [value.replace('\'', '') for value in values]
+            values = values.replace("(", "").replace(")", "")
+            values = re.split(r",(?=\')", values)
+            values = [value.replace("'", "") for value in values]
             for i in range(0, len(values), 3):
                 session.add(PermitDB(login=values[i], discord_ID=values[i + 2]))
         elif insert.startswith("INSERT INTO `bot_valid_persons`"):
-            values = values[1:-2].replace('\'', '')
-            values = values.replace('(', '').replace(')', '')
-            values = values.split(',')
+            values = values[1:-2].replace("'", "")
+            values = values.replace("(", "").replace(")", "")
+            values = values.split(",")
             for i in range(0, len(values), 5):
-                session.add(ValidPersonDB(
-                    login=values[i],
-                    name=values[i + 1],
-                    year=values[i + 2],
-                    code=values[i + 3]
-                    if values[i + 3] != "NULL" else None,
-                    status=values[i + 4])
+                session.add(
+                    ValidPersonDB(
+                        login=values[i],
+                        name=values[i + 1],
+                        year=values[i + 2],
+                        code=values[i + 3] if values[i + 3] != "NULL" else None,
+                        status=values[i + 4],
+                    )
                 )
 
     for karma in karma_values:
@@ -117,6 +114,6 @@ def load_subjects():
     subjects = list(set(config.subjects))
 
     for subject in subjects:
-        print(f'Importing subject {subject}')
+        print(f"Importing subject {subject}")
         SubjectDB.add(subject)
-    print('Import complete')
+    print("Import complete")

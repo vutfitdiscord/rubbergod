@@ -28,16 +28,10 @@ class Bookmark(Base, commands.Cog):
                 embed.append(await BookmarkFeatures.create_image_embed(self, ctx, image))
         # when sending sticker there can be overflow of files
         if len(files_attached) <= 10:
-            await ctx.member.send(
-                embeds=embed,
-                view=BookmarkView(ctx.message.jump_url),
-                files=files_attached
-            )
+            await ctx.member.send(embeds=embed, view=BookmarkView(ctx.message.jump_url), files=files_attached)
         else:
             await ctx.member.send(
-                embeds=embed,
-                view=BookmarkView(ctx.message.jump_url),
-                files=files_attached[:10]
+                embeds=embed, view=BookmarkView(ctx.message.jump_url), files=files_attached[:10]
             )
             await ctx.member.send(files=files_attached[10:])
 

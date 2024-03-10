@@ -25,7 +25,7 @@ class Random(Base, commands.Cog):
     async def pick(
         self,
         inter: disnake.ApplicationCommandInteraction,
-        args: str = commands.Param(max_length=1900, description=Messages.random_pick_format)
+        args: str = commands.Param(max_length=1900, description=Messages.random_pick_format),
     ):
         """
         Pick option from given argument.
@@ -40,7 +40,7 @@ class Random(Base, commands.Cog):
 
         for i, arg in enumerate(args):
             if "?" in arg:
-                args = args[i + 1:]
+                args = args[i + 1 :]
                 break
 
         if not args:
@@ -52,10 +52,7 @@ class Random(Base, commands.Cog):
     @cooldowns.short_cooldown
     @commands.slash_command(name="flip", description=Messages.random_flip_brief)
     async def flip(self, inter: disnake.ApplicationCommandInteraction):
-        await inter.send(
-            random.choice(["True", "False"]),
-            ephemeral=self.check.botroom_check(inter)
-        )
+        await inter.send(random.choice(["True", "False"]), ephemeral=self.check.botroom_check(inter))
 
     @cooldowns.short_cooldown
     @commands.slash_command(name="roll", description=Messages.rng_generator_format)

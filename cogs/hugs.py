@@ -44,10 +44,7 @@ class Hugs(Base, commands.Cog):
 
     @cooldowns.default_cooldown
     @_hug.sub_command(name="hugboard", description=Messages.hug_hugboard_brief)
-    async def hugboard(
-        self,
-        inter: disnake.ApplicationCommandInteraction
-    ):
+    async def hugboard(self, inter: disnake.ApplicationCommandInteraction):
         """
         Overall hugging stats.
         """
@@ -55,12 +52,12 @@ class Hugs(Base, commands.Cog):
         await inter.response.defer(ephemeral=self.check.botroom_check(inter))
 
         page_source = LeaderboardPageSource(
-                bot=self.bot,
-                author=inter.author,
-                query=self.hugs_db.get_top_all_query(),
-                row_formatter=_tophugs_formatter,
-                title='HUGBOARD',
-                emote_name='peepoHugger',
+            bot=self.bot,
+            author=inter.author,
+            query=self.hugs_db.get_top_all_query(),
+            row_formatter=_tophugs_formatter,
+            title="HUGBOARD",
+            emote_name="peepoHugger",
         )
 
         page = page_source.get_page(0)
@@ -71,10 +68,7 @@ class Hugs(Base, commands.Cog):
 
     @cooldowns.default_cooldown
     @_hug.sub_command(name="huggersboard", description=Messages.hug_huggersboard_brief)
-    async def huggersboard(
-        self,
-        inter: disnake.ApplicationCommandInteraction
-    ):
+    async def huggersboard(self, inter: disnake.ApplicationCommandInteraction):
         """
         Get the biggest huggers.
         """
@@ -82,12 +76,12 @@ class Hugs(Base, commands.Cog):
         await inter.response.defer(ephemeral=self.check.botroom_check(inter))
 
         page_source = LeaderboardPageSource(
-                bot=self.bot,
-                author=inter.author,
-                query=self.hugs_db.get_top_givers_query(),
-                row_formatter=self._tophuggers_formatter,
-                title='TOP HUGGERS',
-                emote_name='peepoHugger'
+            bot=self.bot,
+            author=inter.author,
+            query=self.hugs_db.get_top_givers_query(),
+            row_formatter=self._tophuggers_formatter,
+            title="TOP HUGGERS",
+            emote_name="peepoHugger",
         )
 
         page = page_source.get_page(0)
@@ -98,10 +92,7 @@ class Hugs(Base, commands.Cog):
 
     @cooldowns.default_cooldown
     @_hug.sub_command(name="mosthugged", description=Messages.hug_mosthugged_brief)
-    async def mosthugged(
-        self,
-        inter: disnake.ApplicationCommandInteraction
-    ):
+    async def mosthugged(self, inter: disnake.ApplicationCommandInteraction):
         """
         Get the most hugged.
         """
@@ -109,12 +100,12 @@ class Hugs(Base, commands.Cog):
         await inter.response.defer(ephemeral=self.check.botroom_check(inter))
 
         page_source = LeaderboardPageSource(
-                bot=self.bot,
-                author=inter.author,
-                query=self.hugs_db.get_top_receivers_query(),
-                row_formatter=self._tophugged_formatter,
-                title='TOP HUGGED',
-                emote_name='peepoHugger',
+            bot=self.bot,
+            author=inter.author,
+            query=self.hugs_db.get_top_receivers_query(),
+            row_formatter=self._tophugged_formatter,
+            title="TOP HUGGED",
+            emote_name="peepoHugger",
         )
 
         page = page_source.get_page(0)
@@ -125,11 +116,7 @@ class Hugs(Base, commands.Cog):
 
     @cooldowns.default_cooldown
     @_hug.sub_command(name="me", description=Messages.hug_stats_brief)
-    async def stats(
-        self,
-        inter: disnake.ApplicationCommandInteraction,
-        user: disnake.Member = None
-    ):
+    async def stats(self, inter: disnake.ApplicationCommandInteraction, user: disnake.Member = None):
         """
         Get your lovely hug stats.
         """
@@ -179,12 +166,12 @@ class Hugs(Base, commands.Cog):
         inter: disnake.ApplicationCommandInteraction,
         user: disnake.Member = None,
         intensity: int = commands.Param(
-            name='intensity',
+            name="intensity",
             description=Messages.hug_intensity_description(emoji_count=emoji_count),
             ge=1,
             le=emoji_count,
             default=1,
-        )
+        ),
     ):
         """
         Because everyone likes hugs <3

@@ -2,14 +2,13 @@ from __future__ import annotations
 
 from typing import Optional
 
-from sqlalchemy import (Column, DateTime, ForeignKeyConstraint, Integer,
-                        PrimaryKeyConstraint, String, Text)
+from sqlalchemy import Column, DateTime, ForeignKeyConstraint, Integer, PrimaryKeyConstraint, String, Text
 
 from database import database, session
 
 
 class Event(database.base):
-    __tablename__ = 'stats_event'
+    __tablename__ = "stats_event"
     # events are shared between the cogs, so constraint key is needed here
     __table_args__ = (PrimaryKeyConstraint("name", "cog", name="id"),)
 
@@ -31,7 +30,7 @@ class Event(database.base):
 
 
 class ErrorEvent(database.base):
-    __tablename__ = 'stats_error_event'
+    __tablename__ = "stats_error_event"
     _table_args__ = (
         ForeignKeyConstraint(
             ["event_name", "cog"],
@@ -54,7 +53,8 @@ class ErrorEvent(database.base):
     def log(
         cls,
         event_name: str,
-        cog: str, datetime,
+        cog: str,
+        datetime,
         user_id: str,
         args: str,
         exception: str,
@@ -68,7 +68,7 @@ class ErrorEvent(database.base):
             user_id=user_id,
             args=args,
             exception=exception,
-            traceback=traceback
+            traceback=traceback,
         )
         error = session.merge(error)
         session.commit()
@@ -77,6 +77,7 @@ class ErrorEvent(database.base):
     @classmethod
     def get_traceback(cls, id: int) -> ErrorEvent:
         return session.query(cls).filter(cls.id == id).one_or_none()
+
 
 # TODO: add new table that will log command usage
 # class UsageEvent(database.base):

@@ -68,7 +68,7 @@ class Gif(Base, commands.Cog):
                 loop=0,
                 transparency=0,
                 disposal=2,
-                optimize=False
+                optimize=False,
             )
             image_binary.seek(0)
             await inter.response.send_message(file=disnake.File(fp=image_binary, filename="pet.gif"))

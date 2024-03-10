@@ -7,29 +7,25 @@ from disnake.ext import commands
 
 import database.db_migrations as migrations
 from buttons.contestvote import ContestView
-from buttons.poll import (PollBasicView, PollBooleanView, PollCloseView,
-                          PollOpinionView, PollVotersView)
-from buttons.report import (ReportAnonymView, ReportAnswerOnlyView,
-                            ReportGeneralView, ReportMessageView)
+from buttons.poll import PollBasicView, PollBooleanView, PollCloseView, PollOpinionView, PollVotersView
+from buttons.report import ReportAnonymView, ReportAnswerOnlyView, ReportGeneralView, ReportMessageView
 from config.app_config import config
 from config.messages import Messages
 from features import presence
 from features.error import ErrorLogger
 
-logger = logging.getLogger('disnake')
+logger = logging.getLogger("disnake")
 logger.setLevel(logging.WARNING)
-handler = logging.FileHandler(filename='discord.log', encoding='utf-8', mode='w')
-handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
+handler = logging.FileHandler(filename="discord.log", encoding="utf-8", mode="w")
+handler.setFormatter(logging.Formatter("%(asctime)s:%(levelname)s:%(name)s: %(message)s"))
 logger.addHandler(handler)
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--load_dump', type=str,
-                    help='Imports SQL dump from SQL file to database.',
-                    metavar='filepath.sql')
-parser.add_argument('--load_subjects', action='store_true',
-                    help='Fills DB with subjects.')
-parser.add_argument('--init_db', action='store_true',
-                    help='Creates missing DB tables without start bot.')
+parser.add_argument(
+    "--load_dump", type=str, help="Imports SQL dump from SQL file to database.", metavar="filepath.sql"
+)
+parser.add_argument("--load_subjects", action="store_true", help="Fills DB with subjects.")
+parser.add_argument("--init_db", action="store_true", help="Creates missing DB tables without start bot.")
 args = parser.parse_args()
 
 if args.load_dump is not None:
@@ -65,7 +61,7 @@ bot = commands.Bot(
     case_insensitive=True,
     allowed_mentions=AllowedMentions(roles=False, everyone=False, users=True),
     intents=intents,
-    command_sync_flags=command_sync_flags
+    command_sync_flags=command_sync_flags,
 )
 
 presence = presence.Presence(bot)
@@ -91,7 +87,7 @@ async def on_ready():
         PollOpinionView(bot),
         PollCloseView(bot),
         PollVotersView(bot),
-        ContestView(bot)
+        ContestView(bot),
     ]
     for view in views:
         bot.add_view(view)

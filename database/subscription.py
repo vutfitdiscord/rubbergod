@@ -8,7 +8,7 @@ from database import database, session
 
 
 class SubscriptionDB(database.base):
-    __tablename__ = 'subscription'
+    __tablename__ = "subscription"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     user_id = Column(String)
@@ -27,15 +27,15 @@ class SubscriptionDB(database.base):
 
     @classmethod
     def get(cls, user_id: str, forum_id: str, tag: str) -> Optional[SubscriptionDB]:
-        return session.query(cls).filter(
-            (cls.user_id == user_id) & (cls.forum_id == forum_id) & (cls.tag == tag)
-        ).one_or_none()
+        return (
+            session.query(cls)
+            .filter((cls.user_id == user_id) & (cls.forum_id == forum_id) & (cls.tag == tag))
+            .one_or_none()
+        )
 
     @classmethod
     def get_tags(cls, user_id: str, forum_id: str) -> List[SubscriptionDB]:
-        tags = session.query(cls.tag).filter(
-            (cls.user_id == user_id) & (cls.forum_id == forum_id)
-        ).all()
+        tags = session.query(cls.tag).filter((cls.user_id == user_id) & (cls.forum_id == forum_id)).all()
         # from list of sets to list of strings
         return [tag[0] for tag in tags]
 
@@ -53,7 +53,7 @@ class SubscriptionDB(database.base):
 
 
 class AlreadyNotifiedDB(database.base):
-    __tablename__ = 'subscription_notified'
+    __tablename__ = "subscription_notified"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     user_id = Column(String)

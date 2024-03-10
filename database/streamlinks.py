@@ -9,7 +9,7 @@ from database import database, session
 
 
 class StreamLinkDB(database.base):
-    __tablename__ = 'stream_links'
+    __tablename__ = "stream_links"
 
     id = Column(BIGINT, primary_key=True, autoincrement=True)
     subject = Column(String, index=True, nullable=False)
@@ -20,15 +20,22 @@ class StreamLinkDB(database.base):
     created_at = Column(DateTime, index=True)
 
     @classmethod
-    def create(cls, subject: str, link: str, username: str, description: str,
-               thumbnail_url: str, created_at: datetime) -> None:
+    def create(
+        cls,
+        subject: str,
+        link: str,
+        username: str,
+        description: str,
+        thumbnail_url: str,
+        created_at: datetime,
+    ) -> None:
         streamlink = StreamLinkDB(
             subject=subject,
             link=link,
             member_name=username,
             description=description,
             thumbnail_url=thumbnail_url,
-            created_at=created_at
+            created_at=created_at,
         )
 
         session.add(streamlink)
@@ -56,11 +63,7 @@ class StreamLinkDB(database.base):
 
     @classmethod
     def get_streamlinks_of_subject(cls, subject: str) -> List[StreamLinkDB]:
-        return list(session.query(cls)
-                    .filter(cls.subject == subject)
-                    .order_by(desc("created_at"))
-                    .all()
-                    )
+        return list(session.query(cls).filter(cls.subject == subject).order_by(desc("created_at")).all())
 
     @classmethod
     def get_subjects_with_stream(cls) -> List[StreamLinkDB]:

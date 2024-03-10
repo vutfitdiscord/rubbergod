@@ -51,10 +51,10 @@ def merge_messages(message_list: Iterable, max_msg_len: int):
 
 
 async def send_list_of_messages(
-        ctx: Union[disnake.ApplicationCommandInteraction, commands.Context, disnake.abc.Messageable],
-        message_list: Iterable,
-        max_msg_len: int = 1900,
-        ephemeral: bool = False
+    ctx: Union[disnake.ApplicationCommandInteraction, commands.Context, disnake.abc.Messageable],
+    message_list: Iterable,
+    max_msg_len: int = 1900,
+    ephemeral: bool = False,
 ) -> None:
     """Send bunch of messages at once
 

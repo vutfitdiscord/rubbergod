@@ -23,7 +23,7 @@ class TableGenerator:
 
         def wrap_text(elem: str) -> Optional[list[str]]:
             if len(elem) > self.column_width:
-                return wrap(elem[self.column_width:], width=self.column_width)
+                return wrap(elem[self.column_width :], width=self.column_width)
             return []
 
         for row in matrix:
@@ -36,7 +36,7 @@ class TableGenerator:
                 # Get number of rows to add to table because of wrapping
                 new_row_cnt = len(new_row[idx]) if len(new_row[idx]) > new_row_cnt else new_row_cnt
                 # Cut long strings
-                row[idx] = row[idx][:self.column_width]
+                row[idx] = row[idx][: self.column_width]
 
             # add original row
             self.table.add_row(row, divider=(new_row_cnt == 0))

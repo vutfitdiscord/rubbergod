@@ -36,24 +36,24 @@ class ImageHandler:
 
         x, y = avatar_offset
         width, height = 150, 150
-        im.paste(background, (38//2, 38 + 50), background)
-        im.paste(avatar, (x, y+50), avatar)
-        im.paste(catpaw, (38//2, 38 + 50), catpaw)
+        im.paste(background, (38 // 2, 38 + 50), background)
+        im.paste(avatar, (x, y + 50), avatar)
+        im.paste(catpaw, (38 // 2, 38 + 50), catpaw)
         im2 = im.transpose(Image.FLIP_LEFT_RIGHT)
 
         frames = []
         for i in range(frame_count):
             im = im.convert("RGBA")
             frame = Image.new("RGBA", (width, height), (0, 0, 0, 0))
-            hop = 12 if i % 2 else 12+hop_size
-            frame.paste(im, (i*10 - 50, hop - 50), im)
+            hop = 12 if i % 2 else 12 + hop_size
+            frame.paste(im, (i * 10 - 50, hop - 50), im)
             frames.append(frame)
             del frame
         for i in range(frame_count):
             im2 = im2.convert("RGBA")
             frame = Image.new("RGBA", (width, height), (0, 0, 0, 0))
-            hop = 12+hop_size if i % 2 else 12
-            frame.paste(im2, ((10-i)*10 - 50, hop - 50), im2)
+            hop = 12 + hop_size if i % 2 else 12
+            frame.paste(im2, ((10 - i) * 10 - 50, hop - 50), im2)
             frames.append(frame)
 
         frames[0].save(

@@ -92,17 +92,13 @@ class FitWide(Base, commands.Cog):
         for member in verified:
             if member.id not in permitted_ids:
                 if p_verified:
-                    await inter.send(
-                        Messages.fitwide_role_check_user_not_found(user=member.id, id=member.id)
-                    )
+                    await inter.send(Messages.fitwide_role_check_user_not_found(user=member.id, id=member.id))
             else:
                 user = PermitDB.get_user_by_id(member.id)
                 if user is None:
                     continue
                 if len(user) > 1:
-                    await inter.send(
-                        Messages.fitwide_role_check_user_duplicate(user=member.id, id=member.id)
-                    )
+                    await inter.send(Messages.fitwide_role_check_user_duplicate(user=member.id, id=member.id))
                     continue
 
                 person = ValidPersonDB.get_user_by_login(user.login)
@@ -112,9 +108,7 @@ class FitWide(Base, commands.Cog):
                 if person.status != 0:
                     if p_status:
                         await inter.send(
-                            Messages.fitwide_role_check_wrong_status(
-                                user=user.discord_ID, id=user.discord_ID
-                            )
+                            Messages.fitwide_role_check_wrong_status(user=user.discord_ID, id=user.discord_ID)
                         )
 
                 year = self.verification.transform_year(person.year)
@@ -130,9 +124,10 @@ class FitWide(Base, commands.Cog):
                             weird_members[role][correct_role].append(member)
                             break
                     else:
-                        if not (correct_role == dropout and any(
-                            role in member.roles for role in dropout_alternatives
-                        )):
+                        if not (
+                            correct_role == dropout
+                            and any(role in member.roles for role in dropout_alternatives)
+                        ):
                             weird_members[dropout][correct_role].append(member)
 
         for source_role, target_data in weird_members.items():
@@ -157,8 +152,7 @@ class FitWide(Base, commands.Cog):
                     await self.send_masstag_messages(inter, message_prefix, target_ids)
                 elif p_move and (
                     # presun bakalaru do 1MIT
-                    ("BIT" in source_year and target_year == "1MIT")
-                    or target_year == "Dropout"
+                    ("BIT" in source_year and target_year == "1MIT") or target_year == "Dropout"
                 ):
                     await inter.send(
                         f"Přesouvám tyto {len(target_members)} lidi z {source_year} do {target_year}:"
@@ -168,9 +162,10 @@ class FitWide(Base, commands.Cog):
                         await inter.send("jk, debug mode")
                     else:
                         for member in target_members:
-                            if not (target_role == dropout and any(
-                                role in member.roles for role in dropout_alternatives
-                            )):
+                            if not (
+                                target_role == dropout
+                                and any(role in member.roles for role in dropout_alternatives)
+                            ):
                                 await member.add_roles(target_role)
                             await member.remove_roles(source_role)
                 elif p_role:
@@ -208,8 +203,8 @@ class FitWide(Base, commands.Cog):
         categories_names = [
             "1. semestr", "2. semestr", "3. semestr", "4. semestr", "5. semestr",
             "zimni-volitelne", "letni-volitelne", "volitelne",
-            "zimni magistersky semestr", "letni magistersky semestr"
-        ]
+            "zimni magistersky semestr", "letni magistersky semestr",
+        ]  # fmt: off
         categories = [
             disnake.utils.get(guild.categories, name=semester_name) for semester_name in categories_names
         ]
@@ -244,9 +239,7 @@ class FitWide(Base, commands.Cog):
 
         # skolni-info, cvicici-info, stream-links, senat-unie-drby room overwrites
         channel_names = ["skolni-info", "cvicici-info", "stream-links", "senat-unie-drby", "bp-szz", "dp-szz"]
-        channels = [
-            disnake.utils.get(guild.channels, name=channel_name) for channel_name in channel_names
-        ]
+        channels = [disnake.utils.get(guild.channels, name=channel_name) for channel_name in channel_names]
         for channel in channels:
             await channel.set_permissions(bit0, read_messages=True)
             await channel.set_permissions(mit0, read_messages=True)
@@ -322,7 +315,7 @@ class FitWide(Base, commands.Cog):
         # increment channel names
         overwrites = {
             guild.default_role: disnake.PermissionOverwrite(read_messages=False),
-            bit4: disnake.PermissionOverwrite(read_messages=True, send_messages=True)
+            bit4: disnake.PermissionOverwrite(read_messages=True, send_messages=True),
         }
         await general_channels[3].edit(name="4bit-1mit-general", overwrites=overwrites)
         await general_channels[2].edit(name="3bit-general")
@@ -358,11 +351,9 @@ class FitWide(Base, commands.Cog):
                 read_messages=False,
                 send_messages=False,
                 create_private_threads=False,
-                create_public_threads=False
+                create_public_threads=False,
             ),
-            disnake.utils.get(guild.roles, name="1BIT"): disnake.PermissionOverwrite(
-                read_messages=True
-            ),
+            disnake.utils.get(guild.roles, name="1BIT"): disnake.PermissionOverwrite(read_messages=True),
             BIT_roles[0]: disnake.PermissionOverwrite(read_messages=True),
             BIT_roles[1]: disnake.PermissionOverwrite(read_messages=True),
             BIT_roles[2]: disnake.PermissionOverwrite(read_messages=True),
@@ -392,9 +383,7 @@ class FitWide(Base, commands.Cog):
 
     @verify_db.sub_command(name="update", description=Messages.fitwide_update_db_brief)
     async def update_db(
-        self,
-        inter: disnake.ApplicationCommandInteraction,
-        convert_to_0bit_0mit: bool = False
+        self, inter: disnake.ApplicationCommandInteraction, convert_to_0bit_0mit: bool = False
     ):
         await inter.send(Messages.fitwide_update_db_start)
         with open("merlin-latest", "r") as f:
@@ -405,7 +394,7 @@ class FitWide(Base, commands.Cog):
         new_logins = []
         login_results = ValidPersonDB.get_all_logins()
         # Use unpacking on results
-        old_logins = [value for value, in login_results]
+        old_logins = [value for (value,) in login_results]
 
         for line in data:
             line = line.split(":")
@@ -459,9 +448,8 @@ class FitWide(Base, commands.Cog):
     async def pull_db(self, inter: disnake.ApplicationCommandInteraction):
         await inter.response.defer()
         process = subprocess.Popen(
-            ["ssh", "-i", self.config.db_pull_merlin_key_path, "merlin"],
-            stdout=subprocess.PIPE
-            )
+            ["ssh", "-i", self.config.db_pull_merlin_key_path, "merlin"], stdout=subprocess.PIPE
+        )
         try:
             output, error = process.communicate(timeout=15)
             if error:
@@ -495,7 +483,7 @@ class FitWide(Base, commands.Cog):
     async def get_user(
         self,
         inter: disnake.ApplicationCommandInteraction,
-        login: str = commands.Param(autocomplete=autocomp_user_logins)
+        login: str = commands.Param(autocomplete=autocomp_user_logins),
     ):
         await inter.response.defer()
         result = PermitDB.get_user_by_login(login)
@@ -515,7 +503,7 @@ class FitWide(Base, commands.Cog):
     async def reset_login(
         self,
         inter: disnake.ApplicationCommandInteraction,
-        login: str = commands.Param(autocomplete=autocomp_user_logins)
+        login: str = commands.Param(autocomplete=autocomp_user_logins),
     ):
         await inter.response.defer()
         result = ValidPersonDB.get_user_by_login(login)

@@ -33,17 +33,13 @@ class BookmarkModal(disnake.ui.Modal):
                 for image in images:
                     embed.append(await BookmarkFeatures.create_image_embed(self, inter, image, title_name))
             await inter.author.send(
-                embeds=embed,
-                view=BookmarkView(inter.message.jump_url),
-                files=files_attached
-                )
+                embeds=embed, view=BookmarkView(inter.message.jump_url), files=files_attached
+            )
             await inter.response.send_message(
-                Messages.bookmark_created(title_name=title_name),
-                ephemeral=True
-                )
+                Messages.bookmark_created(title_name=title_name), ephemeral=True
+            )
         except disnake.HTTPException as e:
             if e.code == 50007:
-                await inter.response.send_message(Messages.blocked_bot(user=inter.author.id),
-                                                  ephemeral=True)
+                await inter.response.send_message(Messages.blocked_bot(user=inter.author.id), ephemeral=True)
             else:
                 raise e

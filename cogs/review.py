@@ -20,8 +20,7 @@ from permissions import permission_check
 
 
 async def autocomp_subjects_programmes(
-    inter: disnake.ApplicationCommandInteraction,
-    user_input: str
+    inter: disnake.ApplicationCommandInteraction, user_input: str
 ) -> list[str]:
     input = user_input.lower()
     subjects = SubjectDB.lookup(input)
@@ -89,7 +88,7 @@ class Review(Base, commands.Cog):
         subject: str = commands.Param(autocomplete=autocomp_subjects),
         grade: str = commands.Param(choices=TierEnum._member_names_, description=Messages.review_grade_brief),
         text: str = commands.Param(),
-        anonymous: bool = commands.Param(default=False)
+        anonymous: bool = commands.Param(default=False),
     ):
         """Add new review for `subject`"""
         # TODO: use modal in future when select in modal support release
@@ -108,7 +107,7 @@ class Review(Base, commands.Cog):
         self,
         inter: disnake.ApplicationCommandInteraction,
         subject: str = None,
-        id: int = commands.Param(default=None, description=Messages.review_id_brief)
+        id: int = commands.Param(default=None, description=Messages.review_id_brief),
     ):
         """Remove review from DB. User is just allowed to remove his own review
         For admin it is possible to use "id" as subject shortcut and delete review by its ID
@@ -125,10 +124,7 @@ class Review(Base, commands.Cog):
                 return
 
             # not admin
-            await inter.send(
-                Messages.review_remove_denied(user=inter.author.id),
-                ephemeral=True
-            )
+            await inter.send(Messages.review_remove_denied(user=inter.author.id), ephemeral=True)
             return
         elif subject is not None:
             subject = subject.lower()
@@ -212,13 +208,13 @@ class Review(Base, commands.Cog):
                     name="Rozvrh předmětu v IS",
                     value="https://www.vut.cz/studis/student.phtml?sn=rozvrhy&action=gm_rozvrh_predmetu"
                     f"&operation=rozvrh&predmet_id={subject.card}&fakulta_id=814",
-                    inline=False
+                    inline=False,
                 )
             else:
                 embed.add_field(
                     name="Karta předmětu",
                     value=f"https://www.fit.vut.cz/study/course/{subject.shortcut}/.cs",
-                    inline=False
+                    inline=False,
                 )
                 embed.add_field(
                     name="Statistika úspěšnosti předmětu",
@@ -237,7 +233,7 @@ class Review(Base, commands.Cog):
         sem: str = commands.Param(name="semestr", choices=["Z", "L"]),
         year: str = commands.Param(
             name="rocnik", choices=["1BIT", "2BIT", "3BIT", "1MIT", "2MIT"], default=""
-        )
+        ),
     ):
         """Board of suject based on average tier from reviews"""
         degree = None
@@ -277,7 +273,7 @@ class Review(Base, commands.Cog):
 
         pages_total = SubjectDetailsDB.get_tierboard_page_count(type, sem, degree, year)
         for page in range(pages_total):
-            board = SubjectDetailsDB.get_tierboard(type, sem, degree, year, page*10)
+            board = SubjectDetailsDB.get_tierboard(type, sem, degree, year, page * 10)
             output = ""
             cnt = 1
             for line in board:

@@ -1,6 +1,7 @@
 """
 Base cog class. All cogs should inherit from this class.
 """
+
 from functools import cached_property
 
 import disnake

@@ -8,7 +8,7 @@ from database import database, session
 
 
 class BetterMemeDB(database.base):
-    __tablename__ = 'bot_better_meme'
+    __tablename__ = "bot_better_meme"
 
     member_ID = Column(String, primary_key=True)
     posts = Column(Integer, default=0)

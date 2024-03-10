@@ -31,13 +31,13 @@ class Studijni(Base, commands.Cog):
             hours = etree.tostring(hours_div[0], encoding=str, method="text")
             additional_info = xDoc2.xpath("//main//section/p")
             if additional_info:
-                info = etree.tostring(additional_info[0], encoding=str, method="text").split(':', 1)
+                info = etree.tostring(additional_info[0], encoding=str, method="text").split(":", 1)
                 if len(info) > 1:
                     embed.add_field(name=info[0], value=info[1], inline=False)
         else:
             hours_div = xDoc2.xpath("//main//section")
             if len(hours_div):
-                hours = ''.join(hours_div[0].itertext())
+                hours = "".join(hours_div[0].itertext())
                 hours = hours.strip()
             else:
                 hours = Messages.studijni_web_error

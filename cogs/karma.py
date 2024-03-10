@@ -97,40 +97,30 @@ class Karma(Base, commands.Cog):
     @_karma.sub_command(description=Messages.karma_brief)
     async def me(self, inter: disnake.ApplicationCommandInteraction):
         await inter.response.send_message(
-            self.karma_helper.karma_get(inter.author),
-            ephemeral=self.check.botroom_check(inter)
+            self.karma_helper.karma_get(inter.author), ephemeral=self.check.botroom_check(inter)
         )
 
     @commands.user_command(name="Karma uživatele")
     async def stalk_app(self, inter: disnake.UserCommandInteraction, user: disnake.Member):
         await inter.response.send_message(
-            self.karma_helper.karma_get(inter.author, user),
-            ephemeral=self.check.botroom_check(inter)
+            self.karma_helper.karma_get(inter.author, user), ephemeral=self.check.botroom_check(inter)
         )
 
     @_karma.sub_command(description=Messages.karma_stalk_brief)
     async def stalk(self, inter: disnake.ApplicationCommandInteraction, user: disnake.User):
         await inter.response.send_message(
-            self.karma_helper.karma_get(inter.author, user),
-            ephemeral=self.check.botroom_check(inter)
+            self.karma_helper.karma_get(inter.author, user), ephemeral=self.check.botroom_check(inter)
         )
 
     @commands.cooldown(rate=1, per=300.0, type=commands.BucketType.guild)
     @_karma.sub_command(description=Messages.karma_getall_brief)
     async def getall(self, inter: disnake.ApplicationCommandInteraction):
-        await inter.send(
-            Messages.karma_getall_response,
-            ephemeral=self.check.botroom_check(inter)
-        )
+        await inter.send(Messages.karma_getall_response, ephemeral=self.check.botroom_check(inter))
         await self.karma_helper.emoji_list_all_values(inter, self.check.botroom_check(inter))
 
     @_karma.sub_command(description=Messages.karma_get_brief)
     async def get(self, inter: disnake.ApplicationCommandInteraction, emoji):
-        await self.karma_helper.emoji_get_value(
-            inter,
-            emoji,
-            ephemeral=self.check.botroom_check(inter)
-        )
+        await self.karma_helper.emoji_get_value(inter, emoji, ephemeral=self.check.botroom_check(inter))
 
     @cooldowns.long_cooldown
     @commands.message_command(name="Karma zprávy", guild_ids=[Base.config.guild_id])
@@ -143,9 +133,7 @@ class Karma(Base, commands.Cog):
         await self._message(inter, message)
 
     async def _message(
-        self, inter: disnake.ApplicationCommandInteraction,
-        message: disnake.Message,
-        ephemeral: bool = False
+        self, inter: disnake.ApplicationCommandInteraction, message: disnake.Message, ephemeral: bool = False
     ):
         await inter.response.defer(with_message=True, ephemeral=ephemeral)
         embed = await self.karma_helper.message_karma(inter.author, message)
@@ -160,7 +148,7 @@ class Karma(Base, commands.Cog):
         self,
         inter: disnake.ApplicationCommandInteraction,
         direction: str = commands.Param(default="descending", choices=["ascending", "descending"]),
-        start: int = commands.Param(default=1, gt=0, lt=100000000, description=Messages.karma_board_start)
+        start: int = commands.Param(default=1, gt=0, lt=100000000, description=Messages.karma_board_start),
     ):
         """
         Get karma leaderboard
@@ -206,7 +194,7 @@ class Karma(Base, commands.Cog):
         inter: disnake.ApplicationCommandInteraction,
         karma: str = commands.Param(default="positive", choices=["positive", "negative"]),
         direction: str = commands.Param(default="descending", choices=["ascending", "descending"]),
-        start: int = commands.Param(default=1, gt=0, lt=100000000, description=Messages.karma_board_start)
+        start: int = commands.Param(default=1, gt=0, lt=100000000, description=Messages.karma_board_start),
     ):
         """
         Get the biggest positive/negative karma givers
@@ -257,21 +245,13 @@ class Karma(Base, commands.Cog):
         await self.karma_helper.emoji_vote_value(inter)
 
     @_karma_mod.sub_command(name="give", description=Messages.karma_give_brief)
-    async def give(
-        self,
-        inter: disnake.ApplicationCommandInteraction,
-        users: str,
-        karma: int
-    ):
+    async def give(self, inter: disnake.ApplicationCommandInteraction, users: str, karma: int):
         await inter.response.defer()
         await self.karma_helper.karma_give(inter, users, karma)
 
     @_karma_mod.sub_command(name="transfer", description=Messages.karma_transfer_brief)
     async def transfer(
-        self,
-        inter: disnake.ApplicationCommandInteraction,
-        from_user: disnake.Member,
-        to_user: disnake.Member
+        self, inter: disnake.ApplicationCommandInteraction, from_user: disnake.Member, to_user: disnake.Member
     ):
         await inter.response.defer()
         if from_user == to_user:

@@ -33,12 +33,15 @@ class GrillbotApi(Base, commands.Cog):
         async with aiohttp.ClientSession(timeout=aiohttp.ClientTimeout(total=10), headers=headers) as session:
             try:
                 url = f"{self.config.grillbot_api_url}/user/karma/store"
-                data = [{
+                data = [
+                    {
                         "member_ID": data.member_ID,
                         "karmaValue": data.karma,
                         "positive": data.positive,
-                        "negative": data.negative
-                        } for data in karma_objects]
+                        "negative": data.negative,
+                    }
+                    for data in karma_objects
+                ]
                 async with session.post(url, json=data):
                     pass
             except (asyncio.exceptions.TimeoutError, aiohttp.client_exceptions.ClientConnectorError):
@@ -50,11 +53,11 @@ class GrillbotApi(Base, commands.Cog):
         if message.author.id not in self.config.grillbot_ids:
             return
 
-        lines = message.content.split('\n')
-        if not (lines[0] == '```json' and lines[-1] == '```'):
+        lines = message.content.split("\n")
+        if not (lines[0] == "```json" and lines[-1] == "```"):
             return
         lines = lines[1:-1]
-        content = '\n'.join(lines)
+        content = "\n".join(lines)
         request = json.loads(content)
         if "method" not in request or request["method"] not in self.config.grillbot_api_supported_methods:
             await message.reply("Unsupported method")
@@ -71,7 +74,7 @@ class GrillbotApi(Base, commands.Cog):
                 await message.reply(file=content)
                 return
             res_json = json.dumps(content)
-            with BytesIO(bytes(res_json, 'utf-8')) as file_binary:
+            with BytesIO(bytes(res_json, "utf-8")) as file_binary:
                 await message.reply(file=disnake.File(fp=file_binary, filename="res.json"))
         else:
             await message.reply("Extension not loaded")

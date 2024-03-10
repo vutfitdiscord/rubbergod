@@ -153,9 +153,7 @@ class Warden(Base, commands.Cog):
         for i, message in enumerate(messages):
             # update info on every 10th message
             if i % 50 == 0:
-                await msg.edit(
-                    content=template(i, len(messages), (i / len(messages) * 100), ctr_hashes)
-                )
+                await msg.edit(content=template(i, len(messages), (i / len(messages) * 100), ctr_hashes))
 
             if len(message.attachments) == 0:
                 ctr_nofile += 1

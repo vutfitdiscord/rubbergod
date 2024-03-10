@@ -1,6 +1,7 @@
 """
 Cog for handling vote reactions for contests.
 """
+
 from __future__ import annotations
 
 from functools import cached_property
@@ -31,7 +32,7 @@ class ContestVote(Base, commands.Cog):
         self.emojis = {
             str("1️⃣"): self.config.contest_vote_weight_1,
             str("2️⃣"): self.config.contest_vote_weight_2,
-            str("3️⃣"): self.config.contest_vote_weight_3
+            str("3️⃣"): self.config.contest_vote_weight_3,
         }
 
     @cached_property
@@ -42,19 +43,18 @@ class ContestVote(Base, commands.Cog):
     def contest_vote_channel(self) -> disnake.TextChannel:
         return self.bot.get_channel(self.config.contest_vote_channel)
 
-    @commands.slash_command(name="contest",)
+    @commands.slash_command(
+        name="contest",
+    )
     async def contest(self, inter: disnake.ApplicationCommandInteraction):
         pass
 
     @cooldowns.default_cooldown
     @contest.sub_command(
-        name="calculate_contribution",
-        description=Messages.contest_vote_calculate_contribution_brief
+        name="calculate_contribution", description=Messages.contest_vote_calculate_contribution_brief
     )
     async def calculate_contribution(
-        self,
-        inter: disnake.ApplicationCommandInteraction,
-        message_url: disnake.Message
+        self, inter: disnake.ApplicationCommandInteraction, message_url: disnake.Message
     ):
         await inter.response.defer(ephemeral=self.check.botroom_check(inter))
 
@@ -80,7 +80,7 @@ class ContestVote(Base, commands.Cog):
         inter: disnake.ApplicationCommandInteraction,
         number_of: int = commands.Param(
             default=5, gt=0, le=10, description=Messages.contest_vote_number_of_param
-        )
+        ),
     ):
         await inter.response.defer(ephemeral=self.check.botroom_check(inter))
         messages = await self.contest_vote_channel.history().flatten()
@@ -93,7 +93,7 @@ class ContestVote(Base, commands.Cog):
 
         await inter.send(Messages.contest_vote_top_contributions(number_of=number_of))
         for index in range(0, len(contributions), 5):
-            await inter.send("".join(contributions[index:index+5]))
+            await inter.send("".join(contributions[index : index + 5]))
 
     @cooldowns.default_cooldown
     @contest.sub_command(name="submit", description=Messages.contest_vote_submit_brief)
@@ -101,10 +101,10 @@ class ContestVote(Base, commands.Cog):
         self,
         inter: disnake.ApplicationCommandInteraction,
         image: disnake.Attachment,
-        description=commands.Param(default=None, max_length=1000)
+        description=commands.Param(default=None, max_length=1000),
     ):
         await inter.response.defer(ephemeral=True)
-        if image.size > 25000000:   # 25MB
+        if image.size > 25000000:  # 25MB
             await inter.send(Messages.contest_vote_file_too_big)
             return
         if "image" not in image.content_type:
@@ -122,8 +122,10 @@ class ContestVote(Base, commands.Cog):
                 contribution_id = ContestVoteDB.add_contribution(inter.author.id)
 
             elif user_contribution.has_contributions >= self.config.contest_vote_max_contributions:
-                await inter.send(Messages.contest_vote_max_contributions(
-                    max_contributions=self.config.contest_vote_max_contributions)
+                await inter.send(
+                    Messages.contest_vote_max_contributions(
+                        max_contributions=self.config.contest_vote_max_contributions
+                    )
                 )
                 return
             else:

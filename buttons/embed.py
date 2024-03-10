@@ -10,11 +10,11 @@ from features.leaderboard import LeaderboardPageSource
 
 class ViewRowFull(Exception):
     """Adding a Item to already filled row"""
+
     pass
 
 
 class EmbedView(BaseView):
-
     def __init__(
         self,
         author: disnake.User,
@@ -60,44 +60,29 @@ class EmbedView(BaseView):
             self.add_page_numbers()
         self.add_item(
             disnake.ui.Button(
-                emoji="⏪",
-                custom_id="embed:start_page",
-                row=row,
-                style=disnake.ButtonStyle.primary
+                emoji="⏪", custom_id="embed:start_page", row=row, style=disnake.ButtonStyle.primary
             )
         )
         self.add_item(
             disnake.ui.Button(
-                emoji="◀",
-                custom_id="embed:prev_page",
-                row=row,
-                style=disnake.ButtonStyle.primary
+                emoji="◀", custom_id="embed:prev_page", row=row, style=disnake.ButtonStyle.primary
             )
         )
         self.add_item(
             disnake.ui.Button(
-                emoji="▶",
-                custom_id="embed:next_page",
-                row=row,
-                style=disnake.ButtonStyle.primary
+                emoji="▶", custom_id="embed:next_page", row=row, style=disnake.ButtonStyle.primary
             )
         )
         if end_arrow:
             self.add_item(
                 disnake.ui.Button(
-                    emoji="⏩",
-                    custom_id="embed:end_page",
-                    row=row,
-                    style=disnake.ButtonStyle.primary
+                    emoji="⏩", custom_id="embed:end_page", row=row, style=disnake.ButtonStyle.primary
                 )
             )
         if not perma_lock:
             # if permanent lock is applied, dynamic lock is removed from buttons
             self.lock_button = disnake.ui.Button(
-                emoji="🔓",
-                custom_id="embed:lock",
-                row=0,
-                style=disnake.ButtonStyle.success
+                emoji="🔓", custom_id="embed:lock", row=0, style=disnake.ButtonStyle.success
             )
             self.add_item(self.lock_button)
 
@@ -111,7 +96,7 @@ class EmbedView(BaseView):
 
     @embed.setter
     def embed(self, value):
-        self.embeds[self.page-1] = value
+        self.embeds[self.page - 1] = value
 
     def add_item(self, item: disnake.ui.Item) -> None:
         row_cnt = 0
@@ -152,10 +137,7 @@ class EmbedView(BaseView):
             await interaction.send(Messages.embed_not_author, ephemeral=True)
             return False
         self.page = utils.pagination_next(
-            interaction.data.custom_id,
-            self.page,
-            self.max_page,
-            self.roll_arroud
+            interaction.data.custom_id, self.page, self.max_page, self.roll_arroud
         )
         await interaction.response.edit_message(embed=self.embed)
 

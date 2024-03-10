@@ -68,7 +68,7 @@ async def get_top_contributions(self, messages: list[disnake.Message], number_of
             if emoji in self.emojis:
                 emoji_obj = Emoji(emoji=emoji, count=len(users), value=self.emojis[emoji])
                 emojis_for_message.append(emoji_obj)
-        images.append(Image(message.jump_url, emojis_for_message, len(duplicate_votes)-1))  # -1 for the bot
+        images.append(Image(message.jump_url, emojis_for_message, len(duplicate_votes) - 1))  # -1 for the bot
 
     messages = []
     # Sort the images by total_value in descending order and get the top n

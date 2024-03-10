@@ -15,13 +15,13 @@ class NotAdminError(commands.CommandError):
     """An error indicating that a user doesn't have permissions to use
     a command that is available only to admins of bot.
     """
+
     def __init__(self) -> None:
         self.message = Messages.bot_admin_only
 
 
 def is_bot_admin(
-    ctx: Union[commands.Context, disnake.ApplicationCommandInteraction],
-    raise_exception: bool = True
+    ctx: Union[commands.Context, disnake.ApplicationCommandInteraction], raise_exception: bool = True
 ):
     """
     Check if user is bot admin.
@@ -56,6 +56,7 @@ class NotHelperPlusError(commands.CommandError):
     """An error indicating that a user doesn't have permissions to use
     a command that is available only to helpers and above.
     """
+
     def __init__(self) -> None:
         self.message = Messages.helper_plus_only
 
@@ -69,6 +70,7 @@ class NotSubmodPlusError(commands.CommandError):
     """An error indicating that a user doesn't have permissions to use
     a command that is available only to submods and above.
     """
+
     def __init__(self) -> None:
         self.message = Messages.submod_plus_only
 
@@ -82,6 +84,7 @@ class NotModPlusError(commands.CommandError):
     """An error indicating that a user doesn't have permissions to use
     a command that is available only to mods and above.
     """
+
     def __init__(self) -> None:
         self.message = Messages.mod_plus_only
 

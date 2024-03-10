@@ -4,8 +4,18 @@ import datetime
 import math
 from typing import List, Optional
 
-from sqlalchemy import (Boolean, Column, Date, ForeignKey, Integer,
-                        PrimaryKeyConstraint, String, asc, desc, func)
+from sqlalchemy import (
+    Boolean,
+    Column,
+    Date,
+    ForeignKey,
+    Integer,
+    PrimaryKeyConstraint,
+    String,
+    asc,
+    desc,
+    func,
+)
 from sqlalchemy.engine import Row
 from sqlalchemy.orm import Query, relationship
 
@@ -45,18 +55,11 @@ class ReviewDB(database.base):
 
     @classmethod
     def get_review_by_author_subject(cls, author_id: int, subject: str) -> Optional[ReviewDB]:
-        return (
-            session.query(cls)
-            .filter(cls.subject == subject, cls.member_ID == str(author_id))
-            .first()
-        )
+        return session.query(cls).filter(cls.subject == subject, cls.member_ID == str(author_id)).first()
 
     @classmethod
     def get_reviews_by_author(cls, author_id: str) -> Query:
-        return (
-            session.query(cls)
-            .filter(cls.member_ID == str(author_id))
-        )
+        return session.query(cls).filter(cls.member_ID == str(author_id))
 
     @classmethod
     def add_review(cls, author: str, subject: str, tier: int, anonym: bool, text: str) -> None:
@@ -91,19 +94,11 @@ class ReviewRelevanceDB(database.base):
 
     @classmethod
     def get_votes_count(cls, review_id: int, vote: bool) -> int:
-        return (
-            session.query(cls)
-            .filter(cls.review == review_id, cls.vote == vote)
-            .count()
-        )
+        return session.query(cls).filter(cls.review == review_id, cls.vote == vote).count()
 
     @classmethod
     def get_vote_by_author(cls, review_id: int, author_id: str) -> Optional[ReviewRelevanceDB]:
-        return (
-            session.query(cls)
-            .filter(cls.review == review_id, cls.member_ID == author_id)
-            .first()
-        )
+        return session.query(cls).filter(cls.review == review_id, cls.member_ID == author_id).first()
 
     @classmethod
     def add_vote(cls, review_id: int, vote: bool, author_id: str) -> None:
@@ -129,9 +124,7 @@ class SubjectDB(database.base):
     @classmethod
     def lookup(cls, shortcut: str) -> List[SubjectDB]:
         subjects = session.scalars(
-            session.query(cls.shortcut)
-            .filter(cls.shortcut.ilike(f"{shortcut}%"))
-            .limit(25)
+            session.query(cls.shortcut).filter(cls.shortcut.ilike(f"{shortcut}%")).limit(25)
         ).all()
         return subjects
 
@@ -161,11 +154,7 @@ class SubjectDetailsDB(database.base):
 
     @classmethod
     def get(cls, shortcut: str) -> Optional[SubjectDetailsDB]:
-        return (
-            session.query(cls)
-            .filter(cls.shortcut.ilike(shortcut))
-            .one_or_none()
-        )
+        return session.query(cls).filter(cls.shortcut.ilike(shortcut)).one_or_none()
 
     def update(self) -> None:
         session.merge(self)
@@ -202,12 +191,15 @@ class SubjectDetailsDB(database.base):
     @classmethod
     def get_tierboard_page_count(cls, type: str, sem: str, degree: str, year: str) -> int:
         subquery = cls.gen_tierboard_subquery(type, sem, degree, year)
-        return math.ceil((
-            session.query(subquery.c.shortcut, subquery.c.avg_tier)
-            .filter(subquery.c.avg_tier != None)  # noqa: E711
-            .order_by(asc("avg_tier"))
-            .count()
-        )/10)
+        return math.ceil(
+            (
+                session.query(subquery.c.shortcut, subquery.c.avg_tier)
+                .filter(subquery.c.avg_tier != None)  # noqa: E711
+                .order_by(asc("avg_tier"))
+                .count()
+            )
+            / 10
+        )
 
 
 class ProgrammeDB(database.base):
@@ -224,9 +216,7 @@ class ProgrammeDB(database.base):
     @classmethod
     def lookup(cls, shortcut: str) -> List[SubjectDB]:
         programmes = session.scalars(
-            session.query(cls.shortcut)
-            .filter(cls.shortcut.ilike(f"{shortcut}%"))
-            .limit(25)
+            session.query(cls.shortcut).filter(cls.shortcut.ilike(f"{shortcut}%")).limit(25)
         ).all()
         return programmes
 
@@ -236,10 +226,6 @@ class ProgrammeDB(database.base):
 
     @classmethod
     def set(cls, shortcut: str, name: str, link: str) -> None:
-        programme = cls(
-            shortcut=shortcut,
-            name=name,
-            link=link
-        )
+        programme = cls(shortcut=shortcut, name=name, link=link)
         session.merge(programme)
         session.commit()

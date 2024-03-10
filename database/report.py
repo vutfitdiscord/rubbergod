@@ -50,19 +50,14 @@ class ReportDB(database.base):
 
     @classmethod
     def add_report(
-        cls,
-        type: str,
-        author_id: str,
-        reason: str,
-        message_url: str = None,
-        target_user_id: str = None
+        cls, type: str, author_id: str, reason: str, message_url: str = None, target_user_id: str = None
     ) -> int:
         report = ReportDB(
             type=type,
             author_id=str(author_id),
             reason=reason,
             message_url=message_url,
-            target_user_id=str(target_user_id)
+            target_user_id=str(target_user_id),
         )
         session.add(report)
         session.commit()
@@ -192,10 +187,6 @@ class AnswerDB(database.base):
 
     @classmethod
     def add_answer(cls, report_id: int, author_id: str, content: str) -> None:
-        answer = AnswerDB(
-            report_id=int(report_id),
-            author_id=str(author_id),
-            content=content
-        )
+        answer = AnswerDB(report_id=int(report_id), author_id=str(author_id), content=content)
         session.add(answer)
         session.commit()

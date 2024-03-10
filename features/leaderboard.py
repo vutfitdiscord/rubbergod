@@ -12,7 +12,7 @@ from config.app_config import config
 DatabasePage = Iterable[Table]
 
 
-class DatabaseIteratorPageSource():
+class DatabaseIteratorPageSource:
     """A data source from sqlalchemy database query.
 
     This page source does not handle any sort of formatting, leaving it up
@@ -60,6 +60,7 @@ class LeaderboardPageSource(DatabaseIteratorPageSource):
     as most of the possible leaderboard params can be supplied as
     init args.
     """
+
     base_embed: disnake.Embed = None
     member_id_col_name: str = None
 
@@ -115,7 +116,7 @@ class LeaderboardPageSource(DatabaseIteratorPageSource):
         return utils.get_emoji(self.bot.get_guild(config.guild_id), emoji)
 
     def set_leaderboard_title(self, board_name: str, emote_name: str):
-        if emote_name.startswith('<') and emote_name.endswith('>'):
+        if emote_name.startswith("<") and emote_name.endswith(">"):
             emote = emote_name
         else:
             emote = self.get_default_emoji(emote_name) or f":{emote_name}:"
@@ -151,9 +152,9 @@ class LeaderboardPageSource(DatabaseIteratorPageSource):
         board_lines = []
 
         for i, entry in enumerate(page):  # type: int, Table
-            board_lines.append(self._format_row(
-                entry=entry, position=(self.current_page * self.per_page) + i + 1
-            ))
+            board_lines.append(
+                self._format_row(entry=entry, position=(self.current_page * self.per_page) + i + 1)
+            )
 
         self.base_embed.description = "\n" + "\n".join(board_lines)
 
@@ -171,7 +172,7 @@ class LeaderboardPageSource(DatabaseIteratorPageSource):
         Returns page number for given position in query.
         """
         last_page = self.get_max_pages()
-        page_num = start//self.per_page
+        page_num = start // self.per_page
 
         # if it's last element on page we need to subtract 1 from page_num
         if start % self.per_page == 0:
