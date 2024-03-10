@@ -15,7 +15,7 @@ from config.messages import Messages
 
 def remove_prefix(text, prefix) -> str:
     if text.startswith(prefix):
-        return text[len(prefix):]
+        return text[len(prefix) :]
     return text
 
 
@@ -85,10 +85,12 @@ class IconSelect(disnake.ui.Select):
             return
         user = inter.user
         if await can_assign(icon, user):
-            await inter.edit_original_response(Messages.icon_set_success(
-                        user=inter.user,
-                        icon=icon_emoji(self.bot, icon) or icon_name(icon)),
-                        view=None)
+            await inter.edit_original_response(
+                Messages.icon_set_success(
+                    user=inter.user, icon=icon_emoji(self.bot, icon) or icon_name(icon)
+                ),
+                view=None,
+            )
             await do_set_icon(icon, user)
         else:
             await inter.edit_original_response(Messages.icon_ui_no_permission)
@@ -119,19 +121,17 @@ class Icons(Base, commands.Cog):
         icon_roles = get_icon_roles(inter.guild)
         user = inter.user
         options = [
-            disnake.SelectOption(
-                label=icon_name(icon), value=str(icon.id), emoji=icon_emoji(self.bot, icon)
-            )
+            disnake.SelectOption(label=icon_name(icon), value=str(icon.id), emoji=icon_emoji(self.bot, icon))
             for icon in icon_roles
             if await can_assign(icon, user)
         ]
-        view = TrashView("icon:delete", row=4)      # makes it last row so it's always under the dropdown
+        view = TrashView("icon:delete", row=4)  # makes it last row so it's always under the dropdown
         for row, start_i in enumerate(range(0, len(options), 25)):
             # 25 is the max number of options per select
             component = IconSelect(
                 bot=self.bot,
                 placeholder=Messages.icon_ui_choose,
-                options=options[start_i: start_i + 25],
+                options=options[start_i : start_i + 25],
                 row=row,
             )
             view.add_item(component)

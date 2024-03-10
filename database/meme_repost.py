@@ -17,14 +17,18 @@ class MemeRepostDB(database.base):
 
     @classmethod
     def find_repost_by_original_message_id(cls, message_id: str) -> Optional[MemeRepostDB]:
-        return session.query(cls).filter(
-            cls.original_message_id == str(message_id)).one_or_none()
+        return session.query(cls).filter(cls.original_message_id == str(message_id)).one_or_none()
 
     @classmethod
     def find_repost_by_repost_message_id(cls, message_id: str) -> Optional[MemeRepostDB]:
-        return session.query(cls).filter(
-            (cls.reposted_message_id == str(message_id)) |
-            (cls.secondary_repost_message_id == str(message_id))).one_or_none()
+        return (
+            session.query(cls)
+            .filter(
+                (cls.reposted_message_id == str(message_id))
+                | (cls.secondary_repost_message_id == str(message_id))
+            )
+            .one_or_none()
+        )
 
     @classmethod
     def create_repost(
@@ -32,13 +36,13 @@ class MemeRepostDB(database.base):
         original_message_id: int,
         repost_message_id: int,
         author_id: int,
-        secondary_repost_message_id: int = None
+        secondary_repost_message_id: int = None,
     ) -> None:
         item = cls(
             original_message_id=str(original_message_id),
             reposted_message_id=str(repost_message_id),
             author_id=str(author_id),
-            secondary_repost_message_id=str(secondary_repost_message_id)
+            secondary_repost_message_id=str(secondary_repost_message_id),
         )
         session.add(item)
         session.commit()

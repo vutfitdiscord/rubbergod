@@ -130,7 +130,7 @@ class Exams(Base, commands.Cog):
 
     @staticmethod
     def process_match(match):
-        year = match.string[match.regs[0][0]: match.regs[0][1]]
+        year = match.string[match.regs[0][0] : match.regs[0][1]]
         return year
 
     @staticmethod
@@ -193,7 +193,7 @@ class Exams(Base, commands.Cog):
     async def exams(
         self,
         inter: disnake.ApplicationCommandInteraction,
-        rocnik: str = commands.Param(name='rocnik', choices=YEAR_LIST, default=None)
+        rocnik: str = commands.Param(name="rocnik", choices=YEAR_LIST, default=None),
     ):
         await inter.response.defer()
         if rocnik is None:
@@ -282,7 +282,7 @@ class Exams(Base, commands.Cog):
         number_of_exams = len(exams)
         bs = self.config.exams_page_size
         number_of_batches = math.ceil(number_of_exams / bs)
-        exam_batches = [exams[i * bs: bs + i * bs] for i in range(number_of_batches)]
+        exam_batches = [exams[i * bs : bs + i * bs] for i in range(number_of_batches)]
 
         term_strings_dict = {}
         pages = []
@@ -358,9 +358,7 @@ class Exams(Base, commands.Cog):
                             whole_term_count += number_of_terms
 
                             for idx2, (term_date_str, time) in enumerate(zip(terms, times)):
-                                term_date_str = (
-                                    term_date_str.contents[0].replace("\xa0", "").replace(" ", "")
-                                )
+                                term_date_str = term_date_str.contents[0].replace("\xa0", "").replace(" ", "")
                                 term_time_str = ""
                                 for c in time.contents:
                                     term_time_str += str(c)
@@ -383,11 +381,7 @@ class Exams(Base, commands.Cog):
 
                                 term_date = datetime.date(*date_splits)
 
-                                if (
-                                    start_time_str_parts is not None
-                                    and end_time_str_parts is not None
-                                ):
-
+                                if start_time_str_parts is not None and end_time_str_parts is not None:
                                     start_time = datetime.time(*start_time_str_parts)
                                     start_time_str = datetime.time.strftime(start_time, "%H:%M")
                                     end_time = datetime.time(*end_time_str_parts)
@@ -433,9 +427,7 @@ class Exams(Base, commands.Cog):
             view = EmbedView(target.author, pages)
             view.message = await target.edit_original_response(embed=pages[0], view=view)
         else:
-            header = disnake.Embed(
-                title=title, description=description, color=disnake.Color.dark_blue()
-            )
+            header = disnake.Embed(title=title, description=description, color=disnake.Color.dark_blue())
             await self.handle_exams_with_database_access(term_strings_dict, header, target)
 
     async def handle_exams_with_database_access(

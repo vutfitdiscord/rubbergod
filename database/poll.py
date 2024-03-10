@@ -3,8 +3,7 @@ from __future__ import annotations
 from datetime import datetime, timezone
 from enum import IntEnum
 
-from sqlalchemy import (Boolean, Column, DateTime, ForeignKey, Integer, String,
-                        UniqueConstraint)
+from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, String, UniqueConstraint
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.sql.expression import or_
@@ -33,9 +32,10 @@ class VoterDB(database.base):
 
 class PollType(IntEnum):
     """Enum for poll types."""
-    basic = 1       # Basic is multiple choice poll with one or multiple votes per person
-    boolean = 2     # Boolean is yes/no poll where you can only vote for one option
-    opinion = 3     # Opinion is agree/neutral/disagree poll where you can only vote for one option
+
+    basic = 1  # Basic is multiple choice poll with one or multiple votes per person
+    boolean = 2  # Boolean is yes/no poll where you can only vote for one option
+    opinion = 3  # Opinion is agree/neutral/disagree poll where you can only vote for one option
 
 
 class PollDB(database.base):
@@ -47,10 +47,10 @@ class PollDB(database.base):
     message_url = Column(String, nullable=False)
     poll_type = Column(Integer, nullable=False)
     start = Column(DateTime, nullable=False, default=datetime.now(timezone.utc))
-    end = Column(DateTime)      # in UTC
+    end = Column(DateTime)  # in UTC
     closed = Column(Boolean, nullable=True, default=False)
     closed_by = Column(String, nullable=True, default=None)
-    closed_datetime = Column(DateTime, nullable=True, default=None)     # in UTC
+    closed_datetime = Column(DateTime, nullable=True, default=None)  # in UTC
     options: Mapped[list[PollOptionDB]] = relationship(back_populates="poll", cascade="all,delete")
     max_votes = Column(Integer, nullable=False)
     anonymous = Column(Boolean, nullable=False)
@@ -74,7 +74,7 @@ class PollDB(database.base):
         anonymous: bool,
         poll_options: dict,
         max_votes: int = 1,
-        **kwargs
+        **kwargs,
     ) -> PollDB:
         new_poll = cls(
             title=title,
@@ -179,9 +179,7 @@ class PollOptionDB(database.base):
     poll_id = mapped_column(ForeignKey("poll.id"), nullable=False)
 
     # unique text for options per poll
-    __table_args__ = (
-        UniqueConstraint("text", "poll_id"),
-    )
+    __table_args__ = (UniqueConstraint("text", "poll_id"),)
 
     @property
     def voters_count(self) -> int:

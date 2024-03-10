@@ -114,14 +114,8 @@ class Subscriptions(Base, commands.Cog):
             url=thread.jump_url,
             description=content,
         )
-        embed.add_field(
-            name=Messages.subscription_embed_author,
-            value=thread.owner.display_name
-        )
-        embed.add_field(
-            name=Messages.subscription_embed_channel,
-            value=thread.mention
-        )
+        embed.add_field(name=Messages.subscription_embed_author, value=thread.owner.display_name)
+        embed.add_field(name=Messages.subscription_embed_channel, value=thread.mention)
         tags = [f"`{tag.name}`" for tag in thread.applied_tags]
         embed.add_field(name=Messages.subscription_embed_tags, value=", ".join(tags))
         add_author_footer(embed, thread.owner)

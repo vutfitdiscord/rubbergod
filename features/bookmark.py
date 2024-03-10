@@ -6,7 +6,7 @@ from config.messages import Messages
 from utils import split_to_parts
 
 
-class BookmarkFeatures():
+class BookmarkFeatures:
     def __init__(self, bot):
         self.bot = bot
 
@@ -19,10 +19,7 @@ class BookmarkFeatures():
         embed = disnake.Embed(title=title_name, color=author.color)
         embed.set_author(name=author, icon_url=author.display_avatar.url)
         embed.set_image(image)
-        embed.add_field(
-            name="Channel",
-            value=f"{inter.message.channel.mention} - #{inter.message.channel}"
-        )
+        embed.add_field(name="Channel", value=f"{inter.message.channel.mention} - #{inter.message.channel}")
         return embed
 
     async def create_bookmark_embed(self, inter, title_name=None):
@@ -48,7 +45,7 @@ class BookmarkFeatures():
         upload_limit = False
         images = []
         files_attached = []
-        max_upload_size = 25000000    # 25MB
+        max_upload_size = 25000000  # 25MB
         if inter.message.attachments:
             for attachment in inter.message.attachments:
                 if attachment.size > max_upload_size:
@@ -76,8 +73,5 @@ class BookmarkFeatures():
 
         if upload_limit:
             embed.add_field(name="Poznámka", value=Messages.bookmark_upload_limit, inline=False)
-        embed.add_field(
-            name="Channel",
-            value=f"{inter.message.channel.mention} - #{inter.message.channel}"
-        )
+        embed.add_field(name="Channel", value=f"{inter.message.channel.mention} - #{inter.message.channel}")
         return ([embed], images, files_attached)

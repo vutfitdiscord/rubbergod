@@ -23,11 +23,7 @@ class FitRoom(Base, commands.Cog):
 
     @cooldowns.default_cooldown
     @commands.slash_command(name="room", description=Messages.fit_room_brief)
-    async def room(
-        self,
-        inter: disnake.ApplicationCommandInteraction,
-        room: str
-    ):
+    async def room(self, inter: disnake.ApplicationCommandInteraction, room: str):
         await inter.response.defer()
         url = f"https://www.fit.vut.cz/fit/map/.cs?show={room.upper()}&big=1"
         r = requests.get(url)
@@ -36,7 +32,7 @@ class FitRoom(Base, commands.Cog):
             return
 
         try:
-            soup = BeautifulSoup(r.content, 'html.parser')
+            soup = BeautifulSoup(r.content, "html.parser")
             main_body = soup.find("main", {"id": "main"})
             floor_list = main_body.find("ul", {"class": "pagination__list"})
             active_floor = floor_list.find("a", {"aria-current": "page"})
@@ -47,21 +43,25 @@ class FitRoom(Base, commands.Cog):
             return
 
         if image is None or cursor is None:
-            await inter.edit_original_response(
-                Messages.fit_room_room_not_on_plan(room=room[:1024])
-            )
+            await inter.edit_original_response(Messages.fit_room_room_not_on_plan(room=room[:1024]))
             return
 
         image_bytes = BytesIO()
         image_bytestring = str(image).encode("utf-8")
-        svg2png(bytestring=image_bytestring, write_to=image_bytes, parent_width=720,
-                parent_height=1000, background_color="white", dpi=300)
+        svg2png(
+            bytestring=image_bytestring,
+            write_to=image_bytes,
+            parent_width=720,
+            parent_height=1000,
+            background_color="white",
+            dpi=300,
+        )
         image_bytes.seek(0)
 
         embed = disnake.Embed(
             title=f"Místnost: {room.upper()}",
             url=f"https://www.fit.vut.cz/fit/room/{room.upper()}/.cs",
-            color=disnake.Color.dark_blue()
+            color=disnake.Color.dark_blue(),
         )
         embed.set_image(url="attachment://plan.png")
         embed.description = f"[Odkaz na plánek]({url})"

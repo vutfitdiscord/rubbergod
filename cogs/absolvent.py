@@ -32,7 +32,7 @@ class Absolvent(Base, commands.Cog):
         name: str = commands.Param(description=Messages.absolvent_name_param),
         surname: str = commands.Param(description=Messages.absolvent_surname_param),
         diploma_number: str = commands.Param(description=Messages.absolvent_diploma_param),
-        thesis_web_id: int = commands.Param(description=Messages.absolvent_thesis_id_param)
+        thesis_web_id: int = commands.Param(description=Messages.absolvent_thesis_id_param),
     ):
         """Command for diploma verification and honourable role addition
 
@@ -92,7 +92,7 @@ class Absolvent(Base, commands.Cog):
             return
 
         # CHECK OWNERSHIP, TYPE AND YEAR OF THE QUALIFICATION WORK / THESIS
-        original_msg = await self.append_response(inter, '', Messages.absolvent_status_thesis)
+        original_msg = await self.append_response(inter, "", Messages.absolvent_status_thesis)
 
         thesis_url = f"http://hdl.handle.net/11012/{thesis_web_id}?locale-attribute=cs"
 
@@ -100,30 +100,20 @@ class Absolvent(Base, commands.Cog):
         result_thesis = requests.get(thesis_url)
         # parse it using lxml
         xDoc_thesis = etree.fromstring(result_thesis.text, htmlparser)
-        not_found = "".join(xDoc_thesis.xpath('/html/body/p[4]/text()'))
+        not_found = "".join(xDoc_thesis.xpath("/html/body/p[4]/text()"))
         breadcrumb_xpath = (
             "/html/body/ds-app/ds-themed-root/ds-root/div/div/main"
             "/ds-themed-breadcrumbs/ds-breadcrumbs/nav/ol"
             "/li[{}]/div//a[.='{}']/text()"
         )
-        master_thesis = "".join(
-            xDoc_thesis.xpath(breadcrumb_xpath.format(3, 'diplomové práce'))
-        )
-        bachelor_thesis = "".join(
-            xDoc_thesis.xpath(breadcrumb_xpath.format(3, 'bakalářské práce'))
-        )
+        master_thesis = "".join(xDoc_thesis.xpath(breadcrumb_xpath.format(3, "diplomové práce")))
+        bachelor_thesis = "".join(xDoc_thesis.xpath(breadcrumb_xpath.format(3, "bakalářské práce")))
         thesis_author_without_degree_surname_first = "".join(
             xDoc_thesis.xpath('//div[./h5/.="Authors"]//div/a/text()')
         ).strip()
-        habilitation_date = "".join(
-            xDoc_thesis.xpath('//div[./h5/.="Date of acceptance"]//div/span/text()')
-        )
-        result = "".join(
-            xDoc_thesis.xpath('//div[./h5/.="Result of defence"]//div/span/text()')
-        )
-        faculty = "".join(
-            xDoc_thesis.xpath(breadcrumb_xpath.format(4, 'Fakulta informačních technologií'))
-        )
+        habilitation_date = "".join(xDoc_thesis.xpath('//div[./h5/.="Date of acceptance"]//div/span/text()'))
+        result = "".join(xDoc_thesis.xpath('//div[./h5/.="Result of defence"]//div/span/text()'))
+        faculty = "".join(xDoc_thesis.xpath(breadcrumb_xpath.format(4, "Fakulta informačních technologií")))
 
         if "Page cannot be found" in not_found:
             await inter.edit_original_response(Messages.absolvent_thesis_not_found_error)
@@ -212,9 +202,7 @@ class Absolvent(Base, commands.Cog):
 
     @diplom.error
     async def diplom_error(self, inter: disnake.ApplicationCommandInteraction, error):
-        await inter.edit_original_response(
-            Messages.absolvent_help(user=inter.author.id)
-        )
+        await inter.edit_original_response(Messages.absolvent_help(user=inter.author.id))
 
 
 def setup(bot):

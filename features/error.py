@@ -76,7 +76,7 @@ class ErrorLogger:
             img_txt = Image.new("RGBA", (W, H), color=(255, 255, 255, 0))
             draw_txt = ImageDraw.Draw(img_txt)
             bbox = draw_txt.textbbox(xy=(0, 0), text=str(count), font=font)
-            width, height = bbox[2]-bbox[0], bbox[3]-bbox[1]
+            width, height = bbox[2] - bbox[0], bbox[3] - bbox[1]
             draw_txt.text(((W - width) / 2, (H - height) / 2), str(count), font=font, fill="#000")
             img_txt = img_txt.rotate(10, expand=1, fillcolor=255)
             background.paste(img_txt, (1000, 130), img_txt)
@@ -112,8 +112,13 @@ class ErrorLogger:
             return 0
 
     def create_embed(
-        self, command: str, args: str, author: disnake.User, guild: disnake.Guild, jump_url: str,
-        extra_fields: Dict[str, str] = None
+        self,
+        command: str,
+        args: str,
+        author: disnake.User,
+        guild: disnake.Guild,
+        jump_url: str,
+        extra_fields: Dict[str, str] = None,
     ):
         count = self.log_error_time()
         embed = disnake.Embed(
@@ -137,34 +142,30 @@ class ErrorLogger:
             return "User command - "
         elif isinstance(command, commands.InvokableMessageCommand):
             return "Message command - "
-        elif (
-            isinstance(command, commands.InvokableSlashCommand)
-            or isinstance(command, commands.slash_core.SubCommand)
+        elif isinstance(command, commands.InvokableSlashCommand) or isinstance(
+            command, commands.slash_core.SubCommand
         ):
             return "/"
         else:
             # some new command probably? there aren't other options at the moment
             raise NotImplementedError
 
-    async def _parse_context(
-        self,
-        ctx: Union[disnake.ApplicationCommandInteraction, commands.Context]
-    ):
+    async def _parse_context(self, ctx: Union[disnake.ApplicationCommandInteraction, commands.Context]):
         if isinstance(ctx, disnake.ApplicationCommandInteraction):
-            args = ' '.join(f"{key}={item}" for key, item in ctx.filled_options.items())
+            args = " ".join(f"{key}={item}" for key, item in ctx.filled_options.items())
             prefix = self._get_app_cmd_prefix(ctx.application_command)
             return {
-                'args': args,
-                'cog': ctx.application_command.cog_name,
-                'command': f"{prefix}{ctx.application_command.qualified_name}",
-                'url': getattr(ctx.channel, "jump_url", "DM"),
+                "args": args,
+                "cog": ctx.application_command.cog_name,
+                "command": f"{prefix}{ctx.application_command.qualified_name}",
+                "url": getattr(ctx.channel, "jump_url", "DM"),
             }
         elif isinstance(ctx, commands.Context):
             return {
-                'args': ctx.message.content,
-                'cog': ctx.cog.qualified_name,
-                'command': f"?{ctx.command.qualified_name}",
-                'url': getattr(ctx.message, "jump_url", "DM"),
+                "args": ctx.message.content,
+                "cog": ctx.cog.qualified_name,
+                "command": f"?{ctx.command.qualified_name}",
+                "url": getattr(ctx.message, "jump_url", "DM"),
             }
         else:
             raise NotImplementedError
@@ -179,15 +180,11 @@ class ErrorLogger:
             return
         parsed_ctx = await self._parse_context(ctx)
         embed = self.create_embed(
-            parsed_ctx['command'],
-            parsed_ctx["args"][:1000],
-            ctx.author,
-            ctx.guild,
-            parsed_ctx['url']
+            parsed_ctx["command"], parsed_ctx["args"][:1000], ctx.author, ctx.guild, parsed_ctx["url"]
         )
         error_log = ErrorEvent.log(
-            event_name=parsed_ctx['command'],
-            cog=parsed_ctx['cog'],
+            event_name=parsed_ctx["command"],
+            cog=parsed_ctx["cog"],
             datetime=datetime.datetime.now(),
             user_id=str(ctx.author.id),
             args=parsed_ctx["args"],
@@ -197,7 +194,7 @@ class ErrorLogger:
         utils.add_author_footer(embed, author=ctx.author, additional_text=[f"ID: {error_log.id}"])
 
         # send context of command with personal information to logging channel
-        if parsed_ctx['command'] == "/diplom":
+        if parsed_ctx["command"] == "/diplom":
             channel = self.bot.get_channel(config.log_channel)
             await channel.send(embed=embed, view=ErrorView())
             embed.remove_field(0)  # remove args from embed for sending to bot dev channel
@@ -215,28 +212,32 @@ class ErrorLogger:
             return
         if event == "on_message":
             message_id = arg.id
-            if hasattr(arg, 'guild') and arg.guild:
+            if hasattr(arg, "guild") and arg.guild:
                 event_guild = arg.guild.name
                 url = f"https://discord.com/channels/{arg.guild.id}/{arg.channel.id}/{message_id}"
             else:
                 event_guild = url = "DM"
-            embeds = [self.create_embed(
-                command="on_message",
-                args=arg.content,
-                author=author,
-                guild=event_guild,
-                jump_url=url,
-            )]
+            embeds = [
+                self.create_embed(
+                    command="on_message",
+                    args=arg.content,
+                    author=author,
+                    guild=event_guild,
+                    jump_url=url,
+                )
+            ]
         elif event in ["on_raw_reaction_add", "on_raw_reaction_remove"]:
             embeds = await self.handle_reaction_error(arg)
         else:
-            embeds = [self.create_embed(
-                command=event,
-                args=args,
-                author=author,
-                guild=arg.guild,
-                jump_url=None,
-            )]
+            embeds = [
+                self.create_embed(
+                    command=event,
+                    args=args,
+                    author=author,
+                    guild=arg.guild,
+                    jump_url=None,
+                )
+            ]
         error_log = ErrorEvent.log(
             event_name=event,
             cog="System",  # log all events under system cog as it is hard to find actaull cog
@@ -246,21 +247,17 @@ class ErrorLogger:
             exception=type(error).__name__,
             traceback="\n".join(traceback.format_exception(type(error), error, error.__traceback__)),
         )
-        utils.add_author_footer(
-            embeds[-1],
-            author=author,
-            additional_text=[f"ID: {error_log.id}"]
-        )
+        utils.add_author_footer(embeds[-1], author=author, additional_text=[f"ID: {error_log.id}"])
         await self.bot_dev_channel.send(embeds=embeds, view=ErrorView())
 
     async def handle_reaction_error(self, arg: disnake.RawReactionActionEvent):
         """Handle error in on_raw_reaction_add/remove events"""
         embeds = []
 
-        message_id = getattr(arg, 'message_id', None)
-        channel_id = getattr(arg, 'channel_id', None)
-        user_id = getattr(arg, 'user_id', None)
-        if hasattr(arg, 'guild_id'):
+        message_id = getattr(arg, "message_id", None)
+        channel_id = getattr(arg, "channel_id", None)
+        user_id = getattr(arg, "user_id", None)
+        if hasattr(arg, "guild_id"):
             guild = self.bot.get_guild(arg.guild_id)
             event_guild = guild.name
             if channel_id:
@@ -294,26 +291,26 @@ class ErrorLogger:
                             message = message_out
                 else:
                     message = message_id
-        extra_fields = {
-            "Reaction": getattr(arg, 'emoji', None)
-        }
-        url = event_guild if event_guild == "DM" else \
-            f"https://discord.com/channels/{guild.id}/{channel_id}/{message_id}"
-        embeds.append(self.create_embed(
-            command=arg.event_type,
-            args=message,
-            author=user,
-            guild=event_guild,
-            jump_url=url,
-            extra_fields=extra_fields,
-        ))
+        extra_fields = {"Reaction": getattr(arg, "emoji", None)}
+        url = (
+            event_guild
+            if event_guild == "DM"
+            else f"https://discord.com/channels/{guild.id}/{channel_id}/{message_id}"
+        )
+        embeds.append(
+            self.create_embed(
+                command=arg.event_type,
+                args=message,
+                author=user,
+                guild=event_guild,
+                jump_url=url,
+                extra_fields=extra_fields,
+            )
+        )
         return embeds
 
     def create_error_embed(
-        self,
-        inter: disnake.ApplicationCommandInteraction,
-        prefix: str,
-        filled_options=None
+        self, inter: disnake.ApplicationCommandInteraction, prefix: str, filled_options=None
     ):
         filled_options = filled_options or inter.filled_options
         embed = self.create_embed(
@@ -328,7 +325,7 @@ class ErrorLogger:
     async def ignore_errors(
         self,
         ctx: Union[disnake.ApplicationCommandInteraction, commands.Context, ContextMock],
-        error: Exception
+        error: Exception,
     ) -> bool:
         """Handle general errors that can be ignored or responded to user
         Returns whether error was handled or not"""

@@ -79,9 +79,7 @@ class VutSports:
         soup = BeautifulSoup(data, "html.parser")
         pagination_list = soup.find("ul", {"class": "pagination__list"})
         pagination_list_items = pagination_list.find_all("li")
-        page_indexes = [
-            int(item.get_text()) for item in pagination_list_items if item.get_text().isnumeric()
-        ]
+        page_indexes = [int(item.get_text()) for item in pagination_list_items if item.get_text().isnumeric()]
         number_of_pages = max(page_indexes)
 
         output_dict = {}

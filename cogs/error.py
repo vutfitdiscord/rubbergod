@@ -30,7 +30,7 @@ class Error(Base, commands.Cog):
         await inter.response.defer(ephemeral=True)
         id = inter.message.embeds[0].footer.text.split(":")[1].strip()
         traceback = ErrorEvent.get_traceback(id).traceback
-        with BytesIO(bytes(traceback, 'utf-8')) as file_binary:
+        with BytesIO(bytes(traceback, "utf-8")) as file_binary:
             file = disnake.File(fp=file_binary, filename="traceback.txt")
         await inter.send(file=file, ephemeral=True)
 

@@ -50,13 +50,13 @@ def has_role(user, role_name: str):
 
 
 def pagination_next(id: str, page: int, max_page: int, roll_around: bool = True):
-    if 'next' in id:
+    if "next" in id:
         next_page = page + 1
-    elif 'prev' in id:
+    elif "prev" in id:
         next_page = page - 1
-    elif 'start' in id:
+    elif "start" in id:
         next_page = 1
-    elif 'end' in id:
+    elif "end" in id:
         next_page = max_page
     if 1 <= next_page <= max_page:
         return next_page
@@ -69,7 +69,7 @@ def pagination_next(id: str, page: int, max_page: int, roll_around: bool = True)
 
 
 def cut_string(string: str, part_len: int) -> list:
-    return list(string[0 + i: part_len + i] for i in range(0, len(string), part_len))
+    return list(string[0 + i : part_len + i] for i in range(0, len(string), part_len))
 
 
 def split_to_parts(items, size: int) -> list:
@@ -77,7 +77,7 @@ def split_to_parts(items, size: int) -> list:
     result = []
 
     for x in range(math.ceil(len(items) / size)):
-        result.append(items[x * size:(x * size) + size])
+        result.append(items[x * size : (x * size) + size])
 
     return result
 
@@ -90,17 +90,17 @@ def cut_string_by_words(string: str, part_len: int, delimiter: str) -> list:
             result.append(string)
             break
         chunk = string[:part_len]
-        last_delimiter = chunk.rindex(delimiter)    # get index of last delimiter
+        last_delimiter = chunk.rindex(delimiter)  # get index of last delimiter
         chunk = chunk[:last_delimiter]
         result.append(chunk)
-        string = string[len(chunk):]
+        string = string[len(chunk) :]
     return result
 
 
 def split(array, k) -> list:
     """Splits list into K parts of approximate equal length"""
     n = len(array)
-    lists = [array[i * (n // k) + min(i, n % k):(i+1) * (n // k) + min(i+1, n % k)] for i in range(k)]
+    lists = [array[i * (n // k) + min(i, n % k) : (i + 1) * (n // k) + min(i + 1, n % k)] for i in range(k)]
     return lists
 
 
@@ -109,7 +109,7 @@ def add_author_footer(
     author: disnake.User,
     set_timestamp=True,
     additional_text: Iterable[str] = [],
-    anonymous: bool = False
+    anonymous: bool = False,
 ):
     """
     Adds footer to the embed with author name and icon from ctx.
@@ -132,7 +132,7 @@ def add_author_footer(
         display_name = author.display_name
         display_avatar = author.display_avatar.url
 
-    embed.set_footer(icon_url=display_avatar, text=' | '.join((str(display_name), *additional_text)))
+    embed.set_footer(icon_url=display_avatar, text=" | ".join((str(display_name), *additional_text)))
 
 
 def get_emoji(guild: disnake.Guild, name: str) -> Optional[disnake.Emoji]:
@@ -178,9 +178,9 @@ def get_command_signature(ctx: commands.Context):
 def clear_link_escape(link: str):
     """Removes < and > escapes from link."""
 
-    if (link.startswith("<")):
+    if link.startswith("<"):
         link = link[1:]
-    if (link.endswith(">")):
+    if link.endswith(">"):
         link = link[:-1]
 
     return link
@@ -218,8 +218,9 @@ def make_pts_column_row_formatter(pts_column_name: str):
     """For leaderboards with one column of points."""
 
     def formatter(entry: Table, **kwargs):
-        return Messages.base_leaderboard_format_str.format_map(
-            kwargs) + " {} pts".format(getattr(entry, pts_column_name))
+        return Messages.base_leaderboard_format_str.format_map(kwargs) + " {} pts".format(
+            getattr(entry, pts_column_name)
+        )
 
     return formatter
 
@@ -318,9 +319,9 @@ async def get_users_from_tag(self, tag):
     """get user(s) object(s) from tag(s), return list of user(s)"""
     users = []
     # regex to match global name or nickname
-    user_ids = re.findall(r'<@[!]?\d+>', tag)
+    user_ids = re.findall(r"<@[!]?\d+>", tag)
     for user in user_ids:
-        user = re.search(r'\d+', user)
+        user = re.search(r"\d+", user)
         user = await self.bot.get_or_fetch_user(int(user.group()))
         users.append(user)
     return users
@@ -330,9 +331,9 @@ async def get_members_from_tag(guild, tag):
     """get member(s) object(s) from tag(s), return list of member(s)"""
     members = []
     # regex to match global name or nickname
-    member_ids = re.findall(r'<@[!]?\d+>', tag)
+    member_ids = re.findall(r"<@[!]?\d+>", tag)
     for member in member_ids:
-        member = re.search(r'\d+', member)
+        member = re.search(r"\d+", member)
         member = await guild.get_or_fetch_member(int(member.group()))
         if member is None:
             continue
@@ -340,8 +341,16 @@ async def get_members_from_tag(guild, tag):
     return members
 
 
-time_types = Literal["Default", "Short Time", "Long Time", "Short Date", "Long Date",
-                     "Short Date/Time", "Long Date/Time", "Relative Time"]
+time_types = Literal[
+    "Default",
+    "Short Time",
+    "Long Time",
+    "Short Date",
+    "Long Date",
+    "Short Date/Time",
+    "Long Date/Time",
+    "Relative Time",
+]
 
 
 time_types_dict = {
@@ -352,7 +361,7 @@ time_types_dict = {
     "Long Date": ":D",
     "Short Date/Time": ":f",
     "Long Date/Time": ":F",
-    "Relative Time": ":R"
+    "Relative Time": ":R",
 }
 
 
@@ -380,7 +389,7 @@ async def get_or_fetch_channel(bot, channel_id) -> disnake.TextChannel:
 
 
 async def parse_attachments(
-    message: disnake.Message
+    message: disnake.Message,
 ) -> Tuple[List[disnake.File], List[disnake.File], List[disnake.Attachment]]:
     """Parse attachments from message and return them as lists of disnake files
     and if they are over 25MB as attachments.
@@ -401,7 +410,7 @@ async def parse_attachments(
         return [], [], []
 
     for attachment in message.attachments:
-        if attachment.size > 25000000:      # 25MB
+        if attachment.size > 25000000:  # 25MB
             attachments_too_big.append(attachment)
             continue
 
@@ -468,7 +477,7 @@ def parse_time(time_string: str, time_format: str) -> Optional[datetime]:
 
 
 async def get_message_from_url(bot: commands.Bot, message_url: str) -> disnake.Message | None:
-    link = message_url.split('/')
+    link = message_url.split("/")
     msg_id = int(link[-1])
     channel_id = int(link[-2])
     guild_id = int(link[-3])

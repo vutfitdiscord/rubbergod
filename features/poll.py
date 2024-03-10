@@ -16,10 +16,7 @@ def extract_poll_id(message: disnake.Message) -> int:
     return int(poll_id)
 
 
-async def check_end(
-    inter: disnake.ApplicationCommandInteraction,
-    end: str
-) -> tuple[bool, datetime]:
+async def check_end(inter: disnake.ApplicationCommandInteraction, end: str) -> tuple[bool, datetime]:
     """Check if end is valid and above 5min from now"""
     end: datetime = utils.parse_time(end, Messages.time_format)
     now = inter.created_at + timedelta(minutes=5)
@@ -52,7 +49,7 @@ def update_embed(embed: disnake.Embed, poll: PollDB) -> disnake.Embed:
         embed.add_field(
             name=f"{option.emoji} {option.text}",
             value=f"{utils.create_bar(votes, all_votes)} ({votes} hlasů)",
-            inline=True
+            inline=True,
         )
 
     pattern = r"- Celkový počet hlasů: (\d+)"
@@ -64,18 +61,14 @@ def update_embed(embed: disnake.Embed, poll: PollDB) -> disnake.Embed:
 def close_embed(embed: disnake.Embed, poll: PollDB, user_id: str, now: datetime) -> disnake.Embed:
     """update the embed as closed poll with new timestamp"""
     mention = utils.generate_mention(user_id)
-    pattern = re.compile(r'Konec: <t:(\d+):R>')
+    pattern = re.compile(r"Konec: <t:(\d+):R>")
     timestamp = int(now.timestamp())
-    updated_description = pattern.sub(f'Konec: <t:{timestamp}:R>', embed.description)
+    updated_description = pattern.sub(f"Konec: <t:{timestamp}:R>", embed.description)
     embed.description = updated_description
 
     embed = update_embed(embed, poll)
 
-    embed.add_field(
-        name="Ukončeno předčasně",
-        value=f"{mention} ukončil hlasování předčasně.",
-        inline=False
-    )
+    embed.add_field(name="Ukončeno předčasně", value=f"{mention} ukončil hlasování předčasně.", inline=False)
 
     return embed
 
@@ -90,7 +83,7 @@ def create_embed(
     max_votes: int = 1,
     image: disnake.File = None,
     anonymous: bool = False,
-    **kwargs
+    **kwargs,
 ) -> disnake.Embed:
     """Embed template for Poll"""
     end = utils.get_discord_timestamp(end, style="Relative Time")
@@ -107,11 +100,7 @@ def create_embed(
         color=disnake.Color.blue(),
     )
     for emoji, option in poll_options.items():
-        embed.add_field(
-            name=f"{emoji} {option}",
-            value=f"{utils.create_bar(0, 0)} ({0} hlasů)",
-            inline=True
-        )
+        embed.add_field(name=f"{emoji} {option}", value=f"{utils.create_bar(0, 0)} ({0} hlasů)", inline=True)
     if image:
         embed.set_image(file=image)
     utils.add_author_footer(embed, author, additional_text=[f"ID: {poll_id}"])
@@ -140,7 +129,7 @@ async def list_voters(inter: disnake.ApplicationCommandInteraction) -> List[str]
         for index, voter in enumerate(voters):
             voter = utils.generate_mention(voter)
             content += f"{voter} "
-            if (index+1) % 5 == 0 and index != 0 or index == len(voters) - 1:
+            if (index + 1) % 5 == 0 and index != 0 or index == len(voters) - 1:
                 # only 5 mentions per line
                 content += "\n"
 
@@ -160,8 +149,10 @@ def create_end_poll_message(poll: PollDB) -> str:
         percentage = round(winning_options[0].voters_count / total_votes * 100)
         votes = winning_options[0].voters_count
         options = "".join(
-            [f"\n## {option.emoji} {option.text} - {votes} hlasů ({percentage}%)"
-             for option in winning_options]
+            [
+                f"\n## {option.emoji} {option.text} - {votes} hlasů ({percentage}%)"
+                for option in winning_options
+            ]
         )
         content += Messages.poll_tie_options(options=options)
     else:
@@ -175,8 +166,7 @@ def create_end_poll_message(poll: PollDB) -> str:
 
 
 async def has_cooldown(
-    inter: disnake.ApplicationCommandInteraction,
-    button_cd: commands.CooldownMapping
+    inter: disnake.ApplicationCommandInteraction, button_cd: commands.CooldownMapping
 ) -> bool:
     bucket = button_cd.get_bucket(inter)
     retries = bucket.get_tokens()

@@ -1,6 +1,7 @@
 """
 Cog containing timeout commands and manipulating with timeout.
 """
+
 import math
 from datetime import datetime, time, timedelta, timezone
 
@@ -99,7 +100,7 @@ class Timeout(Base, commands.Cog):
                 starttime=starttime_local,
                 endtime=endtime_local,
                 length=length,
-                reason=reason
+                reason=reason,
             )
 
         if timeoutMembers:
@@ -109,17 +110,13 @@ class Timeout(Base, commands.Cog):
             await inter.send("".join(f"{member.mention}" for member in parsed_members), embed=embed)
             embed.add_field(name="Link", value=f"[#{inter.channel.name}]({message.jump_url})")
             await self.submod_helper_room.send(
-                "".join(f"{member.mention}" for member in parsed_members),
-                embed=embed
+                "".join(f"{member.mention}" for member in parsed_members), embed=embed
             )
 
         if cantBeTimeout:
             # print users that can't be timed out
             await inter.send(
-                "\n".join(
-                    Messages.timeout_permission(user_list=user.name)
-                    for user in cantBeTimeout
-                ),
+                "\n".join(Messages.timeout_permission(user_list=user.name) for user in cantBeTimeout),
                 ephemeral=True,
             )
 
@@ -146,7 +143,7 @@ class Timeout(Base, commands.Cog):
             embed.add_field(
                 name=member.display_name,
                 value=Messages.timeout_remove_reason(member=member.mention),
-                inline=False
+                inline=False,
             )
 
         await self.submod_helper_room.send(embed=embed)
@@ -198,12 +195,12 @@ class Timeout(Base, commands.Cog):
         main_embed.add_field(
             name="Unverifies count",
             value=f"[{unverifies}](https://private.grillbot.eu/admin/unverify/logs)",
-            inline=True
+            inline=True,
         )
         main_embed.add_field(
             name="Warnings count",
             value=f"[{warnings}](https://private.grillbot.eu/admin/userMeasures)",
-            inline=True
+            inline=True,
         )
 
         if timeout_user and recent_timeout is not None:
@@ -217,7 +214,7 @@ class Timeout(Base, commands.Cog):
                 starttime=starttime_local,
                 endtime=endtime_local,
                 length=recent_timeout.length,
-                reason=recent_timeout.reason
+                reason=recent_timeout.reason,
             )
             embeds.append(main_embed)
 
@@ -343,11 +340,7 @@ class Timeout(Base, commands.Cog):
             before_timeout = getattr(entry.changes.before, "timeout", None)
             after_timeout = getattr(entry.changes.after, "timeout", None)
 
-            if (
-                before_timeout is not None
-                and after_timeout is None
-                and entry.user.id != self.bot.user.id
-            ):
+            if before_timeout is not None and after_timeout is None and entry.user.id != self.bot.user.id:
                 # remove timeout manually
                 TimeoutDB.remove_timeout(entry.target.id)
                 embed = features_timeout.create_embed(entry.user, "Timeout remove")
@@ -366,7 +359,7 @@ class Timeout(Base, commands.Cog):
             ):
                 # add timeout manually
                 length = entry.changes.after.timeout - entry.created_at
-                length = timedelta(seconds=math.ceil(length.total_seconds()))   # round up to seconds
+                length = timedelta(seconds=math.ceil(length.total_seconds()))  # round up to seconds
                 reason = entry.reason or Messages.timeout_manual_timeout
                 TimeoutDB.add_timeout(
                     entry.target.id,

@@ -18,7 +18,7 @@ for line in f:
         line = line.split(":")
         login = line[0]
         line = line[4]
-        line = line.split(',')
+        line = line.split(",")
         year = line[1]
         name = line[0]
         data = []

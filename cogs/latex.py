@@ -14,7 +14,7 @@ from cogs.base import Base
 from config import cooldowns
 from config.messages import Messages
 
-PNG_HEADER = b'\x89PNG\r\n\x1a\n'
+PNG_HEADER = b"\x89PNG\r\n\x1a\n"
 
 
 class Latex(Base, commands.Cog):
@@ -43,7 +43,6 @@ class Latex(Base, commands.Cog):
             async with aiohttp.ClientSession(timeout=aiohttp.ClientTimeout(total=10)) as session:
                 try:
                     async with session.get(imgURL) as resp:
-
                         if resp.status != 200:
                             await ctx.send("Could not get image.")
                             return

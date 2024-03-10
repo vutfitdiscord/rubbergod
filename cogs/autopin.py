@@ -75,11 +75,7 @@ class AutoPin(Base, commands.Cog):
             return
 
     @pin_mod.sub_command(name="remove", description=Messages.autopin_remove_brief)
-    async def remove(
-        self,
-        inter: disnake.ApplicationCommandInteraction,
-        channel: disnake.TextChannel = None
-    ):
+    async def remove(self, inter: disnake.ApplicationCommandInteraction, channel: disnake.TextChannel = None):
         if channel is None:
             channel = inter.channel
 
@@ -130,10 +126,8 @@ class AutoPin(Base, commands.Cog):
         inter: disnake.ApplicationCommandInteraction,
         channel: pin_channel_type = None,
         type: str = commands.Param(
-            description="Typ výstupu. Markdown/JSON",
-            choices=["json", "markdown"],
-            default="markdown"
-        )
+            description="Typ výstupu. Markdown/JSON", choices=["json", "markdown"], default="markdown"
+        ),
     ):
         """Get all pins from channel and send it to user in markdown file"""
         channel = inter.channel if channel is None else channel
@@ -165,7 +159,7 @@ class AutoPin(Base, commands.Cog):
         pins: List[int] = [message.id for message in await channel.pins()]
 
         # Mapped pin was removed. Remove from map.
-        if not int(pin_map.message_id) in pins:
+        if int(pin_map.message_id) not in pins:
             PinMapDB.remove_channel(str(channel.id))
 
         # check priority pin is first
@@ -235,9 +229,7 @@ class AutoPin(Base, commands.Cog):
         user_names = ", ".join([f"{user.mention}({user.name})" for user in users])
         embed.add_field(name="Users", value=user_names if len(user_names) > 0 else "**Missing users**")
         embed.add_field(
-            name="Message in channel",
-            value=f"[#{message.channel.name}]({message.jump_url})",
-            inline=False
+            name="Message in channel", value=f"[#{message.channel.name}]({message.jump_url})", inline=False
         )
         embed.timestamp = datetime.datetime.now(tz=datetime.timezone.utc)
         channel = self.bot.get_channel(self.config.log_channel)

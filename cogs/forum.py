@@ -43,11 +43,10 @@ class Forum(Base, commands.Cog):
         one_day = 1440
 
         # removed archivation tag from still active thread - reset archive timer
-        if (
-            thread.auto_archive_duration != one_day*7
-            and not any(tag in after_tags for tag in self.config.forum_tags)
+        if thread.auto_archive_duration != one_day * 7 and not any(
+            tag in after_tags for tag in self.config.forum_tags
         ):
-            await thread.edit(auto_archive_duration=one_day*7)
+            await thread.edit(auto_archive_duration=one_day * 7)
             return
         # thread tagged for archivation
         if any(tag in after_tags for tag in self.config.forum_tags):

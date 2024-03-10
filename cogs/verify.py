@@ -1,6 +1,7 @@
 """
 Cog for verification system. Enables users to verify themselves with xlogin00 and gain access to server.
 """
+
 from io import BytesIO
 
 import disnake
@@ -88,9 +89,7 @@ class Verify(Base, commands.Cog):
     ):
         rule = self.dynamic_verify_manager.get_rule(rule_id)
         if rule is None:
-            await inter.response.send_message(
-                Messages.dynamic_verify_missing_rule(rule_id=rule_id)
-            )
+            await inter.response.send_message(Messages.dynamic_verify_missing_rule(rule_id=rule_id))
             return
         modal = DynamicVerifyEditModal(inter.guild, rule)
         await inter.response.send_modal(modal)
@@ -101,13 +100,11 @@ class Verify(Base, commands.Cog):
         inter: disnake.ApplicationCommandInteraction,
         rule_id: str = commands.Param(
             autocomplete=dynamic_verify_rules_autocomplete, description=Messages.dynamic_verify_rule_id
-        )
+        ),
     ):
         rule = self.dynamic_verify_manager.get_rule(rule_id)
         if rule is None:
-            await inter.response.send_message(
-                Messages.dynamic_verify_missing_rule(rule_id=rule_id)
-            )
+            await inter.response.send_message(Messages.dynamic_verify_missing_rule(rule_id=rule_id))
             return
         rule.remove_rule()
         await inter.response.send_message(Messages.dynamic_verify_remove_success)

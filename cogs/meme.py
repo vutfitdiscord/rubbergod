@@ -2,7 +2,6 @@
 Cog for meme commands.
 """
 
-
 import disnake
 from disnake.ext import commands
 

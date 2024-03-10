@@ -1,7 +1,7 @@
 import git
 
 
-class Git():
+class Git:
     def __init__(self):
         self.repo = git.Repo(search_parent_directories=True)
         self.cmd = self.repo.git

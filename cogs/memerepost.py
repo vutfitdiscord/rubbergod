@@ -22,8 +22,10 @@ from permissions import room_check
 
 
 def _leaderboard_formatter(entry: BetterMemeDB, **kwargs):
-    return Messages.base_leaderboard_format_str.format_map(
-        kwargs) + f" **{entry.posts}** posts **{entry.total_karma}** pts"
+    return (
+        Messages.base_leaderboard_format_str.format_map(kwargs)
+        + f" **{entry.posts}** posts **{entry.total_karma}** pts"
+    )
 
 
 class MemeRepost(Base, commands.Cog):
@@ -81,7 +83,6 @@ class MemeRepost(Base, commands.Cog):
 
         repost = MemeRepostDB.find_repost_by_repost_message_id(ctx.message.id)
         if repost is not None:
-
             if ctx.member.id == int(repost.author_id):
                 return
 
@@ -93,8 +94,7 @@ class MemeRepost(Base, commands.Cog):
                 BetterMemeDB.update_post_karma(original_post_user.id, -emoji_val)
                 KarmaDB.karma_emoji_remove(original_post_user.id, ctx.member.id, emoji_key)
 
-    async def __repost_message(self, ctx: ReactionContext,
-                               reactions: List[disnake.Reaction]):
+    async def __repost_message(self, ctx: ReactionContext, reactions: List[disnake.Reaction]):
         # Invalid ID
         if self.repost_channel is None:
             return
@@ -122,8 +122,9 @@ class MemeRepost(Base, commands.Cog):
             embed.timestamp = ctx.message.created_at
 
             # Create link to original post
-            link = Messages.meme_repost_link(original_message_url=ctx.message.jump_url,
-                                             original_channel=self.config.meme_room)
+            link = Messages.meme_repost_link(
+                original_message_url=ctx.message.jump_url, original_channel=self.config.meme_room
+            )
             embed.add_field(name="Link", value=link, inline=False)
 
             # Get all attachments of original post
@@ -195,10 +196,7 @@ class MemeRepost(Base, commands.Cog):
                     secondary_message_id = secondary_message.id
 
             MemeRepostDB.create_repost(
-                ctx.message.id,
-                repost_message_id,
-                ctx.message.author.id,
-                secondary_message_id
+                ctx.message.id, repost_message_id, ctx.message.author.id, secondary_message_id
             )
 
             total_karma = 0
@@ -218,8 +216,8 @@ class MemeRepost(Base, commands.Cog):
     async def leaderboard(
         self,
         inter: disnake.ApplicationCommandInteraction,
-        order_by: str = commands.Param(name='order_by', choices=["total_karma", "posts"], default="posts"),
-        start: int = commands.Param(default=1, gt=0, lt=100000000, description=Messages.karma_board_start)
+        order_by: str = commands.Param(name="order_by", choices=["total_karma", "posts"], default="posts"),
+        start: int = commands.Param(default=1, gt=0, lt=100000000, description=Messages.karma_board_start),
     ):
         await inter.response.defer(ephemeral=self.check.botroom_check(inter))
 
@@ -230,9 +228,9 @@ class MemeRepost(Base, commands.Cog):
             query=BetterMemeDB.get_leaderboard(order_by),
             row_formatter=_leaderboard_formatter,
             base_embed=embed,
-            title='BETTER MEMES LEADERBOARD',
-            emote_name='trophy',
-            member_id_col_name='member_ID',
+            title="BETTER MEMES LEADERBOARD",
+            emote_name="trophy",
+            member_id_col_name="member_ID",
         )
         page_num = page_source.get_page_number(start)
         page = page_source.get_page(page_num)

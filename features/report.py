@@ -33,13 +33,7 @@ async def set_tag(forum: disnake.ForumChannel, forum_thread: disnake.Thread, tag
             break
 
 
-async def embed_resolved(
-    self,
-    author: str,
-    embed: dict,
-    report_type: str,
-    resolved: bool
-) -> disnake.Embed:
+async def embed_resolved(self, author: str, embed: dict, report_type: str, resolved: bool) -> disnake.Embed:
     """Changes the embed to a resolved embed or back to a report embed"""
     if resolved:
         embed["color"] = disnake.Color.green()
@@ -73,19 +67,12 @@ async def embed_resolved(
 def answer_embed(title, inter: disnake.ModalInteraction, report: ReportDB, answer: str) -> disnake.Embed:
     """creates an embed template for the submitted answer"""
     description = Messages.report_embed_answered(last_answer=report.last_answer, answer=answer)
-    embed = disnake.Embed(
-        title=title,
-        description=description,
-        color=disnake.Color.yellow()
-    )
+    embed = disnake.Embed(title=title, description=description, color=disnake.Color.yellow())
 
     if inter.channel.type == disnake.ChannelType.private:
         author = "Anonym"
         embed.timestamp = datetime.now(tz=timezone.utc)
-        embed.set_footer(
-            icon_url=inter.author.default_avatar.url,
-            text=f"{author} | ID: {report.id}"
-        )
+        embed.set_footer(icon_url=inter.author.default_avatar.url, text=f"{author} | ID: {report.id}")
 
     else:
         author = f"{inter.author.mention} `@{inter.author.name}`"
@@ -96,17 +83,10 @@ def answer_embed(title, inter: disnake.ModalInteraction, report: ReportDB, answe
 
 
 def info_message_embed(
-    inter: disnake.ModalInteraction,
-    report: ReportDB,
-    title: str,
-    description: str
+    inter: disnake.ModalInteraction, report: ReportDB, title: str, description: str
 ) -> disnake.Embed:
     """creates info embed for the report"""
-    embed = disnake.Embed(
-        title=title,
-        description=description,
-        color=disnake.Color.yellow()
-    )
+    embed = disnake.Embed(title=title, description=description, color=disnake.Color.yellow())
 
     utils.add_author_footer(embed, inter.author, additional_text=[f"ID: {report.id}"])
     return embed

@@ -15,8 +15,8 @@ class Presence(BaseFeature):
 
         self.activity = disnake.Game(
             start=datetime.datetime.now(datetime.timezone.utc),
-            name=config.default_prefix + 'god'
-            f' | Running hash {self.git.short_hash()}')
+            name=config.default_prefix + "god" f" | Running hash {self.git.short_hash()}",
+        )
 
     async def set_presence(self):
         await self.bot.change_presence(activity=self.activity)

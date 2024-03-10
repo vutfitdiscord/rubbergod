@@ -2,7 +2,6 @@
 Cog for sending and managing messages sent by bot.
 """
 
-
 import disnake
 from disnake.ext import commands
 
@@ -55,7 +54,7 @@ class Message(Base, commands.Cog):
     async def edit(
         self,
         inter: disnake.ApplicationCommandInteraction,
-        message_url: str = commands.Param(description=Messages.message_url_brief)
+        message_url: str = commands.Param(description=Messages.message_url_brief),
     ):
         try:
             message: disnake.Message = await commands.MessageConverter().convert(inter, message_url)

@@ -84,8 +84,9 @@ class Verification(BaseFeature):
     async def send_code(self, login: str, inter: disnake.ApplicationCommandInteraction) -> bool:
         # return True if code was successfully sent
         # Check if the user doesn't have the verify role
-        if not await self.helper.has_role(inter.user, config.verification_role) or \
-           await self.helper.has_role(inter.user, "Host"):
+        if not await self.helper.has_role(inter.user, config.verification_role) or await self.helper.has_role(
+            inter.user, "Host"
+        ):
             # Some of them will use 'xlogin00' as stated in help, cuz they dumb
             if login == "xlogin00":
                 await self.send_xlogin_info(inter)
@@ -186,20 +187,17 @@ class Verification(BaseFeature):
                 return "1BIT"  # TODO: fix erasmus students (BCH)
             elif year_parts[1] in [
                 "MBS", "MBI", "MIS", "MIN", "MMI", "MMM", "MGM", "MGMe",
-                "MPV", "MSK", "NADE",
-                "NBIO", "NGRI", "NNET", "NVIZ", "NCPS", "NSEC", "NEMB",
-                "NHPC", "NISD", "NIDE", "NISY", "NMAL", "NMAT",
-                "NSEN", "NVER", "NSPE", "MGH",
-                "MITP-EN"
-            ]:
+                "MPV", "MSK", "NADE", "NBIO", "NGRI", "NNET", "NVIZ", "NCPS",
+                "NSEC", "NEMB", "NHPC", "NISD", "NIDE", "NISY", "NMAL", "NMAT", "NSEN",
+                "NVER", "NSPE", "MGH", "MITP-EN",
+            ]:  # fmt: off
                 return "2MIT+" if year_value >= 2 else f"{year_value}MIT"
             elif year_parts[1] in ["DVI4", "DRH", "DITP", "DITP-EN"]:
                 return "Doktorand"
         elif year_parts[0] == "employee":
             return "Vyucujici/Zamestnanec FIT"
-        elif year_parts[0] in [
-            "FA", "FAST", "FAVU", "FCH", "FEKT", "FP", "FSI", "USI"
-        ]:  # Other VUT faculties
+        elif year_parts[0] in ["FA", "FAST", "FAVU", "FCH", "FEKT", "FP", "FSI", "USI",]:  # fmt: off
+            # Other VUT faculties
             return "VUT"
         elif len(year_parts) == 1 and year_parts[0] == "MUNI":  # Maybe MUNI?
             return "MUNI"
@@ -264,7 +262,7 @@ class Verification(BaseFeature):
                 return await self.log_verify_fail(
                     inter,
                     "Verify (with code) (User already verified?)",
-                    str({"login": login, "year": new_user.year})
+                    str({"login": login, "year": new_user.year}),
                 )
 
             verify_success_msg = Messages.verify_verify_success(user=inter.user.id)

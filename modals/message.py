@@ -10,7 +10,7 @@ class MessageModal(disnake.ui.Modal):
         title: str,
         channel: disnake.TextChannel = None,
         message: disnake.Message = None,
-        edit: bool = False
+        edit: bool = False,
     ) -> None:
         self.bot = bot
         self.title = title
@@ -28,12 +28,7 @@ class MessageModal(disnake.ui.Modal):
             )
         ]
 
-        super().__init__(
-            title=self.title,
-            custom_id="message_modal",
-            timeout=900,
-            components=components
-        )
+        super().__init__(title=self.title, custom_id="message_modal", timeout=900, components=components)
 
     async def callback(self, inter: disnake.ModalInteraction) -> None:
         if self.edit:

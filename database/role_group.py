@@ -10,7 +10,7 @@ from database import database, session
 
 
 class RoleGroupDB(database.base):
-    __tablename__ = 'bot_role_group'
+    __tablename__ = "bot_role_group"
 
     name = Column(String, primary_key=True)
     role_ids = Column(MutableList.as_mutable(PickleType))

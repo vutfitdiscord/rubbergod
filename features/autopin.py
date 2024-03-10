@@ -1,4 +1,3 @@
-
 import io
 import json
 from typing import List, Union
@@ -7,20 +6,17 @@ import disnake
 
 import utils
 
-pin_channel_type = Union[
-    disnake.TextChannel,
-    disnake.Thread
-]
+pin_channel_type = Union[disnake.TextChannel, disnake.Thread]
 
 
-class AutopinFeatures():
+class AutopinFeatures:
     def __init__(self, bot):
         self.bot = bot
 
     async def create_json_file(
-            self,
-            channel: pin_channel_type,
-            pins: List[disnake.Message],
+        self,
+        channel: pin_channel_type,
+        pins: List[disnake.Message],
     ):
         """Create json file with all pins from channel"""
         if hasattr(channel, "name"):
@@ -37,7 +33,7 @@ class AutopinFeatures():
                 "created_at": created_at.isoformat("T", "seconds"),
                 "jump_url": pin.jump_url,
                 "content": pin.content,
-                "attachments": [{"name": file.filename, "url": file.url} for file in pin.attachments]
+                "attachments": [{"name": file.filename, "url": file.url} for file in pin.attachments],
             }
             list_pins.append(dict_pin)
 
@@ -48,11 +44,7 @@ class AutopinFeatures():
             f.seek(0)
             return disnake.File(f, filename=f"{channel_name}_pins.json")
 
-    async def create_markdown_file(
-            self,
-            channel: pin_channel_type,
-            pins: List[disnake.Message]
-    ):
+    async def create_markdown_file(self, channel: pin_channel_type, pins: List[disnake.Message]):
         """Create markdown file with all pins from channel"""
         if hasattr(channel, "name"):
             channel_name = channel.name

@@ -10,7 +10,7 @@ from database import database, session
 
 
 class VoteDB(database.base):
-    __tablename__ = 'bot_votes'
+    __tablename__ = "bot_votes"
 
     message_id = Column(BigInteger, primary_key=True)
     channel_id = Column(BigInteger, nullable=False)

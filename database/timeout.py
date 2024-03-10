@@ -2,8 +2,7 @@ from __future__ import annotations
 
 from datetime import datetime, timedelta, timezone
 
-from sqlalchemy import (BigInteger, Boolean, Column, DateTime, ForeignKey,
-                        String)
+from sqlalchemy import BigInteger, Boolean, Column, DateTime, ForeignKey, String
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -15,9 +14,9 @@ class TimeoutDB(database.base):
     __tablename__ = "timeout"
 
     id = Column(BigInteger, primary_key=True)
-    mod_id = Column(String)                     # For automod this value is 1
-    start = Column(DateTime)                    # in UTC
-    end = Column(DateTime)                      # in UTC
+    mod_id = Column(String)  # For automod this value is 1
+    start = Column(DateTime)  # in UTC
+    end = Column(DateTime)  # in UTC
     reason = Column(String)
     guild_id = Column(String)
     isself = Column(Boolean, default=False)
@@ -26,7 +25,7 @@ class TimeoutDB(database.base):
 
     @hybrid_property
     def is_active(self) -> bool:
-        now = datetime.now(timezone.utc).replace(tzinfo=None)   # can't compare timezone aware and unaware
+        now = datetime.now(timezone.utc).replace(tzinfo=None)  # can't compare timezone aware and unaware
         return self.end > now
 
     @hybrid_property
@@ -146,5 +145,9 @@ class TimeoutUserDB(database.base):
         return timeouts_query.order_by(TimeoutDB.start.asc()).all()
 
     def get_last_timeout(self, isself: bool = False) -> TimeoutDB | None:
-        return session.query(TimeoutDB).filter_by(
-            user_id=self.id, isself=isself).order_by(TimeoutDB.start.desc()).first()
+        return (
+            session.query(TimeoutDB)
+            .filter_by(user_id=self.id, isself=isself)
+            .order_by(TimeoutDB.start.desc())
+            .first()
+        )

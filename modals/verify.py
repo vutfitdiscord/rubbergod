@@ -16,7 +16,7 @@ class VerifyModal(disnake.ui.Modal):
                 style=disnake.TextInputStyle.short,
                 required=True,
                 min_length=6,
-                max_length=10
+                max_length=10,
             )
         ]
         super().__init__(

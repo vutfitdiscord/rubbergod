@@ -6,7 +6,7 @@ from disnake.ext.commands import Bot
 from config.app_config import config
 
 
-class ReactionContext():
+class ReactionContext:
     channel: disnake.TextChannel
     guild: disnake.Guild
     member: disnake.Member

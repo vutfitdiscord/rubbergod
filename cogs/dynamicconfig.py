@@ -43,7 +43,7 @@ class DynamicConfig(Base, commands.Cog):
         self,
         inter: disnake.ApplicationCommandInteraction,
         key: str = commands.Param(autocomplete=autocomp_keys),
-        value: str = commands.Param()
+        value: str = commands.Param(),
     ):
         """
         Dynamically change config values
@@ -53,9 +53,10 @@ class DynamicConfig(Base, commands.Cog):
 
     @config_cmd.sub_command(description=Messages.config_append_brief)
     async def append(
-        self, inter: disnake.ApplicationCommandInteraction,
+        self,
+        inter: disnake.ApplicationCommandInteraction,
         key: str = commands.Param(autocomplete=autocomp_keys),
-        value: str = commands.Param()
+        value: str = commands.Param(),
     ):
         """
         Append value(s) to existing config
@@ -92,7 +93,7 @@ class DynamicConfig(Base, commands.Cog):
     async def get(
         self,
         inter: disnake.ApplicationCommandInteraction,
-        key: str = commands.Param(autocomplete=autocomp_keys)
+        key: str = commands.Param(autocomplete=autocomp_keys),
     ):
         """
         Get value of specified key
@@ -132,11 +133,7 @@ class DynamicConfig(Base, commands.Cog):
         await inter.send(Messages.config_updated)
 
     async def change_value(
-        self,
-        inter: disnake.ApplicationCommandInteraction,
-        key: str,
-        value: str,
-        append: bool
+        self, inter: disnake.ApplicationCommandInteraction, key: str, value: str, append: bool
     ):
         """
         Changes config attribute specified by `key` to `value`.
@@ -151,7 +148,7 @@ class DynamicConfig(Base, commands.Cog):
             await inter.send(e)
             return
         key_toml = key
-        key_split = key.split('_', 1)
+        key_split = key.split("_", 1)
         for section in self.config.toml_dict:
             if key_split[0] == section:
                 key_toml = key_split[1]

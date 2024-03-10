@@ -21,7 +21,7 @@ from permissions import permission_check
 
 def running_for(time):
     now = datetime.datetime.now()
-    time = time.split(':')
+    time = time.split(":")
     if len(time) == 2:
         hours = now.hour - int(time[0])
         minutes = now.minute - int(time[1])
@@ -66,10 +66,10 @@ def parse_memory(memory):
     for line in memory.strip().splitlines():
         line = line.split()
         login = line[1]
-        if not login.startswith('x'):
+        if not login.startswith("x"):
             continue
         last_change = " ".join(line[-3:])
-        since_last_change = unchanged_for(last_change, '%b %d %H:%M:%S')
+        since_last_change = unchanged_for(last_change, "%b %d %H:%M:%S")
         if since_last_change > 10:
             if login not in parsed:
                 parsed[login] = list()
@@ -88,10 +88,10 @@ def parse_semaphores(semaphores):
     for line in semaphores.strip().splitlines():
         line = line.split()
         login = line[1]
-        if not login.startswith('x'):
+        if not login.startswith("x"):
             continue
         last_change = " ".join(line[-4:-1])
-        since_last_change = unchanged_for(last_change, '%b %d %H:%M:%S')
+        since_last_change = unchanged_for(last_change, "%b %d %H:%M:%S")
         if since_last_change > 10:
             if login not in parsed:
                 parsed[login] = list()
@@ -100,7 +100,7 @@ def parse_semaphores(semaphores):
     for line in files.strip().splitlines():
         line = line.split()
         login = line[2]
-        if not login.startswith('x'):
+        if not login.startswith("x"):
             continue
         last_change = " ".join(line[5:7])
         name = line[7]
@@ -120,7 +120,7 @@ def parse_processes(processes):
     for line in processes.strip().splitlines():
         line = line.split()
         login = line[0]
-        if not login.startswith('x'):
+        if not login.startswith("x"):
             continue
         time = line[8]
         uptime = running_for(time)
@@ -160,17 +160,17 @@ def format_time(minutes):
 
 
 class RESOURCE_TYPE:
-    MEMORY = 'MEMORY'
-    SEMAPHORE = 'SEMAPHORE'
-    PROCESS = 'PROCESS'
-    FILE = 'FILE'
+    MEMORY = "MEMORY"
+    SEMAPHORE = "SEMAPHORE"
+    PROCESS = "PROCESS"
+    FILE = "FILE"
 
 
 # inflected resource names to match the czech language
 _inflected_resources = {
-    RESOURCE_TYPE.MEMORY:    ('sdílená paměť', 'sdílené paměti', 'ztracené'),
-    RESOURCE_TYPE.SEMAPHORE: ('semafory',      'semaforů',       'ležících'),
-    RESOURCE_TYPE.PROCESS:   ('procesy',       'procesů',        'běžících'),
+    RESOURCE_TYPE.MEMORY: ("sdílená paměť", "sdílené paměti", "ztracené"),
+    RESOURCE_TYPE.SEMAPHORE: ("semafory", "semaforů", "ležících"),
+    RESOURCE_TYPE.PROCESS: ("procesy", "procesů", "běžících"),
 }
 
 
@@ -180,8 +180,10 @@ def insult_login(parsed_items, system, res_type):
         user = session.query(PermitDB).filter(PermitDB.login == login).one_or_none()
 
         if not user:
-            msg = f"Na {system} leží {_inflected_resources[res_type][0]} " \
+            msg = (
+                f"Na {system} leží {_inflected_resources[res_type][0]} "
                 f"nějakého `{login}`, co není na serveru."
+            )
         else:
             count = len(array)
             avg_time = int(sum(array) // count)
@@ -209,7 +211,8 @@ def insult_login_shm(parsed_files, system):
 
             msg = (
                 f"{utils.generate_mention(user.discord_ID)} "
-                f"máš na {system} (`/dev/shm`) `{count}` souborů semaforů.")
+                f"máš na {system} (`/dev/shm`) `{count}` souborů semaforů."
+            )
             if avg_time > 9:
                 msg += f"\n\t\tLeží ti tam průměrně už `{format_time(avg_time)}`, ty prase."
             if login_not_in_name:
@@ -223,7 +226,7 @@ async def print_output(bot, channel, system, resources):
     for res_type in [RESOURCE_TYPE.MEMORY, RESOURCE_TYPE.SEMAPHORE, RESOURCE_TYPE.PROCESS]:
         if resources.get(res_type):
             out_arr += insult_login(resources[res_type], system, res_type)
-    if (shm_resources := resources.get(RESOURCE_TYPE.FILE)):
+    if shm_resources := resources.get(RESOURCE_TYPE.FILE):
         out_arr += insult_login_shm(shm_resources, system)
 
     if not any(resources.values()):
@@ -286,21 +289,20 @@ class IOS(Base, commands.Cog):
             await channel.send(Messages.ios_howto_clean)
 
         process = subprocess.Popen(
-            ["ssh", "-i", self.config.ios_leakcheck_key_path, "merlin"],
-            stdout=subprocess.PIPE
-            )
+            ["ssh", "-i", self.config.ios_leakcheck_key_path, "merlin"], stdout=subprocess.PIPE
+        )
         output, _ = process.communicate()
-        memory, rest = output.decode('utf-8').split("semafory:\n")
+        memory, rest = output.decode("utf-8").split("semafory:\n")
         semaphores, processes = rest.split("procesy:\n")
         try:
             parsed_memory = parse_memory(memory)
             parsed_semaphores, parsed_files = parse_semaphores(semaphores)
             parsed_processes = parse_processes(processes)
             parsed_resources = {
-                RESOURCE_TYPE.MEMORY:    parsed_memory,
+                RESOURCE_TYPE.MEMORY: parsed_memory,
                 RESOURCE_TYPE.SEMAPHORE: parsed_semaphores,
-                RESOURCE_TYPE.FILE:      parsed_files,
-                RESOURCE_TYPE.PROCESS:   parsed_processes,
+                RESOURCE_TYPE.FILE: parsed_files,
+                RESOURCE_TYPE.PROCESS: parsed_processes,
             }
             await print_output(self.bot, channel, "merlinovi", filter_year(parsed_resources))
         except (IndexError, ValueError) as e:
@@ -309,12 +311,11 @@ class IOS(Base, commands.Cog):
             raise e
 
         process = subprocess.Popen(
-            ["ssh", "-i", self.config.ios_leakcheck_key_path, "eva"],
-            stdout=subprocess.PIPE
-            )
+            ["ssh", "-i", self.config.ios_leakcheck_key_path, "eva"], stdout=subprocess.PIPE
+        )
         output, _ = process.communicate()
 
-        memory, rest = output.decode('utf-8').split("semafory:\n")
+        memory, rest = output.decode("utf-8").split("semafory:\n")
         semaphores, processes = rest.split("procesy:\n")
         # remove unwanted processes
         processes = filter_processes(processes)
@@ -323,9 +324,9 @@ class IOS(Base, commands.Cog):
             parsed_semaphores, _ = parse_semaphores(semaphores)
             parsed_processes = parse_processes(processes)
             parsed_resources = {
-                RESOURCE_TYPE.MEMORY:    parsed_memory,
+                RESOURCE_TYPE.MEMORY: parsed_memory,
                 RESOURCE_TYPE.SEMAPHORE: parsed_semaphores,
-                RESOURCE_TYPE.PROCESS:   parsed_processes,
+                RESOURCE_TYPE.PROCESS: parsed_processes,
             }
             await print_output(self.bot, channel, "evě", filter_year(parsed_resources))
         except (IndexError, ValueError) as e:

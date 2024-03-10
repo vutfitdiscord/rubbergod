@@ -42,9 +42,7 @@ def add_field_timeout(
             author=author,
             starttime=starttime.strftime("%d.%m.%Y %H:%M"),
             endtime=endtime.strftime("%d.%m.%Y %H:%M"),
-            length=f"{length.days}d, "
-            f"{length.seconds // 3600}h, "
-            f"{(length.seconds // 60) % 60}m",
+            length=f"{length.days}d, " f"{length.seconds // 3600}h, " f"{(length.seconds // 60) % 60}m",
             timestamp=utils.get_discord_timestamp(endtime, "Relative Time"),
             reason=reason,
         ),
@@ -61,7 +59,7 @@ async def timeout_embed_listing(
 ) -> None:
     """Embed for sending timeout updates on users"""
     embeds = []
-    users_lists = utils.split_to_parts(users, 15)       # to avoid embed char limit
+    users_lists = utils.split_to_parts(users, 15)  # to avoid embed char limit
     for users_list in users_lists:
         embed = create_embed(author, title)
         for timeout in users_list:
@@ -101,12 +99,24 @@ async def timeout_perms(
         elif length.days > 28:
             await member.timeout(until=datetime.now(timezone.utc) + timedelta(days=28), reason=reason)
             TimeoutDB.add_timeout(
-                member.id, inter.author.id, starttime, endtime, reason, inter.guild.id, isself,
+                member.id,
+                inter.author.id,
+                starttime,
+                endtime,
+                reason,
+                inter.guild.id,
+                isself,
             )
         else:
             await member.timeout(until=endtime, reason=reason)
             TimeoutDB.add_timeout(
-                member.id, inter.author.id, starttime, endtime, reason, inter.guild.id, isself,
+                member.id,
+                inter.author.id,
+                starttime,
+                endtime,
+                reason,
+                inter.guild.id,
+                isself,
             )
         return True
     except disnake.Forbidden:
@@ -115,8 +125,7 @@ async def timeout_perms(
 
 
 async def parse_members(
-    inter: disnake.ApplicationCommandInteraction,
-    members_string: str
+    inter: disnake.ApplicationCommandInteraction, members_string: str
 ) -> list[disnake.Member] | None:
     """Parse members from string and return list of members"""
 
@@ -137,7 +146,7 @@ async def parse_members(
             Messages.timeout_member_not_found(
                 author=inter.author.mention, members=", ".join(not_found_members)
             ),
-            ephemeral=True
+            ephemeral=True,
         )
 
     return parsed_members or None
@@ -157,9 +166,7 @@ async def get_user_from_grillbot(self, guild_id: str, user_id: str) -> tuple[int
 
 
 async def time_check(
-    inter: disnake.ApplicationCommandInteraction,
-    endtime: datetime,
-    length: timedelta
+    inter: disnake.ApplicationCommandInteraction, endtime: datetime, length: timedelta
 ) -> bool:
     if endtime < inter.created_at:
         await inter.send(Messages.timeout_past_time, ephemeral=True)

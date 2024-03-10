@@ -8,7 +8,7 @@ from database import database, session
 
 
 class PinMapDB(database.base):
-    __tablename__ = 'bot_pin_map'
+    __tablename__ = "bot_pin_map"
 
     channel_id = Column(String, primary_key=True)
     message_id = Column(String)

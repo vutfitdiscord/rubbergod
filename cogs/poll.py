@@ -17,8 +17,7 @@ from disnake.ext import commands, tasks
 
 import utils
 from buttons.general import TrashView
-from buttons.poll import (PollBooleanView, PollOpinionView, PollView,
-                          PollVotersView)
+from buttons.poll import PollBooleanView, PollOpinionView, PollView, PollVotersView
 from cogs.base import Base
 from config import cooldowns
 from config.messages import Messages
@@ -35,7 +34,12 @@ class Poll(Base, commands.Cog):
         self.bot = bot
         self.check = RoomCheck(bot)
 
-    async def poll_create(self, poll_args: dict, poll_options: dict, poll_view: disnake.ui.View,):
+    async def poll_create(
+        self,
+        poll_args: dict,
+        poll_options: dict,
+        poll_view: disnake.ui.View,
+    ):
         inter = poll_args.get("inter")
         attachment = poll_args.get("attachment")
         anonymous = poll_args.get("anonymous")
@@ -45,7 +49,7 @@ class Poll(Base, commands.Cog):
         if not is_end_valid:
             return
 
-        if attachment and attachment.size > 25000000:       # 25MB
+        if attachment and attachment.size > 25000000:  # 25MB
             await inter.send(Messages.attachment_too_big, ephemeral=True)
             return
 
@@ -116,15 +120,10 @@ class Poll(Base, commands.Cog):
         inter: disnake.ApplicationCommandInteraction,
         title: str = commands.Param(description=Messages.poll_title_param, max_length=256),
         description: str = commands.Param(
-            default="",
-            description=Messages.poll_description_param,
-            max_length=3000
+            default="", description=Messages.poll_description_param, max_length=3000
         ),
         end: str = commands.Param(
-            default="1h",
-            description=Messages.time_format,
-            max_length=40,
-            autocomplete=time_choices
+            default="1h", description=Messages.time_format, max_length=40, autocomplete=time_choices
         ),
         attachment: disnake.Attachment = commands.Param(
             default=None, description=Messages.poll_attachment_param
@@ -135,9 +134,7 @@ class Poll(Base, commands.Cog):
         args.pop("self")
 
         await self.poll_create(
-            poll_args=args,
-            poll_options={"✅": "Ano", "❌": "Ne"},
-            poll_view=PollBooleanView(self.bot)
+            poll_args=args, poll_options={"✅": "Ano", "❌": "Ne"}, poll_view=PollBooleanView(self.bot)
         )
 
     @cooldowns.long_cooldown
@@ -147,15 +144,10 @@ class Poll(Base, commands.Cog):
         inter: disnake.ApplicationCommandInteraction,
         title: str = commands.Param(description=Messages.poll_title_param, max_length=256),
         description: str = commands.Param(
-            default="",
-            description=Messages.poll_description_param,
-            max_length=3000
+            default="", description=Messages.poll_description_param, max_length=3000
         ),
         end: str = commands.Param(
-            default="1h",
-            description=Messages.time_format,
-            max_length=40,
-            autocomplete=time_choices
+            default="1h", description=Messages.time_format, max_length=40, autocomplete=time_choices
         ),
         attachment: disnake.Attachment = commands.Param(
             default=None, description=Messages.poll_attachment_param
@@ -168,7 +160,7 @@ class Poll(Base, commands.Cog):
         await self.poll_create(
             poll_args=args,
             poll_options={"✅": "Souhlasím", "😐": "Neutral", "❌": "Nesouhlasím"},
-            poll_view=PollOpinionView(self.bot)
+            poll_view=PollOpinionView(self.bot),
         )
 
     @cooldowns.default_cooldown
@@ -177,8 +169,8 @@ class Poll(Base, commands.Cog):
         self,
         inter: disnake.ApplicationCommandInteraction,
         poll_type: str = commands.Param(
-            default=None,
-            choices=[PollType.basic.name, PollType.boolean.name, PollType.opinion.name])
+            default=None, choices=[PollType.basic.name, PollType.boolean.name, PollType.opinion.name]
+        ),
     ):
         await inter.response.defer(ephemeral=True)
         if not poll_type:
@@ -276,6 +268,7 @@ class Poll(Base, commands.Cog):
 
 class PollTask(PollView):
     """Class only for having task loop"""
+
     def __init__(self):
         super().__init__()
 
