@@ -17,6 +17,15 @@ from database.verification import ValidPersonDB, VerifyStatus
 from features.base_feature import BaseFeature
 from features.verify_helper import VerifyHelper
 
+MIT_SPECIALIZATIONS = [
+    "MBS", "MBI", "MIS", "MIN", "MMI", "MMM", "MGM", "MGMe",
+    "MPV", "MSK", "NADE", "NBIO", "NGRI", "NNET", "NVIZ", "NCPS",
+    "NSEC", "NEMB", "NHPC", "NISD", "NIDE", "NISY", "NMAL", "NMAT", "NSEN",
+    "NVER", "NSPE", "MGH", "MITP-EN",
+]  # fmt: off
+
+FACULTY_NAMES = ["FA", "FAST", "FAVU", "FCH", "FEKT", "FP", "FSI", "USI",]  # fmt: off
+
 
 class Verification(BaseFeature):
     def __init__(self, bot: Bot):
@@ -185,18 +194,13 @@ class Verification(BaseFeature):
                 return "3BIT+" if year_value >= 3 else f"{year_value}BIT"
             elif year_parts[1] in ["BCH", "CZV"]:
                 return "1BIT"  # TODO: fix erasmus students (BCH)
-            elif year_parts[1] in [
-                "MBS", "MBI", "MIS", "MIN", "MMI", "MMM", "MGM", "MGMe",
-                "MPV", "MSK", "NADE", "NBIO", "NGRI", "NNET", "NVIZ", "NCPS",
-                "NSEC", "NEMB", "NHPC", "NISD", "NIDE", "NISY", "NMAL", "NMAT", "NSEN",
-                "NVER", "NSPE", "MGH", "MITP-EN",
-            ]:  # fmt: off
+            elif year_parts[1] in MIT_SPECIALIZATIONS:
                 return "2MIT+" if year_value >= 2 else f"{year_value}MIT"
             elif year_parts[1] in ["DVI4", "DRH", "DITP", "DITP-EN"]:
                 return "Doktorand"
         elif year_parts[0] == "employee":
             return "Vyucujici/Zamestnanec FIT"
-        elif year_parts[0] in ["FA", "FAST", "FAVU", "FCH", "FEKT", "FP", "FSI", "USI",]:  # fmt: off
+        elif year_parts[0] in FACULTY_NAMES:
             # Other VUT faculties
             return "VUT"
         elif len(year_parts) == 1 and year_parts[0] == "MUNI":  # Maybe MUNI?

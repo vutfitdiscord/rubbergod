@@ -23,6 +23,13 @@ async def autocomp_user_logins(inter: disnake.ApplicationCommandInteraction, use
     return [user for user in user_logins if user_input.lower() in user][:25]
 
 
+CATEGORIES_NAMES = [
+    "1. semestr", "2. semestr", "3. semestr", "4. semestr", "5. semestr",
+    "zimni-volitelne", "letni-volitelne", "volitelne",
+    "zimni magistersky semestr", "letni magistersky semestr",
+]  # fmt: off
+
+
 class FitWide(Base, commands.Cog):
     def __init__(self, bot):
         super().__init__()
@@ -200,13 +207,8 @@ class FitWide(Base, commands.Cog):
     ) -> None:
         """Set permissions for new 0bit and 0mit roles to see school channels"""
         # Get all semester categories
-        categories_names = [
-            "1. semestr", "2. semestr", "3. semestr", "4. semestr", "5. semestr",
-            "zimni-volitelne", "letni-volitelne", "volitelne",
-            "zimni magistersky semestr", "letni magistersky semestr",
-        ]  # fmt: off
         categories = [
-            disnake.utils.get(guild.categories, name=semester_name) for semester_name in categories_names
+            disnake.utils.get(guild.categories, name=semester_name) for semester_name in CATEGORIES_NAMES
         ]
 
         # give 0mit access to mit-general
