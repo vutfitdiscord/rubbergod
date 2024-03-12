@@ -2,7 +2,9 @@
 Cog implementing management of year roles and database of user logins.
 """
 
+import json
 import subprocess
+from io import BytesIO
 
 import disnake
 from disnake.ext import commands
@@ -14,6 +16,7 @@ from config.messages import Messages
 from database import session
 from database.verification import PermitDB, ValidPersonDB, VerifyStatus
 from features.verification import Verification
+from features.verify_helper import VerifyHelper
 from permissions import permission_check, room_check
 
 user_logins = []
@@ -35,6 +38,7 @@ class FitWide(Base, commands.Cog):
         super().__init__()
         self.bot = bot
         self.verification = Verification(bot)
+        self.helper = VerifyHelper(bot)
         self.get_all_logins()
 
     def get_all_logins(self):
@@ -540,6 +544,20 @@ class FitWide(Base, commands.Cog):
                 return
             result.change_status(VerifyStatus.Verified.value)
             await inter.edit_original_response(Messages.fitwide_action_success)
+
+    @cooldowns.default_cooldown
+    @commands.check(room_check.is_in_modroom)
+    @commands.slash_command(name="vutapi", description=Messages.fitwide_vutapi_brief)
+    async def vutapi(
+        self,
+        inter: disnake.ApplicationCommandInteraction,
+        login: str = commands.Param(autocomplete=autocomp_user_logins),
+    ):
+        await inter.response.defer()
+        res = await self.helper.get_user_details(login)
+        with BytesIO(bytes(json.dumps(res, indent=2, ensure_ascii=False), "utf-8")) as file:
+            file = disnake.File(fp=file, filename=f"{login}.json")
+            await inter.edit_original_response(file=file)
 
     @verify_db.error
     @role_check.error
