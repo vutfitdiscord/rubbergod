@@ -30,7 +30,7 @@ CATEGORIES_NAMES = [
     "1. semestr", "2. semestr", "3. semestr", "4. semestr", "5. semestr",
     "zimni-volitelne", "letni-volitelne", "volitelne",
     "zimni magistersky semestr", "letni magistersky semestr",
-]  # fmt: off
+]  # fmt: skip
 
 
 class FitWide(Base, commands.Cog):
