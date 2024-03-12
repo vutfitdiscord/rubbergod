@@ -55,6 +55,7 @@ class Messages(metaclass=Formatable):
     fitwide_link_login_user_brief = "Propojí login s uživatelem"
     fitwide_not_in_modroom = "Nothing to see here comrade. <:KKomrade:484470873001164817>"
     fitwide_login_already_exists = "Uživatel již existuje v databázi."
+    fitwide_vutapi_brief = "Získá data z VUT API"
 
     # ERROR
     moved_command = "Tento příkaz již není v textové formě podporován. Příkaz byl nahrazen příkazem </{name}:{id}>"
