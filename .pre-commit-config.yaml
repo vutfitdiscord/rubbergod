@@ -4,6 +4,7 @@ repos:
   hooks:
     - id: ruff
       name: ruff
+      args: [--fix, --exit-non-zero-on-fix]
       description: This hook runs ruff linter.
     - id: ruff-format
       name: ruff-format
