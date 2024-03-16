@@ -5,10 +5,11 @@ Cog controlling bookmarks. React with bookmark emoji and the bot will send copy 
 import disnake
 from disnake.ext import commands
 
-from buttons.bookmark import BookmarkView
 from cogs.base import Base
-from features.bookmark import BookmarkFeatures
-from modals.bookmark import BookmarkModal
+
+from .features import Features
+from .modals import BookmarkModal
+from .views import BookmarkView
 
 
 class Bookmark(Base, commands.Cog):
@@ -22,10 +23,10 @@ class Bookmark(Base, commands.Cog):
         await inter.response.send_modal(modal=BookmarkModal(message))
 
     async def bookmark_reaction(self, ctx):
-        embed, images, files_attached = await BookmarkFeatures.create_bookmark_embed(self, ctx)
+        embed, images, files_attached = await Features.create_bookmark_embed(self, ctx)
         if images:
             for image in images:
-                embed.append(await BookmarkFeatures.create_image_embed(self, ctx, image))
+                embed.append(await Features.create_image_embed(self, ctx, image))
         # when sending sticker there can be overflow of files
         if len(files_attached) <= 10:
             await ctx.member.send(embeds=embed, view=BookmarkView(ctx.message.jump_url), files=files_attached)
@@ -34,7 +35,3 @@ class Bookmark(Base, commands.Cog):
                 embeds=embed, view=BookmarkView(ctx.message.jump_url), files=files_attached[:10]
             )
             await ctx.member.send(files=files_attached[10:])
-
-
-def setup(bot):
-    bot.add_cog(Bookmark(bot))

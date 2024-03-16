@@ -22,6 +22,8 @@ class Messages(metaclass=Formatable):
     attachment_too_big = "Příloha je příliš velká. Maximální velikost je 25 MB."
     api_error = "Nepovedlo se získat data z API\n{error}"
     message_not_found = "Zpráva nebyla nalezena. Zkontroluj formát."
+    blocked_bot = "Nemůžu ti posílat zprávy {user}"
+    trash_delete_id = "trash:delete"   # global identifier for delete button
 
     # FITWIDE
     increment_roles_brief = "Aktualizuje role na serveru podle ročníku. Aktualizace školních roomek."
@@ -596,12 +598,6 @@ if ("Mám průměr pod 2.0")                                           \n  retur
     exams_channel_is_not_text_channel = "`Nenalezeny žádné termíny v kanálu {chan_name}`"
     exams_automatic_update_started = "`Zapnuta automatická aktualizace termínů pro server: {guild_name}`"
     exams_automatic_update_stopped = "`Zastavena automatická aktualizace termínů pro server: {guild_name}`"
-
-    # BOOKMARK
-    bookmark_title = "Záložka na serveru {server}"
-    blocked_bot = "Nemůžu ti posílat zprávy {user}"
-    bookmark_created = "Záložka **{title_name}** vytvořena"
-    bookmark_upload_limit = "Zpráva obsahuje přílohu přesahující upload limit, doporučuji si tuto přílohu stáhnout. V připadě smazání původní zprávy nebude příloha dostupná."
 
     # ICONS
     icon_ui = "UI pro přiřazení ikony"
