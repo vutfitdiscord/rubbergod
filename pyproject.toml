@@ -7,6 +7,8 @@ exclude = [
     ".venv",
     "__pycache__",
     "config/messages.py",
+    "*/messages_cz.py",
+    "*/messages_en.py",
 ]
 
 [tool.ruff.format]
