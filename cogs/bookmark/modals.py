@@ -2,7 +2,7 @@ import disnake
 
 from .features import Features
 from .messages_cz import MessagesCZ
-from .views import BookmarkView
+from .views import View
 
 
 class Modal(disnake.ui.Modal):
@@ -32,9 +32,7 @@ class Modal(disnake.ui.Modal):
             if images:
                 for image in images:
                     embed.append(await Features.create_image_embed(self, inter, image, title_name))
-            await inter.author.send(
-                embeds=embed, view=BookmarkView(inter.message.jump_url), files=files_attached
-            )
+            await inter.author.send(embeds=embed, view=View(inter.message.jump_url), files=files_attached)
             await inter.response.send_message(
                 MessagesCZ.bookmark_created(title_name=title_name), ephemeral=True
             )
