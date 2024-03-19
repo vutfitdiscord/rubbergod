@@ -13,7 +13,8 @@ from disnake.ext import commands
 import utils
 from cogs.base import Base
 from config import cooldowns
-from config.messages import Messages
+
+from .messages_cz import MessagesCZ
 
 
 class FitRoom(Base, commands.Cog):
@@ -22,13 +23,13 @@ class FitRoom(Base, commands.Cog):
         self.bot = bot
 
     @cooldowns.default_cooldown
-    @commands.slash_command(name="room", description=Messages.fit_room_brief)
+    @commands.slash_command(name="room", description=MessagesCZ.room_brief)
     async def room(self, inter: disnake.ApplicationCommandInteraction, room: str):
         await inter.response.defer()
         url = f"https://www.fit.vut.cz/fit/map/.cs?show={room.upper()}&big=1"
         r = requests.get(url)
         if r.status_code != 200:
-            await inter.edit_original_response(Messages.fit_room_unreach)
+            await inter.edit_original_response(MessagesCZ.room_unreach)
             return
 
         try:
@@ -39,11 +40,11 @@ class FitRoom(Base, commands.Cog):
             image = main_body.find("svg", {"id": "map"})
             cursor = main_body.find("polygon", {"id": "arrow"})
         except AttributeError:
-            await inter.edit_original_response(Messages.fit_room_parsing_failed)
+            await inter.edit_original_response(MessagesCZ.parsing_failed)
             return
 
         if image is None or cursor is None:
-            await inter.edit_original_response(Messages.fit_room_room_not_on_plan(room=room[:1024]))
+            await inter.edit_original_response(MessagesCZ.room_not_on_plan(room=room[:1024]))
             return
 
         image_bytes = BytesIO()
