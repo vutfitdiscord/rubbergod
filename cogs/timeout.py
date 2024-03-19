@@ -369,14 +369,15 @@ class Timeout(Base, commands.Cog):
                     reason,
                     entry.guild.id,
                 )
+                start = entry.created_at.astimezone(tz=utils.get_local_zone())
                 embed = features_timeout.create_embed(entry.user, "Timeout")
                 features_timeout.add_field_timeout(
                     embed=embed,
                     title=entry.target.display_name,
                     member=entry.target,
                     author=entry.user,
-                    starttime=entry.created_at,
-                    endtime=entry.created_at + length,
+                    starttime=start,
+                    endtime=start + length,
                     length=length,
                     reason=reason,
                 )
