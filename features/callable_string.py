@@ -30,4 +30,7 @@ class Formatable(type):
         try:
             return CallableString(object.__getattribute__(cls, key))
         except AttributeError:
-            raise AttributeError(f"{cls.clsname} class has no attribute {key}")
+            try:
+                return CallableString(super().__getattribute__(key))
+            except AttributeError:
+                raise AttributeError(f"{cls.clsname} class has no attribute {key}")
