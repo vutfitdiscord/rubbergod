@@ -498,26 +498,6 @@ if ("Mám průměr pod 2.0")                                           \n  retur
     config_list_invalid_regex = "Chybný regex\n`{regex_err}`"
     config_synced = "Config successfully synchronized."
 
-    # STREAMLINKS
-    streamlinks_brief = "Úložiště všech streamů"
-    streamlinks_add_brief = "Zapíše nový stream k předmětu"
-    streamlinks_add_link_exists = "Tento stream již existuje."
-    streamlinks_add_success = "Stream byl úspěšně přidán <:HYPERS:493154327318233088>"
-    streamlinks_not_actual = "Tento seznam již není aktuální. Zavolej znovu příkaz pro aktualizaci."
-    streamlinks_list_brief = "Vypíše zjednodušený seznam všech streamů k daném předmětu."
-    streamlinks_no_stream = "K tomuto předmětu ještě neexistuje žádný stream."
-    streamlinks_missing_description = "Nebyl zadán popis linku."
-    streamlinks_remove_brief = "Smazání streamu z předmětu."
-    streamlinks_ID = "ID se nachází v patičce embedu. Na konci v textu v závorce, kde je # (Jen to číslo je ID)."
-    streamlinks_not_exists = "Stream s tímto ID nebyl nalezen."
-    streamlinks_remove_prompt = "Opravdu chceš tento stream odstranit ({link})?"
-    streamlinks_remove_success = "Stream <{link}> byl úspěšně smazán."
-    streamlinks_date_format = "Formát `dd.mm.yyyy`. Bez zadání se bere datum u videa případně dnešní datum."
-    streamlinks_invalid_link = "Neplatný odkaz na stream."
-    streamlinks_update_brief = "Upraví stream z předmětu"
-    streamlinks_update_success = "Stream byl úspěšně upraven <:HYPERS:493154327318233088>"
-    streamlinks_update_nothing_to_change = "Není co měnit - je potřeba alespoň jeden volitelný argument"
-
     # LATEX
     latex_help = f"Příklad:\n`{prefix}latex [?fg=blue] x^n + y^n = z^n`"
     latex_desc = "Vykreslí LaTeX výraz"
