@@ -6,8 +6,9 @@ import disnake
 from disnake.ext import commands
 
 import utils
-from config.messages import Messages
 from database.poll import PollDB
+
+from .messages_cz import MessagesCZ
 
 
 def extract_poll_id(message: disnake.Message) -> int:
@@ -18,14 +19,14 @@ def extract_poll_id(message: disnake.Message) -> int:
 
 async def check_end(inter: disnake.ApplicationCommandInteraction, end: str) -> tuple[bool, datetime]:
     """Check if end is valid and above 5min from now"""
-    end: datetime = utils.parse_time(end, Messages.time_format)
+    end: datetime = utils.parse_time(end, MessagesCZ.time_format)
     now = inter.created_at + timedelta(minutes=5)
 
     if (end - now) > timedelta(days=365):
-        await inter.send(Messages.poll_end_long, ephemeral=True)
+        await inter.send(MessagesCZ.end_long, ephemeral=True)
         return False, end
     elif end < now:
-        await inter.send(Messages.poll_end_short, ephemeral=True)
+        await inter.send(MessagesCZ.end_short, ephemeral=True)
         return False, end
     return True, end
 
@@ -87,7 +88,7 @@ def create_embed(
 ) -> disnake.Embed:
     """Embed template for Poll"""
     end = utils.get_discord_timestamp(end, style="Relative Time")
-    description = Messages.poll_embed_description(
+    description = MessagesCZ.embed_description(
         description=description,
         votes=max_votes,
         date=end,
@@ -111,16 +112,16 @@ async def list_voters(inter: disnake.ApplicationCommandInteraction) -> List[str]
     poll = PollDB.get(extract_poll_id(inter.message))
 
     if poll is None:
-        await inter.send(Messages.poll_not_found)
+        await inter.send(MessagesCZ.not_found)
         return
 
     if poll.anonymous:
-        await inter.send(Messages.poll_is_anonymous)
+        await inter.send(MessagesCZ.is_anonymous)
         return
 
     voters = poll.get_voters()
     if not voters:
-        await inter.send(Messages.poll_no_voters)
+        await inter.send(MessagesCZ.no_voters)
         return
 
     content = f"# [{poll.title}]({poll.message_url})\n"
@@ -140,7 +141,7 @@ async def list_voters(inter: disnake.ApplicationCommandInteraction) -> List[str]
 def create_end_poll_message(poll: PollDB) -> str:
     winning_options = poll.get_winning_options()
     total_votes = poll.get_voters_count()
-    content = Messages.poll_closed(title=poll.title, url=poll.message_url)
+    content = MessagesCZ.closed(title=poll.title, url=poll.message_url)
 
     if total_votes <= 0:
         return content
@@ -154,10 +155,10 @@ def create_end_poll_message(poll: PollDB) -> str:
                 for option in winning_options
             ]
         )
-        content += Messages.poll_tie_options(options=options)
+        content += MessagesCZ.tie_options(options=options)
     else:
         winning_option = winning_options[0]
-        content += Messages.poll_winning_option(
+        content += MessagesCZ.winning_option(
             option=f"## {winning_option.emoji} {winning_option.text}",
             votes=winning_option.voters_count,
             percentage=round(winning_option.voters_count / total_votes * 100),
@@ -174,7 +175,7 @@ async def has_cooldown(
     if retries == 1:
         time = datetime.now() + timedelta(seconds=bucket.get_retry_after())
         timestamp = utils.get_discord_timestamp(time, style="Relative Time")
-        await inter.send(Messages.poll_button_spam(time=timestamp), ephemeral=True)
+        await inter.send(MessagesCZ.button_spam(time=timestamp), ephemeral=True)
         return True
 
     if retry:
