@@ -510,12 +510,6 @@ if ("Mám průměr pod 2.0")                                           \n  retur
     Periwinkle CadetBlue CornflowerBlue MidnightBlue Cerulean Emerald JungleGreen SeaGreen ForestGreen
     PineGreen LimeGreen YellowGreen SpringGreen OliveGreen RawSienna"""
 
-    # FITROOM
-    fit_room_brief = "Zobrazení místnosti na plánku fakulty."
-    fit_room_unreach = "Stránka s plánkem je nedostupná."
-    fit_room_parsing_failed = "Načtení stránky s plánkem se nezdařilo. Nahlaš prosím tuto chybu správci bota."
-    fit_room_room_not_on_plan = "Zadaná místnost {room} není na plánku nebo neexistuje."
-
     # MEME REPOST
     meme_repost_link = "[Odkaz na originál]({original_message_url}) v <#{original_channel}>"
     meme_leaderboard_brief = "#better-memes leaderboard"
