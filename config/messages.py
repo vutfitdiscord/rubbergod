@@ -530,10 +530,6 @@ if ("Mám průměr pod 2.0")                                           \n  retur
     config_list_invalid_regex = "Chybný regex\n`{regex_err}`"
     config_synced = "Config successfully synchronized."
 
-    # WEEK
-    week_brief = "Vypíše, kolikátý je zrovna týden a jestli je sudý nebo lichý"
-    week_warning = "Pro sudý/lichý se využívá kalendářní týden"
-
     # STREAMLINKS
     streamlinks_brief = "Úložiště všech streamů"
     streamlinks_add_brief = "Zapíše nový stream k předmětu"
