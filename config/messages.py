@@ -219,18 +219,6 @@ class Messages(metaclass=Formatable):
     group_reset_channels = "Resetuje kanály pro skupinu"
     group_reset_roles = "Resetuje role pro skupinu"
 
-    # RANDOM
-    random_roll_brief = "Vygeneruje náhodné celé číslo z intervalu <**first**, **second**>"
-    random_flip_brief = "Hodí mincí"
-    random_pick_brief = "Vybere jedno ze slov za otazníkem."
-    random_pick_format = "*Is foo bar? Yes No Maybe*"
-    random_pick_empty = "Nenapsal jsi žádné možnosti k otázce."
-
-    rng_generator_format = f"Použití: `{prefix}roll x [y]`\n" \
-                           "rozmezí x, y jsou celá čísla,\n" \
-                           "pokud y není specifikováno, " \
-                           "je považováno za 0."
-
     # VERIFY
     verify_brief = "Ověření studenta pro přístup na server."
     verify_login_parameter = "Přihlašovací FIT login (`xlogin00`), osobní 6 místné VUT číslo nebo MUNI UČO."
