@@ -4,15 +4,16 @@ from typing import Tuple
 import disnake
 from disnake.ext import commands
 
-import features.report as report_features
 from buttons.base import BaseView
 from config.app_config import config
-from config.messages import Messages
 from database.report import AnswerDB, ReportDB
 from permissions import permission_check
 
+from . import features as report_features
+from .messages_cz import MessagesCZ
 
-class ReportView(BaseView):
+
+class View(BaseView):
     def __init__(self):
         super().__init__(timeout=None)
 
@@ -58,7 +59,7 @@ class ReportView(BaseView):
                     )
             button.label = "Mark spam"
             button.style = disnake.ButtonStyle.red
-            message = Messages.report_message_not_spam(
+            message = MessagesCZ.message_not_spam(
                 id=report.id, author=inter.author.mention, author_name=inter.author.name
             )
             await report_features.set_tag(self.report_channel, inter.message.channel, "open")
@@ -72,7 +73,7 @@ class ReportView(BaseView):
             button.disabled = False
             button.label = f"Spam marked by @{inter.author.name}"
             button.style = disnake.ButtonStyle.primary
-            message = Messages.report_message_spam(
+            message = MessagesCZ.message_spam(
                 id=report.id, author=inter.author.mention, author_name=inter.author.name
             )
             await report_features.set_tag(self.report_channel, inter.message.channel, "spam")
@@ -92,7 +93,7 @@ class ReportView(BaseView):
         if report.resolved:
             embed = await report_features.embed_resolved(self, resolved_by, embed, report.type, False)
             report.set_resolved(report_id, inter.author.id, False)
-            content = Messages.report_unresolved(
+            content = MessagesCZ.report_unresolved(
                 id=report_id, author=inter.author.mention, author_name=inter.author.name
             )
             await report_features.set_tag(self.report_channel, inter.message.channel, "open")
@@ -127,7 +128,7 @@ class ReportView(BaseView):
         report_author = await self.get_report_author(inter)
         report_message = await report_features.convert_url(inter, report.report_url)
         description, embed = await self.set_spam(button, inter, report)
-        title = Messages.report_message_spam_title(id=report_id)
+        title = MessagesCZ.message_spam_title(id=report_id)
         spam_embed = report_features.info_message_embed(inter, report, title, description)
 
         await report_author.send(embed=spam_embed)
@@ -135,13 +136,13 @@ class ReportView(BaseView):
         await inter.edit_original_response(embed=embed, view=self)
 
 
-class ReportGeneralView(ReportView):
+class ReportGeneralView(View):
     def __init__(self, bot: commands.Bot):
         super().__init__()
         self.bot = bot
 
 
-class ReportMessageView(ReportView):
+class ReportMessageView(View):
     def __init__(self, bot: commands.Bot):
         super().__init__()
         self.bot = bot
@@ -162,17 +163,17 @@ class ReportMessageView(ReportView):
 
         if message is None:
             button.label = "Message not found"
-            description = Messages.report_message_already_deleted(
+            description = MessagesCZ.message_already_deleted(
                 author=inter.author.mention, author_name=inter.author.name
             )
         else:
             button.label = f"Deleted by @{inter.author.name}"
-            description = Messages.report_message_deleted(
+            description = MessagesCZ.message_deleted(
                 author=inter.author.mention, author_name=inter.author.name
             )
             await message.delete()
 
-        title = Messages.report_message_deleted_title(id=report_id)
+        title = MessagesCZ.message_deleted_title(id=report_id)
         embed = report_features.info_message_embed(inter, report, title, description)
 
         await report_message.channel.send(embed=embed, allowed_mentions=disnake.AllowedMentions.none())
@@ -193,7 +194,7 @@ class ReportAnonymView(BaseView):
         report_id = report_features.extract_report_id(inter)
         if ReportDB.is_resolved(report_id):
             await inter.message.edit(view=None)
-            await inter.send(Messages.report_already_solved(id=report_id), ephemeral=True)
+            await inter.send(MessagesCZ.report_already_solved(id=report_id), ephemeral=True)
             return False
         return True
 
@@ -238,7 +239,7 @@ class ReportAnswerOnlyView(BaseView):
         report_id = report_features.extract_report_id(inter)
         if ReportDB.is_resolved(report_id):
             await inter.message.edit(view=None)
-            await inter.send(Messages.report_already_solved(id=report_id), ephemeral=True)
+            await inter.send(MessagesCZ.report_already_solved(id=report_id), ephemeral=True)
             return False
         return permission_check.submod_plus(inter)
 
@@ -257,11 +258,11 @@ class ReportAnswerModal(disnake.ui.Modal):
         self.bot = bot
         self.inter = inter
         self.report_id = report_id
-        self.title = Messages.report_answer_title(id=report_id)
+        self.title = MessagesCZ.answer_title(id=report_id)
         components = [
             disnake.ui.TextInput(
                 label=self.title,
-                placeholder=Messages.report_answer,
+                placeholder=MessagesCZ.answer_placeholder,
                 custom_id="answer",
                 style=disnake.TextInputStyle.long,
                 required=True,
@@ -273,7 +274,7 @@ class ReportAnswerModal(disnake.ui.Modal):
 
     async def callback(self, inter: disnake.ModalInteraction) -> None:
         # respond to interaction to prevent timeout
-        await inter.send(Messages.report_answer_success, ephemeral=True)
+        await inter.send(MessagesCZ.answer_success, ephemeral=True)
 
         answer = inter.text_values["answer"]
         report = ReportDB.get_report(self.report_id)
