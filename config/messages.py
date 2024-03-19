@@ -280,33 +280,6 @@ class Messages(metaclass=Formatable):
     dynamic_verify_no_roles = "Nebyla nalezena žádná role."
     dynamic_verify_missing_rule = "Toto pravidlo (`{rule_id}`) neexistuje."
 
-    # POLL
-    poll_basic_brief = "Zahájí hlasování, s vlastními možnostmi."
-    poll_boolean_brief = "Zahájí hlasování, s možnostmi Ano, Ne. Pouze 1 hlas na uživatele."
-    poll_opinion_brief = "Zahájí hlasování, s možnostmi Souhlasím, Neutral, Nesouhlasím. Pouze 1 hlas na uživatele."
-    poll_list_brief = "Vypíše všechna hlasování"
-    poll_already_voted = "Pro možnost **{option}** jsi již hlasoval"
-    poll_closed = "Hlasování s názvem **{title}** bylo ukončeno. {url}\n"
-    poll_winning_option = "Vyhrála možnost\n{option} - {votes} hlasů ({percentage}%)"
-    poll_tie_options = "Remíza mezi možnostmi {options}"
-    poll_embed_description = "{description}\n- Počet hlasů na uživatele: {votes}\n- Konec: {date}\n- " \
-                             "Anonymní hlasování: {anonymous}\n- Celkový počet hlasů: {all_votes}"
-    poll_not_author = "Toto hlasování nemůžeš ukončit, protože nejsi jeho autorem."
-    poll_title_param = "Otázka v hlasování"
-    poll_description_param = "Popis nebo další informace k hlasování"
-    poll_attachment_param = "Přidat obrázek/video k hlasování"
-    poll_anonymous_param = "Anonymní hlasování. Při neanonymním hlasování lze vypsat kdo pro co hlasoval"
-    poll_voted = "Hlasoval jsi pro možnost **{option}**"
-    poll_vote_removed = "Zrušil jsi své hlasování v\n## [{title}]({url})\n"
-    poll_end_short = "Konec hlasování je přílíš krátký. Minimální délka je 5 minut."
-    poll_end_long = "Konec hlasování je přílíš dlouhý. Maximální délka je 1 rok."
-    poll_not_found = "Hlasování nebylo nalezeno."
-    poll_not_voted = "Nehlasoval jsi pro žádnou možnost."
-    poll_button_spam = "Nespamuj prosím. Počkej {time}, aby jsi mohl pokračovat."
-    poll_no_active_polls = "Nebylo nalezeno žádné aktivní hlasování."
-    poll_is_anonymous = "Hlasování je anonymní. Nelze zobrazit hlasy."
-    poll_list_polls = "**ID: {id} | {url} ** - {title}\n"
-
     # VOTE
     vote_brief = "Zahájí hlasování, ve kterém je možné zvolit více možností"
     vote_one_of_brief = "Zahájí hlasování, ve kterém je možné zvolit pouze jednu možnost"

@@ -7,8 +7,8 @@ from disnake.ext import commands
 
 import database.db_migrations as migrations
 from buttons.contestvote import ContestView
-from buttons.poll import PollBasicView, PollBooleanView, PollCloseView, PollOpinionView, PollVotersView
 from buttons.report import ReportAnonymView, ReportAnswerOnlyView, ReportGeneralView, ReportMessageView
+from cogs.poll.views import PollBasicView, PollBooleanView, PollCloseView, PollOpinionView, PollVotersView
 from config.app_config import config
 from config.messages import Messages
 from features import presence
