@@ -510,12 +510,6 @@ if ("Mám průměr pod 2.0")                                           \n  retur
     Periwinkle CadetBlue CornflowerBlue MidnightBlue Cerulean Emerald JungleGreen SeaGreen ForestGreen
     PineGreen LimeGreen YellowGreen SpringGreen OliveGreen RawSienna"""
 
-    # STUDIJNI
-    studijni_brief = "Úřední hodiny studijního Oddělení"
-    studijni_web_error = "Chyba při parsování webu"
-    studijni_office_hours = "Úřední hodiny"
-    studijni_title = "C109 Studijní oddělení"
-
     # FITROOM
     fit_room_brief = "Zobrazení místnosti na plánku fakulty."
     fit_room_unreach = "Stránka s plánkem je nedostupná."
