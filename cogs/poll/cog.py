@@ -17,13 +17,15 @@ from disnake.ext import commands, tasks
 
 import utils
 from buttons.general import TrashView
-from buttons.poll import PollBooleanView, PollOpinionView, PollView, PollVotersView
 from cogs.base import Base
 from config import cooldowns
 from config.messages import Messages
 from database.poll import PollDB, PollType
-from features import poll as poll_features
 from permissions.room_check import RoomCheck
+
+from . import features as poll_features
+from .messages_cz import MessagesCZ
+from .views import PollBooleanView, PollOpinionView, PollView, PollVotersView
 
 time_choices = ["1y 1M 1w 1d 1h 1m 1s", "DD.MM.YYYY HH:MM", "DD.MM.YYYY", "HH:MM"]
 
@@ -50,7 +52,7 @@ class Poll(Base, commands.Cog):
             return
 
         if attachment and attachment.size > 25000000:  # 25MB
-            await inter.send(Messages.attachment_too_big, ephemeral=True)
+            await inter.send(MessagesCZ.attachment_too_big, ephemeral=True)
             return
 
         await inter.response.defer()
@@ -87,26 +89,26 @@ class Poll(Base, commands.Cog):
 
     # TODO
     # @cooldowns.long_cooldown
-    # @_poll.sub_command(name="basic", description=Messages.poll_basic_brief)
+    # @_poll.sub_command(name="basic", description=MessagesCZ.basic_brief)
     # async def basic(
     #     self,
     #     inter: disnake.ApplicationCommandInteraction,
-    #     title: str = commands.Param(description=Messages.poll_title, max_length=256),
+    #     title: str = commands.Param(description=MessagesCZ.poll_title, max_length=256),
     #     description: str = commands.Param(
     #         default="",
-    #         description=Messages.poll_description,
+    #         description=MessagesCZ.description_param,
     #         max_length=3000
     #     ),
     #     end: str = commands.Param(
     #         default="1h",
-    #         description=Messages.time_format,
+    #         description=MessagesCZ.time_format,
     #         max_length=40,
     #         autocomplete=time_choices
     #     ),
     #     attachment: disnake.Attachment = commands.Param(
-    #         default=None, description=Messages.poll_attachment
+    #         default=None, description=MessagesCZ.attachment_param
     #     ),
-    #     anonymous: bool = commands.Param(default=False, description=Messages.poll_anonymous_vote),
+    #     anonymous: bool = commands.Param(default=False, description=MessagesCZ.anonymous_param),
     #     max_votes: int = 1,
     #     # open_poll: bool = False,
     # ):
@@ -114,21 +116,21 @@ class Poll(Base, commands.Cog):
     #     await inter.send("asdf", view=PollBasicView(self.bot))
 
     @cooldowns.long_cooldown
-    @_poll.sub_command(name="boolean", description=Messages.poll_boolean_brief)
+    @_poll.sub_command(name="boolean", description=MessagesCZ.boolean_brief)
     async def boolean(
         self,
         inter: disnake.ApplicationCommandInteraction,
-        title: str = commands.Param(description=Messages.poll_title_param, max_length=256),
+        title: str = commands.Param(description=MessagesCZ.title_param, max_length=256),
         description: str = commands.Param(
-            default="", description=Messages.poll_description_param, max_length=3000
+            default="", description=MessagesCZ.description_param, max_length=3000
         ),
         end: str = commands.Param(
             default="1h", description=Messages.time_format, max_length=40, autocomplete=time_choices
         ),
         attachment: disnake.Attachment = commands.Param(
-            default=None, description=Messages.poll_attachment_param
+            default=None, description=MessagesCZ.attachment_param
         ),
-        anonymous: bool = commands.Param(default=False, description=Messages.poll_anonymous_param),
+        anonymous: bool = commands.Param(default=False, description=MessagesCZ.anonymous_param),
     ):
         args = locals()
         args.pop("self")
@@ -138,21 +140,21 @@ class Poll(Base, commands.Cog):
         )
 
     @cooldowns.long_cooldown
-    @_poll.sub_command(name="opinion", description=Messages.poll_opinion_brief)
+    @_poll.sub_command(name="opinion", description=MessagesCZ.opinion_brief)
     async def opinion(
         self,
         inter: disnake.ApplicationCommandInteraction,
-        title: str = commands.Param(description=Messages.poll_title_param, max_length=256),
+        title: str = commands.Param(description=MessagesCZ.title_param, max_length=256),
         description: str = commands.Param(
-            default="", description=Messages.poll_description_param, max_length=3000
+            default="", description=MessagesCZ.description_param, max_length=3000
         ),
         end: str = commands.Param(
             default="1h", description=Messages.time_format, max_length=40, autocomplete=time_choices
         ),
         attachment: disnake.Attachment = commands.Param(
-            default=None, description=Messages.poll_attachment_param
+            default=None, description=MessagesCZ.attachment_param
         ),
-        anonymous: bool = commands.Param(default=False, description=Messages.poll_anonymous_param),
+        anonymous: bool = commands.Param(default=False, description=MessagesCZ.anonymous_param),
     ):
         args = locals()
         args.pop("self")
@@ -164,7 +166,7 @@ class Poll(Base, commands.Cog):
         )
 
     @cooldowns.default_cooldown
-    @_poll.sub_command(name="list", description=Messages.poll_list_brief)
+    @_poll.sub_command(name="list", description=MessagesCZ.list_brief)
     async def list_polls(
         self,
         inter: disnake.ApplicationCommandInteraction,
@@ -181,7 +183,7 @@ class Poll(Base, commands.Cog):
             polls = PollDB.get_pending_polls_by_type(PollType[poll_type].value)
 
         if not polls:
-            await inter.send(Messages.poll_no_active_polls)
+            await inter.send(MessagesCZ.no_active_polls)
             return
 
         content = ""
@@ -194,10 +196,10 @@ class Poll(Base, commands.Cog):
 
             permission = message.channel.permissions_for(inter.author)
             if permission.view_channel:
-                content += Messages.poll_list_polls(id=poll.id, url=poll.message_url, title=poll.title)
+                content += MessagesCZ.list_polls(id=poll.id, url=poll.message_url, title=poll.title)
 
         if not content:
-            await inter.send(Messages.poll_no_active_polls)
+            await inter.send(MessagesCZ.no_active_polls)
             return
 
         content = utils.cut_string_by_words(header + content, 1900, "\n")
@@ -306,7 +308,3 @@ class PollTask(PollView):
             except disnake.NotFound:
                 # message was deleted
                 poll.remove()
-
-
-def setup(bot):
-    bot.add_cog(Poll(bot))
