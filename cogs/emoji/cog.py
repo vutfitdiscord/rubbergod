@@ -50,7 +50,7 @@ class Emoji(Base, commands.Cog):
         await inter.response.defer(ephemeral=self.check.botroom_check(inter))
 
     @cooldowns.default_cooldown
-    @emoji.sub_command(name="get_emojis", description=MessagesCZ.emoji_get_emojis_brief)
+    @emoji.sub_command(name="get_emojis", description=MessagesCZ.get_emojis_brief)
     async def get_emojis(self, inter: disnake.ApplicationCommandInteraction):
         """Get all emojis from server"""
         if not os.path.exists("emojis.zip"):
@@ -58,7 +58,7 @@ class Emoji(Base, commands.Cog):
         await inter.send(file=disnake.File("emojis.zip"))
 
     @cooldowns.default_cooldown
-    @emoji.sub_command(name="get_emoji", description=MessagesCZ.emoji_get_emoji_brief)
+    @emoji.sub_command(name="get_emoji", description=MessagesCZ.get_emoji_brief)
     async def get_emoji(self, inter: disnake.ApplicationCommandInteraction, emoji: disnake.PartialEmoji):
         """Get emoji in full size"""
         await inter.send(emoji.url)
@@ -70,5 +70,5 @@ class Emoji(Base, commands.Cog):
     @get_emoji.error
     async def emoji_errors(self, inter: disnake.ApplicationCommandInteraction, error):
         if isinstance(error, commands.PartialEmojiConversionFailure):
-            await inter.send(MessagesCZ.emoji_not_emoji, ephemeral=True)
+            await inter.send(MessagesCZ.not_emoji, ephemeral=True)
             return True
