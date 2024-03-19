@@ -7,9 +7,10 @@ from disnake.ext import commands
 import utils
 from buttons.base import BaseView
 from buttons.general import TrashView
-from config.messages import Messages
 from database.poll import PollDB, PollOptionDB
-from features import poll as poll_features
+
+from . import features as poll_features
+from .messages_cz import MessagesCZ
 
 
 class Action:
@@ -142,7 +143,7 @@ class PollView(BaseView):
 
         if str(inter.author.id) in poll_option.voters_ids:
             await inter.send(
-                Messages.poll_already_voted(option=f"{button.emoji} {button.label}"),
+                MessagesCZ.already_voted(option=f"{button.emoji} {button.label}"),
                 ephemeral=True,
                 view=PollRemoveVoteView(self, poll, poll_option),
             )
@@ -152,7 +153,7 @@ class PollView(BaseView):
         self.messages[poll_id] = inter.message
 
         await inter.send(
-            Messages.poll_voted(option=f"{button.emoji} {button.label}"),
+            MessagesCZ.voted(option=f"{button.emoji} {button.label}"),
             ephemeral=True,
             view=PollRemoveVoteView(self, poll, poll_option),
         )
@@ -227,13 +228,13 @@ class PollRemoveVoteView(PollView):
             message: disnake.Message = await utils.get_message_from_url(self.bot, self.poll.message_url)
             if not message:
                 # poll message not found
-                await inter.edit_original_message(Messages.message_not_found)
+                await inter.edit_original_message(MessagesCZ.message_not_found)
                 return
             self.messages[self.poll.id] = message
 
         poll = PollDB.get(self.poll.id)
         if not poll:
-            await inter.edit_original_message(Messages.poll_not_found, view=None)
+            await inter.edit_original_message(MessagesCZ.not_found, view=None)
             return
 
         if not poll.is_active:
@@ -245,13 +246,13 @@ class PollRemoveVoteView(PollView):
             poll.id, str(inter.user.id)
         ):
             # user wants to remove his vote but there is no vote to remove
-            await inter.edit_original_message(Messages.poll_not_voted, view=None)
+            await inter.edit_original_message(MessagesCZ.not_voted, view=None)
             return
 
         await self.action_cache.remove_voter_from_cache(poll.id, str(inter.user.id))
         await self.action_cache.remove_vote(poll.id, str(inter.user.id), self.poll_option.id)
         await inter.edit_original_message(
-            Messages.poll_vote_removed(title=self.poll.title, url=message.jump_url), view=None
+            MessagesCZ.vote_removed(title=self.poll.title, url=message.jump_url), view=None
         )
 
         # TODO - raise error
@@ -298,7 +299,7 @@ class PollCloseView(PollView):
         poll_id = poll_features.extract_poll_id(inter.message)
         author_id = PollDB.get_author_id(poll_id)
         if author_id != str(inter.author.id):
-            await inter.send(Messages.poll_not_author, ephemeral=True)
+            await inter.send(MessagesCZ.not_author, ephemeral=True)
             return
 
         await self.action_cache.end_poll(poll_id)
@@ -324,24 +325,24 @@ class PollCloseView(PollView):
         await inter.message.reply(content=content, embed=embed, view=poll_view)
 
 
-class PollModal(disnake.ui.Modal):  # TODO
-    def __init__(self, view, bot, inter: disnake.MessageInteraction, report_id: int) -> None:
-        self.view = view
-        self.bot = bot
-        self.inter = inter
-        self.report_id = report_id
-        self.title = Messages.report_answer_title(id=report_id)
-        components = [
-            disnake.ui.TextInput(
-                label=self.title,
-                placeholder=Messages.report_answer,
-                custom_id="answer",
-                style=disnake.TextInputStyle.long,
-                required=True,
-                max_length=2000,
-            )
-        ]
+# class PollModal(disnake.ui.Modal):  # TODO
+#     def __init__(self, view, bot, inter: disnake.MessageInteraction, report_id: int) -> None:
+#         self.view = view
+#         self.bot = bot
+#         self.inter = inter
+#         self.report_id = report_id
+#         self.title = # TODO
+#         components = [
+#             disnake.ui.TextInput(
+#                 label=self.title,
+#                 placeholder= # TODO,
+#                 custom_id="answer",
+#                 style=disnake.TextInputStyle.long,
+#                 required=True,
+#                 max_length=2000,
+#             )
+#         ]
 
-        super().__init__(title=self.title, custom_id="poll_modal", timeout=900, components=components)
+#         super().__init__(title=self.title, custom_id="poll_modal", timeout=900, components=components)
 
-    async def callback(self, inter: disnake.ModalInteraction) -> None: ...
+#     async def callback(self, inter: disnake.ModalInteraction) -> None: ...
