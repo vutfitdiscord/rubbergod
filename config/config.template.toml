@@ -31,7 +31,7 @@ db_string = "postgresql://postgres:postgres@db:5432/postgres"
 extensions = ['karma', 'meme', 'memerepost', 'random', 'verify', 'fitwide', 'autopin',
     'help', 'review', 'vote', 'week', 'roles', 'error', 'absolvent', 'gif', 'reactions',
     'streamlinks', 'bookmark', 'latex', 'info', 'fun', 'moderation', 'message',
-    'timeout', 'forum', 'report', 'contestvote', 'emoji']
+    'timeout', 'forum', 'report', 'contestvote', 'emoji', 'poll']
 
 [config]
 static = ['config_static', 'toml_dict', 'key', 'weather_token', 'db_string']
