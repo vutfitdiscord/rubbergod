@@ -3,15 +3,16 @@ from functools import cached_property
 import disnake
 from disnake.ext import commands
 
-import features.report as report_features
 import utils
-from buttons.report import ReportGeneralView, ReportMessageView
+from cogs.report.views import ReportGeneralView, ReportMessageView
 from config.app_config import config
 from config.messages import Messages
 from database.report import ReportDB, UserDB
 
+from . import features as report_features
 
-class ReportModal(disnake.ui.Modal):
+
+class Modal(disnake.ui.Modal):
     def __init__(
         self,
         bot: commands.Bot,

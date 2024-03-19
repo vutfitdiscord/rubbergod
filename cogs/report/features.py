@@ -6,8 +6,9 @@ import disnake
 from disnake.ext import commands
 
 import utils
-from config.messages import Messages
 from database.report import ReportDB
+
+from .messages_cz import MessagesCZ
 
 
 def extract_report_id(inter: disnake.MessageInteraction) -> int:
@@ -66,7 +67,7 @@ async def embed_resolved(self, author: str, embed: dict, report_type: str, resol
 
 def answer_embed(title, inter: disnake.ModalInteraction, report: ReportDB, answer: str) -> disnake.Embed:
     """creates an embed template for the submitted answer"""
-    description = Messages.report_embed_answered(last_answer=report.last_answer, answer=answer)
+    description = MessagesCZ.embed_answered(last_answer=report.last_answer, answer=answer)
     embed = disnake.Embed(title=title, description=description, color=disnake.Color.yellow())
 
     if inter.channel.type == disnake.ChannelType.private:
