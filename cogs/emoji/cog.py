@@ -1,5 +1,5 @@
 """
-Cog for managing server emojis. Download emojis and stickers. Get full size of emoji.\
+Cog for managing server emojis. Download emojis and stickers. Get full size of emoji.
 """
 
 import io
@@ -13,8 +13,9 @@ from disnake.ext import commands, tasks
 import utils
 from cogs.base import Base
 from config import cooldowns
-from config.messages import Messages
 from permissions import room_check
+
+from .messages_cz import MessagesCZ
 
 
 class Emoji(Base, commands.Cog):
@@ -49,7 +50,7 @@ class Emoji(Base, commands.Cog):
         await inter.response.defer(ephemeral=self.check.botroom_check(inter))
 
     @cooldowns.default_cooldown
-    @emoji.sub_command(name="get_emojis", description=Messages.emoji_get_emojis_brief)
+    @emoji.sub_command(name="get_emojis", description=MessagesCZ.emoji_get_emojis_brief)
     async def get_emojis(self, inter: disnake.ApplicationCommandInteraction):
         """Get all emojis from server"""
         if not os.path.exists("emojis.zip"):
@@ -57,7 +58,7 @@ class Emoji(Base, commands.Cog):
         await inter.send(file=disnake.File("emojis.zip"))
 
     @cooldowns.default_cooldown
-    @emoji.sub_command(name="get_emoji", description=Messages.emoji_get_emoji_brief)
+    @emoji.sub_command(name="get_emoji", description=MessagesCZ.emoji_get_emoji_brief)
     async def get_emoji(self, inter: disnake.ApplicationCommandInteraction, emoji: disnake.PartialEmoji):
         """Get emoji in full size"""
         await inter.send(emoji.url)
@@ -69,9 +70,5 @@ class Emoji(Base, commands.Cog):
     @get_emoji.error
     async def emoji_errors(self, inter: disnake.ApplicationCommandInteraction, error):
         if isinstance(error, commands.PartialEmojiConversionFailure):
-            await inter.send(Messages.emoji_not_emoji, ephemeral=True)
+            await inter.send(MessagesCZ.emoji_not_emoji, ephemeral=True)
             return True
-
-
-def setup(bot):
-    bot.add_cog(Emoji(bot))
