@@ -377,8 +377,8 @@ class Timeout(Base, commands.Cog):
                     entry.guild.id,
                 )
                 start = entry.created_at.astimezone(tz=utils.get_local_zone())
-                embed = features_timeout.create_embed(entry.user, "Timeout")
-                features_timeout.add_field_timeout(
+                embed = features.create_embed(entry.user, "Timeout")
+                features.add_field_timeout(
                     embed=embed,
                     title=entry.target.display_name,
                     member=entry.target,
