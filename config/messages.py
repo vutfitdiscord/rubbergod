@@ -8,9 +8,6 @@ class Messages(metaclass=Formatable):
 
     server_warning = "Tohle funguje jen na VUT FIT serveru."
 
-    help_title = "Nápověda"
-    help_description = "Kompletní seznam lze také najít ve veřejné administraci bota (https://public.grillbot.eu/)"
-
     karma_get_missing = "Toaster pls, měl jsi bordel v DB. Musel jsem za tebe uklidit."
 
     on_ready_message = "<:peepowave:693070888546861096>"
@@ -67,7 +64,6 @@ class Messages(metaclass=Formatable):
     spamming = "{user} Nespamuj tolik <:sadcat:576171980118687754>, příkaz můžeš použít až za {time}."
     member_not_found = "{member} Nikoho takového jsem na serveru nenašel."
     user_not_found = "{user} Nikoho takového jsem nenašel."
-    help_command_not_found = "Žádný příkaz jako `{command}` neexistuje."
 
     # PERMISSIONS
     missing_perms = "{user}, na použití tohoto příkazu nemáš právo."
