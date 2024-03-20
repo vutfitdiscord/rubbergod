@@ -370,13 +370,6 @@ class Messages(metaclass=Formatable):
     tierboard_brief = "Založeno na `reviews` z průměru tier hodnot"
     tierboard_missing_year = f"Nemáš ročníkovou roli, prosím specifikuj ročník"
 
-    # NAMEDAY
-    name_day_cz = "Dnes má svátek {name}"
-    name_day_cz_brief = "Vypíše, kdo má dnes svátek"
-    name_day_sk = "Dnes má meniny {name}"
-    name_day_sk_brief = "Vypíše, kto má dnes meniny"
-    birthday_api_error = "Hobitovi to zas nefunguje, tak nevím kdo má dnes narozeniny <:sadge:751913081285902336>"
-
     # WARDEN
     warden_scan_brief = "Prohledá obrázky v aktuálním kanále a uloží je jako hash pro detekci repostu.\nlimit: [all | <int>]"
     repost_title = "Nápověda"
