@@ -9,7 +9,6 @@ import re
 from datetime import datetime
 from io import BytesIO
 from random import randint
-from typing import Dict, List, Optional, Tuple
 
 import aiohttp
 import disnake
@@ -18,10 +17,12 @@ from disnake.ext import commands
 import utils
 from cogs.base import Base
 from config import cooldowns
-from config.messages import Messages
 from permissions.custom_errors import ApiError
 
-fuchs_list = os.listdir("images/fuchs/")
+from .messages_cz import MessagesCZ
+
+fuchs_path = "cogs/fun/fuchs/"
+fuchs_list = os.listdir(fuchs_path)
 
 
 class Fun(Base, commands.Cog):
@@ -32,7 +33,7 @@ class Fun(Base, commands.Cog):
     def custom_footer(self, author, url) -> str:
         return f"📩 {author} | {url} • {datetime.now().strftime('%d.%m.%Y %H:%M')}"
 
-    async def get_image(self, inter, url) -> Optional[Tuple[BytesIO, str]]:
+    async def get_image(self, inter, url) -> tuple[BytesIO, str] | None:
         async with aiohttp.ClientSession() as session:
             # get random image url
             async with session.get(url) as response:
@@ -65,8 +66,8 @@ class Fun(Base, commands.Cog):
         return fact_response
 
     @cooldowns.default_cooldown
-    @commands.slash_command(name="cat", description=Messages.fun_cat_brief)
-    async def cat(self, inter):
+    @commands.slash_command(name="cat", description=MessagesCZ.cat_brief)
+    async def cat(self, inter: disnake.ApplicationCommandInteraction):
         """Get random image of a cat"""
         await inter.response.defer()
 
@@ -80,7 +81,7 @@ class Fun(Base, commands.Cog):
         image_embed = disnake.Embed(color=disnake.Color.blue())
         image_embed.set_footer(text=self.custom_footer(inter.author, "thecatapi.com"))
         image_embed.set_image(file=image_file)
-        embeds: List[disnake.Embed] = [image_embed]
+        embeds: list[disnake.Embed] = [image_embed]
 
         if fact_response:
             fact_embed = disnake.Embed(
@@ -94,8 +95,8 @@ class Fun(Base, commands.Cog):
         await inter.send(embeds=embeds)
 
     @cooldowns.default_cooldown
-    @commands.slash_command(name="dog", description=Messages.fun_dog_brief)
-    async def dog(self, inter):
+    @commands.slash_command(name="dog", description=MessagesCZ.dog_brief)
+    async def dog(self, inter: disnake.ApplicationCommandInteraction):
         """Get random image of a dog"""
         await inter.response.defer()
 
@@ -109,7 +110,7 @@ class Fun(Base, commands.Cog):
         image_embed = disnake.Embed(color=disnake.Color.blue())
         image_embed.set_footer(text=self.custom_footer(inter.author, "thedogapi.com"))
         image_embed.set_image(file=image_file)
-        embeds: List[disnake.Embed] = [image_embed]
+        embeds: list[disnake.Embed] = [image_embed]
 
         if fact_response:
             fact_embed = disnake.Embed(
@@ -123,8 +124,8 @@ class Fun(Base, commands.Cog):
         await inter.send(embeds=embeds)
 
     @cooldowns.default_cooldown
-    @commands.slash_command(name="fox", description=Messages.fun_fox_brief)
-    async def fox(self, inter):
+    @commands.slash_command(name="fox", description=MessagesCZ.fox_brief)
+    async def fox(self, inter: disnake.ApplicationCommandInteraction):
         """Get random image of a fox"""
         await inter.response.defer()
 
@@ -138,8 +139,8 @@ class Fun(Base, commands.Cog):
         await inter.send(embed=embed)
 
     @cooldowns.default_cooldown
-    @commands.slash_command(name="duck", description=Messages.fun_duck_brief)
-    async def duck(self, inter):
+    @commands.slash_command(name="duck", description=MessagesCZ.duck_brief)
+    async def duck(self, inter: disnake.ApplicationCommandInteraction):
         """Get random image of a duck"""
         await inter.response.defer()
 
@@ -153,7 +154,7 @@ class Fun(Base, commands.Cog):
         await inter.send(embed=embed)
 
     @cooldowns.default_cooldown
-    @commands.slash_command(name="dadjoke", description=Messages.fun_dadjoke_brief)
+    @commands.slash_command(name="dadjoke", description=MessagesCZ.dadjoke_brief)
     async def dadjoke(self, inter: disnake.ApplicationCommandInteraction, *, keyword=None):
         """Get random dad joke
         Arguments
@@ -166,12 +167,12 @@ class Fun(Base, commands.Cog):
             await inter.send("I didn't find a joke like that.")
             return
 
-        params: Dict[str, str] = {"limit": "30"}
+        params: dict[str, str] = {"limit": "30"}
         url: str = "https://icanhazdadjoke.com"
         if keyword is not None:
             params["term"] = keyword
             url += "/search"
-        headers: Dict[str, str] = {"Accept": "application/json"}
+        headers: dict[str, str] = {"Accept": "application/json"}
 
         async with aiohttp.ClientSession() as session:
             async with session.get(url, headers=headers, params=params) as response:
@@ -205,8 +206,8 @@ class Fun(Base, commands.Cog):
         await inter.send(embed=embed)
 
     @cooldowns.default_cooldown
-    @commands.slash_command(name="yo_mamajoke", description=Messages.fun_yo_mamajoke_brief)
-    async def yo_mamajoke(self, inter):
+    @commands.slash_command(name="yo_mamajoke", description=MessagesCZ.yo_mamajoke_brief)
+    async def yo_mamajoke(self, inter: disnake.ApplicationCommandInteraction):
         """Get random Yo momma joke"""
         await inter.response.defer()
 
@@ -227,12 +228,16 @@ class Fun(Base, commands.Cog):
         await inter.send(embed=embed)
 
     @cooldowns.default_cooldown
-    @commands.slash_command(name="fuchs", description=Messages.fun_fuchs_brief)
-    async def fuchs(self, inter, hlaskaid: int = commands.Param(default=None, ge=1, le=len(fuchs_list))):
+    @commands.slash_command(name="fuchs", description=MessagesCZ.fuchs_brief)
+    async def fuchs(
+        self,
+        inter: disnake.ApplicationCommandInteraction,
+        hlaskaid: int = commands.Param(default=None, ge=1, le=len(fuchs_list)),
+    ):
         await inter.response.defer()
 
         if len(fuchs_list) == 0:
-            inter.send(Messages.fun_fuchs_no_reaction)
+            inter.send(MessagesCZ.fuchs_no_reaction)
             return
 
         if hlaskaid is None:
@@ -248,9 +253,5 @@ class Fun(Base, commands.Cog):
 
         utils.add_author_footer(embed, inter.author, additional_text=[f" (hláškaid: #{str(index)})"])
 
-        with open("images/fuchs/" + str(index) + ".png", "rb") as fp:
+        with open(fuchs_path + str(index) + ".png", "rb") as fp:
             await inter.send(embed=embed, file=disnake.File(fp=fp, filename=str(index) + ".png"))
-
-
-def setup(bot):
-    bot.add_cog(Fun(bot))
