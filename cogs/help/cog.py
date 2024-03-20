@@ -12,8 +12,9 @@ import utils
 from buttons.embed import EmbedView
 from cogs.base import Base
 from config import cooldowns
-from config.messages import Messages
 from features.git import Git
+
+from .messages_cz import MessagesCZ
 
 
 class Help(Base, commands.Cog):
@@ -75,9 +76,7 @@ class Help(Base, commands.Cog):
         return pages
 
     def generate_embed(self, page):
-        embed = disnake.Embed(
-            title=Messages.help_title, description=Messages.help_description, color=0xEEE657
-        )
+        embed = disnake.Embed(title=MessagesCZ.title, description=MessagesCZ.description, color=0xEEE657)
         embed.set_thumbnail(url=self.bot.user.display_avatar.url)
         self.add_fields(embed, page["commands"])
         return embed
@@ -134,14 +133,14 @@ class Help(Base, commands.Cog):
         return 0, help
 
     @cooldowns.default_cooldown
-    @commands.command(aliases=["god"], brief=Messages.help_title)
+    @commands.command(aliases=["god"], brief=MessagesCZ.title)
     async def help(self, ctx: commands.Context, *command):
         # Subcommand help
         command = " ".join(command)
         if command:
             command_obj = self.bot.get_command(command)
             if not command_obj:
-                await ctx.send(Messages.help_command_not_found(command=command[:1024]))
+                await ctx.send(MessagesCZ.command_not_found(command=command[:1024]))
             else:
                 # if command group, show all possible subcommands
                 if isinstance(command_obj, commands.Group):
@@ -173,7 +172,3 @@ class Help(Base, commands.Cog):
 
         view = EmbedView(ctx.author, embeds, perma_lock=True)
         view.message = await ctx.reply(embed=embeds[0], view=view)
-
-
-def setup(bot):
-    bot.add_cog(Help(bot))
