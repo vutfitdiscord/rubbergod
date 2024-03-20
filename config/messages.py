@@ -549,16 +549,6 @@ if ("Mám průměr pod 2.0")                                           \n  retur
     slowmode_remove_brief = "Vypne slowmode v aktuálním kanálu"
     slowmode_remove_success = "Slowmode v kanálu {channel} úspěšně odstraněn."
 
-    # FUN COG
-    fun_cat_brief = "Pošle náhodný obrázek kočky"
-    fun_dog_brief = "Pošle náhodný obrázek psa"
-    fun_fox_brief = "Pošle náhodný obrázek lišky"
-    fun_duck_brief = "Pošle náhodný obrázek kachny"
-    fun_dadjoke_brief = "Pošle náhodný dadjoke nebo vyhledá podle zadaného slova"
-    fun_yo_mamajoke_brief = "Pošle náhodný Yo momma joke"
-    fun_fuchs_brief = "Pošle náhodnou fuchs reakci"
-    fun_fuchs_no_reaction = "Žádná fuchs reakce není k dispozici"
-
     # SUBSCRIPTIONS COG
     subscription_add_brief = "Přidá odběr na vlákna se zvoleným tagem"
     subscription_remove_brief = "Zruší odběr na vlákna se zvoleným tagem"
