@@ -76,7 +76,3 @@ class Reactions(Base, commands.Cog):
                     session.rollback()
                 except disnake.errors.DiscordServerError:
                     pass
-
-
-def setup(bot):
-    bot.add_cog(Reactions(bot))
