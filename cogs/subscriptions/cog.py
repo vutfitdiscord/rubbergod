@@ -5,12 +5,13 @@ Cog implementing subscriptions to forum posts based on their tags
 import disnake
 from disnake.ext import commands
 
+import utils
 from buttons.general import TrashView
 from cogs.base import Base
 from config import cooldowns
-from config.messages import Messages
 from database.subscription import AlreadyNotifiedDB, SubscriptionDB
-from utils import add_author_footer
+
+from .messages_cz import MessagesCZ
 
 
 async def autocomp_available_tags(inter: disnake.ApplicationCommandInteraction, user_input: str):
@@ -36,7 +37,7 @@ class Subscriptions(Base, commands.Cog):
         """Group of commands for forum subscriptions."""
         await inter.response.defer(ephemeral=True)
 
-    @subscription.sub_command(name="add", description=Messages.subscription_add_brief)
+    @subscription.sub_command(name="add", description=MessagesCZ.add_brief)
     async def add(
         self,
         inter: disnake.ApplicationCommandInteraction,
@@ -45,17 +46,15 @@ class Subscriptions(Base, commands.Cog):
     ):
         available_tags = [tag.name for tag in channel.available_tags]
         if tag not in available_tags:
-            await inter.edit_original_message(
-                Messages.subscription_tag_not_found(channel=channel.mention, tag=tag)
-            )
+            await inter.edit_original_message(MessagesCZ.tag_not_found(channel=channel.mention, tag=tag))
             return
         if SubscriptionDB.get(str(inter.author.id), str(channel.id), tag):
-            await inter.edit_original_message(Messages.subscription_already_subscribed)
+            await inter.edit_original_message(MessagesCZ.already_subscribed)
             return
         SubscriptionDB.add(inter.author.id, channel.id, tag)
-        await inter.edit_original_response(Messages.subscription_added(channel=channel.mention, tag=tag))
+        await inter.edit_original_response(MessagesCZ.subscription_added(channel=channel.mention, tag=tag))
 
-    @subscription.sub_command(name="remove", description=Messages.subscription_remove_brief)
+    @subscription.sub_command(name="remove", description=MessagesCZ.remove_brief)
     async def remove(
         self,
         inter: disnake.ApplicationCommandInteraction,
@@ -64,16 +63,16 @@ class Subscriptions(Base, commands.Cog):
     ):
         sub = SubscriptionDB.get(str(inter.author.id), str(channel.id), tag)
         if not sub:
-            await inter.edit_original_message(Messages.subscription_not_found(tag=tag))
+            await inter.edit_original_message(MessagesCZ.subscription_not_found(tag=tag))
             return
         sub.remove()
-        await inter.edit_original_message(Messages.subscription_removed(channel=channel.mention, tag=tag))
+        await inter.edit_original_message(MessagesCZ.subscription_removed(channel=channel.mention, tag=tag))
 
-    @subscription.sub_command(name="list", description=Messages.subscription_list_brief)
+    @subscription.sub_command(name="list", description=MessagesCZ.list_brief)
     async def list(self, inter: disnake.ApplicationCommandInteraction):
         subs = SubscriptionDB.get_user(str(inter.author.id))
         sub_list = [f"> <#{sub.forum_id}> - {sub.tag}" for sub in subs]
-        message = f"{Messages.subscription_list_title}\n" + "\n".join(sub_list)
+        message = f"{MessagesCZ.list_title}\n" + "\n".join(sub_list)
         await inter.edit_original_response(message)
 
     @commands.Cog.listener()
@@ -110,17 +109,13 @@ class Subscriptions(Base, commands.Cog):
         first_message = await thread.history(limit=1, oldest_first=True).flatten()
         content = first_message[0].content if first_message[0] else None
         embed = disnake.Embed(
-            title=Messages.subscription_embed_title,
+            title=MessagesCZ.embed_title,
             url=thread.jump_url,
             description=content,
         )
-        embed.add_field(name=Messages.subscription_embed_author, value=thread.owner.display_name)
-        embed.add_field(name=Messages.subscription_embed_channel, value=thread.mention)
+        embed.add_field(name=MessagesCZ.embed_author, value=thread.owner.display_name)
+        embed.add_field(name=MessagesCZ.embed_channel, value=thread.mention)
         tags = [f"`{tag.name}`" for tag in thread.applied_tags]
-        embed.add_field(name=Messages.subscription_embed_tags, value=", ".join(tags))
-        add_author_footer(embed, thread.owner)
+        embed.add_field(name=MessagesCZ.embed_tags, value=", ".join(tags))
+        utils.add_author_footer(embed, thread.owner)
         await user.send(embed=embed, view=TrashView())
-
-
-def setup(bot: commands.Bot):
-    bot.add_cog(Subscriptions(bot))
