@@ -19,9 +19,11 @@ class Forum(Base, commands.Cog):
         guild: disnake.Guild = self.bot.get_guild(payload.guild_id)
         if guild is None:
             return
+
         thread = guild.get_channel_or_thread(payload.channel_id)
         if not isinstance(thread, disnake.Thread):
             return
+
         if thread.parent_id not in self.config.forum_autoclose_forums:
             return
 
@@ -52,7 +54,3 @@ class Forum(Base, commands.Cog):
         if any(tag in after_tags for tag in self.config.forum_tags):
             await thread.edit(auto_archive_duration=one_day)
             return
-
-
-def setup(bot):
-    bot.add_cog(Forum(bot))
