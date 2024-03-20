@@ -163,12 +163,6 @@ class Messages(metaclass=Formatable):
                               "Množství pozitivně rozdané karmy: **{positive}** \n" \
                               "Množství negativně rozdané karmy: **{negative}**"
 
-    # GIF
-    bonk_brief = "Bonk na uživatele"
-    unsupported_image = "Tento avatar aktuálne není podporovaný <:sadcat:576171980118687754>"
-    pet_brief = "Vytvoří gif z uživatele."
-    gif_req_error = "Nepodařilo se získat profilový obrázek uživatele."
-
     # ROLES
     role_add_denied = "{user}, na přidání role {role} nemáš právo."
     role_remove_denied = "{user}, na odebrání role {role} nemáš právo."
