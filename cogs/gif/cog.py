@@ -11,8 +11,9 @@ from PIL import Image
 
 from cogs.base import Base
 from config import cooldowns
-from config.messages import Messages
 from features.imagehandler import ImageHandler
+
+from .messages_cz import MessagesCZ
 
 
 class Gif(Base, commands.Cog):
@@ -25,13 +26,13 @@ class Gif(Base, commands.Cog):
         try:
             response = requests.get(url, timeout=10)
         except requests.exceptions.RequestException:
-            await inter.send(Messages.gif_req_error, ephemeral=True)
+            await inter.send(MessagesCZ.gif_req_error, ephemeral=True)
             return None
         avatar = Image.open(BytesIO(response.content)).convert("RGBA")
         return avatar
 
     @cooldowns.default_cooldown
-    @commands.slash_command(name="pet", description=Messages.pet_brief)
+    @commands.slash_command(name="pet", description=MessagesCZ.pet_brief)
     async def pet(self, inter: disnake.ApplicationCommandInteraction, user: disnake.User = None):
         user = inter.author if user is None else user
         url = user.display_avatar.with_format("png")
@@ -81,7 +82,7 @@ class Gif(Base, commands.Cog):
         try:
             response = requests.get(url, timeout=10)
         except requests.exceptions.RequestException:
-            await inter.send(Messages.gif_req_error, ephemeral=True)
+            await inter.send(MessagesCZ.gif_req_error, ephemeral=True)
             return
         avatar = Image.open(BytesIO(response.content)).convert("RGBA")
 
@@ -99,7 +100,7 @@ class Gif(Base, commands.Cog):
             return
 
     @cooldowns.default_cooldown
-    @commands.slash_command(name="bonk", description=Messages.bonk_brief)
+    @commands.slash_command(name="bonk", description=MessagesCZ.bonk_brief)
     async def bonk(self, inter: disnake.ApplicationCommandInteraction, user: disnake.User = None):
         """Bonk someone
         user: disnake.User. If none, the bot will bonk you.
@@ -126,7 +127,3 @@ class Gif(Base, commands.Cog):
             )
             image_binary.seek(0)
             await inter.send(file=disnake.File(fp=image_binary, filename="bonk.gif"))
-
-
-def setup(bot):
-    bot.add_cog(Gif(bot))
