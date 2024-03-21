@@ -1,16 +1,14 @@
-"""
-Helper functions for image manipulation and creation of gifs.
-"""
-
 from io import BytesIO
 from pathlib import Path
-from typing import List
 
 from PIL import Image, ImageDraw
 
+IMAGES_PATH = Path("cogs/gif/images")
+
 
 class ImageHandler:
-    def square_to_circle(self, image: Image.Image) -> Image.Image:
+    @classmethod
+    def square_to_circle(cls, image: Image.Image) -> Image.Image:
         width, height = image.size
         mask = Image.new("L", (width, height), 0)
         draw = ImageDraw.Draw(mask)
@@ -22,17 +20,18 @@ class ImageHandler:
         result.paste(image, (0, 0), mask=circle_alpha)
         return result
 
-    def render_catnap(self, image_binary: BytesIO, avatar: Image, avatar_offset=(48, 12)):
+    @classmethod
+    def render_catnap(cls, image_binary: BytesIO, avatar: Image, avatar_offset=(48, 12)):
         speed = 60
         hop_size = 4
         frame_count = 11
 
-        image_path = Path(__file__).parent.parent / "images" / "cat_steal"
+        images_path = IMAGES_PATH / "cat_steal"
 
         im = Image.new("RGBA", (150, 200), (0, 0, 0, 0))
 
-        background = Image.open(image_path / "catyay.png").convert("RGBA")
-        catpaw = Image.open(image_path / "catpaw.png").convert("RGBA")
+        background = Image.open(images_path / "catyay.png").convert("RGBA")
+        catpaw = Image.open(images_path / "catpaw.png").convert("RGBA")
 
         x, y = avatar_offset
         width, height = 150, 150
@@ -69,18 +68,21 @@ class ImageHandler:
         )
         image_binary.seek(0)
 
-    def get_bonk_frames(self, avatar: Image.Image) -> List[Image.Image]:
+    @classmethod
+    def get_bonk_frames(cls, avatar: Image.Image) -> list[Image.Image]:
         """Get frames for the bonk"""
         frames = []
         width, height = 200, 170
         deformation = (0, 0, 0, 5, 10, 20, 15, 5)
 
-        avatar = self.square_to_circle(avatar.resize((100, 100)))
+        avatar = cls.square_to_circle(avatar.resize((100, 100)))
+
+        images_path = IMAGES_PATH / "bonk"
 
         for i in range(8):
             img = "%02d" % (i + 1)
             frame = Image.new("RGBA", (width, height), (0, 0, 0, 0))
-            bat = Image.open(f"images/bonk/{img}.png").convert("RGBA")
+            bat = Image.open(f"{images_path}/{img}.png").convert("RGBA")
             avatar = avatar.resize((100, 100 - deformation[i]))
             frame_avatar = avatar.convert("P", palette=Image.ADAPTIVE, colors=200).convert("RGBA")
 
