@@ -11,8 +11,8 @@ from PIL import Image
 
 from cogs.base import Base
 from config import cooldowns
-from features.imagehandler import ImageHandler
 
+from .features import IMAGES_PATH, ImageHandler
 from .messages_cz import MessagesCZ
 
 
@@ -39,7 +39,7 @@ class Gif(Base, commands.Cog):
         avatar = await self.get_profile_picture(inter, url)
         if avatar is None:
             return
-        avatar = self.imagehandler.square_to_circle(avatar)
+        avatar = ImageHandler.square_to_circle(avatar)
 
         frames = []
         deformWidth = [-1, -2, 1, 2, 1]
@@ -47,9 +47,11 @@ class Gif(Base, commands.Cog):
         width, height = 80, 80
         x, y = 112, 122
 
+        images_path = IMAGES_PATH / "pet"
+
         for i in range(5):
             frame = Image.new("RGBA", (x, y), (0, 0, 0, 0))
-            hand = Image.open(f"images/pet/{i}.png")
+            hand = Image.open(f"{images_path}/{i}.png")
             width = width - deformWidth[i]
             height = height - deformHeight[i]
             avatar = avatar.resize((width, height))
@@ -95,7 +97,7 @@ class Gif(Base, commands.Cog):
         avatar = self.imagehandler.square_to_circle(avatar)
         avatar = avatar.convert("P", palette=Image.ADAPTIVE, colors=200).convert("RGBA")
         with BytesIO() as image_binary:
-            self.imagehandler.render_catnap(image_binary, avatar)
+            ImageHandler.render_catnap(image_binary, avatar)
             await inter.send(file=disnake.File(fp=image_binary, filename="steal.gif"))
             return
 
@@ -112,7 +114,7 @@ class Gif(Base, commands.Cog):
         if avatar is None:
             return
 
-        frames = self.imagehandler.get_bonk_frames(avatar)
+        frames = ImageHandler.get_bonk_frames(avatar)
 
         with BytesIO() as image_binary:
             frames[0].save(
