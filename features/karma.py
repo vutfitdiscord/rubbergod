@@ -7,7 +7,7 @@ from disnake.ext.commands import Bot
 from emoji import demojize
 
 import utils
-from cogs.grillbotapi import GrillbotApi
+from cogs.grillbotapi.cog import GrillbotApi
 from config.app_config import config as cfg
 from config.messages import Messages
 from database.karma import KarmaDB, KarmaEmojiDB
