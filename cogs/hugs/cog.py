@@ -9,16 +9,17 @@ import utils
 from buttons.embed import EmbedView
 from cogs.base import Base
 from config import cooldowns
-from config.messages import Messages
 from database.hugs import HugsTableDB
 from features.leaderboard import LeaderboardPageSource
 from permissions import room_check
 from utils import make_pts_column_row_formatter
 
+from .messages_cz import MessagesCZ
+
 
 def _tophugs_formatter(entry: HugsTableDB, **kwargs):
     return (
-        Messages.base_leaderboard_format_str.format_map(kwargs)
+        MessagesCZ.base_leaderboard_format_str.format_map(kwargs)
         + f" _Given:_ **{entry.given}** - _Received:_** {entry.received}**"
     )
 
@@ -43,7 +44,7 @@ class Hugs(Base, commands.Cog):
         pass
 
     @cooldowns.default_cooldown
-    @_hug.sub_command(name="hugboard", description=Messages.hug_hugboard_brief)
+    @_hug.sub_command(name="hugboard", description=MessagesCZ.hugboard_brief)
     async def hugboard(self, inter: disnake.ApplicationCommandInteraction):
         """
         Overall hugging stats.
@@ -67,7 +68,7 @@ class Hugs(Base, commands.Cog):
         view.message = await inter.edit_original_response(embed=embed, view=view)
 
     @cooldowns.default_cooldown
-    @_hug.sub_command(name="huggersboard", description=Messages.hug_huggersboard_brief)
+    @_hug.sub_command(name="huggersboard", description=MessagesCZ.huggersboard_brief)
     async def huggersboard(self, inter: disnake.ApplicationCommandInteraction):
         """
         Get the biggest huggers.
@@ -91,7 +92,7 @@ class Hugs(Base, commands.Cog):
         view.message = await inter.edit_original_response(embed=embed, view=view)
 
     @cooldowns.default_cooldown
-    @_hug.sub_command(name="mosthugged", description=Messages.hug_mosthugged_brief)
+    @_hug.sub_command(name="mosthugged", description=MessagesCZ.mosthugged_brief)
     async def mosthugged(self, inter: disnake.ApplicationCommandInteraction):
         """
         Get the most hugged.
@@ -115,7 +116,7 @@ class Hugs(Base, commands.Cog):
         view.message = await inter.edit_original_response(embed=embed, view=view)
 
     @cooldowns.default_cooldown
-    @_hug.sub_command(name="me", description=Messages.hug_stats_brief)
+    @_hug.sub_command(name="me", description=MessagesCZ.hug_stats_brief)
     async def stats(self, inter: disnake.ApplicationCommandInteraction, user: disnake.Member = None):
         """
         Get your lovely hug stats.
@@ -160,14 +161,14 @@ class Hugs(Base, commands.Cog):
         await inter.edit_original_response(embed=embed)
 
     @cooldowns.short_cooldown
-    @_hug.sub_command(name="give", description=Messages.hug_give_brief)
+    @_hug.sub_command(name="give", description=MessagesCZ.hug_give_brief)
     async def give(
         self,
         inter: disnake.ApplicationCommandInteraction,
         user: disnake.Member = None,
         intensity: int = commands.Param(
             name="intensity",
-            description=Messages.hug_intensity_description(emoji_count=emoji_count),
+            description=MessagesCZ.hug_intensity_description(emoji_count=emoji_count),
             ge=1,
             le=emoji_count,
             default=1,
@@ -196,7 +197,3 @@ class Hugs(Base, commands.Cog):
         intensity -= 1
 
         await inter.send(f"{self.config.hug_emojis[intensity]} **{user_str}**")
-
-
-def setup(bot):
-    bot.add_cog(Hugs(bot))
