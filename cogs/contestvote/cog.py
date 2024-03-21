@@ -10,17 +10,18 @@ import disnake
 from disnake.ext import commands
 
 import utils
-from buttons.contestvote import ContestView
 from buttons.general import TrashView
 from cogs.base import Base
 from config import cooldowns
-from config.messages import Messages
 from database.contestvote import ContestVoteDB
-from features.contestvote import get_top_contributions
 from features.reaction_context import ReactionContext
-from modals.contestvote import DenyContributionModal
 from permissions.permission_check import submod_plus
 from permissions.room_check import RoomCheck
+
+from . import features
+from .messages_cz import MessagesCZ
+from .modals import DenyContributionModal
+from .views import View
 
 
 class ContestVote(Base, commands.Cog):
@@ -50,53 +51,49 @@ class ContestVote(Base, commands.Cog):
         pass
 
     @cooldowns.default_cooldown
-    @contest.sub_command(
-        name="calculate_contribution", description=Messages.contest_vote_calculate_contribution_brief
-    )
+    @contest.sub_command(name="calculate_contribution", description=MessagesCZ.calculate_contribution_brief)
     async def calculate_contribution(
         self, inter: disnake.ApplicationCommandInteraction, message_url: disnake.Message
     ):
         await inter.response.defer(ephemeral=self.check.botroom_check(inter))
 
         if message_url.channel != self.contest_vote_channel:
-            await inter.send(Messages.contest_vote_not_contest_channel)
+            await inter.send(MessagesCZ.not_contest_channel)
             return
 
         if not message_url.reactions:
-            await inter.send(Messages.contest_vote_no_reactions)
+            await inter.send(MessagesCZ.no_reactions)
             return
 
-        contributions = await get_top_contributions(self, [message_url], 1)
+        contributions = await features.get_top_contributions(self, [message_url], 1)
 
         await inter.send("".join(contributions))
 
     @commands.cooldown(rate=1, per=600.0, type=commands.BucketType.user)
     @contest.sub_command(
         name="top_contributions",
-        description=Messages.contest_vote_top_contributions_brief,
+        description=MessagesCZ.top_contributions_brief,
     )
     async def top_contributions(
         self,
         inter: disnake.ApplicationCommandInteraction,
-        number_of: int = commands.Param(
-            default=5, gt=0, le=10, description=Messages.contest_vote_number_of_param
-        ),
+        number_of: int = commands.Param(default=5, gt=0, le=10, description=MessagesCZ.number_of_param),
     ):
         await inter.response.defer(ephemeral=self.check.botroom_check(inter))
         messages = await self.contest_vote_channel.history().flatten()
 
-        contributions = await get_top_contributions(self, messages, number_of)
+        contributions = await features.get_top_contributions(self, messages, number_of)
 
         if not contributions:
-            await inter.send(Messages.contest_vote_no_contributions)
+            await inter.send(MessagesCZ.no_contributions)
             return
 
-        await inter.send(Messages.contest_vote_top_contributions(number_of=number_of))
+        await inter.send(MessagesCZ.top_contributions(number_of=number_of))
         for index in range(0, len(contributions), 5):
             await inter.send("".join(contributions[index : index + 5]))
 
     @cooldowns.default_cooldown
-    @contest.sub_command(name="submit", description=Messages.contest_vote_submit_brief)
+    @contest.sub_command(name="submit", description=MessagesCZ.submit_brief)
     async def submit(
         self,
         inter: disnake.ApplicationCommandInteraction,
@@ -105,13 +102,13 @@ class ContestVote(Base, commands.Cog):
     ):
         await inter.response.defer(ephemeral=True)
         if image.size > 25000000:  # 25MB
-            await inter.send(Messages.contest_vote_file_too_big)
+            await inter.send(MessagesCZ.attachment_too_big)
             return
         if "image" not in image.content_type:
-            await inter.send(Messages.contest_vote_not_image)
+            await inter.send(MessagesCZ.not_image)
             return
         if inter.author.id in self.config.contest_vote_banned_users:
-            await inter.send(Messages.contest_vote_banned_user)
+            await inter.send(MessagesCZ.banned_user)
             return
 
         user_contribution = ContestVoteDB.get_user(inter.author.id)
@@ -123,9 +120,7 @@ class ContestVote(Base, commands.Cog):
 
             elif user_contribution.has_contributions >= self.config.contest_vote_max_contributions:
                 await inter.send(
-                    Messages.contest_vote_max_contributions(
-                        max_contributions=self.config.contest_vote_max_contributions
-                    )
+                    MessagesCZ.max_contributions(max_contributions=self.config.contest_vote_max_contributions)
                 )
                 return
             else:
@@ -134,10 +129,10 @@ class ContestVote(Base, commands.Cog):
         image = await image.to_file()
 
         trash = TrashView(custom_id="contest:delete")
-        view = ContestView(self.bot)
+        view = View(self.bot)
         view.children.extend(trash.children)
 
-        content = Messages.contest_vote_contribution(id=contribution_id)
+        content = MessagesCZ.contribution(id=contribution_id)
         if description:
             content += f"Popis:\n{description}"
 
@@ -145,7 +140,7 @@ class ContestVote(Base, commands.Cog):
         await message.pin()
         await message.add_reaction("👍")
         await message.add_reaction("👎")
-        await inter.send(Messages.contest_vote_submit_success)
+        await inter.send(MessagesCZ.submit_success)
 
     def is_contest_room(self, ctx):
         return ctx.channel.id == self.config.contest_vote_channel
@@ -156,17 +151,17 @@ class ContestVote(Base, commands.Cog):
     async def contest_mod(self, inter: disnake.ApplicationCommandInteraction):
         pass
 
-    @contest_mod.sub_command(name="get_author", description=Messages.contest_vote_get_author_brief)
+    @contest_mod.sub_command(name="get_author", description=MessagesCZ.get_author_brief)
     async def get_author(self, inter: disnake.ApplicationCommandInteraction, id: int):
         await inter.response.defer(ephemeral=True)
         contribution_author_id = ContestVoteDB.get_contribution_author(id)
         if not contribution_author_id:
-            await inter.send(Messages.contest_vote_contribution_not_found)
+            await inter.send(MessagesCZ.contribution_not_found)
             return
         user = await self.bot.get_or_fetch_user(contribution_author_id)
         await inter.send(user.mention)
 
-    @contest_mod.sub_command(name="start", description=Messages.contest_start_voting_brief)
+    @contest_mod.sub_command(name="start", description=MessagesCZ.start_voting_brief)
     async def start_contest(self, inter: disnake.ApplicationCommandInteraction):
         await inter.response.defer(ephemeral=True)
         messages = await self.contest_vote_channel.history().flatten()
@@ -174,29 +169,29 @@ class ContestVote(Base, commands.Cog):
             for emoji in self.emojis:
                 await message.add_reaction(emoji)
 
-        await inter.send(Messages.contest_vote_start_success)
+        await inter.send(MessagesCZ.start_success)
 
-    @contest_mod.sub_command(name="end", description=Messages.contest_end_voting_brief)
+    @contest_mod.sub_command(name="end", description=MessagesCZ.end_voting_brief)
     async def end_contest(self, inter: disnake.ApplicationCommandInteraction):
-        await inter.send(Messages.contest_vote_ending)
+        await inter.send(MessagesCZ.vote_ending)
         messages = await self.contest_vote_channel.history().flatten()
-        contributions = await get_top_contributions(self, messages)
+        contributions = await features.get_top_contributions(self, messages)
         await self.contest_vote_channel.send(f"# Top 5 příspěvků\n{''.join(contributions)}")
 
         message = await inter.original_message()
-        await message.edit(Messages.contest_vote_end_success)
+        await message.edit(MessagesCZ.end_success)
 
-    @contest_mod.sub_command(name="approve", description=Messages.contest_vote_approve_brief)
+    @contest_mod.sub_command(name="approve", description=MessagesCZ.approve_brief)
     async def approve(self, inter: disnake.ApplicationCommandInteraction, message: disnake.Message):
         if inter.channel.id != self.config.contest_vote_filter_channel:
-            await inter.send(Messages.contest_vote_not_filter_channel, ephemeral=True)
+            await inter.send(MessagesCZ.not_filter_channel, ephemeral=True)
             return
 
         file = await message.attachments[0].to_file()
         await self.contest_vote_channel.send(message.content, file=file)
         await message.edit(view=None)
         await message.unpin()
-        await message.reply(Messages.contest_approve_success)
+        await message.reply(MessagesCZ.approve_success)
 
     @commands.Cog.listener()
     async def on_button_click(self, inter: disnake.MessageInteraction):
@@ -221,7 +216,3 @@ class ContestVote(Base, commands.Cog):
             if await r.users().find(lambda x: x.id == user.id):
                 await message.remove_reaction(ctx.emoji, user)
                 return
-
-
-def setup(bot):
-    bot.add_cog(ContestVote(bot))

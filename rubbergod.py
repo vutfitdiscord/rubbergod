@@ -6,7 +6,7 @@ from disnake import AllowedMentions, Intents, TextChannel
 from disnake.ext import commands
 
 import database.db_migrations as migrations
-from buttons.contestvote import ContestView
+from cogs.contestvote.views import View as ContestVoteView
 from cogs.poll.views import PollBasicView, PollBooleanView, PollCloseView, PollOpinionView, PollVotersView
 from cogs.report.views import ReportAnonymView, ReportAnswerOnlyView, ReportGeneralView, ReportMessageView
 from config.app_config import config
@@ -87,7 +87,7 @@ async def on_ready():
         PollOpinionView(bot),
         PollCloseView(bot),
         PollVotersView(bot),
-        ContestView(bot),
+        ContestVoteView(bot),
     ]
     for view in views:
         bot.add_view(view)
