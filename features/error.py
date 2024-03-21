@@ -14,12 +14,12 @@ from PIL import Image, ImageDraw, ImageFont
 
 import utils
 from buttons.error import ErrorView
+from cogs.gif.features import ImageHandler
 from config.app_config import config
 from config.messages import Messages
 from database import session
 from database.error import ErrorLogDB, ErrorRow
 from database.stats import ErrorEvent
-from features.imagehandler import ImageHandler
 from permissions import custom_errors, permission_check
 
 
@@ -42,7 +42,6 @@ class ContextMock:
 
 class ErrorLogger:
     def __init__(self, bot: commands.Bot):
-        self.imagehandler = ImageHandler()
         self.bot = bot
 
     @cached_property
@@ -64,7 +63,7 @@ class ErrorLogger:
             if not user.avatar:
                 avatar = avatar.convert("RGB")
 
-            avatar = self.imagehandler.square_to_circle(avatar)
+            avatar = ImageHandler.square_to_circle(avatar)
             avatar = avatar.resize((230, 230))
             avatar = avatar.crop((0, 0, 230, 200))
             background.paste(avatar, (560, 270), avatar)
