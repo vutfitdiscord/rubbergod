@@ -1,9 +1,9 @@
 import disnake
 
-from config.messages import Messages
+from .messages_cz import MessagesCZ
 
 
-class MessageModal(disnake.ui.Modal):
+class Modal(disnake.ui.Modal):
     def __init__(
         self,
         bot,
@@ -33,8 +33,8 @@ class MessageModal(disnake.ui.Modal):
     async def callback(self, inter: disnake.ModalInteraction) -> None:
         if self.edit:
             await self.message.edit(inter.text_values["content"])
-            await inter.send(Messages.message_sent(channel=self.message.channel.mention), ephemeral=True)
+            await inter.send(MessagesCZ.message_sent(channel=self.message.channel.mention), ephemeral=True)
             return
 
         await self.channel.send(inter.text_values["content"])
-        await inter.send(Messages.message_sent(channel=self.channel.mention), ephemeral=True)
+        await inter.send(MessagesCZ.message_sent(channel=self.channel.mention), ephemeral=True)
