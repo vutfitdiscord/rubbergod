@@ -78,7 +78,3 @@ class GrillbotApi(Base, commands.Cog):
                 await message.reply(file=disnake.File(fp=file_binary, filename="res.json"))
         else:
             await message.reply("Extension not loaded")
-
-
-def setup(bot):
-    bot.add_cog(GrillbotApi(bot))

@@ -10,7 +10,7 @@ from disnake.ext import commands, tasks
 import utils
 from buttons.embed import EmbedView
 from cogs.base import Base
-from cogs.grillbotapi import GrillbotApi
+from cogs.grillbotapi.cog import GrillbotApi
 from config import cooldowns
 from config.messages import Messages
 from database.karma import KarmaDB
