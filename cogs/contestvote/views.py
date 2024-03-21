@@ -8,7 +8,7 @@ from config.app_config import config
 from permissions import permission_check
 
 
-class ContestView(BaseView):
+class View(BaseView):
     def __init__(self, bot: commands.Bot):
         super().__init__(timeout=None)
         self.bot = bot
