@@ -83,15 +83,6 @@ class Messages(metaclass=Formatable):
 
     pr_meme = "https://github.com/Toaster192/rubbergod/pulls"
 
-    # HUGS
-    hug_give_brief = "Obejme kamaráda"
-    hug_intensity_description = "Síla obejmutí (číslo 1-{emoji_count})"
-    hug_stats_brief = "Tvé statistiky obejmutí"
-    hug_hugboard_brief = "Celková tabulka statistiky obejmutí"
-    hug_huggersboard_brief = "Vypíše nejčastější objímače"
-    hug_mosthugged_brief = "Vypíše nejvíce objímané lidi"
-    upgraded_pocitani_caught_deleting = "Podvádět mazáním zpráv je zakázáno. Začínáme znovu: "
-
     # IOS
     ios_brief = "Připomene všem prasatům, že si mají jít po sobě uklidit"
     ios_task_start_brief = "Začne pravidelně připomínat všem prasatům, že si mají jít po sobě uklidit"
@@ -484,6 +475,7 @@ if ("Mám průměr pod 2.0")                                           \n  retur
     # MEME REPOST
     meme_repost_link = "[Odkaz na originál]({original_message_url}) v <#{original_channel}>"
     meme_leaderboard_brief = "#better-memes leaderboard"
+    upgraded_pocitani_caught_deleting = "Podvádět mazáním zpráv je zakázáno. Začínáme znovu: "
 
     # EXAMS
     exams_brief = f"Zobrazí zkoušky pro daný ročník (výchozí ročník podle role)"
