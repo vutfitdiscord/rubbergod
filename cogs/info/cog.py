@@ -3,8 +3,6 @@ Cog containing commands that get basic information from other sources.
 examples - urban meaning of word, weather at location
 """
 
-from typing import Dict, List
-
 import disnake
 import requests
 from disnake.ext import commands
@@ -13,7 +11,8 @@ import utils
 from buttons.embed import EmbedView
 from cogs.base import Base
 from config import cooldowns
-from config.messages import Messages
+
+from .messages_cz import MessagesCZ
 
 
 class Info(Base, commands.Cog):
@@ -21,7 +20,7 @@ class Info(Base, commands.Cog):
         super().__init__()
         self.bot = bot
 
-    def urban_embeds(self, author: disnake.User, dict: Dict) -> List[disnake.Embed]:
+    def urban_embeds(self, author: disnake.User, dict: dict) -> list[disnake.Embed]:
         """Generate embeds from dictionary of responses"""
         embed_list = []
 
@@ -53,14 +52,14 @@ class Info(Base, commands.Cog):
         return embed_list
 
     async def urban_pages(
-        self, inter: disnake.ApplicationCommandInteraction, embeds: List[disnake.Embed]
+        self, inter: disnake.ApplicationCommandInteraction, embeds: list[disnake.Embed]
     ) -> None:
         """Send message and handle pagination for 300 seconds"""
         view = EmbedView(inter.author, embeds)
         view.message = await inter.edit_original_response(embed=embeds[0], view=view)
 
     @cooldowns.short_cooldown
-    @commands.slash_command(name="urban", description=Messages.urban_brief)
+    @commands.slash_command(name="urban", description=MessagesCZ.urban_brief)
     async def urban(self, inter: disnake.ApplicationCommandInteraction, expression) -> None:
         """Finding expression and shortcuts in urban directory"""
 
@@ -82,9 +81,9 @@ class Info(Base, commands.Cog):
         if embeds:
             await self.urban_pages(inter, embeds)
         else:
-            await inter.edit_original_response(Messages.urban_not_found)
+            await inter.edit_original_response(MessagesCZ.urban_not_found)
 
-    @commands.slash_command(name="pocasi", description=Messages.weather_brief)
+    @commands.slash_command(name="pocasi", description=MessagesCZ.weather_brief)
     async def weather(self, inter: disnake.ApplicationCommandInteraction, place: str = "Brno") -> None:
         await inter.response.defer()
         token = self.config.weather_token
@@ -131,13 +130,9 @@ class Info(Base, commands.Cog):
                 f"Město nenalezeno! <:pepeGun:484470874246742018> ({res['message']})"
             )
 
-    @commands.slash_command(name="kreditovy_strop", description=Messages.credit_limit_brief)
+    @commands.slash_command(name="kreditovy_strop", description=MessagesCZ.credit_limit_brief)
     async def kreditovy_strop(self, inter: disnake.ApplicationCommandInteraction) -> None:
         """
         Prints annual credit limit criteria
         """
-        await inter.send(Messages.credit_limit_info)
-
-
-def setup(bot):
-    bot.add_cog(Info(bot))
+        await inter.send(MessagesCZ.credit_limit_info)
