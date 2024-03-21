@@ -76,13 +76,6 @@ class Messages(metaclass=Formatable):
     bot_room_redirect = "{user} <:sadcat:576171980118687754> 👉 " \
                         "<#{bot_room}>\n"
 
-    # MEME
-    uhoh_counter = "{uhohs} uh ohs od spuštění."
-    uhoh_brief = "Vypíše počet uh ohs od spuštění"
-    uhoh = "uh oh"
-
-    pr_meme = "https://github.com/Toaster192/rubbergod/pulls"
-
     # IOS
     ios_brief = "Připomene všem prasatům, že si mají jít po sobě uklidit"
     ios_task_start_brief = "Začne pravidelně připomínat všem prasatům, že si mají jít po sobě uklidit"
