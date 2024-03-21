@@ -488,12 +488,3 @@ class Messages(metaclass=Formatable):
     slowmode_set_success = "Slowmode v kanálu {channel} nastaven na {delay} sekund."
     slowmode_remove_brief = "Vypne slowmode v aktuálním kanálu"
     slowmode_remove_success = "Slowmode v kanálu {channel} úspěšně odstraněn."
-
-    # MESSAGE COG
-    message_send_brief = "Pošle zprávu do kanálu"
-    message_resend_brief = "Přepošle existující zprávu do kanálu"
-    message_channel_brief = "Kanál, do kterého se má zpráva poslat"
-    message_url_brief = "Url zprávy, která se má přeposlat"
-    message_edit_brief = "Upraví existující zprávu"
-    message_sent = "Zpráva byla odeslána do kanálu {channel}"
-    message_too_long = "Zpráva přesahuje limit 2000 znaků"

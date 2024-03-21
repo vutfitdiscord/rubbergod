@@ -7,9 +7,10 @@ from disnake.ext import commands
 
 from cogs.base import Base
 from config import cooldowns
-from config.messages import Messages
-from modals.message import MessageModal
 from permissions import permission_check
+
+from .messages_cz import MessagesCZ
+from .modals import Modal
 
 
 class Message(Base, commands.Cog):
@@ -23,50 +24,46 @@ class Message(Base, commands.Cog):
     async def message(self, inter: disnake.ApplicationCommandInteraction):
         pass
 
-    @message.sub_command(name="send", description=Messages.message_send_brief)
+    @message.sub_command(name="send", description=MessagesCZ.send_brief)
     async def send(
         self,
         inter: disnake.ApplicationCommandInteraction,
-        channel: disnake.TextChannel = commands.Param(description=Messages.message_channel_brief),
+        channel: disnake.TextChannel = commands.Param(description=MessagesCZ.channel_param),
     ):
-        message_modal = MessageModal(self.bot, title="Send message", channel=channel)
+        message_modal = Modal(self.bot, title="Send message", channel=channel)
         await inter.response.send_modal(modal=message_modal)
 
-    @message.sub_command(name="resend", description=Messages.message_resend_brief)
+    @message.sub_command(name="resend", description=MessagesCZ.resend_brief)
     async def resend(
         self,
         inter: disnake.ApplicationCommandInteraction,
-        channel: disnake.TextChannel = commands.Param(description=Messages.message_channel_brief),
-        message_url: str = commands.Param(description=Messages.message_url_brief),
+        channel: disnake.TextChannel = commands.Param(description=MessagesCZ.channel_param),
+        message_url: str = commands.Param(description=MessagesCZ.url_param),
     ):
         try:
             message: disnake.Message = await commands.MessageConverter().convert(inter, message_url)
         except commands.MessageNotFound:
-            await inter.send(Messages.message_not_found, ephemeral=True)
+            await inter.send(MessagesCZ.message_not_found, ephemeral=True)
             return
         if len(message.content) > 2000:
-            await inter.send(Messages.message_too_long, ephemeral=True)
+            await inter.send(MessagesCZ.message_too_long, ephemeral=True)
             return
-        await inter.send(Messages.message_sent(channel=channel.mention), ephemeral=True)
+        await inter.send(MessagesCZ.message_sent(channel=channel.mention), ephemeral=True)
         await channel.send(message.content)
 
-    @message.sub_command(name="edit", description=Messages.message_edit_brief)
+    @message.sub_command(name="edit", description=MessagesCZ.edit_brief)
     async def edit(
         self,
         inter: disnake.ApplicationCommandInteraction,
-        message_url: str = commands.Param(description=Messages.message_url_brief),
+        message_url: str = commands.Param(description=MessagesCZ.url_param),
     ):
         try:
             message: disnake.Message = await commands.MessageConverter().convert(inter, message_url)
         except commands.MessageNotFound:
-            await inter.send(Messages.message_not_found, ephemeral=True)
+            await inter.send(MessagesCZ.message_not_found, ephemeral=True)
             return
         if len(message.content) > 2000:
-            await inter.send(Messages.message_too_long, ephemeral=True)
+            await inter.send(MessagesCZ.message_too_long, ephemeral=True)
             return
-        message_modal = MessageModal(self.bot, title="Edit message", message=message, edit=True)
+        message_modal = Modal(self.bot, title="Edit message", message=message, edit=True)
         await inter.response.send_modal(modal=message_modal)
-
-
-def setup(bot):
-    bot.add_cog(Message(bot))
