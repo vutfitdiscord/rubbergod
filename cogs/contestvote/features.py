@@ -2,12 +2,12 @@ from __future__ import annotations
 
 import re
 from collections import Counter
-from typing import List
 
 import disnake
 
 import utils
-from config.messages import Messages
+
+from .messages_cz import MessagesCZ
 
 
 class Image:
@@ -41,7 +41,7 @@ def get_contribution_id(content: str) -> int:
     return int(contribution_id)
 
 
-async def get_top_contributions(self, messages: list[disnake.Message], number_of: int) -> List[str]:
+async def get_top_contributions(self, messages: list[disnake.Message], number_of: int) -> list[str]:
     images = []
 
     # get all images and their votes
@@ -82,7 +82,7 @@ async def get_top_contributions(self, messages: list[disnake.Message], number_of
         emoji_strings = [emoji_string.format(emoji=emoji) for emoji in image.emojis]
         content = f"{image.message_url} - Total: **{image.total_value}**\n{''.join(emoji_strings)}\n"
         if image.invalid_votes > 0:
-            content += Messages.contest_vote_invalid_votes(invalid_votes=image.invalid_votes)
+            content += MessagesCZ.invalid_votes(invalid_votes=image.invalid_votes)
 
         messages.append(content)
     return messages
