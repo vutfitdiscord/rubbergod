@@ -7,9 +7,10 @@ import disnake
 from disnake.ext import commands
 
 import utils
-from config.messages import Messages
 from database.timeout import TimeoutDB
 from permissions.custom_errors import ApiError
+
+from .messages_cz import MessagesCZ
 
 
 def create_embed(
@@ -37,7 +38,7 @@ def add_field_timeout(
 
     embed.add_field(
         name=title,
-        value=Messages.timeout_field_text(
+        value=MessagesCZ.timeout_field_text(
             member=f"{member.mention} (`{member.name}`)",
             author=author,
             starttime=starttime.strftime("%d.%m.%Y %H:%M"),
@@ -143,7 +144,7 @@ async def parse_members(
     if not_found_members:
         # print users that can't be found
         await inter.send(
-            Messages.timeout_member_not_found(
+            MessagesCZ.timeout_member_not_found(
                 author=inter.author.mention, members=", ".join(not_found_members)
             ),
             ephemeral=True,
@@ -169,10 +170,10 @@ async def time_check(
     inter: disnake.ApplicationCommandInteraction, endtime: datetime, length: timedelta
 ) -> bool:
     if endtime < inter.created_at:
-        await inter.send(Messages.timeout_past_time, ephemeral=True)
+        await inter.send(MessagesCZ.past_time, ephemeral=True)
         return True
 
     if length.total_seconds() < 30:
-        await inter.send(Messages.timeout_too_short, ephemeral=True)
+        await inter.send(MessagesCZ.timeout_too_short, ephemeral=True)
         return True
     return False

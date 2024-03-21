@@ -477,28 +477,6 @@ class Messages(metaclass=Formatable):
     icon_ui_no_permission = "Na tuto ikonu nemáš právo"
     icon_removed = "Ikona byla odstraněna"
 
-    # TIMEOUT COG
-    timeout_brief = "Dočasně zakáže uživateli interakce na serveru."
-    timeout_reason_param = "Důvod umlčení uživatele."
-    timeout_field_text = "**Kdo:** {member}\n**Od:** {author}\n**Délka:** {starttime} - {endtime} ({length})\n**Navrácení:** {timestamp}\n**Důvod:** {reason}\n"
-    timeout_list_brief = "Vypíše uživatele se zatlumením."
-    timeout_remove_brief = "Předčasně odebere umlčení uživateli."
-    timeout_permission = "Na umlčení **{user_list}** nemám práva."
-    timeout_user_param = "Použij tag uživatele/uživatelů"
-    timeout_list_none = "Nenalezeny žádné umlčení."
-    timeout_too_short = "Délka umlčení je příliš krátká. Musí být alespoň 30s."
-    timeout_past_time = "Nelze nastavit umlčení v minulosti."
-    timeout_member_not_found = "{author} `{members}` jsem na serveru nenašel. Ujisti se, že jsi uživatele zadal správně pomocí @tag | name | ID."
-    timeout_remove_logs_param = "Odstraní záznam z databáze."
-    timeout_remove_reason = "{member}\nPředčasně odebráno"
-    timeout_get_user_brief = "Vypíše informace o trestech uživatele"
-    timeout_get_user_no_timeouts = "Uživatel nemá žádné tresty"
-    timeout_manual_timeout = "Bez udání důvodu. (Discord GUI)"
-    timeout_manual_remove = "{member}\nPředčasně odebráno (Discord GUI)"
-    self_timeout = "Dočasně si zakážeš interakce na serveru"
-    self_timeout_reason = "Sebeumlčení"
-    self_timeout_success = "Sebeumlčení proběhlo úspěšně"
-
     # TIMEOUT WARS
     timeout_wars_user = "Uživatel {user} byl umlčen na {time:.0f} minut."
     timeout_wars_message_delete = "Uživatel {user} byl přistižen při mazání zpráv. Byl proto umlčen na {time:.0f} minut."
