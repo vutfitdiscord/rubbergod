@@ -468,15 +468,6 @@ class Messages(metaclass=Formatable):
     exams_automatic_update_started = "`Zapnuta automatická aktualizace termínů pro server: {guild_name}`"
     exams_automatic_update_stopped = "`Zastavena automatická aktualizace termínů pro server: {guild_name}`"
 
-    # ICONS
-    icon_ui = "UI pro přiřazení ikony"
-    icon_set_success = "Změna ikony na {icon} proběhla úspěšně"
-    icon_set_no_role = "Vstup neodpovídá žádné možné ikoně"
-    icon_ui_choose = "Vyber si ikonu"
-    icon_ui_fail = "Nastavit ikonu se nepodařilo"
-    icon_ui_no_permission = "Na tuto ikonu nemáš právo"
-    icon_removed = "Ikona byla odstraněna"
-
     # TIMEOUT WARS
     timeout_wars_user = "Uživatel {user} byl umlčen na {time:.0f} minut."
     timeout_wars_message_delete = "Uživatel {user} byl přistižen při mazání zpráv. Byl proto umlčen na {time:.0f} minut."
