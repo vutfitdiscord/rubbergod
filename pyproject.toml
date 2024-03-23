@@ -18,5 +18,5 @@ line-ending = "auto"
 
 [tool.codespell]
 write-changes = false
-skip = ".*/venv,.*log,.*/__pycache__,merlin-latest,.*/messages.py"
+skip = ".*/venv,.*log,.*/__pycache__,merlin-latest,messages.py,messages_cz.py,messages_en.py"
 ignore-words-list = "autor,studis,mis"
