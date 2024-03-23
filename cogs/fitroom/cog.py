@@ -18,7 +18,7 @@ from .messages_cz import MessagesCZ
 
 
 class FitRoom(Base, commands.Cog):
-    def __init__(self, bot):
+    def __init__(self, bot: commands.Bot):
         super().__init__()
         self.bot = bot
 

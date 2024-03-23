@@ -13,7 +13,7 @@ from utils import is_command_message
 
 
 class Reactions(Base, commands.Cog):
-    def __init__(self, bot):
+    def __init__(self, bot: commands.Bot):
         super().__init__()
         self.bot = bot
 

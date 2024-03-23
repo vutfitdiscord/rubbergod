@@ -17,7 +17,7 @@ from .messages_cz import MessagesCZ
 
 
 class Gif(Base, commands.Cog):
-    def __init__(self, bot):
+    def __init__(self, bot: commands.Bot):
         super().__init__()
         self.bot = bot
         self.imagehandler = ImageHandler()
