@@ -217,7 +217,9 @@ class MemeRepost(Base, commands.Cog):
         self,
         inter: disnake.ApplicationCommandInteraction,
         order_by: str = commands.Param(name="order_by", choices=["total_karma", "posts"], default="posts"),
-        start: int = commands.Param(default=1, gt=0, lt=100000000, description=Messages.karma_board_start),
+        start: int = commands.Param(
+            default=1, gt=0, lt=100000000, description=Messages.meme_board_start_param
+        ),
     ):
         await inter.response.defer(ephemeral=self.check.botroom_check(inter))
 
