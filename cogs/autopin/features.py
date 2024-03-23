@@ -1,7 +1,9 @@
+import datetime
 import io
 import json
 
 import disnake
+from disnake.ext import commands
 
 import utils
 
@@ -9,8 +11,22 @@ PIN_CHANNEL_TYPE = disnake.TextChannel | disnake.Thread
 
 
 class AutopinFeatures:
-    def __init__(self, bot):
+    def __init__(self, bot: commands.Bot):
         self.bot = bot
+
+    async def log(self, message: disnake.Message, users: list[disnake.User]):
+        """
+        Logging message link and users that pinned message
+        """
+        embed = disnake.Embed(title="📌 Auto pin message log", color=disnake.Colour.yellow())
+        user_names = ", ".join([f"{user.mention}({user.name})" for user in users])
+        embed.add_field(name="Users", value=user_names if len(user_names) > 0 else "**Missing users**")
+        embed.add_field(
+            name="Message in channel", value=f"[#{message.channel.name}]({message.jump_url})", inline=False
+        )
+        embed.timestamp = datetime.datetime.now(tz=datetime.timezone.utc)
+        channel = self.bot.get_channel(self.config.log_channel)
+        await channel.send(embed=embed)
 
     async def create_json_file(
         self,
