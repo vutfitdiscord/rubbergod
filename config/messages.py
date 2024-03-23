@@ -372,22 +372,6 @@ class Messages(metaclass=Formatable):
     cog_not_unloadable = "Toto rozšíření `{cog}` je neodebratelné."
     cog_reloaded = "Rozšíření `{cog}` bylo načteno znovu."
 
-    # DYNAMICCONFIG
-    config_set_brief = "Nastaví hodnotu v konfiguraci"
-    config_append_brief = "Přidá hodnotu do pole v konfiguraci"
-    config_load_brief = "Znovu načte třídu ze souboru. Pro aplikování změn je potřeba znovu načíst i cog"
-    config_list_brief = "Vypíše klíče konfigurace"
-    config_get_brief = "Získá hodnotu z konfigurace"
-    config_backup_brief = "Vytvoří záložní kopii konfigurace v novém souboru. Záloha bude obsahovat dnešní datum"
-    config_sync_template_brief = "Přidá nové klíče z template do configu"
-    config_updated = "Config updated."
-    config_loaded = "Config loaded."
-    config_wrong_key = "Nesprávný klíč"
-    config_wrong_type = "Nesprávný typ"
-    config_backup_created = "Config backup created."
-    config_list_invalid_regex = "Chybný regex\n`{regex_err}`"
-    config_synced = "Config successfully synchronized."
-
     # MEME REPOST
     meme_repost_link = "[Odkaz na originál]({original_message_url}) v <#{original_channel}>"
     meme_leaderboard_brief = "#better-memes leaderboard"
