@@ -7,7 +7,6 @@ import collections
 import datetime
 import math
 import re
-from typing import List, Optional, Union
 
 import disnake
 import requests
@@ -19,9 +18,10 @@ import utils
 from buttons.embed import EmbedView
 from cogs.base import Base
 from config import cooldowns
-from config.messages import Messages
 from database.exams import ExamsTermsMessageDB
 from permissions import permission_check
+
+from .messages_cz import MessagesCZ
 
 year_regex = "[1-3][BM]IT"
 YEAR_LIST = ["1BIT", "2BIT", "3BIT", "1MIT", "2MIT"]
@@ -36,7 +36,7 @@ class Exams(Base, commands.Cog):
         super().__init__()
         self.bot = bot
 
-        self.subscribed_guilds: List[int] = []
+        self.subscribed_guilds: list[int] = []
         if self.config.exams_subscribe_default_guild:
             self.subscribed_guilds.append(self.config.guild_id)
 
@@ -50,13 +50,13 @@ class Exams(Base, commands.Cog):
         """Group of commands for terms."""
         await inter.response.defer()
 
-    @terms.sub_command(name="update", description=Messages.exams_update_term_brief)
+    @terms.sub_command(name="update", description=MessagesCZ.update_term_brief)
     async def update(self, inter: disnake.ApplicationCommandInteraction):
         updated_chans = await self.update_exam_terms(inter.guild, inter.author)
-        await inter.edit_original_response(Messages.exams_terms_updated(num_chan=updated_chans))
+        await inter.edit_original_response(MessagesCZ.terms_updated(num_chan=updated_chans))
 
     @commands.check(permission_check.mod_plus)
-    @terms.sub_command(name="remove_all", description=Messages.exams_remove_all_terms_brief)
+    @terms.sub_command(name="remove_all", description=MessagesCZ.remove_all_terms_brief)
     async def remove_all(self, inter: disnake.ApplicationCommandInteraction):
         for channel in inter.guild.channels:
             if not isinstance(channel, disnake.TextChannel):
@@ -71,15 +71,13 @@ class Exams(Base, commands.Cog):
                             await message.delete()
                         except disnake.NotFound:
                             pass
-        await inter.edit_original_response(Messages.exams_terms_removed)
+        await inter.edit_original_response(MessagesCZ.terms_removed)
 
     @commands.check(permission_check.mod_plus)
-    @terms.sub_command(name="remove", description=Messages.exams_remove_terms_brief)
+    @terms.sub_command(name="remove", description=MessagesCZ.remove_terms_brief)
     async def remove(self, inter: disnake.ApplicationCommandInteraction, channel: disnake.TextChannel):
         if not isinstance(channel, disnake.TextChannel):
-            await inter.edit_original_response(
-                Messages.exams_channel_is_not_text_channel(chan_name=channel.name)
-            )
+            await inter.edit_original_response(MessagesCZ.channel_is_not_text_channel(chan_name=channel.name))
             return
 
         message_ids = ExamsTermsMessageDB.remove_from_channel(channel.id)
@@ -91,12 +89,12 @@ class Exams(Base, commands.Cog):
                 pass
 
         if message_ids:
-            await inter.send(Messages.exams_terms_removed)
+            await inter.send(MessagesCZ.terms_removed)
         else:
-            await inter.send(Messages.exams_nothing_to_remove(chan_name=channel.name))
+            await inter.send(MessagesCZ.nothing_to_remove(chan_name=channel.name))
 
     @commands.check(permission_check.mod_plus)
-    @terms.sub_command(name="start", description=Messages.exams_start_terms_brief)
+    @terms.sub_command(name="start", description=MessagesCZ.start_terms_brief)
     async def start(self, inter: disnake.ApplicationCommandInteraction):
         if inter.guild.id not in self.subscribed_guilds:
             self.subscribed_guilds.append(inter.guild.id)
@@ -107,10 +105,10 @@ class Exams(Base, commands.Cog):
             # If task is already running update terms now
             await self.update_exam_terms(inter.guild)
 
-        await inter.send(Messages.exams_automatic_update_started(guild_name=inter.guild.name))
+        await inter.send(MessagesCZ.automatic_update_started(guild_name=inter.guild.name))
 
     @commands.check(permission_check.mod_plus)
-    @terms.sub_command(name="stop", description=Messages.exams_stop_terms_brief)
+    @terms.sub_command(name="stop", description=MessagesCZ.stop_terms_brief)
     async def stop(self, inter: disnake.ApplicationCommandInteraction):
         if inter.guild in self.subscribed_guilds:
             self.subscribed_guilds.remove(inter.guild.id)
@@ -119,7 +117,7 @@ class Exams(Base, commands.Cog):
         if not self.subscribed_guilds:
             self.update_terms_task.cancel()
 
-        await inter.send(Messages.exams_automatic_update_stopped(guild_name=inter.guild.name))
+        await inter.send(MessagesCZ.automatic_update_stopped(guild_name=inter.guild.name))
 
     @tasks.loop(hours=int(Base.config.exams_terms_update_interval * 24))
     async def update_terms_task(self):
@@ -134,7 +132,7 @@ class Exams(Base, commands.Cog):
         return year
 
     @staticmethod
-    def list_int(input) -> List[int]:
+    def list_int(input) -> list[int]:
         """Convert any list to list of integers"""
         return list(map(int, input))
 
@@ -160,7 +158,7 @@ class Exams(Base, commands.Cog):
 
         return dest
 
-    async def update_exam_terms(self, guild: disnake.Guild, author: Optional[disnake.User] = None):
+    async def update_exam_terms(self, guild: disnake.Guild, author: disnake.User = None):
         updated = 0
 
         for channel in guild.channels:
@@ -189,7 +187,7 @@ class Exams(Base, commands.Cog):
 
         return updated
 
-    @commands.slash_command(name="exams", description=Messages.exams_brief, aliases=["zkousky"])
+    @commands.slash_command(name="exams", description=MessagesCZ.exams_brief, aliases=["zkousky"])
     async def exams(
         self,
         inter: disnake.ApplicationCommandInteraction,
@@ -198,7 +196,7 @@ class Exams(Base, commands.Cog):
         await inter.response.defer()
         if rocnik is None:
             if isinstance(inter.author, disnake.Member):
-                user_roles: List[disnake.Role] = inter.author.roles
+                user_roles: list[disnake.Role] = inter.author.roles
 
                 for role in user_roles:
                     match = re.match(year_regex, role.name.upper())
@@ -209,17 +207,17 @@ class Exams(Base, commands.Cog):
                             await self.process_exams(inter, rocnik, inter.author)
                             return
 
-                await inter.edit_original_response(Messages.exams_no_valid_role)
+                await inter.edit_original_response(MessagesCZ.no_valid_role)
             else:
-                await inter.edit_original_response(Messages.exams_specify_year)
+                await inter.edit_original_response(MessagesCZ.specify_year)
         else:
             await self.process_exams(inter, rocnik, inter.author)
 
     async def process_exams(
         self,
-        target: Union[disnake.ApplicationCommandInteraction, disnake.TextChannel, disnake.Message],
-        year: Union[str, None],
-        author: Optional[disnake.User] = None,
+        target: disnake.ApplicationCommandInteraction | disnake.TextChannel | disnake.Message,
+        year: str | None,
+        author: disnake.User = None,
     ):
         """
         Get exams data from web, parse and send/update message
@@ -431,7 +429,7 @@ class Exams(Base, commands.Cog):
             await self.handle_exams_with_database_access(term_strings_dict, header, target)
 
     async def handle_exams_with_database_access(
-        self, src_data: dict, header: disnake.Embed, dest: Union[disnake.TextChannel, disnake.Message]
+        self, src_data: dict, header: disnake.Embed, dest: disnake.TextChannel | disnake.Message
     ):
         sorted_src_data = collections.OrderedDict(sorted(src_data.items()))
 
@@ -483,7 +481,3 @@ class Exams(Base, commands.Cog):
         else:
             # Message already exists
             await dest.edit(content=src_data_string, embed=header)
-
-
-def setup(bot):
-    bot.add_cog(Exams(bot))
