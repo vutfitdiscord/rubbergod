@@ -10,7 +10,8 @@ from disnake.ext import commands
 import utils
 from buttons.general import TrashView
 from cogs.base import Base
-from config.messages import Messages
+
+from .messages_cz import MessagesCZ
 
 
 def remove_prefix(text, prefix) -> str:
@@ -81,19 +82,19 @@ class IconSelect(disnake.ui.Select):
         [choice] = self.values
         icon = disnake.utils.get(inter.guild.roles, id=int(choice))
         if icon is None:
-            await inter.edit_original_response(Messages.icon_ui_fail)
+            await inter.edit_original_response(MessagesCZ.icon_ui_fail)
             return
         user = inter.user
         if await can_assign(icon, user):
             await inter.edit_original_response(
-                Messages.icon_set_success(
+                MessagesCZ.icon_set_success(
                     user=inter.user, icon=icon_emoji(self.bot, icon) or icon_name(icon)
                 ),
                 view=None,
             )
             await do_set_icon(icon, user)
         else:
-            await inter.edit_original_response(Messages.icon_ui_no_permission)
+            await inter.edit_original_response(MessagesCZ.icon_ui_no_permission)
 
 
 async def icon_autocomp(inter: disnake.ApplicationCommandInteraction, partial: str) -> str:
@@ -115,7 +116,7 @@ class Icons(Base, commands.Cog):
         self.bot = bot
 
     @utils.PersistentCooldown(command_name="icon", limit=Base.config.icon_ui_cooldown)
-    @commands.slash_command(description=Messages.icon_ui, guild_ids=[Base.config.guild_id])
+    @commands.slash_command(description=MessagesCZ.icon_ui, guild_ids=[Base.config.guild_id])
     async def icon(self, inter: disnake.ApplicationCommandInteraction):
         await inter.response.defer(ephemeral=True)
         icon_roles = get_icon_roles(inter.guild)
@@ -130,7 +131,7 @@ class Icons(Base, commands.Cog):
             # 25 is the max number of options per select
             component = IconSelect(
                 bot=self.bot,
-                placeholder=Messages.icon_ui_choose,
+                placeholder=MessagesCZ.icon_ui_choose,
                 options=options[start_i : start_i + 25],
                 row=row,
             )
@@ -142,7 +143,7 @@ class Icons(Base, commands.Cog):
         if inter.component.custom_id != "icon:delete":
             return
         await do_set_icon(None, inter.author)
-        await inter.response.send_message(content=Messages.icon_removed, ephemeral=True)
+        await inter.response.send_message(content=MessagesCZ.icon_removed, ephemeral=True)
 
     async def cog_slash_command_error(
         self, inter: disnake.ApplicationCommandInteraction, error: Exception
