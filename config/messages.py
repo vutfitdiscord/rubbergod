@@ -325,33 +325,6 @@ class Messages(metaclass=Formatable):
     repost_content = "Pokud je obrázek repost, dej mu ♻️.\nJestli není, klikni tady na ❎ "\
                      "a při {limit} takových reakcích se toho upozornění smaže."
 
-    # ABSOLVENT
-    absolvent_wrong_diploma_format = "Chybný formát čísla diplomu! Př: 123456/2019"
-    absolvent_wrong_name = "Nepovedla se ověřit shoda zadaného jména s tvým předchozím záznamem o studiu na FIT VUT."
-    absolvent_thesis_not_found_error = "Práce dle zadaného ID nebyla na webu nalezena."
-    absolvent_web_error = "Nepovedlo se ověřit obhájení kvalifikační práce pod uvedeným číslem na webu, jménem, typem práce a rokem obhájení (dle čísla diplomu)."
-    absolvent_diploma_error = "Diplom (číslo a jméno) se nepovedlo na webu ověřit."
-    absolvent_success = "Diplom byl úspěšne ověřen."
-    absolvent_id_from_help = "Zadej svoje ID práce."
-    absolvent_brief = "Příkaz pro ověření absolvování studia na FIT VUT"
-    absolvent_help_brief = "Vypíše help k příkazu /diplom"
-    absolvent_not_in_db = "Tvůj login nebyl nalezen v databázi ověřených uživatelů. Použij příkaz `/verify` pro ověření (je zapotřebí školní email)."
-    absolvent_not_verified = "Pro zavolání tohoto příkazu je potřeba se ověřit pomocí příkazu `/verify`."
-    absolvent_help = f"{absolvent_brief} - zadejte CASE-SENSITIVE údaje ve formátu:\n" \
-        "/diplom <Titul.> <Jméno> <Příjmení> <Číslo diplomu> <ID kvalifikační práce, poslední kombinace čísel v kolonce URI na webu knihovny VUT <http://hdl.handle.net/11012/19121> >\n" \
-        "např: Bc. Josef Novák 123456/2019 99999\n" \
-        "(při <http://hdl.handle.net/11012/99999>)\n" \
-        "Údaje slouží k jednorázovému ověření a nejsou nikam ukládány."
-    absolvent_degree_param = "Dosažený titul - Bc./Ing."
-    absolvent_name_param = "Křestní jméno např.: Josef"
-    absolvent_surname_param = "Příjmení např.: Novák"
-    absolvent_diploma_param = "Číslo diplomu např.: 123456/2019"
-    absolvent_thesis_id_param = "poslední kombinace čísel v URI kolonce na webu knihovny VUT(dspace.vut.cz) např.: 99999"
-    absolvent_not_on_server = "{user}, na použití tohoto příkazu musíš být na FIT VUT serveru.\nhttps://discord.gg/vutfit"
-    absolvent_status_thesis = "Ověřuji práci..."
-    absolvent_status_diploma = "Ověřuji diplom..."
-    absolvent_status_roles = "Přidávam role..."
-
     # SYSTEM
     shutdown_brief = "Vypne bota"
     git_pull_brief = "Stáhne aktuálni změny z repa"
