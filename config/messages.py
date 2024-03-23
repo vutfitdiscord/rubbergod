@@ -352,25 +352,6 @@ class Messages(metaclass=Formatable):
     absolvent_status_diploma = "Ověřuji diplom..."
     absolvent_status_roles = "Přidávam role..."
 
-    # AUTOPIN
-    autopin_max_pins_error = "Zprávu nelze připnout - byl dosažen maximální počet připnutých zpráv."
-    autopin_add_brief = "Začne sledovat zprávu jako prioritní pin."
-    autopin_add_done = "Prioritní pin nastaven."
-    autopin_add_unknown_message = "Očekávána URL zprávy"
-    autopin_remove_brief = "Odebere sledování prioritního pinu."
-    autopin_remove_done = "Prioritní pin odebrán."
-    autopin_remove_not_exists = "V kanálu {channel_name} není nastavena prioritní zpráva pro piny."
-    autopin_no_messages = "Ještě neexistuje žádné mapování."
-    autopin_list_brief = "Zobrazí všechny piny s nastavenou prioritou."
-    autopin_list_unknown_channel = "> Neznámý kanál ({channel_id})"
-    autopin_list_unknown_message = "> {channel} - Neznámá zpráva"
-    autopin_list_item = "> {channel} - {url}"
-    autopin_system_message = "Nelze připnout systémovou zprávu."
-    autopin_list_info = "## Prioritní piny:"
-    autopin_get_all_brief = "Získá všechny piny z kanálu a pošle je ve formátu markdown."
-    autopin_no_pins = "V kanálu nejsou žádné piny."
-    autopin_get_all_done = "Všechny piny z kanálu {channel_name} byly úspěšně staženy."
-
     # SYSTEM
     shutdown_brief = "Vypne bota"
     git_pull_brief = "Stáhne aktuálni změny z repa"
