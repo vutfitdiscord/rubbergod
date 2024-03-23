@@ -10,6 +10,7 @@ from cogs.base import Base
 from permissions import permission_check
 
 from . import features
+from .features import MODERATION_FALSE, MODERATION_TRUE, SLOWMODE_CHANNEL_TYPES
 from .messages_cz import MessagesCZ
 from .views import View
 
@@ -31,7 +32,7 @@ delay_timestamps = {
 }
 
 
-async def slowmode_delay_times(inter, string: str) -> list[str]:
+async def slowmode_delay_times(inter: disnake.ApplicationCommandInteraction, string: str) -> list[str]:
     return [delay for delay in delay_timestamps.keys() if string.lower() in delay.lower()]
 
 
@@ -39,8 +40,6 @@ class Moderation(Base, commands.Cog):
     def __init__(self, bot: commands.Bot):
         super().__init__()
         self.bot = bot
-        self.moderation_true = "moderation:resolve:true"
-        self.moderation_false = "moderation:resolve:false"
 
     @commands.check(permission_check.submod_plus)
     @commands.slash_command(name="slowmode")
@@ -57,23 +56,21 @@ class Moderation(Base, commands.Cog):
             ge=0,
             lt=21600,  # Maximum is 6 hours (See discord docs)
         ),
-        channel: features.SLOWMODE_CHANNEL_TYPES = None,
+        channel: SLOWMODE_CHANNEL_TYPES = None,
     ):
         channel = inter.channel if channel is None else channel
         prev_delay = channel.slowmode_delay
         await channel.edit(slowmode_delay=delay)
-        await features.log(inter, prev_delay, curr_delay=delay, channel=channel)
+        await features.log(inter, prev_delay, curr_delay=delay, channel=channel, log_channel=self.log_channel)
         await inter.edit_original_response(MessagesCZ.set_success(channel=channel.mention, delay=delay))
 
     @commands.check(permission_check.submod_plus)
     @_slowmode.sub_command(name="remove", description=MessagesCZ.remove_brief)
-    async def remove(
-        self, inter: disnake.GuildCommandInteraction, channel: features.SLOWMODE_CHANNEL_TYPES = None
-    ):
+    async def remove(self, inter: disnake.GuildCommandInteraction, channel: SLOWMODE_CHANNEL_TYPES = None):
         channel = inter.channel if channel is None else channel
         prev_delay = inter.channel.slowmode_delay
         await channel.edit(slowmode_delay=0)
-        await features.log(inter, prev_delay, curr_delay=0, channel=channel)
+        await features.log(inter, prev_delay, curr_delay=0, channel=channel, log_channel=self.log_channel)
         await inter.edit_original_response(MessagesCZ.remove_success(channel=channel.mention))
 
     @commands.Cog.listener()
@@ -91,13 +88,13 @@ class Moderation(Base, commands.Cog):
 
     @commands.Cog.listener()
     async def on_button_click(self, inter: disnake.MessageInteraction):
-        if inter.component.custom_id not in [self.moderation_true, self.moderation_false]:
+        if inter.component.custom_id not in [MODERATION_TRUE, MODERATION_FALSE]:
             return
 
         embed = inter.message.embeds[0].to_dict()
-        if inter.component.custom_id == self.moderation_true:
+        if inter.component.custom_id == MODERATION_TRUE:
             label = "Resolve"
-            custom_id = self.moderation_false
+            custom_id = MODERATION_FALSE
             embed["color"] = disnake.Color.yellow()
             for field in embed["fields"]:
                 if field["name"] == "Resolved by:":
@@ -105,7 +102,7 @@ class Moderation(Base, commands.Cog):
 
         else:
             label = "Unresolve"
-            custom_id = self.moderation_true
+            custom_id = MODERATION_TRUE
             embed["color"] = disnake.Color.green()
             for field in embed["fields"]:
                 if field["name"] == "Resolved by:":
