@@ -12,19 +12,20 @@ from buttons.embed import EmbedView
 from cogs.base import Base
 from cogs.grillbotapi.cog import GrillbotApi
 from config import cooldowns
-from config.messages import Messages
 from database.karma import KarmaDB
-from features import karma
 from features.leaderboard import LeaderboardPageSource
 from features.reaction_context import ReactionContext
 from permissions import permission_check, room_check
 
+from . import features
+from .messages_cz import MessagesCZ
+
 
 class Karma(Base, commands.Cog):
-    def __init__(self, bot):
+    def __init__(self, bot: commands.Bot):
         super().__init__()
         self.bot = bot
-        self.karma_helper = karma.Karma(bot)
+        self.karma_helper = features.Karma(bot)
         self.check = room_check.RoomCheck(bot)
         self.grillbot_api = GrillbotApi(bot)
         self._leaderboard_formatter = utils.make_pts_column_row_formatter(KarmaDB.karma.name)
@@ -34,7 +35,7 @@ class Karma(Base, commands.Cog):
 
     async def handle_reaction(self, ctx: ReactionContext):
         # handle karma vote
-        if ctx.message.content.startswith(Messages.karma_vote_message_hack):
+        if ctx.message.content.startswith(MessagesCZ.vote_message_hack):
             if ctx.emoji not in ["✅", "❌", "0⃣"]:
                 await ctx.message.remove_reaction(ctx.emoji, ctx.member)
             else:
@@ -74,7 +75,7 @@ class Karma(Base, commands.Cog):
             KarmaDB.karma_emoji(ctx.message.author.id, ctx.member.id, emoji)
 
     @commands.Cog.listener()
-    async def on_raw_reaction_remove(self, payload):
+    async def on_raw_reaction_remove(self, payload: disnake.RawReactionActionEvent):
         ctx: ReactionContext = await ReactionContext.from_payload(self.bot, payload)
         if ctx is None:
             return
@@ -91,10 +92,10 @@ class Karma(Base, commands.Cog):
 
     @cooldowns.default_cooldown
     @commands.slash_command(name="karma", guild_ids=[Base.config.guild_id])
-    async def _karma(self, inter):
+    async def _karma(self, inter: disnake.ApplicationCommandInteraction):
         pass
 
-    @_karma.sub_command(description=Messages.karma_brief)
+    @_karma.sub_command(description=MessagesCZ.karma_brief)
     async def me(self, inter: disnake.ApplicationCommandInteraction):
         await inter.response.send_message(
             self.karma_helper.karma_get(inter.author), ephemeral=self.check.botroom_check(inter)
@@ -106,19 +107,19 @@ class Karma(Base, commands.Cog):
             self.karma_helper.karma_get(inter.author, user), ephemeral=self.check.botroom_check(inter)
         )
 
-    @_karma.sub_command(description=Messages.karma_stalk_brief)
+    @_karma.sub_command(description=MessagesCZ.stalk_brief)
     async def stalk(self, inter: disnake.ApplicationCommandInteraction, user: disnake.User):
         await inter.response.send_message(
             self.karma_helper.karma_get(inter.author, user), ephemeral=self.check.botroom_check(inter)
         )
 
     @commands.cooldown(rate=1, per=300.0, type=commands.BucketType.guild)
-    @_karma.sub_command(description=Messages.karma_getall_brief)
+    @_karma.sub_command(description=MessagesCZ.getall_brief)
     async def getall(self, inter: disnake.ApplicationCommandInteraction):
-        await inter.send(Messages.karma_getall_response, ephemeral=self.check.botroom_check(inter))
+        await inter.send(MessagesCZ.getall_response, ephemeral=self.check.botroom_check(inter))
         await self.karma_helper.emoji_list_all_values(inter, self.check.botroom_check(inter))
 
-    @_karma.sub_command(description=Messages.karma_get_brief)
+    @_karma.sub_command(description=MessagesCZ.get_brief)
     async def get(self, inter: disnake.ApplicationCommandInteraction, emoji):
         await self.karma_helper.emoji_get_value(inter, emoji, ephemeral=self.check.botroom_check(inter))
 
@@ -128,7 +129,7 @@ class Karma(Base, commands.Cog):
         await self._message(inter, message, ephemeral=self.check.botroom_check(inter))
 
     @cooldowns.long_cooldown
-    @_karma.sub_command(description=Messages.karma_message_brief)
+    @_karma.sub_command(description=MessagesCZ.message_brief)
     async def message(self, inter: disnake.ApplicationCommandInteraction, message: disnake.Message):
         await self._message(inter, message)
 
@@ -143,12 +144,12 @@ class Karma(Base, commands.Cog):
             await msg.add_reaction("🔁")
 
     @cooldowns.long_cooldown
-    @_karma.sub_command(name="leaderboard", description=Messages.karma_leaderboard_brief)
+    @_karma.sub_command(name="leaderboard", description=MessagesCZ.leaderboard_brief)
     async def leaderboard(
         self,
         inter: disnake.ApplicationCommandInteraction,
         direction: str = commands.Param(default="descending", choices=["ascending", "descending"]),
-        start: int = commands.Param(default=1, gt=0, lt=100000000, description=Messages.karma_board_start),
+        start: int = commands.Param(default=1, gt=0, lt=100000000, description=MessagesCZ.board_start_param),
     ):
         """
         Get karma leaderboard
@@ -166,8 +167,8 @@ class Karma(Base, commands.Cog):
 
         embed = disnake.Embed()
         value_num = math.ceil(start / self.config.karma_grillbot_leaderboard_size)
-        value = Messages.karma_web if value_num == 1 else f"{Messages.karma_web}{value_num}"
-        embed.add_field(name=Messages.karma_web_title, value=value)
+        value = MessagesCZ.karma_web if value_num == 1 else f"{MessagesCZ.karma_web}{value_num}"
+        embed.add_field(name=MessagesCZ.web_title, value=value)
         page_source = LeaderboardPageSource(
             bot=self.bot,
             author=inter.author,
@@ -188,13 +189,13 @@ class Karma(Base, commands.Cog):
         view.message = await inter.original_message()
 
     @cooldowns.long_cooldown
-    @_karma.sub_command(name="givingboard", description=Messages.karma_givingboard_brief)
+    @_karma.sub_command(name="givingboard", description=MessagesCZ.givingboard_brief)
     async def givingboard(
         self,
         inter: disnake.ApplicationCommandInteraction,
         karma: str = commands.Param(default="positive", choices=["positive", "negative"]),
         direction: str = commands.Param(default="descending", choices=["ascending", "descending"]),
-        start: int = commands.Param(default=1, gt=0, lt=100000000, description=Messages.karma_board_start),
+        start: int = commands.Param(default=1, gt=0, lt=100000000, description=MessagesCZ.board_start_param),
     ):
         """
         Get the biggest positive/negative karma givers
@@ -226,36 +227,36 @@ class Karma(Base, commands.Cog):
         view.message = await inter.original_message()
 
     @commands.check(permission_check.is_bot_admin)
-    @commands.slash_command(name="karma_mod", description=Messages.karma_brief)
+    @commands.slash_command(name="karma_mod", description=MessagesCZ.karma_brief)
     async def _karma_mod(self, inter: disnake.ApplicationCommandInteraction):
         pass
 
     @commands.check(room_check.is_in_voteroom)
-    @_karma_mod.sub_command(name="revote", description=Messages.karma_revote_brief)
+    @_karma_mod.sub_command(name="revote", description=MessagesCZ.revote_brief)
     async def revote(self, inter: disnake.ApplicationCommandInteraction, emoji):
         """Start a revote of the karma value for emojis."""
         await inter.response.defer(ephemeral=True)
         await self.karma_helper.emoji_revote_value(inter, emoji)
 
     @commands.check(room_check.is_in_voteroom)
-    @_karma_mod.sub_command(name="vote", description=Messages.karma_vote_brief)
+    @_karma_mod.sub_command(name="vote", description=MessagesCZ.vote_brief)
     async def vote(self, inter: disnake.ApplicationCommandInteraction):
         """Start a vote using emojis without a karma value."""
         await inter.response.defer(ephemeral=True)
         await self.karma_helper.emoji_vote_value(inter)
 
-    @_karma_mod.sub_command(name="give", description=Messages.karma_give_brief)
+    @_karma_mod.sub_command(name="give", description=MessagesCZ.give_brief)
     async def give(self, inter: disnake.ApplicationCommandInteraction, users: str, karma: int):
         await inter.response.defer()
         await self.karma_helper.karma_give(inter, users, karma)
 
-    @_karma_mod.sub_command(name="transfer", description=Messages.karma_transfer_brief)
+    @_karma_mod.sub_command(name="transfer", description=MessagesCZ.transfer_brief)
     async def transfer(
         self, inter: disnake.ApplicationCommandInteraction, from_user: disnake.Member, to_user: disnake.Member
     ):
         await inter.response.defer()
         if from_user == to_user:
-            await inter.send(Messages.karma_transfer_same_user)
+            await inter.send(MessagesCZ.transfer_same_user)
             return
         await self.karma_helper.karma_transfer(inter, from_user, to_user)
 
@@ -263,10 +264,10 @@ class Karma(Base, commands.Cog):
     @commands.guild_only()
     async def karma(self, ctx: commands.Context):
         if not (self.config.guild_id == ctx.guild.id):
-            await ctx.reply(Messages.server_warning)
+            await ctx.reply(MessagesCZ.server_warning)
             return
         command_id = utils.get_command_id(self, "karma")
-        await ctx.reply(Messages.moved_command(name="karma", id=command_id))
+        await ctx.reply(MessagesCZ.moved_command(name="karma", id=command_id))
 
     @tasks.loop(minutes=int(Base.config.grillbot_api_karma_sync_interval))
     async def sync_with_grillbot_task(self):
@@ -279,9 +280,5 @@ class Karma(Base, commands.Cog):
     async def karma_error(self, inter: disnake.ApplicationCommandInteraction, error):
         if isinstance(error, commands.CheckFailure):
             vote_room = self.bot.get_channel(self.config.vote_room)
-            await inter.send(Messages.vote_room_only(room=vote_room.mention))
+            await inter.send(MessagesCZ.vote_room_only(room=vote_room.mention))
             return True
-
-
-def setup(bot):
-    bot.add_cog(Karma(bot))
