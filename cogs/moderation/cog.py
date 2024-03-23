@@ -10,10 +10,11 @@ import disnake
 from disnake.ext import commands
 
 import utils
-from buttons.moderation import ModerationView
 from cogs.base import Base
-from config.messages import Messages
 from permissions import permission_check
+
+from .messages_cz import MessagesCZ
+from .views import View
 
 # Reflects UI slider values
 slowmode_delay_timestamps = {
@@ -69,7 +70,7 @@ class Moderation(Base, commands.Cog):
 
         embed.add_field(name="Resolved by:", value="---")
         embed.set_footer(text=datetime.now().strftime("%d.%m.%Y %H:%M"))
-        await room.send(embed=embed, view=ModerationView("Resolve", self.moderation_false))
+        await room.send(embed=embed, view=View("Resolve", self.moderation_false))
 
     @commands.Cog.listener()
     async def on_message(self, message: disnake.Message):
@@ -106,22 +107,20 @@ class Moderation(Base, commands.Cog):
                 if field["name"] == "Resolved by:":
                     field["value"] = inter.author.mention
 
-        await inter.response.edit_message(
-            embed=disnake.Embed.from_dict(embed), view=ModerationView(label, custom_id)
-        )
+        await inter.response.edit_message(embed=disnake.Embed.from_dict(embed), view=View(label, custom_id))
 
     @commands.check(permission_check.submod_plus)
     @commands.slash_command(name="slowmode")
     async def _slowmode(self, inter):
         await inter.response.defer(ephemeral=True)
 
-    @_slowmode.sub_command(name="set", description=Messages.slowmode_set_brief)
+    @_slowmode.sub_command(name="set", description=MessagesCZ.slowmode_set_brief)
     async def set(
         self,
         inter: disnake.ApplicationCommandInteraction,
         delay: int = commands.Param(
             autocomplete=slowmode_delay_timestamps,
-            description=Messages.slowmode_time,
+            description=MessagesCZ.slowmode_time,
             ge=0,
             lt=21600,  # Maximum is 6 hours (See discord docs)
         ),
@@ -132,11 +131,11 @@ class Moderation(Base, commands.Cog):
         await channel.edit(slowmode_delay=delay)
         await self.log(inter, prev_delay, curr_delay=delay, channel=channel)
         await inter.edit_original_response(
-            Messages.slowmode_set_success(channel=channel.mention, delay=delay)
+            MessagesCZ.slowmode_set_success(channel=channel.mention, delay=delay)
         )
 
     @commands.check(permission_check.submod_plus)
-    @_slowmode.sub_command(name="remove", description=Messages.slowmode_remove_brief)
+    @_slowmode.sub_command(name="remove", description=MessagesCZ.slowmode_remove_brief)
     async def remove(
         self, inter: disnake.ApplicationCommandInteraction, channel: slowmode_channel_type = None
     ):
@@ -144,7 +143,7 @@ class Moderation(Base, commands.Cog):
         prev_delay = inter.channel.slowmode_delay
         await channel.edit(slowmode_delay=0)
         await self.log(inter, prev_delay, curr_delay=0, channel=channel)
-        await inter.edit_original_response(Messages.slowmode_remove_success(channel=channel.mention))
+        await inter.edit_original_response(MessagesCZ.slowmode_remove_success(channel=channel.mention))
 
     async def log(
         self,
