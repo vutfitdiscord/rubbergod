@@ -41,7 +41,7 @@ async def autocomp_subjects_with_stream(inter: disnake.ApplicationCommandInterac
 
 
 class StreamLinks(Base, commands.Cog):
-    def __init__(self, bot):
+    def __init__(self, bot: commands.Bot):
         global subjects, subjects_with_stream
         super().__init__()
         self.bot = bot

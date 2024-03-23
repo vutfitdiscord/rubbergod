@@ -13,7 +13,7 @@ from .views import View
 
 
 class Bookmark(Base, commands.Cog):
-    def __init__(self, bot):
+    def __init__(self, bot: commands.Bot):
         super().__init__()
         self.bot = bot
 
