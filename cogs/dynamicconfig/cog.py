@@ -14,7 +14,6 @@ from cogs.base import Base
 from config.app_config import CONFIG_PATH, config_get_keys, load_config
 from permissions import permission_check
 
-from . import features
 from .messages_cz import MessagesCZ
 
 
@@ -45,7 +44,7 @@ class DynamicConfig(Base, commands.Cog):
         """
         Dynamically change config values
         """
-        await features.change_value(self, inter, key, value, False)
+        await self.change_value(inter, key, value, False)
         load_config()
 
     @config_cmd.sub_command(description=MessagesCZ.append_brief)
@@ -59,7 +58,7 @@ class DynamicConfig(Base, commands.Cog):
         Append value(s) to existing config
         For string and int types command has same behaviour as `set_value`.
         """
-        await features.change_value(self, inter, key, value, True)
+        await self.change_value(inter, key, value, True)
         load_config()
 
     @config_cmd.sub_command(description=MessagesCZ.load_brief)
@@ -137,7 +136,7 @@ class DynamicConfig(Base, commands.Cog):
         If `append` values are appended to current setting.
         """
         if not hasattr(self.config, key) or key in self.config.config_static:
-            await inter.send(MessagesCZ.config_wrong_key)
+            await inter.send(MessagesCZ.wrong_key)
             return
         try:
             value = shlex.split(value)
@@ -157,7 +156,7 @@ class DynamicConfig(Base, commands.Cog):
                             try:
                                 value[idx] = int(item)
                             except ValueError:
-                                await inter.send(MessagesCZ.config_wrong_type)
+                                await inter.send(MessagesCZ.wrong_type)
                                 return
                     if append:
                         value = attr + value
@@ -174,16 +173,16 @@ class DynamicConfig(Base, commands.Cog):
                     try:
                         value = int(value[0])
                     except ValueError:
-                        await inter.send(MessagesCZ.config_wrong_type)
+                        await inter.send(MessagesCZ.wrong_type)
                         return
                 self.config.toml_dict[section][key_toml] = value
                 break
             else:
                 key_toml = key
         else:
-            await inter.send(MessagesCZ.config_wrong_key)
+            await inter.send(MessagesCZ.wrong_key)
             return
         setattr(self.config, key, value)
-        with open(self.config_path, "w+", encoding="utf-8") as fd:
+        with open(CONFIG_PATH, "w+", encoding="utf-8") as fd:
             toml.dump(self.config.toml_dict, fd)
         await inter.send(MessagesCZ.config_updated)
