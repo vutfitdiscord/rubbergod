@@ -1,0 +1,60 @@
+from config.messages import Messages as GlobalMessages
+
+
+class MessagesCZ(GlobalMessages):
+    print_karma = (
+        "{user} Karma uživatele `{target}` je: **{karma}** "
+        "(**{order}.**)\nA rozdal:\n"
+        "**{karma_pos}** pozitivní karmy "
+        "(**{karma_pos_order}.**)\n"
+        "**{karma_neg}** negativní karmy "
+        "(**{karma_neg_order}.**)"
+    )
+    karma_brief = "Vypíše stav vaší karmy (vč. rozdané a odebrané)"
+    karma_mod_brief = "Karma příkazy pro moderátory"
+    stalk_brief = "Vypíše karmu uživatele"
+    message_brief = "Zobrazí karmu za zprávu"
+    get_brief = "Vrátí karma hodnotu emotu"
+    getall_brief = "Vypíše, které emoty mají hodnotu 1 a -1"
+    give_brief = "Přidá karmu uživateli"
+    transfer_brief = "Převede karmu z jednoho uživatele na druhého"
+    vote_brief = "Odstartuje hlasování o hodnotě zatím neohodnoceného emotu"
+    revote_brief = "Odstartuje hlasování o nové hodnotě emotu"
+    leaderboard_brief = "Karma leaderboard"
+    givingboard_brief = "Leaderboard rozdávání pozitivní/negativní karmy"
+    board_start_param = "Zobrazí leaderboard na dané pozici"
+
+    karma_invalid_command = "Neznámý karma příkaz."
+    vote_message_hack = "Hlasování o karma ohodnocení emotu"
+    vote_message = f"{vote_message_hack} {{emote}}\n"
+    vote_info = "Hlasování skončí za **{delay}** " "minut a minimální počet hlasů je " "**{minimum}**."
+    vote_result = "Výsledek hlasování o emotu {emote} " "je {result}."
+    vote_not_passed = "Hlasování o emotu {emote} neprošlo.\n" "Bylo třeba aspoň {minimum} hlasů."
+    vote_all_voted = "Už se hlasovalo o všech emotech."
+    revote_not_emoji = "Špatný formát emoji."
+    revote_started = "Hlasování o nové hodnotě emotu začalo."
+    emote_not_found = "Emote `{emote}` jsem na serveru nenašel."
+    karma_get_format = (
+        "Použití:\n"
+        "`/karma getall`: "
+        "vypíše všechny emoty s hodnotou.\n"
+        "`/karma get [emote]`: "
+        "zobrazí hodnotu daného emotu."
+    )
+    karma_get = "Hodnota {emote} je {value}."
+    getall_response = "Ohodnocené emoji:"
+    get_emote_not_voted = "{emote} není ohodnocen."
+    give_success = "Uživateli {user_list} bylo úspěšně přidáno **{karma} karmy**."
+    give_negative_success = "Uživateli {user_list} bylo úspěšně odebráno **{karma} karmy**."
+    message_format = "Musíš zadat url zprávy"
+    leaderboard_offset_error = "{user} Špatný offset, zadej kladné číslo"
+    web_title = "Celý leaderboard"
+    karma_web = "https://karma.grillbot.eu/"
+    transfer_same_user = "Nelze převést karmu na stejného uživatele."
+    transfer_user_no_karma = "{user} nemá žádnou karmu."
+    transfer_complete = (
+        "Karma byla úspěšně převedena z `{from_user}` na `{to_user}`:\n"
+        "Množství karmy: **{karma}**\n"
+        "Množství pozitivně rozdané karmy: **{positive}** \n"
+        "Množství negativně rozdané karmy: **{negative}**"
+    )
