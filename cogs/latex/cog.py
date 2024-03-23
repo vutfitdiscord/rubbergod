@@ -19,7 +19,7 @@ PNG_HEADER = b"\x89PNG\r\n\x1a\n"
 
 
 class Latex(Base, commands.Cog):
-    def __init__(self, bot):
+    def __init__(self, bot: commands.Bot):
         super().__init__()
         self.bot = bot
 

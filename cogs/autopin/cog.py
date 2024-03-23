@@ -18,7 +18,7 @@ from .messages_cz import MessagesCZ
 
 
 class AutoPin(Base, commands.Cog):
-    def __init__(self, bot):
+    def __init__(self, bot: commands.Bot):
         super().__init__()
         self.warning_time = datetime.datetime.now(datetime.timezone.utc) - datetime.timedelta(
             minutes=self.config.autopin_warning_cooldown

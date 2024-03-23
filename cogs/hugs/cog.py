@@ -31,7 +31,7 @@ class Hugs(Base, commands.Cog):
 
     emoji_count = len(Base.config.hug_emojis)
 
-    def __init__(self, bot):
+    def __init__(self, bot: commands.Bot):
         super().__init__()
         self.bot = bot
         self.hugs_db = HugsTableDB()

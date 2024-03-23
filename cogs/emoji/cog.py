@@ -19,7 +19,7 @@ from .messages_cz import MessagesCZ
 
 
 class Emoji(Base, commands.Cog):
-    def __init__(self, bot):
+    def __init__(self, bot: commands.Bot):
         self.bot = bot
         self.check = room_check.RoomCheck(bot)
         self.tasks = [self.download_emojis_task.start()]

@@ -36,7 +36,7 @@ async def slowmode_delay_times(inter, string: str) -> list[str]:
 
 
 class Moderation(Base, commands.Cog):
-    def __init__(self, bot):
+    def __init__(self, bot: commands.Bot):
         super().__init__()
         self.bot = bot
         self.moderation_true = "moderation:resolve:true"
