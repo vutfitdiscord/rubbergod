@@ -14,7 +14,7 @@ from cogs.base import Base
 
 
 class GrillbotApi(Base, commands.Cog):
-    def __init__(self, bot):
+    def __init__(self, bot: commands.Bot):
         super().__init__()
         self.bot = bot
         self._owner_id = bot.owner_id
