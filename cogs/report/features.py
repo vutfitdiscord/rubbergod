@@ -17,7 +17,9 @@ def extract_report_id(inter: disnake.MessageInteraction) -> int:
     return int(report_id)
 
 
-async def convert_url(inter, message_url) -> Optional[disnake.Message]:
+async def convert_url(
+    inter: disnake.ApplicationCommandInteraction, message_url: str
+) -> Optional[disnake.Message]:
     """converts a message url to a message object"""
     try:
         message: disnake.Message = await commands.MessageConverter().convert(inter, message_url)
@@ -34,7 +36,9 @@ async def set_tag(forum: disnake.ForumChannel, forum_thread: disnake.Thread, tag
             break
 
 
-async def embed_resolved(self, author: str, embed: dict, report_type: str, resolved: bool) -> disnake.Embed:
+async def embed_resolved(
+    buttons: list[disnake.ui.Button], author: str, embed: dict, report_type: str, resolved: bool
+) -> disnake.Embed:
     """Changes the embed to a resolved embed or back to a report embed"""
     if resolved:
         embed["color"] = disnake.Color.green()
@@ -42,30 +46,30 @@ async def embed_resolved(self, author: str, embed: dict, report_type: str, resol
         for field in embed["fields"]:
             if field["name"] == "Resolved by":
                 field["value"] = author
-        for child in self.children:
-            child.disabled = True
-            if child.custom_id == "report:resolve":
-                child.label = "Resolved"
-                child.style = disnake.ButtonStyle.green
-                child.emoji = "✅"
-                child.disabled = False
+        for button in buttons:
+            button.disabled = True
+            if button.custom_id == "report:resolve":
+                button.label = "Resolved"
+                button.style = disnake.ButtonStyle.green
+                button.emoji = "✅"
+                button.disabled = False
     else:
         embed["color"] = disnake.Color.red()
         embed["title"] = f"{report_type.capitalize()} report"
         for field in embed["fields"]:
             if field["name"] == "Resolved by":
                 field["value"] = "---"
-        for child in self.children:
-            child.disabled = False
-            if child.custom_id == "report:resolve":
-                child.label = "Resolve"
-                child.style = disnake.ButtonStyle.grey
-                child.emoji = "❌"
+        for button in buttons:
+            button.disabled = False
+            if button.custom_id == "report:resolve":
+                button.label = "Resolve"
+                button.style = disnake.ButtonStyle.grey
+                button.emoji = "❌"
     embed = disnake.Embed.from_dict(embed)
     return embed
 
 
-def answer_embed(title, inter: disnake.ModalInteraction, report: ReportDB, answer: str) -> disnake.Embed:
+def answer_embed(title: str, inter: disnake.ModalInteraction, report: ReportDB, answer: str) -> disnake.Embed:
     """creates an embed template for the submitted answer"""
     description = MessagesCZ.embed_answered(last_answer=report.last_answer, answer=answer)
     embed = disnake.Embed(title=title, description=description, color=disnake.Color.yellow())

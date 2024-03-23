@@ -6,10 +6,10 @@ from disnake.ext import commands
 import utils
 from cogs.report.views import ReportGeneralView, ReportMessageView
 from config.app_config import config
-from config.messages import Messages
 from database.report import ReportDB, UserDB
 
 from . import features as report_features
+from .messages_cz import MessagesCZ
 
 
 class Modal(disnake.ui.Modal):
@@ -27,7 +27,7 @@ class Modal(disnake.ui.Modal):
         components = [
             disnake.ui.TextInput(
                 label="Report reason",
-                placeholder=Messages.report_modal_placeholder,
+                placeholder=MessagesCZ.modal_placeholder,
                 custom_id="reason",
                 style=disnake.TextInputStyle.long,
                 required=True,
@@ -83,7 +83,7 @@ class Modal(disnake.ui.Modal):
 
     async def report_general(self, inter: disnake.ModalInteraction) -> None:
         """add general report to db and send it to the report room"""
-        await inter.send(Messages.report_modal_success, ephemeral=True)
+        await inter.send(MessagesCZ.modal_success, ephemeral=True)
         report_reason = inter.text_values["reason"]
         UserDB.add_user(inter.author.id)
         report_id = ReportDB.add_report(type="general", author_id=inter.author.id, reason=report_reason)
@@ -102,8 +102,8 @@ class Modal(disnake.ui.Modal):
 
     async def report_message(self, inter: disnake.ModalInteraction) -> None:
         """add message report to db and send it to the report room"""
-        await inter.send(Messages.report_modal_success, ephemeral=True)
-        report_reason = Messages.report_message_embed(
+        await inter.send(MessagesCZ.modal_success, ephemeral=True)
+        report_reason = MessagesCZ.message_embed(
             content=self.message.content, reason=inter.text_values["reason"]
         )
         UserDB.add_user(inter.author.id)
@@ -140,7 +140,7 @@ class Modal(disnake.ui.Modal):
             content = ""
 
             if attachments_too_big:
-                content = Messages.report_files_too_big(files="\n- ".join(attachments_too_big))
+                content = MessagesCZ.attachment_too_big(files="\n- ".join(attachments_too_big))
 
             await thread.send(content=content, files=files)
 
