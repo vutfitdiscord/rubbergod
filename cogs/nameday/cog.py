@@ -17,7 +17,7 @@ from .messages_cz import MessagesCZ
 
 
 class Nameday(Base, commands.Cog):
-    def __init__(self, bot):
+    def __init__(self, bot: commands.Bot):
         super().__init__()
         self.bot = bot
         self.check = room_check.RoomCheck(bot)

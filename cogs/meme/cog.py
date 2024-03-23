@@ -13,7 +13,7 @@ uhoh_counter = 0
 
 
 class Meme(Base, commands.Cog):
-    def __init__(self, bot):
+    def __init__(self, bot: commands.Bot):
         super().__init__()
         self.bot = bot
 
