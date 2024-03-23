@@ -186,7 +186,7 @@ class AutoPin(Base, commands.Cog):
 
         PinMapDB.remove_channel(str(payload.channel_id))
 
-    async def handle_reaction(self, ctx):
+    async def handle_reaction(self, ctx: commands.Context):
         """
         if the message has X or more 'pushpin' emojis pin the message
         """
@@ -216,21 +216,7 @@ class AutoPin(Base, commands.Cog):
                     return
 
                 users = await reaction.users().flatten()
-                await self.log(message, users)
+                await self.pin_features.log(message, users)
                 await message.pin()
                 await message.clear_reaction("📌")
                 break
-
-    async def log(self, message, users):
-        """
-        Logging message link and users that pinned message
-        """
-        embed = disnake.Embed(title="📌 Auto pin message log", color=disnake.Colour.yellow())
-        user_names = ", ".join([f"{user.mention}({user.name})" for user in users])
-        embed.add_field(name="Users", value=user_names if len(user_names) > 0 else "**Missing users**")
-        embed.add_field(
-            name="Message in channel", value=f"[#{message.channel.name}]({message.jump_url})", inline=False
-        )
-        embed.timestamp = datetime.datetime.now(tz=datetime.timezone.utc)
-        channel = self.bot.get_channel(self.config.log_channel)
-        await channel.send(embed=embed)
