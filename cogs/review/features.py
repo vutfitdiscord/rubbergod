@@ -6,12 +6,14 @@ from typing import Union
 import disnake
 import requests
 from bs4 import BeautifulSoup
+from disnake.ext.commands import Bot
 
 import utils
 from config.app_config import config
-from config.messages import Messages
 from database.review import ProgrammeDB, ReviewDB, ReviewRelevanceDB, SubjectDB, SubjectDetailsDB
 from features import sports
+
+from .messages_cz import MessagesCZ
 
 
 class TierEnum(Enum):
@@ -32,7 +34,7 @@ class TierEnum(Enum):
 class ReviewManager:
     """Helper class for reviews"""
 
-    def __init__(self, bot):
+    def __init__(self, bot: Bot):
         self.bot = bot
 
     def make_embed(
@@ -58,10 +60,10 @@ class ReviewManager:
             else:
                 guild = self.bot.get_guild(config.guild_id)
                 author = guild.get_member(int(review.member_ID))
-            embed.add_field(name=Messages.review_author_label, value=author)
-            embed.add_field(name=Messages.review_grade_label, value=TierEnum(review.tier).name)
+            embed.add_field(name=MessagesCZ.author_label, value=author)
+            embed.add_field(name=MessagesCZ.grade_label, value=TierEnum(review.tier).name)
             embed.add_field(
-                name=Messages.review_date_label,
+                name=MessagesCZ.date_label,
                 value=utils.get_discord_timestamp(
                     datetime.combine(review.date, time(12, 0)), "Relative Time"
                 ),
@@ -71,10 +73,8 @@ class ReviewManager:
                 if len(text) > 1024:
                     pages = utils.cut_string_by_words(text, 1000, " ")
                     text = pages[0]
-                    embed.add_field(
-                        name=Messages.review_text_page_label, value=f"1/{len(pages)}", inline=False
-                    )
-                embed.add_field(name=Messages.review_text_label, value=text, inline=False)
+                    embed.add_field(name=MessagesCZ.text_page_label, value=f"1/{len(pages)}", inline=False)
+                embed.add_field(name=MessagesCZ.text_label, value=text, inline=False)
             likes = ReviewRelevanceDB.get_votes_count(review.id, True)
             embed.add_field(name="👍", value=f"{likes}")
             dislikes = ReviewRelevanceDB.get_votes_count(review.id, False)
@@ -89,7 +89,7 @@ class ReviewManager:
             subject_id = subject.card.split("/")[-2]
             vutis_link = "https://www.vut.cz/studis/student.phtml?script_name=anketa_statistiky"
             embed.add_field(
-                name=Messages.review_other_reviews_label,
+                name=MessagesCZ.other_reviews_label,
                 value=f"[VUT IS]({vutis_link}&apid={subject_id}&typ_semestru_id={sem})",
                 inline=False,
             )
@@ -108,10 +108,10 @@ class ReviewManager:
                 pages = utils.cut_string_by_words(text, 1000, " ")
                 text = pages[text_page - 1]
                 embed.set_field_at(
-                    idx, name=Messages.review_text_page_label, value=f"{text_page}/{len(pages)}", inline=False
+                    idx, name=MessagesCZ.text_page_label, value=f"{text_page}/{len(pages)}", inline=False
                 )
                 idx += 1
-            embed.set_field_at(idx, name=Messages.review_text_label, value=text, inline=False)
+            embed.set_field_at(idx, name=MessagesCZ.text_label, value=text, inline=False)
             idx += 1
         likes = ReviewRelevanceDB.get_votes_count(review.id, True)
         embed.set_field_at(idx, name="👍", value=f"{likes}")
@@ -160,7 +160,7 @@ class ReviewManager:
         subject_details = SubjectDetailsDB.get(subject_obj.shortcut) or subject_obj.shortcut
         name = getattr(subject_details, "name", "")
         if reviews_cnt == 0:
-            description = f"{name}\n{Messages.review_embed_no_reviews}"
+            description = f"{name}\n{MessagesCZ.no_reviews}"
             return [self.make_embed(author, None, subject_details, description, "1/1")]
         else:
             embeds = []
@@ -169,7 +169,7 @@ class ReviewManager:
                 review = reviews[idx].ReviewDB
                 grade_num = TierEnum.tier_to_grade_num(avg_tier)
                 grade = f"{TierEnum(round(avg_tier)).name}({round(grade_num, 1)})"
-                description = Messages.review_embed_description(name=name, grade=grade)
+                description = MessagesCZ.embed_description(name=name, grade=grade)
                 page = f"{idx+1}/{reviews_cnt}"
 
                 embeds.append(self.make_embed(author, review, subject_details, description, page))
@@ -190,11 +190,11 @@ class ReviewManager:
         reviews_cnt = reviews.count()
 
         if reviews_cnt == 0:
-            description = Messages.review_embed_no_reviews
+            description = MessagesCZ.no_reviews
         else:
             description = "\n".join(map(lambda x: x.subject.upper(), reviews))
 
-        embed = disnake.Embed(title=Messages.review_authored_list_label, description=description)
+        embed = disnake.Embed(title=MessagesCZ.authored_list_label, description=description)
         return embed
 
     def add_vote(self, review_id: int, vote: bool, author: str):
