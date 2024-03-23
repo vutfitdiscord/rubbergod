@@ -212,23 +212,6 @@ class Messages(metaclass=Formatable):
     upgraded_pocitani_caught_deleting = "Podvádět mazáním zpráv je zakázáno. Začínáme znovu: "
     meme_board_start_param = "Zobrazí leaderboard na dané pozici"
 
-    # EXAMS
-    exams_brief = f"Zobrazí zkoušky pro daný ročník (výchozí ročník podle role)"
-    exams_no_valid_role = "Nebyla nalezena ročníková role"
-    exams_specify_year = "Specifikuj ročník"
-    exams_no_valid_year = "Byl zadán neplatný ročník"
-    exams_update_term_brief = "Aktualizuje termíny v kanálech termínů"
-    exams_remove_all_terms_brief = "Odstraní termíny ze všech kanálů termínů"
-    exams_remove_terms_brief = "Odstraní termíny ze zadaného kanálu"
-    exams_start_terms_brief = "Zapne automatickou aktualizaci termínů"
-    exams_stop_terms_brief = "Vypne automatickou aktualizaci termínů"
-    exams_terms_updated = "`Termíny aktualizovány v {num_chan} kanálech`"
-    exams_terms_removed = "`Termíny odstraněny`"
-    exams_nothing_to_remove = "`Nenalezeny žádné termíny v kanálu {chan_name}`"
-    exams_channel_is_not_text_channel = "`Nenalezeny žádné termíny v kanálu {chan_name}`"
-    exams_automatic_update_started = "`Zapnuta automatická aktualizace termínů pro server: {guild_name}`"
-    exams_automatic_update_stopped = "`Zastavena automatická aktualizace termínů pro server: {guild_name}`"
-
     # TIMEOUT WARS
     timeout_wars_user = "Uživatel {user} byl umlčen na {time:.0f} minut."
     timeout_wars_message_delete = "Uživatel {user} byl přistižen při mazání zpráv. Byl proto umlčen na {time:.0f} minut."
