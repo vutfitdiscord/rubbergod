@@ -76,61 +76,6 @@ class Messages(metaclass=Formatable):
     bot_room_redirect = "{user} <:sadcat:576171980118687754> 👉 " \
                         "<#{bot_room}>\n"
 
-    # KARMA
-    karma = "{user} Karma uživatele `{target}` je: **{karma}** " \
-            "(**{order}.**)\nA rozdal:\n" \
-            "**{karma_pos}** pozitivní karmy " \
-            "(**{karma_pos_order}.**)\n" \
-            "**{karma_neg}** negativní karmy " \
-            "(**{karma_neg_order}.**)"
-    karma_brief = "Vypíše stav vaší karmy (vč. rozdané a odebrané)"
-    karma_stalk_brief = "Vypíše karmu uživatele"
-    karma_message_brief = "Zobrazí karmu za zprávu"
-    karma_get_brief = "Vrátí karma hodnotu emotu"
-    karma_getall_brief = "Vypíše, které emoty mají hodnotu 1 a -1"
-    karma_give_brief = "Přidá karmu uživateli"
-    karma_transfer_brief = "Převede karmu z jednoho uživatele na druhého"
-    karma_vote_brief = "Odstartuje hlasování o hodnotě zatím neohodnoceného emotu"
-    karma_revote_brief = "Odstartuje hlasování o nové hodnotě emotu"
-    karma_leaderboard_brief = "Karma leaderboard"
-    karma_givingboard_brief = "Leaderboard rozdávání pozitivní/negativní karmy"
-    karma_board_start = "Zobrazí leaderboard na dané pozici"
-
-    karma_invalid_command = "Neznámý karma příkaz."
-    karma_vote_message_hack = "Hlasování o karma ohodnocení emotu"
-    karma_vote_message = f"{karma_vote_message_hack} {{emote}}\n"
-    karma_vote_info = "Hlasování skončí za **{delay}** " \
-                      "minut a minimální počet hlasů je " \
-                      "**{minimum}**."
-    karma_vote_result = "Výsledek hlasování o emotu {emote} " \
-                        "je {result}."
-    karma_vote_notpassed = "Hlasování o emotu {emote} neprošlo.\n" \
-                           "Bylo třeba aspoň {minimum} hlasů."
-    karma_vote_allvoted = "Už se hlasovalo o všech emotech."
-    karma_revote_not_emoji = "Špatný formát emoji."
-    karma_revote_started = "Hlasování o nové hodnotě emotu začalo."
-    emote_not_found = "Emote `{emote}` jsem na serveru nenašel."
-    karma_get_format = "Použití:\n" \
-                       "`/karma getall`: " \
-                       "vypíše všechny emoty s hodnotou.\n" \
-                       "`/karma get [emote]`: " \
-                       "zobrazí hodnotu daného emotu."
-    karma_get = "Hodnota {emote} je {value}."
-    karma_getall_response = "Ohodnocené emoji:"
-    karma_get_emote_not_voted = "{emote} není ohodnocen."
-    karma_give_success = "Uživateli {user_list} bylo úspěšně přidáno **{karma} karmy**."
-    karma_give_negative_success = "Uživateli {user_list} bylo úspěšně odebráno **{karma} karmy**."
-    karma_message_format = "Musíš zadat url zprávy"
-    karma_leaderboard_offset_error = "{user} Špatný offset, zadej kladné číslo"
-    karma_web_title = "Celý leaderboard"
-    karma_web = "https://karma.grillbot.eu/"
-    karma_transfer_same_user = "Nelze převést karmu na stejného uživatele."
-    karma_transer_user_no_karma = "{user} nemá žádnou karmu."
-    karma_transfer_complete = "Karma byla úspěšně převedena z `{from_user}` na `{to_user}`:\n" \
-                              "Množství karmy: **{karma}**\n" \
-                              "Množství pozitivně rozdané karmy: **{positive}** \n" \
-                              "Množství negativně rozdané karmy: **{negative}**"
-
     # ROLES
     role_add_denied = "{user}, na přidání role {role} nemáš právo."
     role_remove_denied = "{user}, na odebrání role {role} nemáš právo."
@@ -285,6 +230,7 @@ class Messages(metaclass=Formatable):
     meme_repost_link = "[Odkaz na originál]({original_message_url}) v <#{original_channel}>"
     meme_leaderboard_brief = "#better-memes leaderboard"
     upgraded_pocitani_caught_deleting = "Podvádět mazáním zpráv je zakázáno. Začínáme znovu: "
+    meme_board_start_param = "Zobrazí leaderboard na dané pozici"
 
     # EXAMS
     exams_brief = f"Zobrazí zkoušky pro daný ročník (výchozí ročník podle role)"
