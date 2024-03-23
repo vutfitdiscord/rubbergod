@@ -169,7 +169,7 @@ class Timeout(Base, commands.Cog):
     async def get_user(
         self,
         inter: disnake.ApplicationCommandInteraction,
-        user: disnake.Member,
+        user: disnake.User,
     ):
         """List history of timeouts for user"""
         await inter.response.defer()
@@ -190,7 +190,11 @@ class Timeout(Base, commands.Cog):
 
         main_embed.add_field(name="Timeouts count", value=timeouts_count, inline=True)
         main_embed.add_field(name="Reports count", value=ReportDB.get_reports_on_user(user.id), inline=True)
-        unverifies, warnings = await features.get_user_from_grillbot(self, inter.guild.id, user.id)
+        unverifies, warnings = await features.get_user_from_grillbot(
+            self.bot.owner_id,
+            inter.guild.id,
+            user.id,
+        )
         main_embed.add_field(
             name="Unverifies count",
             value=f"[{unverifies}](https://private.grillbot.eu/admin/unverify/logs)",
