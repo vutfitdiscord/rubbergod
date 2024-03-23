@@ -7,6 +7,7 @@ import disnake
 from disnake.ext import commands
 
 import utils
+from config.app_config import config
 from database.timeout import TimeoutDB
 from permissions.custom_errors import ApiError
 
@@ -153,12 +154,12 @@ async def parse_members(
     return parsed_members or None
 
 
-async def get_user_from_grillbot(self, guild_id: str, user_id: str) -> tuple[int, int]:
+async def get_user_from_grillbot(owner_id: str, guild_id: str, user_id: str) -> tuple[int, int]:
     """Get unverify count and warning count"""
-    headers = {"ApiKey": self.config.grillbot_api_key, "Author": str(self.bot.owner_id)}
+    headers = {"ApiKey": config.grillbot_api_key, "Author": str(owner_id)}
     async with aiohttp.ClientSession(timeout=aiohttp.ClientTimeout(total=10), headers=headers) as session:
         try:
-            url = f"{self.config.grillbot_api_url}/user/info/{guild_id}/{user_id}"
+            url = f"{config.grillbot_api_url}/user/info/{guild_id}/{user_id}"
             async with session.get(url) as resp:
                 user = await resp.json()
                 return user.get("unverifyCount", "Missing"), user.get("warningCount", "Missing")
