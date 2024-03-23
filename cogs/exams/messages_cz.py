@@ -2,7 +2,7 @@ from config.messages import Messages as GlobalMessages
 
 
 class MessagesCZ(GlobalMessages):
-    exams_brief = f"Zobrazí zkoušky pro daný ročník (výchozí ročník podle role)"
+    exams_brief = "Zobrazí zkoušky pro daný ročník (výchozí ročník podle role)"
     no_valid_role = "Nebyla nalezena ročníková role"
     specify_year = "Specifikuj ročník"
     no_valid_year = "Byl zadán neplatný ročník"
