@@ -41,7 +41,7 @@ def get_contribution_id(content: str) -> int:
     return int(contribution_id)
 
 
-async def get_top_contributions(self, messages: list[disnake.Message], number_of: int) -> list[str]:
+async def get_top_contributions(emojis: dict, messages: list[disnake.Message], number_of: int) -> list[str]:
     images = []
 
     # get all images and their votes
@@ -65,8 +65,8 @@ async def get_top_contributions(self, messages: list[disnake.Message], number_of
         for r, users in reactions_list.items():
             users = users - duplicate_votes
             emoji = utils.str_emoji_id(r.emoji)
-            if emoji in self.emojis:
-                emoji_obj = Emoji(emoji=emoji, count=len(users), value=self.emojis[emoji])
+            if emoji in emojis:
+                emoji_obj = Emoji(emoji=emoji, count=len(users), value=emojis[emoji])
                 emojis_for_message.append(emoji_obj)
         images.append(Image(message.jump_url, emojis_for_message, len(duplicate_votes) - 1))  # -1 for the bot
 
