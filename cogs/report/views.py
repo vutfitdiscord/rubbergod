@@ -29,10 +29,10 @@ class View(BaseView):
         report = ReportDB.get_report(report_id)
 
         if report.resolved:
-            embed = await report_features.embed_resolved(self, "Anonym", embed, report.type, False)
+            embed = await report_features.embed_resolved(self.children, "Anonym", embed, report.type, False)
             report.set_resolved(report_id, author_id, False)
         else:
-            embed = await report_features.embed_resolved(self, "Anonym", embed, report.type, True)
+            embed = await report_features.embed_resolved(self.children, "Anonym", embed, report.type, True)
             report.set_resolved(report_id, author_id, True)
         return embed
 
@@ -55,7 +55,7 @@ class View(BaseView):
             for child in self.children:
                 if child.custom_id == "report:resolve":
                     embed = await report_features.embed_resolved(
-                        self, resolved_author, embed, report.type, False
+                        self.children, resolved_author, embed, report.type, False
                     )
             button.label = "Mark spam"
             button.style = disnake.ButtonStyle.red
@@ -68,7 +68,9 @@ class View(BaseView):
             ReportDB.set_fake_report(report.id, inter.author.id, True)
             for child in self.children:
                 if child.custom_id == "report:resolve":
-                    embed = await report_features.embed_resolved(self, resolved_author, embed, "Spam", True)
+                    embed = await report_features.embed_resolved(
+                        self.children, resolved_author, embed, "Spam", True
+                    )
                     child.disabled = True
             button.disabled = False
             button.label = f"Spam marked by @{inter.author.name}"
@@ -91,7 +93,9 @@ class View(BaseView):
         resolved_by = f"{inter.author.mention} `@{inter.author.name}`"
 
         if report.resolved:
-            embed = await report_features.embed_resolved(self, resolved_by, embed, report.type, False)
+            embed = await report_features.embed_resolved(
+                self.children, resolved_by, embed, report.type, False
+            )
             report.set_resolved(report_id, inter.author.id, False)
             content = MessagesCZ.report_unresolved(
                 id=report_id, author=inter.author.mention, author_name=inter.author.name
@@ -100,7 +104,7 @@ class View(BaseView):
             await report_author.send(content)
             await inter.message.channel.send(content, allowed_mentions=disnake.AllowedMentions.none())
         else:
-            embed = await report_features.embed_resolved(self, resolved_by, embed, report.type, True)
+            embed = await report_features.embed_resolved(self.children, resolved_by, embed, report.type, True)
             report.set_resolved(report_id, inter.author.id, True)
             await report_features.set_tag(self.report_channel, inter.message.channel, "resolved")
 
