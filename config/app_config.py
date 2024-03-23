@@ -1,7 +1,10 @@
 from datetime import timedelta
+from pathlib import Path
 from typing import Dict, List
 
 import toml
+
+CONFIG_PATH: Path = Path("config/config.toml").resolve()
 
 
 def get_attr(toml_dict: dict, section: str, attr_key: str):
