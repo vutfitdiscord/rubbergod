@@ -65,7 +65,7 @@ class ContestVote(Base, commands.Cog):
             await inter.send(MessagesCZ.no_reactions)
             return
 
-        contributions = await features.get_top_contributions(self, [message_url], 1)
+        contributions = await features.get_top_contributions(self.emojis, [message_url], 1)
 
         await inter.send("".join(contributions))
 
@@ -82,7 +82,7 @@ class ContestVote(Base, commands.Cog):
         await inter.response.defer(ephemeral=self.check.botroom_check(inter))
         messages = await self.contest_vote_channel.history().flatten()
 
-        contributions = await features.get_top_contributions(self, messages, number_of)
+        contributions = await features.get_top_contributions(self.emojis, messages, number_of)
 
         if not contributions:
             await inter.send(MessagesCZ.no_contributions)
@@ -175,7 +175,7 @@ class ContestVote(Base, commands.Cog):
     async def end_contest(self, inter: disnake.ApplicationCommandInteraction):
         await inter.send(MessagesCZ.vote_ending)
         messages = await self.contest_vote_channel.history().flatten()
-        contributions = await features.get_top_contributions(self, messages)
+        contributions = await features.get_top_contributions(self.emojis, messages)
         await self.contest_vote_channel.send(f"# Top 5 příspěvků\n{''.join(contributions)}")
 
         message = await inter.original_message()
