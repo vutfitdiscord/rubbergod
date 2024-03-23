@@ -23,6 +23,6 @@ repos:
   rev: v2.2.6
   hooks:
   - id: codespell
-    exclude: .*/messages.py
+    exclude: messages(_.*)?.py
     additional_dependencies:
       - tomli
