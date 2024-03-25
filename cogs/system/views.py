@@ -5,8 +5,10 @@ import disnake
 import utils
 from buttons.base import BaseView
 from config.app_config import config
-from config.messages import Messages
 from permissions import permission_check
+
+from . import features
+from .messages_cz import MessagesCZ
 
 
 class SystemView(BaseView):
@@ -94,7 +96,7 @@ class Dropdown(disnake.ui.Select):
         return options
 
     def create_cog_lists(self):
-        cog_files = list(utils.get_all_cogs().keys())
+        cog_files = list(features.get_all_cogs().keys())
 
         # list out keys and values separately
         file_list = self.cogs[0]
@@ -112,7 +114,7 @@ class Dropdown(disnake.ui.Select):
 
     def create_embed(self, author_color):
         embed = disnake.Embed(title="Cogs information and loading", color=author_color)
-        all_cogs = utils.get_all_cogs()
+        all_cogs = features.get_all_cogs()
 
         cog_loaded = []
         cog_unloaded = []
@@ -161,7 +163,7 @@ class Dropdown(disnake.ui.Select):
 
             for cog in self.unloadable_cogs:
                 if cog in self.values:
-                    await inter.send(Messages.cog_not_unloadable(cog=cog))
+                    await inter.send(MessagesCZ.cog_not_unloadable(cog=cog))
                     self.options = self.create_select()
                     self.values.remove(cog)
 
@@ -170,20 +172,20 @@ class Dropdown(disnake.ui.Select):
                     if cog in unloaded:
                         try:
                             self.bot.load_extension(f"cogs.{cog}")
-                            print(Messages.cog_loaded(cog=cog))
+                            print(MessagesCZ.cog_loaded(cog=cog))
                         except Exception as e:
                             await inter.send(f"Loading error\n`{e}`")
                     else:
                         try:
                             self.bot.unload_extension(f"cogs.{cog}")
-                            print(Messages.cog_unloaded(cog=cog))
+                            print(MessagesCZ.cog_unloaded(cog=cog))
                         except Exception as e:
                             await inter.send(f"Unloading error\n`{e}`")
             else:
                 for cog in self.values:
                     try:
                         self.bot.reload_extension(f"cogs.{cog}")
-                        message = Messages.cog_reloaded(cog=cog)
+                        message = MessagesCZ.cog_reloaded(cog=cog)
                         print(message)
                         await inter.channel.send(message)
                     except Exception as e:
@@ -192,4 +194,4 @@ class Dropdown(disnake.ui.Select):
             self.options = self.create_select()
             await self.msg.edit(embed=self.create_embed(inter.author.color), view=self._view)
         else:
-            await inter.send(Messages.missing_perms(user=inter.author.id), ephemeral=True)
+            await inter.send(MessagesCZ.missing_perms(user=inter.author.id), ephemeral=True)
