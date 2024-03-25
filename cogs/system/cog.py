@@ -11,14 +11,16 @@ from disnake.ext import commands
 from disnake.message import Message
 
 import utils
-from buttons.system import Dropdown, SystemView
 from cogs.base import Base
 from config import cooldowns
-from config.messages import Messages
 from database.error import ErrorLogDB
 from features.error import ErrorLogger
 from features.git import Git
 from permissions import permission_check
+
+from . import features
+from .messages_cz import MessagesCZ
+from .views import Dropdown, SystemView
 
 boottime = datetime.now().replace(microsecond=0)
 
@@ -37,7 +39,7 @@ class System(Base, commands.Cog):
     async def git(self, inter):
         pass
 
-    @git.sub_command(name="pull", description=Messages.git_pull_brief)
+    @git.sub_command(name="pull", description=MessagesCZ.git_pull_brief)
     async def pull(self, inter: disnake.ApplicationCommandInteraction):
         await inter.send("Pulling...")
         message: Message = await inter.original_message()
@@ -51,11 +53,11 @@ class System(Base, commands.Cog):
             await inter.send(f"```{part}```")
 
     @commands.check(permission_check.is_bot_admin)
-    @commands.slash_command(name="get_logs", description=Messages.system_get_logs_brief)
+    @commands.slash_command(name="get_logs", description=MessagesCZ.get_logs_brief)
     async def get_logs(
         self,
         inter: disnake.ApplicationCommandInteraction,
-        lines: int = commands.Param(100, ge=0, description=Messages.system_get_logs_lines_brief),
+        lines: int = commands.Param(100, ge=0, description=MessagesCZ.lines_param),
     ):
         await inter.response.defer()
         try:
@@ -79,15 +81,15 @@ class System(Base, commands.Cog):
         await inter.send(file=disnake.File("service_logs.txt"))
 
     @commands.check(permission_check.is_bot_admin)
-    @commands.slash_command(name="shutdown", description=Messages.shutdown_brief)
+    @commands.slash_command(name="shutdown", description=MessagesCZ.shutdown_brief)
     async def shutdown(self, inter: disnake.ApplicationCommandInteraction):
         await inter.send("Shutting down...")
         exit(1)
 
     async def create_selects(self):
         """Slices dictionary of all cogs to chunks for select."""
-        cog_files = list(utils.get_all_cogs().keys())
-        cog_names = list(utils.get_all_cogs().values())
+        cog_files = list(features.get_all_cogs().keys())
+        cog_names = list(features.get_all_cogs().values())
         all_selects = []
 
         # 25 is max number of options for one select
@@ -100,7 +102,7 @@ class System(Base, commands.Cog):
         return all_selects
 
     @commands.check(permission_check.is_bot_admin)
-    @commands.slash_command(name="cogs", description=Messages.cogs_brief, guild_ids=[Base.config.guild_id])
+    @commands.slash_command(name="cogs", description=MessagesCZ.cogs_brief, guild_ids=[Base.config.guild_id])
     async def cogs(self, inter: disnake.ApplicationCommandInteraction):
         """
         Creates embed with button and select(s) to load/unload/reload cogs.
@@ -120,7 +122,7 @@ class System(Base, commands.Cog):
             view.selects[i].msg = message
 
     @cooldowns.default_cooldown
-    @commands.slash_command(name="uptime", description=Messages.uptime_brief)
+    @commands.slash_command(name="uptime", description=MessagesCZ.uptime_brief)
     async def uptime(self, inter: disnake.ApplicationCommandInteraction):
         await inter.response.defer()
         now = datetime.now().replace(microsecond=0)
@@ -132,11 +134,11 @@ class System(Base, commands.Cog):
             color=0xEEE657,
         )
         start_streak, end_streak = ErrorLogDB.get_longest_streak()
-        embed.add_field(name=Messages.upsince_title, value=str(boottime))
-        embed.add_field(name=Messages.uptime_title, value=str(delta))
-        embed.add_field(name=Messages.uptime_latency, value=f"{round(self.bot.latency * 1000)} ms")
+        embed.add_field(name=MessagesCZ.upsince_title, value=str(boottime))
+        embed.add_field(name=MessagesCZ.uptime_title, value=str(delta))
+        embed.add_field(name=MessagesCZ.uptime_latency, value=f"{round(self.bot.latency * 1000)} ms")
         embed.add_field(
-            name=Messages.longest_streak,
+            name=MessagesCZ.longest_streak,
             value=f"**{(end_streak - start_streak).days} day(s)**\n{start_streak} — {end_streak}",
             inline=False,
         )
@@ -148,12 +150,8 @@ class System(Base, commands.Cog):
     async def on_command_error(self, ctx: commands.Context, error):
         if isinstance(error, commands.errors.CommandInvokeError):
             if isinstance(error.__cause__, commands.errors.ExtensionAlreadyLoaded):
-                await ctx.send(Messages.cog_is_loaded(cog=error.__cause__.name))
+                await ctx.send(MessagesCZ.cog_is_loaded(cog=error.__cause__.name))
                 return True
             elif isinstance(error.__cause__, commands.errors.ExtensionNotLoaded):
-                await ctx.send(Messages.cog_is_unloaded(cog=error.__cause__.name))
+                await ctx.send(MessagesCZ.cog_is_unloaded(cog=error.__cause__.name))
                 return True
-
-
-def setup(bot):
-    bot.add_cog(System(bot))
