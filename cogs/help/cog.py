@@ -12,7 +12,6 @@ import utils
 from buttons.embed import EmbedView
 from cogs.base import Base
 from config import cooldowns
-from features.git import Git
 
 from .messages_cz import MessagesCZ
 
@@ -23,7 +22,6 @@ class Help(Base, commands.Cog):
     def __init__(self, bot: commands.Bot):
         super().__init__()
         self.bot = bot
-        self.git = Git()
 
     def command_details(self, prefix: str, command: commands.Command):
         return {
