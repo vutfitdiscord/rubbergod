@@ -22,7 +22,9 @@ class BaseView(disnake.ui.View):
 
         if self.error_log is None:
             self.error_log = ErrorLogger(interaction.bot)
-        await self.error_log.ignore_errors(interaction, error)
+        if await self.error_log.ignore_errors(interaction, error):
+            # error was handled
+            return
 
         channel_out = interaction.bot.get_channel(config.bot_dev_channel)
         embed = self.error_log.create_embed(
