@@ -4,6 +4,7 @@ Core cog for bot. Can't be unloaded. Contains commands for cog management.
 
 import subprocess
 from datetime import datetime
+from io import BytesIO
 
 import disnake
 from disnake.ext import commands
@@ -55,28 +56,28 @@ class System(Base, commands.Cog):
     async def get_logs(
         self,
         inter: disnake.ApplicationCommandInteraction,
-        lines: int = commands.Param(100, ge=0, description=MessagesCZ.lines_param),
+        lines: int = commands.Param(100, ge=10, description=MessagesCZ.lines_param),
     ):
         await inter.response.defer()
         try:
             result = subprocess.run(
-                f"touch service_logs.txt && tail -n {lines} service_logs.txt",
+                f"tail -n {lines} service_logs.txt",
                 shell=True,
                 check=True,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
                 text=True,
-            )
+            ).stdout
         except subprocess.CalledProcessError as error:
             strings = utils.cut_string(error.stderr, 1900)
             for string in strings:
                 await inter.send(f"```{string}```")
             return
 
-        with open("service_logs.txt", "w") as file:
-            file.write(result.stdout)
+        with BytesIO(bytes(result, "utf-8")) as file_binary:
+            file = disnake.File(fp=file_binary, filename="traceback.txt")
 
-        await inter.send(file=disnake.File("service_logs.txt"))
+        await inter.send(file=file)
 
     @commands.check(permission_check.is_bot_admin)
     @commands.slash_command(name="shutdown", description=MessagesCZ.shutdown_brief)
