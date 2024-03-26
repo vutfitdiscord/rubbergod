@@ -1,32 +1,29 @@
-import math
-
 import disnake
+from disnake.ext import commands
 
-import utils
 from buttons.base import BaseView
-from config.app_config import config
 from permissions import permission_check
 
 from . import features
 from .messages_cz import MessagesCZ
 
 
-class SystemView(BaseView):
-    def __init__(self, bot, count, cogs):
+class View(BaseView):
+    def __init__(self, bot: commands.Bot, cogs: list[str]):
         super().__init__()
         self.bot = bot
-        self.count = count
+        self.count = len(cogs)
         self.cogs = cogs
         self.message = None
         self.selects = []
 
-        for i in range(count):
+        for i in range(self.count):
             self.selects.append(Dropdown(bot, self, cogs[i]))
             self.add_item(self.selects[i])
 
     @disnake.ui.button(label="Reload off", style=disnake.ButtonStyle.secondary)
-    async def reload_button(self, button: disnake.ui.Button, inter: disnake.MessageInteraction):
-        for i, cogs in enumerate(self.selects):
+    async def reload_button(self, button: disnake.ui.Button, inter: disnake.MessageInteraction) -> None:
+        for i in range(len(self.selects)):
             self.selects[i].reload = not self.selects[i].reload
 
         if self.selects[0].reload:
@@ -38,160 +35,95 @@ class SystemView(BaseView):
 
         await inter.response.edit_message(view=self)
 
-    async def on_timeout(self):
-        length = len(self.children)
-        for x in range(length):
-            self.remove_item(self.children[0])
-        await self.message.edit(view=self)
+    async def on_timeout(self) -> None:
+        await self.message.edit(view=None)
 
-    async def interaction_check(self, inter: disnake.Interaction):
+    async def interaction_check(self, inter: disnake.Interaction) -> bool:
         if permission_check.is_bot_admin(inter):
             return True
         return False
 
 
 class Dropdown(disnake.ui.Select):
-    def __init__(self, bot, view, cogs):
+    def __init__(self, bot: commands.Bot, view: View, cogs: list[str]):
         self.bot = bot
         self._view = view
         self.cogs = cogs
         self.reload = False
-        self.msg = None
+        self.message = None
         self.unloadable_cogs = ["system"]
 
         super().__init__(
             placeholder=self.get_initials(),
             min_values=1,
-            max_values=len(self.cogs[0]),
+            max_values=len(self.cogs),
             options=self.create_select(),
         )
 
-    def get_initials(self):
-        """Creates placeholder for selects from names of cogs."""
-        first = self.cogs[1][0]
-        last = self.cogs[1][-1]
-        return f"{first} - {last}"
+    def unloaded_cogs(self) -> list[str]:
+        """Return list of unloaded paths to cogs"""
+        cogs = [cog for cog, _ in self.cogs]
+        loaded = [cog.lower() for cog in self.bot.cogs if cog.lower() in cogs]
+        return list(set(cogs) - set(loaded))
 
-    def create_select(self):
+    def get_initials(self) -> str:
+        """Creates placeholder for selects from names of cogs."""
+        first = self.cogs[0][0]
+        last = self.cogs[len(self.cogs) - 1][0]
+        return f"{first.title()} - {last.title()}"
+
+    def create_select(self) -> list[disnake.SelectOption]:
         """Creates one singular select from cogs"""
         options = []
-        dict_of_cogs = dict(zip(self.cogs[0], self.cogs[1]))
-        class_list = list(dict_of_cogs.values())
-
-        loaded = []
-        for value in class_list:
-            if value in self.bot.cogs:
-                loaded.append(value)
-
-        unloaded = list(set(class_list) - set(loaded))
-
+        cogs = [cog for cog, _ in self.cogs]
+        loaded = [cog.lower() for cog in self.bot.cogs if cog.lower() in cogs]
         loaded.sort()
-        unloaded.sort()
 
-        for file, cog in dict_of_cogs.items():
+        for cog, file in self.cogs:
             if cog in loaded:
-                options.append(disnake.SelectOption(label=cog, value=file, emoji="✅"))
+                options.append(disnake.SelectOption(label=cog.title(), value=cog, emoji="✅"))
             else:
-                options.append(disnake.SelectOption(label=cog, value=file, emoji="❌"))
+                options.append(disnake.SelectOption(label=cog.title(), value=cog, emoji="❌"))
         return options
 
-    def create_cog_lists(self):
-        cog_files = list(features.get_all_cogs().keys())
-
-        # list out keys and values separately
-        file_list = self.cogs[0]
-        class_list = self.cogs[1]
-
-        loaded = []
-        for value in class_list:
-            if value in self.bot.cogs:
-                position = class_list.index(value)
-                loaded.append(file_list[position])
-
-        unloaded = list(set(cog_files) - set(loaded))
-        unloaded.sort()
-        return unloaded
-
-    def create_embed(self, author_color):
-        embed = disnake.Embed(title="Cogs information and loading", color=author_color)
-        all_cogs = features.get_all_cogs()
-
-        cog_loaded = []
-        cog_unloaded = []
-        for file, class_cog in all_cogs.items():
-            if class_cog in self.bot.cogs:
-                if file not in config.extensions:
-                    cog_loaded.append(f"✅ **{class_cog}**\n\n")
-                else:
-                    cog_loaded.append(f"✅ {class_cog}\n\n")
-            else:
-                if file in config.extensions:
-                    cog_unloaded.append(f"❌ **{class_cog}**\n\n")
-                else:
-                    cog_unloaded.append(f"❌ {class_cog}\n\n")
-
-        cog_list = cog_loaded + cog_unloaded
-        cog_sum = len(cog_loaded) + len(cog_unloaded)
-
-        embed.add_field(
-            name="Loaded/Unloaded/All",
-            value=f"**{len(cog_loaded)} / {len(cog_unloaded)} / {cog_sum}**",
-            inline=False,
-        )
-
-        chunks = math.ceil(len(cog_list) / 20)
-        cog_lists = list(utils.split(cog_loaded, chunks))
-        for cog_list in cog_lists:
-            if cog_list:
-                embed.add_field(name="\u200b", value="".join(cog_list), inline=True)
-
-        if cog_unloaded:
-            embed.add_field(name="\u200b", value="\u200b", inline=False)
-            cog_lists = list(utils.split(cog_unloaded, chunks))
-            for cog_list in cog_lists:
-                if cog_list:
-                    embed.add_field(name="\u200b", value="".join(cog_list), inline=True)
-
-        embed.set_footer(text="Bold items are overrides of config.extension")
-        return embed
-
-    async def callback(self, inter: disnake.MessageInteraction):
+    async def callback(self, inter: disnake.MessageInteraction) -> None:
         """React to user selecting cog(s)."""
         await inter.response.defer()
-        if permission_check.is_bot_admin(inter):
-            unloaded = self.create_cog_lists()
+        if not permission_check.is_bot_admin(inter):
+            return
 
-            for cog in self.unloadable_cogs:
-                if cog in self.values:
-                    await inter.send(MessagesCZ.cog_not_unloadable(cog=cog))
-                    self.options = self.create_select()
-                    self.values.remove(cog)
-
-            if not self.reload:
-                for cog in self.values:
-                    if cog in unloaded:
-                        try:
-                            self.bot.load_extension(f"cogs.{cog}")
-                            print(MessagesCZ.cog_loaded(cog=cog))
-                        except Exception as e:
-                            await inter.send(f"Loading error\n`{e}`")
-                    else:
-                        try:
-                            self.bot.unload_extension(f"cogs.{cog}")
-                            print(MessagesCZ.cog_unloaded(cog=cog))
-                        except Exception as e:
-                            await inter.send(f"Unloading error\n`{e}`")
-            else:
-                for cog in self.values:
-                    try:
-                        self.bot.reload_extension(f"cogs.{cog}")
-                        message = MessagesCZ.cog_reloaded(cog=cog)
-                        print(message)
-                        await inter.channel.send(message)
-                    except Exception as e:
-                        await inter.send(f"Reloading error\n`{e}`")
-
+        unloadable = [cog for cog in self.unloadable_cogs if cog in self.values]
+        if unloadable:
+            await inter.followup.send(MessagesCZ.cog_not_unloadable(cogs=", ".join(unloadable)))
             self.options = self.create_select()
-            await self.msg.edit(embed=self.create_embed(inter.author.color), view=self._view)
+            for cog in unloadable:
+                self.values.remove(cog)
+
+        if not self.reload:
+            for cog in self.values:
+                if cog in self.unloaded_cogs():
+                    try:
+                        self.bot.load_extension(f"cogs.{cog}")
+                        print(MessagesCZ.success_load(cog=cog))
+                    except Exception as e:
+                        await inter.send(f"Loading error\n`{e}`")
+                else:
+                    try:
+                        self.bot.unload_extension(f"cogs.{cog}")
+                        print(MessagesCZ.success_unload(cog=cog))
+                    except Exception as e:
+                        await inter.send(f"Unloading error\n`{e}`")
         else:
-            await inter.send(MessagesCZ.missing_perms(user=inter.author.id), ephemeral=True)
+            cogs = set()
+            for cog in self.values:
+                try:
+                    self.bot.reload_extension(f"cogs.{cog}")
+                    print(MessagesCZ.success_reload(cog=cog))
+                    cogs.add(cog)
+                except Exception as e:
+                    await inter.send(f"Reloading error\n`{e}`")
+            if cogs:
+                await inter.send(MessagesCZ.success_reload(cogs=", ".join(cogs)))
+
+        self.options = self.create_select()
+        await self.message.edit(embed=features.create_embed(self.bot), view=self._view)

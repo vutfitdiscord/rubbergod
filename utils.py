@@ -95,7 +95,7 @@ def cut_string_by_words(string: str, part_len: int, delimiter: str) -> list:
     return result
 
 
-def split(array, k) -> list:
+def split(array: list, k: int) -> list:
     """Splits list into K parts of approximate equal length"""
     n = len(array)
     lists = [array[i * (n // k) + min(i, n % k) : (i + 1) * (n // k) + min(i + 1, n % k)] for i in range(k)]
