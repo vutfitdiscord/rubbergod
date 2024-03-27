@@ -34,7 +34,12 @@ def get_all_cogs() -> list[tuple[str, str]]:
 
 
 async def split_cogs() -> list[tuple[str, str]]:
-    """Slices list of all cogs to chunks for select."""
+    """Slices list of all cogs to chunks for select.
+
+    Returns:
+    --------
+    List of tuples with cog name and path
+    """
     cog_pairs = get_all_cogs()
     all_cogs = []
     pairs_count = len(cog_pairs)
