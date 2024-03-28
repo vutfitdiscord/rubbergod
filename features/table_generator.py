@@ -28,11 +28,11 @@ class TableGenerator:
 
         for row in matrix:
             new_row_cnt = 0
-            new_row = [[]] * len(row)
+            new_row: list[list[str]] = [[]] * len(row)
             # Wrap long strings
             for idx in range(len(row)):
                 # Wrap long strings
-                new_row[idx] = wrap_text(row[idx])
+                new_row[idx] = wrap_text(row[idx])  # type: ignore
                 # Get number of rows to add to table because of wrapping
                 new_row_cnt = len(new_row[idx]) if len(new_row[idx]) > new_row_cnt else new_row_cnt
                 # Cut long strings
