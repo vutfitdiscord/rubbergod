@@ -73,7 +73,7 @@ class View(EmbedView):
     async def help(self, button: disnake.ui.Button, interaction: disnake.MessageInteraction):
         await interaction.send(MessagesCZ.reviews_reaction_help, ephemeral=True)
 
-    async def interaction_check(self, interaction: disnake.MessageInteraction) -> None:
+    async def interaction_check(self, interaction: disnake.MessageInteraction) -> bool:
         if interaction.data.custom_id == "embed:lock":
             await super().interaction_check(interaction)
             return False

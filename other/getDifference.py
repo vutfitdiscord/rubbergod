@@ -15,12 +15,11 @@ f = open("data.txt", "r")
 database_new = []
 for line in f:
     try:
-        line = line.split(":")
-        login = line[0]
-        line = line[4]
-        line = line.split(",")
-        year = line[1]
-        name = line[0]
+        line_split = line.split(":")
+        login = line_split[0]
+        line_split = line_split[4].split(",")
+        year = line_split[1]
+        name = line_split[0]
         data = []
         data.append(login)
         data.append(year)
@@ -31,12 +30,12 @@ for line in f:
 f.close()
 
 database = []
-for line in database_new:
-    if line[0] not in old_logins:
+for data in database_new:
+    if data[0] not in old_logins:
         # for now that the new students are just added in as 1BIT
-        if "FIT BIT 1r" in line[1]:
-            line[1] = line[1].replace("1r", "0r")
-        database.append(line)
+        if "FIT BIT 1r" in data[1]:
+            data[1] = data[1].replace("1r", "0r")
+        database.append(data)
 
 f = open("database_difference.sql", "w")
 f.write("USE `rubbergod`;\n")
@@ -47,11 +46,11 @@ f.write("`year`,\n")
 f.write("`status`\n)\n")
 f.write("VALUES\n")
 string = ""
-for line in database:
+for data in database:
     string = string + "(\n"
-    string = string + "'" + line[0] + "',\n"
-    string = string + "'" + line[2] + "',\n"
-    string = string + "'" + line[1] + "',\n"
+    string = string + "'" + data[0] + "',\n"
+    string = string + "'" + data[2] + "',\n"
+    string = string + "'" + data[1] + "',\n"
     string = string + "1" + "\n"
     string = string + "),\n"
 string = string[:-2]

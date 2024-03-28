@@ -22,7 +22,7 @@ from sqlalchemy.orm import Query, relationship
 from database import database, session
 
 
-class ReviewDB(database.base):
+class ReviewDB(database.base):  # type: ignore
     __tablename__ = "bot_review"
 
     id = Column(Integer, primary_key=True)
@@ -39,7 +39,7 @@ class ReviewDB(database.base):
         return session.query(cls).filter(cls.id == id).one_or_none()
 
     @classmethod
-    def get_subject_reviews(cls, subject: str) -> List[object]:
+    def get_subject_reviews(cls, subject: str) -> List[ReviewDB]:
         # return object with 'ReviewDB' and 'total' properties
         return (
             session.query(
@@ -84,7 +84,7 @@ class ReviewDB(database.base):
         session.commit()
 
 
-class ReviewRelevanceDB(database.base):
+class ReviewRelevanceDB(database.base):  # type: ignore
     __tablename__ = "bot_review_relevance"
     __table_args__ = (PrimaryKeyConstraint("review", "member_ID", name="key"),)
 
@@ -111,7 +111,7 @@ class ReviewRelevanceDB(database.base):
         session.query(cls).filter(cls.review == review_id, cls.member_ID == author_id).delete()
 
 
-class SubjectDB(database.base):
+class SubjectDB(database.base):  # type: ignore
     __tablename__ = "bot_subjects"
 
     shortcut = Column(String, primary_key=True)
@@ -122,7 +122,7 @@ class SubjectDB(database.base):
         return session.query(cls).filter(cls.shortcut == shortcut).first()
 
     @classmethod
-    def lookup(cls, shortcut: str) -> List[SubjectDB]:
+    def lookup(cls, shortcut: str) -> List[str]:
         subjects = session.scalars(
             session.query(cls.shortcut).filter(cls.shortcut.ilike(f"{shortcut}%")).limit(25)
         ).all()
@@ -139,7 +139,7 @@ class SubjectDB(database.base):
         session.commit()
 
 
-class SubjectDetailsDB(database.base):
+class SubjectDetailsDB(database.base):  # type: ignore
     __tablename__ = "bot_subjects_details"
 
     shortcut = Column(String, primary_key=True)
@@ -202,7 +202,7 @@ class SubjectDetailsDB(database.base):
         )
 
 
-class ProgrammeDB(database.base):
+class ProgrammeDB(database.base):  # type: ignore
     __tablename__ = "bot_programme"
 
     shortcut = Column(String, primary_key=True)
@@ -214,7 +214,7 @@ class ProgrammeDB(database.base):
         return session.query(cls).filter(cls.shortcut == shortcut).first()
 
     @classmethod
-    def lookup(cls, shortcut: str) -> List[SubjectDB]:
+    def lookup(cls, shortcut: str) -> List[str]:
         programmes = session.scalars(
             session.query(cls.shortcut).filter(cls.shortcut.ilike(f"{shortcut}%")).limit(25)
         ).all()
