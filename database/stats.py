@@ -7,7 +7,7 @@ from sqlalchemy import Column, DateTime, ForeignKeyConstraint, Integer, PrimaryK
 from database import database, session
 
 
-class Event(database.base):
+class Event(database.base):  # type: ignore
     __tablename__ = "stats_event"
     # events are shared between the cogs, so constraint key is needed here
     __table_args__ = (PrimaryKeyConstraint("name", "cog", name="id"),)
@@ -29,7 +29,7 @@ class Event(database.base):
         return event
 
 
-class ErrorEvent(database.base):
+class ErrorEvent(database.base):  # type: ignore
     __tablename__ = "stats_error_event"
     _table_args__ = (
         ForeignKeyConstraint(

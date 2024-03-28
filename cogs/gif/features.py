@@ -21,7 +21,7 @@ class ImageHandler:
         return result
 
     @classmethod
-    def render_catnap(cls, image_binary: BytesIO, avatar: Image, avatar_offset=(48, 12)):
+    def render_catnap(cls, image_binary: BytesIO, avatar: Image.Image, avatar_offset=(48, 12)):
         speed = 60
         hop_size = 4
         frame_count = 11

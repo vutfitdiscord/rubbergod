@@ -62,7 +62,7 @@ class LeaderboardPageSource(DatabaseIteratorPageSource):
     """
 
     base_embed: disnake.Embed = None
-    member_id_col_name: str = None
+    member_id_col_name: str
 
     def __init__(
         self,
@@ -71,7 +71,7 @@ class LeaderboardPageSource(DatabaseIteratorPageSource):
         row_formatter: Union[str, Callable],
         query: Query,
         title: str,
-        emote_name: str = None,
+        emote_name: str,
         per_page: int = 10,
         base_embed: disnake.Embed = None,
         member_id_col_name: str = "member_id",

@@ -1,7 +1,6 @@
 from datetime import datetime, time
 from enum import Enum
 from statistics import mean
-from typing import Union
 
 import disnake
 import requests
@@ -27,7 +26,8 @@ class TierEnum(Enum):
     # skip 5 as there is no 3.5 grade
     F = 6  # 4
 
-    def tier_to_grade_num(tier: int) -> int:
+    @staticmethod
+    def tier_to_grade_num(tier: int) -> float:
         return 1 + tier / 2
 
 
@@ -40,8 +40,8 @@ class ReviewManager:
     def make_embed(
         self,
         msg_author: disnake.User,
-        review: ReviewDB,
-        subject: Union[SubjectDetailsDB, str],
+        review: ReviewDB | None,
+        subject: SubjectDetailsDB | str,
         description: str,
         page: str,
     ):
@@ -146,7 +146,7 @@ class ReviewManager:
             review.text_review = text
             review.update()
         else:
-            ReviewDB.add_review(author_id, subject, tier, anonym, text)
+            ReviewDB.add_review(str(author_id), subject, tier, anonym, text)
         return True
 
     def list_reviews(self, author: disnake.User, subject: str):
@@ -175,9 +175,9 @@ class ReviewManager:
                 embeds.append(self.make_embed(author, review, subject_details, description, page))
             return embeds
 
-    def remove(self, author: str, subject: str):
+    def remove(self, author_id: int, subject: str):
         """Remove review from DB"""
-        result = ReviewDB.get_review_by_author_subject(author, subject)
+        result = ReviewDB.get_review_by_author_subject(author_id, subject)
         if result:
             result.remove()
             return True

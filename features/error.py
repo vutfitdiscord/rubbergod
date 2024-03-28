@@ -27,6 +27,8 @@ class ContextMock:
     """Create event context similar to commands.Context
     This will be used in ignore_errors function"""
 
+    message: disnake.Message
+
     def __init__(self, bot: commands.Bot, arg):
         self.channel = getattr(arg, "channel", bot.get_channel(arg.channel_id))
         if hasattr(arg, "author"):
@@ -36,7 +38,10 @@ class ContextMock:
         else:
             self.author = bot.user
 
-    async def send(self, *args):
+    async def send(self, *args, ephemeral=False):
+        return await self.channel.send(*args)
+
+    async def reply(self, *args, ephemeral=False):
         return await self.channel.send(*args)
 
 
@@ -77,7 +82,7 @@ class ErrorLogger:
             bbox = draw_txt.textbbox(xy=(0, 0), text=str(count), font=font)
             width, height = bbox[2] - bbox[0], bbox[3] - bbox[1]
             draw_txt.text(((W - width) / 2, (H - height) / 2), str(count), font=font, fill="#000")
-            img_txt = img_txt.rotate(10, expand=1, fillcolor=255)
+            img_txt = img_txt.rotate(10, expand=True, fillcolor=255)
             background.paste(img_txt, (1000, 130), img_txt)
 
             # add upper layers
@@ -116,7 +121,7 @@ class ErrorLogger:
         args: str,
         author: disnake.User,
         guild: disnake.Guild,
-        jump_url: str,
+        jump_url: str | None,
         extra_fields: Dict[str, str] = None,
     ):
         count = self.log_error_time()
@@ -129,7 +134,8 @@ class ErrorLogger:
         embed.add_field(name="Autor", value=author.mention)
         if guild and getattr(guild, "id", None) != config.guild_id:
             embed.add_field(name="Guild", value=getattr(guild, "name", guild))
-        embed.add_field(name="Link", value=jump_url, inline=False)
+        if jump_url:
+            embed.add_field(name="Link", value=jump_url, inline=False)
         self.set_image(embed, author, count)
         if extra_fields:
             for name, value in extra_fields.items():
@@ -205,6 +211,8 @@ class ErrorLogger:
         # there is usually just one arg
         arg = args[0]
         error = sys.exc_info()[1]
+        if error is None:
+            return  # Not sure how this could happen
         author = getattr(arg, "author", self.bot.user)
         if await self.ignore_errors(ContextMock(self.bot, arg), error):
             # error was handled
@@ -244,7 +252,9 @@ class ErrorLogger:
             user_id=author.id,
             args=str(args),
             exception=type(error).__name__,
-            traceback="\n".join(traceback.format_exception(type(error), error, error.__traceback__)),
+            traceback="\n".join(
+                traceback.format_exception(type(error) if error else None, error, error.__traceback__)
+            ),
         )
         utils.add_author_footer(embeds[-1], author=author, additional_text=[f"ID: {error_log.id}"])
         await self.bot_dev_channel.send(embeds=embeds, view=ErrorView())
@@ -290,7 +300,7 @@ class ErrorLogger:
                             message = message_out
                 else:
                     message = message_id
-        extra_fields = {"Reaction": getattr(arg, "emoji", None)}
+        extra_fields = {"Reaction": getattr(arg, "emoji", "None")}
         url = (
             event_guild
             if event_guild == "DM"
@@ -324,7 +334,7 @@ class ErrorLogger:
     async def ignore_errors(
         self,
         ctx: Union[disnake.ApplicationCommandInteraction, commands.Context, ContextMock],
-        error: Exception,
+        error: BaseException,
     ) -> bool:
         """Handle general errors that can be ignored or responded to user
         Returns whether error was handled or not"""
