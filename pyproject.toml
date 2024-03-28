@@ -16,6 +16,10 @@ quote-style = "double"
 indent-style = "space"
 line-ending = "auto"
 
+[tool.mypy]
+no_implicit_optional = false  # e.g. in case of implicit None, don't require explicit typing for None
+disable_error_code = ["operator"]
+
 [tool.codespell]
 write-changes = false
 skip = ".*/venv,.*log,.*/__pycache__,merlin-latest,messages.py,messages_cz.py,messages_en.py"
