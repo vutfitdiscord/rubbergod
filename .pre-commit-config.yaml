@@ -1,5 +1,6 @@
 ci:
-    autofix_prs: false
+  autofix_prs: false
+  skip: [mypy]  # remove after https://github.com/vutfitdiscord/rubbergod/issues/952 is done
 
 repos:
 - repo: https://github.com/astral-sh/ruff-pre-commit
@@ -18,6 +19,12 @@ repos:
   hooks:
     - id: trailing-whitespace
     - id: end-of-file-fixer
+
+- repo: https://github.com/pre-commit/mirrors-mypy
+  rev: 'v1.9.0'
+  hooks:
+  - id: mypy
+    additional_dependencies: [types-all]
 
 - repo: https://github.com/codespell-project/codespell
   rev: v2.2.6
