@@ -2,12 +2,11 @@ f = open("data.txt", "r")
 database = []
 for line in f:
     try:
-        line = line.split(":")
-        login = line[0]
-        line = line[4]
-        line = line.split(",")
-        year = line[1]
-        name = line[0]
+        line_split = line.split(":")
+        login = line_split[0]
+        line_split = line_split[4].split(",")
+        year = line_split[1]
+        name = line_split[0]
         data = []
         data.append(login)
         data.append(year)
@@ -25,11 +24,11 @@ f.write("`year`,\n")
 f.write("`status`\n)\n")
 f.write("VALUES\n")
 string = ""
-for line in database:
+for data in database:
     string = string + "(\n"
-    string = string + "'" + line[0] + "',\n"
-    string = string + "'" + line[2] + "',\n"
-    string = string + "'" + line[1] + "',\n"
+    string = string + "'" + data[0] + "',\n"
+    string = string + "'" + data[2] + "',\n"
+    string = string + "'" + data[1] + "',\n"
     string = string + "1" + "\n"
     string = string + "),\n"
 string = string[:-2]

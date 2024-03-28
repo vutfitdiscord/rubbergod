@@ -5,12 +5,14 @@ Base cog class. All cogs should inherit from this class.
 from functools import cached_property
 
 import disnake
+from disnake.ext.commands import Bot
 
 from config.app_config import config
 
 
 class Base:
     config = config
+    bot: Bot
 
     def __init__(self):
         self.tasks = []

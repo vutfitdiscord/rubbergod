@@ -43,7 +43,7 @@ class Features:
         if saved_messages and message_index < len(saved_messages):
             if message_index < 0:
                 message_index = 0
-            message_id = int(saved_messages[message_index].message_id)
+            message_id = saved_messages[message_index].message_id
 
             dest = None
             try:
@@ -223,7 +223,7 @@ class Features:
                             date_splits = self.list_int(term_date_str.split("."))
                             date_splits.reverse()  # from DDMMYYYY to YYYYMMDD
                             # Without actual time set time to end of the day
-                            term_datetime = datetime.datetime(*date_splits, 23, 59)
+                            term_datetime = datetime.datetime(*date_splits, 23, 59)  # type: ignore
 
                             term_date = datetime.date(*date_splits)
 
@@ -275,16 +275,16 @@ class Features:
                                 )
 
                                 term_datetime = datetime.datetime(
-                                    *date_splits,
-                                    *start_time_str_parts,
+                                    *date_splits,  # type: ignore
+                                    *start_time_str_parts,  # type: ignore
                                 )
 
                                 term_date = datetime.date(*date_splits)
 
                                 if start_time_str_parts is not None and end_time_str_parts is not None:
-                                    start_time = datetime.time(*start_time_str_parts)
+                                    start_time = datetime.time(*start_time_str_parts)  # type: ignore
                                     start_time_str = datetime.time.strftime(start_time, "%H:%M")
-                                    end_time = datetime.time(*end_time_str_parts)
+                                    end_time = datetime.time(*end_time_str_parts)  # type: ignore
                                     end_time_str = datetime.time.strftime(end_time, "%H:%M")
                                     term_time_str = f"{start_time_str} - {end_time_str}"
 
@@ -343,9 +343,9 @@ class Features:
             last_week_number = first_date.isocalendar()[1]
 
             data_by_weeks = []
-            current_week_data = []
+            current_week_data: list[str] = []
             for date in dates:
-                term_string = sorted_src_data.get(date)
+                term_string = str(sorted_src_data.get(date))
                 current_week_number = date.isocalendar()[1]
                 if last_week_number != current_week_number:
                     last_week_number = current_week_number

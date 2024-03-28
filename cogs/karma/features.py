@@ -205,7 +205,7 @@ class Karma(BaseFeature):
         error = False
         for value in ["1", "-1"]:
             emojis, is_error = await self.__make_emoji_list(
-                inter.guild, KarmaEmojiDB.get_ids_of_emojis_valued(value)
+                inter.guild, KarmaEmojiDB.get_ids_of_emojis_valued(int(value))
             )
             error |= is_error
             try:
@@ -220,9 +220,9 @@ class Karma(BaseFeature):
             await bot_dev_channel.send(MessagesCZ.karma_get_missing)
 
     async def karma_give(
-        self, inter: disnake.ApplicationCommandInteraction, members: list[disnake.Member], karma: int
+        self, inter: disnake.ApplicationCommandInteraction, members_str: str, karma: int
     ) -> None:
-        members = await utils.get_members_from_tag(inter.guild, members)
+        members = await utils.get_members_from_tag(inter.guild, members_str)
         for member in members:
             KarmaDB.update_karma(member.id, inter.author.id, karma)
         if karma >= 0:
@@ -273,7 +273,7 @@ class Karma(BaseFeature):
     async def message_karma(self, author: disnake.User, msg: disnake.Message) -> disnake.Embed:
         reactions = msg.reactions
         color = 0x6D6A69
-        output = {"-1": [], "1": [], "0": []}
+        output: dict[str, list[str]] = {"-1": [], "1": [], "0": []}
         karma = 0
         for react in reactions:
             emoji = react.emoji

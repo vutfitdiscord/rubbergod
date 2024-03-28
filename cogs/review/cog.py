@@ -94,8 +94,6 @@ class Review(Base, commands.Cog):
         anonymous: bool = commands.Param(default=False),
     ):
         """Add new review for `subject`"""
-        # TODO: use modal in future when select in modal support release
-        # await inter.response.send_modal(modal=ReviewModal(self.bot))
         await inter.response.defer(ephemeral=anonymous)
         tier = getattr(TierEnum, grade).value
         if not await self.check_member(inter):
@@ -109,7 +107,7 @@ class Review(Base, commands.Cog):
     async def remove(
         self,
         inter: disnake.ApplicationCommandInteraction,
-        subject: str = None,
+        subject: str | None = None,
         id: int = commands.Param(default=None, description=MessagesCZ.review_id_brief),
     ):
         """Remove review from DB. User is just allowed to remove his own review
@@ -131,7 +129,7 @@ class Review(Base, commands.Cog):
             return
         elif subject is not None:
             subject = subject.lower()
-            if self.manager.remove(str(inter.author.id), subject):
+            if self.manager.remove(inter.author.id, subject):
                 await inter.send(MessagesCZ.review_remove_success)
                 return
         await inter.send(MessagesCZ.review_not_found)
@@ -261,7 +259,7 @@ class Review(Base, commands.Cog):
             degree = "BIT"
         if "MIT" in year:
             degree = "MIT"
-        if not degree and not year:
+        if degree is None:
             await inter.send(MessagesCZ.tierboard_missing_year, ephemeral=True)
             return
         embeds = []
