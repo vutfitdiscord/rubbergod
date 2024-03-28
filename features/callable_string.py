@@ -5,7 +5,7 @@ class CallableString(str):
     to_escape = ["role", "not_role", "line"]
     to_mention = ["user", "admin"]
 
-    def __call__(self, *args, **kwargs):
+    def __call__(self, *args, **kwargs) -> str:
         for arg in self.to_mention:
             if arg not in kwargs:
                 continue
@@ -26,7 +26,7 @@ class Formatable(type):
     def __init__(cls, clsname, superclasses, attributedict):
         cls.clsname = clsname
 
-    def __getattribute__(cls, key):
+    def __getattribute__(cls, key: str) -> CallableString:
         try:
             return CallableString(object.__getattribute__(cls, key))
         except AttributeError:

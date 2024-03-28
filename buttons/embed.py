@@ -1,5 +1,3 @@
-from typing import List, Optional
-
 import disnake
 
 import utils
@@ -18,7 +16,7 @@ class EmbedView(BaseView):
     def __init__(
         self,
         author: disnake.User,
-        embeds: List[disnake.Embed],
+        embeds: list[disnake.Embed],
         row: int = 0,
         perma_lock: bool = False,
         roll_arroud: bool = True,
@@ -47,7 +45,7 @@ class EmbedView(BaseView):
         self.page_source = page_source
         self.roll_arroud = roll_arroud
         self.perma_lock = perma_lock
-        if self.page_source is None:
+        if page_source is None:
             self.max_page = len(embeds)
         else:
             self.max_page = page_source.get_max_pages()
@@ -116,7 +114,7 @@ class EmbedView(BaseView):
         for page, embed in enumerate(self.embeds):
             utils.add_author_footer(embed, self.author, additional_text=[f"Page {page+1}/{self.max_page}"])
 
-    async def interaction_check(self, interaction: disnake.MessageInteraction) -> Optional[bool]:
+    async def interaction_check(self, interaction: disnake.MessageInteraction) -> bool:
         if interaction.data.custom_id == "embed:lock":
             if interaction.author.id == self.author.id:
                 self.locked = not self.locked
@@ -140,6 +138,7 @@ class EmbedView(BaseView):
             interaction.data.custom_id, self.page, self.max_page, self.roll_arroud
         )
         await interaction.response.edit_message(embed=self.embed)
+        return True
 
     async def on_timeout(self):
         self.clear_items()

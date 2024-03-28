@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from enum import Enum
-from typing import List
+from typing import Any, List
 from urllib.parse import parse_qs, urlparse
 
 import requests
@@ -32,7 +32,7 @@ class VutSports:
             return res.content
 
     @staticmethod
-    def parse_sports(soup: BeautifulSoup, output_dict: dict) -> None:
+    def parse_sports(soup: BeautifulSoup, output_dict: dict[int, dict[str, Any]]) -> None:
         subject_list = soup.find("ul", {"class": "c-subjects__list"})
         subjects = subject_list.find_all("li")
         if not subjects:
@@ -54,10 +54,10 @@ class VutSports:
             schedule_url = schedule_annotation["href"]
 
             parsed_url = urlparse(schedule_url)
-            subject_id = parse_qs(parsed_url.query)["predmet_id"][0]
+            subject_id = int(parse_qs(parsed_url.query)["predmet_id"][0])
 
-            if subject_id in output_dict:
-                saved_semester = output_dict.get(subject_id).get("semester")
+            if subject_id in output_dict.keys():
+                saved_semester = output_dict.get(subject_id).get("semester")  # type: ignore
                 if (saved_semester == Semester.ZS and semester == Semester.LS) or (
                     saved_semester == Semester.LS and semester == Semester.ZS
                 ):
@@ -82,7 +82,7 @@ class VutSports:
         page_indexes = [int(item.get_text()) for item in pagination_list_items if item.get_text().isnumeric()]
         number_of_pages = max(page_indexes)
 
-        output_dict = {}
+        output_dict: dict[int, dict[str, str]] = {}
         VutSports.parse_sports(soup, output_dict)
 
         if number_of_pages > 1:
@@ -94,7 +94,7 @@ class VutSports:
         session.close()
 
         output = []
-        for id, data in output_dict.items():
-            output.append(SportData.from_dict(id, data))
+        for id, details in output_dict.items():
+            output.append(SportData.from_dict(id, details))
 
         return output

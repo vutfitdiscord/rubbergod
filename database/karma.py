@@ -23,7 +23,7 @@ class KarmaData:
         self.negative: KarmaRowData = negative
 
 
-class KarmaDB(database.base):
+class KarmaDB(database.base):  # type: ignore
     __tablename__ = "bot_karma"
 
     member_ID = Column(String, primary_key=True)
@@ -76,18 +76,20 @@ class KarmaDB(database.base):
         return giver_karma
 
     @classmethod
-    def karma_emoji(cls, member_id: str, giver_id: str, emoji_id: str) -> Optional[List[KarmaDB]]:
+    def karma_emoji(cls, member_id: str, giver_id: str, emoji_id: str) -> list[KarmaDB] | None:
         emoji_value = KarmaEmojiDB.emoji_value(str(emoji_id))
         if emoji_value:
             members_update = cls.update_karma(member_id, giver_id, emoji_value)
             return members_update
+        return None
 
     @classmethod
-    def karma_emoji_remove(cls, member_id: str, giver_id: str, emoji_id: str) -> Optional[List[KarmaDB]]:
+    def karma_emoji_remove(cls, member_id: str, giver_id: str, emoji_id: str) -> list[KarmaDB] | None:
         emoji_value = KarmaEmojiDB.emoji_value(str(emoji_id))
         if emoji_value:
             members_update = cls.update_karma(member_id, giver_id, emoji_value * (-1), True)
             return members_update
+        return None
 
     @classmethod
     def get_karma_position(cls, column: str, karma: int) -> int:
@@ -117,7 +119,7 @@ class KarmaDB(database.base):
         return session.query(cls).order_by(attribute)
 
     @classmethod
-    def transfer_karma(cls, from_user: str, to_user: str) -> KarmaData:
+    def transfer_karma(cls, from_user: str, to_user: str) -> KarmaData | None:
         from_user_karma = cls.get_karma_object(from_user)
         to_user_karma = cls.get_karma_object(to_user)
 
@@ -147,19 +149,19 @@ class KarmaDB(database.base):
         return log_karma
 
 
-class KarmaEmojiDB(database.base):
+class KarmaEmojiDB(database.base):  # type: ignore
     __tablename__ = "bot_karma_emoji"
     emoji_ID = Column(String, primary_key=True)
     value = Column(Integer, default=0)
 
     @classmethod
-    def get_ids_of_emojis_valued(cls, val: int) -> List[str]:
+    def get_ids_of_emojis_valued(cls, val: int) -> list[str]:
         """Returns a list of emoji ids with specified value"""
-        emojis: List[cls] = session.query(cls).filter(cls.value == val)
+        emojis: list[KarmaEmojiDB] = session.query(cls).filter(cls.value == val)
         return [emoji.emoji_ID for emoji in emojis]
 
     @classmethod
-    def get_all_emojis(cls) -> List[KarmaEmojiDB]:
+    def get_all_emojis(cls) -> list[KarmaEmojiDB]:
         """Returns to list of KarmaEmojiDB objects."""
         return session.query(cls).all()
 

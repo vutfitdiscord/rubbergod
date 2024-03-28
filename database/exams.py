@@ -7,7 +7,7 @@ from sqlalchemy import Column, String
 from database import database, session
 
 
-class ExamsTermsMessageDB(database.base):
+class ExamsTermsMessageDB(database.base):  # type: ignore
     __tablename__ = "exams_terms_message"
 
     message_id = Column(String, primary_key=True)

@@ -255,7 +255,7 @@ class PersistentCooldown:
         self.command_name = command_name
         self.limit = limit * 1000  # convert to ms
 
-    async def check_cooldown(self, inter: disnake.ApplicationCommandInteraction) -> None:
+    async def check_cooldown(self, inter: disnake.ApplicationCommandInteraction) -> bool:
         current_cooldown = session.query(cooldown.CooldownDB).get(
             dict(command_name=self.command_name, user_id=str(inter.user.id))
         )
@@ -301,7 +301,7 @@ async def get_users_from_tag(self, tag):
     return users
 
 
-async def get_members_from_tag(guild, tag):
+async def get_members_from_tag(guild: disnake.Guild, tag: str) -> list[disnake.Member]:
     """get member(s) object(s) from tag(s), return list of member(s)"""
     members = []
     # regex to match global name or nickname
@@ -358,7 +358,7 @@ def get_discord_timestamp(dt: datetime, style: time_types = "Default") -> str:
 async def get_or_fetch_channel(bot, channel_id) -> disnake.TextChannel:
     channel: disnake.TextChannel = bot.get_channel(channel_id)
     if channel is None:
-        channel: disnake.TextChannel = await bot.fetch_channel(channel_id)
+        channel = await bot.fetch_channel(channel_id)
     return channel
 
 
@@ -462,4 +462,4 @@ async def get_message_from_url(bot: commands.Bot, message_url: str) -> disnake.M
         message = await channel.fetch_message(msg_id)
         return message
     except disnake.NotFound:
-        return
+        return None
