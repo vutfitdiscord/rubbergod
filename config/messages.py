@@ -206,11 +206,8 @@ class Messages(metaclass=Formatable):
     repost_content = "Pokud je obrázek repost, dej mu ♻️.\nJestli není, klikni tady na ❎ "\
                      "a při {limit} takových reakcích se toho upozornění smaže."
 
-    # MEME REPOST
-    meme_repost_link = "[Odkaz na originál]({original_message_url}) v <#{original_channel}>"
-    meme_leaderboard_brief = "#better-memes leaderboard"
+    # MEME
     upgraded_pocitani_caught_deleting = "Podvádět mazáním zpráv je zakázáno. Začínáme znovu: "
-    meme_board_start_param = "Zobrazí leaderboard na dané pozici"
 
     # TIMEOUT WARS
     timeout_wars_user = "Uživatel {user} byl umlčen na {time:.0f} minut."
