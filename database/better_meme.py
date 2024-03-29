@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from typing import List, Optional
-
 from sqlalchemy import Column, Integer, String
 
 from database import database, session
@@ -15,7 +13,7 @@ class BetterMemeDB(database.base):
     total_karma = Column(Integer, default=0)
 
     @classmethod
-    def get_member(cls, user_id: int) -> Optional[BetterMemeDB]:
+    def get_member(cls, user_id: int) -> BetterMemeDB | None:
         return session.query(cls).filter(cls.member_ID == str(user_id)).one_or_none()
 
     @classmethod
@@ -39,5 +37,5 @@ class BetterMemeDB(database.base):
             session.commit()
 
     @classmethod
-    def get_leaderboard(cls, order_by: str) -> List[BetterMemeDB]:
+    def get_leaderboard(cls, order_by: str) -> list[BetterMemeDB]:
         return session.query(cls).order_by(getattr(cls, order_by).desc())
