@@ -4,7 +4,6 @@ Cog for handling memes with X number of reactions to be reposted to a specific c
 
 import asyncio
 from functools import cached_property
-from typing import List
 
 import disnake
 from disnake.ext import commands
@@ -12,7 +11,6 @@ from disnake.ext import commands
 import utils
 from buttons.embed import EmbedView
 from cogs.base import Base
-from config.messages import Messages
 from database.better_meme import BetterMemeDB
 from database.karma import KarmaDB, KarmaEmojiDB
 from database.meme_repost import MemeRepostDB
@@ -20,18 +18,20 @@ from features.leaderboard import LeaderboardPageSource
 from features.reaction_context import ReactionContext
 from permissions import room_check
 
+from .messages_cz import MessagesCZ
+
 
 def _leaderboard_formatter(entry: BetterMemeDB, **kwargs):
     return (
-        Messages.base_leaderboard_format_str.format_map(kwargs)
+        MessagesCZ.base_leaderboard_format_str.format_map(kwargs)
         + f" **{entry.posts}** posts **{entry.total_karma}** pts"
     )
 
 
-class MemeRepost(Base, commands.Cog):
-    def __init__(self, bot):
+class BetterMeme(Base, commands.Cog):
+    def __init__(self, bot: commands.Bot):
         super().__init__()
-        self.bot: commands.Bot = bot
+        self.bot = bot
 
         self.better_db = BetterMemeDB()
         self.check = room_check.RoomCheck(bot)
@@ -48,7 +48,7 @@ class MemeRepost(Base, commands.Cog):
                 # Message was reposted before
                 return
 
-            all_reactions: List[disnake.Reaction] = ctx.message.reactions
+            all_reactions: list[disnake.Reaction] = ctx.message.reactions
             for reac in all_reactions:
                 if reac.count >= self.config.repost_threshold:
                     emoji_key = str(reac.emoji.id) if not isinstance(reac.emoji, str) else reac.emoji
@@ -73,7 +73,7 @@ class MemeRepost(Base, commands.Cog):
                     KarmaDB.karma_emoji(original_post_user.id, ctx.member.id, emoji_key)
 
     @commands.Cog.listener()
-    async def on_raw_reaction_remove(self, payload):
+    async def on_raw_reaction_remove(self, payload: disnake.RawReactionActionEvent):
         ctx: ReactionContext = await ReactionContext.from_payload(self.bot, payload)
         if ctx is None:
             return
@@ -94,7 +94,7 @@ class MemeRepost(Base, commands.Cog):
                 BetterMemeDB.update_post_karma(original_post_user.id, -emoji_val)
                 KarmaDB.karma_emoji_remove(original_post_user.id, ctx.member.id, emoji_key)
 
-    async def __repost_message(self, ctx: ReactionContext, reactions: List[disnake.Reaction]):
+    async def __repost_message(self, ctx: ReactionContext, reactions: list[disnake.Reaction]):
         # Invalid ID
         if self.repost_channel is None:
             return
@@ -122,7 +122,7 @@ class MemeRepost(Base, commands.Cog):
             embed.timestamp = ctx.message.created_at
 
             # Create link to original post
-            link = Messages.meme_repost_link(
+            link = MessagesCZ.better_meme_link(
                 original_message_url=ctx.message.jump_url, original_channel=self.config.meme_room
             )
             embed.add_field(name="Link", value=link, inline=False)
@@ -209,17 +209,15 @@ class MemeRepost(Base, commands.Cog):
             BetterMemeDB.add_post_to_repo(ctx.message.author.id, total_karma)
 
     @commands.slash_command(name="better-meme", guild_ids=[Base.config.guild_id])
-    async def _better_meme(self, inter):
+    async def _better_meme(self, inter: disnake.ApplicationCommandInteraction):
         pass
 
-    @_better_meme.sub_command(name="leaderboard", description=Messages.meme_leaderboard_brief)
+    @_better_meme.sub_command(name="leaderboard", description=MessagesCZ.leaderboard_brief)
     async def leaderboard(
         self,
         inter: disnake.ApplicationCommandInteraction,
         order_by: str = commands.Param(name="order_by", choices=["total_karma", "posts"], default="posts"),
-        start: int = commands.Param(
-            default=1, gt=0, lt=100000000, description=Messages.meme_board_start_param
-        ),
+        start: int = commands.Param(default=1, gt=0, lt=100000000, description=MessagesCZ.board_start_param),
     ):
         await inter.response.defer(ephemeral=self.check.botroom_check(inter))
 
@@ -241,7 +239,3 @@ class MemeRepost(Base, commands.Cog):
         view = EmbedView(inter.author, embeds=[embed], page_source=page_source)
         await inter.edit_original_response(embed=embed, view=view)
         view.message = await inter.original_message()
-
-
-def setup(bot):
-    bot.add_cog(MemeRepost(bot))
