@@ -14,9 +14,10 @@ from PIL import Image
 
 import utils
 from cogs.base import Base
-from config.messages import Messages
 from database.image import ImageDB
 from permissions import permission_check
+
+from .messages_cz import MessagesCZ
 
 dhash.force_pil()
 
@@ -24,7 +25,7 @@ dhash.force_pil()
 class Warden(Base, commands.Cog):
     """A cog for database lookups"""
 
-    def __init__(self, bot):
+    def __init__(self, bot: commands.Bot):
         super().__init__()
         self.bot = bot
 
@@ -111,7 +112,7 @@ class Warden(Base, commands.Cog):
 
     @commands.group()
     @commands.check(permission_check.is_bot_admin)
-    async def scan(self, ctx):
+    async def scan(self, ctx: commands.Context):
         """Scan for reposts"""
         if ctx.invoked_subcommand is None:
             await ctx.send_help(ctx.invoked_with)
@@ -119,8 +120,8 @@ class Warden(Base, commands.Cog):
     @commands.guild_only()
     @commands.max_concurrency(1, per=commands.BucketType.default, wait=False)
     @commands.bot_has_permissions(read_message_history=True)
-    @scan.command(name="history", brief=Messages.warden_scan_brief)
-    async def scan_history(self, ctx, limit):
+    @scan.command(name="history", brief=MessagesCZ.scan_brief)
+    async def scan_history(self, ctx: commands.Context, limit: int | str):
         """Scan current channel for images and save them as hashes
         limit: [all | <int>]
         """
@@ -169,7 +170,7 @@ class Warden(Base, commands.Cog):
         )
 
     @scan.command(name="message")
-    async def scan_message(self, ctx, link):
+    async def scan_message(self, ctx: commands.Bot, link):
         """Scan message attachments in whole database"""
         # TODO: implement
         pass
@@ -229,13 +230,13 @@ class Warden(Base, commands.Cog):
             link = "404 <:sadcat:576171980118687754>"
             author = "_??? (404)_"
 
-        desc = Messages.repost_description(user=message.author.id, value=prob)
+        desc = MessagesCZ.repost_description(user=message.author.id, value=prob)
         embed = disnake.Embed(title=title, color=0xCB410B, description=desc, url=message.jump_url)
         embed.add_field(name=f"**{author}**, {timestamp}", value=link, inline=False)
 
         embed.add_field(
-            name=Messages.repost_title,
-            value="_" + Messages.repost_content(limit=self.config.duplicate_limit) + "_",
+            name=MessagesCZ.repost_title,
+            value=MessagesCZ.repost_content(limit=self.config.duplicate_limit),
         )
         embed.set_footer(text=message.id)
         send = await message.channel.send(embed=embed)
@@ -245,7 +246,3 @@ class Warden(Base, commands.Cog):
             await send.delete()
             return
         await send.add_reaction("❎")
-
-
-def setup(bot):
-    bot.add_cog(Warden(bot))
