@@ -39,3 +39,8 @@ class MessagesCZ(GlobalMessages):
     channel_overwrites_to_role_brief = "Vytvoří overwrites na místnost z role"
     channel_overwrites_to_role_start = "Probíhá převádění přístupových práv na roli"
     channel_overwrites_to_role_done = "Přístupová práva byla úspěšně převedena na roli"
+    channel_add_description_brief = "Přidá popisy ke všem předmětovým místnostem na serveru"
+    channel_different_topic = "Odlišný popis kanálu {channel.mention}\n```diff\n- {channel.topic}\n+ {topic}```"
+    channel_add_topic_start = "Probíhá přidávání popisů"
+    channel_add_topic_progress = channel_add_topic_start+"\n• kanálů: {index}/{total}\n{progress_bar}\nAktuální kanál: {channel}"
+    channel_add_topic_done = "Popisy byly úspěšně přidány"

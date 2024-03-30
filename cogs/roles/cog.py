@@ -12,7 +12,6 @@ from cogs.base import Base
 from database.review import SubjectDetailsDB
 from permissions import permission_check
 
-# TODO: use messages for prints
 from .messages_cz import MessagesCZ
 
 
@@ -22,22 +21,48 @@ class Roles(Base, commands.Cog):
         self.bot = bot
 
     @commands.check(permission_check.mod_plus)
-    @commands.slash_command(name="do_da_thing", description="hodi prdeli", guild_ids=[Base.config.guild_id])
-    async def do_da_thing(self, inter: disnake.ApplicationCommandInteraction):
-        guild = self.bot.get_guild(self.config.guild_id)
-        logChan = self.bot.get_channel(self.config.log_channel)
-        for channel in guild.channels:
-            if channel.type == disnake.ChannelType.text:
-                boolik = "-" in channel.name
-                name = channel.name.split("-")[0] if boolik else channel.name
-                sub = SubjectDetailsDB.get(name)
-                if sub:
-                    newName = sub.name + ", but " + "-".join(channel.name.split("-")[1:])
-                    if channel.topic:
-                        if channel.topic != sub.name and channel.topic != newName:
-                            await logChan.send(channel.name + " - " + channel.topic + sub.name)
-                    else:
-                        await channel.edit(topic=sub.name if not boolik else newName)
+    @commands.slash_command(
+        name="add_channels_description",
+        description=MessagesCZ.channel_add_description_brief,
+        guild_ids=[Base.config.guild_id],
+    )
+    async def add_channels_description(
+        self,
+        inter: disnake.ApplicationCommandInteraction,
+        rate: int = commands.Param(ge=1, default=10, description=MessagesCZ.channel_rate_param),
+    ):
+        await inter.send(MessagesCZ.channel_add_topic_start)
+        message = await inter.original_message()
+        for index, channel in enumerate(inter.guild.channels):
+            if channel.type != disnake.ChannelType.text:
+                continue
+
+            if index % rate == 0:
+                progress_bar = utils.create_bar(index + 1, len(inter.guild.channels))
+                await message.edit(
+                    MessagesCZ.channel_add_topic_progress(
+                        index=index + 1,
+                        total=len(inter.guild.channels),
+                        progress_bar=progress_bar,
+                        channel=channel.mention,
+                    )
+                )
+
+            is_private = "-" in channel.name
+            name = channel.name.split("-")[0] if is_private else channel.name
+            subject_name = SubjectDetailsDB.get(name)
+            if not subject_name:
+                continue
+
+            private_name = f"{subject_name}, but " + "-".join(channel.name.split("-")[1:])
+            if channel.topic:
+                if channel.topic != subject_name and channel.topic != private_name:
+                    await self.log_channel.send(
+                        MessagesCZ.channel_different_topic(channel=channel, topic=subject_name)
+                    )
+            else:
+                await channel.edit(topic=subject_name if not is_private else private_name)
+        await message.edit(MessagesCZ.channel_add_topic_done)
 
     @commands.check(permission_check.mod_plus)
     @commands.slash_command(name="channel", guild_ids=[Base.config.guild_id])
