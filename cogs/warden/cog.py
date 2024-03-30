@@ -5,18 +5,17 @@ Cog for repost detection.
 # stolen from rubbergoddess
 import asyncio
 import time
-from io import BytesIO
 
 import dhash
 import disnake
 from disnake.ext import commands
-from PIL import Image
 
 import utils
 from cogs.base import Base
 from database.image import ImageDB
 from permissions import permission_check
 
+from . import features
 from .messages_cz import MessagesCZ
 
 dhash.force_pil()
@@ -91,25 +90,6 @@ class Warden(Base, commands.Cog):
                 except disnake.errors.NotFound:
                     pass
 
-    async def saveMessageHashes(self, message: disnake.Message):
-        for f in message.attachments:
-            fp = BytesIO()
-            await f.save(fp)
-            try:
-                image = Image.open(fp)
-            except OSError:
-                # not an image
-                continue
-            img_hash = dhash.dhash_int(image)
-
-            ImageDB.add_image(
-                channel_id=message.channel.id,
-                message_id=message.id,
-                attachment_id=f.id,
-                dhash=str(hex(img_hash)),
-            )
-            yield img_hash
-
     @commands.group()
     @commands.check(permission_check.is_bot_admin)
     async def scan(self, ctx: commands.Context):
@@ -160,7 +140,7 @@ class Warden(Base, commands.Cog):
                 ctr_nofile += 1
                 continue
 
-            hashes = [x async for x in self.saveMessageHashes(message)]
+            hashes = [x async for x in features.saveMessageHashes(message)]
             ctr_hashes += len(hashes)
 
         await msg.edit(
@@ -177,7 +157,7 @@ class Warden(Base, commands.Cog):
 
     async def checkDuplicate(self, message: disnake.Message):
         """Check if uploaded files are known"""
-        hashes = [x async for x in self.saveMessageHashes(message)]
+        hashes = [x async for x in features.saveMessageHashes(message)]
 
         if len(message.attachments) > 0 and len(hashes) == 0:
             return
