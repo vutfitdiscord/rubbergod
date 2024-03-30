@@ -5,21 +5,20 @@ Cog implementing vote and polls feature.
 import asyncio
 import re
 from datetime import datetime
-from typing import Dict
 
 import emoji
 from dateutil import parser
 from disnake import Message, RawReactionActionEvent, TextChannel
 from disnake.errors import NotFound
 from disnake.ext import commands
-from disnake.ext.commands import Bot, Context
 
 import utils
 from cogs.base import Base
 from config import cooldowns
-from config.messages import Messages
 from database.vote import VoteDB
 from utils import is_command_message, str_emoji_id
+
+from .messages_cz import MessagesCZ
 
 
 class VoteMessage:
@@ -84,17 +83,17 @@ class VoteMessage:
 
         self.question = lines[0]
         parsed_opts = [self.parse_option(x.strip()) for x in lines[1:]]
-        self.options: Dict[str, "VoteMessage.VoteOption"] = {x.emoji: x for x in parsed_opts}
+        self.options: dict[str, "VoteMessage.VoteOption"] = {x.emoji: x for x in parsed_opts}
         # Check if emojis are unique
         if len(self.options) != len(set(self.options.keys())):
             raise self.ParseError()
 
 
 class Vote(Base, commands.Cog):
-    def __init__(self, bot: Bot):
+    def __init__(self, bot: commands.Bot):
         super().__init__()
         self.bot = bot
-        self.vote_cache: Dict[int, VoteMessage] = {}
+        self.vote_cache: dict[int, VoteMessage] = {}
 
     async def load_cached(self):
         db_votes = VoteDB.get_pending_votes()
@@ -108,7 +107,7 @@ class Vote(Base, commands.Cog):
                 pass
 
     @cooldowns.short_cooldown
-    @commands.command(rest_is_raw=True, description=Messages.vote_format, brief=Messages.vote_brief)
+    @commands.command(rest_is_raw=True, description=MessagesCZ.vote_format, brief=MessagesCZ.vote_brief)
     async def vote(self, ctx, *, message):
         await self.handle_vote_command(ctx, message, False)
 
@@ -116,27 +115,27 @@ class Vote(Base, commands.Cog):
     @commands.command(
         rest_is_raw=True,
         name="singlevote",
-        description=Messages.vote_format,
-        brief=Messages.vote_one_of_brief,
+        description=MessagesCZ.vote_format,
+        brief=MessagesCZ.singlevote_brief,
     )
-    async def vote_one_of(self, ctx, *, message):
+    async def vote_one_of(self, ctx: commands.Context, *, message: str):
         await self.handle_vote_command(ctx, message, True)
 
-    async def handle_vote_command(self, ctx: Context, message: str, one_of: bool):
+    async def handle_vote_command(self, ctx: commands.Context, message: str, one_of: bool):
         if len(message.strip()) == 0:
-            await ctx.send(Messages.vote_format)
+            await ctx.send(MessagesCZ.vote_format)
             return
         try:
             parsed_vote = VoteMessage(message, one_of)
         except VoteMessage.ParseError:
-            await ctx.send(Messages.vote_bad_format)
+            await ctx.send(MessagesCZ.bad_format)
             return
         except VoteMessage.NotEmojiError as e:
-            await ctx.send(Messages.vote_not_emoji(opt=str(e)))
+            await ctx.send(MessagesCZ.not_emoji(opt=str(e)))
             return
 
         if parsed_vote.end_date is not None and parsed_vote.end_date < datetime.now():
-            await ctx.send(Messages.vote_bad_date)
+            await ctx.send(MessagesCZ.bad_date)
             return
 
         self.vote_cache[ctx.message.id] = parsed_vote
@@ -147,9 +146,9 @@ class Vote(Base, commands.Cog):
             VoteDB.remove(ctx.message.id)
             del self.vote_cache[ctx.message.id]
             match = re.search(f"<:(.*):{ret}>", message)
-            await ctx.send(Messages.emote_not_found(emote=match.group(1)))
+            await ctx.send(MessagesCZ.emote_not_found(emote=match.group(1)))
         else:
-            await ctx.send(Messages.vote_none)
+            await ctx.send(MessagesCZ.vote_none)
 
     async def init_vote(self, message: Message):
         vote = self.vote_cache[message.id]
@@ -247,14 +246,14 @@ class Vote(Base, commands.Cog):
         all_most_voted = list(filter(lambda x: x.count == most_voted, vote.options.values()))
 
         if most_voted <= 0:
-            return Messages.vote_result_none if final else Messages.vote_none
+            return MessagesCZ.result_none if final else MessagesCZ.vote_none
 
         if len(all_most_voted) == 1:
             option = all_most_voted[0]
 
             if final:
                 return singularise(
-                    Messages.vote_result(
+                    MessagesCZ.vote_result(
                         winning_emoji=(
                             option.emoji if option.is_unicode else str(self.bot.get_emoji(int(option.emoji)))
                         ),
@@ -265,7 +264,7 @@ class Vote(Base, commands.Cog):
                 )
             else:
                 return singularise(
-                    Messages.vote_winning(
+                    MessagesCZ.vote_winning(
                         winning_emoji=(
                             option.emoji if option.is_unicode else str(self.bot.get_emoji(int(option.emoji)))
                         ),
@@ -281,12 +280,12 @@ class Vote(Base, commands.Cog):
 
             if final:
                 return singularise(
-                    Messages.vote_result_multiple(
+                    MessagesCZ.result_multiple(
                         winning_emojis=emoji_str, votes=most_voted, question=vote.question
                     )
                 )
             else:
-                return singularise(Messages.vote_winning_multiple(winning_emojis=emoji_str, votes=most_voted))
+                return singularise(MessagesCZ.winning_multiple(winning_emojis=emoji_str, votes=most_voted))
 
     async def update_bot_vote_message(self, vote_msg: Message, channel: TextChannel):
         vote = self.vote_cache[vote_msg.id]
@@ -297,13 +296,9 @@ class Vote(Base, commands.Cog):
 
         await bot_msg.edit(content=self.get_message(vote, False))
 
-    async def send_final_message(self, timeout, message_id, channel_id):
+    async def send_final_message(self, timeout: int, message_id: int, channel_id: int):
         await asyncio.sleep(timeout)
         vote = self.vote_cache[message_id]
         chan = await utils.get_or_fetch_channel(self.bot, channel_id)
         await chan.send(content=self.get_message(vote, True))
         VoteDB.remove(message_id)
-
-
-def setup(bot):
-    bot.add_cog(Vote(bot))
