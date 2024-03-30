@@ -15,7 +15,6 @@ from database.pin_map import PinMapDB  # noqa: F401
 from database.poll import PollDB, PollOptionDB, VoterDB  # noqa: F401
 from database.report import AnswerDB, ReportDB, UserDB  # noqa: F401
 from database.review import ReviewDB, ReviewRelevanceDB, SubjectDB, SubjectDetailsDB  # noqa: F401
-from database.role_group import RoleGroupDB  # noqa: F401
 from database.streamlinks import StreamLinkDB  # noqa: F401
 from database.subscription import AlreadyNotifiedDB, SubscriptionDB  # noqa: F401
 from database.timeout import TimeoutDB, TimeoutUserDB  # noqa: F401

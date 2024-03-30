@@ -39,12 +39,3 @@ class MessagesCZ(GlobalMessages):
     channel_overwrites_to_role_brief = "Vytvoří overwrites na místnost z role"
     channel_overwrites_to_role_start = "Probíhá převádění přístupových práv na roli"
     channel_overwrites_to_role_done = "Přístupová práva byla úspěšně převedena na roli"
-
-    group_add_brief = "Přidá skupinu"
-    group_get_brief = "Vypíše informace o skupině"
-    group_delete_brief = "Smaže skupinu"
-    group_list_brief = "Vypíše všechny skupiny"
-    group_add_channel_id_brief = "Přidá místnost do skupiny"
-    group_add_role_id_brief = "Přidá roli do skupiny"
-    group_reset_channels_brief = "Resetuje kanály pro skupinu"
-    group_reset_roles_brief = "Resetuje role pro skupinu"
