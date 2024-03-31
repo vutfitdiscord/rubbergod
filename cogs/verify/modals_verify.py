@@ -1,7 +1,8 @@
 import disnake
 
-from config.messages import Messages
 from features import verification
+
+from .messages_cz import MessagesCZ
 
 
 class VerifyModal(disnake.ui.Modal):
@@ -20,7 +21,7 @@ class VerifyModal(disnake.ui.Modal):
             )
         ]
         super().__init__(
-            title=Messages.verify_subject, components=components, custom_id="verify_modal", timeout=600
+            title=MessagesCZ.verify_subject, components=components, custom_id="verify_modal", timeout=600
         )
 
     async def callback(self, inter: disnake.ModalInteraction) -> None:

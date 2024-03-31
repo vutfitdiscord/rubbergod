@@ -9,13 +9,15 @@ from disnake.ext import commands
 
 from cogs.base import Base
 from config import cooldowns
-from config.messages import Messages
 from database.verification import DynamicVerifyDB
 from features import verification
-from features.dynamic_verify import DynamicVerifyManager
 from features.table_generator import TableGenerator
-from modals.dynamic_verify import DynamicVerifyEditModal
 from permissions import permission_check, room_check
+
+from .features_dynamic_verify import DynamicVerifyManager
+from .features_table_generator import TableGenerator
+from .messages_cz import MessagesCZ
+from .modals_dynamic_verify import DynamicVerifyEditModal
 
 
 async def dynamic_verify_rules_autocomplete(inter: disnake.ApplicationCommandInteraction, user_input: str):
@@ -24,7 +26,7 @@ async def dynamic_verify_rules_autocomplete(inter: disnake.ApplicationCommandInt
 
 
 class Verify(Base, commands.Cog):
-    def __init__(self, bot):
+    def __init__(self, bot: commands.Bot):
         super().__init__()
         self.bot = bot
         self.verification = verification.Verification(bot)
@@ -35,11 +37,11 @@ class Verify(Base, commands.Cog):
 
     @cooldowns.default_cooldown
     @commands.check(is_valid_guild)
-    @commands.slash_command(name="verify", description=Messages.verify_brief, dm_permission=True)
+    @commands.slash_command(name="verify", description=MessagesCZ.verify_brief, dm_permission=True)
     async def verify(
         self,
         inter: disnake.ApplicationCommandInteraction,
-        login: str = commands.Param(description=Messages.verify_login_parameter),
+        login: str = commands.Param(description=MessagesCZ.verify_login_parameter),
     ):
         login = login.lower()
         await inter.response.defer(ephemeral=True)
@@ -52,7 +54,7 @@ class Verify(Base, commands.Cog):
     @verify.error
     async def on_verification_error(self, inter: disnake.ApplicationCommandInteraction, error):
         if isinstance(error, commands.CheckFailure):
-            await inter.send(Messages.verify_invalid_channel, ephemeral=True)
+            await inter.send(MessagesCZ.verify_invalid_channel, ephemeral=True)
             return True
 
     @commands.check(room_check.is_in_modroom)
@@ -61,12 +63,12 @@ class Verify(Base, commands.Cog):
         """This method is only group for another commands. This function does nothing."""
         pass
 
-    @dynamic_verify.sub_command(name="create", description=Messages.dynamic_verify_create_brief)
+    @dynamic_verify.sub_command(name="create", description=MessagesCZ.dynamic_verify_create_brief)
     async def dynamic_verify_create(self, inter: disnake.ApplicationCommandInteraction):
         modal = DynamicVerifyEditModal(inter.guild, None)
         await inter.response.send_modal(modal)
 
-    @dynamic_verify.sub_command(name="list", description=Messages.dynamic_verify_list_brief)
+    @dynamic_verify.sub_command(name="list", description=MessagesCZ.dynamic_verify_list_brief)
     async def dynamic_verify_list(self, inter: disnake.ApplicationCommandInteraction):
         matrix = []
         for rule in DynamicVerifyDB.get_rules():
@@ -79,35 +81,35 @@ class Verify(Base, commands.Cog):
             file = disnake.File(fp=file, filename="dynamic_verify_list.txt")
         await inter.response.send_message(file=file)
 
-    @dynamic_verify.sub_command(name="edit", description=Messages.dynamic_verify_edit_brief)
+    @dynamic_verify.sub_command(name="edit", description=MessagesCZ.dynamic_verify_edit_brief)
     async def dynamic_verify_edit(
         self,
         inter: disnake.ApplicationCommandInteraction,
         rule_id: str = commands.Param(
-            autocomplete=dynamic_verify_rules_autocomplete, description=Messages.dynamic_verify_rule_id
+            autocomplete=dynamic_verify_rules_autocomplete, description=MessagesCZ.dynamic_verify_rule_id
         ),
     ):
         rule = self.dynamic_verify_manager.get_rule(rule_id)
         if rule is None:
-            await inter.response.send_message(Messages.dynamic_verify_missing_rule(rule_id=rule_id))
+            await inter.response.send_message(MessagesCZ.dynamic_verify_missing_rule(rule_id=rule_id))
             return
         modal = DynamicVerifyEditModal(inter.guild, rule)
         await inter.response.send_modal(modal)
 
-    @dynamic_verify.sub_command(name="remove", description=Messages.dynamic_verify_remove_brief)
+    @dynamic_verify.sub_command(name="remove", description=MessagesCZ.dynamic_verify_remove_brief)
     async def dynamic_verify_remove(
         self,
         inter: disnake.ApplicationCommandInteraction,
         rule_id: str = commands.Param(
-            autocomplete=dynamic_verify_rules_autocomplete, description=Messages.dynamic_verify_rule_id
+            autocomplete=dynamic_verify_rules_autocomplete, description=MessagesCZ.dynamic_verify_rule_id
         ),
     ):
         rule = self.dynamic_verify_manager.get_rule(rule_id)
         if rule is None:
-            await inter.response.send_message(Messages.dynamic_verify_missing_rule(rule_id=rule_id))
+            await inter.response.send_message(MessagesCZ.dynamic_verify_missing_rule(rule_id=rule_id))
             return
         rule.remove_rule()
-        await inter.response.send_message(Messages.dynamic_verify_remove_success)
+        await inter.response.send_message(MessagesCZ.dynamic_verify_remove_success)
 
     @commands.check(permission_check.submod_plus)
     @commands.user_command(name="Verify host", guild_ids=[Base.config.guild_id])
@@ -122,13 +124,13 @@ class Verify(Base, commands.Cog):
             await member.add_roles(host_id, verify_id)
         except AttributeError:
             raise commands.errors.MemberNotFound("Member not found")
-        response_message = Messages.verify_verify_success(user=member.id)
+        response_message = MessagesCZ.verify_verify_success(user=member.id)
         await inter.edit_original_response(response_message)
 
         try:
             await member.send(response_message)
         except disnake.Forbidden:
-            await inter.send(Messages.blocked_bot(user=member.id))
+            await inter.send(MessagesCZ.blocked_bot(user=member.id))
 
 
 def setup(bot):

@@ -10,7 +10,7 @@ import disnake
 from disnake.ext.commands import Bot
 
 import utils
-from buttons.verify import VerifyView, VerifyWithResendButtonView
+from cogs.verify.views_verify import VerifyView, VerifyWithResendButtonView
 from config.app_config import config
 from config.messages import Messages
 from database.verification import ValidPersonDB, VerifyStatus
