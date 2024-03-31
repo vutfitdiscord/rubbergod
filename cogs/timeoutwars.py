@@ -29,7 +29,7 @@ class TimeoutWars(Base, commands.Cog):
         self.bot = bot
         self.immunity: dict[int, datetime] = {}
         self.ignored_messages = set()
-        self.index = 10
+        self.index = 0
 
     log_file = "timeout_wars"
     message_delete = "Smazání zprávy"
@@ -76,7 +76,7 @@ class TimeoutWars(Base, commands.Cog):
         utils.add_author_footer(embed, original_message.author)
         await self.timeout_wars_channel.send(embed=embed)
 
-    async def mute_users(self, original_message, channel, users: list[disnake.Member], duration, reason):
+    async def mute_users(self, original_message, channel, users: list[disnake.Member], duration):
         """Mute users and send message to channel and log"""
         message = []
 
