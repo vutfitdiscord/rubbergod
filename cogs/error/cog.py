@@ -16,6 +16,8 @@ from cogs.base import Base
 from database.stats import ErrorEvent
 from features.error import ErrorLogger
 
+from .messages_cz import MessagesCZ
+
 
 class Error(Base, commands.Cog):
     def __init__(self, bot: commands.Bot):
@@ -25,7 +27,7 @@ class Error(Base, commands.Cog):
 
     @commands.Cog.listener()
     async def on_button_click(self, inter: disnake.MessageInteraction):
-        if inter.component.custom_id != "error:traceback":
+        if inter.component.custom_id != MessagesCZ.error_custom_id:
             return
         await inter.response.defer(ephemeral=True)
         id = inter.message.embeds[0].footer.text.split(":")[1].strip()
@@ -49,7 +51,3 @@ class Error(Base, commands.Cog):
     @commands.Cog.listener()
     async def on_message_command_error(self, inter: disnake.ApplicationCommandInteraction, error: Exception):
         await self.logger.handle_error(inter, error)
-
-
-def setup(bot: commands.Bot):
-    bot.add_cog(Error(bot))
