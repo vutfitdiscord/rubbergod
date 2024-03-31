@@ -29,7 +29,7 @@ class TimeoutWars(Base, commands.Cog):
         self.bot = bot
         self.immunity: dict[int, datetime] = {}
         self.ignored_messages = set()
-        self.index = 10
+        self.index = 0
 
     log_file = "timeout_wars"
     message_delete = "Smazání zprávy"
