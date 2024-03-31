@@ -14,8 +14,6 @@ from buttons.embed import EmbedView
 from config.app_config import config
 from database.exams import ExamsTermsMessageDB
 
-from .messages_cz import MessagesCZ
-
 year_regex = r"[1-3][BM]IT"
 YEAR_LIST = ["1BIT", "2BIT", "3BIT", "1MIT", "2MIT"]
 CLEANR = re.compile(r"<.*?>|&([a-z0-9]+|#[0-9]{1,6}|#x[0-9a-f]{1,6});")
@@ -88,32 +86,6 @@ class Features:
                                 updated += 1
 
         return updated
-
-    @commands.slash_command(name="exams", description=MessagesCZ.exams_brief, aliases=["zkousky"])
-    async def exams(
-        self,
-        inter: disnake.ApplicationCommandInteraction,
-        rocnik: str = commands.Param(name="rocnik", choices=YEAR_LIST, default=None),
-    ):
-        await inter.response.defer()
-        if rocnik is None:
-            if isinstance(inter.author, disnake.Member):
-                user_roles: list[disnake.Role] = inter.author.roles
-
-                for role in user_roles:
-                    match = re.match(year_regex, role.name.upper())
-
-                    if match is not None:
-                        rocnik = self.process_match(match)
-                        if rocnik is not None:
-                            await self.process_exams(inter, rocnik, inter.author)
-                            return
-
-                await inter.edit_original_response(MessagesCZ.no_valid_role)
-            else:
-                await inter.edit_original_response(MessagesCZ.specify_year)
-        else:
-            await self.process_exams(inter, rocnik, inter.author)
 
     async def process_exams(
         self,
