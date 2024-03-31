@@ -2,9 +2,10 @@ from typing import List, Union
 
 import disnake
 
-from config.messages import Messages
 from database.verification import DynamicVerifyDB
-from features.dynamic_verify import DynamicVerifyManager
+
+from . import features_dynamic_verify
+from .messages_cz import MessagesCZ
 
 
 class DynamicVerifyEditModal(disnake.ui.Modal):
@@ -122,7 +123,7 @@ class DynamicVerifyEditModal(disnake.ui.Modal):
         return self.rule is not None
 
     async def callback(self, inter: disnake.ModalInteraction) -> None:
-        manager = DynamicVerifyManager(inter.bot)
+        manager = features_dynamic_verify.DynamicVerifyManager(inter.bot)
         rule_id = await self.get_rule_id(inter, manager)
         name = str(inter.text_values["name"]).strip()
         enabled = await self.get_bool_state(inter, "enabled")
@@ -141,23 +142,25 @@ class DynamicVerifyEditModal(disnake.ui.Modal):
 
         rule.update_rule()
         await inter.response.send_message(
-            Messages.dynamic_verify_edit_success if self.is_edit() else Messages.dynamic_verify_create_success
+            MessagesCZ.dynamic_verify_edit_success
+            if self.is_edit()
+            else MessagesCZ.dynamic_verify_create_success
         )
 
     async def get_rule_id(
-        self, inter: disnake.ModalInteraction, manager: DynamicVerifyManager
+        self, inter: disnake.ModalInteraction, manager: features_dynamic_verify.DynamicVerifyManager
     ) -> Union[str, None]:
         rule_id = str(inter.text_values["id"]).strip()
 
         if rule_id == "None":
-            await inter.response.send_message(Messages.dynamic_verify_rule_missing)
+            await inter.response.send_message(MessagesCZ.dynamic_verify_rule_missing)
             return None
 
         rule = manager.get_rule(rule_id)
         if rule is not None:
             if self.is_edit() and self.rule.id == rule_id:
                 return rule_id  # Same rule ID in edit mode is valid.
-            await inter.response.send_message(Messages.dynamic_verify_rule_exists)
+            await inter.response.send_message(MessagesCZ.dynamic_verify_rule_exists)
             return None
 
         return rule_id
@@ -170,7 +173,7 @@ class DynamicVerifyEditModal(disnake.ui.Modal):
         elif state.lower() == "false":
             return False
         else:
-            await inter.response.send_message(Messages.dynamic_verify_invalid_state)
+            await inter.response.send_message(MessagesCZ.dynamic_verify_invalid_state)
             return None
 
     async def get_roles(self, inter: disnake.ModalInteraction) -> Union[List[disnake.Role], None]:
@@ -183,18 +186,18 @@ class DynamicVerifyEditModal(disnake.ui.Modal):
                 # Search by Role ID
                 role = inter.guild.get_role(int(item))
                 if role is None:
-                    await inter.response.send_message(Messages.dynamic_verify_role_not_exists(role=item))
+                    await inter.response.send_message(MessagesCZ.dynamic_verify_role_not_exists(role=item))
                     return None
                 roles.append(role)
             else:
                 # Search by role name
                 role = disnake.utils.get(inter.guild.roles, name=item)
                 if role is None:
-                    await inter.response.send_message(Messages.dynamic_verify_role_not_exists(role=item))
+                    await inter.response.send_message(MessagesCZ.dynamic_verify_role_not_exists(role=item))
                     return None
                 roles.append(role)
 
         if len(roles) == 0:
-            await inter.response.send_message(Messages.dynamic_verify_no_roles)
+            await inter.response.send_message(MessagesCZ.dynamic_verify_no_roles)
             return None
         return list(set(roles))

@@ -2,8 +2,9 @@ import disnake
 
 from buttons.base import BaseView
 from config.app_config import config
-from config.messages import Messages
-from features import dynamic_verify
+
+from . import features_dynamic_verify
+from .messages_cz import MessagesCZ
 
 
 class DynamicVerifyRequestView(BaseView):
@@ -14,7 +15,7 @@ class DynamicVerifyRequestView(BaseView):
 
     @disnake.ui.button(label="Schválit", style=disnake.ButtonStyle.success, custom_id="dynamic_verify:accept")
     async def accept_access(self, button: disnake.ui.Button, inter: disnake.MessageInteraction):
-        service = dynamic_verify.DynamicVerifyManager(inter.bot)
+        service = features_dynamic_verify.DynamicVerifyManager(inter.bot)
         await service.apply_rule(self.rule_id, self.user_id, inter)
         self.clear_items()
         await self.message.edit(view=self)
@@ -29,6 +30,6 @@ class DynamicVerifyRequestView(BaseView):
         member = await guild.get_or_fetch_member(self.user_id)
         if member is not None:
             try:
-                await member.send(Messages.dynamic_verify_declined)
+                await member.send(MessagesCZ.dynamic_verify_declined)
             except disnake.HTTPException:
                 pass
