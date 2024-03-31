@@ -66,7 +66,7 @@ class Config:
     email_name: str = get_attr(toml_dict, "email", "name")
     email_addr: str = get_attr(toml_dict, "email", "addr")
     email_smtp_server: str = get_attr(toml_dict, "email", "smtp_server")
-    email_smtp_port: str = get_attr(toml_dict, "email", "smtp_port")
+    email_smtp_port: int = get_attr(toml_dict, "email", "smtp_port")
     email_pass: str = get_attr(toml_dict, "email", "pass")
 
     # Extensions loaded on bot start
