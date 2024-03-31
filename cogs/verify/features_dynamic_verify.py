@@ -4,12 +4,13 @@ import disnake
 from disnake.ext.commands import Bot
 
 import utils
-from buttons.dynamic_verify import DynamicVerifyRequestView
 from config.app_config import config
-from config.messages import Messages
 from database.verification import DynamicVerifyDB
 from features.base_feature import BaseFeature
 from features.verify_helper import VerifyHelper
+
+from .messages_cz import MessagesCZ
+from .views_dynamic_verify import DynamicVerifyRequestView
 
 
 class DynamicVerifyManager(BaseFeature):
@@ -27,7 +28,7 @@ class DynamicVerifyManager(BaseFeature):
         rule = self.verify_db.get_rule(rule_id)
         if rule.mod_check:
             await self.request_verification(rule, inter)
-            await inter.send(Messages.dynamic_verify_requested, ephemeral=True)
+            await inter.send(MessagesCZ.dynamic_verify_requested, ephemeral=True)
         else:
             await self.apply_rule(rule_id, inter.author.id, inter)
 
@@ -42,13 +43,13 @@ class DynamicVerifyManager(BaseFeature):
             await member.add_roles(role, reason=f"Dynamic verification - Rule {rule.name} ({rule.id})")
 
         try:
-            await member.send(Messages.verify_verify_success(user=user_id))
-            await member.send(Messages.verify_post_verify_info)
+            await member.send(MessagesCZ.verify_verify_success(user=user_id))
+            await member.send(MessagesCZ.verify_post_verify_info)
         except disnake.HTTPException:
             pass  # User maybe have disabled communication with bots.
 
         if inter.channel.type is not disnake.ChannelType.private:
-            await inter.send(Messages.verify_verify_success(user=user_id))
+            await inter.send(MessagesCZ.verify_verify_success(user=user_id))
 
     async def request_verification(
         self, rule: DynamicVerifyDB, inter: disnake.ApplicationCommandInteraction
