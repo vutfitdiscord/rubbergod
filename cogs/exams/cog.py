@@ -3,6 +3,8 @@ Cog to parse exams data from website and send it to channel.
 Available for each year of study.
 """
 
+import re
+
 import disnake
 from disnake.ext import commands, tasks
 
@@ -11,7 +13,7 @@ from config import cooldowns
 from database.exams import ExamsTermsMessageDB
 from permissions import permission_check
 
-from .features import Features
+from .features import YEAR_LIST, Features, year_regex
 from .messages_cz import MessagesCZ
 
 
@@ -27,6 +29,32 @@ class Exams(Base, commands.Cog):
 
         if self.subscribed_guilds:
             self.tasks = [self.update_terms_task.start()]
+
+    @commands.slash_command(name="exams", description=MessagesCZ.exams_brief)
+    async def exams(
+        self,
+        inter: disnake.ApplicationCommandInteraction,
+        rocnik: str = commands.Param(name="rocnik", choices=YEAR_LIST, default=None),
+    ):
+        await inter.response.defer()
+        if rocnik is None:
+            if isinstance(inter.author, disnake.Member):
+                user_roles: list[disnake.Role] = inter.author.roles
+
+                for role in user_roles:
+                    match = re.match(year_regex, role.name.upper())
+
+                    if match is not None:
+                        rocnik = self.features.process_match(match)
+                        if rocnik is not None:
+                            await self.features.process_exams(inter, rocnik, inter.author)
+                            return
+
+                await inter.edit_original_response(MessagesCZ.no_valid_role)
+            else:
+                await inter.edit_original_response(MessagesCZ.specify_year)
+        else:
+            await self.features.process_exams(inter, rocnik, inter.author)
 
     @cooldowns.default_cooldown
     @commands.check(permission_check.helper_plus)
