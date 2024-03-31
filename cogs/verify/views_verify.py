@@ -3,7 +3,8 @@ import disnake
 from buttons.base import BaseView
 from database.verification import ValidPersonDB
 from features import verification
-from modals.verify import VerifyModal
+
+from .modals_verify import VerifyModal
 
 
 class VerifyView(BaseView):
