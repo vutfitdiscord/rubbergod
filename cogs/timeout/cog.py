@@ -363,8 +363,8 @@ class Timeout(Base, commands.Cog):
                 # add timeout manually
                 length = entry.changes.after.timeout - entry.created_at
                 length = timedelta(seconds=math.ceil(length.total_seconds()))  # round up to seconds
-                reason = entry.reason or Messages.timeout_manual_timeout
-                if reason == Messages.timeout_wars_reason:
+                reason = entry.reason or MessagesCZ.timeout_manual_timeout
+                if reason == MessagesCZ.timeout_wars_reason:
                     # timeout was added during timeout wars 1. April
                     return
 
