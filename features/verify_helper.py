@@ -87,7 +87,7 @@ class VerifyHelper:
             session.commit()
         return person
 
-    async def check_api(self, id: str) -> Optional[dict]:
+    async def check_api(self, id: str) -> ValidPersonDB | None:
         user = await self.get_user_details(id)
         if user is None:
             return None
