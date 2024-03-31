@@ -15,7 +15,6 @@ from features.table_generator import TableGenerator
 from permissions import permission_check, room_check
 
 from .features_dynamic_verify import DynamicVerifyManager
-from .features_table_generator import TableGenerator
 from .messages_cz import MessagesCZ
 from .modals_dynamic_verify import DynamicVerifyEditModal
 

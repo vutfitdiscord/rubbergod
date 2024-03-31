@@ -17,7 +17,7 @@ class VerifyStatus(IntEnum):
     InProcess = 2  # in process of verification (code sent)
 
 
-class PermitDB(database.base):
+class PermitDB(database.base):  # type: ignore
     __tablename__ = "bot_permit"
 
     login = Column(String, primary_key=True)
@@ -61,7 +61,7 @@ class PermitDB(database.base):
         session.commit()
 
 
-class ValidPersonDB(database.base):
+class ValidPersonDB(database.base):  # type: ignore
     __tablename__ = "bot_valid_persons"
 
     login = Column(String, primary_key=True)
@@ -141,7 +141,7 @@ class ValidPersonDB(database.base):
         session.commit()
 
 
-class DynamicVerifyDB(database.base):
+class DynamicVerifyDB(database.base):  # type: ignore
     __tablename__ = "dynamic_verify_rules"
 
     id = Column(String, primary_key=True)
