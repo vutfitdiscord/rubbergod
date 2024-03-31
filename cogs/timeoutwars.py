@@ -7,7 +7,7 @@ the bot will mute the user or on random mute the one with reaction.
 import csv
 import os
 import random
-from datetime import datetime
+from datetime import datetime, timezone
 from functools import cached_property
 from typing import Union
 
@@ -65,8 +65,7 @@ class TimeoutWars(Base, commands.Cog):
         else:
             embed.add_field(name="Umlčený uživatel", value=f"{user.mention}(`{user.name}`)", inline=False)
 
-        if reason == self.message_delete:
-            embed.add_field(name="Důvod", value=reason, inline=False)
+        embed.add_field(name="Důvod", value=reason, inline=False)
 
         embed.add_field(
             name="Link",
@@ -76,7 +75,7 @@ class TimeoutWars(Base, commands.Cog):
         utils.add_author_footer(embed, original_message.author)
         await self.timeout_wars_channel.send(embed=embed)
 
-    async def mute_users(self, original_message, channel, users: list[disnake.Member], duration):
+    async def mute_users(self, original_message, channel, users: list[disnake.Member], duration, reason):
         """Mute users and send message to channel and log"""
         message = []
 
@@ -100,7 +99,7 @@ class TimeoutWars(Base, commands.Cog):
 
         if message:
             await channel.send("\n".join(message))
-        await self.send_embed_log(original_message, users)
+        await self.send_embed_log(original_message, users, reason)
 
     async def mute_user(
         self, original_message, channel, user: disnake.Member, duration, reason="Moderace lidu"
@@ -153,14 +152,16 @@ class TimeoutWars(Base, commands.Cog):
         """
         users = await reaction.users().flatten()
 
-        await self.mute_users(ctx.message, ctx.channel, users, config.timeout_wars_timeout_time)
+        await self.mute_users(
+            ctx.message, ctx.channel, users, config.timeout_wars_timeout_time, "Demokracie zrušena"
+        )
 
         timeouted = []
         for user in users:
             if not self.get_immunity(user):
                 self.give_immunity(user, config.timeout_wars_immunity_time)
                 timeouted.append(user.id)
-        self.write_log(timeouted, [user.id for user in users], ctx.message.author.id, "all mute")
+        self.write_log(timeouted, [user.id for user in users], ctx.message.author.id, "all_mute")
 
     async def random_mute(self, ctx, reaction):
         """
@@ -169,12 +170,14 @@ class TimeoutWars(Base, commands.Cog):
         users = await reaction.users().flatten()
         user = random.choice(users)
 
-        await self.mute_user(ctx.message, ctx.channel, user, config.timeout_wars_timeout_time)
+        await self.mute_user(
+            ctx.message, ctx.channel, user, config.timeout_wars_timeout_time, "Zlobivý troll"
+        )
         timeouted = []
         if not self.get_immunity(user):
             self.give_immunity(user, config.timeout_wars_immunity_time)
             timeouted.append(user.id)
-        self.write_log(timeouted, [user.id for user in users], ctx.message.author.id, "random mute")
+        self.write_log(timeouted, [user.id for user in users], ctx.message.author.id, "random_mute")
 
     async def author_mute(self, ctx, reaction):
         """
@@ -188,12 +191,14 @@ class TimeoutWars(Base, commands.Cog):
         else:
             author = ctx.message.author
 
-        await self.mute_user(ctx.message, ctx.channel, author, config.timeout_wars_timeout_time)
+        await self.mute_user(
+            ctx.message, ctx.channel, author, config.timeout_wars_timeout_time, "Demokratické ticho"
+        )
         timeouted = []
         if not self.get_immunity(author):
             self.give_immunity(author, config.timeout_wars_immunity_time)
             timeouted.append(author.id)
-        self.write_log(timeouted, [user.id for user in reaction_users], author.id, "author mute")
+        self.write_log(timeouted, [user.id for user in reaction_users], author.id, "author_mute")
 
     async def handle_reaction(self, ctx: commands.Context):
         """
@@ -204,6 +209,12 @@ class TimeoutWars(Base, commands.Cog):
             return
 
         message = ctx.message
+
+        threshold = datetime(2024, 3, 31, 0, 0, 0, tzinfo=timezone.utc)
+        if message.created_at < threshold:
+            # message is too old to get timeout
+            return
+
         mute_reaction = None
         # skip if somebody already got mute from this message
         if message.id in self.ignored_messages:
