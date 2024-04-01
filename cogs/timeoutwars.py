@@ -18,6 +18,7 @@ import utils
 from cogs.base import Base
 from config.app_config import config
 from config.messages import Messages
+from database.timeout import TimeoutUserDB
 
 path_to_icons = "images/timeoutwars/"
 icons_list = os.listdir(path_to_icons)
@@ -28,7 +29,7 @@ class TimeoutWars(Base, commands.Cog):
         self.bot = bot
         self.immunity: dict[int, datetime] = {}
         self.ignored_messages = set()
-        self.index = 0
+        self.index = 10
 
     log_file = "timeout_wars"
     message_delete = "Smazání zprávy"
@@ -80,6 +81,9 @@ class TimeoutWars(Base, commands.Cog):
         message = []
 
         for user in users:
+            if TimeoutUserDB.get_active_timeout(user.id):
+                return
+
             if self.get_immunity(user):
                 message.append(
                     Messages.timeout_wars_user_immunity(
@@ -105,6 +109,9 @@ class TimeoutWars(Base, commands.Cog):
         self, original_message, channel, user: disnake.Member, duration, reason="Moderace lidu"
     ):
         """Mute user and send message to channel and log"""
+        if TimeoutUserDB.get_active_timeout(user.id):
+            return
+
         if self.get_immunity(user):
             await channel.send(
                 Messages.timeout_wars_user_immunity(
@@ -265,7 +272,7 @@ class TimeoutWars(Base, commands.Cog):
                     reason=self.message_delete,
                 )
 
-    @tasks.loop(minutes=10)
+    @tasks.loop(minutes=20)
     async def edit_logo(self):
         """Edit server logo and name every 10 minutes"""
         with open(f"{path_to_icons}{icons_list[self.index]}", "rb") as f:
