@@ -188,6 +188,8 @@ class Verification(BaseFeature):
                 return None
 
             year_value_match = re.search(r"(\d*)r", year_parts[2])
+            if year_value_match is None:
+                return None
             year_value = int(year_value_match.group(1))
 
             if year_parts[1] in ["BIT", "BITP"]:
@@ -219,7 +221,7 @@ class Verification(BaseFeature):
             )
             return
 
-        new_user: ValidPersonDB = ValidPersonDB.get_user_by_login(login)
+        new_user = ValidPersonDB.get_user_by_login(login)
         if new_user is not None:
             if code != new_user.code:
                 await inter.response.send_message(Messages.verify_verify_wrong_code)
