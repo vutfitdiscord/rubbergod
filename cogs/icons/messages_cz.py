@@ -8,3 +8,4 @@ class MessagesCZ(GlobalMessages):
     fail_icon = "Nastavit ikonu se nepodařilo"
     no_permission = "Na tuto ikonu nemáš právo"
     icon_removed = "Ikona byla odstraněna"
+    icon_delete_id = "icon:delete"
