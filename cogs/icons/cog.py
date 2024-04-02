@@ -32,7 +32,8 @@ class Icons(Base, commands.Cog):
             for icon in icon_roles
             if await features.can_assign(icon, user)
         ]
-        view = TrashView("icon:delete", row=4)  # makes it last row so it's always under the dropdown
+        # makes it last row so it's always under the dropdown
+        view = TrashView(MessagesCZ.icon_delete_id, row=4)
         for row, start_i in enumerate(range(0, len(options), 25)):
             # 25 is the max number of options per select
             component = IconSelect(
@@ -46,7 +47,7 @@ class Icons(Base, commands.Cog):
 
     @commands.Cog.listener()
     async def on_button_click(self, inter: disnake.MessageInteraction):
-        if inter.component.custom_id != "icon:delete":
+        if inter.component.custom_id != MessagesCZ.icon_delete_id:
             return
         await features.do_set_icon(None, inter.author)
         await inter.response.send_message(content=MessagesCZ.icon_removed, ephemeral=True)
