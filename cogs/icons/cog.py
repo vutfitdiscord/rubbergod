@@ -54,7 +54,8 @@ class Icons(Base, commands.Cog):
 
     async def cog_slash_command_error(
         self, inter: disnake.ApplicationCommandInteraction, error: Exception
-    ) -> None:
+    ) -> bool:
         if isinstance(error, utils.PCommandOnCooldown):
             await inter.response.send_message(str(error), ephemeral=True)
             return True
+        return False

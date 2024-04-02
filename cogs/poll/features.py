@@ -31,7 +31,7 @@ async def check_end(inter: disnake.ApplicationCommandInteraction, end: str) -> t
     return True, end
 
 
-async def parse_attachment(attachment: disnake.Attachment) -> Union[str, disnake.File, None]:
+async def parse_attachment(attachment: disnake.Attachment) -> tuple[str | None, disnake.File | None]:
     """parses the attachment url to get the attachment as file"""
     if attachment is None or attachment.content_type is None:
         return None, None

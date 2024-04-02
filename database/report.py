@@ -9,7 +9,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from database import database, session
 
 
-class ReportDB(database.base):
+class ReportDB(database.base):  # type: ignore
     __tablename__ = "report"
 
     id = Column(Integer, primary_key=True, nullable=False, unique=True, autoincrement=True)
@@ -46,7 +46,7 @@ class ReportDB(database.base):
     @classmethod
     def get_report_author(cls, report_id: int) -> Optional[UserDB]:
         report = cls.get_report(report_id)
-        return report.author_id
+        return report.author_id if report else None
 
     @classmethod
     def add_report(
@@ -81,9 +81,9 @@ class ReportDB(database.base):
     def set_fake_report(cls, report_id: int, moderator_id: str, fake_report: bool) -> None:
         """Report is fake, no other action needed"""
         report = cls.get_report(int(report_id))
-        UserDB.ban_user(report.author_id)
         if report is None:
             return
+        UserDB.ban_user(report.author_id)
 
         report.resolved = fake_report
         report.fake_report = fake_report
@@ -114,7 +114,7 @@ class ReportDB(database.base):
         return session.query(cls).filter_by(target_user_id=str(user_id)).count()
 
 
-class UserDB(database.base):
+class UserDB(database.base):  # type: ignore
     __tablename__ = "report_user"
 
     id = Column(String, primary_key=True, nullable=False, unique=True)
@@ -171,7 +171,7 @@ class UserDB(database.base):
         session.commit()
 
 
-class AnswerDB(database.base):
+class AnswerDB(database.base):  # type: ignore
     __tablename__ = "report_answer"
 
     id = Column(Integer, primary_key=True, nullable=False, unique=True)

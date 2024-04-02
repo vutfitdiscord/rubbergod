@@ -42,12 +42,12 @@ class Poll(Base, commands.Cog):
         poll_options: dict,
         poll_view: disnake.ui.View,
     ):
-        inter = poll_args.get("inter")
+        inter: disnake.ApplicationCommandInteraction = poll_args.get("inter")
         attachment = poll_args.get("attachment")
         anonymous = poll_args.get("anonymous")
-        end = poll_args.get("end")
+        end_str: str = poll_args.get("end")
 
-        is_end_valid, end = await poll_features.check_end(inter, end)
+        is_end_valid, end = await poll_features.check_end(inter, end_str)
         if not is_end_valid:
             return
 
@@ -186,7 +186,7 @@ class Poll(Base, commands.Cog):
             await inter.send(MessagesCZ.no_active_polls)
             return
 
-        content = ""
+        content: str = ""
         for poll in polls:
             message = await utils.get_message_from_url(self.bot, poll.message_url)
             if not message or not message.embeds:
@@ -202,8 +202,8 @@ class Poll(Base, commands.Cog):
             await inter.send(MessagesCZ.no_active_polls)
             return
 
-        content = utils.cut_string_by_words(header + content, 1900, "\n")
-        for content_part in content:
+        content_list = utils.cut_string_by_words(header + content, 1900, "\n")
+        for content_part in content_list:
             await inter.send(content_part, ephemeral=True)
 
     async def task_end_poll(self, poll: PollDB) -> None:

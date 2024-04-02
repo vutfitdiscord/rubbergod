@@ -7,7 +7,7 @@ from sqlalchemy import Column, String
 from database import database, session
 
 
-class MemeRepostDB(database.base):
+class MemeRepostDB(database.base):  # type: ignore
     __tablename__ = "bot_meme_reposts"
 
     original_message_id = Column(String, primary_key=True, nullable=False, unique=True)

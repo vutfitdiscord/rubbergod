@@ -8,7 +8,7 @@ from sqlalchemy import BIGINT, Column, DateTime, String, desc, exists
 from database import database, session
 
 
-class StreamLinkDB(database.base):
+class StreamLinkDB(database.base):  # type: ignore
     __tablename__ = "stream_links"
 
     id = Column(BIGINT, primary_key=True, autoincrement=True)

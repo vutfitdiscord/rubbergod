@@ -1,13 +1,11 @@
 from __future__ import annotations
 
-from typing import Optional
-
 from sqlalchemy import BigInteger, Column, String
 
 from database import database, session
 
 
-class ContestVoteDB(database.base):
+class ContestVoteDB(database.base):  # type: ignore
     __tablename__ = "contest_vote"
 
     user_id = Column(String, nullable=False)
@@ -35,8 +33,8 @@ class ContestVoteDB(database.base):
         return session.query(cls).filter_by(user_id=str(user_id)).first()
 
     @classmethod
-    def get_contribution_author(cls, contribution_id: int) -> Optional[str]:
+    def get_contribution_author(cls, contribution_id: int) -> str | None:
         contribution = session.query(cls).filter_by(contribution_id=contribution_id).first()
         if contribution:
             return contribution.user_id
-        return
+        return None

@@ -7,7 +7,7 @@ from sqlalchemy import Column, String
 from database import database, session
 
 
-class PinMapDB(database.base):
+class PinMapDB(database.base):  # type: ignore
     __tablename__ = "bot_pin_map"
 
     channel_id = Column(String, primary_key=True)
@@ -19,7 +19,7 @@ class PinMapDB(database.base):
 
     @classmethod
     def add_or_update_channel(cls, channel_id: str, message_id: str) -> None:
-        item: cls = cls.find_channel_by_id(channel_id)
+        item: PinMapDB = cls.find_channel_by_id(channel_id)
 
         if item is None:
             item = cls(channel_id=channel_id, message_id=message_id)
