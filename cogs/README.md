@@ -2,28 +2,30 @@
 
 ## Summary
 
-All extensions, also known as cogs, are contained within this folder. The cogs can be dynamically loaded and unloaded at runtime, which allows for the removal or addition of features without requiring the entire bot to be restarted. The `/cogs` command in `system.py` is responsible for handling this process.
+All extensions, also known as cogs, are contained within this folder. The cogs can be dynamically loaded and unloaded at runtime, which allows for the removal or addition of features without requiring the entire bot to be restarted. The `/cogs` command in [system cog](system/cog.py) is responsible for handling this process.
 
 ## Must be met
 
-1. All cogs must inherit from [class Base](base.py).
-2. Cog's file name must be same as class name. File name is lowercase, class name is CamelCase.
-3. If there is task in cog it must be initialized in `self.tasks` list.
-4. Comment at the beginning of the file summarizing function of cog.
-5. All cogs should be included in cogs folder and added to the README.
+1. All cogs must have their own directory. The directory must contain the `cog.py`, `__init__.py` and `messages_*.py` file. Other files should have prefix e.g. (`features_*.py`, `modals_*.py`, `views_*.py`)
+2. Name of the directory represents name of the cog. (if you are adding it to extension in config)
+3. All cogs must inherit from [class Base](base.py).
+4. File name is lowercase, class name is CamelCase.
+5. If there is task in cog it must be initialized in `self.tasks` list.
+6. Comment at the beginning of the file summarizing function of cog.
+7. All cogs should be included in cogs folder and added to the README with their commands.
 
 ## List of Cogs
 
-### [Absolvent](absolvent.py)
+### [Absolvent](absolvent/cog.py)
 
 Cog for diploma verification. When successful, the user is given Survivor (Bc.) or King (Ing.) role.\
 **Commands:**
 
-    - /diplom help
     - /diplom
+    - /diplom help
 ---
 
-### [AutoPin](autopin.py)
+### [AutoPin](autopin/cog.py)
 
 Cog controlling auto pinning of messages and priority pins in channels.\
 **Commands:**
@@ -34,7 +36,15 @@ Cog controlling auto pinning of messages and priority pins in channels.\
     - /pin get_all
 ---
 
-### [Bookmark](bookmark.py)
+### [Bettermeme](bettermeme/cog.py)
+
+Cog for handling memes with X number of reactions to be reposted to a specific channel.\
+**Commands:**
+
+    - /better-meme leaderboard
+---
+
+### [Bookmark](bookmark/cog.py)
 
 Cog controlling bookmarks. The bot will send copy of message to user.\
 **Commands:**
@@ -43,7 +53,7 @@ Cog controlling bookmarks. The bot will send copy of message to user.\
     - message_command "Bookmark"
 ---
 
-### [Contest](contest.py)
+### [Contest](contest/cog.py)
 
 Cog for handling vote reactions for contests.\
 **Commands:**
@@ -57,7 +67,7 @@ Cog for handling vote reactions for contests.\
 
 ---
 
-### [DynamicConfig](dynamicconfig.py)
+### [DynamicConfig](dynamicconfig/cog.py)
 
 Cog for dynamically changing config.\
 **Commands:**
@@ -71,28 +81,29 @@ Cog for dynamically changing config.\
     - /config update
 ---
 
-### [Emoji](emoji.py)
+### [Emoji](emoji/cog.py)
 
 Cog for managing server emojis. Download emojis and stickers. Get full size of emoji.\
 **Commands:**
 
-    - /get_emojis
-    - /get_emoji
+    - /emoji get_emojis
+    - /emoji get_emoji
 ---
 
-### [Error](error.py)
+### [Error](error/cog.py)
 
 Cog for handling command errors. This is mostly for logging purposes.
 Errors originating from other than commands (such as reaction handlers and listeners) are handled in rubbergod.py `on_error` function.
 
 ---
 
-### [Exams](exams.py)
+### [Exams](exams/cog.py)
 
 Cog to parse exams data from website and send it to channel.
 Available for each year of study.\
 **Commands:**
 
+    - /exams
     - /terms
     - /terms update
     - /terms remove_all
@@ -106,7 +117,7 @@ Available for each year of study.\
     - update_terms_task
 ---
 
-### [FitRoom](fitroom.py)
+### [FitRoom](fitroom/cog.py)
 
 Cog for finding rooms on FIT BUT.\
 **Commands:**
@@ -114,28 +125,29 @@ Cog for finding rooms on FIT BUT.\
     - /room
 ---
 
-### [FitWide](fitwide.py)
+### [FitWide](fitwide/cog.py)
 
 Cog implementing management of year roles and database of user logins.\
 **Commands:**
 
-    - ?role_check
+    - /role_check
     - /increment_roles
-    - ?update_db
-    - ?get_db
-    - ?get_user_login
-    - ?get_login_user
-    - ?reset_login
-    - ?connect_login_to_user
+    - /verify_db update
+    - /verify_db pull
+    - /verify_db get_login
+    - /verify_db get_user
+    - /verify_db reset_login
+    - /verify_db link_login_user
+    - /vutapi
 ---
 
-### [Forum](forum.py)
+### [Forum](forum/cog.py)
 
 Cog managing threads in forums (auto-archive, etc.).
 
 ---
 
-### [Fun](fun.py)
+### [Fun](fun/cog.py)
 
 Cog containing commands that call random APIs for fun things.\
 **Commands:**
@@ -149,7 +161,7 @@ Cog containing commands that call random APIs for fun things.\
     - /fuchs
 ---
 
-### [Gif](gif.py)
+### [Gif](gif/cog.py)
 
 Cog for creating gifs.\
 **Commands:**
@@ -159,13 +171,13 @@ Cog for creating gifs.\
     - /bonk
 ---
 
-### [GrillbotApi](grillbotapi.py)
+### [GrillbotApi](grillbotapi/cog.py)
 
 Functions and commands that communicate with the Grillbot API.
 
 ---
 
-### [Help](help.py)
+### [Help](help/cog.py)
 
 Cog containing help command. Only shows commands that user has access to
 and are context commands.\
@@ -174,7 +186,7 @@ and are context commands.\
     - ?help
 ---
 
-### [Hugs](hugs.py)
+### [Hugs](hugs/cog.py)
 
 Cog implementing hug commands. Send hug to user and see leaderboard.\
 **Commands:**
@@ -186,7 +198,7 @@ Cog implementing hug commands. Send hug to user and see leaderboard.\
     - /hug give
 ---
 
-### [Icons](icons.py)
+### [Icons](icons/cog.py)
 
 Cog implementing dynamic icon system. Users can assign themselves icons from a list of roles.\
 **Commands:**
@@ -194,7 +206,7 @@ Cog implementing dynamic icon system. Users can assign themselves icons from a l
     - /icon
 ---
 
-### [Info](info.py)
+### [Info](info/cog.py)
 
 Cog containing commands that get basic information from other sources.\
 **Commands:**
@@ -204,7 +216,7 @@ Cog containing commands that get basic information from other sources.\
     - /kreditovy_strop
 ---
 
-### [IOS](ios.py)
+### [IOS](ios/cog.py)
 
 Cog for the IOS subject. Get users on merlin/eva server which have blocking processes running.\
 **Commands:**
@@ -218,7 +230,7 @@ Cog for the IOS subject. Get users on merlin/eva server which have blocking proc
     - ios_task
 ---
 
-### [Karma](karma.py)
+### [Karma](karma/cog.py)
 
 Cog implementing karma system. Users can give each other positive/negative karma points with reactions.\
 **Commands:**
@@ -238,7 +250,7 @@ Cog implementing karma system. Users can give each other positive/negative karma
     - message_command Karma zprávy
 ---
 
-### [Latex](latex.py)
+### [Latex](latex/cog.py)
 
 Cog for interpreting latex commands as images.\
 **Commands:**
@@ -246,24 +258,15 @@ Cog for interpreting latex commands as images.\
     - ?latex
 ---
 
-### [Meme](meme.py)
+### [Meme](meme/cog.py)
 
 Cog for meme commands.\
 **Commands:**
 
     - /uhoh
-    - ???
 ---
 
-### [MemeRepost](memerepost.py)
-
-Cog for handling memes with X number of reactions to be reposted to a specific channel.\
-**Commands:**
-
-    - /better-meme leaderboard
----
-
-### [Message](message.py)
+### [Message](message/cog.py)
 
 Cog for sending and managing messages sent by bot.\
 **Commands:**
@@ -273,7 +276,7 @@ Cog for sending and managing messages sent by bot.\
     - /message edit
 ---
 
-### [Moderation](moderation.py)
+### [Moderation](moderation/cog.py)
 
 Cog implementing functions for server moderation and help functions for mods.
 Implemented logging for tagging @mods.\
@@ -283,7 +286,7 @@ Implemented logging for tagging @mods.\
     - /slowmode remove
 ---
 
-### [Nameday](nameday.py)
+### [Nameday](nameday/cog.py)
 
 Cog for sending name days and birthdays.\
 **Commands:**
@@ -295,7 +298,7 @@ Cog for sending name days and birthdays.\
     - send_names
 ---
 
-### [Poll](poll.py)
+### [Poll](poll/cog.py)
 
 Cog implementing polls.\
 **Commands:**
@@ -309,7 +312,7 @@ Cog implementing polls.\
     - dynamic generator with polls that closes them
 ---
 
-### [Random](random.py)
+### [Random](random/cog.py)
 
 Implementing commands using random module.\
 **Commands:**
@@ -319,13 +322,13 @@ Implementing commands using random module.\
     - /roll
 ---
 
-### [Reactions](reactions.py)
+### [Reactions](reactions/cog.py)
 
 Cog for handling reactions and delegating to specific cog.
 
 ---
 
-### [Report](report.py)
+### [Report](report/cog.py)
 
 Cog implementing anonymous reporting from users.
 **Commands:**
@@ -337,7 +340,7 @@ Cog implementing anonymous reporting from users.
     - message_command Report message
 ---
 
-### [Review](review.py)
+### [Review](review/cog.py)
 
 Cog implementing review system for subjects.\
 **Commands:**
@@ -345,25 +348,18 @@ Cog implementing review system for subjects.\
     - /review get
     - /review add
     - /review remove
+    - /review list
     - /subject update
     - /wtf
     - /tierboard
 ---
 
-### [Roles](roles.py)
+### [Roles](roles/cog.py)
 
 Cog implementing channels and roles management. Copying/creating channels with permissions.\
 **Commands:**
 
-    - /do_da_thing
-    - /group add
-    - /group get
-    - /group delete
-    - /group list
-    - /group add_channel_id
-    - /group add_role_id
-    - /group reset_channels
-    - /group reset_roles
+    - /add_channels_description
     - /channel copy
     - /channel clone
     - /channel create
@@ -373,7 +369,7 @@ Cog implementing channels and roles management. Copying/creating channels with p
     - /remove_exclusive_roles
 ---
 
-### [StreamLinks](streamlinks.py)
+### [StreamLinks](streamlinks/cog.py)
 
 Cog implementing streamlinks system. List streams for a subject.\
 **Commands:**
@@ -381,11 +377,11 @@ Cog implementing streamlinks system. List streams for a subject.\
     - /streamlinks get
     - /streamlinks list
     - /streamlinks_mod add
-    - /streamlinks_mod remove
     - /streamlinks_mod update
+    - /streamlinks_mod remove
 ---
 
-### [Studijni](studijni.py)
+### [Studijni](studijni/cog.py)
 
 Cog implementing information about office hours of the study department.\
 **Commands:**
@@ -393,7 +389,7 @@ Cog implementing information about office hours of the study department.\
     - /studijni
 ---
 
-### [Subscriptions](subscriptions.py)
+### [Subscriptions](subscriptions/cog.py)
 
 Cog implementing subscriptions to forum posts based on their tags. \
 **Commands:**
@@ -403,43 +399,46 @@ Cog implementing subscriptions to forum posts based on their tags. \
     - /subscriptions list
 ---
 
-### [System](system.py)
+### [System](system/cog.py)
 
 Core cog for bot. Can't be unloaded. Contains commands for cog management.\
 **Commands:**
 
     - /git pull
+    - /get_logs
+    - /shutdown
     - /cogs
     - /uptime
 ---
 
-### [Timeout](timeout.py)
+### [Timeout](timeout/cog.py)
 
 Containing timeout commands and manipulating with timeout.\
 **Commands:**
 
     - /timeout user
-    - /timeout get_user
     - /timeout remove
     - /timeout list
+    - /timeout get_user
     - /selftimeout
 **Tasks:**
 
     - refresh_timeout
 ---
 
-### [Verify](verify.py)
+### [Verify](verify/cog.py)
 
 Cog for verification system. Allows users to verify themselves with xlogin00 and gain access to server.\
 **Commands:**
 
     - /verify
     - /dynamic_verify create
+    - /dynamic_verify list
     - /dynamic_verify edit
     - user_command Verify host
 ---
 
-### [Vote](vote.py)
+### [Vote](vote/cog.py)
 
 Cog implementing vote and polls feature.\
 **Commands:**
@@ -448,7 +447,7 @@ Cog implementing vote and polls feature.\
     - ?singlevote
 ---
 
-### [Warden](warden.py)
+### [Warden](warden/cog.py)
 
 Cog for repost detection.\
 **Commands:**
@@ -458,7 +457,7 @@ Cog for repost detection.\
     - ?scan message
 ---
 
-### [Week](week.py)
+### [Week](week/cog.py)
 
 Cog containing information about week (odd/even) and its relation to calendar/academic week.
 **Commands:**
