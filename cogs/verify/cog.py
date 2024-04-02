@@ -130,7 +130,3 @@ class Verify(Base, commands.Cog):
             await member.send(response_message)
         except disnake.Forbidden:
             await inter.send(MessagesCZ.blocked_bot(user=member.id))
-
-
-def setup(bot):
-    bot.add_cog(Verify(bot))
