@@ -1,4 +1,5 @@
 from datetime import datetime, timezone
+from typing import TypeAlias
 
 import disnake
 
@@ -6,7 +7,9 @@ import utils
 
 from .views import View
 
-SLOWMODE_CHANNEL_TYPES = disnake.TextChannel | disnake.Thread | disnake.VoiceChannel | disnake.ForumChannel
+SLOWMODE_CHANNEL_TYPES: TypeAlias = (
+    disnake.TextChannel | disnake.Thread | disnake.VoiceChannel | disnake.ForumChannel
+)
 
 MODERATION_TRUE = "moderation:resolve:true"
 MODERATION_FALSE = "moderation:resolve:false"

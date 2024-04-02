@@ -83,6 +83,10 @@ class ValidPersonDB(database.base):  # type: ignore
         return f"{self.login}@{fallback_domain}"  # fallback
 
     @classmethod
+    def get_all_persons(cls) -> List[ValidPersonDB]:
+        return session.query(ValidPersonDB)
+
+    @classmethod
     def get_user_with_status(
         cls, login: str, status: int = VerifyStatus.InProcess.value
     ) -> Optional[ValidPersonDB]:
@@ -125,7 +129,7 @@ class ValidPersonDB(database.base):  # type: ignore
         )
 
     @classmethod
-    def get_all_logins(cls) -> List[str]:
+    def get_all_logins(cls) -> list[tuple[str]]:
         """Returns all logins from database"""
         return session.query(ValidPersonDB.login).all()
 
