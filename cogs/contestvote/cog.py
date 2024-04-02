@@ -44,9 +44,7 @@ class ContestVote(Base, commands.Cog):
     def contest_vote_channel(self) -> disnake.TextChannel:
         return self.bot.get_channel(self.config.contest_vote_channel)
 
-    @commands.slash_command(
-        name="contest",
-    )
+    @commands.slash_command(name="contest")
     async def contest(self, inter: disnake.ApplicationCommandInteraction):
         pass
 
@@ -175,7 +173,7 @@ class ContestVote(Base, commands.Cog):
     async def end_contest(self, inter: disnake.ApplicationCommandInteraction):
         await inter.send(MessagesCZ.vote_ending)
         messages = await self.contest_vote_channel.history().flatten()
-        contributions = await features.get_top_contributions(self.emojis, messages)
+        contributions = await features.get_top_contributions(self.emojis, messages, 5)
         await self.contest_vote_channel.send(f"# Top 5 příspěvků\n{''.join(contributions)}")
 
         message = await inter.original_message()
