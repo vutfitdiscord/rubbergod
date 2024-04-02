@@ -9,7 +9,7 @@ from sqlalchemy.sql.expression import or_
 from database import database, session
 
 
-class VoteDB(database.base):
+class VoteDB(database.base):  # type: ignore
     __tablename__ = "bot_votes"
 
     message_id = Column(BigInteger, primary_key=True)

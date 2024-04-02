@@ -7,7 +7,7 @@ from sqlalchemy import Column, Integer, String
 from database import database, session
 
 
-class SubscriptionDB(database.base):
+class SubscriptionDB(database.base):  # type: ignore
     __tablename__ = "subscription"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
@@ -52,7 +52,7 @@ class SubscriptionDB(database.base):
         session.commit()
 
 
-class AlreadyNotifiedDB(database.base):
+class AlreadyNotifiedDB(database.base):  # type: ignore
     __tablename__ = "subscription_notified"
 
     id = Column(Integer, primary_key=True, autoincrement=True)

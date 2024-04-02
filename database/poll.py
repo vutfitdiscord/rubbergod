@@ -11,7 +11,7 @@ from sqlalchemy.sql.expression import or_
 from database import database, session
 
 
-class VoterDB(database.base):
+class VoterDB(database.base):  # type: ignore
     __tablename__ = "voter"
 
     id = Column(String, primary_key=True)
@@ -38,7 +38,7 @@ class PollType(IntEnum):
     opinion = 3  # Opinion is agree/neutral/disagree poll where you can only vote for one option
 
 
-class PollDB(database.base):
+class PollDB(database.base):  # type: ignore
     __tablename__ = "poll"
 
     id = Column(Integer, primary_key=True)
@@ -100,14 +100,14 @@ class PollDB(database.base):
         return session.query(cls).filter(or_(cls.end is None, cls.end > datetime.now(timezone.utc)))
 
     @classmethod
-    def get_pending_polls_by_type(cls, type: PollType) -> list[PollDB]:
-        return cls.get_pending_polls().filter(cls.poll_type == type).all()
+    def get_pending_polls_by_type(cls, type: int) -> list[PollDB]:
+        return cls.get_pending_polls().filter(cls.poll_type == type).all()  # type: ignore
 
     @classmethod
     def get_author_id(cls, poll_id: int) -> str | None:
         poll = cls.get(poll_id)
         if not poll:
-            return
+            return None
         return poll.author_id
 
     def remove_voter(self, voter: VoterDB) -> None:
@@ -168,7 +168,7 @@ class PollDB(database.base):
         return winning_options
 
 
-class PollOptionDB(database.base):
+class PollOptionDB(database.base):  # type: ignore
     __tablename__ = "poll_option"
 
     id = Column(Integer, primary_key=True)
@@ -201,7 +201,7 @@ class PollOptionDB(database.base):
 
     def remove_voter(self, voter: VoterDB | str) -> None:
         if isinstance(voter, str):
-            voter = VoterDB.get(voter, self.id)
+            voter = VoterDB.get(voter, self.id) or ""
 
         if voter:
             session.delete(voter)

@@ -5,7 +5,7 @@ from sqlalchemy import Column, Integer, String
 from database import database, session
 
 
-class BetterMemeDB(database.base):
+class BetterMemeDB(database.base):  # type: ignore
     __tablename__ = "bot_better_meme"
 
     member_ID = Column(String, primary_key=True)

@@ -21,7 +21,7 @@ from permissions import permission_check, room_check
 from . import features
 from .messages_cz import MessagesCZ
 
-user_logins = []
+user_logins: list[str] = []
 
 
 async def autocomp_user_logins(inter: disnake.ApplicationCommandInteraction, user_input: str):
@@ -91,7 +91,7 @@ class FitWide(Base, commands.Cog):
 
         year_roles = {year: disnake.utils.get(guild.roles, name=year) for year in years}
 
-        weird_members = {
+        weird_members: dict[disnake.Role, dict[disnake.Role, list[disnake.Member]]] = {
             year_y: {year_x: [] for year_x in year_roles.values()} for year_y in year_roles.values()
         }
 
@@ -125,7 +125,7 @@ class FitWide(Base, commands.Cog):
                 correct_role = disnake.utils.get(guild.roles, name=year)
 
                 if correct_role not in member.roles:
-                    for role_name, role in year_roles.items():
+                    for role in year_roles.values():
                         if role in member.roles and correct_role in weird_members[role].keys():
                             weird_members[role][correct_role].append(member)
                             break
@@ -336,11 +336,11 @@ class FitWide(Base, commands.Cog):
         old_logins = [value for (value,) in login_results]
 
         for line in data:
-            line = line.split(":")
-            login = line[0]
-            name = line[4].split(",", 1)[0]
+            line_split = line.split(":")
+            login = line_split[0]
+            name = line_split[4].split(",", 1)[0]
             try:
-                year_fields = line[4].split(",")[1].split(" ")
+                year_fields = line_split[4].split(",")[1].split(" ")
                 year = " ".join(year_fields if "mail=" not in year_fields[-1] else year_fields[:-1])
                 mail = year_fields[-1].replace("mail=", "") if "mail=" in year_fields[-1] else None
             except IndexError:
@@ -364,7 +364,8 @@ class FitWide(Base, commands.Cog):
             session.merge(person)
 
         cnt_new = 0
-        for person in session.query(ValidPersonDB):
+        all_persons = ValidPersonDB.get_all_persons()
+        for person in all_persons:
             if person.login not in found_logins:
                 try:
                     # check for muni

@@ -13,7 +13,7 @@ Member = Union[disnake.Member, disnake.User]
 UserHugStats = namedtuple("UserHugStats", ("given", "received"))
 
 
-class HugsTableDB(database.base):
+class HugsTableDB(database.base):  # type: ignore
     __tablename__ = "bot_hugs"
 
     member_id = Column(BIGINT, primary_key=True, nullable=False, unique=True, autoincrement=False)
