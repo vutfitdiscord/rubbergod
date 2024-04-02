@@ -94,7 +94,7 @@ class Help(Base, commands.Cog):
             value += item["description"] if item["description"] else ""
             embed.add_field(name=name, value=value if value else None, inline=False)
 
-    async def api(self, message: commands.Context, params: list):
+    async def api(self, message: commands.Context, params: dict[str, str]):
         """Sending commands help to grillbot"""
         mock_message = copy.copy(message)
         mock_view = commands.view.StringView("")
@@ -132,9 +132,9 @@ class Help(Base, commands.Cog):
 
     @cooldowns.default_cooldown
     @commands.command(aliases=["god"], brief=MessagesCZ.title)
-    async def help(self, ctx: commands.Context, *command):
+    async def help(self, ctx: commands.Context, *command_list: str):
         # Subcommand help
-        command = " ".join(command)
+        command = " ".join(command_list)
         if command:
             command_obj = self.bot.get_command(command)
             if not command_obj:

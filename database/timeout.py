@@ -10,7 +10,7 @@ import utils
 from database import database, session
 
 
-class TimeoutDB(database.base):
+class TimeoutDB(database.base):  # type: ignore
     __tablename__ = "timeout"
 
     id = Column(BigInteger, primary_key=True)
@@ -108,7 +108,7 @@ class TimeoutDB(database.base):
         session.commit()
 
 
-class TimeoutUserDB(database.base):
+class TimeoutUserDB(database.base):  # type: ignore
     __tablename__ = "timeout_user"
 
     id = Column(String, primary_key=True)

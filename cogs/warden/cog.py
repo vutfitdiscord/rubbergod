@@ -106,9 +106,7 @@ class Warden(Base, commands.Cog):
         limit: [all | <int>]
         """
         # parse parameter
-        if limit == "all":
-            limit = None
-        else:
+        if limit != "all":
             try:
                 limit = int(limit)
                 if limit < 1:
@@ -116,7 +114,7 @@ class Warden(Base, commands.Cog):
             except ValueError:
                 raise commands.BadArgument("Expected 'all' or positive integer")
 
-        messages = await ctx.channel.history(limit=limit).flatten()
+        messages = await ctx.channel.history(limit=limit if limit != "all" else None).flatten()
 
         title = "**INITIATING...**\n\nLoaded {} messages"
         await asyncio.sleep(0.5)
@@ -178,13 +176,14 @@ class Warden(Base, commands.Cog):
                     duplicate = post
                     hamming_min = hamming
 
-            duplicates[duplicate] = hamming_min
+            if duplicate is not None:
+                duplicates[duplicate] = hamming_min
 
         for duplicate, hamming_min in duplicates.items():
             if hamming_min <= self.limit_soft:
                 await self._announceDuplicate(message, duplicate, hamming_min)
 
-    async def _announceDuplicate(self, message: disnake.Message, original: object, hamming: int):
+    async def _announceDuplicate(self, message: disnake.Message, original: ImageDB, hamming: int):
         """Send message that a post is a original
         original: object
         hamming: Hamming distance between the image and closest database entry

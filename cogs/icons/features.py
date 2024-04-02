@@ -63,7 +63,7 @@ async def do_set_icon(icon: disnake.Role, user: disnake.Member) -> None:
         await user.add_roles(icon)
 
 
-async def icon_autocomp(inter: disnake.ApplicationCommandInteraction, partial: str) -> str:
+async def icon_autocomp(inter: disnake.ApplicationCommandInteraction, partial: str) -> list[str]:
     icon_roles = get_icon_roles(inter.guild)
     names = (icon_name(role) for role in icon_roles)
     return [name for name in names if partial.casefold() in name.casefold()]

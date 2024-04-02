@@ -2,8 +2,6 @@
 Cog implementing anonymous reporting from users.
 """
 
-from typing import Optional
-
 import disnake
 from disnake.ext import commands
 
@@ -22,13 +20,13 @@ class Report(Base, commands.Cog):
         super().__init__()
         self.bot = bot
 
-    async def check_blocked_bot(self, inter: disnake.Interaction) -> Optional[disnake.Message]:
+    async def check_blocked_bot(self, inter: disnake.Interaction) -> disnake.Message | None:
         try:
             dm_message = await inter.author.send(MessagesCZ.check_dm, view=TrashView())
             return dm_message
         except disnake.Forbidden:
             await inter.send(MessagesCZ.blocked_bot(user=inter.author.id), ephemeral=True)
-            return
+            return None
 
     @cooldowns.default_cooldown
     @commands.message_command(name="Report message", guild_ids=[Base.config.guild_id])

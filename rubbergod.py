@@ -11,8 +11,8 @@ from cogs.poll.views import PollBasicView, PollBooleanView, PollCloseView, PollO
 from cogs.report.views import ReportAnonymView, ReportAnswerOnlyView, ReportGeneralView, ReportMessageView
 from config.app_config import config
 from config.messages import Messages
-from features import presence
 from features.error import ErrorLogger
+from features.presence import Presence
 
 logger = logging.getLogger("disnake")
 logger.setLevel(logging.WARNING)
@@ -64,12 +64,12 @@ bot = commands.Bot(
     command_sync_flags=command_sync_flags,
 )
 
-presence = presence.Presence(bot)
+presence = Presence(bot)
 err_logger = ErrorLogger(bot)
 
 
 @bot.event
-async def on_ready():
+async def on_ready() -> None:
     """If RubberGod is ready"""
     # Inspired from https://github.com/sinus-x/rubbergoddess/blob/master/rubbergoddess.py
     global is_initialized

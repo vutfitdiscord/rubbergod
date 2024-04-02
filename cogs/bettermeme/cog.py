@@ -185,12 +185,12 @@ class BetterMeme(Base, commands.Cog):
 
                 if len(other_attachments) > 0:
                     # Files are getting send as files
-                    files = [file for file in other_attachments if isinstance(file, disnake.File)]
-                    files = files[:10] if files else None
+                    files_list = [file for file in other_attachments if isinstance(file, disnake.File)]
+                    files = files_list[:10] if files_list else None
 
                     # And urls as string in separated message
-                    urls = [file for file in other_attachments if isinstance(file, str)]
-                    urls = "\n".join(urls) if urls else None
+                    urls_list = [file for file in other_attachments if isinstance(file, str)]
+                    urls = "\n".join(urls_list) if urls_list else None
 
                     secondary_message = await self.repost_channel.send(urls, files=files)
                     secondary_message_id = secondary_message.id

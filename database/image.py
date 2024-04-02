@@ -2,7 +2,6 @@
 from __future__ import annotations
 
 from datetime import datetime
-from typing import List
 
 from sqlalchemy import BigInteger, Column, DateTime, String
 from sqlalchemy.orm import Query
@@ -10,7 +9,7 @@ from sqlalchemy.orm import Query
 from database import database, session
 
 
-class ImageDB(database.base):
+class ImageDB(database.base):  # type: ignore
     __tablename__ = "images"
 
     attachment_id = Column(BigInteger, primary_key=True)
@@ -39,7 +38,7 @@ class ImageDB(database.base):
         session.commit()
 
     @classmethod
-    def getHash(cls, dhash: str) -> List[ImageDB]:
+    def getHash(cls, dhash: str) -> list[ImageDB]:
         return session.query(cls).filter(cls.dhash == dhash).all()
 
     @classmethod
@@ -47,7 +46,7 @@ class ImageDB(database.base):
         return session.query(cls).filter(cls.message_id == message_id).one_or_none()
 
     @classmethod
-    def getAll(cls) -> Query:
+    def getAll(cls) -> list[ImageDB]:
         return session.query(cls)
 
     @classmethod
