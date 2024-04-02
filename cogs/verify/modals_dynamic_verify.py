@@ -12,16 +12,16 @@ class DynamicVerifyEditModal(disnake.ui.Modal):
     def __init__(self, guild: disnake.Guild, rule: Union[DynamicVerifyDB, None] = None):
         self.rule = rule
 
-        selected_roles = rule.get_role_ids() if self.is_edit() else []
+        selected_roles = rule.get_role_ids() if rule is not None else []
         guild_roles = list(filter(lambda x: x.name != "@everyone" and x.is_assignable(), guild.roles))
 
-        selected_roles_data = list(
+        selected_roles_data_none: list[DynamicVerifyDB | None] = list(
             map(
                 lambda x: next((role for role in guild_roles if x == role.id), None),
                 selected_roles,
             )
         )
-        selected_roles_data = list(filter(lambda x: x is not None, selected_roles_data))
+        selected_roles_data: list[DynamicVerifyDB] = [x for x in selected_roles_data_none if x is not None]
 
         # TODO: Prepared for modal select menus.
         # guild_role_groups = utils.split_to_parts(guild_roles, 25)
@@ -33,7 +33,7 @@ class DynamicVerifyEditModal(disnake.ui.Modal):
                 custom_id="id",
                 style=disnake.TextInputStyle.short,
                 required=True,
-                value=rule.id if self.is_edit() else None,
+                value=rule.id if rule is not None else None,
                 min_length=2,
             ),
             disnake.ui.TextInput(
@@ -42,7 +42,7 @@ class DynamicVerifyEditModal(disnake.ui.Modal):
                 custom_id="name",
                 style=disnake.TextInputStyle.short,
                 required=True,
-                value=rule.name if self.is_edit() else None,
+                value=rule.name if rule is not None else None,
                 min_length=5,
             ),
             # TODO: Prepared for modal select menus.
@@ -62,7 +62,7 @@ class DynamicVerifyEditModal(disnake.ui.Modal):
                 min_length=4,
                 max_length=5,
                 required=True,
-                value=str(rule.enabled) if self.is_edit() else str(True),
+                value=str(rule.enabled) if rule is not None else str(True),
             ),
             # TODO: switch to select when supported
             disnake.ui.TextInput(
@@ -73,7 +73,7 @@ class DynamicVerifyEditModal(disnake.ui.Modal):
                 min_length=4,
                 max_length=5,
                 required=True,
-                value=str(rule.mod_check) if self.is_edit() else str(True),
+                value=str(rule.mod_check) if rule is not None else str(True),
             ),
             disnake.ui.TextInput(
                 label="Role (zadávej názvy, nebo ID; odděluj čárkou)",
@@ -112,7 +112,7 @@ class DynamicVerifyEditModal(disnake.ui.Modal):
 
         super().__init__(
             title="Modifikace verifikačního pravidla"
-            if self.is_edit()
+            if self.rule is not None
             else "Vytvoření verifikačního pravidla",
             custom_id="dynamic_verify_edit",
             timeout=300,
@@ -132,7 +132,7 @@ class DynamicVerifyEditModal(disnake.ui.Modal):
         if rule_id is None or enabled is None or roles is None:
             return  # Validation failed.
 
-        rule = self.rule if self.is_edit() else DynamicVerifyDB()
+        rule = self.rule if self.rule is not None else DynamicVerifyDB()
 
         rule.id = rule_id
         rule.name = name
@@ -158,7 +158,7 @@ class DynamicVerifyEditModal(disnake.ui.Modal):
 
         rule = manager.get_rule(rule_id)
         if rule is not None:
-            if self.is_edit() and self.rule.id == rule_id:
+            if self.rule is not None and self.rule.id == rule_id:
                 return rule_id  # Same rule ID in edit mode is valid.
             await inter.response.send_message(MessagesCZ.dynamic_verify_rule_exists)
             return None
