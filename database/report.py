@@ -35,8 +35,10 @@ class ReportDB(database.base):  # type: ignore
             return self.reason
 
     @classmethod
-    def is_resolved(cls, report_id: int) -> bool:
+    def is_resolved(cls, report_id: int) -> bool | None:
         report = cls.get_report(report_id)
+        if not report:
+            return None
         return report.resolved
 
     @classmethod

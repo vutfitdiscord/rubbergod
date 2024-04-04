@@ -86,16 +86,16 @@ async def timeout_embed_listing(
 async def timeout_perms(
     inter: disnake.ApplicationCommandInteraction,
     member: disnake.Member,
-    starttime: datetime,
-    endtime: datetime,
-    length: timedelta,
+    starttime: datetime | None,
+    endtime: datetime | None,
+    length: timedelta | None,
     reason: str,
     isself: bool = False,
     remove_logs: bool = False,
 ) -> bool:
     """Set timeout for member and update in db. Return True if successful, False otherwise."""
     try:
-        if endtime is None:
+        if endtime is None or length is None or starttime is None:
             await member.timeout(until=None, reason=reason)
             TimeoutDB.remove_timeout(member.id, remove_logs)
         elif length.days > 28:
@@ -164,12 +164,16 @@ async def get_user_from_grillbot(owner_id: str, guild_id: str, user_id: str) -> 
                 user = await resp.json()
                 return user.get("unverifyCount", "Missing"), user.get("warningCount", "Missing")
         except (asyncio.exceptions.TimeoutError, aiohttp.client_exceptions.ClientConnectorError) as e:
-            raise ApiError(e)
+            raise ApiError(str(e))
 
 
 async def time_check(
-    inter: disnake.ApplicationCommandInteraction, endtime: datetime, length: timedelta
+    inter: disnake.ApplicationCommandInteraction, endtime: datetime | None, length: timedelta
 ) -> bool:
+    if not endtime:
+        await inter.send(MessagesCZ.invalid_time_format, ephemeral=True)
+        return True
+
     if endtime < inter.created_at:
         await inter.send(MessagesCZ.past_time, ephemeral=True)
         return True
