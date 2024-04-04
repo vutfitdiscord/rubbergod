@@ -129,7 +129,7 @@ class SubjectDB(database.base):  # type: ignore
         return subjects
 
     @classmethod
-    def get_all(cls) -> List[SubjectDB]:
+    def get_all(cls) -> list[tuple[str]]:
         return session.query(cls.shortcut).all()
 
     @classmethod
