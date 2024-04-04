@@ -70,14 +70,14 @@ class Timeout(Base, commands.Cog):
         if parsed_members is None:
             return
 
-        endtime: datetime = utils.parse_time(endtime, MessagesCZ.time_format)
-        # convert to local time
-        endtime_local = endtime.astimezone(tz=utils.get_local_zone())
-        starttime_local = inter.created_at.astimezone(tz=utils.get_local_zone())
-        length = endtime - inter.created_at
-
-        if await features.time_check(inter, endtime, length):
+        endtime_datetime = utils.parse_time(endtime, MessagesCZ.time_format)
+        length = endtime_datetime - inter.created_at
+        if await features.time_check(inter, endtime_datetime, length):
             return
+
+        # convert to local time
+        endtime_local = endtime_datetime.astimezone(tz=utils.get_local_zone())  # type: ignore
+        starttime_local = inter.created_at.astimezone(tz=utils.get_local_zone())
 
         await inter.response.defer()
         embed = features.create_embed(inter.author, "Timeout")
@@ -85,7 +85,9 @@ class Timeout(Base, commands.Cog):
         timeoutMembers = []
 
         for member in parsed_members:
-            isSuccess = await features.timeout_perms(inter, member, inter.created_at, endtime, length, reason)
+            isSuccess = await features.timeout_perms(
+                inter, member, inter.created_at, endtime_datetime, length, reason
+            )
             if isSuccess:
                 timeoutMembers.append(member)
             else:
@@ -266,11 +268,11 @@ class Timeout(Base, commands.Cog):
         Guild_ids is used to prevent users from bypassing timeout
         given by moderator and using selftimeout in DMs.
         """
-        endtime = utils.parse_time(endtime, MessagesCZ.time_format)
+        endtime_datetime = utils.parse_time(endtime, MessagesCZ.time_format)
         starttime_local = inter.created_at.astimezone(tz=utils.get_local_zone())
-        length = endtime - inter.created_at
+        length = endtime_datetime - inter.created_at
 
-        if await features.time_check(inter, endtime, length):
+        if await features.time_check(inter, endtime_datetime, length):
             return
 
         await inter.response.defer()
@@ -278,7 +280,7 @@ class Timeout(Base, commands.Cog):
             inter=inter,
             member=inter.user,
             starttime=starttime_local,
-            endtime=endtime,
+            endtime=endtime_datetime,
             length=length,
             reason=MessagesCZ.self_timeout_reason,
             isself=True,
@@ -333,7 +335,7 @@ class Timeout(Base, commands.Cog):
             rule = await execution.guild.fetch_automod_rule(execution.rule_id)
             length = timedelta(seconds=execution.action.duration)
             now = datetime.now(timezone.utc)
-            TimeoutDB.add_timeout(execution.user_id, 1, now, now + length, rule.name, execution.guild.id)
+            TimeoutDB.add_timeout(execution.user_id, "1", now, now + length, rule.name, execution.guild.id)
             # automod actions are sent to submod_helper_room automatically
 
     @commands.Cog.listener()
