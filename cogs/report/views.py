@@ -1,5 +1,4 @@
 from functools import cached_property
-from typing import Tuple
 
 import disnake
 from disnake.ext import commands
@@ -10,6 +9,7 @@ from database.report import AnswerDB, ReportDB
 from permissions import permission_check
 
 from . import features as report_features
+from .features_errors import ButtonInteractionError
 from .messages_cz import MessagesCZ
 
 
@@ -24,9 +24,12 @@ class View(BaseView):
     async def interaction_check(self, inter: disnake.Interaction) -> bool:
         return permission_check.submod_plus(inter, raise_exception=False)
 
-    async def set_view_resolved(self, embed: dict, author_id: int, report_id: int) -> disnake.Embed:
+    async def set_view_resolved(self, embed: dict, author_id: str, report_id: int) -> disnake.Embed | None:
         """set the report as resolved or not resolved"""
         report = ReportDB.get_report(report_id)
+
+        if not report:
+            return None
 
         if report.resolved:
             embed = await report_features.embed_resolved(self.children, "Anonym", embed, report.type, False)
@@ -36,16 +39,15 @@ class View(BaseView):
             report.set_resolved(report_id, author_id, True)
         return embed
 
-    async def get_report_author(self, inter: disnake.MessageInteraction) -> disnake.User:
+    async def get_report_author(self, report_id: int) -> disnake.User:
         """get the report author object from the report id"""
-        report_id = report_features.extract_report_id(inter)
         report_author_id = ReportDB.get_report_author(report_id)
         report_author = await self.bot.get_or_fetch_user(report_author_id)
         return report_author
 
     async def set_spam(
         self, button: disnake.ui.Button, inter: disnake.MessageInteraction, report: ReportDB
-    ) -> Tuple[str, disnake.Embed]:
+    ) -> tuple[str, disnake.Embed]:
         """Set the report as spam, change buttons and tag thread as spam"""
         resolved_author = f"{inter.author.mention} `@{inter.author.name}`"
         embed = inter.message.embeds[0].to_dict()
@@ -86,11 +88,14 @@ class View(BaseView):
     )
     async def resolve(self, button: disnake.ui.Button, inter: disnake.MessageInteraction) -> None:
         await inter.response.defer()
-        report_author = await self.get_report_author(inter)
         report_id = report_features.extract_report_id(inter)
+        report_author = await self.get_report_author(report_id)
         report = ReportDB.get_report(report_id)
         embed = inter.message.embeds[0].to_dict()
         resolved_by = f"{inter.author.mention} `@{inter.author.name}`"
+
+        if not report:
+            raise ButtonInteractionError(inter.author.mention, MessagesCZ.report_not_found)
 
         if report.resolved:
             embed = await report_features.embed_resolved(
@@ -129,7 +134,11 @@ class View(BaseView):
         await inter.response.defer()
         report_id = report_features.extract_report_id(inter)
         report = ReportDB.get_report(report_id)
-        report_author = await self.get_report_author(inter)
+
+        if not report:
+            raise ButtonInteractionError(inter.author.mention, MessagesCZ.report_not_found)
+
+        report_author = await self.get_report_author(report_id)
         report_message = await report_features.convert_url(inter, report.report_url)
         description, embed = await self.set_spam(button, inter, report)
         title = MessagesCZ.message_spam_title(id=report_id)
@@ -138,6 +147,12 @@ class View(BaseView):
         await report_author.send(embed=spam_embed)
         await report_message.channel.send(embed=spam_embed, allowed_mentions=disnake.AllowedMentions.none())
         await inter.edit_original_response(embed=embed, view=self)
+
+    async def on_error(self, error, item: disnake.ui.Item, interaction: disnake.MessageInteraction):
+        if isinstance(error, ButtonInteractionError):
+            await interaction.send(error.message, ephemeral=error.ephemeral)
+            # major error occurred, pass to global handler
+        await super().on_error(error, item, interaction)
 
 
 class ReportGeneralView(View):
@@ -160,10 +175,13 @@ class ReportMessageView(View):
         button.disabled = True
         report_id = report_features.extract_report_id(inter)
         report = ReportDB.get_report(report_id)
-        message_url = ReportDB.get_report(report_id).message_url
-        message = await report_features.convert_url(inter, message_url)
+
+        if not report:
+            raise ButtonInteractionError(inter.author.mention, MessagesCZ.report_not_found)
+
+        message = await report_features.convert_url(inter, report.message_url)
         report_message = await report_features.convert_url(inter, report.report_url)
-        report_author = await self.get_report_author(inter)
+        report_author = await self.get_report_author(report_id)
 
         if message is None:
             button.label = "Message not found"
@@ -209,6 +227,10 @@ class ReportAnonymView(BaseView):
         await inter.response.defer()
         report_id = report_features.extract_report_id(inter)
         report = ReportDB.get_report(report_id)
+
+        if not report:
+            raise ButtonInteractionError(inter.author.mention, MessagesCZ.report_not_found, ephemeral=True)
+
         report_message = await report_features.convert_url(inter, report.report_url)
         embed = report_message.embeds[0].to_dict()
 
@@ -279,9 +301,12 @@ class ReportAnswerModal(disnake.ui.Modal):
     async def callback(self, inter: disnake.ModalInteraction) -> None:
         # respond to interaction to prevent timeout
         await inter.send(MessagesCZ.answer_success, ephemeral=True)
-
         answer = inter.text_values["answer"]
         report = ReportDB.get_report(self.report_id)
+
+        if not report:
+            raise ButtonInteractionError(inter.author.mention, MessagesCZ.report_not_found, ephemeral=True)
+
         report_author = await self.bot.get_or_fetch_user(report.author_id)
         report_message = await report_features.convert_url(inter, report.report_url)
         embed = report_features.answer_embed(self.title, inter, report, answer)

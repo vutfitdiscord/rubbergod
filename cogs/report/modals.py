@@ -103,6 +103,11 @@ class Modal(disnake.ui.Modal):
     async def report_message(self, inter: disnake.ModalInteraction) -> None:
         """add message report to db and send it to the report room"""
         await inter.send(MessagesCZ.modal_success, ephemeral=True)
+
+        if not self.message:
+            await inter.send(MessagesCZ.message_not_found, ephemeral=True)
+            return
+
         report_reason = MessagesCZ.message_embed(
             content=self.message.content, reason=inter.text_values["reason"]
         )
@@ -136,7 +141,7 @@ class Modal(disnake.ui.Modal):
             ]
         if any(inner_list for inner_list in [images, files, attachments_too_big]):
             # if there are any attachments combine them
-            files = images + files if files + images else None
+            files = images + files if files + images else []
             content = ""
 
             if attachments_too_big:

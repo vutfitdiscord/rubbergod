@@ -28,4 +28,6 @@ class MessagesCZ(GlobalMessages):
     report_already_solved = "Report #{id} už byl uzavřen. V případě potřeby otevři další report"
     report_unresolved = "### Report #{id}, byl znovu otevřen uživatelem {author} `@{author_name}`"
     check_dm = "Odesílám report ..."
-    files_too_big = "Soubory přesahující upload limit:\n- {files}"
+    report_not_found = "Report nebyl nalezen"
+    report_id_missing = "Chybí ID reportu v embedu"
+    missing_embed = "Ve zprávě chybí embed"
