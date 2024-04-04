@@ -33,7 +33,7 @@ def get_all_cogs() -> list[tuple[str, str]]:
     return sorted(all_cogs)
 
 
-async def split_cogs() -> list[tuple[str, str]]:
+async def split_cogs() -> list[list[tuple[str, str]]]:
     """Slices list of all cogs to chunks for select.
 
     Returns:

@@ -9,12 +9,12 @@ from .messages_cz import MessagesCZ
 
 
 class View(BaseView):
-    def __init__(self, bot: commands.Bot, cogs: list[str]):
+    def __init__(self, bot: commands.Bot, cogs: list[list[tuple[str, str]]]):
         super().__init__()
         self.bot = bot
         self.count = len(cogs)
         self.cogs = cogs
-        self.message = None
+        self.message: disnake.Message
         self.selects = []
 
         for i in range(self.count):
@@ -36,7 +36,10 @@ class View(BaseView):
         await inter.response.edit_message(view=self)
 
     async def on_timeout(self) -> None:
-        await self.message.edit(view=None)
+        try:
+            await self.message.edit(view=None)
+        except Exception:
+            pass
 
     async def interaction_check(self, inter: disnake.Interaction) -> bool:
         if permission_check.is_bot_admin(inter):
@@ -45,12 +48,12 @@ class View(BaseView):
 
 
 class Dropdown(disnake.ui.Select):
-    def __init__(self, bot: commands.Bot, view: View, cogs: list[str]):
+    def __init__(self, bot: commands.Bot, view: View, cogs: list[tuple[str, str]]):
         self.bot = bot
         self._view = view
-        self.cogs = cogs
+        self.cogs: list[tuple[str, str]] = cogs
         self.reload = False
-        self.message = None
+        self.message: disnake.Message
         self.unloadable_cogs = ["system"]
 
         super().__init__(
