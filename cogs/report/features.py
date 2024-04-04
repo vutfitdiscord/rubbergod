@@ -1,6 +1,5 @@
 import re
 from datetime import datetime, timezone
-from typing import Optional
 
 import disnake
 from disnake.ext import commands
@@ -8,23 +7,27 @@ from disnake.ext import commands
 import utils
 from database.report import ReportDB
 
+from .features_errors import ButtonInteractionError
 from .messages_cz import MessagesCZ
 
 
 def extract_report_id(inter: disnake.MessageInteraction) -> int:
     """extracts the report id from the footer of the report embed"""
-    report_id = re.match(r".+ \| ID: (\d+).*", inter.message.embeds[0].footer.text).group(1)
-    return int(report_id)
+    if not inter.message.embeds:
+        raise ButtonInteractionError(inter.author.mention, MessagesCZ.missing_embed)
+
+    report_id = re.match(r".+ \| ID: (\d+).*", inter.message.embeds[0].footer.text)
+    if not report_id:
+        raise ButtonInteractionError(inter.author.mention, MessagesCZ.report_id_missing)
+    return int(report_id.group(1))
 
 
-async def convert_url(
-    inter: disnake.ApplicationCommandInteraction, message_url: str
-) -> Optional[disnake.Message]:
+async def convert_url(inter: disnake.ApplicationCommandInteraction, message_url: str) -> disnake.Message:
     """converts a message url to a message object"""
     try:
         message: disnake.Message = await commands.MessageConverter().convert(inter, message_url)
     except commands.MessageNotFound:
-        message = None
+        raise ButtonInteractionError(inter.author.mention, MessagesCZ.report_not_found)
     return message
 
 

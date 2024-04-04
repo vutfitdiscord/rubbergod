@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from datetime import datetime
-from typing import List, Optional
 
 from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -22,7 +21,7 @@ class ReportDB(database.base):  # type: ignore
     message_url = Column(String, default="", nullable=False)
     report_url = Column(String, default="", nullable=False)
     reason = Column(String, nullable=False)
-    answers: Mapped[List[AnswerDB]] = relationship(back_populates="report")
+    answers: Mapped[list[AnswerDB]] = relationship(back_populates="report")
     resolved = Column(Boolean, default=False, nullable=False)
     fake_report = Column(Boolean, default=False, nullable=False)
 
@@ -42,11 +41,11 @@ class ReportDB(database.base):  # type: ignore
         return report.resolved
 
     @classmethod
-    def get_report(cls, report_id: int) -> Optional[ReportDB]:
+    def get_report(cls, report_id: int) -> ReportDB | None:
         return session.query(cls).filter_by(id=int(report_id)).first()
 
     @classmethod
-    def get_report_author(cls, report_id: int) -> Optional[UserDB]:
+    def get_report_author(cls, report_id: int) -> UserDB | None:
         report = cls.get_report(report_id)
         return report.author_id if report else None
 
@@ -120,15 +119,15 @@ class UserDB(database.base):  # type: ignore
     __tablename__ = "report_user"
 
     id = Column(String, primary_key=True, nullable=False, unique=True)
-    reports: Mapped[List[ReportDB]] = relationship(back_populates="author")
+    reports: Mapped[list[ReportDB]] = relationship(back_populates="author")
     banned = Column(Boolean, default=False, nullable=False)
 
     @classmethod
-    def get_user(cls, user_id: str) -> Optional[UserDB]:
+    def get_user(cls, user_id: str) -> UserDB | None:
         return session.query(cls).filter_by(id=str(user_id)).first()
 
     @classmethod
-    def get_fake_reports(cls, user_id: str) -> Optional[List[ReportDB]]:
+    def get_fake_reports(cls, user_id: str) -> list[ReportDB] | None:
         return session.query(ReportDB).filter_by(author_id=str(user_id), fake_report=True)
 
     @classmethod
@@ -184,7 +183,7 @@ class AnswerDB(database.base):  # type: ignore
     content = Column(String, default="", nullable=False)
 
     @classmethod
-    def get_answer(cls, answer_id: int) -> Optional[AnswerDB]:
+    def get_answer(cls, answer_id: int) -> AnswerDB | None:
         return session.query(cls).filter_by(id=int(answer_id)).first()
 
     @classmethod
