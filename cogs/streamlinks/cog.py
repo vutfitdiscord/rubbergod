@@ -4,14 +4,13 @@ Cog implementing streamlinks system. List streams for a subject.
 
 import re
 from datetime import datetime, timezone
-from typing import List, Union
 
 import disnake
 import requests
 from bs4 import BeautifulSoup
 from disnake.ext import commands
 from requests.adapters import HTTPAdapter
-from requests.packages.urllib3.util.retry import Retry
+from requests.packages.urllib3.util.retry import Retry  # type: ignore
 
 import utils
 from buttons.embed import EmbedView
@@ -28,8 +27,8 @@ from .messages_cz import MessagesCZ
 # Pattern: "AnyText | [Subject] Page: CurrentPage / {TotalPages}"
 pagination_regex = re.compile(r"^\[([^\]]*)\]\s*Page:\s*(\d*)\s*\/\s*(\d*)")
 
-subjects = []
-subjects_with_stream = []
+subjects: list[tuple[str]] = []
+subjects_with_stream: list[tuple[str]] = []
 
 
 async def autocomp_subjects(inter: disnake.ApplicationCommandInteraction, user_input: str):
@@ -87,7 +86,7 @@ class StreamLinks(Base, commands.Cog):
         inter: disnake.ApplicationCommandInteraction,
         subject: str = commands.Param(autocomplete=autocomp_subjects_with_stream),
     ):
-        streamlinks: List[StreamLinkDB] = StreamLinkDB.get_streamlinks_of_subject(subject.lower())
+        streamlinks: list[StreamLinkDB] = StreamLinkDB.get_streamlinks_of_subject(subject.lower())
 
         if len(streamlinks) == 0:
             await inter.send(content=MessagesCZ.no_stream)
@@ -196,14 +195,14 @@ class StreamLinks(Base, commands.Cog):
 
         if date is not None:
             parameter = True
-            date = datetime.strptime(date, "%d.%m.%Y")
+            date_time = datetime.strptime(date, "%d.%m.%Y")
             embed.add_field(
                 name="Datum vydání:",
                 value=self.gen_change_string(
-                    stream.created_at.strftime("%Y-%m-%d"), date.strftime("%Y-%m-%d")
+                    stream.created_at.strftime("%Y-%m-%d"), date_time.strftime("%Y-%m-%d")
                 ),
             )
-            stream.created_at = date
+            stream.created_at = date_time
 
         if subject is not None:
             parameter = True
@@ -229,11 +228,10 @@ class StreamLinks(Base, commands.Cog):
         inter: disnake.ApplicationCommandInteraction,
         id: int = commands.Param(description=MessagesCZ.id_description),
     ):
-        if not StreamLinkDB.exists(id):
+        stream = StreamLinkDB.get_stream_by_id(id)
+        if stream is None:
             await inter.edit_original_response(MessagesCZ.not_exists)
             return
-
-        stream = StreamLinkDB.get_stream_by_id(id)
         link = stream.link
 
         prompt_message = MessagesCZ.remove_prompt(link=link)
@@ -266,7 +264,7 @@ class StreamLinks(Base, commands.Cog):
         Gets thumbnail from youtube or maybe from another service.
         It downloads HTML from link and tries get thumbnail url from SEO meta tags.
         """
-        data = {"image": None, "upload_date": None}
+        data: dict[str, None | datetime] = {"image": None, "upload_date": None}
 
         session = requests.Session()
         retry = Retry(connect=5, backoff_factor=0.5)
@@ -305,7 +303,7 @@ class StreamLinks(Base, commands.Cog):
     def create_embed_of_link(
         self,
         streamlink: StreamLinkDB,
-        author: Union[disnake.User, disnake.Member],
+        author: disnake.User | disnake.Member,
         links_count: int,
         current_pos: int,
     ) -> disnake.Embed:

@@ -66,5 +66,5 @@ class StreamLinkDB(database.base):  # type: ignore
         return list(session.query(cls).filter(cls.subject == subject).order_by(desc("created_at")).all())
 
     @classmethod
-    def get_subjects_with_stream(cls) -> List[StreamLinkDB]:
+    def get_subjects_with_stream(cls) -> List[tuple[str]]:
         return session.query(StreamLinkDB.subject).distinct().all()
