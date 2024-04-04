@@ -113,7 +113,7 @@ class ReportDB(database.base):  # type: ignore
 
     @classmethod
     def get_reports_on_user(cls, user_id: str) -> int:
-        return session.query(cls).filter_by(target_user_id=str(user_id)).count()
+        return session.query(cls).filter_by(target_user_id=str(user_id), fake_report=False).count()
 
 
 class UserDB(database.base):  # type: ignore
