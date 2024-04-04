@@ -23,7 +23,7 @@ class Modal(disnake.ui.Modal):
                 custom_id="content",
                 style=disnake.TextInputStyle.long,
                 required=True,
-                value=self.message.content if edit else None,
+                value=message.content if message and edit else None,
                 max_length=2000,
             )
         ]
@@ -31,10 +31,11 @@ class Modal(disnake.ui.Modal):
         super().__init__(title=self.title, custom_id="message_modal", timeout=900, components=components)
 
     async def callback(self, inter: disnake.ModalInteraction) -> None:
-        if self.edit:
+        if self.edit and self.message:
             await self.message.edit(inter.text_values["content"])
             await inter.send(MessagesCZ.message_sent(channel=self.message.channel.mention), ephemeral=True)
             return
 
-        await self.channel.send(inter.text_values["content"])
-        await inter.send(MessagesCZ.message_sent(channel=self.channel.mention), ephemeral=True)
+        if self.channel:
+            await self.channel.send(inter.text_values["content"])
+            await inter.send(MessagesCZ.message_sent(channel=self.channel.mention), ephemeral=True)
