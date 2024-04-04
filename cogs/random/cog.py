@@ -34,20 +34,20 @@ class Random(Base, commands.Cog):
         """
 
         try:
-            args = shlex.split(args)
+            args_list = shlex.split(args)
         except Exception as e:
             await inter.send(e)
             return
 
-        for i, arg in enumerate(args):
+        for i, arg in enumerate(args_list):
             if "?" in arg:
-                args = args[i + 1 :]
+                args_list = args_list[i + 1 :]
                 break
 
-        if not args:
+        if not args_list:
             await inter.send(MessagesCZ.pick_empty)
             return
-        option = disnake.utils.escape_mentions(random.choice(args))
+        option = disnake.utils.escape_mentions(random.choice(args_list))
         await inter.send(f"{option} {inter.author.mention}", ephemeral=self.check.botroom_check(inter))
 
     @cooldowns.short_cooldown
