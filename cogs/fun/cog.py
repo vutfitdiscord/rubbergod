@@ -33,7 +33,7 @@ class Fun(Base, commands.Cog):
     def custom_footer(self, author, url) -> str:
         return f"📩 {author} | {url} • {datetime.now().strftime('%d.%m.%Y %H:%M')}"
 
-    async def get_image(self, inter, url) -> tuple[BytesIO, str] | None:
+    async def get_image(self, inter, url) -> tuple[BytesIO, str]:
         async with aiohttp.ClientSession() as session:
             # get random image url
             async with session.get(url) as response:
