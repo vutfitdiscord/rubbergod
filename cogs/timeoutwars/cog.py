@@ -17,10 +17,11 @@ from disnake.ext import commands, tasks
 import utils
 from cogs.base import Base
 from config.app_config import config
-from config.messages import Messages
 from database.timeout import TimeoutUserDB
 
-path_to_icons = "images/timeoutwars/"
+from .messages_cz import MessagesCZ
+
+path_to_icons = "cogs/timeoutwars/images/"
 icons_list = os.listdir(path_to_icons)
 
 
@@ -28,11 +29,18 @@ class TimeoutWars(Base, commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
         self.immunity: dict[int, datetime] = {}
-        self.ignored_messages = set()
+        self.ignored_messages: set[int] = set()
         self.index = 0
 
     log_file = "timeout_wars"
     message_delete = "Smazání zprávy"
+
+    async def cog_load(self):
+        if self.bot.is_ready():
+            self.tasks = [self.edit_logo.start()]
+        else:
+            await self.bot.wait_until_ready()
+            self.tasks = [self.edit_logo.start()]
 
     @cached_property
     def timeout_wars_channel(self):
@@ -46,7 +54,6 @@ class TimeoutWars(Base, commands.Cog):
             with open(self.log_file, "w") as f:
                 writer = csv.writer(f, delimiter=";")
                 writer.writerow(header)
-        self.tasks = [self.edit_logo.start()]
 
     def write_log(self, timeout_users, reacted_users, original_message_author, reason):
         """write log to csv file"""
@@ -86,15 +93,15 @@ class TimeoutWars(Base, commands.Cog):
 
             if self.get_immunity(user):
                 message.append(
-                    Messages.timeout_wars_user_immunity(
+                    MessagesCZ.timeout_wars_user_immunity(
                         user=user, time=(self.immunity[user.id] - datetime.now()).total_seconds()
                     )
                 )
             else:
                 try:
-                    await user.timeout(duration=duration, reason=Messages.timeout_wars_reason)
+                    await user.timeout(duration=duration, reason=MessagesCZ.timeout_wars_reason)
                     message.append(
-                        Messages.timeout_wars_user(
+                        MessagesCZ.timeout_wars_user(
                             user=user.mention, time=config.timeout_wars_timeout_time.total_seconds() // 60
                         )
                     )
@@ -114,22 +121,22 @@ class TimeoutWars(Base, commands.Cog):
 
         if self.get_immunity(user):
             await channel.send(
-                Messages.timeout_wars_user_immunity(
+                MessagesCZ.timeout_wars_user_immunity(
                     user=user, time=(self.immunity[user.id] - datetime.now()).total_seconds()
                 )
             )
         else:
             try:
-                await user.timeout(duration=duration, reason=Messages.timeout_wars_reason)
+                await user.timeout(duration=duration, reason=MessagesCZ.timeout_wars_reason)
                 if reason == self.message_delete:
                     await channel.send(
-                        Messages.timeout_wars_message_delete(
+                        MessagesCZ.timeout_wars_message_delete(
                             user=user.mention, time=config.timeout_wars_timeout_time.total_seconds() // 60
                         )
                     )
                 else:
                     await channel.send(
-                        Messages.timeout_wars_user(
+                        MessagesCZ.timeout_wars_user(
                             user=user.mention, time=config.timeout_wars_timeout_time.total_seconds() // 60
                         )
                     )
@@ -280,7 +287,3 @@ class TimeoutWars(Base, commands.Cog):
         name = icons_list[self.index].split("_")[0]
         await self.base_guild.edit(name=name, icon=icon)
         self.index = (self.index + 1) % len(icons_list)  # cycle through icons
-
-
-def setup(bot: commands.Bot):
-    bot.add_cog(TimeoutWars(bot))
