@@ -44,9 +44,3 @@ class Messages(metaclass=Formatable):
 
     # MEME
     upgraded_pocitani_caught_deleting = "Podvádět mazáním zpráv je zakázáno. Začínáme znovu: "
-
-    # TIMEOUT WARS
-    timeout_wars_user = "Uživatel {user} byl umlčen na {time:.0f} minut."
-    timeout_wars_message_delete = "Uživatel {user} byl přistižen při mazání zpráv. Byl proto umlčen na {time:.0f} minut."
-    timeout_wars_user_immunity = "Uživatel {user} má ještě imunitu na {time:.0f} sekund."
-    timeout_wars_reason = "timeoutwars"
