@@ -65,11 +65,11 @@ class Absolvent(Base, commands.Cog):
 
         # prepare
         htmlparser = etree.HTMLParser()
-        diploma_year = re.search(r"\d+/(\d+)", diploma_number)
-        if not diploma_year:
+        diploma = re.search(r"\d+/(\d+)", diploma_number)
+        if not diploma:
             await inter.edit_original_response(MessagesCZ.wrong_diploma_format)
             return
-        diploma_year = diploma_year.group(1)
+        diploma_year = diploma.group(1)
         full_name_without_degree_surname_first = f"{surname}, {name}"
 
         # CHECK WHETHER THE PROVIDED NAME MATCHES THE ONE STORED FOR FIT VUT VERIFICATION
@@ -80,7 +80,7 @@ class Absolvent(Base, commands.Cog):
             return only_ascii
 
         # get "surname name" for bot database for the current command caller
-        name_from_db = ValidPersonDB.get_user_by_id(inter.author.id).name
+        name_from_db = ValidPersonDB.get_user_by_id(inter.author.id)
         # remove diacritics from the user-supplied name
         name_from_user_without_diacritics = remove_accents(f"{surname} {name}")
 
@@ -88,6 +88,7 @@ class Absolvent(Base, commands.Cog):
             await inter.edit_original_response(MessagesCZ.not_in_db)
             return
 
+        name_from_db = name_from_db.name
         if name_from_db != name_from_user_without_diacritics:
             await inter.edit_original_response(MessagesCZ.wrong_name)
             return
@@ -120,11 +121,11 @@ class Absolvent(Base, commands.Cog):
             await inter.edit_original_response(MessagesCZ.thesis_not_found_error)
             return
 
-        habilitation_year = re.search(r"(\d+)-\d+-\d+", habilitation_date)
-        if habilitation_year is None:
+        habilitation = re.search(r"(\d+)-\d+-\d+", habilitation_date)
+        if habilitation is None:
             await inter.edit_original_response(MessagesCZ.thesis_not_found_error)
             return
-        habilitation_year = habilitation_year.group(1)
+        habilitation_year = habilitation.group(1)
 
         if not (
             ((degree == "Ing." and master_thesis != "") or (degree == "Bc." and bachelor_thesis != ""))
