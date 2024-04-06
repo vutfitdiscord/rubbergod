@@ -7,7 +7,6 @@ from disnake.ext import commands
 
 import database.db_migrations as migrations
 from cogs.contestvote.views import View as ContestVoteView
-from cogs.poll.views import PollBasicView, PollBooleanView, PollCloseView, PollOpinionView, PollVotersView
 from cogs.report.views import ReportAnonymView, ReportAnswerOnlyView, ReportGeneralView, ReportMessageView
 from config.app_config import config
 from config.messages import Messages
@@ -82,11 +81,6 @@ async def on_ready() -> None:
         ReportMessageView(bot),
         ReportAnonymView(bot),
         ReportAnswerOnlyView(bot),
-        PollBasicView(bot),
-        PollBooleanView(bot),
-        PollOpinionView(bot),
-        PollCloseView(bot),
-        PollVotersView(bot),
         ContestVoteView(bot),
     ]
     for view in views:
