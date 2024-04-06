@@ -40,7 +40,7 @@ class BetterMeme(Base, commands.Cog):
 
     @cached_property
     def repost_channel(self):
-        return self.bot.get_channel(self.config.meme_repost_room)
+        return self.bot.get_channel(self.config.bettermeme_room)
 
     async def handle_reaction(self, ctx: ReactionContext):
         if ctx.channel.id == self.config.meme_room:
@@ -57,7 +57,7 @@ class BetterMeme(Base, commands.Cog):
                     if int(emoji_val) >= 1:
                         await self.__repost_message(ctx, all_reactions)
                         return
-        elif ctx.channel.id == self.config.meme_repost_room:
+        elif ctx.channel.id == self.config.bettermeme_room:
             repost = MemeRepostDB.find_repost_by_repost_message_id(ctx.message.id)
 
             if repost is not None:
@@ -78,7 +78,7 @@ class BetterMeme(Base, commands.Cog):
         if ctx is None:
             return
 
-        if ctx.channel.id != self.config.meme_repost_room:
+        if ctx.channel.id != self.config.bettermeme_room:
             return
 
         repost = MemeRepostDB.find_repost_by_repost_message_id(ctx.message.id)
