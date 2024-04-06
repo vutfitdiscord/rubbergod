@@ -79,10 +79,8 @@ class Config:
     karma_ban_role_id: int = get_attr(toml_dict, "karma", "ban_role_id")
     karma_banned_channels: List[int] = get_attr(toml_dict, "karma", "banned_channels")
     karma_grillbot_leaderboard_size: int = get_attr(toml_dict, "karma", "grillbot_leaderboard_size")
-
-    # Voting
-    vote_minimum: int = get_attr(toml_dict, "vote", "minimum")
-    vote_minutes: int = get_attr(toml_dict, "vote", "minutes")
+    karma_vote_minimum: int = get_attr(toml_dict, "karma", "vote_minimum")
+    karma_vote_minutes: int = get_attr(toml_dict, "karma", "vote_minutes")
 
     # ContestVote
     contest_vote_channel: int = get_attr(toml_dict, "contestvote", "channel")

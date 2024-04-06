@@ -1,4 +1,4 @@
-from typing import Union
+from __future__ import annotations
 
 import disnake
 from disnake.ext.commands import Bot
@@ -12,7 +12,7 @@ class ReactionContext:
     member: disnake.Member
     message: disnake.Message
     reply_to: disnake.Message
-    emoji: Union[disnake.Emoji, str]
+    emoji: disnake.Emoji | str
 
     def __init__(self, channel, guild, member, message, reply_to, emoji):
         self.channel = channel
@@ -23,7 +23,7 @@ class ReactionContext:
         self.emoji = emoji
 
     @staticmethod
-    async def from_payload(bot: Bot, payload: disnake.RawReactionActionEvent):
+    async def from_payload(bot: Bot, payload: disnake.RawReactionActionEvent) -> ReactionContext | None:
         channel: disnake.TextChannel = bot.get_channel(payload.channel_id)
         if channel is None:
             return None

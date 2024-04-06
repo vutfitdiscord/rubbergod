@@ -30,7 +30,7 @@ db_string = "postgresql://postgres:postgres@db:5432/postgres"
 [cogs]
 extensions = [
     'karma', 'meme', 'bettermeme', 'random', 'verify', 'fitwide', 'autopin',
-    'help', 'review', 'vote', 'week', 'roles', 'error', 'absolvent', 'gif', 'reactions',
+    'help', 'review', 'week', 'roles', 'error', 'absolvent', 'gif', 'reactions',
     'streamlinks', 'bookmark', 'latex', 'info', 'fun', 'moderation', 'message',
     'timeout', 'forum', 'report', 'contestvote', 'emoji', 'hugs',
 ]
@@ -46,10 +46,8 @@ ban_role_id = -1
 #                        add-roles         back-to-school
 banned_channels = [591384273051975683, 622202824377237504]
 grillbot_leaderboard_size = 50
-
-[vote]
-minimum = 20
-minutes = 2
+vote_minimum = 20
+vote_minutes = 240
 
 [contestvote]
 channel = 1185908476250161242
