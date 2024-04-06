@@ -5,6 +5,7 @@ Cog for dynamically changing config.
 import re
 import shlex
 from datetime import datetime
+from typing import Any
 
 import disnake
 import toml
@@ -73,14 +74,14 @@ class DynamicConfig(Base, commands.Cog):
     async def list_all(self, inter: disnake.ApplicationCommandInteraction, regex: str = None):
         if regex is not None:
             try:
-                regex = re.compile(regex)
+                regex_pat = re.compile(regex)
             except re.error as ex:
                 await inter.send(MessagesCZ.list_invalid_regex(regex_err=str(ex)))
                 return
 
         output = "```\n"
         for key in config_get_keys()[:]:
-            if regex is None or regex.match(key) is not None:
+            if regex_pat is None or regex_pat.match(key) is not None:
                 output += key + "\n"
         output += "```"
         await inter.send(output)
@@ -139,7 +140,7 @@ class DynamicConfig(Base, commands.Cog):
             await inter.send(MessagesCZ.wrong_key)
             return
         try:
-            value = shlex.split(value)
+            new_val: Any = shlex.split(value)
         except Exception as e:
             await inter.send(e)
             return
@@ -152,37 +153,37 @@ class DynamicConfig(Base, commands.Cog):
                 attr = getattr(self.config, key)
                 if isinstance(attr, list):
                     if isinstance(attr[0], int):
-                        for idx, item in enumerate(value):
+                        for idx, item in enumerate(new_val):
                             try:
-                                value[idx] = int(item)
+                                new_val[idx] = int(item)
                             except ValueError:
                                 await inter.send(MessagesCZ.wrong_type)
                                 return
                     if append:
-                        value = attr + value
+                        new_val = attr + new_val
                 elif isinstance(attr, tuple) and append:
-                    value = tuple(list(attr) + value)
+                    new_val = tuple(list(attr) + new_val)
                 elif isinstance(attr, str):
-                    value = " ".join(value)
+                    new_val = " ".join(new_val)
                 elif isinstance(attr, bool):
-                    if value[0].lower() == "false":
-                        value = False
+                    if new_val[0].lower() == "false":
+                        new_val = False
                     else:
-                        value = True
+                        new_val = True
                 elif isinstance(attr, int):
                     try:
-                        value = int(value[0])
+                        new_val = int(new_val[0])
                     except ValueError:
                         await inter.send(MessagesCZ.wrong_type)
                         return
-                self.config.toml_dict[section][key_toml] = value
+                self.config.toml_dict[section][key_toml] = new_val
                 break
             else:
                 key_toml = key
         else:
             await inter.send(MessagesCZ.wrong_key)
             return
-        setattr(self.config, key, value)
+        setattr(self.config, key, new_val)
         with open(CONFIG_PATH, "w+", encoding="utf-8") as fd:
             toml.dump(self.config.toml_dict, fd)
         await inter.send(MessagesCZ.config_updated)
