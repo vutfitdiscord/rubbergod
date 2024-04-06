@@ -39,9 +39,9 @@ class Karma(BaseFeature):
     async def emoji_process_vote(
         self, inter: disnake.ApplicationCommandInteraction, emoji: Emoji | str
     ) -> int | None:
-        delay = config.vote_minutes * 60
+        delay = config.karma_vote_minutes * 60
         message = MessagesCZ.vote_message(emote=str(emoji))
-        message += MessagesCZ.vote_info(delay=str(delay // 60), minimum=str(config.vote_minimum))
+        message += MessagesCZ.vote_info(delay=str(delay // 60), minimum=str(config.karma_vote_minimum))
         message = await inter.channel.send(message)
         await inter.send(MessagesCZ.revote_started)
         await message.add_reaction("✅")
@@ -63,7 +63,7 @@ class Karma(BaseFeature):
             elif reaction.emoji == "0⃣":
                 neutral = reaction.count - 1
 
-        if plus + minus + neutral < config.vote_minimum:
+        if plus + minus + neutral < config.karma_vote_minimum:
             return None
 
         if plus > minus + neutral:
@@ -92,7 +92,7 @@ class Karma(BaseFeature):
         if vote_value is None:
             KarmaEmojiDB.remove_emoji(emoji)
             await inter.channel.send(
-                MessagesCZ.vote_not_passed(emote=str(emoji), minimum=str(config.vote_minimum))
+                MessagesCZ.vote_not_passed(emote=str(emoji), minimum=str(config.karma_vote_minimum))
             )
 
         else:
@@ -120,7 +120,7 @@ class Karma(BaseFeature):
             await inter.channel.send(MessagesCZ.vote_result(emote=str(emoji), result=str(vote_value)))
         else:
             await inter.channel.send(
-                MessagesCZ.vote_not_passed(emote=str(emoji), minimum=str(config.vote_minimum))
+                MessagesCZ.vote_not_passed(emote=str(emoji), minimum=str(config.karma_vote_minimum))
             )
 
     async def emoji_get_value(

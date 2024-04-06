@@ -424,15 +424,6 @@ Cog for verification system. Allows users to verify themselves with xlogin00 and
     - user_command Verify host
 ---
 
-### [Vote](vote/cog.py)
-
-Cog implementing vote and polls feature.\
-**Commands:**
-
-    - ?vote
-    - ?singlevote
----
-
 ### [Warden](warden/cog.py)
 
 Cog for repost detection.\

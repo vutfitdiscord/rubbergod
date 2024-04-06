@@ -194,24 +194,6 @@ def is_valid_datetime_format(dt: str, fmt: str) -> bool:
         return False
 
 
-def is_command_message(cmd: str, msg: str, require_space=True) -> bool:
-    """Checks whether the message starts with a specified command"""
-    cmd = cmd.strip()
-    msg_len = len(msg)
-
-    for prefix in config.command_prefix:
-        cmd_p = f"{prefix}{cmd}"
-        cmd_p_len = len(cmd_p)
-
-        if msg.find(cmd_p) == 0:
-            if require_space:
-                return msg_len > cmd_p_len and msg[cmd_p_len].isspace()
-            else:
-                return True
-
-    return False
-
-
 def make_pts_column_row_formatter(pts_column_name: str):
     """For leaderboards with one column of points."""
 
