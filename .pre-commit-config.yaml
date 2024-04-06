@@ -1,6 +1,5 @@
 ci:
   autofix_prs: false
-  skip: [mypy]  # remove after https://github.com/vutfitdiscord/rubbergod/issues/952 is done
 
 repos:
 - repo: https://github.com/astral-sh/ruff-pre-commit
