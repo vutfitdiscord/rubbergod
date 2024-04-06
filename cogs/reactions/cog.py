@@ -60,7 +60,7 @@ class Reactions(Base, commands.Cog):
             cogs.append(self.bot.get_cog("Warden"))
 
         if (
-            ctx.channel.id == self.config.meme_room or ctx.channel.id == self.config.meme_repost_room
+            ctx.channel.id == self.config.meme_room or ctx.channel.id == self.config.bettermeme_room
         ) and ctx.message.author.id != ctx.member.id:
             cogs.append(self.bot.get_cog("MemeRepost"))
 
