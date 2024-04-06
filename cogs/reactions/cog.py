@@ -51,7 +51,7 @@ class Reactions(Base, commands.Cog):
         if (
             ctx.channel.id == self.config.meme_room or ctx.channel.id == self.config.bettermeme_room
         ) and ctx.message.author.id != ctx.member.id:
-            cogs.append(self.bot.get_cog("MemeRepost"))
+            cogs.append(self.bot.get_cog("BetterMeme"))
 
         if ctx.emoji == "🔇":
             cogs.append(self.bot.get_cog("TimeoutWars"))
