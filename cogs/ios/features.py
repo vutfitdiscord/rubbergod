@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import datetime
 import re
+from enum import Enum
 
 import disnake
 
@@ -13,30 +14,30 @@ from features.list_message_sender import send_list_of_messages
 
 def running_for(time: str) -> int:
     now = datetime.datetime.now()
-    time = time.split(":")
-    if len(time) == 2:
-        hours = now.hour - int(time[0])
-        minutes = now.minute - int(time[1])
+    time_list = time.split(":")
+    if len(time_list) == 2:
+        hours = now.hour - int(time_list[0])
+        minutes = now.minute - int(time_list[1])
         return hours * 60 + minutes
     else:
         try:
-            date = datetime.datetime.strptime(time[0], "%b%d")
+            date = datetime.datetime.strptime(time_list[0], "%b%d")
         except ValueError:
-            date = datetime.datetime.strptime(time[0], "%a%d")
+            date = datetime.datetime.strptime(time_list[0], "%a%d")
             date = date.replace(year=now.year, month=now.month)
-        minutes = (now - date.replace(year=now.year)).total_seconds() // 60
+        minutes = int((now - date.replace(year=now.year)).total_seconds()) // 60
         # subtracting a day as to assume it was ran right before midnight
         return minutes - 1440
 
 
-def unchanged_for(date: str, format_str: str) -> int:
+def unchanged_for(date_str: str, format_str: str) -> int:
     now = datetime.datetime.now()
-    date = datetime.datetime.strptime(date, format_str)
-    return (now - date.replace(year=now.year)).total_seconds() // 60
+    date = datetime.datetime.strptime(date_str, format_str)
+    return int((now - date.replace(year=now.year)).total_seconds()) // 60
 
 
 # filter people and keep only those containing "BIT" or "FEKT" in person.year
-def filter_year(resources: dict[RESOURCE_TYPE, dict]):
+def filter_year(resources: dict[RESOURCE_TYPE, dict]) -> dict[RESOURCE_TYPE, dict]:
     # get unique logins and people objects from db
     logins = set(login for res_data in resources.values() for login in res_data.keys())
     people = {
@@ -45,7 +46,7 @@ def filter_year(resources: dict[RESOURCE_TYPE, dict]):
     }
 
     # keep only people with "BIT" or "FEKT" in their person.year
-    out_res = {res_type: {} for res_type in resources.keys()}
+    out_res: dict[RESOURCE_TYPE, dict] = {res_type: {} for res_type in resources.keys()}
     for res_type, res_data in resources.items():
         for login, data in res_data.items():
             if not people.get(login) or "BIT" in people[login].year or "FEKT" in people[login].year:
@@ -54,13 +55,13 @@ def filter_year(resources: dict[RESOURCE_TYPE, dict]):
 
 
 def parse_memory(memory: str) -> dict:
-    parsed = {}
+    parsed: dict = {}
     for line in memory.strip().splitlines():
-        line = line.split()
-        login = line[1]
+        line_split = line.split()
+        login = line_split[1]
         if not login.startswith("x"):
             continue
-        last_change = " ".join(line[-3:])
+        last_change = " ".join(line_split[-3:])
         since_last_change = unchanged_for(last_change, "%b %d %H:%M:%S")
         if since_last_change > 10:
             if login not in parsed:
@@ -69,20 +70,20 @@ def parse_memory(memory: str) -> dict:
     return parsed
 
 
-def parse_semaphores(semaphores: str) -> tuple[dict, dict]:
-    parsed = {}
-    parsed_files = {}
+def parse_semaphores(semaphores: str) -> tuple[dict, dict[str, tuple[list, bool]]]:
+    parsed: dict = {}
+    parsed_files: dict[str, tuple[list, bool]] = {}
     if "soubory semaforu" in semaphores:
         semaphores, files = semaphores.split("soubory semaforu:\n")
     else:
         files = ""
 
     for line in semaphores.strip().splitlines():
-        line = line.split()
-        login = line[1]
+        line_split = line.split()
+        login = line_split[1]
         if not login.startswith("x"):
             continue
-        last_change = " ".join(line[-4:-1])
+        last_change = " ".join(line_split[-4:-1])
         since_last_change = unchanged_for(last_change, "%b %d %H:%M:%S")
         if since_last_change > 10:
             if login not in parsed:
@@ -90,31 +91,31 @@ def parse_semaphores(semaphores: str) -> tuple[dict, dict]:
             parsed[login].append(since_last_change)
 
     for line in files.strip().splitlines():
-        line = line.split()
-        login = line[2]
+        line_split = line.split()
+        login = line_split[2]
         if not login.startswith("x"):
             continue
-        last_change = " ".join(line[5:7])
-        name = line[7]
+        last_change = " ".join(line_split[5:7])
+        name = line_split[7]
         since_last_change = unchanged_for(last_change, "%m-%d %H:%M")
         if since_last_change > 10 or login not in name:
             if login not in parsed_files:
-                parsed_files[login] = [list(), False]
+                parsed_files[login] = (list(), False)
             parsed_files[login][0].append(since_last_change)
             if login not in name:
-                parsed_files[login][1] = True
+                parsed_files[login] = (parsed_files[login][0], True)
 
     return parsed, parsed_files
 
 
 def parse_processes(processes: str) -> dict:
-    parsed = {}
+    parsed: dict = {}
     for line in processes.strip().splitlines():
-        line = line.split()
-        login = line[0]
+        line_split = line.split()
+        login = line_split[0]
         if not login.startswith("x"):
             continue
-        time = line[8]
+        time = line_split[8]
         uptime = running_for(time)
         if uptime > 10:
             if login not in parsed:
@@ -151,7 +152,7 @@ def format_time(minutes: int) -> str:
     return f"{round(minutes, 1)} minut"
 
 
-class RESOURCE_TYPE:
+class RESOURCE_TYPE(Enum):
     MEMORY = "MEMORY"
     SEMAPHORE = "SEMAPHORE"
     PROCESS = "PROCESS"
@@ -199,7 +200,7 @@ def insult_login_shm(parsed_files: dict, system: str) -> list[str]:
             msg = f"Na {system} leží soubory semaforů nějakého `{login}`, co není na serveru."
         else:
             count = len(array)
-            avg_time = float(sum(array)) // count
+            avg_time = int(sum(array) // count)
 
             msg = (
                 f"{utils.generate_mention(user.discord_ID)} "
