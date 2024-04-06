@@ -39,7 +39,7 @@ class BetterMeme(Base, commands.Cog):
         self.repost_lock = asyncio.Lock()
 
     @cached_property
-    def repost_channel(self):
+    def bettermeme_channel(self):
         return self.bot.get_channel(self.config.bettermeme_room)
 
     async def handle_reaction(self, ctx: ReactionContext):
@@ -96,12 +96,11 @@ class BetterMeme(Base, commands.Cog):
 
     async def __repost_message(self, ctx: ReactionContext, reactions: list[disnake.Reaction]):
         # Invalid ID
-        if self.repost_channel is None:
+        if self.bettermeme_channel is None:
             return
         async with self.repost_lock:
             if MemeRepostDB.find_repost_by_original_message_id(ctx.message.id) is not None:
                 return
-
             # Generate string with all reactions on post at the time
             title_string = ""
             for reaction in reactions:
@@ -180,7 +179,7 @@ class BetterMeme(Base, commands.Cog):
             repost_message_id = -1
             secondary_message_id = None
             if len(embed) < 6000:
-                repost_message = await self.repost_channel.send(embed=embed, file=main_image)
+                repost_message = await self.bettermeme_channel.send(embed=embed, file=main_image)
                 repost_message_id = repost_message.id
 
                 if len(other_attachments) > 0:
@@ -192,7 +191,7 @@ class BetterMeme(Base, commands.Cog):
                     urls_list = [file for file in other_attachments if isinstance(file, str)]
                     urls = "\n".join(urls_list) if urls_list else None
 
-                    secondary_message = await self.repost_channel.send(urls, files=files)
+                    secondary_message = await self.bettermeme_channel.send(urls, files=files)
                     secondary_message_id = secondary_message.id
 
             MemeRepostDB.create_repost(
