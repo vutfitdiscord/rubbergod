@@ -37,8 +37,10 @@ class Emoji:
 
 def get_contribution_id(content: str) -> int:
     """extracts the contribution id from the string"""
-    contribution_id = re.match(r".*ID: (\d+).*", content).group(1)
-    return int(contribution_id)
+    contribution_id = re.match(r".*ID: (\d+).*", content)
+    if not contribution_id:
+        raise ValueError("No contribution id found")
+    return int(contribution_id.group(1))
 
 
 async def get_top_contributions(emojis: dict, messages: list[disnake.Message], number_of: int) -> list[str]:
@@ -55,20 +57,22 @@ async def get_top_contributions(emojis: dict, messages: list[disnake.Message], n
 
         # Create a dictionary to store all reactions for this message only once
         reactions_list = {}
-        duplicate_votes = Counter()
+        duplicate_votes: Counter = Counter()
         for r in message.reactions:
             reactions_list[r] = {user.id for user in await r.users().flatten()}
             duplicate_votes.update(user for user in reactions_list[r])
-        duplicate_votes = {user for user, count in duplicate_votes.items() if count > 1}
+        duplicate_user_votes = {user for user, count in duplicate_votes.items() if count > 1}
 
         # iterate reactions and create Emoji objects for each reaction
         for r, users in reactions_list.items():
-            users = users - duplicate_votes
+            users = users - duplicate_user_votes
             emoji = utils.str_emoji_id(r.emoji)
             if emoji in emojis:
                 emoji_obj = Emoji(emoji=emoji, count=len(users), value=emojis[emoji])
                 emojis_for_message.append(emoji_obj)
-        images.append(Image(message.jump_url, emojis_for_message, len(duplicate_votes) - 1))  # -1 for the bot
+        images.append(
+            Image(message.jump_url, emojis_for_message, len(duplicate_user_votes) - 1)
+        )  # -1 for the bot
 
     messages = []
     # Sort the images by total_value in descending order and get the top n
