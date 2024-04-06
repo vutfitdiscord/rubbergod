@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from typing import Optional
-
 from sqlalchemy import Column, String
 
 from database import database, session
@@ -16,11 +14,11 @@ class MemeRepostDB(database.base):  # type: ignore
     secondary_repost_message_id = Column(String, nullable=True)
 
     @classmethod
-    def find_repost_by_original_message_id(cls, message_id: str) -> Optional[MemeRepostDB]:
+    def find_repost_by_original_message_id(cls, message_id: str) -> MemeRepostDB | None:
         return session.query(cls).filter(cls.original_message_id == str(message_id)).one_or_none()
 
     @classmethod
-    def find_repost_by_repost_message_id(cls, message_id: str) -> Optional[MemeRepostDB]:
+    def find_repost_by_repost_message_id(cls, message_id: str) -> MemeRepostDB | None:
         return (
             session.query(cls)
             .filter(

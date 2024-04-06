@@ -68,7 +68,7 @@ class Karma(Base, commands.Cog):
             ctx.member.id != ctx.message.author.id
             and ctx.guild.id == self.config.guild_id
             and ctx.message.channel.id not in self.config.karma_banned_channels
-            and ctx.message.channel.id != self.config.meme_repost_room
+            and ctx.message.channel.id != self.config.bettermeme_room
             and self.config.karma_ban_role_id not in map(lambda x: x.id, ctx.member.roles)
         ):
             emoji = utils.str_emoji_id(ctx.emoji)
@@ -84,7 +84,7 @@ class Karma(Base, commands.Cog):
             ctx.member.id != ctx.message.author.id
             and ctx.guild.id == self.config.guild_id
             and ctx.message.channel.id not in self.config.karma_banned_channels
-            and ctx.message.channel.id != self.config.meme_repost_room
+            and ctx.message.channel.id != self.config.bettermeme_room
             and self.config.karma_ban_role_id not in map(lambda x: x.id, ctx.member.roles)
         ):
             emoji = utils.str_emoji_id(ctx.emoji)
