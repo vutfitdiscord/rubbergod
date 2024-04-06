@@ -298,20 +298,6 @@ Cog for sending name days and birthdays.\
     - send_names
 ---
 
-### [Poll](poll/cog.py)
-
-Cog implementing polls.\
-**Commands:**
-
-    - /poll basic
-    - /poll boolean
-    - /poll opinion
-    - /poll list
-**Tasks:**
-
-    - dynamic generator with polls that closes them
----
-
 ### [Random](random/cog.py)
 
 Implementing commands using random module.\
