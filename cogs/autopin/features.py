@@ -1,13 +1,15 @@
 import datetime
 import io
 import json
+from typing import TypeAlias
 
 import disnake
 from disnake.ext import commands
 
 import utils
+from config.app_config import config
 
-PIN_CHANNEL_TYPE = disnake.TextChannel | disnake.Thread
+PIN_CHANNEL_TYPE: TypeAlias = disnake.TextChannel | disnake.Thread
 
 
 class AutopinFeatures:
@@ -25,7 +27,7 @@ class AutopinFeatures:
             name="Message in channel", value=f"[#{message.channel.name}]({message.jump_url})", inline=False
         )
         embed.timestamp = datetime.datetime.now(tz=datetime.timezone.utc)
-        channel = self.bot.get_channel(self.config.log_channel)
+        channel = self.bot.get_channel(config.log_channel)
         await channel.send(embed=embed)
 
     async def create_json_file(

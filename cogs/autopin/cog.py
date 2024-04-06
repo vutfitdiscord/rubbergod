@@ -27,7 +27,7 @@ class AutoPin(Base, commands.Cog):
         self.check = room_check.RoomCheck(bot)
         self.pin_features = AutopinFeatures(bot)
 
-    async def api(self, message: commands.Context, params: list):
+    async def api(self, message: commands.Context, params: dict):
         """Sending pins from channel to grillbot"""
         if "command" in params and params["command"] is not None:
             if params["command"] == "pin_get_all":
@@ -107,7 +107,7 @@ class AutoPin(Base, commands.Cog):
                 message: disnake.Message = await channel.fetch_message(int(item.message_id))
                 msg: str = MessagesCZ.list_item(channel=channel.mention, url=message.jump_url)
             except disnake.NotFound:
-                msg: str = MessagesCZ.list_unknown_message(channel=channel.mention)
+                msg = MessagesCZ.list_unknown_message(channel=channel.mention)
             finally:
                 lines.append(msg)
 
