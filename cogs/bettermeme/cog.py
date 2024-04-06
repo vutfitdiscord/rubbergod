@@ -74,7 +74,7 @@ class BetterMeme(Base, commands.Cog):
 
     @commands.Cog.listener()
     async def on_raw_reaction_remove(self, payload: disnake.RawReactionActionEvent):
-        ctx: ReactionContext = await ReactionContext.from_payload(self.bot, payload)
+        ctx = await ReactionContext.from_payload(self.bot, payload)
         if ctx is None:
             return
 

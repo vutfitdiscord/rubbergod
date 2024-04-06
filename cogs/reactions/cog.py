@@ -9,7 +9,6 @@ from disnake.ext import commands
 from cogs.base import Base
 from database import session
 from features.reaction_context import ReactionContext
-from utils import is_command_message
 
 
 class Reactions(Base, commands.Cog):
@@ -18,20 +17,10 @@ class Reactions(Base, commands.Cog):
         self.bot = bot
 
     @commands.Cog.listener()
-    async def on_raw_reaction_add(self, payload):
+    async def on_raw_reaction_add(self, payload: disnake.RawReactionActionEvent):
         """Catch reaction, get all properties and then call proper cog/s"""
-        ctx: ReactionContext = await ReactionContext.from_payload(self.bot, payload)
+        ctx = await ReactionContext.from_payload(self.bot, payload)
         if ctx is None:
-            return
-
-        if self.bot.get_cog("Vote") is not None and (
-            is_command_message("vote", ctx.message.content)
-            or is_command_message("singlevote", ctx.message.content, False)
-        ):
-            try:
-                await self.bot.get_cog("Vote").handle_raw_reaction_add(payload)
-            except sqlalchemy.exc.InternalError:
-                session.rollback()
             return
 
         cogs = []
