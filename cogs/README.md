@@ -394,6 +394,7 @@ Core cog for bot. Can't be unloaded. Contains commands for cog management.\
     - /get_logs
     - /shutdown
     - /cogs
+    - /rubbergod
     - /uptime
 ---
 

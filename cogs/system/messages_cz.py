@@ -8,10 +8,9 @@ class MessagesCZ(GlobalMessages):
     lines_param = "Počet řádků, které se mají zobrazit"
 
     uptime_brief = "Vypíše čas spuštění a čas uplynulý od spuštění"
-    uptime_title = "Uptime"
-    upsince_title = "Up since"
-    uptime_latency = "Latency"
-    longest_streak = "Longest streak without error"
+    uptime_title = "Doba od spuštění"
+    upsince_title = "Spuštěno"
+    longest_streak = "Nejdelší doba bez chyby"
 
     cogs_brief = "Vypíše seznam všech cogs a jejich stav"
     embed_title = "Informace o rozšířeních"
@@ -23,3 +22,9 @@ class MessagesCZ(GlobalMessages):
     success_unload = "Rozšíření `{cog}` odebráno."
     success_reload = "Rozšíření `{cog}` bylo načteno znovu."
     override = "📄 Tučné položky jsou rozdílné oproti config.extension"
+
+    rubbergod_brief = "Vypíše základní informace o botovi"
+    commands_count = "Celkový počet - **{sum}**\nTextové příkazy - **{context}**\nSlash příkazy - **{slash}**\nUser příkazy - **{user_comm}**\nMessage příkazy - **{message_comm}**"
+    latency = "Odezva"
+    guilds = "Počet serverů"
+    commands = "Příkazy"

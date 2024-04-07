@@ -2,6 +2,7 @@
 Core cog for bot. Can't be unloaded. Contains commands for cog management.
 """
 
+import platform
 import subprocess
 from datetime import datetime
 from io import BytesIO
@@ -105,6 +106,35 @@ class System(Base, commands.Cog):
             view.selects[i].message = message
 
     @cooldowns.default_cooldown
+    @commands.slash_command(name="rubbergod", description=MessagesCZ.rubbergod_brief)
+    async def rubbergod(self, inter: disnake.ApplicationCommandInteraction):
+        await inter.response.defer()
+        embed = disnake.Embed(title="Rubbergod", url=MessagesCZ.rubbergod_url, color=disnake.Colour.yellow())
+        embed.add_field(name="ID", value=self.bot.user.id, inline=False)
+        embed.add_field(name="Python", value=platform.python_version())
+        embed.add_field(name="Disnake", value=disnake.__version__)
+        embed.add_field(name=MessagesCZ.latency, value=f"{round(self.bot.latency * 1000)} ms")
+        embed.add_field(name=MessagesCZ.guilds, value=len(self.bot.guilds))
+
+        context_commands = len(self.bot.commands)
+        slash_commands = len(self.bot.slash_commands)
+        user_commands = len(self.bot.user_commands)
+        message_commands = len(self.bot.message_commands)
+        commands_sum = context_commands + slash_commands + user_commands + message_commands
+
+        commands = MessagesCZ.commands_count(
+            sum=commands_sum,
+            context=context_commands,
+            slash=slash_commands,
+            user_comm=user_commands,
+            message_comm=message_commands,
+        )
+        embed.add_field(name=MessagesCZ.commands, value=commands, inline=False)
+        embed.set_thumbnail(url=self.bot.user.avatar.url)
+
+        await inter.edit_original_response(embed=embed)
+
+    @cooldowns.default_cooldown
     @commands.slash_command(name="uptime", description=MessagesCZ.uptime_brief)
     async def uptime(self, inter: disnake.ApplicationCommandInteraction):
         await inter.response.defer()
@@ -119,7 +149,7 @@ class System(Base, commands.Cog):
         start_streak, end_streak = ErrorLogDB.get_longest_streak()
         embed.add_field(name=MessagesCZ.upsince_title, value=str(boottime))
         embed.add_field(name=MessagesCZ.uptime_title, value=str(delta))
-        embed.add_field(name=MessagesCZ.uptime_latency, value=f"{round(self.bot.latency * 1000)} ms")
+        embed.add_field(name=MessagesCZ.latency, value=f"{round(self.bot.latency * 1000)} ms")
         embed.add_field(
             name=MessagesCZ.longest_streak,
             value=f"**{(end_streak - start_streak).days} day(s)**\n{start_streak} — {end_streak}",

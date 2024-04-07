@@ -5,6 +5,7 @@ from features.callable_string import Formatable
 class Messages(metaclass=Formatable):
     # GENERAL MESSAGES
     prefix = config.default_prefix
+    rubbergod_url = "https://github.com/vutfitdiscord/rubbergod"
 
     server_warning = "Tohle funguje jen na VUT FIT serveru."
 
