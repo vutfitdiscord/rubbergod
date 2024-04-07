@@ -10,9 +10,9 @@ import disnake
 from disnake.ext.commands import Bot
 
 import utils
+from cogs.verify.messages_cz import MessagesCZ
 from cogs.verify.views_verify import VerifyView, VerifyWithResendButtonView
 from config.app_config import config
-from config.messages import Messages
 from database.verification import ValidPersonDB, VerifyStatus
 from features.base_feature import BaseFeature
 from features.verify_helper import VerifyHelper
@@ -51,8 +51,8 @@ class Verification(BaseFeature):
         """Send mail with instructions in case of blocked DMs"""
         self.send_mail(
             receiver_email,
-            Messages.verify_post_verify_info_mail,
-            f"{user} {Messages.verify_verify_success_mail}",
+            MessagesCZ.verify_post_verify_info_mail,
+            f"{user} {MessagesCZ.verify_verify_success_mail}",
         )
 
     async def gen_code_and_send_mail(
@@ -68,24 +68,24 @@ class Verification(BaseFeature):
         if not dry_run:
             # Generate a verification code
             code = "".join(random.choices(string.ascii_uppercase + string.digits, k=6))
-            mail_content = Messages.verify_mail_content(code=code)
+            mail_content = MessagesCZ.verify_mail_content(code=code)
             # Save the newly generated code into the database
             user.save_sent_code(code)
-            self.send_mail(mail_address, mail_content, Messages.verify_subject)
+            self.send_mail(mail_address, mail_content, MessagesCZ.verify_subject)
 
         if not is_resend:
-            success_message = Messages.verify_send_success(
+            success_message = MessagesCZ.verify_send_success(
                 user=inter.user.id,
                 mail=mail_address,
-                subject=Messages.verify_subject,
+                subject=MessagesCZ.verify_subject,
             )
             view = VerifyWithResendButtonView(user.login)
             await inter.edit_original_response(content=success_message, view=view)
         else:
-            success_message = Messages.verify_resend_success(
+            success_message = MessagesCZ.verify_resend_success(
                 user=inter.user.id,
                 mail=mail_address,
-                subject=Messages.verify_subject,
+                subject=MessagesCZ.verify_subject,
             )
             view = VerifyView(user.login)
             await inter.response.edit_message(content=success_message, view=view)
@@ -108,7 +108,7 @@ class Verification(BaseFeature):
                     if user.status == VerifyStatus.InProcess.value:
                         await self.gen_code_and_send_mail(inter, user, "stud.fit.vutbr.cz", dry_run=True)
                         return True
-                    msg = Messages.verify_step_done(
+                    msg = MessagesCZ.verify_step_done(
                         user=inter.user.id,
                         admin=config.admin_ids[0],
                     )
@@ -126,7 +126,7 @@ class Verification(BaseFeature):
                 try:
                     int(login)
                 except ValueError:
-                    msg = Messages.invalid_login(user=inter.user.id, admin=config.admin_ids[0])
+                    msg = MessagesCZ.invalid_login(user=inter.user.id, admin=config.admin_ids[0])
                     await inter.edit_original_response(msg)
                     await self.log_verify_fail(inter, "getcode (MUNI)", str({"login": login}))
                     return False
@@ -137,7 +137,7 @@ class Verification(BaseFeature):
                     if user.status == VerifyStatus.InProcess.value:
                         await self.gen_code_and_send_mail(inter, user, "mail.muni.cz", dry_run=True)
                         return True
-                    msg = Messages.verify_step_done(
+                    msg = MessagesCZ.verify_step_done(
                         user=inter.user.id,
                         admin=config.admin_ids[0],
                     )
@@ -155,7 +155,7 @@ class Verification(BaseFeature):
                 await self.gen_code_and_send_mail(inter, user, "mail.muni.cz")
                 return True
         else:
-            msg = Messages.verify_already_verified(user=inter.user.id, admin=config.admin_ids[0])
+            msg = MessagesCZ.verify_already_verified(user=inter.user.id, admin=config.admin_ids[0])
             await inter.send(content=msg)
 
         return False
@@ -217,14 +217,14 @@ class Verification(BaseFeature):
     async def finish_verify(self, inter: disnake.ModalInteraction, code: str, login: str) -> None:
         if await self.helper.has_role(inter.user, config.verification_role):
             inter.response.send_message(
-                Messages.verify_already_verified(user=inter.user.id, admin=config.admin_ids[0])
+                MessagesCZ.verify_already_verified(user=inter.user.id, admin=config.admin_ids[0])
             )
             return
 
         new_user = ValidPersonDB.get_user_by_login(login)
         if new_user is not None:
             if code != new_user.code:
-                await inter.response.send_message(Messages.verify_verify_wrong_code)
+                await inter.response.send_message(MessagesCZ.verify_verify_wrong_code)
                 await self.log_verify_fail(
                     inter,
                     "Verify (with code) - Wrong code",
@@ -236,7 +236,7 @@ class Verification(BaseFeature):
             year = self.transform_year(new_user.year)
 
             if year is None:
-                msg = Messages.verify_verify_manual(
+                msg = MessagesCZ.verify_verify_manual(
                     user=inter.user.id,
                     admin=config.admin_ids[0],
                     year=str(new_user.year),
@@ -271,16 +271,16 @@ class Verification(BaseFeature):
                     str({"login": login, "year": new_user.year}),
                 )
 
-            verify_success_msg = Messages.verify_verify_success(user=inter.user.id)
+            verify_success_msg = MessagesCZ.verify_verify_success(user=inter.user.id)
             try:
                 await member.send(verify_success_msg)
-                await member.send(Messages.verify_post_verify_info, suppress_embeds=True)
+                await member.send(MessagesCZ.verify_post_verify_info, suppress_embeds=True)
             except disnake.errors.Forbidden:
                 mail = new_user.get_mail(self.get_mail_postfix(login))
                 self.send_mail_verified(mail, member)
             await inter.response.send_message(verify_success_msg)
         else:
-            msg = Messages.verify_verify_not_found(user=inter.user.id, admin=config.admin_ids[0])
+            msg = MessagesCZ.verify_verify_not_found(user=inter.user.id, admin=config.admin_ids[0])
             await inter.response.send_message(msg)
             await self.log_verify_fail(
                 inter, "Verify (with code) - Not exists in DB", str({"login": login, "code": code})
@@ -297,7 +297,7 @@ class Verification(BaseFeature):
         guild = self.bot.get_guild(config.guild_id)
         fp = await guild.fetch_emoji(585915845146968093)
         await inter.edit_original_response(
-            content=Messages.verify_send_dumbshit(user=inter.user.id, emote=str(fp))
+            content=MessagesCZ.verify_send_dumbshit(user=inter.user.id, emote=str(fp))
         )
 
     async def clear_host_roles(self, inter: disnake.ApplicationCommandInteraction):
