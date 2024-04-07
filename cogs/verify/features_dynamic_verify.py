@@ -58,7 +58,7 @@ class DynamicVerifyManager(BaseFeature):
     async def request_verification(
         self, rule: DynamicVerifyDB, inter: disnake.ApplicationCommandInteraction
     ) -> None:
-        embed = disnake.Embed(title="Žádost o dynamickou verifikaci", color=0xEEE657)
+        embed = disnake.Embed(title="Žádost o dynamickou verifikaci", color=disnake.Colour.yellow())
         embed.add_field("Pravidlo", f"{rule.name} ({rule.id})")
         embed.add_field(
             "Uživatel",
@@ -75,7 +75,7 @@ class DynamicVerifyManager(BaseFeature):
         inter: disnake.ApplicationCommandInteraction,
         target_id: int,
     ) -> None:
-        embed = disnake.Embed(title="Dynamická verifikace", color=0xEEE657)
+        embed = disnake.Embed(title="Dynamická verifikace", color=disnake.Colour.yellow())
         embed.add_field("Pravidlo", f"{rule.name} ({rule.id})")
         embed.add_field("Potvrdil", utils.generate_mention(inter.user.id))
         embed.add_field("Uživatel", utils.generate_mention(target_id))

@@ -144,7 +144,7 @@ class System(Base, commands.Cog):
         embed = disnake.Embed(
             title="Uptime",
             description=f"{count} days without an accident.",
-            color=0xEEE657,
+            color=disnake.Colour.yellow(),
         )
         start_streak, end_streak = ErrorLogDB.get_longest_streak()
         embed.add_field(name=MessagesCZ.upsince_title, value=str(boottime))

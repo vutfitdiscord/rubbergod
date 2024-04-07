@@ -74,7 +74,9 @@ class Help(Base, commands.Cog):
         return pages
 
     def generate_embed(self, page):
-        embed = disnake.Embed(title=MessagesCZ.title, description=MessagesCZ.description, color=0xEEE657)
+        embed = disnake.Embed(
+            title=MessagesCZ.title, description=MessagesCZ.description, color=disnake.Colour.yellow()
+        )
         embed.set_thumbnail(url=self.bot.user.display_avatar.url)
         self.add_fields(embed, page["commands"])
         return embed

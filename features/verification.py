@@ -287,7 +287,7 @@ class Verification(BaseFeature):
             )
 
     async def log_verify_fail(self, inter: disnake.ApplicationCommand, phase: str, data: str):
-        embed = disnake.Embed(title="Neúspěšný pokus o verify", color=0xEEE657)
+        embed = disnake.Embed(title="Neúspěšný pokus o verify", color=disnake.Colour.yellow())
         embed.add_field(name="User", value=utils.generate_mention(inter.user.id))
         embed.add_field(name="Verify phase", value=phase)
         embed.add_field(name="Data", value=data, inline=False)
