@@ -90,7 +90,7 @@ class Info(Base, commands.Cog):
 
         place = place[:100]
         if "&" in place:
-            await inter.edit_original_response("Takhle se žádné město určitě nejmenuje.")
+            await inter.edit_original_response(MessagesCZ.invalid_name)
             return
 
         url = f"http://api.openweathermap.org/data/2.5/weather?q={place}&units=metric&lang=cz&appid={token}"
@@ -98,7 +98,7 @@ class Info(Base, commands.Cog):
         res = requests.get(url, timeout=10).json()
 
         if str(res["cod"]) == "200":
-            description = f"Aktuální počasí v městě {res['name']}, {res['sys']['country']}"
+            description = MessagesCZ.weather_description(city=res["name"], country=res["sys"]["country"])
             embed = disnake.Embed(title="Počasí", description=description)
             image = f"http://openweathermap.org/img/w/{res['weather'][0]['icon']}.png"
             embed.set_thumbnail(url=image)
@@ -109,26 +109,24 @@ class Info(Base, commands.Cog):
             wind = f"{res['wind']['speed']}m/s"
             clouds = f"{res['clouds']['all']}%"
             visibility = f"{res['visibility'] / 1000} km" if "visibility" in res else "bez dat"
-            embed.add_field(name="Počasí", value=weather, inline=False)
-            embed.add_field(name="Teplota", value=temp, inline=True)
-            embed.add_field(name="Pocitová teplota", value=feels_temp, inline=True)
-            embed.add_field(name="Vlhkost", value=humidity, inline=True)
-            embed.add_field(name="Vítr", value=wind, inline=True)
-            embed.add_field(name="Oblačnost", value=clouds, inline=True)
-            embed.add_field(name="Viditelnost", value=visibility, inline=True)
+            embed.add_field(name=MessagesCZ.weather, value=weather, inline=False)
+            embed.add_field(name=MessagesCZ.temperature, value=temp, inline=True)
+            embed.add_field(name=MessagesCZ.feels_like, value=feels_temp, inline=True)
+            embed.add_field(name=MessagesCZ.humidity, value=humidity, inline=True)
+            embed.add_field(name=MessagesCZ.wind, value=wind, inline=True)
+            embed.add_field(name=MessagesCZ.clouds, value=clouds, inline=True)
+            embed.add_field(name=MessagesCZ.visibility, value=visibility, inline=True)
 
             utils.add_author_footer(embed, inter.author)
 
             await inter.edit_original_response(embed=embed)
 
         elif str(res["cod"]) == "404":
-            await inter.edit_original_response("Město nenalezeno")
+            await inter.edit_original_response(MessagesCZ.city_not_found)
         elif str(res["cod"]) == "401":
-            await inter.edit_original_response("Rip token -> Rebel pls fix")
+            await inter.edit_original_response(MessagesCZ.token_error)
         else:
-            await inter.edit_original_response(
-                f"Město nenalezeno! <:pepeGun:484470874246742018> ({res['message']})"
-            )
+            await inter.edit_original_response(MessagesCZ.no_city(result=res["message"]))
 
     @commands.slash_command(name="kreditovy_strop", description=MessagesCZ.credit_limit_brief)
     async def kreditovy_strop(self, inter: disnake.ApplicationCommandInteraction) -> None:
