@@ -15,16 +15,16 @@ class IconSelect(disnake.ui.Select):
         [choice] = self.values
         icon = disnake.utils.get(inter.guild.roles, id=int(choice))
         if icon is None:
-            await inter.edit_original_response(MessagesCZ.icon_ui_fail)
+            await inter.edit_original_response(MessagesCZ.fail_icon)
             return
         user = inter.user
         if await features.can_assign(icon, user):
             await inter.edit_original_response(
-                MessagesCZ.icon_set_success(
+                MessagesCZ.set_success(
                     user=inter.user, icon=features.icon_emoji(self.bot, icon) or features.icon_name(icon)
                 ),
                 view=None,
             )
             await features.do_set_icon(icon, user)
         else:
-            await inter.edit_original_response(MessagesCZ.icon_ui_no_permission)
+            await inter.edit_original_response(MessagesCZ.no_permission)
