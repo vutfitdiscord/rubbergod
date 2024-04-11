@@ -7,16 +7,11 @@ Listeners catch errors from commands and send a response to the user.
 If an error remains uncaught, the entire traceback is printed to the bot_dev_channel.
 """
 
-from io import BytesIO
-
 import disnake
 from disnake.ext import commands
 
 from cogs.base import Base
-from database.stats import ErrorEvent
 from features.error import ErrorLogger
-
-from .messages_cz import MessagesCZ
 
 
 class Error(Base, commands.Cog):
@@ -24,17 +19,6 @@ class Error(Base, commands.Cog):
         super().__init__()
         self.bot = bot
         self.logger = ErrorLogger(bot)
-
-    @commands.Cog.listener()
-    async def on_button_click(self, inter: disnake.MessageInteraction):
-        if inter.component.custom_id != MessagesCZ.error_custom_id:
-            return
-        await inter.response.defer(ephemeral=True)
-        id = inter.message.embeds[0].footer.text.split(":")[1].strip()
-        traceback = ErrorEvent.get_traceback(id).traceback
-        with BytesIO(bytes(traceback, "utf-8")) as file_binary:
-            file = disnake.File(fp=file_binary, filename="traceback.txt")
-        await inter.send(file=file, ephemeral=True)
 
     @commands.Cog.listener()
     async def on_command_error(self, ctx: commands.Context, error: Exception):

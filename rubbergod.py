@@ -6,6 +6,7 @@ from disnake import AllowedMentions, Intents, TextChannel
 from disnake.ext import commands
 
 import database.db_migrations as migrations
+from buttons.error import ErrorView
 from cogs.contestvote.views import View as ContestVoteView
 from cogs.report.views import ReportAnonymView, ReportAnswerOnlyView, ReportGeneralView, ReportMessageView
 from config.app_config import config
@@ -111,6 +112,7 @@ class Rubbergod(commands.Bot):
         self.add_view(ReportGeneralView(self))
         self.add_view(ReportMessageView(self))
         self.add_view(ContestVoteView(self))
+        self.add_view(ErrorView())
 
 
 rubbergod = Rubbergod()
