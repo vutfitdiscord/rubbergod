@@ -6,7 +6,8 @@ import utils
 CATEGORIES_NAMES = [
     "1. semestr", "2. semestr", "3. semestr", "4. semestr", "5. semestr",
     "zimni-volitelne", "letni-volitelne", "volitelne",
-    "zimni magistersky semestr", "letni magistersky semestr",
+    "zimni magistersky semestr 1", "letni magistersky semestr 1",
+    "zimni magistersky semestr 2", "letni magistersky semestr 2",
 ]  # fmt: skip
 
 
