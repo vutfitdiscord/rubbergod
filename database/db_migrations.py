@@ -1,3 +1,4 @@
+import logging
 import re
 
 from config.app_config import config
@@ -21,6 +22,8 @@ from database.timeout import TimeoutDB, TimeoutUserDB  # noqa: F401
 from database.verification import PermitDB, ValidPersonDB
 from database.vote import VoteDB  # noqa: F401
 
+rubbergod_logger = logging.getLogger("rubbergod")
+
 
 def init_db(commit: bool = True):
     # database.base.metadata.drop_all(database.db)
@@ -40,11 +43,11 @@ def load_dump(filename: str):
     session.query(HugsTableDB).delete()
     session.commit()
 
-    print(f"Loading dump from {filename}")
+    rubbergod_logger.info(f"Loading dump from {filename}")
 
     data = database.base.metadata.tables.keys()
     for row in data:
-        print(row)
+        rubbergod_logger.info(row)
 
     with open(filename, "r", encoding="utf-8") as backup_file:
         data = backup_file.readlines()
@@ -113,6 +116,6 @@ def load_subjects():
     subjects = list(set(config.subjects))
 
     for subject in subjects:
-        print(f"Importing subject {subject}")
+        rubbergod_logger.info(f"Importing subject {subject}")
         SubjectDB.add(subject)
-    print("Import complete")
+    rubbergod_logger.info("Import complete")

@@ -1,3 +1,5 @@
+import logging
+
 import disnake
 from disnake.ext import commands
 
@@ -6,6 +8,8 @@ from permissions import permission_check
 
 from . import features
 from .messages_cz import MessagesCZ
+
+rubbergod_logger = logging.getLogger("rubbergod")
 
 
 class View(BaseView):
@@ -107,13 +111,13 @@ class Dropdown(disnake.ui.Select):
                 if cog in self.unloaded_cogs():
                     try:
                         self.bot.load_extension(f"cogs.{cog}")
-                        print(MessagesCZ.success_load(cog=cog))
+                        rubbergod_logger.info(MessagesCZ.success_load(cog=cog))
                     except Exception as e:
                         await inter.send(f"Loading error\n`{e}`")
                 else:
                     try:
                         self.bot.unload_extension(f"cogs.{cog}")
-                        print(MessagesCZ.success_unload(cog=cog))
+                        rubbergod_logger.info(MessagesCZ.success_unload(cog=cog))
                     except Exception as e:
                         await inter.send(f"Unloading error\n`{e}`")
         else:
@@ -121,12 +125,12 @@ class Dropdown(disnake.ui.Select):
             for cog in self.values:
                 try:
                     self.bot.reload_extension(f"cogs.{cog}")
-                    print(MessagesCZ.success_reload(cog=cog))
+                    rubbergod_logger.info(MessagesCZ.success_reload(cog=cog))
                     cogs.add(cog)
                 except Exception as e:
                     await inter.send(f"Reloading error\n`{e}`")
             if cogs:
-                await inter.send(MessagesCZ.success_reload(cogs=", ".join(cogs)))
+                await inter.send(MessagesCZ.success_reload(cog=", ".join(cogs)))
 
         self.options = self.create_select()
         await self.message.edit(embed=features.create_embed(self.bot), view=self._view)
