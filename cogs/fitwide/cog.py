@@ -497,3 +497,73 @@ class FitWide(Base, commands.Cog):
         if isinstance(error, commands.CheckFailure):
             await inter.send(MessagesCZ.not_in_modroom)
             return True
+
+    @cooldowns.default_cooldown
+    @commands.check(room_check.is_in_modroom)
+    @commands.slash_command(name="gen_teacher_info", description=MessagesCZ.gen_teacher_info_brief)
+    async def gen_teacher_info(self, inter: disnake.ApplicationCommandInteraction):
+        await inter.response.defer()
+        await inter.send(MessagesCZ.gen_teacher_info_start)
+
+        # Get all semester categories
+        categories = [
+            disnake.utils.get(inter.guild.categories, name=semester_name)
+            for semester_name in features.CATEGORIES_NAMES
+        ]
+
+        # TODO remove in production - masks errors we want to know about
+        # Remove None values
+        categories = [category for category in categories if category is not None]
+
+        # Check if all categories were found
+        if None in categories:
+            await inter.edit_original_response(MessagesCZ.gen_teacher_info_inv_catg)
+            return
+
+        teacher_roles = [
+            disnake.utils.get(inter.guild.roles, id=role_id) for role_id in self.config.teacher_roles
+        ]
+
+        if None in teacher_roles:
+            await inter.edit_original_response(MessagesCZ.gen_teacher_info_inv_roles)
+            return
+
+        teacher_info_channel = self.bot.get_channel(self.config.teacher_info_channel)
+        if teacher_info_channel is None:
+            await inter.edit_original_response(MessagesCZ.gen_teacher_info_channel_none)
+            return
+
+        # Clear channel before sending new data
+        await teacher_info_channel.purge()
+        await teacher_info_channel.send(MessagesCZ.gen_teacher_info_header)
+
+        # Get all semester channels
+        for index, category in enumerate(categories):
+            progress_bar = utils.create_bar(index, len(categories))
+            await inter.edit_original_message(
+                content=MessagesCZ.gen_teacher_info_processing.format(progress_bar=progress_bar)
+            )
+            for channel in category.channels:
+                channel_teachers = []
+                for user, permission in channel.overwrites.items():
+                    if not isinstance(user, disnake.Member):  # Only user overwrites
+                        continue
+
+                    # Check if user is a teacher
+                    if not set(user.roles).intersection(teacher_roles):
+                        continue
+
+                    # Check if user has permission to read messages
+                    if not permission.read_messages:
+                        continue
+
+                    channel_teachers.append(user)
+
+                if channel_teachers:
+                    message = f"**{channel.name.upper()}:**\n"
+                    for teacher in channel_teachers:
+                        # TODO add teacher's full name
+                        message += f"- {teacher.mention}\n"
+                    await teacher_info_channel.send(message)
+
+        await inter.edit_original_response(MessagesCZ.gen_teacher_info_success)
