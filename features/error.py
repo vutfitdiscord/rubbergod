@@ -1,4 +1,5 @@
 import datetime
+import logging
 import sys
 import traceback
 from functools import cached_property
@@ -21,6 +22,8 @@ from database import session
 from database.error import ErrorLogDB, ErrorRow
 from database.stats import ErrorEvent
 from permissions import custom_errors, permission_check
+
+rubbegod_logger = logging.getLogger("rubbergod")
 
 
 class ContextMock:
@@ -98,7 +101,7 @@ class ErrorLogger:
             embed.set_image(file=file)
         except Exception as error:
             output = "".join(traceback.format_exception(type(error), error, error.__traceback__))
-            print(output)
+            rubbegod_logger.warning(output)
 
     def log_error_time(self, set=True) -> int:
         """Log details of last exception and return number of days since last exception"""
