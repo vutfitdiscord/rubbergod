@@ -86,8 +86,8 @@ Cog for dynamically changing config.\
 Cog for managing server emojis. Download emojis and stickers. Get full size of emoji.\
 **Commands:**
 
-    - /emoji get_emojis
-    - /emoji get_emoji
+    - /emoji all
+    - /emoji get
 ---
 
 ### [Error](error/cog.py)
