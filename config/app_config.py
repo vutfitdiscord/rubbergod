@@ -54,6 +54,7 @@ class Config:
     mod_role: int = get_attr(toml_dict, "base", "mod_role")
     submod_role: int = get_attr(toml_dict, "base", "submod_role")
     helper_role: int = get_attr(toml_dict, "base", "helper_role")
+    teacher_roles: List[int] = get_attr(toml_dict, "base", "teacher_roles")
 
     # Verification
     verification_role: str = get_attr(toml_dict, "verification", "role")
@@ -106,6 +107,7 @@ class Config:
     mod_room: int = get_attr(toml_dict, "channels", "mod_room")
     submod_helper_room: int = get_attr(toml_dict, "channels", "submod_helper_room")
     report_channel: int = get_attr(toml_dict, "channels", "report_channel")
+    teacher_info_channel: int = get_attr(toml_dict, "channels", "teacher_info_channel")
 
     # Meme repost
     meme_room: int = get_attr(toml_dict, "bettermeme", "meme_room")

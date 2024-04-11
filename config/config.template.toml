@@ -9,6 +9,8 @@ guild_id = 0
 mod_role = 461550034668748800
 submod_role = 591372495936815114
 helper_role = 461550323727859712
+                # Vyucujici           Doktorand
+teacher_roles = [1020697715857948733, 591348532422639666]
 
 [verification]
 role = ''
@@ -74,6 +76,7 @@ bot_room = 461549842896781312
 mod_room = 505679727936143361
 submod_helper_room = 1023669101744357377
 report_channel = 1120635712950251551
+teacher_info_channel = 635169501771464704
 
 allowed_channels = [
         'bot_room',
