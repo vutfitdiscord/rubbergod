@@ -11,13 +11,11 @@ from cogs.report.views import ReportAnonymView, ReportAnswerOnlyView, ReportGene
 from config.app_config import config
 from config.messages import Messages
 from features.error import ErrorLogger
+from features.logger import setup_logging
 from features.presence import Presence
 
-logger = logging.getLogger("disnake")
-logger.setLevel(logging.WARNING)
-handler = logging.FileHandler(filename="discord.log", encoding="utf-8", mode="w")
-handler.setFormatter(logging.Formatter("%(asctime)s:%(levelname)s:%(name)s: %(message)s"))
-logger.addHandler(handler)
+setup_logging()
+rubbergod_logger = logging.getLogger("rubbergod")
 
 parser = argparse.ArgumentParser()
 parser.add_argument(
@@ -35,7 +33,7 @@ elif args.load_subjects:
     exit(0)
 elif args.init_db:
     migrations.init_db()
-    print("Init complete")
+    rubbergod_logger.info("Init complete")
     exit(0)
 
 is_initialized = False
@@ -51,72 +49,70 @@ intents.presences = True
 intents.moderation = True
 intents.automod_execution = True
 
-command_sync_flags = commands.CommandSyncFlags()
-command_sync_flags.sync_commands_debug = False
 
-bot = commands.Bot(
-    command_prefix=commands.when_mentioned_or(*config.command_prefix),
-    help_command=None,
-    case_insensitive=True,
-    allowed_mentions=AllowedMentions(roles=False, everyone=False, users=True),
-    intents=intents,
-    command_sync_flags=command_sync_flags,
-)
+class Rubbergod(commands.Bot):
+    def __init__(self):
+        super().__init__(
+            command_prefix=commands.when_mentioned_or(*config.command_prefix),
+            help_command=None,
+            case_insensitive=True,
+            allowed_mentions=AllowedMentions(roles=False, everyone=False, users=True),
+            intents=intents,
+            command_sync_flags=commands.CommandSyncFlags(sync_commands_debug=False),
+        )
+        # Create missing tables at start
+        migrations.init_db()
 
-presence = Presence(bot)
-err_logger = ErrorLogger(bot)
+        # Features
+        self.presence = Presence(self)
+        self.err_logger = ErrorLogger(self)
+
+        self.init_cogs()
+
+    async def on_ready(self) -> None:
+        """If RubberGod is ready"""
+        # Inspired from https://github.com/sinus-x/rubbergoddess/blob/master/rubbergoddess.py
+        global is_initialized
+        if is_initialized:
+            return
+        is_initialized = True
+
+        self.init_views()
+        bot_room: TextChannel = self.get_channel(config.bot_room)
+        if bot_room is not None:
+            await bot_room.send(Messages.on_ready_message)
+
+        await self.application_info()
+        await self.presence.set_presence()
+        rubbergod_logger.info("Ready")
+
+    async def on_button_click(self, inter: disnake.MessageInteraction):
+        if inter.component.custom_id in [Messages.trash_delete_id, "bookmark:delete"]:
+            try:
+                await inter.message.delete()
+            except disnake.NotFound:
+                pass
+
+    async def on_error(self, event, *args, **kwargs):
+        return await self.err_logger.handle_event_error(event, args)
+
+    def init_cogs(self) -> None:
+        self.load_extension("cogs.system")
+        rubbergod_logger.info("SYSTEM loaded")
+
+        for extension in config.extensions:
+            self.load_extension(f"cogs.{extension}")
+            rubbergod_logger.info(f"{extension.upper()} loaded")
+
+    def init_views(self) -> None:
+        """Instantiate views for persistent interactions with bot"""
+        self.add_view(ReportAnonymView(self))
+        self.add_view(ReportAnswerOnlyView(self))
+        self.add_view(ReportGeneralView(self))
+        self.add_view(ReportMessageView(self))
+        self.add_view(ContestVoteView(self))
 
 
-@bot.event
-async def on_ready() -> None:
-    """If RubberGod is ready"""
-    # Inspired from https://github.com/sinus-x/rubbergoddess/blob/master/rubbergoddess.py
-    global is_initialized
-    if is_initialized:
-        return
-    is_initialized = True
+rubbergod = Rubbergod()
 
-    views = [
-        ReportGeneralView(bot),
-        ReportMessageView(bot),
-        ReportAnonymView(bot),
-        ReportAnswerOnlyView(bot),
-        ContestVoteView(bot),
-    ]
-    for view in views:
-        bot.add_view(view)
-
-    bot_room: TextChannel = bot.get_channel(config.bot_room)
-    if bot_room is not None:
-        await bot_room.send(Messages.on_ready_message)
-
-    await bot.application_info()
-    await presence.set_presence()
-    print("Ready")
-
-
-@bot.event
-async def on_button_click(inter: disnake.MessageInteraction):
-    if inter.component.custom_id in [Messages.trash_delete_id, "bookmark:delete"]:
-        try:
-            await inter.message.delete()
-        except disnake.NotFound:
-            pass
-
-
-@bot.event
-async def on_error(event, *args, **kwargs):
-    return await err_logger.handle_event_error(event, args)
-
-
-# Create missing tables at start
-migrations.init_db()
-
-bot.load_extension("cogs.system")
-print("System cog loaded")
-
-for extension in config.extensions:
-    bot.load_extension(f"cogs.{extension}")
-    print(f"{extension} loaded")
-
-bot.run(config.key)
+rubbergod.run(config.key)
