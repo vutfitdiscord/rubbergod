@@ -2,7 +2,7 @@ import disnake
 from disnake.ext import commands
 
 import utils
-from config.app_config import Config
+from config.app_config import config
 from database.verification import ValidPersonDB
 
 CATEGORIES_NAMES = [
@@ -76,7 +76,7 @@ async def set_channel_permissions_for_new_students(
 
 
 async def get_teacher_roles(guild: disnake.Guild) -> list[disnake.Role]:
-    return [disnake.utils.get(guild.roles, id=role_id) for role_id in Config.teacher_roles]
+    return [disnake.utils.get(guild.roles, id=role_id) for role_id in config.teacher_roles]
 
 
 async def get_teacher_perms_list(
@@ -119,23 +119,23 @@ async def update_teacher_info(
     teacher_roles = await get_teacher_roles(channel.guild)
     perms_list = await get_teacher_perms_list(channel, teacher_roles)
 
+    if not perms_list:
+        return None, None
+
     # Don't ping anyone
     no_one = disnake.AllowedMentions.none()
 
-    if perms_list:
-        async for message in teacher_info_channel.history():
-            if message.author == channel.guild.me and channel.name.upper() in message.content:
-                old_content = message.content
-                await message.edit(content=perms_list, allowed_mentions=no_one)
-                return old_content, perms_list
-            elif channel.name.upper() in message.content:
-                old_content = message.content
-                await message.delete()
-                await teacher_info_channel.send(perms_list, allowed_mentions=no_one)
-                return old_content, perms_list
+    async for message in teacher_info_channel.history():
+        if message.author == channel.guild.me and channel.name.upper() in message.content:
+            old_content = message.content
+            await message.edit(content=perms_list, allowed_mentions=no_one)
+            return old_content, perms_list
+        elif channel.name.upper() in message.content:
+            old_content = message.content
+            await message.delete()
+            await teacher_info_channel.send(perms_list, allowed_mentions=no_one)
+            return old_content, perms_list
 
-        # Channel had no listing yet
-        await teacher_info_channel.send(perms_list, allowed_mentions=no_one)
-        return None, perms_list
-
-    return None, None
+    # Channel had no listing yet
+    await teacher_info_channel.send(perms_list, allowed_mentions=no_one)
+    return None, perms_list

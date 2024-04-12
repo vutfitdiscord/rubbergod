@@ -504,9 +504,7 @@ class FitWide(Base, commands.Cog):
     @commands.slash_command(name="gen_teacher_info", description=MessagesCZ.gen_teacher_info_brief)
     async def gen_teacher_info(self, inter: disnake.ApplicationCommandInteraction):
         """Generate teacher info channel"""
-        await inter.response.defer()
         await inter.send(MessagesCZ.gen_teacher_info_start)
-
         # Get all semester categories
         categories = [
             disnake.utils.get(inter.guild.categories, name=semester_name)
@@ -514,8 +512,16 @@ class FitWide(Base, commands.Cog):
         ]
 
         # Check if all categories were found
-        if None in categories:
-            await inter.edit_original_response(MessagesCZ.gen_teacher_info_inv_catg)
+        invalid_categories = [
+            semester_name
+            for semester_name, category in zip(features.CATEGORIES_NAMES, categories)
+            if category is None
+        ]
+        if invalid_categories:
+            # Tell which categories were invalid
+            await inter.edit_original_response(
+                MessagesCZ.gen_teacher_info_inv_catg(categories=invalid_categories)
+            )
             return
 
         teacher_roles = await features.get_teacher_roles(inter.guild)

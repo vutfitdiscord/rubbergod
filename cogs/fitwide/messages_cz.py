@@ -39,6 +39,6 @@ class MessagesCZ(GlobalMessages):
     gen_teacher_info_header = "# Vyučující mající přístup k předmětovým kanálům"
     gen_teacher_info_processing = "Generuji informace o vyučujících: {progress_bar}"
     gen_teacher_info_success = "Informace o vyučujících byly úspěšně vygenerovány."
-    gen_teacher_info_inv_catg = "Některé kategorie mají neplatné názvy. Hodilo by se je opravit."
+    gen_teacher_info_inv_catg = "Některé kategorie mají neplatné názvy. Hodilo by se je opravit: {categories}"
     gen_teacher_info_inv_roles = "Nemohu najít role pro vyučující."
     gen_teacher_info_channel_none = "Nemohu najít kanál vyucujici-info."
