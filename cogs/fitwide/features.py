@@ -2,6 +2,8 @@ import disnake
 from disnake.ext import commands
 
 import utils
+from config.app_config import Config
+from database.verification import ValidPersonDB
 
 CATEGORIES_NAMES = [
     "1. semestr", "2. semestr", "3. semestr", "4. semestr", "5. semestr",
@@ -71,3 +73,69 @@ async def set_channel_permissions_for_new_students(
     for channel in channels:
         await channel.set_permissions(bit0, read_messages=True)
         await channel.set_permissions(mit0, read_messages=True)
+
+
+async def get_teacher_roles(guild: disnake.Guild) -> list[disnake.Role]:
+    return [disnake.utils.get(guild.roles, id=role_id) for role_id in Config.teacher_roles]
+
+
+async def get_teacher_perms_list(
+    channel: disnake.abc.GuildChannel, teacher_roles: list[disnake.Role]
+) -> str | None:
+    """Get message with teacher permissions"""
+    channel_teachers = []
+    for user, permission in channel.overwrites.items():
+        if not isinstance(user, disnake.Member):  # Only user overwrites
+            continue
+
+        # Check if user is a teacher
+        if not set(user.roles).intersection(teacher_roles):
+            continue
+
+        # Check if user has permission to read messages
+        if not permission.read_messages:
+            continue
+
+        channel_teachers.append(user)
+
+    perms_list = None
+
+    if channel_teachers:
+        perms_list = f"**{channel.name.upper()}: {channel.mention}**\n"
+        for teacher in channel_teachers:
+            perms_list += f"- {teacher.mention}"
+            user = ValidPersonDB.get_user_by_id(teacher.id)
+            if user:
+                perms_list += f" ({user.name})"
+            perms_list += "\n"
+
+    return perms_list
+
+
+async def update_teacher_info(
+    channel: disnake.abc.GuildChannel, teacher_info_channel: disnake.TextChannel
+) -> tuple[str | None, str | None]:
+    """Update teacher info channel"""
+    teacher_roles = await get_teacher_roles(channel.guild)
+    perms_list = await get_teacher_perms_list(channel, teacher_roles)
+
+    # Don't ping anyone
+    no_one = disnake.AllowedMentions.none()
+
+    if perms_list:
+        async for message in teacher_info_channel.history():
+            if message.author == channel.guild.me and channel.name.upper() in message.content:
+                old_content = message.content
+                await message.edit(content=perms_list, allowed_mentions=no_one)
+                return old_content, perms_list
+            elif channel.name.upper() in message.content:
+                old_content = message.content
+                await message.delete()
+                await teacher_info_channel.send(perms_list, allowed_mentions=no_one)
+                return old_content, perms_list
+
+        # Channel had no listing yet
+        await teacher_info_channel.send(perms_list, allowed_mentions=no_one)
+        return None, perms_list
+
+    return None, None
