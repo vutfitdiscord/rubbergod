@@ -101,12 +101,15 @@ async def get_teacher_perms_list(
     perms_list = None
 
     if channel_teachers:
-        perms_list = f"**{channel.name.upper()}: {channel.mention}**\n"
+        perms_list = f"**===== {channel.name.upper()}: {channel.mention} =====**\n"
         for teacher in channel_teachers:
             perms_list += f"- {teacher.mention} ({teacher.display_name})"
             user = ValidPersonDB.get_user_by_id(teacher.id)
             if user:
-                perms_list += f" - {user.name}"
+                # Get Full Name in reverse order
+                last_name, first_name = user.name.split(" ")
+                if first_name and last_name:
+                    perms_list += f" - {first_name} {last_name}"
             perms_list += "\n"
 
     return perms_list
