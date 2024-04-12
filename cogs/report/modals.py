@@ -79,7 +79,7 @@ class Modal(disnake.ui.Modal):
             message: disnake.Message = await commands.MessageConverter().convert(inter, url)
             await message.edit(content="", embed=embed, view=None)
         except commands.MessageNotFound:
-            await message.channel.send(content="", embed=embed, view=None)
+            await inter.author.send(content="", embed=embed, view=None)
 
     async def report_general(self, inter: disnake.ModalInteraction) -> None:
         """add general report to db and send it to the report room"""
