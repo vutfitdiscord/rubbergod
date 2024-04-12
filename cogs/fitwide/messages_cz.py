@@ -36,7 +36,7 @@ class MessagesCZ(GlobalMessages):
     vutapi_brief = "Získá data z VUT API"
     gen_teacher_info_brief = "Generuje informace o vyučujících"
     gen_teacher_info_start = "Generuji informace o vyučujících..."
-    gen_teacher_info_header = "# Vyučující mající přístup k předmětovým kanálům"
+    gen_teacher_info_header = "# Vyučující v předmětových kanálech"
     gen_teacher_info_processing = "Generuji informace o vyučujících: {progress_bar}"
     gen_teacher_info_success = "Informace o vyučujících byly úspěšně vygenerovány."
     gen_teacher_info_inv_catg = "Některé kategorie mají neplatné názvy. Hodilo by se je opravit: {categories}"
