@@ -1,0 +1,10 @@
+#!/bin/ksh
+
+echo -e "$(LC_ALL=C.UTF-8 ipcs -tm | tail -n +3)"
+
+echo -e "semafory:"
+echo -e "$(LC_ALL=C.UTF-8 ipcs -ts | tail -n +3)"
+
+echo -e "procesy:"
+#echo -e "$(ps aux | grep -E '/[A-Za-z0-9.]+ [[:digit:]]+ [[:digit:]]+ [[:digit:]]+ [[:digit:]]+ [[:digit:]]+')" >> $OUT
+echo -e "$(LC_ALL=C.UTF-8 ps -wwaux)"
