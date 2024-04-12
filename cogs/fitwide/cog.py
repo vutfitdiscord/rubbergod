@@ -4,6 +4,7 @@ Cog implementing management of year roles and database of user logins.
 
 import json
 import subprocess
+from datetime import datetime, timezone
 from io import BytesIO
 
 import disnake
@@ -502,6 +503,7 @@ class FitWide(Base, commands.Cog):
     @commands.check(room_check.is_in_modroom)
     @commands.slash_command(name="gen_teacher_info", description=MessagesCZ.gen_teacher_info_brief)
     async def gen_teacher_info(self, inter: disnake.ApplicationCommandInteraction):
+        """Generate teacher info channel"""
         await inter.response.defer()
         await inter.send(MessagesCZ.gen_teacher_info_start)
 
@@ -511,24 +513,18 @@ class FitWide(Base, commands.Cog):
             for semester_name in features.CATEGORIES_NAMES
         ]
 
-        # TODO remove in production - masks errors we want to know about
-        # Remove None values
-        categories = [category for category in categories if category is not None]
-
         # Check if all categories were found
         if None in categories:
             await inter.edit_original_response(MessagesCZ.gen_teacher_info_inv_catg)
             return
 
-        teacher_roles = [
-            disnake.utils.get(inter.guild.roles, id=role_id) for role_id in self.config.teacher_roles
-        ]
+        teacher_roles = await features.get_teacher_roles(inter.guild)
 
         if None in teacher_roles:
             await inter.edit_original_response(MessagesCZ.gen_teacher_info_inv_roles)
             return
 
-        teacher_info_channel = self.bot.get_channel(self.config.teacher_info_channel)
+        teacher_info_channel = self.teacher_info_channel
         if teacher_info_channel is None:
             await inter.edit_original_response(MessagesCZ.gen_teacher_info_channel_none)
             return
@@ -537,33 +533,34 @@ class FitWide(Base, commands.Cog):
         await teacher_info_channel.purge()
         await teacher_info_channel.send(MessagesCZ.gen_teacher_info_header)
 
-        # Get all semester channels
+        # Run through all semester channels
         for index, category in enumerate(categories):
             progress_bar = utils.create_bar(index, len(categories))
             await inter.edit_original_message(
-                content=MessagesCZ.gen_teacher_info_processing.format(progress_bar=progress_bar)
+                content=MessagesCZ.gen_teacher_info_processing(progress_bar=progress_bar)
             )
             for channel in category.channels:
-                channel_teachers = []
-                for user, permission in channel.overwrites.items():
-                    if not isinstance(user, disnake.Member):  # Only user overwrites
-                        continue
-
-                    # Check if user is a teacher
-                    if not set(user.roles).intersection(teacher_roles):
-                        continue
-
-                    # Check if user has permission to read messages
-                    if not permission.read_messages:
-                        continue
-
-                    channel_teachers.append(user)
-
-                if channel_teachers:
-                    message = f"**{channel.name.upper()}:**\n"
-                    for teacher in channel_teachers:
-                        # TODO add teacher's full name
-                        message += f"- {teacher.mention}\n"
-                    await teacher_info_channel.send(message)
+                perms_list = await features.get_teacher_perms_list(channel, teacher_roles)
+                if perms_list is not None:
+                    await teacher_info_channel.send(
+                        perms_list, allowed_mentions=disnake.AllowedMentions.none()
+                    )
 
         await inter.edit_original_response(MessagesCZ.gen_teacher_info_success)
+
+    @commands.Cog.listener()
+    async def on_guild_channel_update(
+        self, before: disnake.abc.GuildChannel, after: disnake.abc.GuildChannel
+    ) -> None:
+        """Update teacher info channel on permissions change"""
+        if before.overwrites != after.overwrites and after.category.name in features.CATEGORIES_NAMES:
+            perms_list_before, perms_list_after = await features.update_teacher_info(
+                after, self.teacher_info_channel
+            )
+            if perms_list_before is None and perms_list_after is None:
+                return
+            embed = disnake.Embed(title="Teacher permissions update", color=disnake.Colour.yellow())
+            missing = "None"
+            embed.description = f"## Old permissions\n{perms_list_before or missing}\n## New permissions\n{perms_list_after or missing}"
+            embed.timestamp = datetime.now(tz=timezone.utc)
+            await self.log_channel.send(embed=embed, allowed_mentions=disnake.AllowedMentions.none())

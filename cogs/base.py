@@ -41,6 +41,10 @@ class Base:
     def bot_dev_channel(self) -> disnake.TextChannel:
         return self.bot.get_channel(self.config.bot_dev_channel)
 
+    @cached_property
+    def teacher_info_channel(self) -> disnake.TextChannel:
+        return self.bot.get_channel(self.config.teacher_info_channel)
+
     def cog_unload(self) -> None:
         for task in self.tasks:
             task.cancel()
