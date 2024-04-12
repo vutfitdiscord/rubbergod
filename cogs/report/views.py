@@ -179,7 +179,10 @@ class ReportMessageView(View):
         if not report:
             raise ButtonInteractionError(inter.author.mention, MessagesCZ.report_not_found)
 
-        message = await report_features.convert_url(inter, report.message_url)
+        try:
+            message = await report_features.convert_url(inter, report.message_url)
+        except ButtonInteractionError:
+            message = None
         report_message = await report_features.convert_url(inter, report.report_url)
         report_author = await self.get_report_author(report_id)
 
