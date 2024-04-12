@@ -17,3 +17,12 @@ echo >> $_ << EOF
 <script_output>
 EOF
 ```
+
+Then, to setup `leakcheck` (aka `/ios` command), you need to copy three files located in the `./leakcheck` folder to `merlin`:
+
+```bash
+ssh merlin
+mkdir -p rubbergod
+exit
+scp "leakcheck/leakcheck*" merlin:rubbergod/
+```

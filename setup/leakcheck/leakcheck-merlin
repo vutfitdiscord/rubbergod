@@ -1,0 +1,12 @@
+#!/bin/bash
+
+echo -e "$(LC_ALL=C.UTF-8 ipcs -tm | tail -n +4)"
+
+echo -e "semafory:"
+echo -e "$(LC_ALL=C.UTF-8 ipcs -ts | tail -n +4)"
+
+echo -e "soubory semaforu:"
+echo -e "$(LC_ALL=C.UTF-8 ls -l --time-style=iso /dev/shm | tail -n +2)"
+
+echo -e "procesy:"
+echo -e "$(LC_ALL=C.UTF-8 ps aux | grep -E '/[A-Za-z0-9.]+ [[:digit:]]+ [[:digit:]]+ [[:digit:]]+ [[:digit:]]+')"

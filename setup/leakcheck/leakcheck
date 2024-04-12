@@ -1,0 +1,9 @@
+#!/bin/sh
+
+cd "$(dirname "$0")"
+
+if [ "$HOSTNAME" = "merlin.fit.vutbr.cz" ]; then
+	./leakcheck-merlin
+else
+	./leakcheck-eva
+fi
