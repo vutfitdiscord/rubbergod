@@ -536,7 +536,7 @@ class FitWide(Base, commands.Cog):
             return
 
         # Clear channel before sending new data
-        await teacher_info_channel.purge()
+        await teacher_info_channel.purge(limit=None)
         await teacher_info_channel.send(MessagesCZ.gen_teacher_info_header)
 
         # Run through all semester channels
