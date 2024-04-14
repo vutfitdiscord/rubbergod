@@ -139,6 +139,7 @@ Cog implementing management of year roles and database of user logins.\
     - /verify_db reset_login
     - /verify_db link_login_user
     - /vutapi
+    - /gen_teacher_info
 ---
 
 ### [Forum](forum/cog.py)
