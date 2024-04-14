@@ -120,25 +120,24 @@ async def update_teacher_info(
 ) -> tuple[str | None, str | None]:
     """Update teacher info channel"""
     teacher_roles = await get_teacher_roles(channel.guild)
-    perms_list = await get_teacher_perms_list(channel, teacher_roles)
-
-    if not perms_list:
-        return None, None
+    new_perms_list = await get_teacher_perms_list(channel, teacher_roles)
 
     # Don't ping anyone
     no_one = disnake.AllowedMentions.none()
 
     async for message in teacher_info_channel.history():
-        if message.author == channel.guild.me and channel.name.upper() in message.content:
-            old_content = message.content
-            await message.edit(content=perms_list, allowed_mentions=no_one)
-            return old_content, perms_list
-        elif channel.name.upper() in message.content:
-            old_content = message.content
-            await message.delete()
-            await teacher_info_channel.send(perms_list, allowed_mentions=no_one)
-            return old_content, perms_list
+        if channel.name.upper() in message.content:
+            old_perms_list = message.content
+            if new_perms_list is not None:
+                if message.author == channel.guild.me:  # Can edit only own messages
+                    await message.edit(content=new_perms_list, allowed_mentions=no_one)
+                else:  # If not mine, delete and resend
+                    await message.delete()
+                    await teacher_info_channel.send(new_perms_list, allowed_mentions=no_one)
+            else:  # Channel had listing but now it's empty
+                await message.delete()
+            return old_perms_list, new_perms_list
 
     # Channel had no listing yet
-    await teacher_info_channel.send(perms_list, allowed_mentions=no_one)
-    return None, perms_list
+    await teacher_info_channel.send(new_perms_list, allowed_mentions=no_one)
+    return None, new_perms_list
