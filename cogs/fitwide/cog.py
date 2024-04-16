@@ -530,14 +530,13 @@ class FitWide(Base, commands.Cog):
             await inter.edit_original_response(MessagesCZ.gen_teacher_info_inv_roles)
             return
 
-        teacher_info_channel = self.teacher_info_channel
-        if teacher_info_channel is None:
+        if self.teacher_info_channel is None:
             await inter.edit_original_response(MessagesCZ.gen_teacher_info_channel_none)
             return
 
         # Clear channel before sending new data
-        await teacher_info_channel.purge(limit=None)
-        await teacher_info_channel.send(MessagesCZ.gen_teacher_info_header)
+        await self.teacher_info_channel.purge(limit=None)
+        await self.teacher_info_channel.send(MessagesCZ.gen_teacher_info_header)
 
         # Run through all semester channels
         for index, category in enumerate(categories):
@@ -547,10 +546,8 @@ class FitWide(Base, commands.Cog):
             )
             for channel in category.channels:
                 perms_list = await features.get_teacher_perms_list(channel, teacher_roles)
-                if perms_list is not None:
-                    await teacher_info_channel.send(
-                        perms_list, allowed_mentions=disnake.AllowedMentions.none()
-                    )
+                if perms_list:
+                    await features.send_teacher_info(perms_list, self.teacher_info_channel)
 
         await inter.edit_original_response(MessagesCZ.gen_teacher_info_success)
 
