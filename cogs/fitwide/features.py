@@ -115,6 +115,17 @@ async def get_teacher_perms_list(
     return perms_list
 
 
+async def send_teacher_info(perms_list: str | None, teacher_info_channel: disnake.TextChannel) -> None:
+    """
+    Send teacher permissions message to teacher_info_channel, don't ping but send user data
+    The library does not send user data on disabled mentions, so we have to edit the mention and send them manually afterwards
+    See: https://github.com/discord/discord-api-docs/issues/2126
+    """
+    if perms_list:
+        message = await teacher_info_channel.send("Generating...")
+        await message.edit(content=perms_list)
+
+
 async def update_teacher_info(
     channel: disnake.abc.GuildChannel, teacher_info_channel: disnake.TextChannel
 ) -> tuple[str | None, str | None]:
@@ -122,22 +133,19 @@ async def update_teacher_info(
     teacher_roles = await get_teacher_roles(channel.guild)
     new_perms_list = await get_teacher_perms_list(channel, teacher_roles)
 
-    # Don't ping anyone
-    no_one = disnake.AllowedMentions.none()
-
     async for message in teacher_info_channel.history():
         if channel.name.upper() in message.content:
             old_perms_list = message.content
-            if new_perms_list is not None:
-                if message.author == channel.guild.me:  # Can edit only own messages
-                    await message.edit(content=new_perms_list, allowed_mentions=no_one)
+            if new_perms_list:
+                if message.author == channel.guild.me:  # Can edit only my own messages
+                    await message.edit(content=new_perms_list)
                 else:  # If not mine, delete and resend
                     await message.delete()
-                    await teacher_info_channel.send(new_perms_list, allowed_mentions=no_one)
+                    await send_teacher_info(new_perms_list, teacher_info_channel)
             else:  # Channel had listing but now it's empty
                 await message.delete()
             return old_perms_list, new_perms_list
 
     # Channel had no listing yet
-    await teacher_info_channel.send(new_perms_list, allowed_mentions=no_one)
+    await send_teacher_info(new_perms_list, teacher_info_channel)
     return None, new_perms_list
