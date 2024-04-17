@@ -26,8 +26,10 @@ jobs:
     - name: Restore cache
       uses: actions/cache@v4
       with:
-        path: ~/.cache/pip
-        key: ${{ runner.os }}-${{ hashFiles('requirements*') }}
+        path: |
+          ~/.cache/pip
+          ~/.cache/pre-commit
+        key: ${{ runner.os }}-${{ hashFiles('.pre-commit-config.yaml') }}
 
     - name: Install dependencies
       run: |
