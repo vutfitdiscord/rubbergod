@@ -33,6 +33,11 @@ class Config:
     It checks value from config override and if not exists that will be take from config template.
     """
 
+    def __new__(cls):
+        if not hasattr(cls, "instance"):
+            cls.instance = super(Config, cls).__new__(cls)
+        return cls.instance
+
     toml_dict: dict = toml.load("config/config.toml", _dict=dict)
 
     # Authorization
@@ -216,4 +221,5 @@ def config_get_keys() -> list:
 
 def load_config():
     global config
+    del config.instance
     config = Config()
