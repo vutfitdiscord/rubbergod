@@ -12,7 +12,7 @@ from database.verification import PermitDB, ValidPersonDB
 from features.list_message_sender import send_list_of_messages
 
 
-def running_for(time: str) -> int:
+def running_for(time: str, time_dom: str) -> int:
     now = datetime.datetime.now()
     time_list = time.split(":")
     if len(time_list) == 2:
@@ -20,6 +20,8 @@ def running_for(time: str) -> int:
         minutes = now.minute - int(time_list[1])
         return hours * 60 + minutes
     else:
+        if time_dom:
+            time_list[0] = "".join([time, time_dom])
         try:
             date = datetime.datetime.strptime(time_list[0], "%b%d")
         except ValueError:
@@ -116,7 +118,8 @@ def parse_processes(processes: str) -> dict:
         if not login.startswith("x"):
             continue
         time = line_split[8]
-        uptime = running_for(time)
+        time_dom = line_split[9]
+        uptime = running_for(time, time_dom)
         if uptime > 10:
             if login not in parsed:
                 parsed[login] = list()
