@@ -9,4 +9,4 @@ echo -e "soubory semaforu:"
 echo -e "$(LC_ALL=C.UTF-8 ls -l --time-style=iso /dev/shm | tail -n +2)"
 
 echo -e "procesy:"
-echo -e "$(LC_ALL=C.UTF-8 ps aux | grep -E '/[A-Za-z0-9.]+ [[:digit:]]+ [[:digit:]]+ [[:digit:]]+ [[:digit:]]+')"
+echo -e "$(LC_ALL=C.UTF-8 ps axo user:10,pid,pcpu,pmem,vsz,rss,tty,stat,start,time,command | grep -E '/[A-Za-z0-9.]+ [[:digit:]]+ [[:digit:]]+ [[:digit:]]+ [[:digit:]]+')"
