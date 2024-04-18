@@ -23,14 +23,14 @@ class ErrorView(BaseView):
         emoji="📄", label="Traceback", style=disnake.ButtonStyle.danger, custom_id="error:traceback"
     )
     async def traceback(self, button: disnake.ui.Button, inter: disnake.MessageInteraction) -> None:
-        await inter.response.defer(ephemeral=True)
+        await inter.response.defer()
         file = self.create_traceback_file(inter)
-        await inter.send(file=file)
+        await inter.send(file=file, ephemeral=True)
 
     @disnake.ui.button(
         emoji="📄", label="Traceback DM", style=disnake.ButtonStyle.danger, custom_id="error:traceback_dm"
     )
     async def traceback_dm(self, button: disnake.ui.Button, inter: disnake.MessageInteraction) -> None:
-        await inter.response.defer(ephemeral=True)
+        await inter.response.defer()
         file = self.create_traceback_file(inter)
         await inter.author.send(file=file, view=TrashView())
