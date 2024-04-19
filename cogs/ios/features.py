@@ -15,7 +15,7 @@ from features.list_message_sender import send_list_of_messages
 def running_for(time: str, time_dom: str) -> int:
     now = datetime.datetime.now()
     time_list = time.split(":")
-    if len(time_list) == 2:
+    if len(time_list) == 2 or len(time_list) == 3:
         hours = now.hour - int(time_list[0])
         minutes = now.minute - int(time_list[1])
         return hours * 60 + minutes
