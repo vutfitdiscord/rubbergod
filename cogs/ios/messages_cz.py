@@ -11,5 +11,5 @@ class MessagesCZ(GlobalMessages):
     task_stop_success = "Automatické připomínání zastaveno."
     task_nothing_to_stop = "Automatické připomínání není nastaveno."
     task_cancel_brief = "Okamžitě ukončí automatické připomínání (přeruší aktuální běh)"
-    parsing_error = "Toastere, máš bordel v parsování."
+    parsing_error = "Keizzho, máš bordel v parsování."
     howto_clean = "Pokud nevíte, jak po sobě uklidit, checkněte: https://discordapp.com/channels/461541385204400138/534431057001316362/698701631495340033"
