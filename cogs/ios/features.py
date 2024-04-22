@@ -210,7 +210,7 @@ def insult_login_shm(parsed_files: dict, system: str) -> list[str]:
                 f"máš na {system} (`/dev/shm`) `{count}` souborů semaforů."
             )
             if avg_time > 9:
-                msg += f"\n\t\tLeží ti tam průměrně už `{format_time(avg_time)}`"
+                msg += f"\n\t\tLeží ti tam průměrně už `{format_time(avg_time)}`."
             if login_not_in_name:
                 msg += "\n\t\tNemáš v názvu tvůj login, takže můžeš mit kolize s ostatními."
         output_array += [msg]
