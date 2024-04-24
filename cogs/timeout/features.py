@@ -85,6 +85,8 @@ async def timeout_embed_listing(
 
 async def timeout_perms(
     inter: disnake.ApplicationCommandInteraction,
+    session: aiohttp.ClientSession,
+    bot_dev_channel: disnake.TextChannel,
     member: disnake.Member,
     starttime: datetime | None,
     endtime: datetime | None,
@@ -94,13 +96,14 @@ async def timeout_perms(
     remove_logs: bool = False,
 ) -> bool:
     """Set timeout for member and update in db. Return True if successful, False otherwise."""
+    mode = "delete" if remove_logs else "create"
     try:
         if endtime is None or length is None or starttime is None:
             await member.timeout(until=None, reason=reason)
-            TimeoutDB.remove_timeout(member.id, remove_logs)
+            timeout = TimeoutDB.remove_timeout(member.id, remove_logs)
         elif length.days > 28:
             await member.timeout(until=datetime.now(timezone.utc) + timedelta(days=28), reason=reason)
-            TimeoutDB.add_timeout(
+            timeout = TimeoutDB.add_timeout(
                 member.id,
                 inter.author.id,
                 starttime,
@@ -111,7 +114,7 @@ async def timeout_perms(
             )
         else:
             await member.timeout(until=endtime, reason=reason)
-            TimeoutDB.add_timeout(
+            timeout = TimeoutDB.add_timeout(
                 member.id,
                 inter.author.id,
                 starttime,
@@ -120,6 +123,12 @@ async def timeout_perms(
                 inter.guild.id,
                 isself,
             )
+
+        if timeout:
+            error = await send_to_grillbot(session, timeout, mode)
+            if error:
+                await bot_dev_channel.send(error)
+
         return True
     except disnake.Forbidden:
         # bot can't timeout member
@@ -154,17 +163,17 @@ async def parse_members(
     return parsed_members or None
 
 
-async def get_user_from_grillbot(owner_id: str, guild_id: str, user_id: str) -> tuple[int, int]:
+async def get_user_from_grillbot(
+    session: aiohttp.ClientSession, guild_id: str, user_id: str
+) -> tuple[int, int]:
     """Get unverify count and warning count"""
-    headers = {"ApiKey": config.grillbot_api_key, "Author": str(owner_id)}
-    async with aiohttp.ClientSession(timeout=aiohttp.ClientTimeout(total=10), headers=headers) as session:
-        try:
-            url = f"{config.grillbot_api_url}/user/info/{guild_id}/{user_id}"
-            async with session.get(url) as resp:
-                user = await resp.json()
-                return user.get("unverifyCount", "Missing"), user.get("warningCount", "Missing")
-        except (asyncio.exceptions.TimeoutError, aiohttp.client_exceptions.ClientConnectorError) as e:
-            raise ApiError(str(e))
+    try:
+        url = f"{config.grillbot_api_url}/user/info/{guild_id}/{user_id}"
+        async with session.get(url) as resp:
+            user = await resp.json()
+            return user.get("unverifyCount", "Missing"), user.get("warningCount", "Missing")
+    except (asyncio.exceptions.TimeoutError, aiohttp.client_exceptions.ClientConnectorError) as e:
+        raise ApiError(str(e))
 
 
 async def time_check(
@@ -182,3 +191,41 @@ async def time_check(
         await inter.send(MessagesCZ.timeout_too_short, ephemeral=True)
         return True
     return False
+
+
+async def send_to_grillbot(
+    session: aiohttp.ClientSession, timeout: TimeoutDB, mode: str = "create"
+) -> str | None:
+    """Send timeout data to grillbot api.
+
+    Sending create/update timeout event or delete timeout event.
+    """
+    # if user got timeout from automod grillbot api expects user_id as mod_id
+    mod_id = timeout.user_id if timeout.mod_id == "1" else timeout.mod_id
+    if mode == "delete":
+        try:
+            url = f"{config.grillbot_api_url}/user/measures/timeout/{timeout.id}"
+            async with session.post(url) as response:
+                if response.status != 200:
+                    return MessagesCZ.error_msg(url=url, status=response.status, text=await response.text())
+                return None
+        except Exception as error:
+            return str(error)
+
+    try:
+        url = f"{config.grillbot_api_url}/user/measures/timeout/create"
+        data = {
+            "timeoutId": f"{timeout.id}",
+            "createdAtUtc": f"{timeout.start.replace(tzinfo=timezone.utc).isoformat()}",
+            "moderatorId": f"{mod_id}",
+            "targetUserId": f"{timeout.user_id}",
+            "guildId": f"{timeout.guild_id}",
+            "validToUtc": f"{timeout.end.replace(tzinfo=timezone.utc).isoformat()}",
+            "reason": f"{timeout.reason}",
+        }
+        async with session.post(url, json=data) as response:
+            if response.status != 201:
+                return MessagesCZ.error_msg(url=url, status=response.status, text=await response.text())
+            return None
+    except Exception as error:
+        return str(error)

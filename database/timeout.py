@@ -51,7 +51,7 @@ class TimeoutDB(database.base):  # type: ignore
         reason: str,
         guild_id: str,
         isself: bool = False,
-    ) -> None:
+    ) -> TimeoutDB:
         """Add the user and their timeout/selftimeout to the database."""
         user = TimeoutUserDB.get_user(user_id)
         timeout = TimeoutUserDB.get_active_timeout(user_id)
@@ -59,7 +59,7 @@ class TimeoutDB(database.base):  # type: ignore
         if user and timeout:
             # if user has already timeout update it
             cls.update_timeout(timeout, mod_id, end, reason)
-            return
+            return timeout
 
         if user is None:
             TimeoutUserDB.add_user(user_id)
@@ -76,6 +76,7 @@ class TimeoutDB(database.base):  # type: ignore
 
         session.add(timeout)
         session.commit()
+        return timeout
 
     @classmethod
     def update_timeout(
@@ -96,16 +97,17 @@ class TimeoutDB(database.base):  # type: ignore
         return session.query(TimeoutDB).get(str(user_id))
 
     @classmethod
-    def remove_timeout(cls, user_id: str, permanent: bool = False) -> None:
+    def remove_timeout(cls, user_id: str, permanent: bool = False) -> TimeoutDB | None:
         timeout = TimeoutUserDB.get_active_timeout(str(user_id))
         if timeout is None:
-            return
+            return None
 
         if permanent:
             session.delete(timeout)
         else:
             timeout.end = datetime.now(timezone.utc)
         session.commit()
+        return timeout
 
 
 class TimeoutUserDB(database.base):  # type: ignore
