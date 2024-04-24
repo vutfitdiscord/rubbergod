@@ -5,6 +5,7 @@ Cog containing timeout commands and manipulating with timeout.
 import math
 from datetime import datetime, time, timedelta, timezone
 
+import aiohttp
 import disnake
 from disnake.ext import commands, tasks
 
@@ -48,6 +49,8 @@ class Timeout(Base, commands.Cog):
         super().__init__()
         self.bot = bot
         self.tasks = [self.refresh_timeout.start()]
+        self.headers = {"ApiKey": self.config.grillbot_api_key, "Author": str(self.bot.owner_id)}
+        self.session = aiohttp.ClientSession(timeout=aiohttp.ClientTimeout(total=10), headers=self.headers)
 
     @commands.check(permission_check.submod_plus)
     @commands.slash_command(name="timeout", guild_ids=[Base.config.guild_id])
@@ -86,7 +89,14 @@ class Timeout(Base, commands.Cog):
 
         for member in parsed_members:
             isSuccess = await features.timeout_perms(
-                inter, member, inter.created_at, endtime_datetime, length, reason
+                inter=inter,
+                session=self.session,
+                bot_dev_channel=self.bot_dev_channel,
+                member=member,
+                starttime=inter.created_at,
+                endtime=endtime_datetime,
+                length=length,
+                reason=reason,
             )
             if isSuccess:
                 timeoutMembers.append(member)
@@ -139,7 +149,15 @@ class Timeout(Base, commands.Cog):
 
         for member in parsed_members:
             await features.timeout_perms(
-                inter, member, None, None, None, "Předčasně odebráno", remove_logs=remove_logs
+                inter=inter,
+                session=self.session,
+                bot_dev_channel=self.bot_dev_channel,
+                member=member,
+                starttime=None,
+                endtime=None,
+                length=None,
+                reason="Předčasně odebráno",
+                remove_logs=remove_logs,
             )
             embed.add_field(
                 name=member.display_name,
@@ -192,11 +210,7 @@ class Timeout(Base, commands.Cog):
 
         main_embed.add_field(name="Timeouts count", value=timeouts_count, inline=True)
         main_embed.add_field(name="Reports count", value=ReportDB.get_reports_on_user(user.id), inline=True)
-        unverifies, warnings = await features.get_user_from_grillbot(
-            self.bot.owner_id,
-            inter.guild.id,
-            user.id,
-        )
+        unverifies, warnings = await features.get_user_from_grillbot(self.session, inter.guild.id, user.id)
         main_embed.add_field(
             name="Unverifies count",
             value=f"[{unverifies}](https://private.grillbot.eu/admin/unverify/logs)",
@@ -278,6 +292,8 @@ class Timeout(Base, commands.Cog):
         await inter.response.defer()
         isSuccess = await features.timeout_perms(
             inter=inter,
+            session=self.session,
+            bot_dev_channel=self.bot_dev_channel,
             member=inter.user,
             starttime=starttime_local,
             endtime=endtime_datetime,
@@ -335,7 +351,12 @@ class Timeout(Base, commands.Cog):
             rule = await execution.guild.fetch_automod_rule(execution.rule_id)
             length = timedelta(seconds=execution.action.duration)
             now = datetime.now(timezone.utc)
-            TimeoutDB.add_timeout(execution.user_id, "1", now, now + length, rule.name, execution.guild.id)
+            timeout = TimeoutDB.add_timeout(
+                execution.user_id, "1", now, now + length, rule.name, execution.guild.id
+            )
+            error = await features.send_to_grillbot(self.session, timeout)
+            if error:
+                await self.bot_dev_channel.send(error)
             # automod actions are sent to submod_helper_room automatically
 
     @commands.Cog.listener()
@@ -370,7 +391,7 @@ class Timeout(Base, commands.Cog):
                     # timeout was added during timeout wars 1. April
                     return
 
-                TimeoutDB.add_timeout(
+                timeout = TimeoutDB.add_timeout(
                     entry.target.id,
                     entry.user.id,
                     entry.created_at,
@@ -392,3 +413,6 @@ class Timeout(Base, commands.Cog):
                 )
 
                 await self.submod_helper_room.send(embed=embed)
+                error = await features.send_to_grillbot(self.session, timeout)
+                if error:
+                    await self.bot_dev_channel.send(error)

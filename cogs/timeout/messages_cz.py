@@ -22,3 +22,4 @@ class MessagesCZ(GlobalMessages):
     manual_remove = "{member}\nPředčasně odebráno (Discord GUI)"
     self_timeout_reason = "Sebeumlčení"
     self_timeout_success = "Sebeumlčení proběhlo úspěšně"
+    error_msg = "Grillbot `{url}` returned error\n{status} - {text}"
