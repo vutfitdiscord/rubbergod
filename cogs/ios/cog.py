@@ -72,7 +72,12 @@ class IOS(Base, commands.Cog):
             ["ssh", "-i", self.config.ios_leakcheck_key_path, "merlin"], stdout=subprocess.PIPE
         )
         output, _ = process.communicate()
-        memory, rest = output.decode("utf-8").split("semafory:\n")
+
+        try:
+            memory, rest = output.decode("utf-8").split("semafory:\n")
+        except ValueError:
+            await channel.send(MessagesCZ.connection_error(system="merlinovi"))
+            return
         semaphores, processes = rest.split("procesy:\n")
         try:
             parsed_memory = features.parse_memory(memory)
@@ -94,8 +99,11 @@ class IOS(Base, commands.Cog):
             ["ssh", "-i", self.config.ios_leakcheck_key_path, "eva"], stdout=subprocess.PIPE
         )
         output, _ = process.communicate()
-
-        memory, rest = output.decode("utf-8").split("semafory:\n")
+        try:
+            memory, rest = output.decode("utf-8").split("semafory:\n")
+        except ValueError:
+            await channel.send(MessagesCZ.connection_error(system="evě"))
+            return
         semaphores, processes = rest.split("procesy:\n")
         # remove unwanted processes
         processes = features.filter_processes(processes)

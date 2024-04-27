@@ -15,7 +15,7 @@ printf "your xlogin00: "
 read xlogin
 printf "\n"
 
-ssh_config="
+ssh_config="\
 Host *
     IdentitiesOnly yes
 
@@ -25,7 +25,7 @@ Host eva merlin
     RequestTTY no
 
 Host merlin
-    ProxyCommand ssh -i /root/.ssh/nc_eva_merlin %r@eva
+    ProxyCommand ssh -i /root/.ssh/nc_eva_merlin %r@eva\
 "
 
 # `ash` is not a mistake; Rubbergod Alpine does not have bash
