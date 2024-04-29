@@ -124,7 +124,7 @@ async def timeout_perms(
                 isself,
             )
 
-        if timeout:
+        if timeout and not isself:
             error = await send_to_grillbot(session, timeout, mode)
             if error:
                 await bot_dev_channel.send(error)
