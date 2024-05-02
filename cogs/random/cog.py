@@ -48,7 +48,7 @@ class Random(Base, commands.Cog):
             await inter.send(MessagesCZ.pick_empty)
             return
         option = disnake.utils.escape_mentions(random.choice(args_list))
-        await inter.send(f"{option} {inter.author.mention}", ephemeral=self.check.botroom_check(inter))
+        await inter.send(option, ephemeral=self.check.botroom_check(inter))
 
     @cooldowns.short_cooldown
     @commands.slash_command(name="flip", description=MessagesCZ.flip_brief)
