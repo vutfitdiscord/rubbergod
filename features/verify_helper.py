@@ -94,6 +94,10 @@ class VerifyHelper:
         person = await self.save_user_details(user)
         return person
 
+    async def get_mails(self, id: str) -> list[str]:
+        user = await self.get_user_details(id)
+        return user["emaily"] if user else []
+
     async def log_relation_error(self, user: dict) -> None:
         name = user["login"] or user["id"]
         with BytesIO(bytes(json.dumps(user, indent=2, ensure_ascii=False), "utf-8")) as file:

@@ -73,13 +73,14 @@ class Verification(BaseFeature):
             user.save_sent_code(code)
             self.send_mail(mail_address, mail_content, MessagesCZ.verify_subject)
 
+        mail_list = await self.helper.get_mails(user.login)
         if not is_resend:
             success_message = MessagesCZ.verify_send_success(
                 user=inter.user.id,
                 mail=mail_address,
                 subject=MessagesCZ.verify_subject,
             )
-            view = VerifyWithResendButtonView(user.login)
+            view = VerifyWithResendButtonView(user.login, mail_list)
             await inter.edit_original_response(content=success_message, view=view)
         else:
             success_message = MessagesCZ.verify_resend_success(
@@ -87,8 +88,8 @@ class Verification(BaseFeature):
                 mail=mail_address,
                 subject=MessagesCZ.verify_subject,
             )
-            view = VerifyView(user.login)
-            await inter.response.edit_message(content=success_message, view=view)
+            view = VerifyView(user.login, mail_list)
+            await inter.edit_original_response(content=success_message, view=view)
 
     async def send_code(self, login: str, inter: disnake.ApplicationCommandInteraction) -> bool:
         # return True if code was successfully sent
