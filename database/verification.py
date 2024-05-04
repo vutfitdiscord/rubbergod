@@ -82,6 +82,10 @@ class ValidPersonDB(database.base):  # type: ignore
 
         return f"{self.login}@{fallback_domain}"  # fallback
 
+    def set_mail(self, mail: str) -> None:
+        self.mail = mail
+        session.commit()
+
     @classmethod
     def get_all_persons(cls) -> List[ValidPersonDB]:
         return session.query(ValidPersonDB)

@@ -9,11 +9,13 @@ class MessagesCZ(GlobalMessages):
     verify_send_dumbshit = "{user} Tvůj login. {emote}"
     verify_send_success = "Kód byl odeslán na tvůj mail (`{mail}`). " \
                           "Pokud kód do 10 minut nedorazí, tak si jej nech znovu zaslat. " \
-                          "Hledej zprávu s předmětem `{subject}` (může být i ve SPAMu)."
+                          "Hledej zprávu s předmětem `{subject}` (může být i ve SPAMu). " \
+                          "Pokud tvůj mail není správný, vyber z možností alternativních mailů."
     verify_resend_success = "Kód byl znovuodeslán na tvůj mail (`{mail}`). " \
-                          "Pokud kód do 10 minut nedorazí, tak tagni někoho z Mod týmu." \
-                          "Hledej zprávu s předmětem `{subject}` (může být i ve SPAMu)."
-    verify_verify_manual = "Čauec {user}, nechám {admin}, aby to udělal manuálně, " \
+                          "Pokud kód do 10 minut nedorazí, tak tagni někoho z Mod týmu. " \
+                          "Hledej zprávu s předmětem `{subject}` (může být i ve SPAMu). " \
+                          "Pokud tvůj mail není správný, vyber z možností alternativních mailů."
+    verify_verify_manual = "Čau {user}, nechám {admin}, aby to udělal manuálně, " \
                            "jsi shady (Year: {year})"
     verify_verify_success = "{user} Gratuluji, byl jsi verifikován!"
     verify_post_verify_info = "Role si přidáš v Channels & Roles " \
@@ -31,6 +33,9 @@ class MessagesCZ(GlobalMessages):
     verify_verify_wrong_code = "Špatný kód."
     verify_step_done = "{user} Tímto krokem jsi už prošel. ({admin} pls)"
     verify_invalid_channel = "Tento příkaz je možné spustit pouze v DMs nebo na VUT FIT serveru."
+    mail_alternative = "Alternativní maily"
+    mail_changed = "Změna mailu"
+    mail_changed_desc = "Uživatel {login} změnil mail z `{old}` na `{new}`."
     invalid_login = "{user} Neplatný login. Přečti si prosím <#591386755547136020>. ({admin} pls)"
     verify_subject = "FIT Discord verifikace"
     dynamic_verify_requested = "Byla zaslána žádost o verifikaci. Vyčkej prosím než ji někdo z oprávněných osob schválí."
