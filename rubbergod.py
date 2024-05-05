@@ -19,20 +19,10 @@ setup_logging()
 rubbergod_logger = logging.getLogger("rubbergod")
 
 parser = argparse.ArgumentParser()
-parser.add_argument(
-    "--load_dump", type=str, help="Imports SQL dump from SQL file to database.", metavar="filepath.sql"
-)
-parser.add_argument("--load_subjects", action="store_true", help="Fills DB with subjects.")
 parser.add_argument("--init_db", action="store_true", help="Creates missing DB tables without start bot.")
 args = parser.parse_args()
 
-if args.load_dump is not None:
-    migrations.load_dump(args.load_dump)
-    exit(0)
-elif args.load_subjects:
-    migrations.load_subjects()
-    exit(0)
-elif args.init_db:
+if args.init_db:
     migrations.init_db()
     rubbergod_logger.info("Init complete")
     exit(0)
