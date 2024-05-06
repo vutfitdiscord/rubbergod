@@ -33,6 +33,13 @@ class System(Base, commands.Cog):
         self.git = Git()
 
         self.unloadable_cogs = ["system"]
+        self.check_first_boot()
+
+    def check_first_boot(self):
+        """Check if the bot is booting for the first time. If so, set the error log."""
+        start_streak, end_streak = ErrorLogDB.get_longest_streak()
+        if not start_streak:
+            ErrorLogDB.set()
 
     @commands.check(permission_check.is_bot_admin)
     @commands.slash_command(name="git")

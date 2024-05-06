@@ -70,9 +70,12 @@ class ErrorLogDB(database.base):  # type: ignore
         return last_error, start_streak, end_streak  # type: ignore
 
     @classmethod
-    def get_longest_streak(cls) -> tuple[Date, Date]:
+    def get_longest_streak(cls) -> tuple[Date | None, Date]:
         last_error, start_streak, end_streak = cls.get_all()
         today = date.today()
+
+        if not last_error.date:
+            return None, today
 
         current_streak = today - last_error.date
         longest_streak = end_streak.date - start_streak.date
