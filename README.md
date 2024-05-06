@@ -109,8 +109,6 @@ This command should do the trick:
 docker compose up
 ```
 
-**Note:** We use the newer Compose V2 here. If the above command doesn't work, please install Compose V2: `docker-compose-plugin`. As a second option, you can install and use (now deprecated) `docker-compose` command instead.
-
 Docker will download all the necessary stuff and run the container. If you did everything correctly, bot will connect to the DB, load all the extensions and print `Ready` at the end. It will also send `:peepowave:` emoji to the `#bot-room` if you configured one. You're now all set!
 
 --------------------------------------
