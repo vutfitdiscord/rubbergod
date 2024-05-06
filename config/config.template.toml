@@ -27,7 +27,7 @@ smtp_port = 465
 pass = ''
 
 [database]
-db_string = "postgresql://postgres:postgres@db:5432/postgres"
+db_string = "postgresql://rubbergod:postgres@db:5432/rubbergod"
 
 [cogs]
 extensions = [

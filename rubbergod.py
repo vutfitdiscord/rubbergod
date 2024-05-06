@@ -24,7 +24,6 @@ args = parser.parse_args()
 
 if args.init_db:
     migrations.init_db()
-    rubbergod_logger.info("Init complete")
     exit(0)
 
 is_initialized = False

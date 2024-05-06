@@ -12,6 +12,7 @@ timeout_wars
 service_logs.txt
 emojis.zip
 *sql
+!database/backup/backup.sql
 *.bak
 .ruff_cache
 .mypy_cache
