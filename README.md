@@ -21,6 +21,7 @@ from the developers of Disnake, Discord API Python library.
 the `bot` and `applications.commands` scopes are required. We also strongly recommend choosing `Administrator` in the __Bot permissions__
 as it is hard to figure out which of these permissions you actually need for the development.
 
+> [!IMPORTANT]
 > You should set up a separate server just for the development purposes so it shouldn't be that much of a security risk anyway.
 
 - After you create the Discord application, one additional step is required.
@@ -28,6 +29,7 @@ You will also need to enable `SERVER MEMBERS INTENT` in __Bot__ tab:
 
 ![image](https://user-images.githubusercontent.com/16971100/224842973-efa05793-31a4-4e88-b2da-8bc864d6adcb.png)
 
+> [!TIP]
 > You can do this by going to the [Discord Developer Portal](https://discord.com/developers/applications) and selecting your newly created application.
 Then click on the __Bot__ tab on the left and scroll down to the __Privileged Gateway Intents__ section.
 
@@ -40,6 +42,7 @@ git clone https://github.com/Toaster192/rubbergod.git
 cd rubbergod
 ```
 
+> [!IMPORTANT]
 > If you want to contribute to this project, refer to the [contribution](#contribution) section first.
 
 #### Configuration
@@ -58,6 +61,7 @@ Now open the `config.toml` file in your editor. Insert the Discord API key you o
 ...
 ```
 
+> [!WARNING]
 > __Be careful.__ Bad things will happen if anyone else gets a possession of this key. Do not share it with anyone, ever!
 
 On the next two lines, insert your Discord user and server ID so you get administrator rights over the bot:
@@ -67,6 +71,7 @@ On the next two lines, insert your Discord user and server ID so you get adminis
 7 guild_id = <Your Server ID here>
 ```
 
+> [!TIP]
 > [Where can I find my User/Server/Message ID?](https://support.discord.com/hc/en-us/articles/206346498-Where-can-I-find-my-User-Server-Message-ID-)
 
 Then, create the following 5 channels (or use one channel for all of them) on your server and paste their IDs to the config:
@@ -87,10 +92,8 @@ Then, create the following 5 channels (or use one channel for all of them) on yo
 
 Install Docker & Docker Compose V2 by going to their [official documentation](https://docs.docker.com/engine/install/). Just select your OS and follow the steps.
 
-> You can also install Docker as a GUI App — Docker Desktop — which includes everything you need.
-
-- If you haven't already, enable `docker` service on startup: `sudo systemctl enable --now docker.service`. Most installers should do that automatically, though.
-- To use Docker without `sudo`, you also need to be in `docker` group (eg. `sudo usermod -aG docker $USER && newgrp docker`).
+- Most installers should do that automatically, but just to be sure, enable `docker` service on startup: `sudo systemctl enable --now docker.service`.
+- To use Docker without `sudo`, you also need to be in `docker` group (eg. `sudo usermod -aG docker $USER`).
 - It's recommended to restart your system at this point (to get all the permissions and other stuff right).
 
 #### a. Dev containers in VS Code (one click run) — preferred option
@@ -122,8 +125,10 @@ Try to tweak some command a little bit and run the bot again, this time you can 
 docker compose up --detach
 ```
 
-**Note:** You can use shorter `-d` instead of `--detach`.
+> [!NOTE]
+> You can use shorter `-d` instead of `--detach`.
 
+> [!IMPORTANT]
 > If you changed some internal command logic, it should be applied instantly. If, however, your change involves Discord-side API changes — command name change, for example — it can take longer (few minutes to a few hours in extreme cases).
 
 To stop the detached container, use this command:
@@ -134,6 +139,7 @@ docker compose down
 
 ### Tips (optional)
 
+> [!NOTE]
 > These things are not necessary for development but can help from time to time.
 
 #### Enable commands sync debug
