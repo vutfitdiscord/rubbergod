@@ -3,7 +3,7 @@
 ## Connecting to the DB through Docker (externally)
 
 ```bash
-docker compose exec -it db psql -U postgres
+docker compose exec -it db psql -U rubbergod
 ```
 
 PostgreSQL prompt will open and you can now run any SQL (or Postgre-specific) commands you want. To quit, press Ctrl+D.
