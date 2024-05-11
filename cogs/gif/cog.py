@@ -5,7 +5,6 @@ Cog for creating gifs.
 from io import BytesIO
 
 import disnake
-import requests
 from disnake.ext import commands
 from PIL import Image
 
@@ -15,6 +14,8 @@ from config import cooldowns
 from .features import IMAGES_PATH, ImageHandler
 from .messages_cz import MessagesCZ
 
+MISSING = disnake.utils.MISSING
+
 
 class Gif(Base, commands.Cog):
     def __init__(self, bot: commands.Bot):
@@ -22,23 +23,17 @@ class Gif(Base, commands.Cog):
         self.bot = bot
         self.imagehandler = ImageHandler()
 
-    async def get_profile_picture(self, inter, url):
-        try:
-            response = requests.get(url, timeout=10)
-        except requests.exceptions.RequestException:
-            await inter.send(MessagesCZ.gif_req_error, ephemeral=True)
-            return None
-        avatar = Image.open(BytesIO(response.content)).convert("RGBA")
-        return avatar
+    async def get_profile_picture(self, user: disnake.User, size: int = MISSING, format: str = "png"):
+        avatar = await user.display_avatar.replace(size=size, format=format).read()
+        avatarFull = Image.open(BytesIO(avatar)).convert("RGBA")
+        return avatarFull
 
     @cooldowns.default_cooldown
     @commands.slash_command(name="pet", description=MessagesCZ.pet_brief)
     async def pet(self, inter: disnake.ApplicationCommandInteraction, user: disnake.User = None):
+        await inter.response.defer()
         user = inter.author if user is None else user
-        url = user.display_avatar.with_format("png")
-        avatar = await self.get_profile_picture(inter, url)
-        if avatar is None:
-            return
+        avatar = await self.get_profile_picture(inter.author)
         avatar = ImageHandler.square_to_circle(avatar)
 
         frames = []
@@ -74,19 +69,14 @@ class Gif(Base, commands.Cog):
                 optimize=False,
             )
             image_binary.seek(0)
-            await inter.response.send_message(file=disnake.File(fp=image_binary, filename="pet.gif"))
+            await inter.send(file=disnake.File(fp=image_binary, filename="pet.gif"))
 
     @cooldowns.default_cooldown
     @commands.slash_command(name="catnap", description="Catnap your friend")
-    async def catnap(self, inter: disnake.ApplicationCommandInteraction, user: disnake.User):
+    async def catnap(self, inter: disnake.ApplicationCommandInteraction, user: disnake.User = None):
         await inter.response.defer()
-        url = user.display_avatar.replace(size=64, format="png")
-        try:
-            response = requests.get(url, timeout=10)
-        except requests.exceptions.RequestException:
-            await inter.send(MessagesCZ.gif_req_error, ephemeral=True)
-            return
-        avatar = Image.open(BytesIO(response.content)).convert("RGBA")
+        user = inter.author if user is None else user
+        avatar = await self.get_profile_picture(user, 64, "png")
 
         width, height = avatar.size
         if width != 64 or height != 64:
@@ -109,10 +99,7 @@ class Gif(Base, commands.Cog):
         """
         await inter.response.defer()
         user = inter.author if user is None else user
-        url = user.display_avatar.with_format("png")
-        avatar = await self.get_profile_picture(inter, url)
-        if avatar is None:
-            return
+        avatar = await self.get_profile_picture(user, 64, "png")
 
         frames = ImageHandler.get_bonk_frames(avatar)
 
