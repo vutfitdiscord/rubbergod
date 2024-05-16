@@ -14,12 +14,21 @@ from rubbergod import Rubbergod
 
 from .messages_cz import MessagesCZ
 from .modals import Modal
+from .views import ReportAnonymView, ReportAnswerOnlyView, ReportGeneralView, ReportMessageView
 
 
 class Report(Base, commands.Cog):
     def __init__(self, bot: Rubbergod):
         super().__init__()
         self.bot = bot
+
+    @commands.Cog.listener("on_ready")
+    async def init_views(self):
+        """Instantiate views for persistent interactions with bot"""
+        self.bot.add_view(ReportAnonymView(self.bot))
+        self.bot.add_view(ReportAnswerOnlyView(self.bot))
+        self.bot.add_view(ReportGeneralView(self.bot))
+        self.bot.add_view(ReportMessageView(self.bot))
 
     async def check_blocked_bot(self, inter: disnake.Interaction) -> disnake.Message | None:
         try:
