@@ -48,7 +48,7 @@ class Rubbergod(commands.Bot):
             case_insensitive=True,
             allowed_mentions=AllowedMentions(roles=False, everyone=False, users=True),
             intents=intents,
-            command_sync_flags=commands.CommandSyncFlags(sync_commands_debug=False),
+            command_sync_flags=commands.CommandSyncFlags(sync_commands=True, sync_commands_debug=False),
         )
         # Create missing tables at start
         migrations.init_db()

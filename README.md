@@ -142,11 +142,12 @@ docker compose down
 
 #### Enable commands sync debug
 
-To enable command synchronization debug logging, change the following setting in `rubbergod.py` to `True`:
+On startup the bot automatically syncs commands. Restarting the bot too frequently can lead to excessive synchronization attempts, causing the bot to time out from the Discord API. This timeout duration can vary widely, ranging anywhere from 10 minutes to up to X days. For debugging purposes it is recommended to set the `sync_commands=False` parameter. Be aware that the commands will not be updated on discord side (name, description, permissions, etc.), the functionality however will be updated.
+
+To enable command synchronization debug logging, change the following setting in `rubbergod.py` to `True`.
 
 ```python
-command_sync_flags = commands.CommandSyncFlags()
-command_sync_flags.sync_commands_debug = False
+command_sync_flags=commands.CommandSyncFlags(sync_commands=True, sync_commands_debug=False),
 ```
 
 Database-related tips can be found in [database README](database/README.md).
