@@ -20,7 +20,7 @@ from rubbergod import Rubbergod
 from . import features
 from .messages_cz import MessagesCZ
 from .modals import DenyContributionModal
-from .views import View
+from .views import ContestView
 
 
 class ContestVote(Base, commands.Cog):
@@ -34,6 +34,11 @@ class ContestVote(Base, commands.Cog):
             str("2️⃣"): self.config.contest_vote_weight_2,
             str("3️⃣"): self.config.contest_vote_weight_3,
         }
+
+    @commands.Cog.listener("on_ready")
+    async def init_views(self):
+        """Instantiate views for persistent interactions with bot"""
+        self.bot.add_view(ContestView(self.bot))
 
     @cached_property
     def filter_channel(self) -> disnake.TextChannel:
@@ -126,7 +131,7 @@ class ContestVote(Base, commands.Cog):
         image = await image.to_file()
 
         trash = TrashView(custom_id="contest:delete")
-        view = View(self.bot)
+        view = ContestView(self.bot)
         view.children.extend(trash.children)
 
         content = MessagesCZ.contribution(id=contribution_id)

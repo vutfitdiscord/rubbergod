@@ -8,7 +8,7 @@ from permissions import permission_check
 from rubbergod import Rubbergod
 
 
-class View(BaseView):
+class ContestView(BaseView):
     def __init__(self, bot: Rubbergod):
         super().__init__(timeout=None)
         self.bot = bot
