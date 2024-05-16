@@ -33,7 +33,7 @@ class Gif(Base, commands.Cog):
     async def pet(self, inter: disnake.ApplicationCommandInteraction, user: disnake.User = None):
         await inter.response.defer()
         user = inter.author if user is None else user
-        avatar = await self.get_profile_picture(inter.author)
+        avatar = await self.get_profile_picture(user)
         avatar = ImageHandler.square_to_circle(avatar)
 
         frames = []
@@ -76,7 +76,7 @@ class Gif(Base, commands.Cog):
     async def catnap(self, inter: disnake.ApplicationCommandInteraction, user: disnake.User = None):
         await inter.response.defer()
         user = inter.author if user is None else user
-        avatar = await self.get_profile_picture(user, 64, "png")
+        avatar = await self.get_profile_picture(user, 64)
 
         width, height = avatar.size
         if width != 64 or height != 64:
@@ -99,7 +99,7 @@ class Gif(Base, commands.Cog):
         """
         await inter.response.defer()
         user = inter.author if user is None else user
-        avatar = await self.get_profile_picture(user, 64, "png")
+        avatar = await self.get_profile_picture(user, 64)
 
         frames = ImageHandler.get_bonk_frames(avatar)
 
