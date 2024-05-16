@@ -92,7 +92,10 @@ class System(Base, commands.Cog):
     @commands.slash_command(name="shutdown", description=MessagesCZ.shutdown_brief)
     async def shutdown(self, inter: disnake.ApplicationCommandInteraction):
         await inter.send("Shutting down...")
-        exit(1)
+        await self.bot.rubbergod_session.close()
+        await self.bot.grillbot_session.close()
+        await self.bot.vutapi_session.close()
+        await self.bot.close()
 
     @commands.check(permission_check.is_bot_admin)
     @commands.slash_command(name="cogs", description=MessagesCZ.cogs_brief, guild_ids=[Base.config.guild_id])
