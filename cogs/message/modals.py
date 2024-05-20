@@ -3,19 +3,21 @@ import disnake
 from .messages_cz import MessagesCZ
 
 
-class Modal(disnake.ui.Modal):
+class MessageModal(disnake.ui.Modal):
     def __init__(
         self,
         bot,
         title: str,
         channel: disnake.TextChannel = None,
         message: disnake.Message = None,
+        files: list[disnake.File] = None,
         edit: bool = False,
     ) -> None:
         self.bot = bot
         self.title = title
         self.channel = channel
         self.message = message
+        self.files = files
         self.edit = edit
         components = [
             disnake.ui.TextInput(
@@ -37,5 +39,5 @@ class Modal(disnake.ui.Modal):
             return
 
         if self.channel:
-            await self.channel.send(inter.text_values["content"])
+            await self.channel.send(inter.text_values["content"], files=self.files)
             await inter.send(MessagesCZ.message_sent(channel=self.channel.mention), ephemeral=True)

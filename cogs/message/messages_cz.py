@@ -9,3 +9,4 @@ class MessagesCZ(GlobalMessages):
     url_param = "Url zprávy, která se má přeposlat"
     message_sent = "Zpráva byla odeslána do kanálu {channel}"
     message_too_long = "Zpráva přesahuje limit 2000 znaků"
+    attachment_param = "Příloha, která se má poslat se zprávou. Max 25MB"
