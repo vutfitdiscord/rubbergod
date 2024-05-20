@@ -10,7 +10,7 @@ from config import cooldowns
 from permissions import permission_check
 
 from .messages_cz import MessagesCZ
-from .modals import Modal
+from .modals import MessageModal
 
 
 class Message(Base, commands.Cog):
@@ -29,8 +29,15 @@ class Message(Base, commands.Cog):
         self,
         inter: disnake.ApplicationCommandInteraction,
         channel: disnake.TextChannel = commands.Param(description=MessagesCZ.channel_param),
+        attachment: disnake.Attachment = commands.Param(
+            default=None, description=MessagesCZ.attachment_param
+        ),
     ):
-        message_modal = Modal(self.bot, title="Send message", channel=channel)
+        if attachment.size > 25_000_000:
+            await inter.send(MessagesCZ.attachment_too_big, ephemeral=True)
+            return
+        file = await attachment.to_file()
+        message_modal = MessageModal(self.bot, title="Send message", files=[file], channel=channel)
         await inter.response.send_modal(modal=message_modal)
 
     @message.sub_command(name="resend", description=MessagesCZ.resend_brief)
@@ -38,32 +45,24 @@ class Message(Base, commands.Cog):
         self,
         inter: disnake.ApplicationCommandInteraction,
         channel: disnake.TextChannel = commands.Param(description=MessagesCZ.channel_param),
-        message_url: str = commands.Param(description=MessagesCZ.url_param),
+        message_url: disnake.Message = commands.Param(description=MessagesCZ.url_param),
     ):
-        try:
-            message: disnake.Message = await commands.MessageConverter().convert(inter, message_url)
-        except commands.MessageNotFound:
-            await inter.send(MessagesCZ.message_not_found, ephemeral=True)
-            return
-        if len(message.content) > 2000:
+        if len(message_url.content) > 2000:
             await inter.send(MessagesCZ.message_too_long, ephemeral=True)
             return
+
+        files = [await attachment.to_file() for attachment in message_url.attachments]
         await inter.send(MessagesCZ.message_sent(channel=channel.mention), ephemeral=True)
-        await channel.send(message.content)
+        await channel.send(message_url.content, files=files)
 
     @message.sub_command(name="edit", description=MessagesCZ.edit_brief)
     async def edit(
         self,
         inter: disnake.ApplicationCommandInteraction,
-        message_url: str = commands.Param(description=MessagesCZ.url_param),
+        message_url: disnake.Message = commands.Param(description=MessagesCZ.url_param),
     ):
-        try:
-            message: disnake.Message = await commands.MessageConverter().convert(inter, message_url)
-        except commands.MessageNotFound:
-            await inter.send(MessagesCZ.message_not_found, ephemeral=True)
-            return
-        if len(message.content) > 2000:
+        if len(message_url.content) > 2000:
             await inter.send(MessagesCZ.message_too_long, ephemeral=True)
             return
-        message_modal = Modal(self.bot, title="Edit message", message=message, edit=True)
+        message_modal = MessageModal(self.bot, title="Edit message", message=message_url, edit=True)
         await inter.response.send_modal(modal=message_modal)
