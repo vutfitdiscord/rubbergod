@@ -1,8 +1,8 @@
 import os
+from genericpath import isdir, isfile
 
 import disnake
 from disnake.ext import commands
-from genericpath import isdir, isfile
 
 import utils
 from config.app_config import config
