@@ -38,6 +38,11 @@ class Config:
             cls.instance = super(Config, cls).__new__(cls)
         return cls.instance
 
+    @classmethod
+    def _del(cls):
+        if hasattr(cls, "instance"):
+            del cls.instance
+
     toml_dict: dict = toml.load("config/config.toml", _dict=dict)
 
     # Authorization
@@ -221,5 +226,5 @@ def config_get_keys() -> list:
 
 def load_config():
     global config
-    del config.instance
+    Config._del()
     config = Config()
