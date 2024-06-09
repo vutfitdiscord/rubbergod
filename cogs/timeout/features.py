@@ -125,7 +125,7 @@ async def timeout_perms(
                 isself,
             )
 
-        if timeout and not isself:
+        if timeout:
             error = await send_to_grillbot(session, timeout, mode)
             if error:
                 await bot_dev_channel.send(error)
@@ -202,6 +202,9 @@ async def send_to_grillbot(
     Sending create/update timeout event or delete timeout event.
     """
     # if user got timeout from automod grillbot api expects user_id as mod_id
+    if timeout.isself:
+        return None
+
     mod_id = timeout.user_id if timeout.mod_id == "1" else timeout.mod_id
     if mode == "delete":
         try:
