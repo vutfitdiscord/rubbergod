@@ -13,12 +13,13 @@ from disnake.ext import commands
 import utils
 from cogs.base import Base
 from config import cooldowns
+from rubbergod import Rubbergod
 
 from .messages_cz import MessagesCZ
 
 
 class FitRoom(Base, commands.Cog):
-    def __init__(self, bot: commands.Bot):
+    def __init__(self, bot: Rubbergod):
         super().__init__()
         self.bot = bot
 

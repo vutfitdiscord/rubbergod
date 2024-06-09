@@ -18,6 +18,7 @@ import utils
 from cogs.base import Base
 from config.app_config import config
 from database.timeout import TimeoutUserDB
+from rubbergod import Rubbergod
 
 from .messages_cz import MessagesCZ
 
@@ -26,7 +27,7 @@ icons_list = os.listdir(path_to_icons)
 
 
 class TimeoutWars(Base, commands.Cog):
-    def __init__(self, bot: commands.Bot):
+    def __init__(self, bot: Rubbergod):
         self.bot = bot
         self.immunity: dict[int, datetime] = {}
         self.ignored_messages: set[int] = set()

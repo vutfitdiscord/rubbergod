@@ -14,6 +14,7 @@ from disnake.ext import commands
 from cogs.base import Base
 from config.app_config import CONFIG_PATH, config_get_keys, load_config
 from permissions import permission_check
+from rubbergod import Rubbergod
 
 from .messages_cz import MessagesCZ
 
@@ -23,7 +24,7 @@ async def autocomp_keys(inter: disnake.ApplicationCommandInteraction, user_input
 
 
 class DynamicConfig(Base, commands.Cog):
-    def __init__(self, bot: commands.Bot):
+    def __init__(self, bot: Rubbergod):
         super().__init__()
         self.bot = bot
 

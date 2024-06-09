@@ -15,6 +15,7 @@ import utils
 from cogs.base import Base
 from database.image import ImageDB
 from permissions import permission_check
+from rubbergod import Rubbergod
 
 from . import features
 from .messages_cz import MessagesCZ
@@ -26,7 +27,7 @@ rubbegod_logger = logging.getLogger("rubbergod")
 class Warden(Base, commands.Cog):
     """A cog for database lookups"""
 
-    def __init__(self, bot: commands.Bot):
+    def __init__(self, bot: Rubbergod):
         super().__init__()
         self.bot = bot
 
@@ -150,7 +151,7 @@ class Warden(Base, commands.Cog):
         )
 
     @scan.command(name="message")
-    async def scan_message(self, ctx: commands.Bot, link):
+    async def scan_message(self, ctx: Rubbergod, link):
         """Scan message attachments in whole database"""
         # TODO: implement
         pass

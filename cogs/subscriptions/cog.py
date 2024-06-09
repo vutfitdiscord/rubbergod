@@ -10,6 +10,7 @@ from buttons.general import TrashView
 from cogs.base import Base
 from config import cooldowns
 from database.subscription import AlreadyNotifiedDB, SubscriptionDB
+from rubbergod import Rubbergod
 
 from .messages_cz import MessagesCZ
 
@@ -27,7 +28,7 @@ async def autocomp_subscribed_tags(inter: disnake.ApplicationCommandInteraction,
 
 
 class Subscriptions(Base, commands.Cog):
-    def __init__(self, bot: commands.Bot):
+    def __init__(self, bot: Rubbergod):
         super().__init__()
         self.bot = bot
 

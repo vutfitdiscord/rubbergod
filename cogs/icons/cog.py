@@ -8,6 +8,7 @@ from disnake.ext import commands
 import utils
 from buttons.general import TrashView
 from cogs.base import Base
+from rubbergod import Rubbergod
 
 from . import features
 from .messages_cz import MessagesCZ
@@ -15,7 +16,7 @@ from .views import IconSelect
 
 
 class Icons(Base, commands.Cog):
-    def __init__(self, bot: commands.Bot):
+    def __init__(self, bot: Rubbergod):
         super().__init__()
         self.bot = bot
 

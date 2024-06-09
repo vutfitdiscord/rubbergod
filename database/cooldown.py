@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from sqlalchemy import BigInteger, Column, String
 
 from database import database

@@ -1,10 +1,10 @@
 import logging
 
 import disnake
-from disnake.ext import commands
 
 from buttons.base import BaseView
 from permissions import permission_check
+from rubbergod import Rubbergod
 
 from . import features
 from .messages_cz import MessagesCZ
@@ -13,7 +13,7 @@ rubbergod_logger = logging.getLogger("rubbergod")
 
 
 class View(BaseView):
-    def __init__(self, bot: commands.Bot, cogs: list[list[tuple[str, str]]]):
+    def __init__(self, bot: Rubbergod, cogs: list[list[tuple[str, str]]]):
         super().__init__()
         self.bot = bot
         self.count = len(cogs)
@@ -52,7 +52,7 @@ class View(BaseView):
 
 
 class Dropdown(disnake.ui.Select):
-    def __init__(self, bot: commands.Bot, view: View, cogs: list[tuple[str, str]]):
+    def __init__(self, bot: Rubbergod, view: View, cogs: list[tuple[str, str]]):
         self.bot = bot
         self._view = view
         self.cogs: list[tuple[str, str]] = cogs

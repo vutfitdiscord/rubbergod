@@ -2,13 +2,14 @@ import asyncio
 from collections import OrderedDict
 
 import disnake
-from disnake.ext import commands
+
+from rubbergod import Rubbergod
 
 
 class PromptSession:
     def __init__(
         self,
-        bot: commands.Bot,
+        bot: Rubbergod,
         inter: disnake.ApplicationCommandInteraction,
         message: str,
         timeout=60,

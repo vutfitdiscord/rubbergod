@@ -5,12 +5,12 @@ from statistics import mean
 import disnake
 import requests
 from bs4 import BeautifulSoup
-from disnake.ext.commands import Bot
 
 import utils
 from config.app_config import config
 from database.review import ProgrammeDB, ReviewDB, ReviewRelevanceDB, SubjectDB, SubjectDetailsDB
 from features import sports
+from rubbergod import Rubbergod
 
 from .messages_cz import MessagesCZ
 
@@ -34,7 +34,7 @@ class TierEnum(Enum):
 class ReviewManager:
     """Helper class for reviews"""
 
-    def __init__(self, bot: Bot):
+    def __init__(self, bot: Rubbergod):
         self.bot = bot
 
     def make_embed(

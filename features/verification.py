@@ -7,7 +7,6 @@ from datetime import datetime
 from email.mime.text import MIMEText
 
 import disnake
-from disnake.ext.commands import Bot
 
 import utils
 from cogs.verify.messages_cz import MessagesCZ
@@ -16,6 +15,7 @@ from config.app_config import config
 from database.verification import ValidPersonDB, VerifyStatus
 from features.base_feature import BaseFeature
 from features.verify_helper import VerifyHelper
+from rubbergod import Rubbergod
 
 MIT_SPECIALIZATIONS = [
     "MBS", "MBI", "MIS", "MIN", "MMI", "MMM", "MGM", "MGMe",
@@ -28,7 +28,7 @@ FACULTY_NAMES = ["FA", "FAST", "FAVU", "FCH", "FEKT", "FP", "FSI", "USI",]  # fm
 
 
 class Verification(BaseFeature):
-    def __init__(self, bot: Bot):
+    def __init__(self, bot: Rubbergod):
         super().__init__(bot)
         self.helper = VerifyHelper(bot)
 

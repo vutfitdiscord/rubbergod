@@ -1,25 +1,23 @@
-from typing import Dict, Union
-
 import disnake
-from disnake.ext.commands import Bot
 
 import utils
 from config.app_config import config
 from database.verification import DynamicVerifyDB
 from features.base_feature import BaseFeature
 from features.verify_helper import VerifyHelper
+from rubbergod import Rubbergod
 
 from .messages_cz import MessagesCZ
 from .views_dynamic_verify import DynamicVerifyRequestView
 
 
 class DynamicVerifyManager(BaseFeature):
-    def __init__(self, bot: Bot) -> None:
+    def __init__(self, bot: Rubbergod) -> None:
         super().__init__(bot)
         self.verify_db = DynamicVerifyDB()
         self.helper = VerifyHelper(bot)
 
-    async def can_apply_rule(self, user: Union[disnake.User, disnake.Member], rule_id: str) -> bool:
+    async def can_apply_rule(self, user: disnake.User | disnake.Member, rule_id: str) -> bool:
         return self.verify_db.exists_rule(rule_id) and not await self.helper.has_role(
             user, config.verification_role
         )
@@ -83,9 +81,9 @@ class DynamicVerifyManager(BaseFeature):
         channel = self.bot.get_channel(config.log_channel)
         await channel.send(embed=embed)
 
-    def get_rules_list(self) -> Dict[str, str]:
+    def get_rules_list(self) -> dict[str, str]:
         rules = self.verify_db.get_rules(25)
         return {rule.name: rule.id for rule in rules}
 
-    def get_rule(self, rule_id: str) -> Union[DynamicVerifyDB, None]:
+    def get_rule(self, rule_id: str) -> DynamicVerifyDB | None:
         return self.verify_db.get_rule(rule_id)

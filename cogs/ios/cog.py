@@ -10,13 +10,14 @@ from disnake.ext import commands, tasks
 from cogs.base import Base
 from config import cooldowns
 from permissions import permission_check
+from rubbergod import Rubbergod
 
 from . import features
 from .messages_cz import MessagesCZ
 
 
 class IOS(Base, commands.Cog):
-    def __init__(self, bot: commands.Bot):
+    def __init__(self, bot: Rubbergod):
         super().__init__()
         self.bot = bot
         self.tasks = [self.ios_task]

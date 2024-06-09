@@ -2,10 +2,10 @@ import os
 from genericpath import isdir, isfile
 
 import disnake
-from disnake.ext import commands
 
 import utils
 from config.app_config import config
+from rubbergod import Rubbergod
 
 from . import features
 from .messages_cz import MessagesCZ
@@ -52,7 +52,7 @@ async def split_cogs() -> list[list[tuple[str, str]]]:
     return all_cogs
 
 
-def create_embed(bot: commands.Bot) -> disnake.Embed:
+def create_embed(bot: Rubbergod) -> disnake.Embed:
     """Create embed with all cogs and statuses."""
     embed = disnake.Embed(title=MessagesCZ.embed_title, colour=disnake.Color.yellow())
     bot_cogs = [cog.lower() for cog in bot.cogs]

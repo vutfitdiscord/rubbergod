@@ -21,6 +21,7 @@ from database.streamlinks import StreamLinkDB
 from features.list_message_sender import send_list_of_messages
 from features.prompt import PromptSession
 from permissions import permission_check, room_check
+from rubbergod import Rubbergod
 
 from .messages_cz import MessagesCZ
 
@@ -40,7 +41,7 @@ async def autocomp_subjects_with_stream(inter: disnake.ApplicationCommandInterac
 
 
 class StreamLinks(Base, commands.Cog):
-    def __init__(self, bot: commands.Bot):
+    def __init__(self, bot: Rubbergod):
         global subjects, subjects_with_stream
         super().__init__()
         self.bot = bot

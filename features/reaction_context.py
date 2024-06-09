@@ -1,9 +1,9 @@
 from __future__ import annotations
 
 import disnake
-from disnake.ext.commands import Bot
 
 from config.app_config import config
+from rubbergod import Rubbergod
 
 
 class ReactionContext:
@@ -23,7 +23,7 @@ class ReactionContext:
         self.emoji = emoji
 
     @staticmethod
-    async def from_payload(bot: Bot, payload: disnake.RawReactionActionEvent) -> ReactionContext | None:
+    async def from_payload(bot: Rubbergod, payload: disnake.RawReactionActionEvent) -> ReactionContext | None:
         channel: disnake.TextChannel = bot.get_channel(payload.channel_id)
         if channel is None:
             return None

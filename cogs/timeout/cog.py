@@ -16,6 +16,7 @@ from config import cooldowns
 from database.report import ReportDB
 from database.timeout import TimeoutDB, TimeoutUserDB
 from permissions import permission_check
+from rubbergod import Rubbergod
 
 from . import features
 from .messages_cz import MessagesCZ
@@ -45,7 +46,7 @@ async def autocomplete_times(inter: disnake.ApplicationCommandInteraction, input
 
 
 class Timeout(Base, commands.Cog):
-    def __init__(self, bot: commands.Bot):
+    def __init__(self, bot: Rubbergod):
         super().__init__()
         self.bot = bot
         self.tasks = [self.refresh_timeout.start()]

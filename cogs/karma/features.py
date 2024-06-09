@@ -2,7 +2,6 @@ import asyncio
 
 import disnake
 from disnake import Emoji
-from disnake.ext.commands import Bot
 from emoji import demojize
 
 import utils
@@ -10,6 +9,7 @@ from cogs.grillbotapi.cog import GrillbotApi
 from config.app_config import config
 from database.karma import KarmaDB, KarmaEmojiDB
 from features.base_feature import BaseFeature
+from rubbergod import Rubbergod
 
 from .messages_cz import MessagesCZ
 
@@ -32,7 +32,7 @@ def is_unicode(text: str) -> bool:
 
 
 class Karma(BaseFeature):
-    def __init__(self, bot: Bot):
+    def __init__(self, bot: Rubbergod):
         super().__init__(bot)
         self.grillbot_api = GrillbotApi(bot)
 

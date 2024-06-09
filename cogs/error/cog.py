@@ -12,10 +12,11 @@ from disnake.ext import commands
 
 from cogs.base import Base
 from features.error import ErrorLogger
+from rubbergod import Rubbergod
 
 
 class Error(Base, commands.Cog):
-    def __init__(self, bot: commands.Bot):
+    def __init__(self, bot: Rubbergod):
         super().__init__()
         self.bot = bot
         self.logger = ErrorLogger(bot)

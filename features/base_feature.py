@@ -1,9 +1,10 @@
 from disnake import Embed, TextChannel
-from disnake.ext.commands import Bot
+
+from rubbergod import Rubbergod
 
 
 class BaseFeature:
-    def __init__(self, bot: Bot):
+    def __init__(self, bot: Rubbergod):
         self.bot = bot
 
     async def reply_to_channel(self, channel: TextChannel, message: str = None, embed: Embed = None):

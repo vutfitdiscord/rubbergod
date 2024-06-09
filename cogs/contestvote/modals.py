@@ -1,15 +1,15 @@
 import disnake
-from disnake.ext import commands
 
 from buttons.general import TrashView
 from database.contestvote import ContestVoteDB
+from rubbergod import Rubbergod
 
 from . import features
 from .messages_cz import MessagesCZ
 
 
 class DenyContributionModal(disnake.ui.Modal):
-    def __init__(self, bot: commands.Bot, inter: disnake.MessageInteraction) -> None:
+    def __init__(self, bot: Rubbergod, inter: disnake.MessageInteraction) -> None:
         self.bot = bot
         self.inter = inter
         self.contribution_id = features.get_contribution_id(inter.message.content)

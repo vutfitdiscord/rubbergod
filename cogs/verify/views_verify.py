@@ -1,10 +1,10 @@
 import disnake
-from disnake.ext.commands import Bot
 
 from buttons.base import BaseView
 from config.app_config import config
 from database.verification import ValidPersonDB
 from features import verification
+from rubbergod import Rubbergod
 
 from .messages_cz import MessagesCZ
 from .modals_verify import VerifyModal
@@ -63,7 +63,7 @@ class MailDropdown(disnake.ui.StringSelect):
             options.append(disnake.SelectOption(label=mail, value=mail))
         return options
 
-    async def log(self, bot: Bot, old_mail: str, new_mail: str) -> None:
+    async def log(self, bot: Rubbergod, old_mail: str, new_mail: str) -> None:
         log_channel = bot.get_channel(config.log_channel)
         embed = disnake.Embed(
             title=MessagesCZ.mail_changed,
