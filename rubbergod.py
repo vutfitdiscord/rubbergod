@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+from datetime import datetime, timezone
 from typing import TYPE_CHECKING
 
 import aiohttp
@@ -11,17 +12,16 @@ from disnake.ext import commands
 import database.db_migrations as migrations
 from config.app_config import config
 from config.messages import Messages
+from features.git import Git
 
 if TYPE_CHECKING:
     from features.error import ErrorLogger
-    from features.presence import Presence
 
 
 class Rubbergod(commands.Bot):
-    rubbergod_initialized = False
+    is_initialized = False
     logger: logging.Logger
     err_logger: ErrorLogger
-    presence: Presence
 
     def __init__(self):
         self.logger = logging.getLogger("rubbergod")
@@ -52,9 +52,9 @@ class Rubbergod(commands.Bot):
     async def on_ready(self) -> None:
         """If RubberGod is ready"""
         # Inspired from https://github.com/sinus-x/rubbergoddess/blob/master/rubbergoddess.py
-        if self.rubbergod_initialized:
+        if self.is_initialized:
             return
-        self.rubbergod_initialized = True
+        self.is_initialized = True
 
         await self.create_sessions()
         bot_room: TextChannel = self.get_channel(config.bot_room)
@@ -62,7 +62,7 @@ class Rubbergod(commands.Bot):
             await bot_room.send(Messages.on_ready_message)
 
         await self.application_info()
-        await self.presence.set_presence()
+        await self.set_presence()
         self.logger.info("Ready")
 
     async def on_button_click(self, inter: disnake.MessageInteraction):
@@ -98,3 +98,9 @@ class Rubbergod(commands.Bot):
         self.vutapi_session = aiohttp.ClientSession(
             timeout=aiohttp.ClientTimeout(total=10), headers=vut_api_headers
         )
+
+    async def set_presence(self):
+        git = Git()
+        activity = disnake.Game(name=f"hash {git.short_hash()}", start=datetime.now(timezone.utc))
+
+        await self.change_presence(activity=activity)
