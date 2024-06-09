@@ -12,12 +12,13 @@ from disnake.ext import commands, tasks
 import utils
 from cogs.base import Base
 from permissions import room_check
+from rubbergod import Rubbergod
 
 from .messages_cz import MessagesCZ
 
 
 class Nameday(Base, commands.Cog):
-    def __init__(self, bot: commands.Bot):
+    def __init__(self, bot: Rubbergod):
         super().__init__()
         self.bot = bot
         self.check = room_check.RoomCheck(bot)

@@ -1,7 +1,7 @@
-from disnake.ext.commands import Bot
+from rubbergod import Rubbergod
 
 from .cog import Roles
 
 
-def setup(bot: Bot):
+def setup(bot: Rubbergod):
     bot.add_cog(Roles(bot))

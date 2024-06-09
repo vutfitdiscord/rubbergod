@@ -6,6 +6,7 @@ import disnake
 from disnake.ext import commands
 
 from cogs.base import Base
+from rubbergod import Rubbergod
 
 from .features import Features
 from .modals import Modal
@@ -13,7 +14,7 @@ from .views import View
 
 
 class Bookmark(Base, commands.Cog):
-    def __init__(self, bot: commands.Bot):
+    def __init__(self, bot: Rubbergod):
         super().__init__()
         self.bot = bot
 

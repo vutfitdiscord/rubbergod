@@ -1,12 +1,12 @@
 from functools import cached_property
 
 import disnake
-from disnake.ext import commands
 
 from buttons.base import BaseView
 from config.app_config import config
 from database.report import AnswerDB, ReportDB
 from permissions import permission_check
+from rubbergod import Rubbergod
 
 from . import features as report_features
 from .features_errors import ButtonInteractionError
@@ -156,13 +156,13 @@ class View(BaseView):
 
 
 class ReportGeneralView(View):
-    def __init__(self, bot: commands.Bot):
+    def __init__(self, bot: Rubbergod):
         super().__init__()
         self.bot = bot
 
 
 class ReportMessageView(View):
-    def __init__(self, bot: commands.Bot):
+    def __init__(self, bot: Rubbergod):
         super().__init__()
         self.bot = bot
 
@@ -207,7 +207,7 @@ class ReportMessageView(View):
 
 
 class ReportAnonymView(BaseView):
-    def __init__(self, bot: commands.Bot):
+    def __init__(self, bot: Rubbergod):
         super().__init__(timeout=None)
         self.bot = bot
 
@@ -260,7 +260,7 @@ class ReportAnonymView(BaseView):
 
 
 class ReportAnswerOnlyView(BaseView):
-    def __init__(self, bot: commands.Bot):
+    def __init__(self, bot: Rubbergod):
         super().__init__(timeout=None)
         self.bot = bot
 
@@ -282,7 +282,7 @@ class ReportAnswerOnlyView(BaseView):
 
 
 class ReportAnswerModal(disnake.ui.Modal):
-    def __init__(self, view, bot: commands.Bot, inter: disnake.MessageInteraction, report_id: int) -> None:
+    def __init__(self, view, bot: Rubbergod, inter: disnake.MessageInteraction, report_id: int) -> None:
         self.view = view
         self.bot = bot
         self.inter = inter

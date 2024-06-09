@@ -8,13 +8,14 @@ from disnake.ext import commands
 from lxml import etree
 
 from cogs.base import Base
+from rubbergod import Rubbergod
 from utils import add_author_footer
 
 from .messages_cz import MessagesCZ
 
 
 class Studijni(Base, commands.Cog):
-    def __init__(self, bot: commands.Bot):
+    def __init__(self, bot: Rubbergod):
         super().__init__()
         self.bot = bot
 

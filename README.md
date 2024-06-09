@@ -167,7 +167,7 @@ pip3 install -r requirements.txt
 Run the bot (might want to use `nohup` or something):
 
 ```bash
-python3 rubbergod.py
+python3 main.py
 ```
 
 #### Required/recommended packages (apt)

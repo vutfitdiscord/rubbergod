@@ -1,7 +1,7 @@
-from disnake.ext.commands import Bot
+from rubbergod import Rubbergod
 
 from .cog import Nameday
 
 
-def setup(bot: Bot):
+def setup(bot: Rubbergod):
     bot.add_cog(Nameday(bot))

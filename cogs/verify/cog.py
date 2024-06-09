@@ -13,6 +13,7 @@ from database.verification import DynamicVerifyDB
 from features import verification
 from features.table_generator import TableGenerator
 from permissions import permission_check, room_check
+from rubbergod import Rubbergod
 
 from .features_dynamic_verify import DynamicVerifyManager
 from .messages_cz import MessagesCZ
@@ -25,7 +26,7 @@ async def dynamic_verify_rules_autocomplete(inter: disnake.ApplicationCommandInt
 
 
 class Verify(Base, commands.Cog):
-    def __init__(self, bot: commands.Bot):
+    def __init__(self, bot: Rubbergod):
         super().__init__()
         self.bot = bot
         self.verification = verification.Verification(bot)

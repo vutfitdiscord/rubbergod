@@ -11,10 +11,11 @@ import disnake
 from disnake.ext import commands
 
 from cogs.base import Base
+from rubbergod import Rubbergod
 
 
 class GrillbotApi(Base, commands.Cog):
-    def __init__(self, bot: commands.Bot):
+    def __init__(self, bot: Rubbergod):
         super().__init__()
         self.bot = bot
         self._owner_id = bot.owner_id

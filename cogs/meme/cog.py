@@ -6,6 +6,7 @@ import disnake
 from disnake.ext import commands
 
 from cogs.base import Base
+from rubbergod import Rubbergod
 
 from .messages_cz import MessagesCZ
 
@@ -13,7 +14,7 @@ uhoh_counter = 0
 
 
 class Meme(Base, commands.Cog):
-    def __init__(self, bot: commands.Bot):
+    def __init__(self, bot: Rubbergod):
         super().__init__()
         self.bot = bot
 

@@ -17,6 +17,7 @@ from database.meme_repost import MemeRepostDB
 from features.leaderboard import LeaderboardPageSource
 from features.reaction_context import ReactionContext
 from permissions import room_check
+from rubbergod import Rubbergod
 
 from .messages_cz import MessagesCZ
 
@@ -29,7 +30,7 @@ def _leaderboard_formatter(entry: BetterMemeDB, **kwargs):
 
 
 class BetterMeme(Base, commands.Cog):
-    def __init__(self, bot: commands.Bot):
+    def __init__(self, bot: Rubbergod):
         super().__init__()
         self.bot = bot
 

@@ -2,8 +2,6 @@
 Cog for handling vote reactions for contests.
 """
 
-from __future__ import annotations
-
 from functools import cached_property
 
 import disnake
@@ -17,6 +15,7 @@ from database.contestvote import ContestVoteDB
 from features.reaction_context import ReactionContext
 from permissions.permission_check import submod_plus
 from permissions.room_check import RoomCheck
+from rubbergod import Rubbergod
 
 from . import features
 from .messages_cz import MessagesCZ
@@ -25,7 +24,7 @@ from .views import View
 
 
 class ContestVote(Base, commands.Cog):
-    def __init__(self, bot: commands.Bot):
+    def __init__(self, bot: Rubbergod):
         super().__init__()
         self.bot = bot
         self.check = RoomCheck(bot)

@@ -7,6 +7,7 @@ import utils
 from cogs.report.views import ReportGeneralView, ReportMessageView
 from config.app_config import config
 from database.report import ReportDB, UserDB
+from rubbergod import Rubbergod
 
 from . import features as report_features
 from .messages_cz import MessagesCZ
@@ -15,7 +16,7 @@ from .messages_cz import MessagesCZ
 class Modal(disnake.ui.Modal):
     def __init__(
         self,
-        bot: commands.Bot,
+        bot: Rubbergod,
         dm_message: disnake.Message,
         title="General report",
         message: disnake.Message = None,

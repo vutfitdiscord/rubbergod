@@ -12,13 +12,14 @@ from cogs.base import Base
 from config import cooldowns
 from database.exams import ExamsTermsMessageDB
 from permissions import permission_check
+from rubbergod import Rubbergod
 
 from .features import YEAR_LIST, Features, year_regex
 from .messages_cz import MessagesCZ
 
 
 class Exams(Base, commands.Cog):
-    def __init__(self, bot: commands.Bot):
+    def __init__(self, bot: Rubbergod):
         super().__init__()
         self.bot = bot
         self.features = Features(bot)

@@ -10,6 +10,7 @@ from PIL import Image
 
 from cogs.base import Base
 from config import cooldowns
+from rubbergod import Rubbergod
 
 from .features import IMAGES_PATH, ImageHandler
 from .messages_cz import MessagesCZ
@@ -18,7 +19,7 @@ MISSING = disnake.utils.MISSING
 
 
 class Gif(Base, commands.Cog):
-    def __init__(self, bot: commands.Bot):
+    def __init__(self, bot: Rubbergod):
         super().__init__()
         self.bot = bot
         self.imagehandler = ImageHandler()

@@ -1,12 +1,13 @@
 import disnake
-from disnake.ext import commands
+
+from rubbergod import Rubbergod
 
 from . import features
 from .messages_cz import MessagesCZ
 
 
 class IconSelect(disnake.ui.Select):
-    def __init__(self, bot: commands.Bot, **kwargs) -> None:
+    def __init__(self, bot: Rubbergod, **kwargs) -> None:
         super().__init__(**kwargs)
         self.bot = bot
 

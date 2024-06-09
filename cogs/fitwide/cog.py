@@ -18,6 +18,7 @@ from database.verification import PermitDB, ValidPersonDB, VerifyStatus
 from features.verification import Verification
 from features.verify_helper import VerifyHelper
 from permissions import permission_check, room_check
+from rubbergod import Rubbergod
 
 from . import features
 from .messages_cz import MessagesCZ
@@ -30,7 +31,7 @@ async def autocomp_user_logins(inter: disnake.ApplicationCommandInteraction, use
 
 
 class FitWide(Base, commands.Cog):
-    def __init__(self, bot: commands.Bot):
+    def __init__(self, bot: Rubbergod):
         super().__init__()
         self.bot = bot
         self.verification = Verification(bot)

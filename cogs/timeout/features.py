@@ -10,6 +10,7 @@ import utils
 from config.app_config import config
 from database.timeout import TimeoutDB
 from permissions.custom_errors import ApiError
+from rubbergod import Rubbergod
 
 from .messages_cz import MessagesCZ
 
@@ -53,7 +54,7 @@ def add_field_timeout(
 
 
 async def timeout_embed_listing(
-    bot: commands.Bot,
+    bot: Rubbergod,
     users: list[TimeoutDB],
     title: str,
     room: disnake.TextChannel,

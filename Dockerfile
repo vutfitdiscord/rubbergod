@@ -17,4 +17,4 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 COPY . .
 RUN git config --global --add safe.directory /rubbergod
 
-ENTRYPOINT [ "python3", "rubbergod.py" ]
+ENTRYPOINT [ "python3", "main.py" ]
