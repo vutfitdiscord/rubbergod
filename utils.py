@@ -347,6 +347,7 @@ async def get_or_fetch_channel(bot, channel_id) -> disnake.TextChannel:
 
 async def parse_attachments(
     message: disnake.Message,
+    limit: int = 25000000,  # 25MB
 ) -> Tuple[List[disnake.File], List[disnake.File], List[disnake.Attachment]]:
     """Parse attachments from message and return them as lists of disnake files
     and if they are over 25MB as attachments.
@@ -367,7 +368,7 @@ async def parse_attachments(
         return [], [], []
 
     for attachment in message.attachments:
-        if attachment.size > 25000000:  # 25MB
+        if attachment.size > limit:
             attachments_too_big.append(attachment)
             continue
 
