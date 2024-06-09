@@ -8,7 +8,8 @@ from disnake.ext import commands
 
 import utils
 from config.app_config import config
-from database.timeout import TimeoutDB
+from database.report import ReportDB
+from database.timeout import TimeoutDB, TimeoutUserDB
 from permissions.custom_errors import ApiError
 from rubbergod import Rubbergod
 
@@ -164,13 +165,88 @@ async def parse_members(
     return parsed_members or None
 
 
+async def timeout_get_user(
+    author: disnake.User,
+    guild_id: int,
+    bot: Rubbergod,
+    user: disnake.User,
+) -> list[disnake.Embed]:
+    timeout_user = TimeoutUserDB.get_user(user.id)
+    if timeout_user:
+        timeouts_count = timeout_user.timeout_count
+        recent_timeout = timeout_user.get_last_timeout()
+    else:
+        timeouts_count = 0
+        recent_timeout = None
+
+    embeds = []
+    main_embed = create_embed(
+        author=author,
+        title=f"`@{user.display_name}` timeouts",
+        description=user.mention,
+    )
+
+    main_embed.add_field(name="Timeouts count", value=timeouts_count, inline=True)
+    main_embed.add_field(name="Reports count", value=ReportDB.get_reports_on_user(user.id), inline=True)
+    unverifies, warnings = await get_user_from_grillbot(bot.grillbot_session, guild_id, user.id)
+    main_embed.add_field(
+        name="Unverifies count",
+        value=f"[{unverifies}](https://private.grillbot.eu/admin/unverify/logs)",
+        inline=True,
+    )
+    main_embed.add_field(
+        name="Warnings count",
+        value=f"[{warnings}](https://private.grillbot.eu/admin/userMeasures)",
+        inline=True,
+    )
+
+    if timeout_user and recent_timeout is not None:
+        author = await bot.get_or_fetch_user(recent_timeout.mod_id)
+        starttime_local, endtime_local = recent_timeout.start_end_local
+        add_field_timeout(
+            embed=main_embed,
+            title="Recent timeout",
+            member=user,
+            author=author,
+            starttime=starttime_local,
+            endtime=endtime_local,
+            length=recent_timeout.length,
+            reason=recent_timeout.reason,
+        )
+        embeds.append(main_embed)
+
+        embed = create_embed(author, f"`@{user.display_name}` timeouts")
+        for index, timeout in enumerate(timeout_user.get_all_timeouts()):
+            if (index % 5) == 0 and index != 0:
+                embeds.append(embed)
+                embed = create_embed(author, f"`@{user.display_name}` timeouts")
+
+            author = await bot.get_or_fetch_user(timeout.mod_id)
+            starttime_local, endtime_local = timeout.start_end_local
+            add_field_timeout(
+                embed=embed,
+                title=user.display_name,
+                member=user,
+                author=author,
+                starttime=starttime_local,
+                endtime=endtime_local,
+                length=timeout.length,
+                reason=timeout.reason,
+            )
+        embeds.append(embed)
+    else:
+        embeds.append(main_embed)
+
+    return embeds
+
+
 async def get_user_from_grillbot(
-    session: aiohttp.ClientSession, guild_id: str, user_id: str
+    grillbot_session: aiohttp.ClientSession, guild_id: int, user_id: int
 ) -> tuple[int, int]:
     """Get unverify count and warning count"""
     try:
         url = f"{config.grillbot_api_url}/user/info/{guild_id}/{user_id}"
-        async with session.get(url) as resp:
+        async with grillbot_session.get(url) as resp:
             user = await resp.json()
             return user.get("unverifyCount", "Missing"), user.get("warningCount", "Missing")
     except (asyncio.exceptions.TimeoutError, aiohttp.client_exceptions.ClientConnectorError) as e:
@@ -195,7 +271,7 @@ async def time_check(
 
 
 async def send_to_grillbot(
-    session: aiohttp.ClientSession, timeout: TimeoutDB, mode: str = "create"
+    grillbot_session: aiohttp.ClientSession, timeout: TimeoutDB, mode: str = "create"
 ) -> str | None:
     """Send timeout data to grillbot api.
 
@@ -206,7 +282,7 @@ async def send_to_grillbot(
     if mode == "delete":
         try:
             url = f"{config.grillbot_api_url}/user/measures/timeout/{timeout.id}"
-            async with session.delete(url) as response:
+            async with grillbot_session.post(url) as response:
                 if response.status != 200:
                     return MessagesCZ.error_msg(url=url, status=response.status, text=await response.text())
                 return None
@@ -224,7 +300,7 @@ async def send_to_grillbot(
             "validToUtc": f"{timeout.end.replace(tzinfo=timezone.utc).isoformat()}",
             "reason": f"{timeout.reason}",
         }
-        async with session.post(url, json=data) as response:
+        async with grillbot_session.post(url, json=data) as response:
             if response.status != 201:
                 return MessagesCZ.error_msg(url=url, status=response.status, text=await response.text())
             return None

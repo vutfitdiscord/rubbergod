@@ -5,6 +5,7 @@ from disnake.ext import commands
 
 import utils
 from cogs.report.views import ReportGeneralView, ReportMessageView
+from cogs.timeout.features import timeout_get_user
 from config.app_config import config
 from database.report import ReportDB, UserDB
 from rubbergod import Rubbergod
@@ -151,6 +152,10 @@ class Modal(disnake.ui.Modal):
                 content = MessagesCZ.attachment_too_big(files="\n- ".join(attachments_too_big))
 
             await thread.send(content=content, files=files)
+
+        # send listing of user's timeouts
+        embeds = await timeout_get_user(self.bot.user, inter.guild.id, self.bot, self.message.author)
+        await thread.send(embed=embeds[0])
 
         # remove image from embed because of explicit content
         embed.set_image(url=None)
