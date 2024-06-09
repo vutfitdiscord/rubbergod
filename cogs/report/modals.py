@@ -121,7 +121,9 @@ class Modal(disnake.ui.Modal):
             target_user_id=self.message.author.id,
         )
 
-        images, files, attachments_too_big = await utils.parse_attachments(self.message)
+        images, files, attachments_too_big = await utils.parse_attachments(
+            self.message, inter.guild.filesize_limit
+        )
 
         first_image = None
         if images:
