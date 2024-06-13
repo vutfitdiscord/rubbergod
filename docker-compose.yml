@@ -10,7 +10,9 @@ services:
             POSTGRES_USER: rubbergod
             POSTGRES_DB: rubbergod
             POSTGRES_HOST_AUTH_METHOD: "trust"
+        command: ["postgres", "-c", "logging_collector=on", "-c", "log_directory=/var/log/", "-c", "log_filename=postgresql.log", "-c", "log_file_mode=0644", "-c", "log_rotation_size=200MB"]
         volumes:
+            - ./logs:/var/log
             - postgres_data:/var/lib/postgresql/data/
             - ./database/backup/backup.sql:/docker-entrypoint-initdb.d/backup.sql
     bot:
