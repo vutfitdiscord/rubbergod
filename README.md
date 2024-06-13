@@ -86,6 +86,14 @@ Then, create the following 5 channels (or use one channel for all of them) on yo
 
 (Optional) For some features you will also need to set other config variables, usually they are divided into categories based on cogs.
 
+#### Permissions
+
+> [!IMPORTANT]
+> Update folder permissions ortherwise database container won't be able to write to logs:
+> ```bash
+> sudo chmod -R 777 logs
+> ```
+
 --------------------------------------
 
 ### Docker setup (recommended)
