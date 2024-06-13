@@ -6,6 +6,7 @@ class MessagesCZ(GlobalMessages):
     git_pull_brief = "Stáhne aktuálni změny z repa"
     get_logs_brief = "Získá logy bota z journalctl"
     lines_param = "Počet řádků, které se mají zobrazit"
+    service_param = "Název služby"
 
     uptime_brief = "Vypíše čas spuštění a čas uplynulý od spuštění"
     uptime_title = "Doba od spuštění"

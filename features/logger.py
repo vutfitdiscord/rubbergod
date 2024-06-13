@@ -36,9 +36,10 @@ def setup_logging():
     rubbergod_logger = logging.getLogger("rubbergod")
     rubbergod_logger.setLevel(logging.INFO)
 
-    # These two handlers need to be in this exact order or the log file will contain escape sequences
-    file_handler = logging.FileHandler(filename="rubbergod.log", encoding="utf-8", mode="w")
+    # These handlers need to be in this exact order or the log file will contain escape sequences
     file_formatter = logging.Formatter(output_fmt, dt_fmt, style)
+    file_handler = logging.FileHandler(filename="logs/rubbergod.log", encoding="utf-8", mode="w")
+
     file_handler.setFormatter(file_formatter)
     disnake_logger.addHandler(file_handler)
     rubbergod_logger.addHandler(file_handler)

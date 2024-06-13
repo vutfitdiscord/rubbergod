@@ -66,27 +66,39 @@ class System(Base, commands.Cog):
         self,
         inter: disnake.ApplicationCommandInteraction,
         lines: int = commands.Param(100, ge=10, description=MessagesCZ.lines_param),
+        service: str = commands.Param(
+            choices={
+                "Rubbergod": "rubbergod.log",
+                "Postgres": "postgresql.log",
+                "All": "rubbergod.log,postgresql.log",
+            },
+            description=MessagesCZ.service_param,
+        ),
     ):
         await inter.response.defer()
-        try:
-            result = subprocess.run(
-                f"tail -n {lines} service_logs.txt",
-                shell=True,
-                check=True,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE,
-                text=True,
-            ).stdout
-        except subprocess.CalledProcessError as error:
-            strings = utils.cut_string(error.stderr, 1900)
-            for string in strings:
-                await inter.send(f"```{string}```")
-            return
 
-        with BytesIO(bytes(result, "utf-8")) as file_binary:
-            file = disnake.File(fp=file_binary, filename="traceback.txt")
+        files = []
+        services = service.split(",")
+        for service in services:
+            try:
+                result = subprocess.run(
+                    f"tail -n {lines} logs/{service}",
+                    shell=True,
+                    check=True,
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.PIPE,
+                    text=True,
+                ).stdout
+            except subprocess.CalledProcessError as error:
+                strings = utils.cut_string(error.stderr, 1900)
+                for string in strings:
+                    await inter.send(f"```{string}```")
+                return
 
-        await inter.send(file=file)
+            with BytesIO(bytes(result, "utf-8")) as file_binary:
+                files.append(disnake.File(fp=file_binary, filename=f"{service}"))
+
+        await inter.send(files=files)
 
     @commands.check(permission_check.is_bot_admin)
     @commands.slash_command(name="shutdown", description=MessagesCZ.shutdown_brief)
