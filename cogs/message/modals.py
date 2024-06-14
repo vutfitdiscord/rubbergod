@@ -24,7 +24,7 @@ class MessageModal(disnake.ui.Modal):
                 label="Message content",
                 custom_id="content",
                 style=disnake.TextInputStyle.long,
-                required=True,
+                required=False if files else True,
                 value=message.content if message and edit else None,
                 max_length=2000,
             )
@@ -39,5 +39,6 @@ class MessageModal(disnake.ui.Modal):
             return
 
         if self.channel:
-            await self.channel.send(inter.text_values["content"], files=self.files)
+            content = inter.text_values["content"] or None
+            await self.channel.send(content, files=self.files)
             await inter.send(MessagesCZ.message_sent(channel=self.channel.mention), ephemeral=True)
