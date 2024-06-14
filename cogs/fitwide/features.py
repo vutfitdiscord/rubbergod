@@ -98,6 +98,7 @@ async def get_teacher_perms_list(
 
         channel_teachers.append(user)
 
+    channel_teachers.sort()
     perms_list = None
 
     if channel_teachers:

@@ -561,7 +561,11 @@ class FitWide(Base, commands.Cog):
             perms_list_before, perms_list_after = await features.update_teacher_info(
                 after, self.teacher_info_channel
             )
-            if perms_list_before is None and perms_list_after is None:
+            if (
+                perms_list_before is None
+                and perms_list_after is None
+                or perms_list_before == perms_list_after
+            ):
                 return
             embed = disnake.Embed(title="Teacher permissions update", color=disnake.Colour.yellow())
             missing = "None"
