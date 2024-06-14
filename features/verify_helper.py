@@ -84,6 +84,11 @@ class VerifyHelper:
             )
             session.add(person)
             session.commit()
+        else:
+            relation = self._parse_relation(user)
+            if person.year != await relation:
+                person.year = relation
+                session.commit()
         return person
 
     async def check_api(self, id: str) -> ValidPersonDB | None:
