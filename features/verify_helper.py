@@ -85,8 +85,8 @@ class VerifyHelper:
             session.add(person)
             session.commit()
         else:
-            relation = self._parse_relation(user)
-            if person.year != await relation:
+            relation = await self._parse_relation(user)
+            if person.year != relation:
                 person.year = relation
                 session.commit()
         return person
