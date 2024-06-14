@@ -188,7 +188,7 @@ class Verification(BaseFeature):
                 # ['FIT'], ['FIT', '1r'], .... Who knows. Other faculty students, dropouts, ...
                 return None
 
-            year_value_match = re.search(r"(\d*)r", year_parts[2])
+            year_value_match = re.search(r"(\d*)r?", year_parts[2])
             if year_value_match is None:
                 return None
             year_value = int(year_value_match.group(1))
