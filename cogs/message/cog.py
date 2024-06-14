@@ -34,9 +34,15 @@ class Message(Base, commands.Cog):
             default=None, description=MessagesCZ.attachment_param
         ),
     ):
+        if not attachment:
+            message_modal = MessageModal(self.bot, title="Send message", files=[], channel=channel)
+            await inter.response.send_modal(modal=message_modal)
+            return
+
         if attachment.size > 25_000_000:
             await inter.send(MessagesCZ.attachment_too_big, ephemeral=True)
             return
+
         file = await attachment.to_file()
         message_modal = MessageModal(self.bot, title="Send message", files=[file], channel=channel)
         await inter.response.send_modal(modal=message_modal)
@@ -65,5 +71,6 @@ class Message(Base, commands.Cog):
         if len(message_url.content) > 2000:
             await inter.send(MessagesCZ.message_too_long, ephemeral=True)
             return
+
         message_modal = MessageModal(self.bot, title="Edit message", message=message_url, edit=True)
         await inter.response.send_modal(modal=message_modal)
