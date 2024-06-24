@@ -1,0 +1,27 @@
+name: Deployment
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  lint-workflow-call:
+      uses: vutfitdiscord/rubbergod/.github/workflows/lint.yml@main
+
+  Deployment_Production:
+    runs-on: ubuntu-latest
+    environment: Production
+    needs: lint-workflow-call
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - name: Execute deployment on SSH
+        uses: appleboy/ssh-action@v0.1.8
+        with:
+          host: ${{ secrets.PRODUCTION_HOST }}
+          key: ${{ secrets.PRODUCTION_SSH_KEY }}
+          username: ${{ secrets.PRODUCTION_USERNAME }}
+          port: 22
+          script: |
+            cd rubbergod
+            ./deployment.sh
