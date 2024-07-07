@@ -431,7 +431,7 @@ class ErrorLogger:
 
         if isinstance(error, commands.CommandOnCooldown):
             time = datetime.datetime.now() + datetime.timedelta(seconds=error.retry_after)
-            retry_after = utils.get_discord_timestamp(time, style="Relative Time")
+            retry_after = disnake.utils.format_dt(time, style="R")
             await ctx.send(Messages.spamming(user=ctx.author.id, time=retry_after), ephemeral=True)
             return True
 
