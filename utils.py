@@ -148,32 +148,6 @@ def get_username(user: Union[disnake.User, disnake.Member]) -> str:
     return disnake.utils.escape_markdown(user.display_name).replace("@", "@ ")
 
 
-def get_command_group_signature(ctx: commands.Context):
-    """Return signature of group command with checks
-    `?group [subcommand1, subcommand2]`
-    """
-    subcommands = []
-    if ctx.command.usage is not None:
-        subcommands.append(ctx.command.signature)
-    for subcommand in ctx.command.commands:
-        for check in subcommand.checks:
-            try:
-                if not check(ctx):
-                    break
-            except Exception:
-                break
-        else:
-            subcommands.append(subcommand.name)
-    return f"`{ctx.prefix}{ctx.command.name} [{', '.join(subcommands)}]`"
-
-
-def get_command_signature(ctx: commands.Context):
-    """Return signature of command in group
-    `?(group sub)command [args]`
-    """
-    return f"{ctx.prefix}{ctx.command} {ctx.command.signature}"
-
-
 def clear_link_escape(link: str):
     """Removes < and > escapes from link."""
 
@@ -183,16 +157,6 @@ def clear_link_escape(link: str):
         link = link[:-1]
 
     return link
-
-
-def is_valid_datetime_format(dt: str, fmt: str) -> bool:
-    """Checks if string have valid datetime format"""
-
-    try:
-        datetime.strptime(dt, fmt)
-        return True
-    except ValueError:
-        return False
 
 
 def make_pts_column_row_formatter(pts_column_name: str):
