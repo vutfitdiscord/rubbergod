@@ -318,7 +318,7 @@ class StreamLinks(Base, commands.Cog):
         embed.add_field(name="Od", value=streamlink.member_name, inline=True)
         embed.add_field(
             name="Datum vydání",
-            value=utils.get_discord_timestamp(streamlink.created_at, "Short Date"),
+            value=disnake.utils.format_dt(streamlink.created_at, style="d"),
             inline=True,
         )
         embed.add_field(name="Odkaz", value=f"[Link]({streamlink.link})", inline=False)

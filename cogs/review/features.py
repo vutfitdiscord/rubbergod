@@ -64,9 +64,7 @@ class ReviewManager:
             embed.add_field(name=MessagesCZ.grade_label, value=TierEnum(review.tier).name)
             embed.add_field(
                 name=MessagesCZ.date_label,
-                value=utils.get_discord_timestamp(
-                    datetime.combine(review.date, time(12, 0)), "Relative Time"
-                ),
+                value=disnake.utils.format_dt(datetime.combine(review.date, time(12, 0)), style="R"),
             )
             text = review.text_review
             if text is not None:
