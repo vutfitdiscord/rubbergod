@@ -359,7 +359,7 @@ class ErrorLogger:
             slash_comms = [command.name for command in self.bot.slash_commands]
             invoked = ctx.message.content.split(" ")[0][1:]
             if invoked in slash_comms:
-                command_id = utils.get_command_id(self, invoked)
+                command_id = utils.get_command_id(self.bot, invoked)
                 await ctx.reply(Messages.moved_command(name=invoked, id=command_id))
             return True
 

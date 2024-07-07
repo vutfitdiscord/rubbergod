@@ -55,7 +55,7 @@ class StreamLinks(Base, commands.Cog):
     )
     async def streamlinks(self, ctx: commands.Context):
         if ctx.invoked_subcommand is None:
-            command_id = utils.get_command_id(self, "streamlinks")
+            command_id = utils.get_command_id(self.bot, "streamlinks")
             await ctx.reply(MessagesCZ.moved_command(name="streamlinks", id=command_id))
 
     @cooldowns.default_cooldown
@@ -255,7 +255,7 @@ class StreamLinks(Base, commands.Cog):
         await channel.send(embed=embed)
 
     async def get_user_string(self, user):
-        users = await utils.get_users_from_tag(self, user)
+        users = await utils.get_users_from_tag(self.bot, user)
         users = [user.name for user in users]
         user = " & ".join(users)
         return user
