@@ -1,8 +1,8 @@
 import math
 import re
 import time
-from datetime import datetime, timezone
-from typing import Callable, Iterable, List, Optional, Tuple, Union
+from datetime import datetime, timezone, tzinfo
+from typing import Callable, Iterable
 
 import disnake
 from dateutil import parser
@@ -19,11 +19,11 @@ from permissions.custom_errors import InvalidTime
 from rubbergod import Rubbergod
 
 
-def generate_mention(user_id):
+def generate_mention(user_id: int) -> str:
     return f"<@{user_id}>"
 
 
-def id_to_datetime(snowflake_id: int):
+def id_to_datetime(snowflake_id: int) -> datetime:
     return datetime.fromtimestamp(((snowflake_id >> 22) + 1420070400000) / 1000)
 
 
@@ -48,7 +48,7 @@ def has_role(user, role_name: str):
     return role_name.lower() in [x.name.lower() for x in user.roles]
 
 
-def pagination_next(id: str, page: int, max_page: int, roll_around: bool = True):
+def pagination_next(id: str, page: int, max_page: int, roll_around: bool = True) -> int:
     if "next" in id:
         next_page = page + 1
     elif "prev" in id:
@@ -71,7 +71,7 @@ def cut_string(string: str, part_len: int) -> list:
     return list(string[0 + i : part_len + i] for i in range(0, len(string), part_len))
 
 
-def split_to_parts(items, size: int) -> list:
+def split_to_parts(items: list, size: int) -> list:
     """Splits list into smaller lists with given size"""
     result = []
 
@@ -109,7 +109,7 @@ def add_author_footer(
     set_timestamp=True,
     additional_text: Iterable[str] = [],
     anonymous: bool = False,
-):
+) -> None:
     """
     Adds footer to the embed with author name and icon from ctx.
 
@@ -134,7 +134,7 @@ def add_author_footer(
     embed.set_footer(icon_url=display_avatar, text=" | ".join((str(display_name), *additional_text)))
 
 
-def get_emoji(guild: disnake.Guild, name: str) -> Optional[disnake.Emoji]:
+def get_emoji(guild: disnake.Guild, name: str) -> disnake.Emoji | None:
     """
     guild: :class:`disnake.Guild`
 
@@ -144,11 +144,11 @@ def get_emoji(guild: disnake.Guild, name: str) -> Optional[disnake.Emoji]:
     return disnake.utils.get(guild.emojis, name=name)
 
 
-def get_username(user: Union[disnake.User, disnake.Member]) -> str:
+def get_username(user: disnake.User | disnake.Member) -> str:
     return disnake.utils.escape_markdown(user.display_name).replace("@", "@ ")
 
 
-def clear_link_escape(link: str):
+def clear_link_escape(link: str) -> str:
     """Removes < and > escapes from link."""
 
     if link.startswith("<"):
@@ -159,7 +159,7 @@ def clear_link_escape(link: str):
     return link
 
 
-def make_pts_column_row_formatter(pts_column_name: str):
+def make_pts_column_row_formatter(pts_column_name: str) -> Callable[[Table], str]:
     """For leaderboards with one column of points."""
 
     def formatter(entry: Table, **kwargs):
@@ -170,14 +170,14 @@ def make_pts_column_row_formatter(pts_column_name: str):
     return formatter
 
 
-def create_bar(value, total) -> str:
+def create_bar(value: int, total: int) -> str:
     """
     creates progress bar
     returns string like this: ▓▓▓▓▓░░░░░ 50%
     """
     prog_bar_str = ""
     prog_bar_length = 10
-    percentage = 0
+    percentage = 0.0
     if total != 0:
         percentage = value / total
         for i in range(prog_bar_length):
@@ -227,23 +227,23 @@ class PersistentCooldown:
         return f
 
 
-def get_command_id(self, name):
+def get_command_id(bot: Rubbergod, name: str) -> int | None:
     """get slash command ID by name"""
-    command = self.bot.get_global_command_named(name)
+    command = bot.get_global_command_named(name)
     if command is None:
-        guild = self.bot.get_guild(config.guild_id)
+        guild = bot.get_guild(config.guild_id)
         command = guild.get_command_named(name)
     return getattr(command, "id", None)
 
 
-async def get_users_from_tag(self, tag):
+async def get_users_from_tag(bot: Rubbergod, tag: str) -> list[disnake.User]:
     """get user(s) object(s) from tag(s), return list of user(s)"""
     users = []
     # regex to match global name or nickname
     user_ids = re.findall(r"<@[!]?\d+>", tag)
     for user in user_ids:
         user = re.search(r"\d+", user)
-        user = await self.bot.get_or_fetch_user(int(user.group()))
+        user = await bot.get_or_fetch_user(int(user.group()))
         users.append(user)
     return users
 
@@ -262,7 +262,7 @@ async def get_members_from_tag(guild: disnake.Guild, tag: str) -> list[disnake.M
     return members
 
 
-async def get_or_fetch_channel(bot, channel_id) -> disnake.TextChannel:
+async def get_or_fetch_channel(bot: Rubbergod, channel_id: int) -> disnake.TextChannel:
     channel: disnake.TextChannel = bot.get_channel(channel_id)
     if channel is None:
         channel = await bot.fetch_channel(channel_id)
@@ -272,7 +272,7 @@ async def get_or_fetch_channel(bot, channel_id) -> disnake.TextChannel:
 async def parse_attachments(
     message: disnake.Message,
     limit: int = 25000000,  # 25MB
-) -> Tuple[List[disnake.File], List[disnake.File], List[disnake.Attachment]]:
+) -> tuple[list[disnake.File], list[disnake.File], list[disnake.Attachment]]:
     """Parse attachments from message and return them as lists of disnake files
     and if they are over 25MB as attachments.
 
@@ -304,12 +304,12 @@ async def parse_attachments(
     return images, files, attachments_too_big
 
 
-def get_local_zone():
+def get_local_zone() -> tzinfo | None:
     """Return local timezone"""
     return datetime.now().astimezone().tzinfo
 
 
-def parse_time(time_string: str, time_format: str) -> Optional[datetime]:
+def parse_time(time_string: str, time_format: str) -> datetime | None:
     """Parse local time from string to datetime object.
     Using first regex for abbreviations and if it fails, use dateutil parser.
 

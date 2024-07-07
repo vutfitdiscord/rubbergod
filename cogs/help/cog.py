@@ -113,7 +113,7 @@ class Help(Base, commands.Cog):
                 res = {}
                 for slash in self.bot.slash_commands:
                     res[slash.name] = {
-                        "id": utils.get_command_id(self, slash.name),
+                        "id": utils.get_command_id(self.bot, slash.name),
                         "children": list(slash.children.keys()),
                     }
                 return 0, res

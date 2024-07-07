@@ -267,7 +267,7 @@ class Karma(Base, commands.Cog):
         if not (self.config.guild_id == ctx.guild.id):
             await ctx.reply(MessagesCZ.server_warning)
             return
-        command_id = utils.get_command_id(self, "karma")
+        command_id = utils.get_command_id(self.bot, "karma")
         await ctx.reply(MessagesCZ.moved_command(name="karma", id=command_id))
 
     @tasks.loop(minutes=int(Base.config.grillbot_api_karma_sync_interval))
