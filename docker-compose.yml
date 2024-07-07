@@ -21,7 +21,7 @@ services:
                 condition: unless-stopped
                 delay: 5s
                 window: 20s
-        build: .
+        image: rubbergod-bot
         volumes:
             - .:/rubbergod:Z
             - ssh_config:/root/.ssh:Z

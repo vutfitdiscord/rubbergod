@@ -6,22 +6,32 @@ on:
   workflow_dispatch:
 
 jobs:
-  lint-workflow-call:
+  pre_commit_ci:
       uses: vutfitdiscord/rubbergod/.github/workflows/lint.yml@main
 
-  Deployment_Production:
+  deployment_production:
     runs-on: ubuntu-latest
     environment: Production
-    needs: lint-workflow-call
+    needs: pre_commit_ci
     if: github.ref == 'refs/heads/main'
     steps:
       - name: Execute deployment on SSH
-        uses: appleboy/ssh-action@v0.1.8
+        uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.PRODUCTION_HOST }}
           key: ${{ secrets.PRODUCTION_SSH_KEY }}
           username: ${{ secrets.PRODUCTION_USERNAME }}
           port: 22
           script: |
-            cd rubbergod
-            ./deployment.sh
+            echo "================== Pull Changes =================="
+            cd Rubbergod
+            git pull
+
+            echo "================== Build Image =================="
+            docker build . --tag rubbergod-bot
+
+            echo "================== Restart Services =================="
+            docker compose down && docker compose up -d
+
+            echo "================== Clean Up Images =================="
+            echo "y" | docker image prune -a
