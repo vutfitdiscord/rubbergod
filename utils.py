@@ -8,7 +8,7 @@ import disnake
 from dateutil import parser
 from dateutil.parser import ParserError
 from dateutil.relativedelta import relativedelta
-from disnake import Emoji, Member, PartialEmoji
+from disnake import Emoji, PartialEmoji
 from disnake.ext import commands
 from sqlalchemy.schema import Table
 
@@ -41,10 +41,8 @@ def str_emoji_id(emoji):
     return None
 
 
-def has_role(user, role_name: str):
-    if isinstance(user, Member):
-        return None
-
+def has_role(user: disnake.Member, role_name: str) -> bool:
+    """Check if user has specific role by name"""
     return role_name.lower() in [x.name.lower() for x in user.roles]
 
 
