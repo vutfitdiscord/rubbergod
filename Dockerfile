@@ -12,7 +12,7 @@ WORKDIR /rubbergod
 
 RUN /usr/local/bin/python -m pip install --upgrade pip
 COPY requirements.txt requirements.txt
-RUN pip install -r requirements.txt --user
+RUN pip install -r requirements.txt
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 COPY . .
 RUN git config --global --add safe.directory /rubbergod

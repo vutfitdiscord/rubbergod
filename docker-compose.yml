@@ -22,6 +22,11 @@ services:
                 delay: 5s
                 window: 20s
         image: rubbergod-bot
+        build:
+            context: .
+            dockerfile: Dockerfile
+            tags:
+                - rubbergod-bot
         volumes:
             - .:/rubbergod:Z
             - ssh_config:/root/.ssh:Z
