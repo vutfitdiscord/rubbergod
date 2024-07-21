@@ -1,17 +1,26 @@
-bckup*
-config/config.toml
-config/config_backup*.toml
-__pycache__
+# IDE files
 .idea
+.vscode
+
+# Virtual environments
 venv
 .venv
-*.log
-.vscode
-merlin-latest
-timeout_wars
-service_logs.txt
-emojis.zip
-*sql
-*.bak
+env
+.env
+
+# Cache files
+__pycache__
 .ruff_cache
 .mypy_cache
+
+# Local files
+emojis.zip
+timeout_wars
+merlin-latest
+service_logs.txt
+config/config.toml
+*sql
+
+# Ignore all logs
+logs/*
+*.log
