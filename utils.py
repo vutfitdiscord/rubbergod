@@ -103,7 +103,7 @@ def split(array: list, k: int) -> list:
 
 def add_author_footer(
     embed: disnake.Embed,
-    author: disnake.User,
+    author: disnake.User | None,
     set_timestamp=True,
     additional_text: Iterable[str] = [],
     anonymous: bool = False,
@@ -121,6 +121,11 @@ def add_author_footer(
 
     if set_timestamp:
         embed.timestamp = datetime.now(tz=timezone.utc)
+
+    if author is None:
+        # sometimes discord returns None even though it shouldn't
+        embed.set_footer(icon_url=None, text=" | ".join("Unknown", *additional_text))
+        return
 
     if anonymous:
         display_name = "Anonymous"
