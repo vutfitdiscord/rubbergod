@@ -4,7 +4,6 @@ Cog for dynamically changing config.
 
 import re
 import shlex
-from datetime import datetime
 from typing import Any
 
 import disnake
@@ -102,17 +101,6 @@ class DynamicConfig(Base, commands.Cog):
         value = getattr(self.config, key)
         embed = disnake.Embed(title=key, description=str(value))
         await inter.send(embed=embed)
-
-    @config_cmd.sub_command(description=MessagesCZ.backup_brief)
-    async def backup(self, inter: disnake.ApplicationCommandInteraction):
-        """
-        Create backup from current config. Backup filename will contain current date.
-        """
-        date = datetime.today()
-        backup_path = self.config_dir.joinpath(f"config_backup_{date}.toml")
-        with open(backup_path, "w+", encoding="utf-8") as fd:
-            toml.dump(self.config.toml_dict, fd)
-        await inter.send(MessagesCZ.backup_created)
 
     @config_cmd.sub_command(description=MessagesCZ.sync_template_brief)
     async def update(self, inter: disnake.ApplicationCommandInteraction):
