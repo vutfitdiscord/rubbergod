@@ -43,24 +43,6 @@ class System(Base, commands.Cog):
             ErrorLogDB.set()
 
     @commands.check(permission_check.is_bot_admin)
-    @commands.slash_command(name="git")
-    async def git(self, inter: disnake.ApplicationCommandInteraction):
-        pass
-
-    @git.sub_command(name="pull", description=MessagesCZ.git_pull_brief)
-    async def pull(self, inter: disnake.ApplicationCommandInteraction):
-        await inter.send("Pulling...")
-        message: disnake.Message = await inter.original_message()
-
-        pull_result = await self.git.pull()
-        pull_parts = utils.cut_string(pull_result, 1900)
-
-        await message.edit(content=f"```{pull_parts[0]}```")
-
-        for part in pull_parts[1:]:
-            await inter.send(f"```{part}```")
-
-    @commands.check(permission_check.is_bot_admin)
     @commands.slash_command(name="get_logs", description=MessagesCZ.get_logs_brief)
     async def get_logs(
         self,
