@@ -23,11 +23,11 @@ class VerifyHelper:
 
     async def has_role(self, user, role_name: str) -> bool:
         if isinstance(user, Member):
-            return utils.has_role(user, role_name)
+            return utils.user.has_role(user, role_name)
         else:
             guild = await self.bot.fetch_guild(config.guild_id)
             member = await guild.fetch_member(user.id)
-            return utils.has_role(member, role_name)
+            return utils.user.has_role(member, role_name)
 
     async def get_user_details(self, id: str) -> dict | None:
         headers = {"Authorization": f"Bearer {config.vut_api_key}"}

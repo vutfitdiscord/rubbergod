@@ -20,7 +20,7 @@ class Icons(Base, commands.Cog):
         super().__init__()
         self.bot = bot
 
-    @utils.PersistentCooldown(command_name="icon", limit=Base.config.icon_ui_cooldown)
+    @utils.general.PersistentCooldown(command_name="icon", limit=Base.config.icon_ui_cooldown)
     @commands.slash_command(description=MessagesCZ.icon_brief, guild_ids=[Base.config.guild_id])
     async def icon(self, inter: disnake.ApplicationCommandInteraction):
         await inter.response.defer(ephemeral=True)
@@ -56,7 +56,7 @@ class Icons(Base, commands.Cog):
     async def cog_slash_command_error(
         self, inter: disnake.ApplicationCommandInteraction, error: Exception
     ) -> bool:
-        if isinstance(error, utils.PCommandOnCooldown):
+        if isinstance(error, utils.general.PCommandOnCooldown):
             await inter.response.send_message(str(error), ephemeral=True)
             return True
         return False

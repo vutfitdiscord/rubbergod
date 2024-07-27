@@ -59,7 +59,7 @@ class Modal(disnake.ui.Modal):
 
         embed.add_field(name="Resolved by", value="---", inline=False)
 
-        utils.add_author_footer(
+        utils.general.add_author_footer(
             embed=embed, author=inter.author, additional_text=[f"ID: {report_id}"], anonymous=True
         )
         return embed
@@ -122,7 +122,7 @@ class Modal(disnake.ui.Modal):
             target_user_id=self.message.author.id,
         )
 
-        images, files, attachments_too_big = await utils.parse_attachments(
+        images, files, attachments_too_big = await utils.general.parse_attachments(
             self.message, inter.guild.filesize_limit
         )
 

@@ -23,7 +23,7 @@ def create_embed(
 ) -> disnake.Embed:
     """Embed template for Timeout"""
     embed = disnake.Embed(title=title, color=disnake.Color.yellow(), description=description)
-    utils.add_author_footer(embed, author)
+    utils.general.add_author_footer(embed, author)
     return embed
 
 
@@ -63,7 +63,7 @@ async def timeout_embed_listing(
 ) -> None:
     """Embed for sending timeout updates on users"""
     embeds = []
-    users_lists = utils.split_to_parts(users, 15)  # to avoid embed char limit
+    users_lists = utils.general.split_to_parts(users, 15)  # to avoid embed char limit
     for users_list in users_lists:
         embed = create_embed(author, title)
         for timeout in users_list:

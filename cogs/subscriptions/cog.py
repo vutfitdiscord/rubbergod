@@ -118,5 +118,5 @@ class Subscriptions(Base, commands.Cog):
         embed.add_field(name=MessagesCZ.embed_channel, value=thread.mention)
         tags = [f"`{tag.name}`" for tag in thread.applied_tags]
         embed.add_field(name=MessagesCZ.embed_tags, value=", ".join(tags))
-        utils.add_author_footer(embed, thread.owner)
+        utils.general.add_author_footer(embed, thread.owner)
         await user.send(embed=embed, view=TrashView())

@@ -68,7 +68,7 @@ class BetterMeme(Base, commands.Cog):
                 original_post_user = ctx.guild.get_member(int(repost.author_id))
 
                 if original_post_user:
-                    emoji_key = utils.str_emoji_id(ctx.emoji)
+                    emoji_key = utils.general.str_emoji_id(ctx.emoji)
                     emoji_val = KarmaEmojiDB.emoji_value(emoji_key)
                     BetterMemeDB.update_post_karma(original_post_user.id, emoji_val)
                     KarmaDB.karma_emoji(original_post_user.id, ctx.member.id, emoji_key)
@@ -90,7 +90,7 @@ class BetterMeme(Base, commands.Cog):
             original_post_user = ctx.guild.get_member(int(repost.author_id))
 
             if original_post_user:
-                emoji_key = utils.str_emoji_id(ctx.emoji)
+                emoji_key = utils.general.str_emoji_id(ctx.emoji)
                 emoji_val = KarmaEmojiDB.emoji_value(emoji_key)
                 BetterMemeDB.update_post_karma(original_post_user.id, -emoji_val)
                 KarmaDB.karma_emoji_remove(original_post_user.id, ctx.member.id, emoji_key)
@@ -118,7 +118,7 @@ class BetterMeme(Base, commands.Cog):
                 title_string = tmp_string
 
             embed = disnake.Embed(color=disnake.Color.dark_blue(), title=title_string)
-            utils.add_author_footer(embed, author=ctx.message.author)
+            utils.general.add_author_footer(embed, author=ctx.message.author)
             embed.timestamp = ctx.message.created_at
 
             # Create link to original post
@@ -202,7 +202,7 @@ class BetterMeme(Base, commands.Cog):
             total_karma = 0
 
             for reac in reactions:
-                emoji_key = utils.str_emoji_id(reac.emoji)
+                emoji_key = utils.general.str_emoji_id(reac.emoji)
                 emoji_val = KarmaEmojiDB.emoji_value(emoji_key)
                 total_karma += reac.count * emoji_val
 

@@ -37,8 +37,8 @@ class TimeoutDB(database.base):  # type: ignore
         """Return the start and end time in the local timezone.
         First we need to add UTC timezone then convert it to local timezone.
         """
-        start = self.start.replace(tzinfo=timezone.utc).astimezone(utils.get_local_zone())
-        end = self.end.replace(tzinfo=timezone.utc).astimezone(utils.get_local_zone())
+        start = self.start.replace(tzinfo=timezone.utc).astimezone(utils.general.get_local_zone())
+        end = self.end.replace(tzinfo=timezone.utc).astimezone(utils.general.get_local_zone())
         return start, end
 
     @classmethod

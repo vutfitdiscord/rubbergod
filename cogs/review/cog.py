@@ -226,7 +226,7 @@ class Review(Base, commands.Cog):
                     inline=False,
                 )
 
-        utils.add_author_footer(embed, inter.author)
+        utils.general.add_author_footer(embed, inter.author)
         await inter.response.send_message(embed=embed)
 
     @commands.slash_command(name="tierboard", description=MessagesCZ.tierboard_brief)
@@ -273,7 +273,7 @@ class Review(Base, commands.Cog):
             year = ""
         else:
             embed.add_field(name="Ročník", value=year)
-        utils.add_author_footer(embed, author)
+        utils.general.add_author_footer(embed, author)
 
         pages_total = SubjectDetailsDB.get_tierboard_page_count(type, sem, degree, year)
         for page in range(pages_total):

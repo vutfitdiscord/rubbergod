@@ -39,7 +39,7 @@ class Roles(Base, commands.Cog):
                 continue
 
             if index % rate == 0:
-                progress_bar = utils.create_bar(index + 1, len(inter.guild.channels))
+                progress_bar = utils.general.create_bar(index + 1, len(inter.guild.channels))
                 await message.edit(
                     MessagesCZ.channel_add_topic_progress(
                         index=index + 1,
@@ -113,7 +113,8 @@ class Roles(Base, commands.Cog):
             await channel.set_permissions(member, view_channel=True)
             if index % rate == 0:
                 await inter.edit_original_response(
-                    f"• uživatelů: {len(role.members)}\n" + utils.create_bar(index + 1, len(role.members))
+                    f"• uživatelů: {len(role.members)}\n"
+                    + utils.general.create_bar(index + 1, len(role.members))
                 )
 
         await inter.edit_original_response(
@@ -144,7 +145,7 @@ class Roles(Base, commands.Cog):
             if index % rate == 0:
                 await inter.edit_original_response(
                     f"• kanálů: {index+1}/{len(inter.guild.channels)}\n"
-                    f"{utils.create_bar(index+1, len(inter.guild.channels))}"
+                    f"{utils.general.create_bar(index+1, len(inter.guild.channels))}"
                 )
             user_overwrites += len(channel_user_overwrites)
             total_overwrites += len(channel_overwrites)
@@ -191,7 +192,7 @@ class Roles(Base, commands.Cog):
             if index % rate == 0:
                 await inter.edit_original_response(
                     f"• overwrites: {index+1}/{len(channel_user_overwrites)}\n"
-                    f"{utils.create_bar(index+1, len(channel_user_overwrites))}"
+                    f"{utils.general.create_bar(index+1, len(channel_user_overwrites))}"
                 )
         await inter.edit_original_response(MessagesCZ.channel_overwrites_to_role_done)
 
@@ -216,7 +217,8 @@ class Roles(Base, commands.Cog):
             await channel.set_permissions(member, view_channel=True)
             if index % rate == 0:
                 await inter.edit_original_response(
-                    f"• overwrites: {index+1}/{len(members)}\n" f"{utils.create_bar(index+1, len(members))}"
+                    f"• overwrites: {index+1}/{len(members)}\n"
+                    f"{utils.general.create_bar(index+1, len(members))}"
                 )
         await inter.edit_original_response(MessagesCZ.channel_role_to_overwrites_done)
 
@@ -246,6 +248,7 @@ class Roles(Base, commands.Cog):
             await member.remove_roles(remove_role)
             if index % rate == 0:
                 await inter.edit_original_response(
-                    f"• members: {index+1}/{len(members)}\n" f"{utils.create_bar(index+1, len(members))}"
+                    f"• members: {index+1}/{len(members)}\n"
+                    f"{utils.general.create_bar(index+1, len(members))}"
                 )
         await inter.edit_original_response(MessagesCZ.remove_exclusive_roles_done)

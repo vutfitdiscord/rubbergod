@@ -55,7 +55,7 @@ class StreamLinks(Base, commands.Cog):
     )
     async def streamlinks(self, ctx: commands.Context):
         if ctx.invoked_subcommand is None:
-            command_id = utils.get_command_id(self.bot, "streamlinks")
+            command_id = utils.general.get_command_id(self.bot, "streamlinks")
             await ctx.reply(MessagesCZ.moved_command(name="streamlinks", id=command_id))
 
     @cooldowns.default_cooldown
@@ -116,7 +116,7 @@ class StreamLinks(Base, commands.Cog):
         description: str = commands.Param(max_length=1024),
         date: str = commands.Param(default=None, description=MessagesCZ.date_format),
     ):
-        link = utils.clear_link_escape(link)
+        link = utils.general.clear_link_escape(link)
         try:
             requests.get(link)
         except Exception:
@@ -174,7 +174,7 @@ class StreamLinks(Base, commands.Cog):
 
         if link is not None:
             parameter = True
-            link = utils.clear_link_escape(link)
+            link = utils.general.clear_link_escape(link)
             try:
                 requests.get(link)
             except Exception:
@@ -216,7 +216,7 @@ class StreamLinks(Base, commands.Cog):
 
         stream.merge()
 
-        utils.add_author_footer(embed, inter.author)
+        utils.general.add_author_footer(embed, inter.author)
         embed.timestamp = datetime.now(timezone.utc)
         channel = self.bot.get_channel(self.config.log_channel)
         await channel.send(embed=embed)
@@ -255,7 +255,7 @@ class StreamLinks(Base, commands.Cog):
         await channel.send(embed=embed)
 
     async def get_user_string(self, user):
-        users = await utils.get_users_from_tag(self.bot, user)
+        users = await utils.user.get_users_from_tag(self.bot, user)
         users = [user.name for user in users]
         user = " & ".join(users)
         return user
@@ -324,7 +324,7 @@ class StreamLinks(Base, commands.Cog):
         embed.add_field(name="Odkaz", value=f"[Link]({streamlink.link})", inline=False)
         embed.add_field(name="Popis", value=streamlink.description[:1024], inline=False)
         embed.timestamp = datetime.now(timezone.utc)
-        utils.add_author_footer(
+        utils.general.add_author_footer(
             embed,
             author,
             additional_text=[

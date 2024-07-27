@@ -98,7 +98,7 @@ class AutoPin(Base, commands.Cog):
         lines: list[str] = []
         for item in mappings:
             try:
-                channel = await utils.get_or_fetch_channel(self.bot, int(item.channel_id))
+                channel = await utils.general.get_or_fetch_channel(self.bot, int(item.channel_id))
             except disnake.NotFound:
                 lines.append(MessagesCZ.list_unknown_channel(channel_id=item.channel_id))
                 PinMapDB.remove_channel(str(item.channel_id))
@@ -113,7 +113,7 @@ class AutoPin(Base, commands.Cog):
                 lines.append(msg)
 
         await inter.send(MessagesCZ.list_info)
-        for part in utils.split_to_parts(lines, 10):
+        for part in utils.general.split_to_parts(lines, 10):
             await inter.channel.send("\n".join(part))
 
     @cooldowns.long_cooldown

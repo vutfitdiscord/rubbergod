@@ -64,7 +64,7 @@ class Emoji(Base, commands.Cog):
         """Get emoji in full size"""
         await inter.send(emoji.url)
 
-    @tasks.loop(time=time(5, 0, tzinfo=utils.get_local_zone()))
+    @tasks.loop(time=time(5, 0, tzinfo=utils.general.get_local_zone()))
     async def download_emojis_task(self):
         await self.download_emojis(self.base_guild)
 

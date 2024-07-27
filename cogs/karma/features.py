@@ -222,7 +222,7 @@ class Karma(BaseFeature):
     async def karma_give(
         self, inter: disnake.ApplicationCommandInteraction, members_str: str, karma: int
     ) -> None:
-        members = await utils.get_members_from_tag(inter.guild, members_str)
+        members = await utils.user.get_members_from_tag(inter.guild, members_str)
         for member in members:
             KarmaDB.update_karma(member.id, inter.author.id, karma)
         if karma >= 0:
@@ -314,5 +314,5 @@ class Karma(BaseFeature):
             color = 0xCB410B
         embed.color = color
         embed.add_field(name="Celková karma za zprávu:", value=karma, inline=False)
-        utils.add_author_footer(embed, author)
+        utils.general.add_author_footer(embed, author)
         return embed

@@ -206,19 +206,19 @@ class FitWide(Base, commands.Cog):
         for index, member in enumerate(bit4_members):
             await member.add_roles(bit4)
             if (index % 50) == 0:
-                progress_bar = utils.create_bar(index, len(bit4_members))
+                progress_bar = utils.general.create_bar(index, len(bit4_members))
                 await message.edit(f"Přidávání role 4bit-1mit: {progress_bar}")
 
         # give 3bit/2mit users 2bit/1mit role
         for index, member in enumerate(BIT_roles[3].members):
             await member.add_roles(BIT_roles[2])
             if (index % 50) == 0:
-                progress_bar = utils.create_bar(index, len(BIT_roles[3].members))
+                progress_bar = utils.general.create_bar(index, len(BIT_roles[3].members))
                 await message.edit(f"Přidávání role 3bit: {progress_bar}")
 
         for index, member in enumerate(MIT_roles[2].members):
             if (index % 50) == 0:
-                progress_bar = utils.create_bar(index, len(MIT_roles[2].members))
+                progress_bar = utils.general.create_bar(index, len(MIT_roles[2].members))
                 await message.edit(f"Přidávání role 2mit: {progress_bar}")
             await member.add_roles(MIT_roles[1])
 
@@ -437,7 +437,7 @@ class FitWide(Base, commands.Cog):
             else:
                 await inter.edit_original_response(MessagesCZ.get_user_format(p=person) + "Není na serveru.")
         else:
-            await inter.edit_original_response(utils.generate_mention(result.discord_ID))
+            await inter.edit_original_response(utils.user.generate_mention(result.discord_ID))
 
     @verify_db.sub_command(name="reset_login", description=MessagesCZ.reset_login_brief)
     async def reset_login(
@@ -541,7 +541,7 @@ class FitWide(Base, commands.Cog):
 
         # Run through all semester channels
         for index, category in enumerate(categories):
-            progress_bar = utils.create_bar(index, len(categories))
+            progress_bar = utils.general.create_bar(index, len(categories))
             await inter.edit_original_message(
                 content=MessagesCZ.gen_teacher_info_processing(progress_bar=progress_bar)
             )

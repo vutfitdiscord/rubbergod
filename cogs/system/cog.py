@@ -72,7 +72,7 @@ class System(Base, commands.Cog):
                     text=True,
                 ).stdout
             except subprocess.CalledProcessError as error:
-                strings = utils.cut_string(error.stderr, 1900)
+                strings = utils.general.cut_string(error.stderr, 1900)
                 for string in strings:
                     await inter.send(f"```{string}```")
                 return

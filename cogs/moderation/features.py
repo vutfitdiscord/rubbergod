@@ -31,7 +31,7 @@ async def mod_tag(message: disnake.Message, role: str, room: disnake.TextChannel
             f"**Link:** [#{message.channel}]({message.jump_url})\n",
             color=disnake.Color.yellow(),
         )
-        parts = utils.split_to_parts(message.content, 1024)
+        parts = utils.general.split_to_parts(message.content, 1024)
         for msg in parts:
             embed.add_field(name="Content", value=msg, inline=False)
 

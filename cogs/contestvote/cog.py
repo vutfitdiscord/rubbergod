@@ -209,11 +209,11 @@ class ContestVote(Base, commands.Cog):
         if ctx is None:
             return
 
-        emoji_str = utils.str_emoji_id(ctx.emoji)
+        emoji_str = utils.general.str_emoji_id(ctx.emoji)
         message = ctx.message
         user = await self.bot.get_or_fetch_user(ctx.member.id)
         for r in message.reactions:
-            if utils.str_emoji_id(r.emoji) == emoji_str:
+            if utils.general.str_emoji_id(r.emoji) == emoji_str:
                 continue
             if await r.users().find(lambda x: x.id == user.id):
                 await message.remove_reaction(ctx.emoji, user)

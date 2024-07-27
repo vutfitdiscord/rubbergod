@@ -19,10 +19,6 @@ from permissions.custom_errors import InvalidTime
 from rubbergod import Rubbergod
 
 
-def generate_mention(user_id: int) -> str:
-    return f"<@{user_id}>"
-
-
 def id_to_datetime(snowflake_id: int) -> datetime:
     return datetime.fromtimestamp(((snowflake_id >> 22) + 1420070400000) / 1000)
 
@@ -39,11 +35,6 @@ def str_emoji_id(emoji):
             return str(emoji.id)
 
     return None
-
-
-def has_role(user: disnake.Member, role_name: str) -> bool:
-    """Check if user has specific role by name"""
-    return role_name.lower() in [x.name.lower() for x in user.roles]
 
 
 def pagination_next(id: str, page: int, max_page: int, roll_around: bool = True) -> int:
@@ -147,10 +138,6 @@ def get_emoji(guild: disnake.Guild, name: str) -> disnake.Emoji | None:
     return disnake.utils.get(guild.emojis, name=name)
 
 
-def get_username(user: disnake.User | disnake.Member) -> str:
-    return disnake.utils.escape_markdown(user.display_name).replace("@", "@ ")
-
-
 def clear_link_escape(link: str) -> str:
     """Removes < and > escapes from link."""
 
@@ -239,32 +226,6 @@ def get_command_id(bot: Rubbergod, name: str) -> int | None:
     return getattr(command, "id", None)
 
 
-async def get_users_from_tag(bot: Rubbergod, tag: str) -> list[disnake.User]:
-    """get user(s) object(s) from tag(s), return list of user(s)"""
-    users = []
-    # regex to match global name or nickname
-    user_ids = re.findall(r"<@[!]?\d+>", tag)
-    for user in user_ids:
-        user = re.search(r"\d+", user)
-        user = await bot.get_or_fetch_user(int(user.group()))
-        users.append(user)
-    return users
-
-
-async def get_members_from_tag(guild: disnake.Guild, tag: str) -> list[disnake.Member]:
-    """get member(s) object(s) from tag(s), return list of member(s)"""
-    members = []
-    # regex to match global name or nickname
-    member_ids = re.findall(r"<@[!]?\d+>", tag)
-    for member in member_ids:
-        member = re.search(r"\d+", member)
-        member = await guild.get_or_fetch_member(int(member.group()))
-        if member is None:
-            continue
-        members.append(member)
-    return members
-
-
 async def get_or_fetch_channel(bot: Rubbergod, channel_id: int) -> disnake.TextChannel:
     channel: disnake.TextChannel = bot.get_channel(channel_id)
     if channel is None:
@@ -274,7 +235,7 @@ async def get_or_fetch_channel(bot: Rubbergod, channel_id: int) -> disnake.TextC
 
 async def parse_attachments(
     message: disnake.Message,
-    limit: int = 25000000,  # 25MB
+    limit: int = 25000000,
 ) -> tuple[list[disnake.File], list[disnake.File], list[disnake.Attachment]]:
     """Parse attachments from message and return them as lists of disnake files
     and if they are over 25MB as attachments.

@@ -44,7 +44,7 @@ class AutopinFeatures:
             channel_url = ""
         list_pins = []
         for pin in pins:
-            created_at = pin.created_at.astimezone(tz=utils.get_local_zone()).replace(tzinfo=None)
+            created_at = pin.created_at.astimezone(tz=utils.general.get_local_zone()).replace(tzinfo=None)
             dict_pin = {
                 "author": pin.author.name,
                 "created_at": created_at.isoformat("T", "seconds"),
@@ -73,7 +73,7 @@ class AutopinFeatures:
         with io.StringIO() as f:
             f.write(f"# [#{channel_name}]({channel_url})\n\n")
             for index, pin in enumerate(pins):
-                created_at = pin.created_at.astimezone(tz=utils.get_local_zone()).replace(tzinfo=None)
+                created_at = pin.created_at.astimezone(tz=utils.general.get_local_zone()).replace(tzinfo=None)
                 f.write(f"## {index+1}. {pin.author} — {created_at.strftime('%d. %m. %Y %H:%M:%S')}\n\n")
                 f.write(f"[Message link]({pin.jump_url})\n\n")
                 f.write(f"### Content\n\n{pin.content}\n\n") if pin.content else ...

@@ -15,7 +15,7 @@ def trim_messages(message_list: Iterable, max_msg_len: int):
     output_arr = []
     for it in message_list:
         if len(it) > max_msg_len:
-            output_arr.extend(utils.split_to_parts(it, max_msg_len))
+            output_arr.extend(utils.general.split_to_parts(it, max_msg_len))
         else:
             output_arr.append(it)
     return output_arr

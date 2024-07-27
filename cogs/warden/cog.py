@@ -201,7 +201,7 @@ class Warden(Base, commands.Cog):
             title = "To je možná repost"
             reaction = "🤷🏻"
         prob = "{:.1f} %".format((1 - hamming / 128) * 100)
-        timestamp = utils.id_to_datetime(original.attachment_id).strftime("%Y-%m-%d %H:%M:%S")
+        timestamp = utils.general.id_to_datetime(original.attachment_id).strftime("%Y-%m-%d %H:%M:%S")
 
         src_chan = self.bot.get_guild(self.config.guild_id).get_channel(original.channel_id)
         try:

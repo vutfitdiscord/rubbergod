@@ -2,7 +2,7 @@ import re
 
 import disnake
 
-from utils import split_to_parts
+from utils.general import split_to_parts
 
 from .messages_cz import MessagesCZ
 

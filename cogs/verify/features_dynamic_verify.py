@@ -60,7 +60,7 @@ class DynamicVerifyManager(BaseFeature):
         embed.add_field("Pravidlo", f"{rule.name} ({rule.id})")
         embed.add_field(
             "Uživatel",
-            f"{inter.user.display_name} ({utils.generate_mention(inter.user.id)})",
+            f"{inter.user.display_name} ({inter.author.mention}))",
         )
 
         channel = self.bot.get_channel(config.mod_room)
@@ -75,8 +75,8 @@ class DynamicVerifyManager(BaseFeature):
     ) -> None:
         embed = disnake.Embed(title="Dynamická verifikace", color=disnake.Colour.yellow())
         embed.add_field("Pravidlo", f"{rule.name} ({rule.id})")
-        embed.add_field("Potvrdil", utils.generate_mention(inter.user.id))
-        embed.add_field("Uživatel", utils.generate_mention(target_id))
+        embed.add_field("Potvrdil", inter.author.mention)
+        embed.add_field("Uživatel", utils.user.generate_mention(target_id))
 
         channel = self.bot.get_channel(config.log_channel)
         await channel.send(embed=embed)

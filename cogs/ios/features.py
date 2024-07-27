@@ -185,7 +185,7 @@ def insult_login(parsed_items: dict, system: str, res_type: RESOURCE_TYPE) -> li
             avg_time = int(sum(array) // count)
 
             msg = (
-                f"{utils.generate_mention(user.discord_ID)}, máš na "
+                f"{utils.user.generate_mention(user.discord_ID)}, máš na "
                 f"{system} `{count}` {_inflected_resources[res_type][1]}, "
                 f"{_inflected_resources[res_type][2]} průměrně `{format_time(avg_time)}`."
             )
@@ -206,7 +206,7 @@ def insult_login_shm(parsed_files: dict, system: str) -> list[str]:
             avg_time = int(sum(array) // count)
 
             msg = (
-                f"{utils.generate_mention(user.discord_ID)} "
+                f"{utils.user.generate_mention(user.discord_ID)} "
                 f"máš na {system} (`/dev/shm`) `{count}` souborů semaforů."
             )
             if avg_time > 9:
