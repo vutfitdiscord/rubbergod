@@ -113,7 +113,7 @@ class LeaderboardPageSource(DatabaseIteratorPageSource):
 
     @lru_cache(5)
     def get_default_emoji(self, emoji: str):
-        return utils.get_emoji(self.bot.get_guild(config.guild_id), emoji)
+        return utils.general.get_emoji(self.bot.get_guild(config.guild_id), emoji)
 
     def set_leaderboard_title(self, board_name: str, emote_name: str):
         if emote_name.startswith("<") and emote_name.endswith(">"):
@@ -159,7 +159,7 @@ class LeaderboardPageSource(DatabaseIteratorPageSource):
         self.base_embed.description = "\n" + "\n".join(board_lines)
 
         # possibility to optimize, author could be set only once
-        utils.add_author_footer(
+        utils.general.add_author_footer(
             self.base_embed,
             self.author,
             additional_text=(f"{self.current_page + 1}/{self.get_max_pages()} pages.",),

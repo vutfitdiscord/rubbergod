@@ -66,7 +66,7 @@ async def get_top_contributions(emojis: dict, messages: list[disnake.Message], n
         # iterate reactions and create Emoji objects for each reaction
         for r, users in reactions_list.items():
             users = users - duplicate_user_votes
-            emoji = utils.str_emoji_id(r.emoji)
+            emoji = utils.general.str_emoji_id(r.emoji)
             if emoji in emojis:
                 emoji_obj = Emoji(emoji=emoji, count=len(users), value=emojis[emoji])
                 emojis_for_message.append(emoji_obj)

@@ -81,7 +81,7 @@ class TimeoutWars(Base, commands.Cog):
             value=f"{original_message.jump_url}",
             inline=False,
         )
-        utils.add_author_footer(embed, original_message.author)
+        utils.general.add_author_footer(embed, original_message.author)
         await self.timeout_wars_channel.send(embed=embed)
 
     async def mute_users(self, original_message, channel, users: list[disnake.Member], duration, reason):

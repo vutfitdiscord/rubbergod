@@ -176,16 +176,16 @@ class KarmaEmojiDB(database.base):  # type: ignore
     def emoji_value_raw(cls, emoji_id: str) -> Optional[int]:
         """Returns the value of an emoji.
         If the emoji has not been voted for, returns None."""
-        emoji = session.query(cls).filter(cls.emoji_ID == utils.str_emoji_id(emoji_id)).one_or_none()
+        emoji = session.query(cls).filter(cls.emoji_ID == utils.general.str_emoji_id(emoji_id)).one_or_none()
         return emoji.value if emoji else None
 
     @classmethod
     def set_emoji_value(cls, emoji_id: str, value: int) -> None:
-        emoji = cls(emoji_ID=utils.str_emoji_id(emoji_id), value=str(value))
+        emoji = cls(emoji_ID=utils.general.str_emoji_id(emoji_id), value=str(value))
         session.merge(emoji)
         session.commit()
 
     @classmethod
     def remove_emoji(cls, emoji_id: str) -> None:
-        session.query(cls).filter(cls.emoji_ID == utils.str_emoji_id(emoji_id)).delete()
+        session.query(cls).filter(cls.emoji_ID == utils.general.str_emoji_id(emoji_id)).delete()
         session.commit()

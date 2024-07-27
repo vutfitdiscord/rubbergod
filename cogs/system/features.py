@@ -81,8 +81,8 @@ def create_embed(bot: Rubbergod) -> disnake.Embed:
 
     chunks_count = 2 if cog_count <= 20 else 3
 
-    loaded_chunks = utils.split(cog_loaded, chunks_count)
-    unloaded_chunks = utils.split(cog_unloaded, chunks_count)
+    loaded_chunks = utils.general.split(cog_loaded, chunks_count)
+    unloaded_chunks = utils.general.split(cog_unloaded, chunks_count)
 
     for loaded_chunk in loaded_chunks:
         embed.add_field(name="\u200b", value="".join(loaded_chunk), inline=True)

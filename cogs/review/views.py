@@ -101,7 +101,9 @@ class View(EmbedView):
                 pages = self.embed.fields[3].value.split("/")
                 text_page = int(pages[0])
                 max_text_page = int(pages[1])
-                next_text_page = utils.pagination_next(interaction.data.custom_id, text_page, max_text_page)
+                next_text_page = utils.general.pagination_next(
+                    interaction.data.custom_id, text_page, max_text_page
+                )
                 if next_text_page:
                     self.embed = self.manager.update_embed(self.embed, review, next_text_page)
                     await interaction.response.edit_message(embed=self.embed)

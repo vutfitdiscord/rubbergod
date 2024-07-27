@@ -8,7 +8,6 @@ from email.mime.text import MIMEText
 
 import disnake
 
-import utils
 from cogs.verify.messages_cz import MessagesCZ
 from cogs.verify.views_verify import VerifyView, VerifyWithResendButtonView
 from config.app_config import config
@@ -289,7 +288,7 @@ class Verification(BaseFeature):
 
     async def log_verify_fail(self, inter: disnake.ApplicationCommand, phase: str, data: str):
         embed = disnake.Embed(title="Neúspěšný pokus o verify", color=disnake.Colour.yellow())
-        embed.add_field(name="User", value=utils.generate_mention(inter.user.id))
+        embed.add_field(name="User", value=inter.author.mention)
         embed.add_field(name="Verify phase", value=phase)
         embed.add_field(name="Data", value=data, inline=False)
         await self.bot.get_channel(config.log_channel).send(embed=embed)

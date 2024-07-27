@@ -21,7 +21,7 @@ def icon_emoji(bot: Rubbergod, icon_role: disnake.Role) -> disnake.PartialEmoji 
         return emoji
     icon = icon_name(icon_role)
     guild = bot.get_guild(Base.config.guild_id)
-    emoji = utils.get_emoji(guild=guild, name=icon)
+    emoji = utils.general.get_emoji(guild=guild, name=icon)
     if emoji is not None:
         return emoji
     try:

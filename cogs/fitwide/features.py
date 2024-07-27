@@ -20,7 +20,7 @@ async def send_masstag_messages(ctx: commands.Context, prefix: str, target_ids: 
         if index % 35 == 0 and index:
             await ctx.send(message)
             message = prefix
-        message += utils.generate_mention(target_ids[index])
+        message += utils.user.generate_mention(target_ids[index])
         message += " "
     await ctx.send(message)
 
@@ -61,7 +61,7 @@ async def set_channel_permissions_for_new_students(
 
     # for every channel in category set overwrite
     for index, category in enumerate(categories):
-        progress_bar = utils.create_bar(index, len(categories))
+        progress_bar = utils.general.create_bar(index, len(categories))
         await message.edit(f"Přídávám práva pro roomky: {progress_bar}")
         for channel in category.channels:
             await channel.set_permissions(bit0, read_messages=True)

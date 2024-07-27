@@ -13,7 +13,7 @@ from database.hugs import HugsTableDB
 from features.leaderboard import LeaderboardPageSource
 from permissions import room_check
 from rubbergod import Rubbergod
-from utils import make_pts_column_row_formatter
+from utils.general import make_pts_column_row_formatter
 
 from .messages_cz import MessagesCZ
 
@@ -127,10 +127,10 @@ class Hugs(Base, commands.Cog):
 
         if user is None or user == inter.author:
             user = inter.author
-            user_str = utils.get_username(user)
+            user_str = user.display_name
             title = "{0} Your Lovely Hug Stats {0}"
         else:
-            user_str = utils.get_username(user)
+            user_str = user.display_name
             title = f"{{0}} {user_str}'s Lovely Hug Stats {{0}}"
 
         stats = self.hugs_db.get_members_stats(user.id)
@@ -139,7 +139,7 @@ class Hugs(Base, commands.Cog):
         guild = self.bot.get_guild(self.config.guild_id)
 
         embed = disnake.Embed(
-            title=title.format(utils.get_emoji(guild, "peepoHugger") or ""),
+            title=title.format(utils.general.get_emoji(guild, "peepoHugger") or ""),
             description=" | ".join(
                 (
                     "**Ranks**",
@@ -150,11 +150,11 @@ class Hugs(Base, commands.Cog):
             ),
         )
 
-        embed.set_author(name=user_str, icon_url=user.avatar.url)
-        utils.add_author_footer(embed, inter.author)
+        embed.set_author(name=user_str, icon_url=user.display_avatar.url)
+        utils.general.add_author_footer(embed, inter.author)
 
-        given_emoji = utils.get_emoji(guild, "peepohugs") or ""
-        recv_emoji = utils.get_emoji(guild, "huggers") or ""
+        given_emoji = utils.general.get_emoji(guild, "peepohugs") or ""
+        recv_emoji = utils.general.get_emoji(guild, "huggers") or ""
 
         embed.add_field(name=f"{given_emoji} Given", value=str(stats.given))
         embed.add_field(name=f"{recv_emoji} Received", value=str(stats.received))
@@ -185,14 +185,15 @@ class Hugs(Base, commands.Cog):
             user = inter.author
         elif user.bot:
             await inter.send(
-                utils.get_emoji(self.bot.get_guild(self.config.guild_id), "huggers") or ":people_hugging:"
+                utils.general.get_emoji(self.bot.get_guild(self.config.guild_id), "huggers")
+                or ":people_hugging:"
             )
             return
 
         if user != inter.author:
             self.hugs_db.do_hug(giver_id=inter.author.id, receiver_id=user.id)
 
-        user_str = utils.get_username(user)
+        user_str = inter.author.display_name
 
         # Convert a human-friendly intensity to an array index
         intensity -= 1

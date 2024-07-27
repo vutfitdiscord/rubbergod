@@ -70,14 +70,14 @@ class Timeout(Base, commands.Cog):
         if parsed_members is None:
             return
 
-        endtime_datetime = utils.parse_time(endtime, MessagesCZ.time_format)
+        endtime_datetime = utils.general.parse_time(endtime, MessagesCZ.time_format)
         length = endtime_datetime - inter.created_at
         if await features.time_check(inter, endtime_datetime, length):
             return
 
         # convert to local time
-        endtime_local = endtime_datetime.astimezone(tz=utils.get_local_zone())  # type: ignore
-        starttime_local = inter.created_at.astimezone(tz=utils.get_local_zone())
+        endtime_local = endtime_datetime.astimezone(tz=utils.general.get_local_zone())  # type: ignore
+        starttime_local = inter.created_at.astimezone(tz=utils.general.get_local_zone())
 
         await inter.response.defer()
         embed = features.create_embed(inter.author, "Timeout")
@@ -214,8 +214,8 @@ class Timeout(Base, commands.Cog):
         Guild_ids is used to prevent users from bypassing timeout
         given by moderator and using selftimeout in DMs.
         """
-        endtime_datetime = utils.parse_time(endtime, MessagesCZ.time_format)
-        starttime_local = inter.created_at.astimezone(tz=utils.get_local_zone())
+        endtime_datetime = utils.general.parse_time(endtime, MessagesCZ.time_format)
+        starttime_local = inter.created_at.astimezone(tz=utils.general.get_local_zone())
         length = endtime_datetime - inter.created_at
 
         if await features.time_check(inter, endtime_datetime, length):
@@ -264,7 +264,7 @@ class Timeout(Base, commands.Cog):
             elif member.current_timeout < end:
                 await member.timeout(until=end, reason=timeout.reason)
 
-    @tasks.loop(time=time(12, 0, tzinfo=utils.get_local_zone()))
+    @tasks.loop(time=time(12, 0, tzinfo=utils.general.get_local_zone()))
     async def refresh_timeout(self):
         """Update timeout for users saved in db"""
         await self.update_timeout()
@@ -331,7 +331,7 @@ class Timeout(Base, commands.Cog):
                     reason,
                     entry.guild.id,
                 )
-                start = entry.created_at.astimezone(tz=utils.get_local_zone())
+                start = entry.created_at.astimezone(tz=utils.general.get_local_zone())
                 embed = features.create_embed(entry.user, "Timeout")
                 features.add_field_timeout(
                     embed=embed,

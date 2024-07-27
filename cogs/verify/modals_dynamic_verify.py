@@ -24,7 +24,7 @@ class DynamicVerifyEditModal(disnake.ui.Modal):
         selected_roles_data: list[DynamicVerifyDB] = [x for x in selected_roles_data_none if x is not None]
 
         # TODO: Prepared for modal select menus.
-        # guild_role_groups = utils.split_to_parts(guild_roles, 25)
+        # guild_role_groups = utils.general.split_to_parts(guild_roles, 25)
 
         components = [
             disnake.ui.TextInput(

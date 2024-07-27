@@ -69,7 +69,7 @@ class ReviewManager:
             text = review.text_review
             if text is not None:
                 if len(text) > 1024:
-                    pages = utils.cut_string_by_words(text, 1000, " ")
+                    pages = utils.general.cut_string_by_words(text, 1000, " ")
                     text = pages[0]
                     embed.add_field(name=MessagesCZ.text_page_label, value=f"1/{len(pages)}", inline=False)
                 embed.add_field(name=MessagesCZ.text_label, value=text, inline=False)
@@ -91,7 +91,7 @@ class ReviewManager:
                 value=f"[VUT IS]({vutis_link}&apid={subject_id}&typ_semestru_id={sem})",
                 inline=False,
             )
-        utils.add_author_footer(embed, msg_author, additional_text=[f"Review: {page} | ID: {id}"])
+        utils.general.add_author_footer(embed, msg_author, additional_text=[f"Review: {page} | ID: {id}"])
         return embed
 
     def update_embed(self, embed: disnake.Embed, review: ReviewDB, text_page: int = 1):
@@ -103,7 +103,7 @@ class ReviewManager:
         fields_cnt = len(embed.fields)
         if text is not None:
             if len(text) > 1024:
-                pages = utils.cut_string_by_words(text, 1000, " ")
+                pages = utils.general.cut_string_by_words(text, 1000, " ")
                 text = pages[text_page - 1]
                 embed.set_field_at(
                     idx, name=MessagesCZ.text_page_label, value=f"{text_page}/{len(pages)}", inline=False
