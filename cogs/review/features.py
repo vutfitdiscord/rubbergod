@@ -91,7 +91,7 @@ class ReviewManager:
                 value=f"[VUT IS]({vutis_link}&apid={subject_id}&typ_semestru_id={sem})",
                 inline=False,
             )
-        utils.general.add_author_footer(embed, msg_author, additional_text=[f"Review: {page} | ID: {id}"])
+        utils.embed.add_author_footer(embed, msg_author, additional_text=[f"Review: {page} | ID: {id}"])
         return embed
 
     def update_embed(self, embed: disnake.Embed, review: ReviewDB, text_page: int = 1):

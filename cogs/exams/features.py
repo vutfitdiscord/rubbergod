@@ -129,7 +129,7 @@ class Features:
         if r.status_code != 200:
             # Site returned fail code
             embed = disnake.Embed(title=title, description=description, color=disnake.Color.dark_blue())
-            utils.general.add_author_footer(embed, author if author is not None else self.bot.user)
+            utils.embed.add_author_footer(embed, author if author is not None else self.bot.user)
             if isinstance(target, disnake.ApplicationCommandInteraction):
                 await target.send(embed=embed)
             return
@@ -142,7 +142,7 @@ class Features:
         if body is None:
             # There is no table so no terms
             embed = disnake.Embed(title=title, description=description, color=disnake.Color.dark_blue())
-            utils.general.add_author_footer(embed, author if author is not None else self.bot.user)
+            utils.embed.add_author_footer(embed, author if author is not None else self.bot.user)
 
             if isinstance(target, disnake.ApplicationCommandInteraction):
                 await target.send(embed=embed)
@@ -160,7 +160,7 @@ class Features:
         pages = []
         for exam_batch in exam_batches:
             embed = disnake.Embed(title=title, description=description, color=disnake.Color.dark_blue())
-            utils.general.add_author_footer(embed, author if author is not None else self.bot.user)
+            utils.embed.add_author_footer(embed, author if author is not None else self.bot.user)
 
             for exam in exam_batch:
                 # Every exams row start with link tag
@@ -293,7 +293,7 @@ class Features:
 
         if len(pages) == 0:
             embed = disnake.Embed(title=title, description=description, color=disnake.Color.dark_blue())
-            utils.general.add_author_footer(embed, author if author is not None else self.bot.user)
+            utils.embed.add_author_footer(embed, author if author is not None else self.bot.user)
             pages.append(embed)
         if isinstance(target, disnake.ApplicationCommandInteraction):
             view = EmbedView(target.author, pages)

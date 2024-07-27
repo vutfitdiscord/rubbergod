@@ -159,7 +159,7 @@ class LeaderboardPageSource(DatabaseIteratorPageSource):
         self.base_embed.description = "\n" + "\n".join(board_lines)
 
         # possibility to optimize, author could be set only once
-        utils.general.add_author_footer(
+        utils.embed.add_author_footer(
             self.base_embed,
             self.author,
             additional_text=(f"{self.current_page + 1}/{self.get_max_pages()} pages.",),

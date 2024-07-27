@@ -112,7 +112,7 @@ class EmbedView(BaseView):
     def add_page_numbers(self):
         """Set footers with page numbers for each embed in list"""
         for page, embed in enumerate(self.embeds):
-            utils.general.add_author_footer(
+            utils.embed.add_author_footer(
                 embed, self.author, additional_text=[f"Page {page+1}/{self.max_page}"]
             )
 
@@ -136,7 +136,8 @@ class EmbedView(BaseView):
         if (self.perma_lock or self.locked) and interaction.author.id != self.author.id:
             await interaction.send(Messages.embed_not_author, ephemeral=True)
             return False
-        self.page = utils.general.pagination_next(
+
+        self.page = utils.embed.pagination_next(
             interaction.data.custom_id, self.page, self.max_page, self.roll_arroud
         )
         await interaction.response.edit_message(embed=self.embed)

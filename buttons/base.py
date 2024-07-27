@@ -48,7 +48,8 @@ class BaseView(disnake.ui.View):
             exception=type(error).__name__,
             traceback="\n".join(traceback.format_exception(type(error), error, error.__traceback__)),
         )
-        utils.general.add_author_footer(
+
+        utils.embed.add_author_footer(
             embed, author=interaction.author, additional_text=[f"ID: {error_log.id}"]
         )
         await channel_out.send(embed=embed, view=ErrorView())

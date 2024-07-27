@@ -101,7 +101,7 @@ class View(EmbedView):
                 pages = self.embed.fields[3].value.split("/")
                 text_page = int(pages[0])
                 max_text_page = int(pages[1])
-                next_text_page = utils.general.pagination_next(
+                next_text_page = utils.embed.pagination_next(
                     interaction.data.custom_id, text_page, max_text_page
                 )
                 if next_text_page:

@@ -216,7 +216,7 @@ class StreamLinks(Base, commands.Cog):
 
         stream.merge()
 
-        utils.general.add_author_footer(embed, inter.author)
+        utils.embed.add_author_footer(embed, inter.author)
         embed.timestamp = datetime.now(timezone.utc)
         channel = self.bot.get_channel(self.config.log_channel)
         await channel.send(embed=embed)
@@ -324,7 +324,7 @@ class StreamLinks(Base, commands.Cog):
         embed.add_field(name="Odkaz", value=f"[Link]({streamlink.link})", inline=False)
         embed.add_field(name="Popis", value=streamlink.description[:1024], inline=False)
         embed.timestamp = datetime.now(timezone.utc)
-        utils.general.add_author_footer(
+        utils.embed.add_author_footer(
             embed,
             author,
             additional_text=[

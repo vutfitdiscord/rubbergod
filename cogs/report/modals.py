@@ -59,7 +59,7 @@ class Modal(disnake.ui.Modal):
 
         embed.add_field(name="Resolved by", value="---", inline=False)
 
-        utils.general.add_author_footer(
+        utils.embed.add_author_footer(
             embed=embed, author=inter.author, additional_text=[f"ID: {report_id}"], anonymous=True
         )
         return embed

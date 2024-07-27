@@ -151,7 +151,7 @@ class Hugs(Base, commands.Cog):
         )
 
         embed.set_author(name=user_str, icon_url=user.display_avatar.url)
-        utils.general.add_author_footer(embed, inter.author)
+        utils.embed.add_author_footer(embed, inter.author)
 
         given_emoji = utils.general.get_emoji(guild, "peepohugs") or ""
         recv_emoji = utils.general.get_emoji(guild, "huggers") or ""

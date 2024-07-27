@@ -67,6 +67,6 @@ class FitRoom(Base, commands.Cog):
         )
         embed.set_image(url="attachment://plan.png")
         embed.description = f"[Odkaz na plánek]({url})"
-        utils.general.add_author_footer(embed, inter.author, additional_text=[str(active_floor.text)])
+        utils.embed.add_author_footer(embed, inter.author, additional_text=[str(active_floor.text)])
         file = disnake.File(fp=image_bytes, filename="plan.png")
         await inter.edit_original_response(embed=embed, file=file)

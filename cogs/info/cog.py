@@ -46,7 +46,7 @@ class Info(Base, commands.Cog):
                 value=f"{idx + 1}/{len(dict['list'])}",
                 inline=False,
             )
-            utils.general.add_author_footer(embed, author)
+            utils.embed.add_author_footer(embed, author)
 
             embed_list.append(embed)
 
@@ -118,7 +118,7 @@ class Info(Base, commands.Cog):
             embed.add_field(name=MessagesCZ.clouds, value=clouds, inline=True)
             embed.add_field(name=MessagesCZ.visibility, value=visibility, inline=True)
 
-            utils.general.add_author_footer(embed, inter.author)
+            utils.embed.add_author_footer(embed, inter.author)
 
             await inter.edit_original_response(embed=embed)
 
