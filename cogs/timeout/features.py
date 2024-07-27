@@ -23,7 +23,7 @@ def create_embed(
 ) -> disnake.Embed:
     """Embed template for Timeout"""
     embed = disnake.Embed(title=title, color=disnake.Color.yellow(), description=description)
-    utils.general.add_author_footer(embed, author)
+    utils.embed.add_author_footer(embed, author)
     return embed
 
 

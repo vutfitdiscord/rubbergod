@@ -84,7 +84,7 @@ def answer_embed(title: str, inter: disnake.ModalInteraction, report: ReportDB, 
 
     else:
         author = f"{inter.author.mention} `@{inter.author.name}`"
-        utils.general.add_author_footer(embed, inter.author, additional_text=[f"ID: {report.id}"])
+        utils.embed.add_author_footer(embed, inter.author, additional_text=[f"ID: {report.id}"])
 
     embed.add_field(name="Answered by", value=author, inline=False)
     return embed
@@ -96,5 +96,5 @@ def info_message_embed(
     """creates info embed for the report"""
     embed = disnake.Embed(title=title, description=description, color=disnake.Color.yellow())
 
-    utils.general.add_author_footer(embed, inter.author, additional_text=[f"ID: {report.id}"])
+    utils.embed.add_author_footer(embed, inter.author, additional_text=[f"ID: {report.id}"])
     return embed

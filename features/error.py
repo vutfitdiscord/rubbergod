@@ -199,7 +199,7 @@ class ErrorLogger:
             exception=type(error).__name__,
             traceback="\n".join(traceback.format_exception(type(error), error, error.__traceback__)),
         )
-        utils.general.add_author_footer(embed, author=ctx.author, additional_text=[f"ID: {error_log.id}"])
+        utils.embed.add_author_footer(embed, author=ctx.author, additional_text=[f"ID: {error_log.id}"])
 
         # send context of command with personal information to logging channel
         if parsed_ctx["command"] == "/diplom":
@@ -259,7 +259,7 @@ class ErrorLogger:
                 traceback.format_exception(type(error) if error else None, error, error.__traceback__)
             ),
         )
-        utils.general.add_author_footer(embeds[-1], author=author, additional_text=[f"ID: {error_log.id}"])
+        utils.embed.add_author_footer(embeds[-1], author=author, additional_text=[f"ID: {error_log.id}"])
         await self.bot_dev_channel.send(embeds=embeds, view=ErrorView())
 
     async def handle_reaction_error(self, arg: disnake.RawReactionActionEvent):

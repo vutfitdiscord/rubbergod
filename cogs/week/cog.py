@@ -34,6 +34,6 @@ class Week(Base, commands.Cog):
         embed.add_field(name="Kalendářní", value=f"{cal_type} ({cal_week})")
         embed.add_field(name="Poznámka", value=MessagesCZ.week_warning, inline=False)
 
-        utils.general.add_author_footer(embed, inter.author)
+        utils.embed.add_author_footer(embed, inter.author)
 
         await inter.response.send_message(embed=embed)

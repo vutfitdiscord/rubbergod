@@ -9,7 +9,7 @@ from lxml import etree
 
 from cogs.base import Base
 from rubbergod import Rubbergod
-from utils.general import add_author_footer
+from utils.embed import add_author_footer
 
 from .messages_cz import MessagesCZ
 

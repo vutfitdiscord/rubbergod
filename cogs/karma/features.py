@@ -314,5 +314,5 @@ class Karma(BaseFeature):
             color = 0xCB410B
         embed.color = color
         embed.add_field(name="Celková karma za zprávu:", value=karma, inline=False)
-        utils.general.add_author_footer(embed, author)
+        utils.embed.add_author_footer(embed, author)
         return embed

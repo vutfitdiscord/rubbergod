@@ -118,7 +118,7 @@ class BetterMeme(Base, commands.Cog):
                 title_string = tmp_string
 
             embed = disnake.Embed(color=disnake.Color.dark_blue(), title=title_string)
-            utils.general.add_author_footer(embed, author=ctx.message.author)
+            utils.embed.add_author_footer(embed, author=ctx.message.author)
             embed.timestamp = ctx.message.created_at
 
             # Create link to original post
