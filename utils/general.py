@@ -17,6 +17,7 @@ from config.messages import Messages
 from database import cooldown, session
 from permissions.custom_errors import InvalidTime
 from rubbergod import Rubbergod
+from utils.constants import MAX_ATTACHMENT_SIZE
 
 
 def id_to_datetime(snowflake_id: int) -> datetime:
@@ -235,7 +236,7 @@ async def get_or_fetch_channel(bot: Rubbergod, channel_id: int) -> disnake.TextC
 
 async def parse_attachments(
     message: disnake.Message,
-    limit: int = 25000000,
+    limit: int = MAX_ATTACHMENT_SIZE,
 ) -> tuple[list[disnake.File], list[disnake.File], list[disnake.Attachment]]:
     """Parse attachments from message and return them as lists of disnake files
     and if they are over 25MB as attachments.

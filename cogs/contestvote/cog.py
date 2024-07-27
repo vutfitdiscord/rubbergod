@@ -16,6 +16,7 @@ from features.reaction_context import ReactionContext
 from permissions.permission_check import submod_plus
 from permissions.room_check import RoomCheck
 from rubbergod import Rubbergod
+from utils.constants import MAX_ATTACHMENT_SIZE
 
 from . import features
 from .messages_cz import MessagesCZ
@@ -103,7 +104,7 @@ class ContestVote(Base, commands.Cog):
         description=commands.Param(default=None, max_length=1000),
     ):
         await inter.response.defer(ephemeral=True)
-        if image.size > 25000000:  # 25MB
+        if image.size > MAX_ATTACHMENT_SIZE:
             await inter.send(MessagesCZ.attachment_too_big)
             return
         if "image" not in image.content_type:

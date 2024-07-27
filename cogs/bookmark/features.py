@@ -2,6 +2,7 @@ import re
 
 import disnake
 
+from utils.constants import MAX_ATTACHMENT_SIZE
 from utils.general import split_to_parts
 
 from .messages_cz import MessagesCZ
@@ -46,10 +47,9 @@ class Features:
         upload_limit = False
         images = []
         files_attached = []
-        max_upload_size = 25000000  # 25MB
         if inter.message.attachments:
             for attachment in inter.message.attachments:
-                if attachment.size > max_upload_size:
+                if attachment.size > MAX_ATTACHMENT_SIZE:
                     upload_limit = True
                     continue
                 if re.search(r"\.png|\.jpg|\.jpeg|\.gif$", str(attachment)):
