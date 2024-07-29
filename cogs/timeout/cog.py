@@ -11,6 +11,7 @@ from disnake.ext import commands, tasks
 import utils
 from buttons.embed import EmbedView
 from cogs.base import Base
+from cogs.timeoutwars.messages_cz import MessagesCZ as TimeoutWarsMessages
 from config import cooldowns
 from database.timeout import TimeoutDB, TimeoutUserDB
 from permissions import permission_check
@@ -319,7 +320,7 @@ class Timeout(Base, commands.Cog):
                 length = entry.changes.after.timeout - entry.created_at
                 length = timedelta(seconds=math.ceil(length.total_seconds()))  # round up to seconds
                 reason = entry.reason or MessagesCZ.manual_timeout
-                if reason == MessagesCZ.timeout_wars_reason:
+                if reason == TimeoutWarsMessages.timeout_wars_reason:
                     # timeout was added during timeout wars 1. April
                     return
 
