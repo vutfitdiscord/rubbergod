@@ -77,11 +77,11 @@ On the next two lines, insert your Discord user and server ID so you get adminis
 Then, create the following 5 channels (or use one channel for all of them) on your server and paste their IDs to the config:
 
 ```
-58 log_channel = <Channel ID>
-59 bot_dev_channel = <Channel ID>
-60 vote_room = <Channel ID>
-61 bot_room = <Channel ID>
-62 mod_room = <Channel ID>
+72 log_channel = <Channel ID>
+73 bot_dev_channel = <Channel ID>
+74 vote_room = <Channel ID>
+75 bot_room = <Channel ID>
+76 mod_room = <Channel ID>
 ```
 
 (Optional) For some features you will also need to set other config variables, usually they are divided into categories based on cogs.
