@@ -207,6 +207,11 @@ class ErrorLogger:
             await channel.send(embed=embed, view=ErrorView())
             embed.remove_field(0)  # remove args from embed for sending to bot dev channel
 
+        # send context of verify command with personal information to logging channel only
+        if parsed_ctx["command"] == "/verify":
+            channel = self.bot.get_channel(config.log_channel)
+            return await channel.send(embed=embed, view=ErrorView())
+
         await self.bot_dev_channel.send(embed=embed, view=ErrorView())
 
     async def handle_event_error(self, event: str, args):
