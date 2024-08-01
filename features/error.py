@@ -56,6 +56,10 @@ class ErrorLogger:
     def bot_dev_channel(self) -> disnake.TextChannel:
         return self.bot.get_channel(config.bot_dev_channel)
 
+    @cached_property
+    def log_channel(self) -> disnake.TextChannel:
+        return self.bot.get_channel(config.log_channel)
+
     def set_image(self, embed: disnake.Embed, user: disnake.User, count: int):
         try:
             image_path = Path(__file__).parent.parent / "images/accident"
@@ -203,14 +207,13 @@ class ErrorLogger:
 
         # send context of command with personal information to logging channel
         if parsed_ctx["command"] == "/diplom":
-            channel = self.bot.get_channel(config.log_channel)
-            await channel.send(embed=embed, view=ErrorView())
+            await self.log_channel.send(embed=embed, view=ErrorView())
             embed.remove_field(0)  # remove args from embed for sending to bot dev channel
 
         # send context of verify command with personal information to logging channel only
         if parsed_ctx["command"] == "/verify":
-            channel = self.bot.get_channel(config.log_channel)
-            return await channel.send(embed=embed, view=ErrorView())
+            await self.log_channel.send(embed=embed, view=ErrorView())
+            return
 
         await self.bot_dev_channel.send(embed=embed, view=ErrorView())
 
