@@ -17,17 +17,38 @@ from .messages_cz import MessagesCZ
 
 
 def create_embed(
-    author: disnake.User,
     title: str,
     description: str = None,
 ) -> disnake.Embed:
     """Embed template for Timeout"""
-    embed = disnake.Embed(title=title, color=disnake.Color.yellow(), description=description)
-    utils.embed.add_author_footer(embed, author)
-    return embed
+    return disnake.Embed(title=title, color=disnake.Color.yellow(), description=description)
 
 
 def add_field_timeout(
+    embed: disnake.Embed,
+    title: str,
+    member: disnake.User,
+    starttime: datetime,
+    endtime: datetime,
+    length: timedelta,
+    reason: str,
+):
+    embed.add_field(
+        name=title,
+        value=MessagesCZ.timeout_field_text(
+            member=f"{member.mention} (`{member.name}`)",
+            starttime=starttime.strftime("%d.%m.%Y %H:%M"),
+            endtime=endtime.strftime("%d.%m.%Y %H:%M"),
+            length=f"{length.days}d, " f"{length.seconds // 3600}h, " f"{(length.seconds // 60) % 60}m",
+            timestamp=disnake.utils.format_dt(endtime, style="R"),
+            reason=reason,
+        ),
+        inline=False,
+    )
+
+
+def set_field_timeout_at(
+    index: int,
     embed: disnake.Embed,
     title: str,
     member: disnake.User,
@@ -37,13 +58,12 @@ def add_field_timeout(
     length: timedelta,
     reason: str,
 ):
-    author = f"{author.mention} (`{author.name}`)" if author else "Automod"
-
-    embed.add_field(
+    embed.set_field_at(
+        index,
         name=title,
-        value=MessagesCZ.timeout_field_text(
+        value=MessagesCZ.timeout_submod_field_text(
             member=f"{member.mention} (`{member.name}`)",
-            author=author,
+            author=f"{author.mention} (`{author.name}`)",
             starttime=starttime.strftime("%d.%m.%Y %H:%M"),
             endtime=endtime.strftime("%d.%m.%Y %H:%M"),
             length=f"{length.days}d, " f"{length.seconds // 3600}h, " f"{(length.seconds // 60) % 60}m",

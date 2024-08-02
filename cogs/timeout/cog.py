@@ -79,10 +79,13 @@ class Timeout(Base, commands.Cog):
         endtime_local = endtime_datetime.astimezone(tz=utils.general.get_local_zone())  # type: ignore
         starttime_local = inter.created_at.astimezone(tz=utils.general.get_local_zone())
 
-        await inter.response.defer()
-        embed = features.create_embed(inter.author, "Timeout")
+        await inter.response.defer(ephemeral=True)
+
+        embed = features.create_embed("Timeout")
         cantBeTimeout = []
         timeoutMembers = []
+
+        utils.embed.add_author_footer(embed, author=inter.author, anonymous=True)
 
         for member in parsed_members:
             isSuccess = await features.timeout_perms(
@@ -104,7 +107,6 @@ class Timeout(Base, commands.Cog):
                 embed=embed,
                 title=member.display_name,
                 member=member,
-                author=inter.author,
                 starttime=starttime_local,
                 endtime=endtime_local,
                 length=length,
@@ -114,11 +116,32 @@ class Timeout(Base, commands.Cog):
         if timeoutMembers:
             # print users with timeout if any exists
             message = await inter.original_message()
+            members = "".join(f"{member.mention}" for member in parsed_members)
 
-            await inter.send("".join(f"{member.mention}" for member in parsed_members), embed=embed)
+            await inter.send(
+                MessagesCZ.timeout_success(members=members),
+                ephemeral=True,
+            )
+            
+            await inter.channel.send(members, embed=embed)
+
+            # change the field before sending the embed to submod_helper_room
+            features.set_field_timeout_at(
+                0,
+                embed=embed,
+                title=member.display_name,
+                member=member,
+                author=inter.author,
+                starttime=starttime_local,
+                endtime=endtime_local,
+                length=length,
+                reason=reason,
+            )
+
             embed.add_field(name="Link", value=f"[#{inter.channel.name}]({message.jump_url})")
+            utils.embed.add_author_footer(embed, inter.author)
             await self.submod_helper_room.send(
-                "".join(f"{member.mention}" for member in parsed_members), embed=embed
+                members, embed=embed
             )
 
         if cantBeTimeout:
