@@ -14,7 +14,7 @@ from database.pin_map import PinMapDB
 from permissions import permission_check, room_check
 from rubbergod import Rubbergod
 
-from .features import PIN_CHANNEL_TYPE, AutopinFeatures
+from .features import AutopinFeatures
 from .messages_cz import MessagesCZ
 
 
@@ -125,7 +125,7 @@ class AutoPin(Base, commands.Cog):
     async def get_all(
         self,
         inter: disnake.ApplicationCommandInteraction,
-        channel: PIN_CHANNEL_TYPE = None,
+        channel: disnake.TextChannel | disnake.Thread = None,
         type: str = commands.Param(
             description="Typ výstupu. Markdown/JSON", choices=["json", "markdown"], default="markdown"
         ),
