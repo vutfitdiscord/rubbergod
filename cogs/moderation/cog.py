@@ -59,7 +59,8 @@ class Moderation(Base, commands.Cog):
         ),
         channel: SLOWMODE_CHANNEL_TYPES = None,
     ):
-        channel = inter.channel if channel is None else channel
+        if channel is None:
+            channel = inter.channel
         prev_delay = channel.slowmode_delay
         await channel.edit(slowmode_delay=delay)
         await features.log(inter, prev_delay, curr_delay=delay, channel=channel, log_channel=self.log_channel)
@@ -68,7 +69,8 @@ class Moderation(Base, commands.Cog):
     @commands.check(permission_check.submod_plus)
     @_slowmode.sub_command(name="remove", description=MessagesCZ.remove_brief)
     async def remove(self, inter: disnake.GuildCommandInteraction, channel: SLOWMODE_CHANNEL_TYPES = None):
-        channel = inter.channel if channel is None else channel
+        if channel is None:
+            channel = inter.channel
         prev_delay = inter.channel.slowmode_delay
         await channel.edit(slowmode_delay=0)
         await features.log(inter, prev_delay, curr_delay=0, channel=channel, log_channel=self.log_channel)

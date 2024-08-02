@@ -1,15 +1,12 @@
 import datetime
 import io
 import json
-from typing import TypeAlias
 
 import disnake
 
 import utils
 from config.app_config import config
 from rubbergod import Rubbergod
-
-PIN_CHANNEL_TYPE: TypeAlias = disnake.TextChannel | disnake.Thread
 
 
 class AutopinFeatures:
@@ -32,7 +29,7 @@ class AutopinFeatures:
 
     async def create_json_file(
         self,
-        channel: PIN_CHANNEL_TYPE,
+        channel: disnake.TextChannel | disnake.Thread,
         pins: list[disnake.Message],
     ):
         """Create json file with all pins from channel"""
@@ -61,7 +58,9 @@ class AutopinFeatures:
             f.seek(0)
             return disnake.File(f, filename=f"{channel_name}_pins.json")
 
-    async def create_markdown_file(self, channel: PIN_CHANNEL_TYPE, pins: list[disnake.Message]):
+    async def create_markdown_file(
+        self, channel: disnake.TextChannel | disnake.Thread, pins: list[disnake.Message]
+    ):
         """Create markdown file with all pins from channel"""
         if hasattr(channel, "name"):
             channel_name = channel.name
