@@ -45,6 +45,7 @@ class Features:
 
         # create list of attachments
         upload_limit = False
+        lottie_sticker = False
         images = []
         files_attached = []
         if inter.message.attachments:
@@ -63,16 +64,23 @@ class Features:
 
         if inter.message.stickers:
             for sticker in inter.message.stickers:
+                if sticker.format is disnake.StickerFormatType.lottie:
+                    lottie_sticker = True
+                    continue
                 files_attached.append(await sticker.to_file())
 
         if len(content) > 1024:
             parts = split_to_parts(content, 1024)
             for msg in parts:
-                embed.add_field(name="Původní zpráva", value=msg, inline=False)
+                embed.add_field(name=MessagesCZ.original_message, value=msg, inline=False)
         else:
-            embed.add_field(name="Původní zpráva", value=content, inline=False)
+            embed.add_field(name=MessagesCZ.original_message, value=content, inline=False)
 
         if upload_limit:
-            embed.add_field(name="Poznámka", value=MessagesCZ.upload_limit, inline=False)
+            embed.add_field(name=MessagesCZ.bookmark_note, value=MessagesCZ.upload_limit, inline=False)
+
+        if lottie_sticker:
+            embed.add_field(name=MessagesCZ.bookmark_note, value=MessagesCZ.lottie_sticker, inline=False)
+
         embed.add_field(name="Channel", value=f"{inter.message.channel.mention} - #{inter.message.channel}")
         return ([embed], images, files_attached)
