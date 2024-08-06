@@ -8,7 +8,7 @@ import utils
 from config.app_config import config
 from database.report import ReportDB
 from database.timeout import TimeoutDB, TimeoutUserDB
-from permissions.custom_errors import ApiError
+from permissions.custom_errors import ApiError, InvalidTime
 from rubbergod import Rubbergod
 
 from .messages_cz import MessagesCZ
@@ -114,7 +114,6 @@ async def timeout_perms(
     remove_logs: bool = False,
 ) -> bool:
     """Set timeout for member and update in db. Return True if successful, False otherwise."""
-    mode = "delete" if remove_logs else "create"
     try:
         if endtime is None or length is None or starttime is None:
             await member.timeout(until=None, reason=reason)
@@ -143,6 +142,7 @@ async def timeout_perms(
             )
 
         if timeout:
+            mode = "delete" if remove_logs else "create"
             error = await send_to_grillbot(session, timeout, mode)
             if error:
                 await bot_dev_channel.send(error)
@@ -241,21 +241,15 @@ async def get_user_from_grillbot(
         raise ApiError(str(e))
 
 
-async def time_check(
-    inter: disnake.ApplicationCommandInteraction, endtime: datetime | None, length: timedelta
-) -> bool:
+async def time_check(created_at: datetime, endtime: datetime | None, length: timedelta):
     if not endtime:
-        await inter.send(MessagesCZ.invalid_time_format, ephemeral=True)
-        return True
+        raise InvalidTime(MessagesCZ.invalid_time_format)
 
-    if endtime < inter.created_at:
-        await inter.send(MessagesCZ.past_time, ephemeral=True)
-        return True
+    if endtime < created_at:
+        raise InvalidTime(MessagesCZ.past_time)
 
-    if length.total_seconds() < 30:
-        await inter.send(MessagesCZ.timeout_too_short, ephemeral=True)
-        return True
-    return False
+    if length.total_seconds() < 60:
+        raise InvalidTime(MessagesCZ.timeout_too_short)
 
 
 async def send_to_grillbot(
