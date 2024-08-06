@@ -21,29 +21,6 @@ from utils.converters import DiscordDatetime, MembersList
 from . import features
 from .messages_cz import MessagesCZ
 
-timestamps = [
-    "60s",
-    "5min",
-    "10min",
-    "1hour",
-    "4hours",
-    "8hours",
-    "12hours",
-    "16hours",
-    "1day",
-    "3days",
-    "1week",
-    "2weeks",
-    "3weeks",
-    "4weeks",
-    "Forever",
-]
-
-
-async def autocomplete_times(inter: disnake.ApplicationCommandInteraction, input: str) -> list[str]:
-    input = input.lower()
-    return [endtime for endtime in timestamps if input in endtime.lower()]
-
 
 class Timeout(Base, commands.Cog):
     def __init__(self, bot: Rubbergod):
@@ -61,7 +38,7 @@ class Timeout(Base, commands.Cog):
         inter: disnake.ApplicationCommandInteraction,
         users: MembersList = commands.Param(max_length=1000, description=MessagesCZ.user_param),
         endtime: DiscordDatetime = commands.Param(
-            autocomplete=autocomplete_times,
+            autocomplete=features.autocomplete_times,
             max_length=50,
             description=MessagesCZ.time_format,
         ),
@@ -218,7 +195,7 @@ class Timeout(Base, commands.Cog):
         self,
         inter: disnake.ApplicationCommandInteraction,
         endtime: DiscordDatetime = commands.Param(
-            autocomplete=autocomplete_times,
+            autocomplete=features.autocomplete_times,
             max_length=50,
             description=MessagesCZ.time_format,
         ),
