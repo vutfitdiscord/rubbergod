@@ -137,34 +137,6 @@ async def timeout_perms(
         return False
 
 
-async def parse_members(
-    inter: disnake.ApplicationCommandInteraction, members_string: str
-) -> list[disnake.Member] | None:
-    """Parse members from string and return list of members"""
-
-    member_string = shlex.split(members_string)
-    converter = commands.MemberConverter()
-    parsed_members = []
-    not_found_members = []
-
-    for member in member_string:
-        try:
-            parsed_members.append(await converter.convert(inter, member))
-        except commands.MemberNotFound:
-            not_found_members.append(member)
-
-    if not_found_members:
-        # print users that can't be found
-        await inter.send(
-            MessagesCZ.timeout_member_not_found(
-                author=inter.author.mention, members=", ".join(not_found_members)
-            ),
-            ephemeral=True,
-        )
-
-    return parsed_members or None
-
-
 async def timeout_get_user(
     author: disnake.User,
     guild_id: int,

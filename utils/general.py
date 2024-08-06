@@ -1,13 +1,9 @@
 import math
-import re
 import time
-from datetime import datetime, timezone, tzinfo
+from datetime import datetime, tzinfo
 from typing import Callable
 
 import disnake
-from dateutil import parser
-from dateutil.parser import ParserError
-from dateutil.relativedelta import relativedelta
 from disnake import Emoji, PartialEmoji
 from disnake.ext import commands
 from sqlalchemy.schema import Table
@@ -15,7 +11,6 @@ from sqlalchemy.schema import Table
 from config.app_config import config
 from config.messages import Messages
 from database import cooldown, session
-from permissions.custom_errors import InvalidTime
 from rubbergod import Rubbergod
 from utils.constants import MAX_ATTACHMENT_SIZE
 
@@ -217,55 +212,6 @@ async def parse_attachments(
 def get_local_zone() -> tzinfo | None:
     """Return local timezone"""
     return datetime.now().astimezone().tzinfo
-
-
-def parse_time(time_string: str, time_format: str) -> datetime | None:
-    """Parse local time from string to datetime object.
-    Using first regex for abbreviations and if it fails, use dateutil parser.
-
-    Returns
-    -------
-    datetime object in UTC
-    """
-    options = ["forever", "never", "nikdy", "none"]
-    if time_string.lower() in options:
-        return datetime(9999, 12, 30, 0, 0, 0, tzinfo=timezone.utc)
-
-    pattern = re.compile(r"(\d+)([yYMwdhms])")
-    matches = pattern.findall(time_string)
-
-    if matches:
-        time = datetime.now(timezone.utc)
-        timedelta = None
-        while matches:
-            match = matches.pop()
-            value, unit = match
-            if unit.lower() in ["y", "r"]:
-                timedelta = relativedelta(years=int(value))
-            elif unit == "M":
-                timedelta = relativedelta(months=int(value))
-            elif unit == "w":
-                timedelta = relativedelta(weeks=int(value))
-            elif unit == "d":
-                timedelta = relativedelta(days=int(value))
-            elif unit == "h":
-                timedelta = relativedelta(hours=int(value))
-            elif unit == "m":
-                timedelta = relativedelta(minutes=int(value))
-            elif unit == "s":
-                timedelta = relativedelta(seconds=int(value))
-            try:
-                time = time + timedelta
-            except ValueError:
-                raise InvalidTime(time_format)
-    else:
-        try:
-            time = parser.parse(time_string, dayfirst=True)
-            time = time.astimezone(get_local_zone())
-        except ParserError:
-            raise InvalidTime(time_format)
-
-    return time.astimezone(timezone.utc)
 
 
 async def get_message_from_url(bot: Rubbergod, message_url: str) -> disnake.Message | None:
