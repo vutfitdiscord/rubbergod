@@ -254,6 +254,10 @@ class Timeout(Base, commands.Cog):
     @tasks.loop(time=time(12, 0, tzinfo=utils.general.get_local_zone()))
     async def refresh_timeout(self):
         """Update timeout for users saved in db"""
+        if datetime.today().isoweekday() != 3:
+            # update only on wednesday
+            return
+
         await self.update_timeout()
 
         # send update
