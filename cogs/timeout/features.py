@@ -1,10 +1,8 @@
 import asyncio
-import shlex
 from datetime import datetime, timedelta, timezone
 
 import aiohttp
 import disnake
-from disnake.ext import commands
 
 import utils
 from config.app_config import config
@@ -14,6 +12,24 @@ from permissions.custom_errors import ApiError
 from rubbergod import Rubbergod
 
 from .messages_cz import MessagesCZ
+
+TIMESTAMPS = [
+    "60s",
+    "5min",
+    "10min",
+    "1hour",
+    "4hours",
+    "8hours",
+    "12hours",
+    "16hours",
+    "1day",
+    "3days",
+    "1week",
+    "2weeks",
+    "3weeks",
+    "4weeks",
+    "Forever",
+]
 
 
 def create_embed(
@@ -281,3 +297,8 @@ async def send_to_grillbot(
             return None
     except Exception as error:
         return str(error)
+
+
+async def autocomplete_times(inter: disnake.ApplicationCommandInteraction, input: str) -> list[str]:
+    input = input.lower()
+    return [endtime for endtime in TIMESTAMPS if input in endtime.lower()]
