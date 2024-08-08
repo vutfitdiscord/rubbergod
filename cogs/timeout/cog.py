@@ -13,7 +13,7 @@ from buttons.embed import EmbedView
 from cogs.base import Base
 from cogs.timeoutwars.messages_cz import MessagesCZ as TimeoutWarsMessages
 from config import cooldowns
-from database.timeout import TimeoutDB, TimeoutUserDB
+from database.timeout import TimeoutDB
 from permissions import permission_check
 from rubbergod import Rubbergod
 from utils.converters import DiscordDatetime, MembersList
@@ -62,9 +62,7 @@ class Timeout(Base, commands.Cog):
                 ephemeral=True,
             )
 
-        length = endtime.utc - inter.created_at
-        if await features.time_check(inter.created_at, endtime.utc, length):
-            return
+        await features.time_check(inter.created_at, endtime.utc)
 
         # convert to local time
         starttime_local = inter.created_at.astimezone(tz=utils.general.get_local_zone())
@@ -75,29 +73,34 @@ class Timeout(Base, commands.Cog):
         timeoutMembers = []
 
         for member in users.valid_members:
-            isSuccess = await features.timeout_perms(
-                inter=inter,
-                session=self.bot.grillbot_session,
-                bot_dev_channel=self.bot_dev_channel,
+            isSuccess = await features.set_member_timeout(
                 member=member,
                 starttime=inter.created_at,
                 endtime=endtime.utc,
-                length=length,
                 reason=reason,
             )
             if isSuccess:
                 timeoutMembers.append(member)
+                await features.set_timeout_db(
+                    inter=inter,
+                    grillbot_session=self.bot.grillbot_session,
+                    bot_dev_channel=self.bot_dev_channel,
+                    user=member,
+                    starttime=inter.created_at,
+                    endtime=endtime.utc,
+                    reason=reason,
+                )
             else:
                 cantBeTimeout.append(member)
 
-            features.add_field_timeout(
+            await features.add_field_timeout(
                 embed=embed,
                 title=member.display_name,
                 member=member,
                 author=inter.author,
                 starttime=starttime_local,
                 endtime=endtime.local,
-                length=length,
+                length=endtime.utc - inter.created_at,
                 reason=reason,
             )
 
@@ -139,20 +142,45 @@ class Timeout(Base, commands.Cog):
         embed = features.create_embed(inter.author, "Timeout remove")
 
         for member in users.valid_members:
-            await features.timeout_perms(
-                inter=inter,
-                session=self.bot.grillbot_session,
-                bot_dev_channel=self.bot_dev_channel,
+            # remove timeout from member
+            isSuccess = await features.set_member_timeout(
                 member=member,
                 starttime=None,
                 endtime=None,
-                length=None,
+                reason="Předčasně odebráno",
+            )
+            if isSuccess:
+                await features.set_timeout_db(
+                    inter=inter,
+                    grillbot_session=self.bot.grillbot_session,
+                    bot_dev_channel=self.bot_dev_channel,
+                    user=member,
+                    starttime=None,
+                    endtime=None,
+                    reason="Předčasně odebráno",
+                    remove_logs=remove_logs,
+                )
+            embed.add_field(
+                name=member.display_name,
+                value=MessagesCZ.remove_reason(member=member.mention),
+                inline=False,
+            )
+
+        for user in users.valid_users:
+            # remove timeout from database, user is not in the server
+            await features.set_timeout_db(
+                inter=inter,
+                grillbot_session=self.bot.grillbot_session,
+                bot_dev_channel=self.bot_dev_channel,
+                user=user,
+                starttime=None,
+                endtime=None,
                 reason="Předčasně odebráno",
                 remove_logs=remove_logs,
             )
             embed.add_field(
-                name=member.display_name,
-                value=MessagesCZ.remove_reason(member=member.mention),
+                name=user.display_name,
+                value=MessagesCZ.remove_reason(member=user.mention),
                 inline=False,
             )
 
@@ -167,14 +195,16 @@ class Timeout(Base, commands.Cog):
     ):
         """List all timed out users"""
         await inter.response.defer()
-        users = TimeoutUserDB.get_active_timeouts(selftimeout)
+        users = TimeoutDB.get_active_timeouts_list(selftimeout)
         await self.update_timeout()
 
         if not users:
             await inter.send(MessagesCZ.list_none)
             return
 
-        await features.timeout_embed_listing(self.bot, users, "Timeout list", inter, inter.author)
+        embeds = await features.timeout_embed_listing(self.bot, users, inter.author)
+        view = EmbedView(inter.author, embeds, show_page=True)
+        await inter.send(embed=embeds[0], view=view)
 
     @_timeout.sub_command(name="get_user", description=MessagesCZ.get_user_brief)
     async def get_user(self, inter: disnake.ApplicationCommandInteraction, user: disnake.User):
@@ -204,22 +234,27 @@ class Timeout(Base, commands.Cog):
         Guild_ids is used to prevent users from bypassing timeout
         given by moderator and using selftimeout in DMs.
         """
-        length = endtime.utc - inter.created_at
-
-        await features.time_check(inter.created_at, endtime.utc, length)
+        await features.time_check(inter.created_at, endtime.utc)
 
         await inter.response.defer()
-        isSuccess = await features.timeout_perms(
-            inter=inter,
-            session=self.bot.grillbot_session,
-            bot_dev_channel=self.bot_dev_channel,
+        isSuccess = await features.set_member_timeout(
             member=inter.user,
             starttime=inter.created_at,
             endtime=endtime.utc,
-            length=length,
             reason=MessagesCZ.self_timeout_reason,
-            isself=True,
         )
+
+        if isSuccess:
+            await features.set_timeout_db(
+                inter=inter,
+                grillbot_session=self.bot.grillbot_session,
+                bot_dev_channel=self.bot_dev_channel,
+                user=inter.user,
+                starttime=inter.created_at,
+                endtime=endtime.utc,
+                reason=MessagesCZ.self_timeout_reason,
+                isself=True,
+            )
 
         if not isSuccess:
             await inter.send(content=MessagesCZ.missing_permission(user_list=inter.user.mention))
@@ -229,7 +264,7 @@ class Timeout(Base, commands.Cog):
 
     async def update_timeout(self):
         """update all user's timeout in database and on server"""
-        timeouts = TimeoutUserDB.get_active_timeouts()
+        timeouts = TimeoutDB.get_active_timeouts_list()
         guild = self.bot.get_guild(Base.config.guild_id)
 
         for timeout in timeouts:
@@ -261,11 +296,9 @@ class Timeout(Base, commands.Cog):
         await self.update_timeout()
 
         # send update
-        users = TimeoutUserDB.get_active_timeouts(isself=False)
-        if users:
-            await features.timeout_embed_listing(
-                self.bot, users, "Timeout update", self.log_channel, self.bot.user
-            )
+        counts = await TimeoutDB.get_timeouts_counts()
+        embed = await features.embed_update_list(counts, self.bot.user)
+        await self.log_channel.send(embed=embed)
 
     @commands.Cog.listener()
     async def on_automod_action_execution(self, execution: disnake.AutoModActionExecution):
@@ -324,7 +357,7 @@ class Timeout(Base, commands.Cog):
                 )
                 start = entry.created_at.astimezone(tz=utils.general.get_local_zone())
                 embed = features.create_embed(entry.user, "Timeout")
-                features.add_field_timeout(
+                await features.add_field_timeout(
                     embed=embed,
                     title=entry.target.display_name,
                     member=entry.target,

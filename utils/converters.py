@@ -131,8 +131,8 @@ class DiscordDatetime:
 
         Returns
         -------
-        :class: `datetime`
-            object in UTC
+        :class: `DiscordDatetime`
+            Class containing local and utc datetime objects
         """
 
         discord_datetime = DiscordDatetime()
