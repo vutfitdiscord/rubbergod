@@ -43,7 +43,7 @@ def create_embed(
     return embed
 
 
-def add_field_timeout(
+async def add_field_timeout(
     embed: disnake.Embed,
     title: str,
     member: disnake.User,
@@ -71,22 +71,18 @@ def add_field_timeout(
 
 
 async def timeout_embed_listing(
-    bot: Rubbergod,
-    users: list[TimeoutDB],
-    title: str,
-    room: disnake.TextChannel,
-    author: disnake.User,
-) -> None:
+    bot: Rubbergod, users: list[TimeoutDB], author: disnake.User
+) -> list[disnake.Embed]:
     """Embed for sending timeout updates on users"""
     embeds = []
-    users_lists = utils.general.split_to_parts(users, 15)  # to avoid embed char limit
+    users_lists = utils.general.split_to_parts(users, 10)
     for users_list in users_lists:
-        embed = create_embed(author, title)
+        embed = create_embed(author, "Timeout list")
         for timeout in users_list:
             mod = await bot.get_or_fetch_user(timeout.mod_id)
             starttime_local, endtime_local = timeout.start_end_local
             member = await bot.get_or_fetch_user(timeout.user_id)
-            add_field_timeout(
+            await add_field_timeout(
                 embed=embed,
                 title=member.display_name,
                 member=member,
@@ -98,54 +94,73 @@ async def timeout_embed_listing(
             )
 
         embeds.append(embed)
-    await room.send(embeds=embeds)
+    return embeds
 
 
-async def timeout_perms(
+async def embed_update_list(counts: dict[str, int], author: disnake.User) -> disnake.Embed:
+    """Embed for sending timeout updates on users"""
+    embed = create_embed(author, "Timeout update")
+
+    embed.add_field(name="Timeouts", value=counts["timeouts"], inline=True)
+    embed.add_field(name="Infinite Timeouts", value=counts["infinite timeouts"], inline=True)
+    embed.add_field(name="Selftimeouts", value=counts["selftimeouts"], inline=True)
+    embed.add_field(name="Sum of timeouts", value=counts["sum"], inline=False)
+
+    return embed
+
+
+async def set_timeout_db(
     inter: disnake.ApplicationCommandInteraction,
-    session: aiohttp.ClientSession,
+    grillbot_session: aiohttp.ClientSession,
     bot_dev_channel: disnake.TextChannel,
-    member: disnake.Member,
+    user: disnake.Member,
     starttime: datetime | None,
     endtime: datetime | None,
-    length: timedelta | None,
     reason: str,
     isself: bool = False,
     remove_logs: bool = False,
-) -> bool:
-    """Set timeout for member and update in db. Return True if successful, False otherwise."""
-    try:
-        if endtime is None or length is None or starttime is None:
-            await member.timeout(until=None, reason=reason)
-            timeout = TimeoutDB.remove_timeout(member.id, remove_logs)
-        elif length.days > 28:
-            await member.timeout(until=datetime.now(timezone.utc) + timedelta(days=28), reason=reason)
-            timeout = TimeoutDB.add_timeout(
-                member.id,
-                inter.author.id,
-                starttime,
-                endtime,
-                reason,
-                inter.guild.id,
-                isself,
-            )
-        else:
-            await member.timeout(until=endtime, reason=reason)
-            timeout = TimeoutDB.add_timeout(
-                member.id,
-                inter.author.id,
-                starttime,
-                endtime,
-                reason,
-                inter.guild.id,
-                isself,
-            )
+) -> None:
+    """Set timeout for user in database."""
+    if not starttime or not endtime:
+        # remove timeout
+        timeout = TimeoutDB.remove_timeout(user.id, remove_logs)
+    else:
+        # set timeout
+        timeout = TimeoutDB.add_timeout(
+            user_id=user.id,
+            mod_id=inter.author.id,
+            start=starttime,
+            end=endtime,
+            reason=reason,
+            guild_id=inter.guild.id,
+            isself=isself,
+        )
 
-        if timeout:
-            mode = "delete" if remove_logs else "create"
-            error = await send_to_grillbot(session, timeout, mode)
-            if error:
-                await bot_dev_channel.send(error)
+    if timeout:
+        # send timeout to grillbot api
+        mode = "delete" if remove_logs else "create"
+        error = await send_to_grillbot(grillbot_session, timeout, mode)
+        if error:
+            await bot_dev_channel.send(error)
+
+
+async def set_member_timeout(
+    member: disnake.Member,
+    starttime: datetime | None,
+    endtime: datetime | None,
+    reason: str,
+) -> bool:
+    """Set timeout for member. Return True if successful, False otherwise."""
+    try:
+        if not starttime or not endtime:
+            # remove timeout
+            await member.timeout(until=None, reason=reason)
+        elif (endtime - starttime).days > 28:
+            # timeout longer than discord supports, setting it to max 28 days
+            await member.timeout(until=datetime.now(timezone.utc) + timedelta(days=28), reason=reason)
+        else:
+            # normal timeout in range <60s, 28days>
+            await member.timeout(until=endtime, reason=reason)
 
         return True
     except disnake.Forbidden:
@@ -191,7 +206,7 @@ async def timeout_get_user(
     if timeout_user and recent_timeout is not None:
         author = await bot.get_or_fetch_user(recent_timeout.mod_id)
         starttime_local, endtime_local = recent_timeout.start_end_local
-        add_field_timeout(
+        await add_field_timeout(
             embed=main_embed,
             title="Recent timeout",
             member=user,
@@ -211,7 +226,7 @@ async def timeout_get_user(
 
             author = await bot.get_or_fetch_user(timeout.mod_id)
             starttime_local, endtime_local = timeout.start_end_local
-            add_field_timeout(
+            await add_field_timeout(
                 embed=embed,
                 title=user.display_name,
                 member=user,
@@ -241,13 +256,12 @@ async def get_user_from_grillbot(
         raise ApiError(str(e))
 
 
-async def time_check(created_at: datetime, endtime: datetime | None, length: timedelta):
-    if not endtime:
-        raise InvalidTime(MessagesCZ.invalid_time_format)
-
+async def time_check(created_at: datetime, endtime: datetime) -> None:
+    """Check if timeout time is valid. Raise `InvalidTime` if not."""
     if endtime < created_at:
         raise InvalidTime(MessagesCZ.past_time)
 
+    length = endtime - created_at
     if length.total_seconds() < 60:
         raise InvalidTime(MessagesCZ.timeout_too_short)
 
