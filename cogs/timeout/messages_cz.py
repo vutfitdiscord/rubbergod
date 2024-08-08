@@ -13,7 +13,7 @@ class MessagesCZ(GlobalMessages):
     missing_permission = "Na umlčení **{user_list}** nemám práva."
     timeout_field_text = "**Kdo:** {member}\n**Od:** {author}\n**Délka:** {starttime} - {endtime} ({length})\n**Navrácení:** {timestamp}\n**Důvod:** {reason}\n"
     list_none = "Nenalezeny žádné umlčení."
-    timeout_too_short = "Délka umlčení je příliš krátká. Musí být alespoň 30s."
+    timeout_too_short = "Délka umlčení je příliš krátká. Musí být alespoň 60s."
     past_time = "Nelze nastavit umlčení v minulosti."
     timeout_member_not_found = "{author} `{members}` jsem na serveru nenašel. Ujisti se, že jsi uživatele zadal správně pomocí @tag | name | ID."
     remove_reason = "{member}\nPředčasně odebráno"

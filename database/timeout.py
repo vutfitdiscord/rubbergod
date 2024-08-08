@@ -54,7 +54,7 @@ class TimeoutDB(database.base):  # type: ignore
     ) -> TimeoutDB:
         """Add the user and their timeout/selftimeout to the database."""
         user = TimeoutUserDB.get_user(user_id)
-        timeout = TimeoutUserDB.get_active_timeout(user_id)
+        timeout = TimeoutDB.get_active_timeout(user_id)
 
         if user and timeout:
             # if user has already timeout update it
@@ -98,7 +98,7 @@ class TimeoutDB(database.base):  # type: ignore
 
     @classmethod
     def remove_timeout(cls, user_id: str, permanent: bool = False) -> TimeoutDB | None:
-        timeout = TimeoutUserDB.get_active_timeout(str(user_id))
+        timeout = TimeoutDB.get_active_timeout(str(user_id))
         if timeout is None:
             return None
 
@@ -108,6 +108,36 @@ class TimeoutDB(database.base):  # type: ignore
             timeout.end = datetime.now(timezone.utc)
         session.commit()
         return timeout
+
+    @classmethod
+    async def get_timeouts_counts(cls) -> dict[str, int]:
+        timeouts = 0
+        infinite_timeouts = 0
+        timeouts_list = cls.get_active_timeouts_list(False)
+        selftimeouts_list = cls.get_active_timeouts_list(True)
+
+        forever_timestamp = await utils.converters.DiscordDatetime.convert("_", "forever")
+        for timeout in timeouts_list:
+            if forever_timestamp.utc <= timeout.end.replace(tzinfo=timezone.utc):
+                infinite_timeouts += 1
+            else:
+                timeouts += 1
+
+        stats = {
+            "timeouts": timeouts,
+            "infinite timeouts": infinite_timeouts,
+            "selftimeouts": len(selftimeouts_list),
+            "sum": len(selftimeouts_list) + timeouts + infinite_timeouts,
+        }
+        return stats
+
+    @classmethod
+    def get_active_timeouts_list(cls, isself: bool = False) -> list[TimeoutDB]:
+        return session.query(TimeoutDB).filter_by(isself=isself, is_active=True).all()
+
+    @classmethod
+    def get_active_timeout(cls, user_id: str) -> TimeoutDB | None:
+        return session.query(TimeoutDB).filter_by(user_id=str(user_id), is_active=True).first()
 
 
 class TimeoutUserDB(database.base):  # type: ignore
@@ -129,14 +159,6 @@ class TimeoutUserDB(database.base):  # type: ignore
     @classmethod
     def get_user(cls, user_id: str) -> TimeoutUserDB:
         return session.query(cls).get(str(user_id))
-
-    @classmethod
-    def get_active_timeouts(cls, isself: bool = False) -> list[TimeoutDB]:
-        return session.query(TimeoutDB).filter_by(isself=isself, is_active=True).all()
-
-    @classmethod
-    def get_active_timeout(cls, user_id: str) -> TimeoutDB | None:
-        return session.query(TimeoutDB).filter_by(user_id=str(user_id), is_active=True).first()
 
     def get_all_timeouts(self, isself: bool = False, descending: bool = True) -> list[TimeoutDB]:
         if descending:
