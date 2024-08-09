@@ -45,10 +45,11 @@ class Timeout(Base, commands.Cog):
         reason: str = commands.Param(max_length=256, description=MessagesCZ.reason_param),
     ):
         """Set timeout for user(s)"""
-        if not users.valid_members:
+        if not users.valid_members and not users.valid_users:
+            # no users found
             await inter.send(
-                MessagesCZ.timeout_member_not_found(
-                    author=inter.author.mention, members=", ".join(users.input), ephemeral=True
+                MessagesCZ.timeout_user_not_found(
+                    author=inter.author.mention, users=", ".join(users.input), ephemeral=True
                 )
             )
             return
@@ -67,20 +68,19 @@ class Timeout(Base, commands.Cog):
         # convert to local time
         starttime_local = inter.created_at.astimezone(tz=utils.general.get_local_zone())
 
-        await inter.response.defer()
         embed = features.create_embed(inter.author, "Timeout")
-        cantBeTimeout = []
-        timeoutMembers = []
+        failed_timeout_members = []
+        timeout_members = []
 
         for member in users.valid_members:
-            isSuccess = await features.set_member_timeout(
-                member=member,
-                starttime=inter.created_at,
-                endtime=endtime.utc,
-                reason=reason,
-            )
-            if isSuccess:
-                timeoutMembers.append(member)
+            if inter.guild.me.top_role > member.top_role:
+                timeout_members.append(member)
+                await features.set_member_timeout(
+                    member=member,
+                    starttime=inter.created_at,
+                    endtime=endtime.utc,
+                    reason=reason,
+                )
                 await features.set_timeout_db(
                     inter=inter,
                     grillbot_session=self.bot.grillbot_session,
@@ -90,36 +90,32 @@ class Timeout(Base, commands.Cog):
                     endtime=endtime.utc,
                     reason=reason,
                 )
+                await features.add_field_timeout(
+                    embed=embed,
+                    title=member.display_name,
+                    member=member,
+                    author=inter.author,
+                    starttime=starttime_local,
+                    endtime=endtime.local,
+                    length=endtime.utc - inter.created_at,
+                    reason=reason,
+                )
             else:
-                cantBeTimeout.append(member)
+                failed_timeout_members.append(member)
 
-            await features.add_field_timeout(
-                embed=embed,
-                title=member.display_name,
-                member=member,
-                author=inter.author,
-                starttime=starttime_local,
-                endtime=endtime.local,
-                length=endtime.utc - inter.created_at,
-                reason=reason,
-            )
-
-        if timeoutMembers:
-            # print users with timeout if any exists
-            message = await inter.original_message()
-
-            await inter.send("".join(f"{member.mention}" for member in users.valid_members), embed=embed)
-            embed.add_field(name="Link", value=f"[#{inter.channel.name}]({message.jump_url})")
-            await self.submod_helper_room.send(
-                "".join(f"{member.mention}" for member in users.valid_members), embed=embed
-            )
-
-        if cantBeTimeout:
+        if failed_timeout_members:
             # print users that can't be timed out
-            await inter.send(
-                "\n".join(MessagesCZ.missing_permission(user_list=user.name) for user in cantBeTimeout),
-                ephemeral=True,
-            )
+            users_str = ", ".join(user.mention for user in failed_timeout_members)
+            await inter.send(MessagesCZ.missing_permission(users=users_str), ephemeral=True)
+
+        if timeout_members:
+            # print users with timeout if any exists
+            content = "".join(f"{member.mention}" for member in timeout_members)
+            message = await inter.channel.send(content, embed=embed)
+            embed.add_field(name="Link", value=f"[#{inter.channel.name}]({message.jump_url})")
+            await self.submod_helper_room.send(content, embed=embed)
+
+        await inter.send(MessagesCZ.timeout_success, ephemeral=True)
 
     @_timeout.sub_command(name="remove", description=MessagesCZ.remove_brief)
     async def remove_timeout(
@@ -129,27 +125,37 @@ class Timeout(Base, commands.Cog):
         remove_logs: bool = commands.Param(description=MessagesCZ.remove_logs_param),
     ):
         """Removes timeout from user(s)"""
-        if users.invalid_members and not users.valid_users:
+        if not users.valid_members and not users.valid_users:
+            # no users found
+            await inter.send(
+                MessagesCZ.timeout_user_not_found(author=inter.author.mention, users=users.input),
+                ephemeral=True,
+            )
+            return
+
+        if users.invalid_users:
             # print users that can't be found
             await inter.send(
-                MessagesCZ.timeout_member_not_found(
-                    author=inter.author.mention, members=", ".join(users.invalid_members)
+                MessagesCZ.timeout_user_not_found(
+                    author=inter.author.mention, users=", ".join(users.invalid_users)
                 ),
                 ephemeral=True,
             )
 
-        await inter.response.defer()
         embed = features.create_embed(inter.author, "Timeout remove")
 
+        completed_users = []
         for member in users.valid_members:
             # remove timeout from member
-            isSuccess = await features.set_member_timeout(
-                member=member,
-                starttime=None,
-                endtime=None,
-                reason="Předčasně odebráno",
-            )
-            if isSuccess:
+            if inter.guild.me.top_role > member.top_role:
+                completed_users.append(member)
+                await features.set_member_timeout(
+                    member=member,
+                    starttime=None,
+                    endtime=None,
+                    reason="Předčasně odebráno",
+                )
+
                 await features.set_timeout_db(
                     inter=inter,
                     grillbot_session=self.bot.grillbot_session,
@@ -160,14 +166,16 @@ class Timeout(Base, commands.Cog):
                     reason="Předčasně odebráno",
                     remove_logs=remove_logs,
                 )
-            embed.add_field(
-                name=member.display_name,
-                value=MessagesCZ.remove_reason(member=member.mention),
-                inline=False,
-            )
+
+                embed.add_field(
+                    name=member.display_name,
+                    value=MessagesCZ.remove_reason(member=member.mention),
+                    inline=False,
+                )
 
         for user in users.valid_users:
             # remove timeout from database, user is not in the server
+            completed_users.append(user)
             await features.set_timeout_db(
                 inter=inter,
                 grillbot_session=self.bot.grillbot_session,
@@ -184,8 +192,10 @@ class Timeout(Base, commands.Cog):
                 inline=False,
             )
 
-        await self.submod_helper_room.send(embed=embed)
-        await inter.send(embed=embed)
+        content = "".join(f"{user.mention}" for user in completed_users)
+        await self.submod_helper_room.send(content, embed=embed)
+        await inter.channel.send(content, embed=embed)
+        await inter.send(MessagesCZ.remove_success, ephemeral=True)
 
     @_timeout.sub_command(name="list", description=MessagesCZ.list_brief)
     async def timeout_list(
@@ -199,7 +209,7 @@ class Timeout(Base, commands.Cog):
         await self.update_timeout()
 
         if not users:
-            await inter.send(MessagesCZ.list_none)
+            await inter.send(MessagesCZ.no_timeout_found)
             return
 
         embeds = await features.timeout_embed_listing(self.bot, users, inter.author)
@@ -236,29 +246,29 @@ class Timeout(Base, commands.Cog):
         """
         await features.time_check(inter.created_at, endtime.utc)
 
+        if inter.guild.me.top_role > inter.author.top_role:
+            await inter.send(content=MessagesCZ.missing_permission(users=inter.user.mention), ephemeral=True)
+            return
+
         await inter.response.defer()
-        isSuccess = await features.set_member_timeout(
+
+        await features.set_member_timeout(
             member=inter.user,
             starttime=inter.created_at,
             endtime=endtime.utc,
             reason=MessagesCZ.self_timeout_reason,
         )
 
-        if isSuccess:
-            await features.set_timeout_db(
-                inter=inter,
-                grillbot_session=self.bot.grillbot_session,
-                bot_dev_channel=self.bot_dev_channel,
-                user=inter.user,
-                starttime=inter.created_at,
-                endtime=endtime.utc,
-                reason=MessagesCZ.self_timeout_reason,
-                isself=True,
-            )
-
-        if not isSuccess:
-            await inter.send(content=MessagesCZ.missing_permission(user_list=inter.user.mention))
-            return
+        await features.set_timeout_db(
+            inter=inter,
+            grillbot_session=self.bot.grillbot_session,
+            bot_dev_channel=self.bot_dev_channel,
+            user=inter.user,
+            starttime=inter.created_at,
+            endtime=endtime.utc,
+            reason=MessagesCZ.self_timeout_reason,
+            isself=True,
+        )
 
         await inter.send(content=MessagesCZ.self_timeout_success)
 
@@ -332,7 +342,7 @@ class Timeout(Base, commands.Cog):
                     inline=False,
                 )
 
-                await self.submod_helper_room.send(embed=embed)
+                await self.submod_helper_room.send(entry.target.mention, embed=embed)
 
             elif (
                 entry.user.current_timeout is None
@@ -368,7 +378,7 @@ class Timeout(Base, commands.Cog):
                     reason=reason,
                 )
 
-                await self.submod_helper_room.send(embed=embed)
+                await self.submod_helper_room.send(entry.target.mention, embed=embed)
                 error = await features.send_to_grillbot(self.bot.grillbot_session, timeout)
                 if error:
                     await self.bot_dev_channel.send(error)
