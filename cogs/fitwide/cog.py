@@ -2,8 +2,8 @@
 Cog implementing management of year roles and database of user logins.
 """
 
+import asyncio
 import json
-import subprocess
 from datetime import datetime, timezone
 from io import BytesIO
 
@@ -12,7 +12,6 @@ from disnake.ext import commands
 
 import utils
 from cogs.base import Base
-from database import session
 from database.verification import PermitDB, ValidPersonDB, VerifyStatus
 from features.verification import Verification
 from features.verify_helper import VerifyHelper
@@ -50,95 +49,62 @@ class FitWide(Base, commands.Cog):
     @cooldowns.default_cooldown
     @commands.check(permission_check.is_bot_admin)
     @commands.check(room_check.is_in_modroom)
-    @commands.slash_command(name="role_check", description=MessagesCZ.role_check_brief)
-    async def role_check(
-        self,
-        inter: disnake.ApplicationCommandInteraction,
-        p_verified: bool = True,
-        p_move: bool = False,
-        p_status: bool = True,
-        p_role: bool = True,
-        p_zapis: bool = False,
-        p_debug: bool = True,
-    ):
+    @commands.slash_command(name="verify_check", description=MessagesCZ.verify_check_brief)
+    async def verify_check(self, inter: disnake.ApplicationCommandInteraction):
         await inter.send(MessagesCZ.role_check_start)
         guild = inter.guild
-        members = guild.members
+        verified = await features.get_verified_members(guild)
 
-        verify = disnake.utils.get(guild.roles, name="Verify")
-        host = disnake.utils.get(guild.roles, name="Host")
-        bot = disnake.utils.get(guild.roles, name="Bot")
-        poradce = disnake.utils.get(guild.roles, name="Poradce")
-        dropout = disnake.utils.get(guild.roles, name="Dropout")
-        survivor = disnake.utils.get(guild.roles, name="Survivor")
-        king = disnake.utils.get(guild.roles, name="King")
-        vut = disnake.utils.get(guild.roles, name="VUT")
-
-        dropout_alternatives = [survivor, king]
-
-        verified = [
-            member
-            for member in members
-            if verify in member.roles
-            and host not in member.roles
-            and bot not in member.roles
-            and poradce not in member.roles
-            and vut not in member.roles
-        ]
-
-        permitted = session.query(PermitDB)
+        permitted = PermitDB.get_all_users()
         permitted_ids = [int(person.discord_ID) for person in permitted]
-
-        years = ["0BIT", "1BIT", "2BIT", "3BIT+", "0MIT", "1MIT", "2MIT+", "Doktorand", "VUT", "Dropout"]
-
-        year_roles = {year: disnake.utils.get(guild.roles, name=year) for year in years}
-
-        weird_members: dict[disnake.Role, dict[disnake.Role, list[disnake.Member]]] = {
-            year_y: {year_x: [] for year_x in year_roles.values()} for year_y in year_roles.values()
-        }
 
         for member in verified:
             if member.id not in permitted_ids:
-                if p_verified:
-                    await inter.send(MessagesCZ.role_check_user_not_found(user=member.id, id=member.id))
-            else:
-                user = PermitDB.get_user_by_id(member.id)
-                if user is None:
-                    continue
-                if len(user) > 1:
-                    await inter.send(MessagesCZ.role_check_user_duplicate(user=member.id, id=member.id))
-                    continue
+                await inter.send(MessagesCZ.verify_check_user_not_found(user=member.id, id=member.id))
 
-                person = ValidPersonDB.get_user_by_login(user.login)
-                if person is None:
-                    continue
+        await inter.send(MessagesCZ.role_check_end)
 
-                if person.status != 0:
-                    if p_status:
-                        await inter.send(
-                            MessagesCZ.role_check_wrong_status(user=user.discord_ID, id=user.discord_ID)
-                        )
+    @cooldowns.default_cooldown
+    @commands.check(permission_check.is_bot_admin)
+    @commands.check(room_check.is_in_modroom)
+    @commands.slash_command(name="status_check", description=MessagesCZ.status_check_brief)
+    async def status_check(self, inter: disnake.ApplicationCommandInteraction):
+        await inter.send(MessagesCZ.role_check_start)
+        guild = inter.guild
+        verified = await features.get_verified_members(guild)
 
-                year = self.verification.transform_year(person.year)
+        for member in verified:
+            users = PermitDB.get_all_users_by_id(member.id)
+            if not users:
+                continue
+            if len(users) > 1:
+                await inter.send(MessagesCZ.status_check_user_duplicate(user=member.id, id=member.id))
+                continue
 
-                if year is None:
-                    year = "Dropout"
+            user = users[0]
 
-                correct_role = disnake.utils.get(guild.roles, name=year)
+            person = ValidPersonDB.get_user_by_login(user.login)
+            if person is None:
+                continue
 
-                if correct_role not in member.roles:
-                    for role in year_roles.values():
-                        if role in member.roles and correct_role in weird_members[role].keys():
-                            weird_members[role][correct_role].append(member)
-                            break
-                    else:
-                        if not (
-                            correct_role == dropout
-                            and any(role in member.roles for role in dropout_alternatives)
-                        ):
-                            weird_members[dropout][correct_role].append(member)
+            if person.status != VerifyStatus.Verified.value:
+                await inter.send(
+                    MessagesCZ.status_check_wrong_status(user=user.discord_ID, id=user.discord_ID)
+                )
 
-        for source_role, target_data in weird_members.items():
+        await inter.send(MessagesCZ.role_check_end)
+
+    @cooldowns.default_cooldown
+    @commands.check(permission_check.is_bot_admin)
+    @commands.check(room_check.is_in_modroom)
+    @commands.slash_command(name="zapis_check", description=MessagesCZ.zapis_check_brief)
+    async def zapis_check(self, inter: disnake.ApplicationCommandInteraction):
+        await inter.send(MessagesCZ.role_check_start)
+        guild = inter.guild
+
+        unmatching_members = await features.get_members_with_unmatching_year(guild)
+
+        for source_role, target_data in unmatching_members.items():
             for target_role, target_members in target_data.items():
                 if len(target_members) == 0:
                     continue
@@ -146,44 +112,117 @@ class FitWide(Base, commands.Cog):
                 target_year = target_role.name
                 target_ids = [member.id for member in target_members]
                 if (
-                    p_zapis
-                    and (
-                        ("BIT" in source_year and "BIT" in target_year)
-                        or ("MIT" in source_year and "MIT" in target_year)
-                    )
-                    and int(source_year[0]) == int(target_year[0]) + 1
-                ):
-                    message_prefix = (
-                        "Vypadá, že do dalšího ročníku se nezapsali "
-                        f"(protoze na merlinovi maji {target_year}): "
-                    )
-                    await features.send_masstag_messages(inter, message_prefix, target_ids)
-                elif p_move and (
+                    ("BIT" in source_year and "BIT" in target_year)
+                    or ("MIT" in source_year and "MIT" in target_year)
+                ) and int(source_year[0]) == int(target_year[0]) + 1:
+                    await inter.send(MessagesCZ.zapis_check_found(target_year=target_year))
+                    await features.send_masstag_messages(inter, "", target_ids)
+
+        await inter.send(MessagesCZ.role_check_end)
+
+    @cooldowns.default_cooldown
+    @commands.check(permission_check.is_bot_admin)
+    @commands.check(room_check.is_in_modroom)
+    @commands.slash_command(name="mit_check", description=MessagesCZ.mit_check_brief)
+    async def mit_check(self, inter: disnake.ApplicationCommandInteraction, p_debug: bool = True):
+        await inter.send(MessagesCZ.role_check_start)
+        guild = inter.guild
+
+        unmatching_members = await features.get_members_with_unmatching_year(guild)
+
+        for source_role, target_data in unmatching_members.items():
+            for target_role, target_members in target_data.items():
+                if len(target_members) == 0:
+                    continue
+                source_year = source_role.name
+                target_year = target_role.name
+                target_ids = [member.id for member in target_members]
+                if (
                     # presun bakalaru do 1MIT
-                    ("BIT" in source_year and target_year == "1MIT") or target_year == "Dropout"
+                    "BIT" in source_year and target_year == "1MIT"
                 ):
                     await inter.send(
-                        f"Přesouvám tyto {len(target_members)} lidi z {source_year} do {target_year}:"
+                        MessagesCZ.role_check_move(
+                            people_count=len(target_members), target_year=target_year, source_year=source_year
+                        )
                     )
                     await features.send_masstag_messages(inter, "", target_ids)
                     if p_debug:
-                        await inter.send("jk, debug mode")
-                    else:
-                        for member in target_members:
-                            if not (
-                                target_role == dropout
-                                and any(role in member.roles for role in dropout_alternatives)
-                            ):
-                                await member.add_roles(target_role)
-                            await member.remove_roles(source_role)
-                elif p_role:
+                        await inter.send(MessagesCZ.role_check_debug_mode)
+                        continue
+
+                    for member in target_members:
+                        await member.add_roles(target_role)
+                        await member.remove_roles(source_role)
+
+        await inter.send(MessagesCZ.role_check_end)
+
+    @cooldowns.default_cooldown
+    @commands.check(permission_check.is_bot_admin)
+    @commands.check(room_check.is_in_modroom)
+    @commands.slash_command(name="dropout_check", description=MessagesCZ.dropout_check_brief)
+    async def dropout_check(self, inter: disnake.ApplicationCommandInteraction, p_debug: bool = True):
+        await inter.send(MessagesCZ.role_check_start)
+        guild = inter.guild
+
+        survivor = disnake.utils.get(guild.roles, name="Survivor")
+        king = disnake.utils.get(guild.roles, name="King")
+
+        dropout_alternatives = [survivor, king]
+
+        unmatching_members = await features.get_members_with_unmatching_year(guild)
+
+        for source_role, target_data in unmatching_members.items():
+            for target_role, target_members in target_data.items():
+                if len(target_members) == 0:
+                    continue
+                source_year = source_role.name
+                target_year = target_role.name
+                target_ids = [member.id for member in target_members]
+                if target_year == "Dropout":
                     await inter.send(
-                        f"Našel jsem {len(target_members)} lidi, kteří mají na merlinovi "
-                        f"{target_year} ale roli {source_year}:"
+                        MessagesCZ.role_check_move(
+                            people_count=len(target_members), target_year=target_year, source_year=source_year
+                        )
                     )
                     await features.send_masstag_messages(inter, "", target_ids)
+                    if p_debug:
+                        await inter.send(MessagesCZ.role_check_debug_mode)
+                        continue
 
-        await inter.send("Done")
+                    for member in target_members:
+                        if not (any(role in member.roles for role in dropout_alternatives)):
+                            await member.add_roles(target_role)
+                        await member.remove_roles(source_role)
+
+        await inter.send(MessagesCZ.role_check_end)
+
+    @cooldowns.default_cooldown
+    @commands.check(permission_check.is_bot_admin)
+    @commands.check(room_check.is_in_modroom)
+    @commands.slash_command(name="role_check", description=MessagesCZ.role_check_brief)
+    async def role_check(self, inter: disnake.ApplicationCommandInteraction):
+        await inter.send(MessagesCZ.role_check_start)
+        guild = inter.guild
+
+        unmatching_members = await features.get_members_with_unmatching_year(guild)
+
+        for source_role, target_data in unmatching_members.items():
+            for target_role, target_members in target_data.items():
+                if len(target_members) == 0:
+                    continue
+                source_year = source_role.name
+                target_year = target_role.name
+                target_ids = [member.id for member in target_members]
+
+                await inter.send(
+                    MessagesCZ.role_check_found(
+                        people_count=len(target_members), target_year=target_year, source_year=source_year
+                    )
+                )
+                await features.send_masstag_messages(inter, "", target_ids)
+
+        await inter.send(MessagesCZ.role_check_end)
 
     @cooldowns.default_cooldown
     @commands.check(permission_check.is_bot_admin)
@@ -327,82 +366,33 @@ class FitWide(Base, commands.Cog):
         self, inter: disnake.ApplicationCommandInteraction, convert_to_0bit_0mit: bool = False
     ):
         await inter.send(MessagesCZ.update_db_start)
-        with open("merlin-latest", "r") as f:
-            data = f.readlines()
+        message = await inter.original_message()
 
-        found_people = []
-        found_logins = []
-        new_logins = []
-        login_results = ValidPersonDB.get_all_logins()
-        # Use unpacking on results
-        old_logins = [value for (value,) in login_results]
+        all_persons = ValidPersonDB.get_all_persons()
+        persons_count = len(all_persons)
+        dropout_count = 0
 
-        for line in data:
-            line_split = line.split(":")
-            login = line_split[0]
-            name = line_split[4].split(",", 1)[0]
-            try:
-                year_fields = line_split[4].split(",")[1].split(" ")
-                year = " ".join(year_fields if "mail=" not in year_fields[-1] else year_fields[:-1])
-                mail = year_fields[-1].replace("mail=", "") if "mail=" in year_fields[-1] else None
-            except IndexError:
+        for index, person in enumerate(all_persons):
+            if (index % 50) == 0:
+                progress_bar = utils.general.create_bar(index, persons_count)
+                await message.edit(MessagesCZ.update_db_progress(progress_bar=progress_bar))
+
+            if (index % 10) == 0:
+                # The simplest solution we could think of so that we don't hit rate limit
+                await asyncio.sleep(60)
+
+            updated_person = await self.helper.check_api(person.login)
+            if updated_person is None:
+                if person.year != "MUNI" and person.year != "dropout":
+                    person.year = "dropout"
+                    dropout_count += 1
                 continue
 
-            if convert_to_0bit_0mit and year.endswith("1r"):
-                person = ValidPersonDB.get_user_by_login(login)
-                if person is not None and person.year.endswith("0r"):
-                    year = year.replace("1r", "0r")
+            # This will have the side-effect of mixing up "0bit"/"0mit" with the others again
+            # until the enrollment to the next year
+            ValidPersonDB.merge_person(updated_person)
 
-            found_people.append(ValidPersonDB(login=login, year=year, name=name, mail=mail))
-            found_logins.append(login)
-
-        for login in found_logins:
-            if login not in old_logins:
-                new_logins.append(login)
-
-        await inter.send(MessagesCZ.new_logins(new_logins=len(new_logins)))
-
-        for person in found_people:
-            session.merge(person)
-
-        cnt_new = 0
-        all_persons = ValidPersonDB.get_all_persons()
-        for person in all_persons:
-            if person.login not in found_logins:
-                try:
-                    # check for muni
-                    int(person.login)
-                    person.year = "MUNI"
-                except ValueError:
-                    person.year = "dropout"
-            elif convert_to_0bit_0mit and person.login in new_logins:
-                if person.year.endswith("1r"):
-                    person.year = person.year.replace("1r", "0r")
-                    cnt_new += 1
-
-        session.commit()
-
-        await inter.send(MessagesCZ.update_db_done)
-        if convert_to_0bit_0mit:
-            await inter.send(MessagesCZ.db_debug(cnt_new=cnt_new))
-
-    @verify_db.sub_command(name="pull", description=MessagesCZ.pull_db_brief)
-    async def pull_db(self, inter: disnake.ApplicationCommandInteraction):
-        await inter.response.defer()
-        process = subprocess.Popen(
-            ["ssh", "-i", self.config.db_pull_merlin_key_path, "merlin"], stdout=subprocess.PIPE
-        )
-        try:
-            output, error = process.communicate(timeout=15)
-            if error:
-                await inter.edit_original_response(MessagesCZ.get_db_error)
-                return
-        except subprocess.TimeoutExpired:
-            await inter.edit_original_response(MessagesCZ.get_db_timeout)
-            return
-        with open("merlin-latest", "w") as f:
-            f.write(output.decode("utf-8"))
-        await inter.edit_original_response(MessagesCZ.get_db_success)
+        await inter.send(MessagesCZ.update_db_done(dropout_count=dropout_count))
 
     @verify_db.sub_command(name="get_login", description=MessagesCZ.get_login_brief)
     async def get_login(self, inter: disnake.ApplicationCommandInteraction, member: disnake.User):
@@ -494,6 +484,11 @@ class FitWide(Base, commands.Cog):
             await inter.edit_original_response(file=file)
 
     @verify_db.error
+    @zapis_check.error
+    @status_check.error
+    @dropout_check.error
+    @mit_check.error
+    @verify_check.error
     @role_check.error
     async def fitwide_checks_error(self, inter: disnake.ApplicationCommandInteraction, error):
         if isinstance(error, commands.CheckFailure):

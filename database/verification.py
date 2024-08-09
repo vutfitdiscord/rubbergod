@@ -34,6 +34,11 @@ class PermitDB(database.base):  # type: ignore
         return user
 
     @classmethod
+    def get_all_users_by_id(cls, discord_ID: str) -> List[PermitDB]:
+        users = session.query(PermitDB).filter(PermitDB.discord_ID == str(discord_ID)).all()
+        return users
+
+    @classmethod
     def get_all_users(cls) -> List[PermitDB]:
         users = session.query(PermitDB).all()
         return users
@@ -136,6 +141,11 @@ class ValidPersonDB(database.base):  # type: ignore
     def get_all_logins(cls) -> list[tuple[str]]:
         """Returns all logins from database"""
         return session.query(ValidPersonDB.login).all()
+
+    @classmethod
+    def merge_person(cls, person: ValidPersonDB):
+        session.merge(person)
+        session.commit()
 
     def save_sent_code(self, code: str) -> None:
         """Updates a specified login with a new verification code"""
