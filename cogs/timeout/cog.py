@@ -270,7 +270,8 @@ class Timeout(Base, commands.Cog):
             isself=True,
         )
 
-        await inter.send(content=MessagesCZ.self_timeout_success)
+        timestamp = disnake.utils.format_dt(endtime.utc, "R")
+        await inter.send(content=MessagesCZ.self_timeout_success(timestamp=timestamp))
 
     async def update_timeout(self):
         """update all user's timeout in database and on server"""
