@@ -149,23 +149,17 @@ async def set_member_timeout(
     starttime: datetime | None,
     endtime: datetime | None,
     reason: str,
-) -> bool:
+) -> None:
     """Set timeout for member. Return True if successful, False otherwise."""
-    try:
-        if not starttime or not endtime:
-            # remove timeout
-            await member.timeout(until=None, reason=reason)
-        elif (endtime - starttime).days > 28:
-            # timeout longer than discord supports, setting it to max 28 days
-            await member.timeout(until=datetime.now(timezone.utc) + timedelta(days=28), reason=reason)
-        else:
-            # normal timeout in range <60s, 28days>
-            await member.timeout(until=endtime, reason=reason)
-
-        return True
-    except disnake.Forbidden:
-        # bot can't timeout member
-        return False
+    if not starttime or not endtime:
+        # remove timeout
+        await member.timeout(until=None, reason=reason)
+    elif (endtime - starttime).days > 28:
+        # timeout longer than discord supports, setting it to max 28 days
+        await member.timeout(until=datetime.now(timezone.utc) + timedelta(days=28), reason=reason)
+    else:
+        # normal timeout in range <60s, 28days>
+        await member.timeout(until=endtime, reason=reason)
 
 
 async def timeout_get_user(
