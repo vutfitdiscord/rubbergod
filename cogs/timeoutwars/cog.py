@@ -17,7 +17,7 @@ from disnake.ext import commands, tasks
 import utils
 from cogs.base import Base
 from config.app_config import config
-from database.timeout import TimeoutUserDB
+from database.timeout import TimeoutDB
 from rubbergod import Rubbergod
 
 from .messages_cz import MessagesCZ
@@ -89,7 +89,7 @@ class TimeoutWars(Base, commands.Cog):
         message = []
 
         for user in users:
-            if TimeoutUserDB.get_active_timeout(user.id):
+            if TimeoutDB.get_active_timeout(user.id):
                 return
 
             if self.get_immunity(user):
@@ -117,7 +117,7 @@ class TimeoutWars(Base, commands.Cog):
         self, original_message, channel, user: disnake.Member, duration, reason="Moderace lidu"
     ):
         """Mute user and send message to channel and log"""
-        if TimeoutUserDB.get_active_timeout(user.id):
+        if TimeoutDB.get_active_timeout(user.id):
             return
 
         if self.get_immunity(user):
