@@ -362,9 +362,7 @@ class FitWide(Base, commands.Cog):
         pass
 
     @verify_db.sub_command(name="update", description=MessagesCZ.update_db_brief)
-    async def update_db(
-        self, inter: disnake.ApplicationCommandInteraction, convert_to_0bit_0mit: bool = False
-    ):
+    async def update_db(self, inter: disnake.ApplicationCommandInteraction):
         await inter.send(MessagesCZ.update_db_start)
         message = await inter.original_message()
 
