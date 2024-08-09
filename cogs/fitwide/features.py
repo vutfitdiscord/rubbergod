@@ -3,7 +3,8 @@ from disnake.ext import commands
 
 import utils
 from config.app_config import config
-from database.verification import ValidPersonDB
+from database.verification import PermitDB, ValidPersonDB
+from features.verification import Verification
 
 CATEGORIES_NAMES = [
     "1. semestr", "2. semestr", "3. semestr", "4. semestr", "5. semestr",
@@ -150,3 +151,76 @@ async def update_teacher_info(
     # Channel had no listing yet
     await send_teacher_info(new_perms_list, teacher_info_channel)
     return None, new_perms_list
+
+
+async def get_verified_members(guild: disnake.Guild) -> list[disnake.Member]:
+    members = guild.members
+
+    verify = disnake.utils.get(guild.roles, name="Verify")
+    host = disnake.utils.get(guild.roles, name="Host")
+    bot = disnake.utils.get(guild.roles, name="Bot")
+    poradce = disnake.utils.get(guild.roles, name="Poradce")
+    vut = disnake.utils.get(guild.roles, name="VUT")
+
+    verified = [
+        member
+        for member in members
+        if verify in member.roles
+        and host not in member.roles
+        and bot not in member.roles
+        and poradce not in member.roles
+        and vut not in member.roles
+    ]
+
+    return verified
+
+
+async def get_members_with_unmatching_year(
+    guild: disnake.Guild,
+) -> dict[disnake.Role, dict[disnake.Role, list[disnake.Member]]]:
+    verified = await get_verified_members(guild)
+
+    dropout = disnake.utils.get(guild.roles, name="Dropout")
+    survivor = disnake.utils.get(guild.roles, name="Survivor")
+    king = disnake.utils.get(guild.roles, name="King")
+
+    dropout_alternatives = [survivor, king]
+
+    years = ["0BIT", "1BIT", "2BIT", "3BIT+", "0MIT", "1MIT", "2MIT+", "Doktorand", "VUT", "Dropout"]
+
+    year_roles = {year: disnake.utils.get(guild.roles, name=year) for year in years}
+
+    unmatching_members: dict[disnake.Role, dict[disnake.Role, list[disnake.Member]]] = {
+        year_y: {year_x: [] for year_x in year_roles.values()} for year_y in year_roles.values()
+    }
+
+    # collects all members whose database "year" doesn't match their role
+    # the first dictionary key is the role they have currently
+    # while the value is another dictionary with keys of the role they should have
+    for member in verified:
+        user = PermitDB.get_user_by_id(member.id)
+        if user is None:
+            continue
+
+        person = ValidPersonDB.get_user_by_login(user.login)
+        if person is None:
+            continue
+
+        year = Verification.transform_year(person.year)
+
+        if year is None:
+            year = "Dropout"
+
+        correct_role = disnake.utils.get(guild.roles, name=year)
+
+        if correct_role not in member.roles:
+            for role in year_roles.values():
+                if role in member.roles and correct_role in unmatching_members[role].keys():
+                    unmatching_members[role][correct_role].append(member)
+                    break
+                elif not (
+                    correct_role == dropout and any(role in member.roles for role in dropout_alternatives)
+                ):
+                    unmatching_members[dropout][correct_role].append(member)
+
+    return unmatching_members
