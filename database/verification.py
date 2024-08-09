@@ -93,7 +93,7 @@ class ValidPersonDB(database.base):  # type: ignore
 
     @classmethod
     def get_all_persons(cls) -> List[ValidPersonDB]:
-        return session.query(ValidPersonDB)
+        return session.query(ValidPersonDB).all()
 
     @classmethod
     def get_user_with_status(
