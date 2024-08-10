@@ -20,7 +20,8 @@ from .general import get_local_zone
 
 class UsersList:
     """
-    Custom converter for users list. Converts string of users into a list of disnake.User.
+    Custom converter for users list. Converts string of users into a list of `disnake.User`.
+
     Returns object with valid and invalid users.
     """
 
@@ -33,6 +34,8 @@ class UsersList:
     async def convert(cls, inter: disnake.ApplicationCommandInteraction, users_string: str) -> UsersList:
         """Convert a string of users into a list of users objects.
         Try to find the user if not found add them to the invalid users list.
+
+        Convert method uses defer! Because it can take more than 3 seconds. Don't call defer in command when using this.
 
         Parameters
         ----------
@@ -64,7 +67,8 @@ class UsersList:
 
 class MembersList:
     """
-    Custom converter for members. Converts string of members into a list of disnake.Member.
+    Custom converter for members. Converts string of members into a list of `disnake.Member`.
+
     Returns valid members, invalid members, valid users and invalid users.
     """
 
@@ -79,6 +83,8 @@ class MembersList:
     async def convert(cls, inter: disnake.ApplicationCommandInteraction, users_string: str) -> MembersList:
         """Convert a string of users into a list of members.
         Try to find each user as a member. If not found, try to find the user if not found add them to the invalid users list.
+
+        Convert method uses defer! Because it can take more than 3 seconds. Don't call defer in command when using this.
 
         Parameters
         ----------
