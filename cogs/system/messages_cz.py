@@ -29,3 +29,5 @@ class MessagesCZ(GlobalMessages):
     latency = "Odezva"
     guilds = "Počet serverů"
     commands = "Příkazy"
+
+    command_checks_brief = "Vypíše příkazy a jejich omezení nastavené v kódu"

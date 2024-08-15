@@ -162,3 +162,21 @@ class System(Base, commands.Cog):
         )
         self.error_log.set_image(embed, self.bot.user, count)
         await inter.edit_original_response(embed=embed)
+
+    @cooldowns.default_cooldown
+    @commands.slash_command(name="command_checks", description=MessagesCZ.uptime_brief)
+    async def command_checks(self, inter: disnake.ApplicationCommandInteraction):
+        await inter.response.defer()
+        commands = {cmd.name.capitalize(): cmd.checks for cmd in self.bot.application_commands}
+        commands = dict(sorted(commands.items()))
+        embed = disnake.Embed(title="Command checks", color=disnake.Colour.yellow())
+        utils.embed.add_author_footer(embed, inter.author)
+        description = ""
+        for command, checks in commands.items():
+            if not checks:
+                continue
+            checks = ", ".join([str(check.__name__) for check in checks])
+            description += f"**{command}** - {checks}\n"
+        embed.description = description
+
+        await inter.edit_original_response(embed=embed)
