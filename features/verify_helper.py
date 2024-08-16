@@ -47,6 +47,7 @@ class VerifyHelper:
         """Parse user relations and return year, programee and faculty for students,
         `employee` for FIT employees, None for others."""
         ret = None  # rule out students that are also employees or have multiple studies
+        relation: dict
         for relation in user["vztahy"]:
             # student
             if "rok_studia" in relation.keys():
@@ -57,7 +58,7 @@ class VerifyHelper:
                 # do not return yet if not FIT, check for all relations if student has multiple studies
                 if relation["fakulta"]["zkratka"] == "FIT":
                     return ret
-            elif "ustav" in relation.keys() and relation["ustav"]["fakulta"]["zkratka"] == "FIT":
+            elif "fakulta" in relation.keys() and relation["fakulta"]["zkratka"] == "FIT":
                 # FIT employee, replace only if not student
                 ret = ret or "employee"
         if not ret:
