@@ -2,16 +2,15 @@
 Cog for sending name days and birthdays.
 """
 
-import asyncio
 from datetime import date, time
 
-import aiohttp
 import disnake
 from disnake.ext import commands, tasks
 
 import utils
 from cogs.base import Base
 from permissions import room_check
+from permissions.custom_errors import ApiError
 from rubbergod import Rubbergod
 
 from .messages_cz import MessagesCZ
@@ -24,42 +23,38 @@ class Nameday(Base, commands.Cog):
         self.check = room_check.RoomCheck(bot)
         self.tasks = [self.send_names.start()]
 
-    async def _name_day_cz(self):
-        async with aiohttp.ClientSession(timeout=aiohttp.ClientTimeout(total=10)) as session:
-            try:
-                url = f"http://svatky.adresa.info/json?date={date.today().strftime('%d%m')}"
-                async with session.get(url) as resp:
-                    res = await resp.json()
-                names = []
-                for i in res:
-                    names.append(i["name"])
-                return MessagesCZ.name_day_cz(name=", ".join(names))
-            except (asyncio.exceptions.TimeoutError, aiohttp.client_exceptions.ClientConnectorError):
-                return "Website unreachable"
+    async def _name_day_cz(self, task: bool = False) -> str:
+        url = f"http://svatky.adresa.info/json?date={date.today().strftime('%d%m')}"
+        try:
+            async with self.bot.rubbergod_session.get(url) as resp:
+                names: dict = await resp.json()
+            return MessagesCZ.name_day_cz(name=", ".join(i["name"] for i in names))
+        except Exception as error:
+            if task:
+                # tasks can't handle exceptions and will stop working
+                return MessagesCZ.api_error(error=error)
+            raise ApiError(str(error))
 
-    async def _name_day_sk(self):
-        async with aiohttp.ClientSession(timeout=aiohttp.ClientTimeout(total=10)) as session:
-            try:
-                url = f"http://svatky.adresa.info/json?lang=sk&date={date.today().strftime('%d%m')}"
-                async with session.get(url) as resp:
-                    res = await resp.json()
-                names = []
-                for i in res:
-                    names.append(i["name"])
-                return MessagesCZ.name_day_sk(name=", ".join(names))
-            except (asyncio.exceptions.TimeoutError, aiohttp.client_exceptions.ClientConnectorError):
-                return "Website unreachable"
+    async def _name_day_sk(self, task: bool = False) -> str:
+        url = f"http://svatky.adresa.info/json?lang=sk&date={date.today().strftime('%d%m')}"
+        try:
+            async with self.bot.rubbergod_session.get(url) as resp:
+                names_list = await resp.json()
+            return MessagesCZ.name_day_sk(name=", ".join(i["name"] for i in names_list))
+        except Exception as error:
+            if task:
+                # tasks can't handle exceptions and will stop working
+                return MessagesCZ.api_error(error=error)
+            raise ApiError(str(error))
 
-    async def _birthday(self):
-        headers = {"ApiKey": self.config.grillbot_api_key, "Author": str(self.bot.owner_id)}
-        async with aiohttp.ClientSession(timeout=aiohttp.ClientTimeout(total=10), headers=headers) as session:
-            try:
-                url = f"{self.config.grillbot_api_url}/user/birthday/today"
-                async with session.get(url) as resp:
-                    birthday = await resp.json()
-                    return birthday["message"]
-            except (asyncio.exceptions.TimeoutError, aiohttp.client_exceptions.ClientConnectorError):
-                return MessagesCZ.birthday_api_error
+    async def _birthday(self) -> str:
+        url = f"{self.config.grillbot_api_url}/user/birthday/today"
+        try:
+            async with self.bot.grillbot_session.get(url) as resp:
+                birthday = await resp.json()
+                return birthday["message"]
+        except Exception as error:
+            return MessagesCZ.api_error(error=error)
 
     @commands.slash_command(name="svatek", description=MessagesCZ.name_day_cz_brief)
     async def name_day_cz(self, inter: disnake.ApplicationCommandInteraction):
@@ -75,8 +70,8 @@ class Nameday(Base, commands.Cog):
 
     @tasks.loop(time=time(7, 0, tzinfo=utils.general.get_local_zone()))
     async def send_names(self):
-        name_day_cz = await self._name_day_cz()
-        name_day_sk = await self._name_day_sk()
+        name_day_cz = await self._name_day_cz(task=True)
+        name_day_sk = await self._name_day_sk(task=True)
         birthday = await self._birthday()
         mentions = disnake.AllowedMentions.none()
         await self.bot_room.send(f"{name_day_cz}\n{name_day_sk}\n{birthday}", allowed_mentions=mentions)
