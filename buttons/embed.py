@@ -13,13 +13,15 @@ class ViewRowFull(Exception):
 
 
 class EmbedView(BaseView):
+    message: disnake.Message
+
     def __init__(
         self,
         author: disnake.User,
         embeds: list[disnake.Embed],
         row: int = 0,
         perma_lock: bool = False,
-        roll_arroud: bool = True,
+        roll_around: bool = True,
         end_arrow: bool = True,
         page_source: LeaderboardPageSource = None,
         timeout: int = 300,
@@ -28,24 +30,24 @@ class EmbedView(BaseView):
     ):
         """Embed pagination view
 
-        param: disnake.User author: command author, used for locking pagination
-        param: List[disnake.Embed] embeds: List of embed to be paginated
-        param int row: On which row should be buttons added, defaults to first
-        param bool perma_lock: If true allow just message author to change pages, without dynamic lock button
-        param bool roll_arroud: After last page rollaround to first
-        param bool end_arrow: If true use also '⏩' button
-        param LeaderboardPageSource page_source: Use for long leaderboards, embeds should contain one embed
-        param int timeout: Seconds until disabling interaction, use None for always enabled
-        param int page: Starting page
-        param bool show_page: Show page number at the bottom of embed, e.g.: 2/4
+        :param disnake.User author: command author, used for locking pagination.
+        :param List[disnake.Embed] embeds: List of embeds to be paginated.
+        :param int row: On which row should the buttons be added, defaults to the first row.
+        :param bool perma_lock: If True, only the message author can change pages without the dynamic lock button.
+        :param bool roll_around: If True, after reaching the last page, roll around to the first page.
+        :param bool end_arrow: If True, use the '⏩' button as well.
+        :param LeaderboardPageSource page_source: Used for long leaderboards, where embeds should contain one embed.
+        :param int timeout: Seconds until disabling interaction, use None for always enabled.
+        :param int page: Starting page.
+        :param bool show_page: Show the page number at the bottom of the embed, e.g.: 2/4.
         """
         self.page = page
         self.author = author
         self.locked = False
         self.page_source = page_source
-        self.roll_arroud = roll_arroud
+        self.roll_around = roll_around
         self.perma_lock = perma_lock
-        if page_source is None:
+        if not page_source:
             self.max_page = len(embeds)
         else:
             self.max_page = page_source.get_max_pages()
@@ -138,11 +140,10 @@ class EmbedView(BaseView):
             return False
 
         self.page = utils.embed.pagination_next(
-            interaction.data.custom_id, self.page, self.max_page, self.roll_arroud
+            interaction.data.custom_id, self.page, self.max_page, self.roll_around
         )
         await interaction.response.edit_message(embed=self.embed)
         return True
 
     async def on_timeout(self):
-        self.clear_items()
-        await self.message.edit(view=self)
+        await self.message.edit(view=None)
