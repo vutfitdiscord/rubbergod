@@ -5,13 +5,14 @@ import disnake
 import utils
 from buttons.embed import EmbedView, ViewRowFull
 from database.review import ReviewDB, ReviewRelevanceDB
+from rubbergod import Rubbergod
 
 from .features import ReviewManager
 from .messages_cz import MessagesCZ
 
 
-class View(EmbedView):
-    def __init__(self, author: disnake.User, bot: disnake.Client, embeds: List[disnake.Embed], page: int = 1):
+class ReviewView(EmbedView):
+    def __init__(self, author: disnake.User, bot: Rubbergod, embeds: List[disnake.Embed], page: int = 1):
         self.bot = bot
         self.manager = ReviewManager(bot)
         self.total_pages = len(embeds)
@@ -86,7 +87,7 @@ class View(EmbedView):
                     view = self
                 except ViewRowFull:
                     # there was an issue while adding buttons; recreate view
-                    view = View(self.author, self.bot, self.embeds, page=self.page)
+                    view = ReviewView(self.author, self.bot, self.embeds, page=self.page)
                     # set the page of new view to the current one
                 # update view
                 await interaction.edit_original_response(view=view)
