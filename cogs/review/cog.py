@@ -18,7 +18,7 @@ from rubbergod import Rubbergod
 
 from .features import ReviewManager, TierEnum
 from .messages_cz import MessagesCZ
-from .views import View
+from .views import ReviewView
 
 
 async def autocomp_subjects_programmes(
@@ -79,7 +79,7 @@ class Review(Base, commands.Cog):
         if embeds is None or len(embeds) == 0:
             await inter.send(MessagesCZ.wrong_subject)
             return
-        view = View(inter.author, self.bot, embeds)
+        view = ReviewView(inter.author, self.bot, embeds)
         await inter.edit_original_response(embed=embeds[0], view=view)
         view.message = await inter.original_message()
 
