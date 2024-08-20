@@ -1,4 +1,5 @@
 from . import (
+    colors,  # noqa: F401
     constants,  # noqa: F401
     converters,  # noqa: F401
     embed,  # noqa: F401
