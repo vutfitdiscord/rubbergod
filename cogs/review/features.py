@@ -11,6 +11,7 @@ from config.app_config import config
 from database.review import ProgrammeDB, ReviewDB, ReviewRelevanceDB, SubjectDB, SubjectDetailsDB
 from features import sports
 from rubbergod import Rubbergod
+from utils.colors import RubbergodColors
 
 from .messages_cz import MessagesCZ
 
@@ -37,6 +38,15 @@ class ReviewManager:
     def __init__(self, bot: Rubbergod):
         self.bot = bot
 
+    def set_embed_color(self, embed: disnake.Embed, diff: int):
+        """Set embed color based on difference between likes and dislikes"""
+        if diff > 0:
+            embed.color = RubbergodColors.bright_green()
+        elif diff < 0:
+            embed.color = RubbergodColors.bright_red()
+        else:
+            embed.color = RubbergodColors.dark_grey()
+
     def make_embed(
         self,
         msg_author: disnake.User,
@@ -50,8 +60,9 @@ class ReviewManager:
             shortcut = getattr(subject, "shortcut")
         else:
             shortcut = subject
-        embed = disnake.Embed(title=f"{shortcut} reviews", description=description)
-        embed.color = 0x6D6A69
+        embed = disnake.Embed(
+            title=f"{shortcut} reviews", description=description, color=RubbergodColors.dark_grey()
+        )
         id = 0
         if review:
             id = review.id
@@ -77,11 +88,7 @@ class ReviewManager:
             embed.add_field(name="👍", value=f"{likes}")
             dislikes = ReviewRelevanceDB.get_votes_count(review.id, False)
             embed.add_field(name="👎", value=f"{dislikes}")
-            diff = likes - dislikes
-            if diff > 0:
-                embed.color = 0x34CB0B
-            elif diff < 0:
-                embed.color = 0xCB410B
+            self.set_embed_color(embed, likes - dislikes)
         if isinstance(subject, SubjectDetailsDB) and not subject.shortcut.lower().startswith("tv"):
             sem = 1 if subject.semester == "L" else 2
             subject_id = subject.card.split("/")[-2]
@@ -96,7 +103,6 @@ class ReviewManager:
 
     def update_embed(self, embed: disnake.Embed, review: ReviewDB, text_page: int = 1):
         """Update embed fields"""
-        embed.color = 0x6D6A69
         text = review.text_review
         idx = 3
         add_new_field = False
@@ -126,11 +132,7 @@ class ReviewManager:
             idx += 1
         for _ in range(fields_cnt - idx):
             embed.remove_field(idx)
-        diff = likes - dislikes
-        if diff > 0:
-            embed.color = 0x34CB0B
-        elif diff < 0:
-            embed.color = 0xCB410B
+        self.set_embed_color(embed, likes - dislikes)
         return embed
 
     def add_review(self, author_id: int, subject: str, tier: int, anonym: bool, text: str):
