@@ -9,7 +9,7 @@ import disnake
 from disnake.ext import commands
 
 import utils
-from buttons.embed import EmbedView
+from buttons.embed import PaginationView
 from cogs.base import Base
 from database.review import ProgrammeDB, ReviewDB, SubjectDB, SubjectDetailsDB
 from permissions import permission_check
@@ -293,6 +293,6 @@ class Review(Base, commands.Cog):
             embed.description = ""
             embeds.append(embed)
 
-        view = EmbedView(inter.author, embeds)
+        view = PaginationView(inter.author, embeds)
         await inter.response.send_message(embed=embeds[0], view=view)
         view.message = await inter.original_message()

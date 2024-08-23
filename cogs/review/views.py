@@ -3,7 +3,7 @@ from typing import List
 import disnake
 
 import utils
-from buttons.embed import EmbedView, ViewRowFull
+from buttons.embed import PaginationView, ViewRowFull
 from database.review import ReviewDB, ReviewRelevanceDB
 from rubbergod import Rubbergod
 
@@ -11,7 +11,7 @@ from .features import ReviewManager
 from .messages_cz import MessagesCZ
 
 
-class ReviewView(EmbedView):
+class ReviewView(PaginationView):
     def __init__(self, author: disnake.User, bot: Rubbergod, embeds: List[disnake.Embed], page: int = 1):
         self.bot = bot
         self.manager = ReviewManager(bot)

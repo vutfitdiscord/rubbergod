@@ -9,7 +9,7 @@ import disnake
 from disnake.ext import commands, tasks
 
 import utils
-from buttons.embed import EmbedView
+from buttons.embed import PaginationView
 from cogs.base import Base
 from cogs.timeoutwars.messages_cz import MessagesCZ as TimeoutWarsMessages
 from database.timeout import TimeoutDB
@@ -213,7 +213,7 @@ class Timeout(Base, commands.Cog):
             return
 
         embeds = await features.timeout_embed_listing(self.bot, users, inter.author)
-        view = EmbedView(inter.author, embeds, show_page=True)
+        view = PaginationView(inter.author, embeds, show_page=True)
         await inter.send(embed=embeds[0], view=view)
 
     @_timeout.sub_command(name="get_user", description=MessagesCZ.get_user_brief)
@@ -221,7 +221,7 @@ class Timeout(Base, commands.Cog):
         """List history of timeouts for user"""
         await inter.response.defer()
         embeds = await features.timeout_get_user(inter.author, inter.guild.id, self.bot, user)
-        view = EmbedView(inter.author, embeds, show_page=True)
+        view = PaginationView(inter.author, embeds, show_page=True)
         await inter.send(embed=embeds[0], view=view)
         view.message = await inter.original_message()
 

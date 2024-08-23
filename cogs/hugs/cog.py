@@ -6,7 +6,7 @@ import disnake
 from disnake.ext import commands
 
 import utils
-from buttons.embed import EmbedView
+from buttons.embed import PaginationView
 from cogs.base import Base
 from database.hugs import HugsTableDB
 from features.leaderboard import LeaderboardPageSource
@@ -65,7 +65,7 @@ class Hugs(Base, commands.Cog):
         page = page_source.get_page(0)
         embed = page_source.format_page(page)
 
-        view = EmbedView(inter.author, embeds=[embed], page_source=page_source)
+        view = PaginationView(inter.author, embeds=[embed], page_source=page_source)
         view.message = await inter.edit_original_response(embed=embed, view=view)
 
     @cooldowns.default_cooldown
@@ -89,7 +89,7 @@ class Hugs(Base, commands.Cog):
         page = page_source.get_page(0)
         embed = page_source.format_page(page)
 
-        view = EmbedView(inter.author, embeds=[embed], page_source=page_source)
+        view = PaginationView(inter.author, embeds=[embed], page_source=page_source)
         view.message = await inter.edit_original_response(embed=embed, view=view)
 
     @cooldowns.default_cooldown
@@ -113,7 +113,7 @@ class Hugs(Base, commands.Cog):
         page = page_source.get_page(0)
         embed = page_source.format_page(page)
 
-        view = EmbedView(inter.author, embeds=[embed], page_source=page_source)
+        view = PaginationView(inter.author, embeds=[embed], page_source=page_source)
         view.message = await inter.edit_original_response(embed=embed, view=view)
 
     @cooldowns.default_cooldown

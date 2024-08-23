@@ -8,7 +8,7 @@ import requests
 from disnake.ext import commands
 
 import utils
-from buttons.embed import EmbedView
+from buttons.embed import PaginationView
 from cogs.base import Base
 from rubbergod import Rubbergod
 from utils import cooldowns
@@ -56,7 +56,7 @@ class Info(Base, commands.Cog):
         self, inter: disnake.ApplicationCommandInteraction, embeds: list[disnake.Embed]
     ) -> None:
         """Send message and handle pagination for 300 seconds"""
-        view = EmbedView(inter.author, embeds)
+        view = PaginationView(inter.author, embeds)
         view.message = await inter.edit_original_response(embed=embeds[0], view=view)
 
     @cooldowns.short_cooldown

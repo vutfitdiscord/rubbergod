@@ -13,7 +13,7 @@ from requests.adapters import HTTPAdapter
 from requests.packages.urllib3.util.retry import Retry  # type: ignore
 
 import utils
-from buttons.embed import EmbedView
+from buttons.embed import PaginationView
 from cogs.base import Base
 from database.review import SubjectDB
 from database.streamlinks import StreamLinkDB
@@ -78,7 +78,7 @@ class StreamLinks(Base, commands.Cog):
         embeds = []
         for idx, link in enumerate(streamlinks):
             embeds.append(self.create_embed_of_link(link, inter.author, len(streamlinks), idx + 1))
-        view = EmbedView(inter.author, embeds, timeout=180)
+        view = PaginationView(inter.author, embeds, timeout=180)
         view.message = await inter.edit_original_response(embed=embeds[0], view=view)
 
     @_streamlinks.sub_command(name="list", description=MessagesCZ.list_brief)

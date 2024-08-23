@@ -9,7 +9,7 @@ import disnake
 from disnake.ext import commands
 
 import utils
-from buttons.embed import EmbedView
+from buttons.embed import PaginationView
 from cogs.base import Base
 from rubbergod import Rubbergod
 from utils import cooldowns
@@ -171,5 +171,5 @@ class Help(Base, commands.Cog):
             embed.set_footer(text=footer_text, icon_url=ctx.author.display_avatar.url)
             embeds.append(embed)
 
-        view = EmbedView(ctx.author, embeds, perma_lock=True)
+        view = PaginationView(ctx.author, embeds, perma_lock=True)
         view.message = await ctx.reply(embed=embeds[0], view=view)
