@@ -9,7 +9,7 @@ import disnake
 from disnake.ext import commands
 
 import utils
-from buttons.embed import EmbedView
+from buttons.embed import PaginationView
 from cogs.base import Base
 from database.better_meme import BetterMemeDB
 from database.karma import KarmaDB, KarmaEmojiDB
@@ -236,6 +236,6 @@ class BetterMeme(Base, commands.Cog):
         page = page_source.get_page(page_num)
         embed = page_source.format_page(page)
 
-        view = EmbedView(inter.author, embeds=[embed], page_source=page_source)
+        view = PaginationView(inter.author, embeds=[embed], page_source=page_source)
         await inter.edit_original_response(embed=embed, view=view)
         view.message = await inter.original_message()

@@ -12,7 +12,7 @@ class ViewRowFull(Exception):
     pass
 
 
-class EmbedView(BaseView):
+class PaginationView(BaseView):
     message: disnake.Message
 
     def __init__(

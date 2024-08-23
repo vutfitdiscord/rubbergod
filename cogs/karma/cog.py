@@ -8,7 +8,7 @@ import disnake
 from disnake.ext import commands, tasks
 
 import utils
-from buttons.embed import EmbedView
+from buttons.embed import PaginationView
 from cogs.base import Base
 from cogs.grillbotapi.cog import GrillbotApi
 from config import cooldowns
@@ -185,7 +185,7 @@ class Karma(Base, commands.Cog):
         page = page_source.get_page(page_num)
         embed = page_source.format_page(page)
 
-        view = EmbedView(inter.author, embeds=[embed], page_source=page_source)
+        view = PaginationView(inter.author, embeds=[embed], page_source=page_source)
         await inter.edit_original_response(embed=embed, view=view)
         view.message = await inter.original_message()
 
@@ -223,7 +223,7 @@ class Karma(Base, commands.Cog):
         page_num = page_source.get_page_number(start)
         page = page_source.get_page(page_num)
         embed = page_source.format_page(page)
-        view = EmbedView(inter.author, embeds=[embed], page_source=page_source)
+        view = PaginationView(inter.author, embeds=[embed], page_source=page_source)
         await inter.edit_original_response(embed=embed, view=view)
         view.message = await inter.original_message()
 

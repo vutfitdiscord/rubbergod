@@ -9,7 +9,7 @@ from bs4 import BeautifulSoup
 from bs4.element import NavigableString
 
 import utils
-from buttons.embed import EmbedView
+from buttons.embed import PaginationView
 from config.app_config import config
 from database.exams import ExamsTermsMessageDB
 from rubbergod import Rubbergod
@@ -296,7 +296,7 @@ class Features:
             utils.embed.add_author_footer(embed, author if author is not None else self.bot.user)
             pages.append(embed)
         if isinstance(target, disnake.ApplicationCommandInteraction):
-            view = EmbedView(target.author, pages)
+            view = PaginationView(target.author, pages)
             view.message = await target.edit_original_response(embed=pages[0], view=view)
         else:
             header = disnake.Embed(title=title, description=description, color=disnake.Color.dark_blue())
