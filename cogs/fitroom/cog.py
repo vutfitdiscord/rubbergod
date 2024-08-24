@@ -2,10 +2,11 @@
 Cog for finding rooms on FIT BUT.
 """
 
+import asyncio
 from io import BytesIO
 
+import aiohttp
 import disnake
-import requests
 from bs4 import BeautifulSoup
 from cairosvg import svg2png
 from disnake.ext import commands
@@ -13,6 +14,7 @@ from disnake.ext import commands
 import utils
 from cogs.base import Base
 from config import cooldowns
+from permissions.custom_errors import ApiError
 from rubbergod import Rubbergod
 
 from .messages_cz import MessagesCZ
@@ -28,13 +30,19 @@ class FitRoom(Base, commands.Cog):
     async def room(self, inter: disnake.ApplicationCommandInteraction, room: str):
         await inter.response.defer()
         url = f"https://www.fit.vut.cz/fit/map/.cs?show={room.upper()}&big=1"
-        r = requests.get(url)
-        if r.status_code != 200:
-            await inter.edit_original_response(MessagesCZ.room_unreach)
-            return
 
         try:
-            soup = BeautifulSoup(r.content, "html.parser")
+            async with self.bot.rubbergod_session.get(url) as response:
+                if response.status != 200:
+                    await inter.edit_original_response(MessagesCZ.room_unreachable)
+                    return
+                else:
+                    html = await response.text()
+        except (aiohttp.ClientConnectorError, asyncio.TimeoutError) as error:
+            raise ApiError(str(error))
+
+        try:
+            soup = BeautifulSoup(html, "html.parser")
             main_body = soup.find("main", {"id": "main"})
             floor_list = main_body.find("ul", {"class": "pagination__list"})
             active_floor = floor_list.find("a", {"aria-current": "page"})
