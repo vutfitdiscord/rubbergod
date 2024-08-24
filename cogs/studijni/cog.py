@@ -2,12 +2,15 @@
 Cog implementing information about office hours of the study department.
 """
 
+import asyncio
+
+import aiohttp
 import disnake
-import requests
 from disnake.ext import commands
 from lxml import etree
 
 from cogs.base import Base
+from permissions.custom_errors import ApiError
 from rubbergod import Rubbergod
 from utils.embed import add_author_footer
 
@@ -21,14 +24,18 @@ class Studijni(Base, commands.Cog):
 
     @commands.slash_command(name="studijni", description=MessagesCZ.studijni_brief)
     async def studijni(self, inter: disnake.ApplicationCommandInteraction):
-        await inter.response.defer(with_message=True)
-        link = "https://www.fit.vut.cz/fit/room/C109/.cs"
+        await inter.response.defer()
+        url = "https://www.fit.vut.cz/fit/room/C109/.cs"
+        try:
+            async with self.bot.rubbergod_session.get(url) as response:
+                html = await response.text()
+        except (aiohttp.ClientConnectionError, asyncio.TimeoutError) as error:
+            raise ApiError(str(error))
+
         htmlparser = etree.HTMLParser()
-        session = requests.session()
-        result = session.get(link, timeout=10)
-        xDoc2 = etree.fromstring(result.text, htmlparser)
+        xDoc2 = etree.fromstring(html, htmlparser)
         hours_div = xDoc2.xpath("//*[b[contains(text(),'Úřední hodiny')]]//following-sibling::div")
-        embed = disnake.Embed(title=MessagesCZ.studijni_title, url=link)
+        embed = disnake.Embed(title=MessagesCZ.studijni_title, url=url, color=disnake.Color.blue())
         if hours_div:
             hours = etree.tostring(hours_div[0], encoding=str, method="text")
             additional_info = xDoc2.xpath("//main//section/p")
