@@ -8,12 +8,12 @@ import disnake
 from disnake.ext import commands
 
 from cogs.base import Base
-from config import cooldowns
 from database.verification import DynamicVerifyDB
 from features import verification
 from features.table_generator import TableGenerator
 from permissions import permission_check, room_check
 from rubbergod import Rubbergod
+from utils import cooldowns
 
 from .features_dynamic_verify import DynamicVerifyManager
 from .messages_cz import MessagesCZ

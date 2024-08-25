@@ -11,10 +11,10 @@ from disnake.ext import commands
 import utils
 from buttons.embed import EmbedView
 from cogs.base import Base
-from config import cooldowns
 from database.review import ProgrammeDB, ReviewDB, SubjectDB, SubjectDetailsDB
 from permissions import permission_check
 from rubbergod import Rubbergod
+from utils import cooldowns
 
 from .features import ReviewManager, TierEnum
 from .messages_cz import MessagesCZ

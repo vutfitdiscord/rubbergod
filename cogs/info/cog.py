@@ -10,8 +10,8 @@ from disnake.ext import commands
 import utils
 from buttons.embed import EmbedView
 from cogs.base import Base
-from config import cooldowns
 from rubbergod import Rubbergod
+from utils import cooldowns
 
 from .messages_cz import MessagesCZ
 

@@ -9,8 +9,8 @@ from disnake.ext import commands
 from PIL import Image
 
 from cogs.base import Base
-from config import cooldowns
 from rubbergod import Rubbergod
+from utils import cooldowns
 
 from .features import IMAGES_PATH, ImageHandler
 from .messages_cz import MessagesCZ

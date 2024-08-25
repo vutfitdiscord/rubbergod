@@ -15,13 +15,13 @@ from requests.packages.urllib3.util.retry import Retry  # type: ignore
 import utils
 from buttons.embed import EmbedView
 from cogs.base import Base
-from config import cooldowns
 from database.review import SubjectDB
 from database.streamlinks import StreamLinkDB
 from features.list_message_sender import send_list_of_messages
 from features.prompt import PromptSession
 from permissions import permission_check, room_check
 from rubbergod import Rubbergod
+from utils import cooldowns
 
 from .messages_cz import MessagesCZ
 

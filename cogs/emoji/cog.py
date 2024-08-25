@@ -12,9 +12,9 @@ from disnake.ext import commands, tasks
 
 import utils
 from cogs.base import Base
-from config import cooldowns
 from permissions import room_check
 from rubbergod import Rubbergod
+from utils import cooldowns
 
 from .messages_cz import MessagesCZ
 

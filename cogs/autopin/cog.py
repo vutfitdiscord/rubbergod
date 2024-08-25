@@ -9,10 +9,10 @@ from disnake.ext import commands
 
 import utils
 from cogs.base import Base
-from config import cooldowns
 from database.pin_map import PinMapDB
 from permissions import permission_check, room_check
 from rubbergod import Rubbergod
+from utils import cooldowns
 
 from .features import AutopinFeatures
 from .messages_cz import MessagesCZ

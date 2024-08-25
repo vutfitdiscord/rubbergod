@@ -12,13 +12,13 @@ from disnake.ext import commands
 
 import utils
 from cogs.base import Base
-from config import cooldowns
 from database import session
 from database.verification import PermitDB, ValidPersonDB, VerifyStatus
 from features.verification import Verification
 from features.verify_helper import VerifyHelper
 from permissions import permission_check, room_check
 from rubbergod import Rubbergod
+from utils import cooldowns
 
 from . import features
 from .messages_cz import MessagesCZ

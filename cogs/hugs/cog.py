@@ -8,11 +8,11 @@ from disnake.ext import commands
 import utils
 from buttons.embed import EmbedView
 from cogs.base import Base
-from config import cooldowns
 from database.hugs import HugsTableDB
 from features.leaderboard import LeaderboardPageSource
 from permissions import room_check
 from rubbergod import Rubbergod
+from utils import cooldowns
 from utils.general import make_pts_column_row_formatter
 
 from .messages_cz import MessagesCZ

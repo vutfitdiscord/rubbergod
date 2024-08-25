@@ -12,10 +12,10 @@ import utils
 from buttons.embed import EmbedView
 from cogs.base import Base
 from cogs.timeoutwars.messages_cz import MessagesCZ as TimeoutWarsMessages
-from config import cooldowns
 from database.timeout import TimeoutDB
 from permissions import permission_check
 from rubbergod import Rubbergod
+from utils import cooldowns
 from utils.converters import DiscordDatetime, MembersList
 
 from . import features
