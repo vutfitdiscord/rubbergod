@@ -127,7 +127,7 @@ class ReportView(BaseView):
 
         await report_author.send(embed=embed_user)
         await inter.message.channel.send(embed=embed)
-        await inter.edit_original_response(content=None, embed=embed, view=self)
+        await inter.edit_original_response(embed=embed, view=self, attachments=None)
 
     @disnake.ui.button(
         label="Send answer", emoji="✉️", style=disnake.ButtonStyle.secondary, custom_id="report:answer"
@@ -154,7 +154,7 @@ class ReportView(BaseView):
 
         await report_author.send(embed=spam_embed)
         await report_message.channel.send(embed=spam_embed)
-        await inter.edit_original_response(embed=embed, view=self)
+        await inter.edit_original_response(embed=embed, view=self, attachments=None)
 
     async def on_error(self, error, item: disnake.ui.Item, interaction: disnake.MessageInteraction):
         if isinstance(error, ButtonInteractionError):
@@ -212,7 +212,7 @@ class ReportMessageView(ReportView):
 
         await report_message.channel.send(embed=embed)
         await report_author.send(embed=embed, view=ReportAnonymView(self.bot))
-        await inter.edit_original_response(view=self)
+        await inter.edit_original_response(view=self, attachments=None)
 
 
 class ReportAnonymView(BaseView):
