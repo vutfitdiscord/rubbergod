@@ -20,7 +20,7 @@ from permissions.room_check import RoomCheck
 from rubbergod import Rubbergod
 from utils import cooldowns
 
-from .features import create_nasa_embed, nasa_daily_image
+from .features import create_nasa_embed, nasa_daily_image, urban_embeds
 from .messages_cz import MessagesCZ
 
 
@@ -31,51 +31,12 @@ class Info(Base, commands.Cog):
         self.check = RoomCheck(bot)
         self.tasks = [self.send_nasa_image.start()]
 
-    async def urban_embeds(self, author: disnake.User, dict: dict) -> list[disnake.Embed]:
-        """Generate embeds from dictionary of responses"""
-        embed_list = []
-
-        for idx, item in enumerate(dict["list"]):
-            definition = item["definition"]
-            example = item["example"]
-
-            if len(definition) > 1024:
-                definition = definition[0:1021] + "`…`"
-            if len(example) > 1024:
-                example = example[0:1021] + "`…`"
-
-            embed = disnake.Embed(
-                title=item["word"],
-                url=item["permalink"],
-            )
-            embed.add_field(name="Definition", value=definition, inline=False)
-            if example:
-                embed.add_field(name="Example", value=example, inline=False)
-            embed.add_field(
-                name="Page",
-                value=f"{idx + 1}/{len(dict['list'])}",
-                inline=False,
-            )
-            utils.embed.add_author_footer(embed, author)
-
-            embed_list.append(embed)
-
-        return embed_list
-
-    async def urban_pages(
-        self, inter: disnake.ApplicationCommandInteraction, embeds: list[disnake.Embed]
-    ) -> None:
-        """Send message and handle pagination for 300 seconds"""
-        view = PaginationView(inter.author, embeds)
-        view.message = await inter.edit_original_response(embed=embeds[0], view=view)
-
     @cooldowns.short_cooldown
     @commands.slash_command(name="urban", description=MessagesCZ.urban_brief)
     async def urban(self, inter: disnake.ApplicationCommandInteraction, expression: str) -> None:
         """Finding expression and shortcuts in urban directory"""
         await inter.response.defer()
         url = f"http://api.urbandictionary.com/v0/define?term={expression}"
-        embeds = None
         try:
             async with self.bot.rubbergod_session.get(url) as response:
                 dict = await response.json()
@@ -84,10 +45,8 @@ class Info(Base, commands.Cog):
         except (aiohttp.ClientConnectorError, asyncio.TimeoutError) as error:
             raise ApiError(str(error))
 
-        embeds = await self.urban_embeds(inter.author, dict)
-        if embeds:
-            await self.urban_pages(inter, embeds)
-        else:
+        embeds = await urban_embeds(inter.author, dict)
+        if not embeds:
             await inter.edit_original_response(MessagesCZ.urban_not_found)
             return
 
