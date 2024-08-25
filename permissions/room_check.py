@@ -23,7 +23,7 @@ class RoomCheck:
     def __init__(self, bot: Rubbergod):
         self.bot = bot
 
-    def botroom_check(self, inter) -> bool:
+    def botroom_check(self, inter: disnake.ApplicationCommandInteraction) -> bool:
         """
         returns False/True if we want ephemeral command
         False if:

@@ -214,6 +214,7 @@ Cog containing commands that get basic information from other sources.\
 
     - /urban
     - /pocasi
+    - /nasa_daily_image
     - /kreditovy_strop
 ---
 

@@ -158,6 +158,10 @@ class Config:
     # weather token to openweather API
     weather_token: str = get_attr(toml_dict, "weather", "token")
 
+    # nasa
+    space_channel: int = get_attr(toml_dict, "space", "channel")
+    nasa_token: str = get_attr(toml_dict, "space", "nasa_token")
+
     # warden
     duplicate_limit: int = get_attr(toml_dict, "warden", "duplicate_limit")
     deduplication_channels: List[int] = get_attr(toml_dict, "warden", "deduplication_channels")
