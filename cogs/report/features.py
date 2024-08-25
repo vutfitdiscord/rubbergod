@@ -40,13 +40,13 @@ async def set_tag(forum: disnake.ForumChannel, forum_thread: disnake.Thread, tag
 
 
 async def embed_resolved(
-    buttons: list[disnake.ui.Button], author: str, embed: dict, report_type: str, resolved: bool
+    buttons: list[disnake.ui.Button], author: str, embed_dict: dict, report_type: str, resolved: bool
 ) -> disnake.Embed:
     """Changes the embed to a resolved embed or back to a report embed"""
     if resolved:
-        embed["color"] = disnake.Color.green()
-        embed["title"] = "Resolved"
-        for field in embed["fields"]:
+        embed_dict["color"] = disnake.Color.green()
+        embed_dict["title"] = "Resolved"
+        for field in embed_dict["fields"]:
             if field["name"] == "Resolved by":
                 field["value"] = author
         for button in buttons:
@@ -57,9 +57,9 @@ async def embed_resolved(
                 button.emoji = "✅"
                 button.disabled = False
     else:
-        embed["color"] = disnake.Color.red()
-        embed["title"] = f"{report_type.capitalize()} report"
-        for field in embed["fields"]:
+        embed_dict["color"] = disnake.Color.red()
+        embed_dict["title"] = f"{report_type.capitalize()} report"
+        for field in embed_dict["fields"]:
             if field["name"] == "Resolved by":
                 field["value"] = "---"
         for button in buttons:
@@ -68,7 +68,7 @@ async def embed_resolved(
                 button.label = "Resolve"
                 button.style = disnake.ButtonStyle.grey
                 button.emoji = "❌"
-    embed = disnake.Embed.from_dict(embed)
+    embed = disnake.Embed.from_dict(embed_dict)
     return embed
 
 
