@@ -186,17 +186,18 @@ class ReportMessageView(ReportView):
         report_message = await report_features.convert_url(inter, report.report_url)
         report_author = await self.get_report_author(report_id)
 
-        if message is None:
-            button.label = "Message not found"
-            description = MessagesCZ.message_already_deleted(
-                author=inter.author.mention, author_name=inter.author.name
-            )
-        else:
+        try:
+            await message.delete()
             button.label = f"Deleted by @{inter.author.name}"
             description = MessagesCZ.message_deleted(
                 author=inter.author.mention, author_name=inter.author.name
             )
-            await message.delete()
+        except (disnake.NotFound, AttributeError):
+            # message is None or already deleted, often it's cached message
+            button.label = "Message not found"
+            description = MessagesCZ.message_already_deleted(
+                author=inter.author.mention, author_name=inter.author.name
+            )
 
         title = MessagesCZ.message_deleted_title(id=report_id)
         embed = report_features.info_message_embed(inter, report, title, description)
