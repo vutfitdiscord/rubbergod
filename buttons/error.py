@@ -12,8 +12,10 @@ class ErrorView(BaseView):
     def __init__(self):
         super().__init__(timeout=None)
 
-    def create_traceback_file(self, inter: disnake.MessageInteraction) -> disnake.File:
-        id = inter.message.embeds[0].footer.text.split(":")[1].strip()
+    async def create_traceback_file(self, inter: disnake.MessageInteraction) -> disnake.File | None:
+        if not inter.message.embeds:
+            return None
+        id = inter.message.embeds[0].footer.text.split(":")[1].strip()  # get error id from footer
         traceback = ErrorEvent.get_traceback(id).traceback
         with BytesIO(bytes(traceback, "utf-8")) as file_binary:
             file = disnake.File(fp=file_binary, filename="traceback.txt")
@@ -24,7 +26,11 @@ class ErrorView(BaseView):
     )
     async def traceback(self, button: disnake.ui.Button, inter: disnake.MessageInteraction) -> None:
         await inter.response.defer()
-        file = self.create_traceback_file(inter)
+        file = await self.create_traceback_file(inter)
+        if not file:
+            await inter.message.delete()
+            return
+
         await inter.send(file=file, ephemeral=True)
 
     @disnake.ui.button(
@@ -32,5 +38,9 @@ class ErrorView(BaseView):
     )
     async def traceback_dm(self, button: disnake.ui.Button, inter: disnake.MessageInteraction) -> None:
         await inter.response.defer()
-        file = self.create_traceback_file(inter)
+        file = await self.create_traceback_file(inter)
+        if not file:
+            await inter.message.delete()
+            return
+
         await inter.author.send(file=file, view=TrashView())
