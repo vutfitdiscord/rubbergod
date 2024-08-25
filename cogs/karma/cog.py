@@ -11,12 +11,12 @@ import utils
 from buttons.embed import EmbedView
 from cogs.base import Base
 from cogs.grillbotapi.cog import GrillbotApi
-from config import cooldowns
 from database.karma import KarmaDB
 from features.leaderboard import LeaderboardPageSource
 from features.reaction_context import ReactionContext
 from permissions import permission_check, room_check
 from rubbergod import Rubbergod
+from utils import cooldowns
 
 from . import features
 from .messages_cz import MessagesCZ

@@ -8,9 +8,9 @@ from disnake.ext import commands
 import utils
 from buttons.general import TrashView
 from cogs.base import Base
-from config import cooldowns
 from database.subscription import AlreadyNotifiedDB, SubscriptionDB
 from rubbergod import Rubbergod
+from utils import cooldowns
 
 from .messages_cz import MessagesCZ
 

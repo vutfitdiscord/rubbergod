@@ -10,12 +10,12 @@ from disnake.ext import commands
 import utils
 from buttons.general import TrashView
 from cogs.base import Base
-from config import cooldowns
 from database.contestvote import ContestVoteDB
 from features.reaction_context import ReactionContext
 from permissions.permission_check import submod_plus
 from permissions.room_check import RoomCheck
 from rubbergod import Rubbergod
+from utils import cooldowns
 from utils.constants import MAX_ATTACHMENT_SIZE
 
 from . import features

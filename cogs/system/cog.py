@@ -12,12 +12,12 @@ from disnake.ext import commands
 
 import utils
 from cogs.base import Base
-from config import cooldowns
 from database.error import ErrorLogDB
 from features.error import ErrorLogger
 from features.git import Git
 from permissions import permission_check
 from rubbergod import Rubbergod
+from utils import cooldowns
 
 from . import features
 from .messages_cz import MessagesCZ

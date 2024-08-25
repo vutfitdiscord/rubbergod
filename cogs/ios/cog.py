@@ -8,9 +8,9 @@ import disnake
 from disnake.ext import commands, tasks
 
 from cogs.base import Base
-from config import cooldowns
 from permissions import permission_check
 from rubbergod import Rubbergod
+from utils import cooldowns
 
 from . import features
 from .messages_cz import MessagesCZ
