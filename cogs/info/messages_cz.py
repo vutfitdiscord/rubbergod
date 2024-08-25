@@ -27,3 +27,6 @@ if ("Mám průměr pod 2.0")                                           \n  retur
     wind = "Vítr"
     clouds = "Oblačnost"
     visibility = "Viditelnost"
+
+    nasa_image_brief = "Pošle obrázek dne z NASA"
+    nasa_url = "https://apod.nasa.gov/apod/astropix.html"

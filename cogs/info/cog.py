@@ -3,19 +3,24 @@ Cog containing commands that get basic information from other sources.
 examples - urban meaning of word, weather at location
 """
 
+from __future__ import annotations
+
 import asyncio
+from datetime import time
 
 import aiohttp
 import disnake
-from disnake.ext import commands
+from disnake.ext import commands, tasks
 
 import utils
 from buttons.embed import PaginationView
 from cogs.base import Base
 from permissions.custom_errors import ApiError
+from permissions.room_check import RoomCheck
 from rubbergod import Rubbergod
 from utils import cooldowns
 
+from .features import create_nasa_embed, nasa_daily_image
 from .messages_cz import MessagesCZ
 
 
@@ -23,6 +28,8 @@ class Info(Base, commands.Cog):
     def __init__(self, bot: Rubbergod):
         super().__init__()
         self.bot = bot
+        self.check = RoomCheck(bot)
+        self.tasks = [self.send_nasa_image.start()]
 
     async def urban_embeds(self, author: disnake.User, dict: dict) -> list[disnake.Embed]:
         """Generate embeds from dictionary of responses"""
@@ -136,6 +143,25 @@ class Info(Base, commands.Cog):
         utils.embed.add_author_footer(embed, inter.author)
 
         await inter.edit_original_response(embed=embed)
+
+    @cooldowns.default_cooldown
+    @commands.slash_command(name="nasa_daily_image", description=MessagesCZ.nasa_image_brief)
+    async def nasa_image(self, inter: disnake.ApplicationCommandInteraction) -> None:
+        ephemeral = self.check.botroom_check(inter)
+        await inter.response.defer(ephemeral=ephemeral)
+        response = await nasa_daily_image(self.bot.rubbergod_session, self.config.nasa_token)
+        embed, video = await create_nasa_embed(inter.author, response)
+        await inter.edit_original_response(embed=embed)
+        if video:
+            await inter.send(video, ephemeral=ephemeral)
+
+    @tasks.loop(time=time(7, 0, tzinfo=utils.general.get_local_zone()))
+    async def send_nasa_image(self):
+        response = await nasa_daily_image(self.bot.rubbergod_session, self.config.nasa_token)
+        embed, video = await create_nasa_embed(self.bot.user, response)
+        await self.space_channel.send(embed=embed)
+        if video:
+            await self.space_channel.send(video)
 
     @commands.slash_command(name="kreditovy_strop", description=MessagesCZ.credit_limit_brief)
     async def kreditovy_strop(self, inter: disnake.ApplicationCommandInteraction) -> None:
