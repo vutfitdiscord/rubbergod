@@ -24,7 +24,9 @@ class ReportView(BaseView):
     async def interaction_check(self, inter: disnake.Interaction) -> bool:
         return permission_check.submod_plus(inter, raise_exception=False)
 
-    async def set_view_resolved(self, embed: dict, author_id: str, report_id: int) -> disnake.Embed | None:
+    async def set_view_resolved(
+        self, embed_dict: dict, author_id: str, report_id: int
+    ) -> disnake.Embed | None:
         """set the report as resolved or not resolved"""
         report = ReportDB.get_report(report_id)
 
@@ -32,10 +34,14 @@ class ReportView(BaseView):
             return None
 
         if report.resolved:
-            embed = await report_features.embed_resolved(self.children, "Anonym", embed, report.type, False)
+            embed = await report_features.embed_resolved(
+                self.children, "Anonym", embed_dict, report.type, False
+            )
             report.set_resolved(report_id, author_id, False)
         else:
-            embed = await report_features.embed_resolved(self.children, "Anonym", embed, report.type, True)
+            embed = await report_features.embed_resolved(
+                self.children, "Anonym", embed_dict, report.type, True
+            )
             report.set_resolved(report_id, author_id, True)
         return embed
 
@@ -50,14 +56,14 @@ class ReportView(BaseView):
     ) -> tuple[str, disnake.Embed]:
         """Set the report as spam, change buttons and tag thread as spam"""
         resolved_author = f"{inter.author.mention} `@{inter.author.name}`"
-        embed = inter.message.embeds[0].to_dict()
+        embed_dict = inter.message.embeds[0].to_dict()
 
         if report.fake_report:
             ReportDB.set_fake_report(report.id, inter.author.id, False)
             for child in self.children:
                 if child.custom_id == "report:resolve":
                     embed = await report_features.embed_resolved(
-                        self.children, resolved_author, embed, report.type, False
+                        self.children, resolved_author, embed_dict, report.type, False
                     )
             button.label = "Mark spam"
             button.style = disnake.ButtonStyle.red
@@ -71,7 +77,7 @@ class ReportView(BaseView):
             for child in self.children:
                 if child.custom_id == "report:resolve":
                     embed = await report_features.embed_resolved(
-                        self.children, resolved_author, embed, "Spam", True
+                        self.children, resolved_author, embed_dict, "Spam", True
                     )
                     child.disabled = True
             button.disabled = False
@@ -91,7 +97,7 @@ class ReportView(BaseView):
         report_id = report_features.extract_report_id(inter)
         report_author = await self.get_report_author(report_id)
         report = ReportDB.get_report(report_id)
-        embed = inter.message.embeds[0].to_dict()
+        embed_dict = inter.message.embeds[0].to_dict()
         resolved_by = f"{inter.author.mention} `@{inter.author.name}`"
 
         if not report:
@@ -99,7 +105,7 @@ class ReportView(BaseView):
 
         if report.resolved:
             embed = await report_features.embed_resolved(
-                self.children, resolved_by, embed, report.type, False
+                self.children, resolved_by, embed_dict, report.type, False
             )
             report.set_resolved(report_id, inter.author.id, False)
             content = MessagesCZ.report_unresolved(
@@ -109,7 +115,9 @@ class ReportView(BaseView):
             await report_author.send(content)
             await inter.message.channel.send(content, allowed_mentions=disnake.AllowedMentions.none())
         else:
-            embed = await report_features.embed_resolved(self.children, resolved_by, embed, report.type, True)
+            embed = await report_features.embed_resolved(
+                self.children, resolved_by, embed_dict, report.type, True
+            )
             report.set_resolved(report_id, inter.author.id, True)
             await report_features.set_tag(self.report_channel, inter.message.channel, "resolved")
 
@@ -118,7 +126,7 @@ class ReportView(BaseView):
         embed_user.set_image(url=None)
 
         await report_author.send(embed=embed_user)
-        await inter.message.channel.send(embed=embed, allowed_mentions=disnake.AllowedMentions.none())
+        await inter.message.channel.send(embed=embed)
         await inter.edit_original_response(content=None, embed=embed, view=self)
 
     @disnake.ui.button(
@@ -145,7 +153,7 @@ class ReportView(BaseView):
         spam_embed = report_features.info_message_embed(inter, report, title, description)
 
         await report_author.send(embed=spam_embed)
-        await report_message.channel.send(embed=spam_embed, allowed_mentions=disnake.AllowedMentions.none())
+        await report_message.channel.send(embed=spam_embed)
         await inter.edit_original_response(embed=embed, view=self)
 
     async def on_error(self, error, item: disnake.ui.Item, interaction: disnake.MessageInteraction):
@@ -202,7 +210,7 @@ class ReportMessageView(ReportView):
         title = MessagesCZ.message_deleted_title(id=report_id)
         embed = report_features.info_message_embed(inter, report, title, description)
 
-        await report_message.channel.send(embed=embed, allowed_mentions=disnake.AllowedMentions.none())
+        await report_message.channel.send(embed=embed)
         await report_author.send(embed=embed, view=ReportAnonymView(self.bot))
         await inter.edit_original_response(view=self)
 
@@ -236,14 +244,14 @@ class ReportAnonymView(BaseView):
             raise ButtonInteractionError(inter.author.mention, MessagesCZ.report_not_found, ephemeral=True)
 
         report_message = await report_features.convert_url(inter, report.report_url)
-        embed = report_message.embeds[0].to_dict()
+        embed_dict = report_message.embeds[0].to_dict()
 
         if report.type == "general":
             view = ReportGeneralView(self.bot)
         else:
             view = ReportMessageView(self.bot)
 
-        embed = await view.set_view_resolved(embed, "", report_id)
+        embed = await view.set_view_resolved(embed_dict, "", report_id)
 
         await report_features.set_tag(self.report_channel, report_message.channel, "resolved")
         await report_message.edit(embed=embed, view=view)
