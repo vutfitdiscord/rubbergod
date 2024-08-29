@@ -18,6 +18,7 @@ from features.git import Git
 from permissions import permission_check
 from rubbergod import Rubbergod
 from utils import cooldowns
+from utils.colors import RubbergodColors
 
 from . import features
 from .messages_cz import MessagesCZ
@@ -114,7 +115,7 @@ class System(Base, commands.Cog):
     @commands.slash_command(name="rubbergod", description=MessagesCZ.rubbergod_brief)
     async def rubbergod(self, inter: disnake.ApplicationCommandInteraction):
         await inter.response.defer()
-        embed = disnake.Embed(title="Rubbergod", url=MessagesCZ.rubbergod_url, color=disnake.Colour.yellow())
+        embed = disnake.Embed(title="Rubbergod", url=MessagesCZ.rubbergod_url, color=RubbergodColors.yellow())
         embed.add_field(name="ID", value=self.bot.user.id, inline=False)
         embed.add_field(name="Python", value=platform.python_version())
         embed.add_field(name="Disnake", value=disnake.__version__)
@@ -149,7 +150,7 @@ class System(Base, commands.Cog):
         embed = disnake.Embed(
             title="Uptime",
             description=f"{count} days without an accident.",
-            color=disnake.Colour.yellow(),
+            color=RubbergodColors.yellow(),
         )
         start_streak, end_streak = ErrorLogDB.get_longest_streak()
         embed.add_field(name=MessagesCZ.upsince_title, value=str(boottime))
@@ -164,12 +165,13 @@ class System(Base, commands.Cog):
         await inter.edit_original_response(embed=embed)
 
     @cooldowns.default_cooldown
-    @commands.slash_command(name="command_checks", description=MessagesCZ.uptime_brief)
+    @commands.check(permission_check.is_bot_admin)
+    @commands.slash_command(name="command_checks", description=MessagesCZ.command_checks_brief)
     async def command_checks(self, inter: disnake.ApplicationCommandInteraction):
         await inter.response.defer()
         commands = {cmd.name.capitalize(): cmd.checks for cmd in self.bot.application_commands}
         commands = dict(sorted(commands.items()))
-        embed = disnake.Embed(title="Command checks", color=disnake.Colour.yellow())
+        embed = disnake.Embed(title="Command checks", color=RubbergodColors.yellow())
         utils.embed.add_author_footer(embed, inter.author)
         description = ""
         for command, checks in commands.items():
