@@ -7,8 +7,10 @@ import disnake
 from disnake.ext import commands
 
 from cogs.base import Base
+from database.moderation import ActionType, ModerationDB
 from permissions import permission_check
 from rubbergod import Rubbergod
+from utils.colors import RubbergodColors
 
 from . import features
 from .features import MODERATION_FALSE, MODERATION_TRUE, SLOWMODE_CHANNEL_TYPES
@@ -98,7 +100,7 @@ class Moderation(Base, commands.Cog):
         if inter.component.custom_id == MODERATION_TRUE:
             label = "Resolve"
             custom_id = MODERATION_FALSE
-            embed["color"] = disnake.Color.yellow()
+            embed["color"] = RubbergodColors.yellow()
             for field in embed["fields"]:
                 if field["name"] == "Resolved by:":
                     field["value"] = "---"
@@ -106,9 +108,52 @@ class Moderation(Base, commands.Cog):
         else:
             label = "Unresolve"
             custom_id = MODERATION_TRUE
-            embed["color"] = disnake.Color.green()
+            embed["color"] = RubbergodColors.green()
             for field in embed["fields"]:
                 if field["name"] == "Resolved by:":
                     field["value"] = inter.author.mention
 
         await inter.response.edit_message(embed=disnake.Embed.from_dict(embed), view=View(label, custom_id))
+
+    @commands.Cog.listener()
+    async def on_audit_log_entry_create(self, entry: disnake.AuditLogEntry):
+        if entry.action not in (
+            disnake.AuditLogAction.kick,
+            disnake.AuditLogAction.ban,
+            disnake.AuditLogAction.unban,
+        ):
+            # We only care about kicks and (un)bans
+            return
+
+        if entry.action == disnake.AuditLogAction.kick:
+            action_emoji = "👢"
+            action_name = "kicked"
+            action_type = ActionType.kick
+        elif entry.action == disnake.AuditLogAction.ban:
+            action_emoji = "🔨"
+            action_name = "banned"
+            action_type = ActionType.ban
+        elif entry.action == disnake.AuditLogAction.unban:
+            action_emoji = "🔓"
+            action_name = "unbanned"
+            action_type = ActionType.unban
+
+        timestamp = disnake.utils.format_dt(entry.created_at)
+
+        target = entry.target
+        if isinstance(target, disnake.Object):
+            target = await self.bot.fetch_user(target.id)
+
+        content = MessagesCZ.moderation_log(
+            entry=entry, target=target, action_emoji=action_emoji, action=action_name, timestamp=timestamp
+        )
+
+        flags = disnake.MessageFlags(suppress_notifications=True)
+        ModerationDB.add_action_log(
+            target_id=target.id,
+            author_id=entry.user.id,
+            datetime=entry.created_at,
+            reason=entry.reason,
+            action_type=action_type,
+        )
+        await self.moderation_channel.send(content=content, flags=flags)

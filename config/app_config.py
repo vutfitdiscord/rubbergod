@@ -118,6 +118,7 @@ class Config:
     submod_helper_room: int = get_attr(toml_dict, "channels", "submod_helper_room")
     report_channel: int = get_attr(toml_dict, "channels", "report_channel")
     teacher_info_channel: int = get_attr(toml_dict, "channels", "teacher_info_channel")
+    moderation_channel: int = get_attr(toml_dict, "channels", "moderation_channel")
 
     # Meme repost
     meme_room: int = get_attr(toml_dict, "bettermeme", "meme_room")
