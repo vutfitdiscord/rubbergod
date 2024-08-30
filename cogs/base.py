@@ -49,6 +49,10 @@ class Base:
     def space_channel(self) -> disnake.TextChannel:
         return self.bot.get_channel(Base.config.space_channel)
 
+    @cached_property
+    def moderation_channel(self) -> disnake.TextChannel:
+        return self.bot.get_channel(Base.config.moderation_channel)
+
     def cog_unload(self) -> None:
         for task in self.tasks:
             task.cancel()

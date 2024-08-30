@@ -10,6 +10,7 @@ from database.hugs import HugsTableDB  # noqa: F401
 from database.image import ImageDB  # noqa: F401
 from database.karma import KarmaDB, KarmaEmojiDB  # noqa: F401
 from database.meme_repost import MemeRepostDB  # noqa: F401
+from database.moderation import ModerationDB  # noqa: F401
 from database.pin_map import PinMapDB  # noqa: F401
 from database.report import AnswerDB, ReportDB, UserDB  # noqa: F401
 from database.review import ReviewDB, ReviewRelevanceDB, SubjectDB, SubjectDetailsDB  # noqa: F401

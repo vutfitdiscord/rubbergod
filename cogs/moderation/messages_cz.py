@@ -7,3 +7,8 @@ class MessagesCZ(GlobalMessages):
     set_success = "Slowmode v kanálu {channel} nastaven na {delay} sekund."
     remove_brief = "Vypne slowmode v aktuálním kanálu"
     remove_success = "Slowmode v kanálu {channel} úspěšně odstraněn."
+
+    moderation_log = "### {action_emoji} {target.mention} `{target.id}` was {action}\n" \
+                    "- {timestamp}\n" \
+                    "- Given By: {entry.user.mention} `{entry.user.id}`\n" \
+                    "- Reason: `{entry.reason}`"
