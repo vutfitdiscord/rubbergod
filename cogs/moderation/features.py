@@ -15,6 +15,30 @@ MODERATION_TRUE = "moderation:resolve:true"
 MODERATION_FALSE = "moderation:resolve:false"
 
 
+# Reflects UI slider values
+delay_timestamps = {
+    "5s": 5,
+    "10s": 10,
+    "15s": 15,
+    "30s": 30,
+    "1min": 60,
+    "2min": 2 * 60,
+    "5min": 5 * 60,
+    "10min": 10 * 60,
+    "15min": 15 * 60,
+    "30min": 30 * 60,
+    "1h": 1 * 60 * 60,
+    "2h": 2 * 60 * 60,
+    "6h": 6 * 60 * 60,
+}
+
+
+async def slowmode_delay_autocomp(
+    inter: disnake.ApplicationCommandInteraction, string: str
+) -> dict[str, int]:
+    return {key: value for key, value in delay_timestamps.items() if string.lower() in key.lower()}
+
+
 async def mod_tag(message: disnake.Message, role: str, room: disnake.TextChannel):
     if len(message.content) < 3800:
         embed = disnake.Embed(

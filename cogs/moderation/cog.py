@@ -17,27 +17,6 @@ from .features import MODERATION_FALSE, MODERATION_TRUE, SLOWMODE_CHANNEL_TYPES
 from .messages_cz import MessagesCZ
 from .views import View
 
-# Reflects UI slider values
-delay_timestamps = {
-    "5s": 5,
-    "10s": 10,
-    "15s": 15,
-    "30s": 30,
-    "1min": 60,
-    "2min": 2 * 60,
-    "5min": 5 * 60,
-    "10min": 10 * 60,
-    "15min": 15 * 60,
-    "30min": 30 * 60,
-    "1h": 1 * 60 * 60,
-    "2h": 2 * 60 * 60,
-    "6h": 6 * 60 * 60,
-}
-
-
-async def slowmode_delay_times(inter: disnake.ApplicationCommandInteraction, string: str) -> list[str]:
-    return [delay for delay in delay_timestamps.keys() if string.lower() in delay.lower()]
-
 
 class Moderation(Base, commands.Cog):
     def __init__(self, bot: Rubbergod):
@@ -54,13 +33,14 @@ class Moderation(Base, commands.Cog):
         self,
         inter: disnake.GuildCommandInteraction,
         delay: int = commands.Param(
-            autocomplete=delay_timestamps,
+            autocomplete=features.slowmode_delay_autocomp,
             description=MessagesCZ.time_param,
             ge=0,
             lt=21600,  # Maximum is 6 hours (See discord docs)
         ),
         channel: SLOWMODE_CHANNEL_TYPES = None,
     ):
+        await inter.response.defer(ephemeral=True)
         if channel is None:
             channel = inter.channel
         prev_delay = channel.slowmode_delay
@@ -71,6 +51,7 @@ class Moderation(Base, commands.Cog):
     @commands.check(permission_check.submod_plus)
     @_slowmode.sub_command(name="remove", description=MessagesCZ.remove_brief)
     async def remove(self, inter: disnake.GuildCommandInteraction, channel: SLOWMODE_CHANNEL_TYPES = None):
+        await inter.response.defer(ephemeral=True)
         if channel is None:
             channel = inter.channel
         prev_delay = inter.channel.slowmode_delay
