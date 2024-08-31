@@ -117,6 +117,9 @@ class Moderation(Base, commands.Cog):
 
     @commands.Cog.listener()
     async def on_audit_log_entry_create(self, entry: disnake.AuditLogEntry):
+        if entry.guild.id != self.config.guild_id:
+            return
+
         if entry.action not in (
             disnake.AuditLogAction.kick,
             disnake.AuditLogAction.ban,
