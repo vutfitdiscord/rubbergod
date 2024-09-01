@@ -16,6 +16,9 @@ from .messages_cz import MessagesCZ
 
 
 async def autocomp_available_tags(inter: disnake.ApplicationCommandInteraction, user_input: str):
+    if "channel" not in inter.filled_options:
+        return []
+
     channel_id = inter.filled_options["channel"]
     channel: disnake.ForumChannel = await inter.bot.fetch_channel(channel_id)
     return [tag.name for tag in channel.available_tags if user_input in tag.name][:25]
