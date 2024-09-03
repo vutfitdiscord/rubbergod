@@ -4,8 +4,12 @@ ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 ENV TZ=Europe/Prague
 
-RUN apk update && apk add gcc git postgresql-dev musl-dev tzdata libxml2-dev libxslt-dev g++ openssh python3-dev graphviz-dev graphviz
-RUN apk add jpeg-dev zlib-dev freetype-dev lcms2-dev openjpeg-dev tiff-dev tk-dev tcl-dev libwebp-dev libffi-dev cairo
+# cairo - /room - for generating images
+# git - setting bot presence and it's commit
+# openssh - ios cog & merlin access
+RUN apk update && apk add git cairo openssh
+# lxml python library dependencies
+RUN apk add libxml2-dev libxslt-dev python3-dev
 
 VOLUME /rubbergod
 WORKDIR /rubbergod

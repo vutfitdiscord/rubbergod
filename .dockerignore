@@ -1,8 +1,36 @@
+# Ignore unneeded files
 LICENSE
 README.md
-**/__pycache__/
-config.toml
-**/docker-compose*
-**/Dockerfile*
-**/other
+
+# IDE files
+.idea
+.vscode
+
+# Local files
+emojis.zip
+timeout_wars
+merlin-latest
+service_logs.txt
+config/config.toml
+*sql
+
+# Ignore all logs
+logs/*
 *.log
+
+# Cache files
+__pycache__
+.mypy_cache/
+.ruff_cache
+
+# Virtual environments
+venv
+.venv
+env
+.env
+
+# Ignore configuration files
+config.toml
+docker-compose*
+Dockerfile*
+other
