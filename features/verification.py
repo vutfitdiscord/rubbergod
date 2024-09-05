@@ -90,7 +90,68 @@ class Verification(BaseFeature):
             view = VerifyView(user.login, mail_list)
             await inter.edit_original_response(content=success_message, view=view)
 
-    async def send_code(self, login: str, inter: disnake.ApplicationCommandInteraction) -> bool:
+    async def send_code_muni(self, login: str, inter: disnake.ApplicationCommandInteraction) -> bool:
+        try:
+            int(login)
+        except ValueError:
+            msg = MessagesCZ.invalid_login(user=inter.user.id, admin=config.admin_ids[0])
+            await inter.edit_original_response(msg)
+            await self.log_verify_fail(inter, "getcode (MUNI)", str({"login": login}))
+            return False
+
+        user = ValidPersonDB.get_user_by_login(login)
+
+        if user is not None and user.status != VerifyStatus.Unverified.value:
+            if user.status == VerifyStatus.InProcess.value:
+                await self.gen_code_and_send_mail(inter, user, "mail.muni.cz", dry_run=True)
+                return True
+            msg = MessagesCZ.verify_step_done(
+                user=inter.user.id,
+                admin=config.admin_ids[0],
+            )
+            await inter.send(content=msg)
+            await self.log_verify_fail(
+                inter,
+                "getcode (MUNI) - Invalid verify state",
+                str(user.__dict__),
+            )
+            return False
+
+        user = ValidPersonDB.get_user_with_status(login, status=VerifyStatus.Unverified.value)
+        if user is None:
+            user = ValidPersonDB.add_user(login, "MUNI", status=VerifyStatus.Unverified.value)
+        await self.gen_code_and_send_mail(inter, user, "mail.muni.cz")
+        return True
+
+    async def send_code_vut(self, login: str, inter: disnake.ApplicationCommandInteraction) -> bool:
+        user = await self.helper.check_api(login)
+        if user is None:
+            inter.send(MessagesCZ.invalid_login(user=login, admin=config.admin_ids[0]))
+            return False
+
+        if user.status == VerifyStatus.Unverified.value:
+            await self.gen_code_and_send_mail(inter, user, "stud.fit.vutbr.cz")
+            return True
+
+        if user.status == VerifyStatus.InProcess.value:
+            await self.gen_code_and_send_mail(inter, user, "stud.fit.vutbr.cz", dry_run=True)
+            return True
+
+        msg = MessagesCZ.verify_step_done(
+            user=inter.user.id,
+            admin=config.admin_ids[0],
+        )
+        await inter.edit_original_response(content=msg)
+        await self.log_verify_fail(
+            inter,
+            "getcode (xlogin) - Invalid verify state",
+            str(user.__dict__),
+        )
+        return False
+
+    async def send_code(
+        self, login: str, inter: disnake.ApplicationCommandInteraction, muni: bool = False
+    ) -> bool:
         # return True if code was successfully sent
         # Check if the user doesn't have the verify role
         if not await self.helper.has_role(inter.user, config.verification_role) or await self.helper.has_role(
@@ -100,60 +161,10 @@ class Verification(BaseFeature):
             if login == "xlogin00":
                 await self.send_xlogin_info(inter)
                 return False
-
-            user = await self.helper.check_api(login)
-            if user is not None:
-                # VUT
-                if user.status != VerifyStatus.Unverified.value:
-                    if user.status == VerifyStatus.InProcess.value:
-                        await self.gen_code_and_send_mail(inter, user, "stud.fit.vutbr.cz", dry_run=True)
-                        return True
-                    msg = MessagesCZ.verify_step_done(
-                        user=inter.user.id,
-                        admin=config.admin_ids[0],
-                    )
-                    await inter.edit_original_response(content=msg)
-                    await self.log_verify_fail(
-                        inter,
-                        "getcode (xlogin) - Invalid verify state",
-                        str(user.__dict__),
-                    )
-                else:
-                    await self.gen_code_and_send_mail(inter, user, "stud.fit.vutbr.cz")
-                    return True
+            if muni:
+                return await self.send_code_muni(login, inter)
             else:
-                # MUNI
-                try:
-                    int(login)
-                except ValueError:
-                    msg = MessagesCZ.invalid_login(user=inter.user.id, admin=config.admin_ids[0])
-                    await inter.edit_original_response(msg)
-                    await self.log_verify_fail(inter, "getcode (MUNI)", str({"login": login}))
-                    return False
-
-                user = ValidPersonDB.get_user_by_login(login)
-
-                if user is not None and user.status != VerifyStatus.Unverified.value:
-                    if user.status == VerifyStatus.InProcess.value:
-                        await self.gen_code_and_send_mail(inter, user, "mail.muni.cz", dry_run=True)
-                        return True
-                    msg = MessagesCZ.verify_step_done(
-                        user=inter.user.id,
-                        admin=config.admin_ids[0],
-                    )
-                    await inter.send(content=msg)
-                    await self.log_verify_fail(
-                        inter,
-                        "getcode (MUNI) - Invalid verify state",
-                        str(user.__dict__),
-                    )
-                    return False
-
-                user = ValidPersonDB.get_user_with_status(login, status=VerifyStatus.Unverified.value)
-                if user is None:
-                    user = ValidPersonDB.add_user(login, "MUNI", status=VerifyStatus.Unverified.value)
-                await self.gen_code_and_send_mail(inter, user, "mail.muni.cz")
-                return True
+                return await self.send_code_vut(login, inter)
         else:
             msg = MessagesCZ.verify_already_verified(user=inter.user.id, admin=config.admin_ids[0])
             await inter.send(content=msg)

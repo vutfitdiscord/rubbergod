@@ -41,14 +41,33 @@ class Verify(Base, commands.Cog):
     async def verify(
         self,
         inter: disnake.ApplicationCommandInteraction,
+    ):
+        await inter.response.defer(ephemeral=True)
+
+    @verify.sub_command(name="vut", description=MessagesCZ.verify_brief)
+    async def verify_vut(
+        self,
+        inter: disnake.ApplicationCommandInteraction,
         login: str = commands.Param(description=MessagesCZ.verify_login_parameter),
     ):
         login = login.lower()
-        await inter.response.defer(ephemeral=True)
         if await self.dynamic_verify_manager.can_apply_rule(inter.user, login):
             await self.dynamic_verify_manager.request_access(login, inter)
             return
-        if await self.verification.send_code(login, inter):
+        if await self.verification.send_code(login, inter, muni=False):
+            await self.verification.clear_host_roles(inter)
+
+    @verify.sub_command(name="muni", description=MessagesCZ.verify_brief)
+    async def verify_muni(
+        self,
+        inter: disnake.ApplicationCommandInteraction,
+        login: str = commands.Param(description=MessagesCZ.verify_login_parameter_muni),
+    ):
+        login = login.lower()
+        if await self.dynamic_verify_manager.can_apply_rule(inter.user, login):
+            await self.dynamic_verify_manager.request_access(login, inter)
+            return
+        if await self.verification.send_code(login, inter, muni=True):
             await self.verification.clear_host_roles(inter)
 
     @verify.error
