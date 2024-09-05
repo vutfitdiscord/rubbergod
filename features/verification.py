@@ -200,8 +200,8 @@ class Verification(BaseFeature):
                 return "2MIT+" if year_value >= 2 else f"{year_value}MIT"
             elif year_parts[1] in ["DVI4", "DRH", "DITP", "DITP-EN"]:
                 return "Doktorand"
-        elif year_parts[0] == "employee":
-            return "Vyucujici/Zamestnanec FIT"
+        elif year_parts[0] in ["employee", "external employee"]:
+            return "Vyucujici/Zamestnanec"
         elif year_parts[0] in FACULTY_NAMES:
             # Other VUT faculties
             return "VUT"

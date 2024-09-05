@@ -58,9 +58,12 @@ class VerifyHelper:
                 # do not return yet if not FIT, check for all relations if student has multiple studies
                 if relation["fakulta"]["zkratka"] == "FIT":
                     return ret
-            elif "fakulta" in relation.keys() and relation["fakulta"]["zkratka"] == "FIT":
-                # FIT employee, replace only if not student
-                ret = ret or "employee"
+            elif "fakulta" in relation.keys():
+                if relation["fakulta"]["zkratka"] == "FIT":
+                    # FIT employee, replace only if not student
+                    ret = ret or "employee"
+                else:
+                    ret = ret or "external employee"
         if not ret:
             await self.log_relation_error(user)
         return ret
