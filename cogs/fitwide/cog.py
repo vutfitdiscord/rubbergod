@@ -52,6 +52,7 @@ class FitWide(Base, commands.Cog):
     @commands.slash_command(name="verify_check", description=MessagesCZ.verify_check_brief)
     async def verify_check(self, inter: disnake.ApplicationCommandInteraction):
         await inter.send(MessagesCZ.role_check_start)
+        message = await inter.original_response()
         guild = inter.guild
         verified = await features.get_verified_members(guild)
 
@@ -60,9 +61,9 @@ class FitWide(Base, commands.Cog):
 
         for member in verified:
             if member.id not in permitted_ids:
-                await inter.send(MessagesCZ.verify_check_user_not_found(user=member.id, id=member.id))
+                await message.reply(MessagesCZ.verify_check_user_not_found(user=member.id, id=member.id))
 
-        await inter.send(MessagesCZ.role_check_end)
+        await message.reply(MessagesCZ.role_check_end)
 
     @cooldowns.default_cooldown
     @commands.check(permission_check.is_bot_admin)
@@ -70,6 +71,7 @@ class FitWide(Base, commands.Cog):
     @commands.slash_command(name="status_check", description=MessagesCZ.status_check_brief)
     async def status_check(self, inter: disnake.ApplicationCommandInteraction):
         await inter.send(MessagesCZ.role_check_start)
+        message = await inter.original_response()
         guild = inter.guild
         verified = await features.get_verified_members(guild)
 
@@ -78,7 +80,7 @@ class FitWide(Base, commands.Cog):
             if not users:
                 continue
             if len(users) > 1:
-                await inter.send(MessagesCZ.status_check_user_duplicate(user=member.id, id=member.id))
+                await message.reply(MessagesCZ.status_check_user_duplicate(user=member.id, id=member.id))
                 continue
 
             user = users[0]
@@ -88,11 +90,11 @@ class FitWide(Base, commands.Cog):
                 continue
 
             if person.status != VerifyStatus.Verified.value:
-                await inter.send(
+                await message.reply(
                     MessagesCZ.status_check_wrong_status(user=user.discord_ID, id=user.discord_ID)
                 )
 
-        await inter.send(MessagesCZ.role_check_end)
+        await message.reply(MessagesCZ.role_check_end)
 
     @cooldowns.default_cooldown
     @commands.check(permission_check.is_bot_admin)
@@ -100,6 +102,7 @@ class FitWide(Base, commands.Cog):
     @commands.slash_command(name="zapis_check", description=MessagesCZ.zapis_check_brief)
     async def zapis_check(self, inter: disnake.ApplicationCommandInteraction):
         await inter.send(MessagesCZ.role_check_start)
+        message = await inter.original_response()
         guild = inter.guild
 
         unmatching_members = await features.get_members_with_unmatching_year(guild)
@@ -115,10 +118,10 @@ class FitWide(Base, commands.Cog):
                     ("BIT" in source_year and "BIT" in target_year)
                     or ("MIT" in source_year and "MIT" in target_year)
                 ) and int(source_year[0]) == int(target_year[0]) + 1:
-                    await inter.send(MessagesCZ.zapis_check_found(target_year=target_year))
+                    await message.reply(MessagesCZ.zapis_check_found(target_year=target_year))
                     await features.send_masstag_messages(inter, "", target_ids)
 
-        await inter.send(MessagesCZ.role_check_end)
+        await message.reply(MessagesCZ.role_check_end)
 
     @cooldowns.default_cooldown
     @commands.check(permission_check.is_bot_admin)
@@ -126,6 +129,7 @@ class FitWide(Base, commands.Cog):
     @commands.slash_command(name="mit_check", description=MessagesCZ.mit_check_brief)
     async def mit_check(self, inter: disnake.ApplicationCommandInteraction, p_debug: bool = True):
         await inter.send(MessagesCZ.role_check_start)
+        message = await inter.original_response()
         guild = inter.guild
 
         unmatching_members = await features.get_members_with_unmatching_year(guild)
@@ -141,21 +145,21 @@ class FitWide(Base, commands.Cog):
                     # presun bakalaru do 1MIT
                     "BIT" in source_year and target_year == "1MIT"
                 ):
-                    await inter.send(
+                    await message.reply(
                         MessagesCZ.role_check_move(
                             people_count=len(target_members), target_year=target_year, source_year=source_year
                         )
                     )
                     await features.send_masstag_messages(inter, "", target_ids)
                     if p_debug:
-                        await inter.send(MessagesCZ.role_check_debug_mode)
+                        await message.reply(MessagesCZ.role_check_debug_mode)
                         continue
 
                     for member in target_members:
                         await member.add_roles(target_role)
                         await member.remove_roles(source_role)
 
-        await inter.send(MessagesCZ.role_check_end)
+        await message.reply(MessagesCZ.role_check_end)
 
     @cooldowns.default_cooldown
     @commands.check(permission_check.is_bot_admin)
@@ -163,6 +167,7 @@ class FitWide(Base, commands.Cog):
     @commands.slash_command(name="dropout_check", description=MessagesCZ.dropout_check_brief)
     async def dropout_check(self, inter: disnake.ApplicationCommandInteraction, p_debug: bool = True):
         await inter.send(MessagesCZ.role_check_start)
+        message = await inter.original_response()
         guild = inter.guild
 
         survivor = disnake.utils.get(guild.roles, name="Survivor")
@@ -180,14 +185,14 @@ class FitWide(Base, commands.Cog):
                 target_year = target_role.name
                 target_ids = [member.id for member in target_members]
                 if target_year == "Dropout":
-                    await inter.send(
+                    await message.reply(
                         MessagesCZ.role_check_move(
                             people_count=len(target_members), target_year=target_year, source_year=source_year
                         )
                     )
                     await features.send_masstag_messages(inter, "", target_ids)
                     if p_debug:
-                        await inter.send(MessagesCZ.role_check_debug_mode)
+                        await message.reply(MessagesCZ.role_check_debug_mode)
                         continue
 
                     for member in target_members:
@@ -195,7 +200,7 @@ class FitWide(Base, commands.Cog):
                             await member.add_roles(target_role)
                         await member.remove_roles(source_role)
 
-        await inter.send(MessagesCZ.role_check_end)
+        await message.reply(MessagesCZ.role_check_end)
 
     @cooldowns.default_cooldown
     @commands.check(permission_check.is_bot_admin)
@@ -203,6 +208,7 @@ class FitWide(Base, commands.Cog):
     @commands.slash_command(name="role_check", description=MessagesCZ.role_check_brief)
     async def role_check(self, inter: disnake.ApplicationCommandInteraction):
         await inter.send(MessagesCZ.role_check_start)
+        message = await inter.original_response()
         guild = inter.guild
 
         unmatching_members = await features.get_members_with_unmatching_year(guild)
@@ -215,21 +221,21 @@ class FitWide(Base, commands.Cog):
                 target_year = target_role.name
                 target_ids = [member.id for member in target_members]
 
-                await inter.send(
+                await message.reply(
                     MessagesCZ.role_check_found(
                         people_count=len(target_members), target_year=target_year, source_year=source_year
                     )
                 )
                 await features.send_masstag_messages(inter, "", target_ids)
 
-        await inter.send(MessagesCZ.role_check_end)
+        await message.reply(MessagesCZ.role_check_end)
 
     @cooldowns.default_cooldown
     @commands.check(permission_check.is_bot_admin)
     @commands.slash_command(name="increment_roles", description=MessagesCZ.increment_roles_brief)
     async def increment_roles(self, inter: disnake.ApplicationCommandInteraction):
         await inter.send(MessagesCZ.increment_roles_start)
-        message = await inter.original_message()
+        message = await inter.original_response()
         guild = inter.guild
 
         BIT_names = ["0BIT", "1BIT", "2BIT", "3BIT+"]
@@ -364,7 +370,7 @@ class FitWide(Base, commands.Cog):
     @verify_db.sub_command(name="update", description=MessagesCZ.update_db_brief)
     async def update_db(self, inter: disnake.ApplicationCommandInteraction):
         await inter.send(MessagesCZ.update_db_start)
-        message = await inter.original_message()
+        message = await inter.original_response()
 
         all_persons = ValidPersonDB.get_all_persons()
         persons_count = len(all_persons)
@@ -390,7 +396,7 @@ class FitWide(Base, commands.Cog):
             # until the enrollment to the next year
             ValidPersonDB.merge_person(updated_person)
 
-        await inter.send(MessagesCZ.update_db_done(dropout_count=dropout_count))
+        await message.reply(MessagesCZ.update_db_done(dropout_count=dropout_count))
 
     @verify_db.sub_command(name="get_login", description=MessagesCZ.get_login_brief)
     async def get_login(self, inter: disnake.ApplicationCommandInteraction, member: disnake.User):
