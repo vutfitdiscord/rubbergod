@@ -26,7 +26,7 @@ from rubbergod import Rubbergod
 rubbegod_logger = logging.getLogger("rubbergod")
 
 
-class ContextMock:
+class ContextMock(disnake.ApplicationCommandInteraction):
     """Create event context similar to commands.Context
     This will be used in ignore_errors function"""
 
@@ -433,7 +433,10 @@ class ErrorLogger:
             return True
 
         if isinstance(error, commands.CommandInvokeError):
-            await inter.send(Messages.command_invoke_error)
+            if inter.is_expired():
+                await inter.message.reply(Messages.command_invoke_error)
+            else:
+                await inter.send(Messages.command_invoke_error)
             # return False, because we want to log these errors
             return False
 
