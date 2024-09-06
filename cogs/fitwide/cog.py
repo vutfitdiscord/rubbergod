@@ -368,13 +368,27 @@ class FitWide(Base, commands.Cog):
         pass
 
     @verify_db.sub_command(name="update", description=MessagesCZ.update_db_brief)
-    async def update_db(self, inter: disnake.ApplicationCommandInteraction):
+    async def update_db(
+        self,
+        inter: disnake.ApplicationCommandInteraction,
+        continue_from_login: str = commands.Param(
+            default="",
+            autocomplete=autocomp_user_logins,
+            description=MessagesCZ.update_db_continue_from_login,
+        ),
+    ):
         await inter.send(MessagesCZ.update_db_start)
         message = await inter.original_response()
 
         all_persons = ValidPersonDB.get_all_persons()
         persons_count = len(all_persons)
         dropout_count = 0
+
+        if continue_from_login:
+            for index, person in enumerate(all_persons):
+                if person.login == continue_from_login:
+                    all_persons = all_persons[index:]
+                    break
 
         for index, person in enumerate(all_persons):
             if (index % 50) == 0:
@@ -385,8 +399,8 @@ class FitWide(Base, commands.Cog):
                 # The simplest solution we could think of so that we don't hit rate limit
                 await asyncio.sleep(60)
 
-            updated_person = await self.helper.check_api(person.login)
             self.bot.logger.info(f"Checking {person.login}")
+            updated_person = await self.helper.check_api(person.login)
             if updated_person is None:
                 if person.year != "MUNI" and person.year != "dropout":
                     person.year = "dropout"

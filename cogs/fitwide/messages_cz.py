@@ -24,6 +24,7 @@ class MessagesCZ(GlobalMessages):
     role_check_debug_mode = "jk, debug mode"
     fitwide_brief = "Příkazy na manipulaci verify studentů"
     update_db_brief = "Aktualizuje databázi s loginy"
+    update_db_continue_from_login = "Pokračovat v aktualizaci databáze od loginu (včetně)"
     update_db_start = "Aktualizuji databázi..."
     update_db_progress = "Progress: {progress_bar}."
     update_db_done = "Aktualizace databáze proběhla úspěšně. Nalezeno {dropout_count} nových dropout."

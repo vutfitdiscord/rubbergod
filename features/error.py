@@ -26,7 +26,7 @@ from rubbergod import Rubbergod
 rubbegod_logger = logging.getLogger("rubbergod")
 
 
-class ContextMock(disnake.ApplicationCommandInteraction):
+class ContextMock:
     """Create event context similar to commands.Context
     This will be used in ignore_errors function"""
 
@@ -46,6 +46,9 @@ class ContextMock(disnake.ApplicationCommandInteraction):
 
     async def reply(self, *args, ephemeral=False):
         return await self.channel.send(*args)
+
+    async def is_expired(self):
+        pass
 
 
 class ErrorLogger:
@@ -434,7 +437,8 @@ class ErrorLogger:
 
         if isinstance(error, commands.CommandInvokeError):
             if inter.is_expired():
-                await inter.message.reply(Messages.command_invoke_error)
+                # if the webhook is expired we can't use the interaction object so we send to channel
+                await inter.channel.send(f"{inter.author.mention} {Messages.command_invoke_error}")
             else:
                 await inter.send(Messages.command_invoke_error)
             # return False, because we want to log these errors
