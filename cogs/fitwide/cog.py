@@ -386,6 +386,7 @@ class FitWide(Base, commands.Cog):
                 await asyncio.sleep(60)
 
             updated_person = await self.helper.check_api(person.login)
+            self.bot.logger.info(f"Checking {person.login}")
             if updated_person is None:
                 if person.year != "MUNI" and person.year != "dropout":
                     person.year = "dropout"
