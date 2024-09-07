@@ -2,7 +2,6 @@ import json
 from functools import cached_property
 from io import BytesIO
 
-import aiohttp
 import disnake
 from disnake import Member
 
@@ -30,18 +29,16 @@ class VerifyHelper:
             return utils.user.has_role(member, role_name)
 
     async def get_user_details(self, id: str) -> dict | None:
-        headers = {"Authorization": f"Bearer {config.vut_api_key}"}
         url = f"https://www.vut.cz/api/person/v1/{id}/pusobeni-osoby"
-        async with aiohttp.ClientSession() as session:
-            async with session.get(url, headers=headers) as res:
-                if res.status != 200:
-                    if res.status in [401, 403]:
-                        raise Exception("Invalid API key")
-                    elif res.status == 429:
-                        raise Exception("Rate limit exceeded")
-                    # Login not found
-                    return None
-                return await res.json()
+        async with self.bot.vutapi_session.get(url) as res:
+            if res.status != 200:
+                if res.status in [401, 403]:
+                    raise Exception("Invalid API key")
+                elif res.status == 429:
+                    raise Exception("Rate limit exceeded")
+                # Login not found
+                return None
+            return await res.json()
 
     async def _parse_relation(self, user: dict) -> str | None:
         """Parse user relations and return year, programee and faculty for students,
