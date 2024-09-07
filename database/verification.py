@@ -92,14 +92,14 @@ class ValidPersonDB(database.base):  # type: ignore
         session.commit()
 
     @classmethod
-    def get_all_persons(cls) -> List[ValidPersonDB]:
-        return session.query(ValidPersonDB).all()
+    def get_all_vut_persons(cls) -> List[ValidPersonDB]:
+        return session.query(cls).filter(cls.year != "MUNI").all()
 
     @classmethod
     def get_user_with_status(
         cls, login: str, status: int = VerifyStatus.InProcess.value
     ) -> Optional[ValidPersonDB]:
-        """ "Finds login from database and checks if status is correct"""
+        """Finds login from database and checks if status is correct"""
         user = (
             session.query(ValidPersonDB)
             .filter(ValidPersonDB.login == login, ValidPersonDB.status == status)
@@ -122,7 +122,7 @@ class ValidPersonDB(database.base):  # type: ignore
         return user
 
     def save_verified(self, discord_id: str) -> None:
-        """ "Inserts login with discord name into database"""
+        """Inserts login with discord name into database"""
         PermitDB.add_user(login=self.login, discord_ID=discord_id)
         self.status = 0
         session.commit()

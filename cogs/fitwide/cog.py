@@ -380,8 +380,7 @@ class FitWide(Base, commands.Cog):
         await inter.send(MessagesCZ.update_db_start)
         message = await inter.original_response()
 
-        all_persons = ValidPersonDB.get_all_persons()
-        persons_count = len(all_persons)
+        all_persons = ValidPersonDB.get_all_vut_persons()
         dropout_count = 0
 
         if continue_from_login:
@@ -390,12 +389,13 @@ class FitWide(Base, commands.Cog):
                     all_persons = all_persons[index:]
                     break
 
+        persons_count = len(all_persons)
         for index, person in enumerate(all_persons):
             if (index % 50) == 0:
                 progress_bar = utils.general.create_bar(index, persons_count)
                 await message.edit(MessagesCZ.update_db_progress(progress_bar=progress_bar))
 
-            if (index % 10) == 0:
+            if (index % 8) == 0:
                 # The simplest solution we could think of so that we don't hit rate limit
                 await asyncio.sleep(60)
 
