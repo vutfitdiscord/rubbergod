@@ -69,7 +69,7 @@ async def set_channel_permissions_for_new_students(
             await channel.set_permissions(mit0, read_messages=True)
 
     # skolni-info, cvicici-info, stream-links, senat-unie-drby room overwrites
-    channel_names = ["skolni-info", "cvicici-info", "stream-links", "senat-unie-drby", "bp-szz", "dp-szz"]
+    channel_names = ["skolni-info", "vyucujici-info", "stream-links", "senat-unie-drby", "bp-szz", "dp-szz"]
     channels = [disnake.utils.get(guild.channels, name=channel_name) for channel_name in channel_names]
     for channel in channels:
         await channel.set_permissions(bit0, read_messages=True)
