@@ -41,6 +41,7 @@ class VerifyWithResendButtonView(VerifyView):
         custom_id="verify:missing_code",
     )
     async def missing_code(self, button: disnake.ui.Button, inter: disnake.MessageInteraction):
+        await inter.response.defer()
         service = verification.Verification(inter.bot)
         await service.resend_code(self.login, inter)
 
