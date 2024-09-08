@@ -126,7 +126,7 @@ class Verification(BaseFeature):
     async def send_code_vut(self, login: str, inter: disnake.ApplicationCommandInteraction) -> bool:
         user = await self.helper.check_api(login)
         if user is None:
-            inter.send(MessagesCZ.invalid_login(user=login, admin=config.admin_ids[0]))
+            await inter.send(MessagesCZ.invalid_login(user=inter.author.id, admin=config.admin_ids[0]))
             return False
 
         if user.status == VerifyStatus.Unverified.value:
@@ -227,7 +227,7 @@ class Verification(BaseFeature):
 
     async def finish_verify(self, inter: disnake.ModalInteraction, code: str, login: str) -> None:
         if await self.helper.has_role(inter.user, config.verification_role):
-            inter.response.send_message(
+            await inter.response.send_message(
                 MessagesCZ.verify_already_verified(user=inter.user.id, admin=config.admin_ids[0])
             )
             return
