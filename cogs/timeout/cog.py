@@ -246,7 +246,7 @@ class Timeout(Base, commands.Cog):
         """
         await features.time_check(inter.created_at, endtime.utc)
 
-        if inter.guild.me.top_role > inter.author.top_role:
+        if inter.guild.me.top_role < inter.author.top_role:
             await inter.send(content=MessagesCZ.missing_permission(users=inter.user.mention), ephemeral=True)
             return
 
