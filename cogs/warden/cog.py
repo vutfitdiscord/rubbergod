@@ -4,7 +4,6 @@ Cog for repost detection.
 
 # stolen from rubbergoddess
 import asyncio
-import logging
 import time
 
 import dhash
@@ -21,7 +20,6 @@ from . import features
 from .messages_cz import MessagesCZ
 
 dhash.force_pil()
-rubbegod_logger = logging.getLogger("rubbergod")
 
 
 class Warden(Base, commands.Cog):
@@ -87,7 +85,7 @@ class Warden(Base, commands.Cog):
                     await orig.remove_reaction("🤷🏻", self.bot.user)
                     await orig.remove_reaction("🤔", self.bot.user)
                 except Exception as e:
-                    rubbegod_logger.warning("Warden:handle_reaction", "Could not remove bot's emote", e)
+                    self.bot.logger.warning("Warden:handle_reaction", "Could not remove bot's emote", e)
                 try:
                     await message.delete()
                 except disnake.errors.NotFound:
