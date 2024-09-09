@@ -1,3 +1,5 @@
+import logging
+
 import disnake
 from disnake.ext import commands
 
@@ -12,6 +14,8 @@ CATEGORIES_NAMES = [
     "zimni magistersky semestr 1", "letni magistersky semestr 1",
     "zimni magistersky semestr 2", "letni magistersky semestr 2",
 ]  # fmt: skip
+
+rubbergod_logger = logging.getLogger("rubbergod")
 
 
 async def send_masstag_messages(ctx: commands.Context, prefix: str, target_ids: list[int]) -> None:
@@ -225,14 +229,20 @@ async def get_members_with_unmatching_year(
 
         correct_role = disnake.utils.get(guild.roles, name=year)
 
+        if correct_role not in year_roles.values():
+            rubbergod_logger.error(f"Unexpected correct_role found {member.id}, {correct_role}, {year}")
+            continue
+
         if correct_role not in member.roles:
             for role in year_roles.values():
-                if role in member.roles and correct_role in unmatching_members[role].keys():
+                if role in member.roles:
                     unmatching_members[role][correct_role].append(member)
                     break
-                elif not (
-                    correct_role == dropout and any(role in member.roles for role in dropout_alternatives)
-                ):
-                    unmatching_members[dropout][correct_role].append(member)
+            else:
+                if correct_role == dropout and any(role in member.roles for role in dropout_alternatives):
+                    # if the desired role is dropout but the user has a dropout alternative role then skip
+                    continue
+                # otherwise just add them to the dropout -> correct_role list
+                unmatching_members[dropout][correct_role].append(member)
 
     return unmatching_members
