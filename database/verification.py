@@ -5,6 +5,7 @@ from enum import IntEnum
 from typing import List, Optional
 
 from sqlalchemy import Boolean, Column, Integer, String, asc, exists
+from sqlalchemy.orm.exc import MultipleResultsFound
 
 from database import database, session
 
@@ -25,8 +26,12 @@ class PermitDB(database.base):  # type: ignore
 
     @classmethod
     def get_user_by_id(cls, discord_ID: str) -> Optional[PermitDB]:
-        user = session.query(PermitDB).filter(PermitDB.discord_ID == str(discord_ID)).one_or_none()
-        return user
+        try:
+            user = session.query(PermitDB).filter(PermitDB.discord_ID == str(discord_ID)).one_or_none()
+            return user
+        except MultipleResultsFound:
+            # Temporary fix so that people with multiple logins associated don't break everything
+            return None
 
     @classmethod
     def get_user_by_login(cls, login: str) -> Optional[PermitDB]:
