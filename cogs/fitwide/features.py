@@ -186,7 +186,19 @@ async def get_members_with_unmatching_year(
 
     dropout_alternatives = [survivor, king]
 
-    years = ["0BIT", "1BIT", "2BIT", "3BIT+", "0MIT", "1MIT", "2MIT+", "Doktorand", "VUT", "Dropout"]
+    years = [
+        "0BIT",
+        "1BIT",
+        "2BIT",
+        "3BIT+",
+        "0MIT",
+        "1MIT",
+        "2MIT+",
+        "Doktorand",
+        "Vyucujici/Zamestnanec",
+        "VUT",
+        "Dropout",
+    ]
 
     year_roles = {year: disnake.utils.get(guild.roles, name=year) for year in years}
 
