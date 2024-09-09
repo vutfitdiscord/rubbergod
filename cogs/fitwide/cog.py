@@ -416,19 +416,20 @@ class FitWide(Base, commands.Cog):
     @verify_db.sub_command(name="get_login", description=MessagesCZ.get_login_brief)
     async def get_login(self, inter: disnake.ApplicationCommandInteraction, member: disnake.User):
         await inter.response.defer()
-        result = PermitDB.get_user_by_id(member.id)
+        results = PermitDB.get_all_users_by_id(member.id)
 
-        if result is None:
+        if not results:
             await inter.edit_original_response(MessagesCZ.login_not_found)
             return
 
-        person = ValidPersonDB.get_user_by_login(result.login)
+        for result in results:
+            person = ValidPersonDB.get_user_by_login(result.login)
 
-        if person is None:
-            await inter.edit_original_response(result.login)
-            return
+            if person is None:
+                await inter.send(result.login)
+                return
 
-        await inter.edit_original_response(MessagesCZ.get_user_format(p=person))
+            await inter.send(MessagesCZ.get_user_format(p=person))
 
     @verify_db.sub_command(name="get_user", description=MessagesCZ.get_user_brief)
     async def get_user(
