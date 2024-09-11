@@ -28,7 +28,7 @@ class MessagesCZ(GlobalMessages):
     update_db_start = "Aktualizuji databázi..."
     update_db_progress = "Progress: {progress_bar}."
     update_db_done = "Aktualizace databáze proběhla úspěšně. Nalezeno {dropout_count} nových dropout."
-    update_db_brief = "Aktualizuje data pro login"
+    update_db_single_brief = "Aktualizuje data pro login"
     update_db_single_login = "Login který aktualizovat"
     update_db_single_no_login = "Nebyl zadán login"
     update_db_single_done = "Aktualizace databáze uživatele proběhla úspěšně."
