@@ -367,7 +367,7 @@ class FitWide(Base, commands.Cog):
     async def verify_db(self, inter: disnake.ApplicationCommandInteraction):
         pass
 
-    @verify_db.sub_command(name="update", description=MessagesCZ.update_db_single_brief)
+    @verify_db.sub_command(name="update_single", description=MessagesCZ.update_db_single_brief)
     async def update_db_single(
         self,
         inter: disnake.ApplicationCommandInteraction,
@@ -390,7 +390,6 @@ class FitWide(Base, commands.Cog):
             await message.reply(MessagesCZ.update_db_not_in_db)
             return
 
-        self.bot.logger.info(f"Checking {person.login}")
         updated_person = await self.helper.check_api(person.login)
         if updated_person is None:
             if person.year != "MUNI" and person.year != "dropout":
