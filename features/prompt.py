@@ -14,6 +14,7 @@ class PromptSession:
         message: str,
         timeout=60,
         color=disnake.Color.orange(),
+        delete_after=True,
     ):
         self.bot = bot
         self.inter = inter
@@ -21,6 +22,7 @@ class PromptSession:
         self.message = message
         self.color = color
         self.timeout = timeout
+        self.delete_after = delete_after
 
         self.__running = False
         self.__prompt_instance = None
@@ -35,7 +37,7 @@ class PromptSession:
         em.description = self.message
 
         self.__running = True
-        await self.inter.send(embed=em)
+        await self.inter.edit_original_response(embed=em)
         self.__prompt_instance = await self.inter.original_message()
 
         for react in self.reactions.keys():
@@ -76,6 +78,10 @@ class PromptSession:
 
     async def __close(self):
         self.__running = False
+        if not self.delete_after:
+            await self.__prompt_instance.clear_reactions()
+            await self.__prompt_instance.edit(embed=None)
+            return
         try:
             await asyncio.sleep(1)
             await self.__prompt_instance.delete()
