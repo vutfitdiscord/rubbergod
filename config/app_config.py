@@ -65,6 +65,7 @@ class Config:
     submod_role: int = get_attr(toml_dict, "base", "submod_role")
     helper_role: int = get_attr(toml_dict, "base", "helper_role")
     teacher_roles: List[int] = get_attr(toml_dict, "base", "teacher_roles")
+    newbie_role: int = get_attr(toml_dict, "base", "newbie_role")
 
     # Verification
     verification_role: str = get_attr(toml_dict, "verification", "role")

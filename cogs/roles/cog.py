@@ -252,3 +252,7 @@ class Roles(Base, commands.Cog):
                     f"{utils.general.create_bar(index+1, len(members))}"
                 )
         await inter.edit_original_response(MessagesCZ.remove_exclusive_roles_done)
+
+    @commands.Cog.listener()
+    async def on_member_join(self, member: disnake.Member):
+        await member.add_roles(member.guild.get_role(Base.config.newbie_role))

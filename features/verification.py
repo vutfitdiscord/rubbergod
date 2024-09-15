@@ -322,4 +322,5 @@ class Verification(BaseFeature):
 
         verify = disnake.utils.get(guild.roles, name="Verify")
         zajemce = disnake.utils.get(guild.roles, name="ZajemceoStudium")
-        await member.remove_roles(host, verify, zajemce, reason="Reverify user")
+        newbie = member.guild.get_role(config.newbie_role)
+        await member.remove_roles(host, verify, zajemce, newbie, reason="Verify user")
