@@ -13,11 +13,13 @@ from disnake.ext import commands
 import utils
 from cogs.base import Base
 from database.verification import PermitDB, ValidPersonDB, VerifyStatus
+from features.prompt import PromptSession
 from features.verification import Verification
 from features.verify_helper import VerifyHelper
 from permissions import permission_check, room_check
 from rubbergod import Rubbergod
 from utils import cooldowns
+from utils.general import edit_msg
 
 from . import features
 from .messages_cz import MessagesCZ
@@ -510,16 +512,34 @@ class FitWide(Base, commands.Cog):
     ):
         await inter.response.defer()
         result = ValidPersonDB.get_user_by_login(login)
-        if result is None:
-            await inter.edit_original_response(MessagesCZ.invalid_login)
-        else:
-            try:
-                PermitDB.add_user(login, str(member.id))
-            except Exception:
-                await inter.edit_original_response(MessagesCZ.login_already_exists)
-                return
-            result.change_status(VerifyStatus.Verified.value)
-            await inter.edit_original_response(MessagesCZ.action_success)
+
+        if result is None:  # user not found in DB
+            await inter.edit_original_response(MessagesCZ.login_not_found)
+            orig_msg = await edit_msg(inter, MessagesCZ.login_not_found, MessagesCZ.getting_info_from_api)
+            # Check VUT API if login is valid
+            result = await self.helper.check_api(login)
+            if result is None:  # login not found in VUT API
+                orig_msg = await edit_msg(inter, orig_msg, MessagesCZ.invalid_login)
+                # Prompt user to confirm if they want to add the login even if it's invalid
+                # This may be useful if the user is not in the VUT API yet
+                prompt_result = await PromptSession(
+                    self.bot,
+                    inter,
+                    MessagesCZ.link_login_prompt(login=login, user=member.mention),
+                    60,
+                    delete_after=False,
+                ).run()
+                if not prompt_result:
+                    return  # User didn't confirm
+                # User confirmed, add the login to the DB; we don't know the year yet
+                result = ValidPersonDB.add_user(login, "", VerifyStatus.Unverified.value)
+        try:
+            PermitDB.add_user(login, str(member.id))
+        except Exception:
+            await inter.edit_original_response(MessagesCZ.login_already_exists)
+            return
+        result.change_status(VerifyStatus.Verified.value)
+        await inter.edit_original_response(MessagesCZ.action_success)
 
     @cooldowns.default_cooldown
     @commands.check(room_check.is_in_modroom)

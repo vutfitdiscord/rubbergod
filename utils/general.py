@@ -227,3 +227,10 @@ async def get_message_from_url(bot: Rubbergod, message_url: str) -> disnake.Mess
         return message
     except disnake.NotFound:
         return None
+
+
+async def edit_msg(inter: disnake.ApplicationCommandInteraction, original_msg: str, new_msg: str) -> str:
+    """Append new string to the original message and send"""
+    new_msg = f"{original_msg}\n{new_msg}"
+    await inter.edit_original_response(new_msg)
+    return new_msg
