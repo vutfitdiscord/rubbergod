@@ -255,5 +255,5 @@ class Roles(Base, commands.Cog):
 
     @commands.Cog.listener()
     async def on_member_join(self, member: disnake.Member):
-        if member.guild == Base.config.guild_id:  # We're on VUT FIT guild
+        if member.guild.id == Base.config.guild_id:  # We're on VUT FIT guild
             await member.add_roles(member.guild.get_role(Base.config.newbie_role))
