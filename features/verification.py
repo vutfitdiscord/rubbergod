@@ -315,12 +315,9 @@ class Verification(BaseFeature):
         """Removes host roles (Host, Zajemce o studium, Verify)"""
         guild = self.bot.get_guild(config.guild_id)
         member = inter.user if isinstance(inter.user, disnake.Member) else guild.get_member(inter.user.id)
+
+        newbie = disnake.utils.get(guild.roles, id=config.newbie_role)
         host = disnake.utils.get(guild.roles, name="Host")
-
-        if host not in member.roles:
-            return
-
         verify = disnake.utils.get(guild.roles, name="Verify")
         zajemce = disnake.utils.get(guild.roles, name="ZajemceoStudium")
-        newbie = disnake.utils.get(guild.roles, id=config.newbie_role)
-        await member.remove_roles(host, verify, zajemce, newbie, reason="Verify user")
+        await member.remove_roles(host, newbie, verify, zajemce, reason="Verify user")
