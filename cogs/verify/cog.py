@@ -137,9 +137,11 @@ class Verify(Base, commands.Cog):
         await inter.response.defer()
         host_id = inter.guild.get_role(self.config.verification_host_id)
         verify_id = inter.guild.get_role(self.config.verification_role_id)
+        newbie_id = inter.guild.get_role(self.config.newbie_role)
 
         # check if user is still on server
         try:
+            await member.remove_roles(newbie_id)
             await member.add_roles(host_id, verify_id)
         except AttributeError:
             raise commands.errors.MemberNotFound("Member not found")

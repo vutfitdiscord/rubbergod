@@ -41,6 +41,8 @@ class DynamicVerifyManager(BaseFeature):
         roles = [guild.get_role(role_id) for role_id in role_ids]
         await self.log_attempt(rule, inter, user_id)
         member = await guild.get_or_fetch_member(user_id)
+        newbie = guild.get_role(config.newbie_role)
+        await member.remove_roles(newbie)
         for role in list(filter(lambda x: x is not None, roles)):
             await member.add_roles(role, reason=f"Dynamic verification - Rule {rule.name} ({rule.id})")
 
