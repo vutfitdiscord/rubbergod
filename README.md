@@ -38,7 +38,7 @@ Then click on the __Bot__ tab on the left and scroll down to the __Privileged Ga
 Start by cloning the repo:
 
 ```bash
-git clone https://github.com/Toaster192/rubbergod.git
+git clone https://github.com/vutfitdiscord/rubbergod.git
 cd rubbergod
 ```
 
