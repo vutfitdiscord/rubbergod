@@ -347,12 +347,13 @@ Cog implementing review system for subjects.\
 Cog implementing channels and roles management. Copying/creating channels with permissions.\
 **Commands:**
 
-    - /add_channels_description
+    - /move_category
     - /channel copy
     - /channel clone
     - /channel create
+    - /channel add_channels_description
     - /channel get_overwrites
-    - /channel overwrite_to_role
+    - /channel overwrites_to_role
     - /channel role_to_overwrites
     - /remove_exclusive_roles
 ---

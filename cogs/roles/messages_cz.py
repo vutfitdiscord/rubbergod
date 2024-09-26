@@ -23,6 +23,9 @@ class MessagesCZ(GlobalMessages):
     remove_exclusive_roles_done = "Úspěšně odstraněny konflikty rolí"
     role_to_remove_param = "Role, která se má odstranit"
 
+    move_category_brief = "Přesune kategorii pod vybranou kategorii"
+    move_category_done = "Kategorie `{move_category}` byla přesunuta pod kategorii `{under_category}`"
+
     channel_copy_start = "Probíhá kopírování kanálu"
     channel_copy_done = "Práva byla zkopírována."
     channel_clone_start = "Probíhá klonování kanálu"
