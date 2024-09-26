@@ -22,48 +22,18 @@ class Roles(Base, commands.Cog):
         self.bot = bot
 
     @commands.check(permission_check.mod_plus)
-    @commands.slash_command(
-        name="add_channels_description",
-        description=MessagesCZ.channel_add_description_brief,
-        guild_ids=[Base.config.guild_id],
-    )
-    async def add_channels_description(
+    @commands.slash_command(name="move_category", description=MessagesCZ.move_category_brief)
+    async def move_category(
         self,
         inter: disnake.ApplicationCommandInteraction,
-        rate: int = commands.Param(ge=1, default=10, description=MessagesCZ.channel_rate_param),
+        move_category: disnake.CategoryChannel,
+        under_category: disnake.CategoryChannel,
     ):
-        await inter.send(MessagesCZ.channel_add_topic_start)
-        message = await inter.original_message()
-        for index, channel in enumerate(inter.guild.channels):
-            if channel.type != disnake.ChannelType.text:
-                continue
-
-            if index % rate == 0:
-                progress_bar = utils.general.create_bar(index + 1, len(inter.guild.channels))
-                await message.edit(
-                    MessagesCZ.channel_add_topic_progress(
-                        index=index + 1,
-                        total=len(inter.guild.channels),
-                        progress_bar=progress_bar,
-                        channel=channel.mention,
-                    )
-                )
-
-            is_private = "-" in channel.name
-            name = channel.name.split("-")[0] if is_private else channel.name
-            subject_name = SubjectDetailsDB.get(name)
-            if not subject_name:
-                continue
-
-            private_name = f"{subject_name}, but " + "-".join(channel.name.split("-")[1:])
-            if channel.topic:
-                if channel.topic != subject_name and channel.topic != private_name:
-                    await self.log_channel.send(
-                        MessagesCZ.channel_different_topic(channel=channel, topic=subject_name)
-                    )
-            else:
-                await channel.edit(topic=subject_name if not is_private else private_name)
-        await message.edit(MessagesCZ.channel_add_topic_done)
+        await inter.response.defer()
+        await move_category.edit(position=under_category.position + 1)
+        await inter.edit_original_response(
+            MessagesCZ.move_category_done(move_category=move_category, under_category=under_category)
+        )
 
     @commands.check(permission_check.mod_plus)
     @commands.slash_command(name="channel", guild_ids=[Base.config.guild_id])
@@ -120,6 +90,50 @@ class Roles(Base, commands.Cog):
         await inter.edit_original_response(
             MessagesCZ.channel_create_done(channel=channel.mention, role=role.name, perms=len(role.members))
         )
+
+    @commands.check(permission_check.mod_plus)
+    @channel.sub_command(
+        name="add_channels_description",
+        description=MessagesCZ.channel_add_description_brief,
+        guild_ids=[Base.config.guild_id],
+    )
+    async def add_channels_description(
+        self,
+        inter: disnake.ApplicationCommandInteraction,
+        rate: int = commands.Param(ge=1, default=10, description=MessagesCZ.channel_rate_param),
+    ):
+        await inter.send(MessagesCZ.channel_add_topic_start)
+        message = await inter.original_message()
+        for index, channel in enumerate(inter.guild.channels):
+            if channel.type != disnake.ChannelType.text:
+                continue
+
+            if index % rate == 0:
+                progress_bar = utils.general.create_bar(index + 1, len(inter.guild.channels))
+                await message.edit(
+                    MessagesCZ.channel_add_topic_progress(
+                        index=index + 1,
+                        total=len(inter.guild.channels),
+                        progress_bar=progress_bar,
+                        channel=channel.mention,
+                    )
+                )
+
+            is_private = "-" in channel.name
+            name = channel.name.split("-")[0] if is_private else channel.name
+            subject_name = SubjectDetailsDB.get(name)
+            if not subject_name:
+                continue
+
+            private_name = f"{subject_name}, but " + "-".join(channel.name.split("-")[1:])
+            if channel.topic:
+                if channel.topic != subject_name and channel.topic != private_name:
+                    await self.log_channel.send(
+                        MessagesCZ.channel_different_topic(channel=channel, topic=subject_name)
+                    )
+            else:
+                await channel.edit(topic=subject_name if not is_private else private_name)
+        await message.edit(MessagesCZ.channel_add_topic_done)
 
     @channel.sub_command(name="get_overwrites", description=MessagesCZ.channel_get_overwrites_brief)
     async def get_overwrites(
