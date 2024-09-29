@@ -97,7 +97,7 @@ Then, create the following 5 channels (or use one channel for all of them) on yo
 
 --------------------------------------
 
-### Docker setup (recommended)
+### Environment setup
 
 Install Docker & Docker Compose V2 by going to their [official documentation](https://docs.docker.com/engine/install/). Just select your OS and follow the steps.
 
@@ -163,33 +163,6 @@ Database-related tips can be found in [database README](database/README.md).
 
 List with all cogs, their commands and tasks can be found in [cog README](cogs/README.md).
 
---------------------------------------
-
-### Local setup (not recommended)
-
-Install the required Python modules (`venv` / `--user` flag recommended):
-
-```bash
-pip3 install -r requirements.txt
-```
-
-Run the bot (might want to use `nohup` or something):
-
-```bash
-python3 main.py
-```
-
-#### Required/recommended packages (apt)
-
-```bash
-git
-python3.8
-python3.8-dev
-python3-pip
-postgresql
-postgresql-contrib
-libpq-dev
-```
 --------------------------------------
 
 ## Contribution
