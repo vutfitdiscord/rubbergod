@@ -107,8 +107,9 @@ async def get_teacher_perms_list(
     perms_list = None
 
     if channel_teachers:
-        perms_list = f"**===== {channel.name.upper()}: {channel.mention} =====**\n"
+        perms_list = f"**===== {channel.name.upper()}: {channel.mention} =====**"
         for teacher in channel_teachers:
+            perms_list += "\n"
             perms_list += f"- {teacher.mention} ({teacher.display_name})"
             user = ValidPersonDB.get_user_by_id(teacher.id)
             if user:
@@ -116,7 +117,6 @@ async def get_teacher_perms_list(
                 last_name, first_name = user.name.split(" ")
                 if first_name and last_name:
                     perms_list += f" - {first_name} {last_name}"
-            perms_list += "\n"
 
     return perms_list
 
@@ -142,14 +142,14 @@ async def update_teacher_info(
     async for message in teacher_info_channel.history():
         if channel.name.upper() in message.content:
             old_perms_list = message.content
-            if new_perms_list:
+            if new_perms_list is None:  # Channel had listing but now it's empty
+                await message.delete()
+            elif new_perms_list != old_perms_list:  # Channel had listing and it's different
                 if message.author == channel.guild.me:  # Can edit only my own messages
                     await message.edit(content=new_perms_list)
                 else:  # If not mine, delete and resend
                     await message.delete()
                     await send_teacher_info(new_perms_list, teacher_info_channel)
-            else:  # Channel had listing but now it's empty
-                await message.delete()
             return old_perms_list, new_perms_list
 
     # Channel had no listing yet
