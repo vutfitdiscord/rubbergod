@@ -624,7 +624,11 @@ class FitWide(Base, commands.Cog):
         self, before: disnake.abc.GuildChannel, after: disnake.abc.GuildChannel
     ) -> None:
         """Update teacher info channel on permissions change"""
-        if before.overwrites != after.overwrites and after.category.name in features.CATEGORIES_NAMES:
+        if (
+            before.overwrites != after.overwrites
+            and after.category is not None
+            and after.category.name in features.CATEGORIES_NAMES
+        ):
             perms_list_before, perms_list_after = await features.update_teacher_info(
                 after, self.teacher_info_channel
             )
