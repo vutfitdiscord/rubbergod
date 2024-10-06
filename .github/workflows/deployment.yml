@@ -23,6 +23,28 @@ jobs:
           username: ${{ secrets.PRODUCTION_USERNAME }}
           port: 22
           script: |
+            echo "================== Lock Mutex =================="
+            LOCK="/tmp/deployment.lock"
+
+            remove_lock()
+            {
+                rm -f "$LOCK"
+            }
+
+            acquire_failed()
+            {
+                echo "Failed to acquire lock, perphaps a stale deployment is running requiring manual fix?"
+                exit 1
+            }
+
+            # !IMPORTANT: For this to work, the remote server has to have `procmail` installed.
+            # Try to lock 5 times with a 60s sleep time between retries
+            # Remove any lock older than 10min (600s) and then wait 30s
+            lockfile -60 -r 5 -l 600 -s 30 "$LOCK" || acquire_failed
+
+            # Remove lock on exit
+            trap remove_lock EXIT
+
             echo "================== Pull Changes =================="
             cd rubbergod
             git pull
