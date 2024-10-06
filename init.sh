@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e # Exit on error
+
 DEFAULT_UID=$(id -u)
 DEFAULT_GID=$(id -g)
 
