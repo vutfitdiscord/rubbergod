@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     environment: Production
     needs: pre_commit_ci
-    if: github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/main' && !contains(github.event.pull_request.labels.*.name, 'no-deployment')
     steps:
       - name: Execute deployment on SSH
         uses: appleboy/ssh-action@v1.0.3
