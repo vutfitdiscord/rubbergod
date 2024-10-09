@@ -16,7 +16,7 @@ jobs:
     if: github.ref == 'refs/heads/main' && !contains(github.event.pull_request.labels.*.name, 'no-deployment')
     steps:
       - name: Execute deployment on SSH
-        uses: appleboy/ssh-action@v1.0.3
+        uses: appleboy/ssh-action@v1.1.0
         with:
           host: ${{ secrets.PRODUCTION_HOST }}
           key: ${{ secrets.PRODUCTION_SSH_KEY }}
