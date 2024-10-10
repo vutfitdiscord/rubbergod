@@ -143,7 +143,7 @@ class Review(Base, commands.Cog):
 
     @cooldowns.short_cooldown
     @commands.slash_command(name="subject")
-    @commands.check(permission_check.is_bot_admin)
+    @permission_check.is_bot_admin()
     async def subject(self, inter: disnake.ApplicationCommandInteraction):
         """Group of commands for managing subjects in DB"""
         await inter.response.defer()

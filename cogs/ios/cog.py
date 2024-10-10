@@ -33,7 +33,7 @@ class IOS(Base, commands.Cog):
     async def _ios(self, inter: disnake.ApplicationCommandInteraction):
         pass
 
-    @commands.check(permission_check.is_bot_admin)
+    @permission_check.is_bot_admin()
     @_ios.sub_command(name="start", description=MessagesCZ.task_start_brief)
     async def ios_task_start(self, inter: disnake.ApplicationCommandInteraction):
         try:
@@ -42,7 +42,7 @@ class IOS(Base, commands.Cog):
         except RuntimeError:
             await inter.send(MessagesCZ.task_start_already_set)
 
-    @commands.check(permission_check.is_bot_admin)
+    @permission_check.is_bot_admin()
     @_ios.sub_command(name="stop", description=MessagesCZ.task_stop_brief)
     async def ios_task_stop(self, inter: disnake.ApplicationCommandInteraction):
         if self.ios_task.is_running():
@@ -51,7 +51,7 @@ class IOS(Base, commands.Cog):
         else:
             await inter.send(MessagesCZ.task_nothing_to_stop)
 
-    @commands.check(permission_check.is_bot_admin)
+    @permission_check.is_bot_admin()
     @_ios.sub_command(name="cancel", description=MessagesCZ.task_cancel_brief)
     async def ios_task_cancel(self, inter: disnake.ApplicationCommandInteraction):
         if self.ios_task.is_running():

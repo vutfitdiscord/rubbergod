@@ -27,7 +27,7 @@ class DynamicConfig(Base, commands.Cog):
         super().__init__()
         self.bot = bot
 
-    @commands.check(permission_check.is_bot_admin)
+    @permission_check.is_bot_admin()
     @commands.slash_command(name="config")
     async def config_cmd(self, inter: disnake.ApplicationCommandInteraction):
         """
