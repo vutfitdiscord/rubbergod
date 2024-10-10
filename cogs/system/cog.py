@@ -15,7 +15,7 @@ from cogs.base import Base
 from database.error import ErrorLogDB
 from features.error import ErrorLogger
 from features.git import Git
-from permissions import permission_check
+from permissions.permission_check import PermissionsCheck
 from rubbergod import Rubbergod
 from utils import cooldowns
 from utils.colors import RubbergodColors
@@ -43,7 +43,7 @@ class System(Base, commands.Cog):
         if not start_streak:
             ErrorLogDB.set()
 
-    @commands.check(permission_check.is_bot_admin)
+    @PermissionsCheck.is_bot_admin()
     @commands.slash_command(name="get_logs", description=MessagesCZ.get_logs_brief)
     async def get_logs(
         self,
@@ -83,7 +83,7 @@ class System(Base, commands.Cog):
 
         await inter.send(files=files)
 
-    @commands.check(permission_check.is_bot_admin)
+    @PermissionsCheck.is_bot_admin()
     @commands.slash_command(name="shutdown", description=MessagesCZ.shutdown_brief)
     async def shutdown(self, inter: disnake.ApplicationCommandInteraction):
         await inter.send("Shutting down...")
@@ -92,7 +92,7 @@ class System(Base, commands.Cog):
         await self.bot.vutapi_session.close()
         await self.bot.close()
 
-    @commands.check(permission_check.is_bot_admin)
+    @PermissionsCheck.is_bot_admin()
     @commands.slash_command(name="cogs", description=MessagesCZ.cogs_brief, guild_ids=[Base.config.guild_id])
     async def cogs(self, inter: disnake.ApplicationCommandInteraction):
         """
@@ -165,7 +165,7 @@ class System(Base, commands.Cog):
         await inter.edit_original_response(embed=embed)
 
     @cooldowns.default_cooldown
-    @commands.check(permission_check.is_bot_admin)
+    @PermissionsCheck.is_bot_admin()
     @commands.slash_command(name="command_checks", description=MessagesCZ.command_checks_brief)
     async def command_checks(self, inter: disnake.ApplicationCommandInteraction):
         await inter.response.defer()

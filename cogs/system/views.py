@@ -3,7 +3,7 @@ import logging
 import disnake
 
 from buttons.base import BaseView
-from permissions import permission_check
+from permissions.permission_check import PermissionsCheck
 from rubbergod import Rubbergod
 
 from . import features
@@ -46,7 +46,7 @@ class View(BaseView):
             pass
 
     async def interaction_check(self, inter: disnake.Interaction) -> bool:
-        if permission_check.is_bot_admin(inter):
+        if PermissionsCheck.is_bot_admin(inter):
             return True
         return False
 
@@ -96,7 +96,7 @@ class Dropdown(disnake.ui.Select):
     async def callback(self, inter: disnake.MessageInteraction) -> None:
         """React to user selecting cog(s)."""
         await inter.response.defer()
-        if not permission_check.is_bot_admin(inter):
+        if not PermissionsCheck.is_bot_admin(inter):
             return
 
         unloadable = [cog for cog in self.unloadable_cogs if cog in self.values]

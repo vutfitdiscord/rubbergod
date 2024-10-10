@@ -1,7 +1,5 @@
 """All checks for role and user permissions"""
 
-from typing import Union
-
 import disnake
 from disnake.ext import commands
 
@@ -20,22 +18,44 @@ class NotAdminError(commands.CommandError):
         self.message = Messages.bot_admin_only
 
 
-def is_bot_admin(
-    ctx: Union[commands.Context, disnake.ApplicationCommandInteraction], raise_exception: bool = True
+class PermissionsCheck:
+    """Class containing methods to check permissions"""
+
+    @staticmethod
+    def is_bot_admin(
+        ctx: commands.Context | disnake.ApplicationCommandInteraction = None, raise_exception: bool = True
+    ) -> bool:
+        """
+        Check if the user is a bot admin. Works as a function or a command decorator.
+
+        When `ctx` is passed, it works as a function.
+        When `ctx` is not passed, it acts as a decorator for a command.
+
+        Throws `NotAdminError` if user is not an admin.
+        If `raise_exception=False` this function returns only boolean value and doesn't raise exception.
+        """
+
+        def predicate(ctx: commands.Context | disnake.ApplicationCommandInteraction) -> bool:
+            if ctx.author.id in config.admin_ids:
+                return True
+            if not raise_exception:
+                return False
+            raise NotAdminError
+
+        if ctx:
+            # If ctx is passed, return the result of the predicate
+            return predicate(ctx)
+        else:
+            # If ctx is not passed, act as a decorator for command
+            return commands.check(predicate)
+
+
+def role_check(
+    ctx: commands.Context | disnake.ApplicationCommandInteraction,
+    roles,
+    MissingPermission,
+    raise_exception: bool = True,
 ):
-    """
-    Check if user is bot admin.
-    if raise_exception=False return False instead of raising error
-    """
-    if ctx.author.id in config.admin_ids:
-        return True
-
-    if not raise_exception:
-        return False
-    raise NotAdminError
-
-
-def role_check(ctx, roles, MissingPermission, raise_exception=True):
     """
     Check if user has permission for command.
     if raise_exception=False return False instead of raising error
@@ -61,7 +81,7 @@ class NotHelperPlusError(commands.CommandError):
         self.message = Messages.helper_plus_only
 
 
-def helper_plus(ctx, raise_exception=True):
+def helper_plus(ctx: commands.Context | disnake.ApplicationCommandInteraction, raise_exception: bool = True):
     """Check if user has permission for command helper or above."""
     return role_check(ctx, allowed_roles, NotHelperPlusError, raise_exception)
 
@@ -75,7 +95,7 @@ class NotSubmodPlusError(commands.CommandError):
         self.message = Messages.submod_plus_only
 
 
-def submod_plus(ctx, raise_exception=True):
+def submod_plus(ctx: commands.Context | disnake.ApplicationCommandInteraction, raise_exception: bool = True):
     """Check if user has permission for command submod or above."""
     return role_check(ctx, allowed_roles[:-1], NotSubmodPlusError, raise_exception)
 
@@ -89,6 +109,6 @@ class NotModPlusError(commands.CommandError):
         self.message = Messages.mod_plus_only
 
 
-def mod_plus(ctx, raise_exception=True):
+def mod_plus(ctx: commands.Context | disnake.ApplicationCommandInteraction, raise_exception: bool = True):
     """Check if user has permission for command mod or above."""
     return role_check(ctx, allowed_roles[:-2], NotModPlusError, raise_exception)

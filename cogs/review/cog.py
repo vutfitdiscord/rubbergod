@@ -12,7 +12,7 @@ import utils
 from buttons.embed import PaginationView
 from cogs.base import Base
 from database.review import ProgrammeDB, ReviewDB, SubjectDB, SubjectDetailsDB
-from permissions import permission_check
+from permissions.permission_check import PermissionsCheck
 from rubbergod import Rubbergod
 from utils import cooldowns
 
@@ -116,7 +116,7 @@ class Review(Base, commands.Cog):
         """
         await inter.response.defer()
         if id is not None:
-            if permission_check.is_bot_admin(inter, False):
+            if PermissionsCheck.is_bot_admin(inter, False):
                 review = ReviewDB.get_review_by_id(id)
                 if review:
                     review.remove()
@@ -143,7 +143,7 @@ class Review(Base, commands.Cog):
 
     @cooldowns.short_cooldown
     @commands.slash_command(name="subject")
-    @commands.check(permission_check.is_bot_admin)
+    @PermissionsCheck.is_bot_admin()
     async def subject(self, inter: disnake.ApplicationCommandInteraction):
         """Group of commands for managing subjects in DB"""
         await inter.response.defer()

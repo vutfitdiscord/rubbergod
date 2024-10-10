@@ -14,7 +14,8 @@ from cogs.grillbotapi.cog import GrillbotApi
 from database.karma import KarmaDB
 from features.leaderboard import LeaderboardPageSource
 from features.reaction_context import ReactionContext
-from permissions import permission_check, room_check
+from permissions import room_check
+from permissions.permission_check import PermissionsCheck
 from rubbergod import Rubbergod
 from utils import cooldowns
 
@@ -227,7 +228,7 @@ class Karma(Base, commands.Cog):
         await inter.edit_original_response(embed=embed, view=view)
         view.message = await inter.original_message()
 
-    @commands.check(permission_check.is_bot_admin)
+    @PermissionsCheck.is_bot_admin()
     @commands.slash_command(name="karma_mod", description=MessagesCZ.karma_brief)
     async def _karma_mod(self, inter: disnake.ApplicationCommandInteraction):
         pass
