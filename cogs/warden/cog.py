@@ -92,7 +92,7 @@ class Warden(Base, commands.Cog):
                     pass
 
     @commands.group()
-    @commands.check(permission_check.is_bot_admin)
+    @permission_check.is_bot_admin()
     async def scan(self, ctx: commands.Context):
         """Scan for reposts"""
         if ctx.invoked_subcommand is None:

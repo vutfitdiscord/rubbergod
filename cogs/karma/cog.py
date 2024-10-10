@@ -227,7 +227,7 @@ class Karma(Base, commands.Cog):
         await inter.edit_original_response(embed=embed, view=view)
         view.message = await inter.original_message()
 
-    @commands.check(permission_check.is_bot_admin)
+    @permission_check.is_bot_admin()
     @commands.slash_command(name="karma_mod", description=MessagesCZ.karma_brief)
     async def _karma_mod(self, inter: disnake.ApplicationCommandInteraction):
         pass
