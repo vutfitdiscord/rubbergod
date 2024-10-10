@@ -16,7 +16,8 @@ from database.verification import PermitDB, ValidPersonDB, VerifyStatus
 from features.prompt import PromptSession
 from features.verification import Verification
 from features.verify_helper import VerifyHelper
-from permissions import permission_check, room_check
+from permissions import room_check
+from permissions.permission_check import PermissionsCheck
 from rubbergod import Rubbergod
 from utils import cooldowns
 from utils.general import edit_msg
@@ -49,7 +50,7 @@ class FitWide(Base, commands.Cog):
         user_logins = sorted(user_logins)
 
     @cooldowns.default_cooldown
-    @commands.check(permission_check.is_bot_admin)
+    @PermissionsCheck.is_bot_admin()
     @commands.check(room_check.is_in_modroom)
     @commands.slash_command(name="verify_check", description=MessagesCZ.verify_check_brief)
     async def verify_check(self, inter: disnake.ApplicationCommandInteraction):
@@ -68,7 +69,7 @@ class FitWide(Base, commands.Cog):
         await message.reply(MessagesCZ.role_check_end)
 
     @cooldowns.default_cooldown
-    @commands.check(permission_check.is_bot_admin)
+    @PermissionsCheck.is_bot_admin()
     @commands.check(room_check.is_in_modroom)
     @commands.slash_command(name="status_check", description=MessagesCZ.status_check_brief)
     async def status_check(self, inter: disnake.ApplicationCommandInteraction):
@@ -99,7 +100,7 @@ class FitWide(Base, commands.Cog):
         await message.reply(MessagesCZ.role_check_end)
 
     @cooldowns.default_cooldown
-    @commands.check(permission_check.is_bot_admin)
+    @PermissionsCheck.is_bot_admin()
     @commands.check(room_check.is_in_modroom)
     @commands.slash_command(name="zapis_check", description=MessagesCZ.zapis_check_brief)
     async def zapis_check(self, inter: disnake.ApplicationCommandInteraction):
@@ -126,7 +127,7 @@ class FitWide(Base, commands.Cog):
         await message.reply(MessagesCZ.role_check_end)
 
     @cooldowns.default_cooldown
-    @commands.check(permission_check.is_bot_admin)
+    @PermissionsCheck.is_bot_admin()
     @commands.check(room_check.is_in_modroom)
     @commands.slash_command(name="mit_check", description=MessagesCZ.mit_check_brief)
     async def mit_check(self, inter: disnake.ApplicationCommandInteraction, p_debug: bool = True):
@@ -164,7 +165,7 @@ class FitWide(Base, commands.Cog):
         await message.reply(MessagesCZ.role_check_end)
 
     @cooldowns.default_cooldown
-    @commands.check(permission_check.is_bot_admin)
+    @PermissionsCheck.is_bot_admin()
     @commands.check(room_check.is_in_modroom)
     @commands.slash_command(name="dropout_check", description=MessagesCZ.dropout_check_brief)
     async def dropout_check(self, inter: disnake.ApplicationCommandInteraction, p_debug: bool = True):
@@ -205,7 +206,7 @@ class FitWide(Base, commands.Cog):
         await message.reply(MessagesCZ.role_check_end)
 
     @cooldowns.default_cooldown
-    @commands.check(permission_check.is_bot_admin)
+    @PermissionsCheck.is_bot_admin()
     @commands.check(room_check.is_in_modroom)
     @commands.slash_command(name="role_check", description=MessagesCZ.role_check_brief)
     async def role_check(self, inter: disnake.ApplicationCommandInteraction):
@@ -233,7 +234,7 @@ class FitWide(Base, commands.Cog):
         await message.reply(MessagesCZ.role_check_end)
 
     @cooldowns.default_cooldown
-    @commands.check(permission_check.is_bot_admin)
+    @PermissionsCheck.is_bot_admin()
     @commands.slash_command(name="increment_roles", description=MessagesCZ.increment_roles_brief)
     async def increment_roles(self, inter: disnake.ApplicationCommandInteraction):
         await inter.send(MessagesCZ.increment_roles_start)
