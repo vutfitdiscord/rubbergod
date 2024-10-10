@@ -4,7 +4,6 @@
 - [ ] Refactor/Enhancement
 - [ ] New Feature
 - [ ] Bug Fix
-- [ ] Optimization
 - [ ] Documentation Update
 -->
 
