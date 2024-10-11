@@ -13,8 +13,8 @@ from disnake.ext import commands
 import utils
 from cogs.base import Base
 from database.image import ImageDB
-from permissions.checks import PermissionsCheck
 from rubbergod import Rubbergod
+from utils.checks import PermissionsCheck
 
 from . import features
 from .messages_cz import MessagesCZ

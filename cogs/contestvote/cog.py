@@ -12,10 +12,10 @@ from buttons.general import TrashView
 from cogs.base import Base
 from database.contestvote import ContestVoteDB
 from features.reaction_context import ReactionContext
-from permissions.checks import PermissionsCheck
 from permissions.room_check import RoomCheck
 from rubbergod import Rubbergod
 from utils import cooldowns
+from utils.checks import PermissionsCheck
 from utils.constants import MAX_ATTACHMENT_SIZE
 
 from . import features

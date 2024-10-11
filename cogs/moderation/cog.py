@@ -8,8 +8,8 @@ from disnake.ext import commands
 
 from cogs.base import Base
 from database.moderation import ActionType, ModerationDB
-from permissions.checks import PermissionsCheck
 from rubbergod import Rubbergod
+from utils.checks import PermissionsCheck
 from utils.colors import RubbergodColors
 
 from . import features

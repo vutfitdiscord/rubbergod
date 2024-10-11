@@ -10,8 +10,8 @@ from disnake.ext import commands
 import utils
 from cogs.base import Base
 from database.review import SubjectDetailsDB
-from permissions.checks import PermissionsCheck
 from rubbergod import Rubbergod
+from utils.checks import PermissionsCheck
 
 from .messages_cz import MessagesCZ
 

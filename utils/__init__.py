@@ -8,4 +8,4 @@ from . import (
     user,
 )
 
-__all__ = ["colors", "constants", "cooldowns", "converters", "embed", "errors", "general", "user"]
+__all__ = ["checks", "colors", "constants", "cooldowns", "converters", "embed", "errors", "general", "user"]

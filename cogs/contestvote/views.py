@@ -4,8 +4,8 @@ import disnake
 
 from buttons.base import BaseView
 from config.app_config import config
-from permissions.checks import PermissionsCheck
 from rubbergod import Rubbergod
+from utils.checks import PermissionsCheck
 
 
 class ContestView(BaseView):

@@ -12,9 +12,9 @@ import utils
 from buttons.embed import PaginationView
 from cogs.base import Base
 from database.review import ProgrammeDB, ReviewDB, SubjectDB, SubjectDetailsDB
-from permissions.checks import PermissionsCheck
 from rubbergod import Rubbergod
 from utils import cooldowns
+from utils.checks import PermissionsCheck
 
 from .features import ReviewManager, TierEnum
 from .messages_cz import MessagesCZ

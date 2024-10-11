@@ -20,9 +20,9 @@ from database.streamlinks import StreamLinkDB
 from features.list_message_sender import send_list_of_messages
 from features.prompt import PromptSession
 from permissions import room_check
-from permissions.checks import PermissionsCheck
 from rubbergod import Rubbergod
 from utils import cooldowns
+from utils.checks import PermissionsCheck
 
 from .messages_cz import MessagesCZ
 
