@@ -15,9 +15,9 @@ from cogs.base import Base
 from database.error import ErrorLogDB
 from features.error import ErrorLogger
 from features.git import Git
-from permissions.checks import PermissionsCheck
 from rubbergod import Rubbergod
 from utils import cooldowns
+from utils.checks import PermissionsCheck
 from utils.colors import RubbergodColors
 
 from . import features

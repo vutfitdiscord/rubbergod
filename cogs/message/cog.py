@@ -6,9 +6,9 @@ import disnake
 from disnake.ext import commands
 
 from cogs.base import Base
-from permissions.checks import PermissionsCheck
 from rubbergod import Rubbergod
 from utils import cooldowns
+from utils.checks import PermissionsCheck
 
 from .messages_cz import MessagesCZ
 from .modals import MessageModal

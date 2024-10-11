@@ -17,9 +17,9 @@ from features.prompt import PromptSession
 from features.verification import Verification
 from features.verify_helper import VerifyHelper
 from permissions import room_check
-from permissions.checks import PermissionsCheck
 from rubbergod import Rubbergod
 from utils import cooldowns
+from utils.checks import PermissionsCheck
 from utils.general import edit_msg
 
 from . import features

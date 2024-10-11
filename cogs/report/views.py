@@ -5,8 +5,8 @@ import disnake
 from buttons.base import BaseView
 from config.app_config import config
 from database.report import AnswerDB, ReportDB
-from permissions.checks import PermissionsCheck
 from rubbergod import Rubbergod
+from utils.checks import PermissionsCheck
 
 from . import features as report_features
 from .features_errors import ButtonInteractionError

@@ -10,9 +10,9 @@ from disnake.ext import commands, tasks
 
 from cogs.base import Base
 from database.exams import ExamsTermsMessageDB
-from permissions.checks import PermissionsCheck
 from rubbergod import Rubbergod
 from utils import cooldowns
+from utils.checks import PermissionsCheck
 
 from .features import YEAR_LIST, Features, year_regex
 from .messages_cz import MessagesCZ

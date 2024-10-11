@@ -13,9 +13,9 @@ from buttons.embed import PaginationView
 from cogs.base import Base
 from cogs.timeoutwars.messages_cz import MessagesCZ as TimeoutWarsMessages
 from database.timeout import TimeoutDB
-from permissions.checks import PermissionsCheck
 from rubbergod import Rubbergod
 from utils import cooldowns
+from utils.checks import PermissionsCheck
 from utils.converters import DiscordDatetime, MembersList
 
 from . import features

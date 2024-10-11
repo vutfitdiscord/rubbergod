@@ -11,9 +11,9 @@ import utils
 from cogs.base import Base
 from database.pin_map import PinMapDB
 from permissions import room_check
-from permissions.checks import PermissionsCheck
 from rubbergod import Rubbergod
 from utils import cooldowns
+from utils.checks import PermissionsCheck
 
 from .features import AutopinFeatures
 from .messages_cz import MessagesCZ

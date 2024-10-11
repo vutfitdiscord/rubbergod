@@ -11,7 +11,7 @@ from utils.errors import (
     NotSubmodPlusError,
 )
 
-priviliged_roles = [config.bot_admin_role, config.mod_role, config.submod_role, config.helper_role]
+PRIVILEGED_ROLES = [config.mod_role, config.submod_role, config.helper_role]
 
 
 class PermissionsCheck:
@@ -71,7 +71,9 @@ class PermissionsCheck:
         """
 
         def predicate(ctx: commands.Context | disnake.ApplicationCommandInteraction) -> bool:
-            if cls.role_check(ctx, priviliged_roles[:-2]):
+            if cls.is_bot_admin(ctx):
+                return True
+            if cls.role_check(ctx, PRIVILEGED_ROLES[:-2]):
                 return True
 
             if raise_exception:
@@ -105,7 +107,9 @@ class PermissionsCheck:
         """
 
         def predicate(ctx: commands.Context | disnake.ApplicationCommandInteraction) -> bool:
-            if cls.role_check(ctx, priviliged_roles[:-1]):
+            if cls.is_bot_admin(ctx):
+                return True
+            if cls.role_check(ctx, PRIVILEGED_ROLES[:-1]):
                 return True
 
             if raise_exception:
@@ -139,7 +143,9 @@ class PermissionsCheck:
         """
 
         def predicate(ctx: commands.Context | disnake.ApplicationCommandInteraction) -> bool:
-            if cls.role_check(ctx, priviliged_roles):
+            if cls.is_bot_admin(ctx):
+                return True
+            if cls.role_check(ctx, PRIVILEGED_ROLES):
                 return True
 
             if raise_exception:

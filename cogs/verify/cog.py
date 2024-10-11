@@ -12,9 +12,9 @@ from database.verification import DynamicVerifyDB
 from features import verification
 from features.table_generator import TableGenerator
 from permissions import room_check
-from permissions.checks import PermissionsCheck
 from rubbergod import Rubbergod
 from utils import cooldowns
+from utils.checks import PermissionsCheck
 
 from .features_dynamic_verify import DynamicVerifyManager
 from .messages_cz import MessagesCZ
