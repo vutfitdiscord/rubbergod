@@ -12,7 +12,7 @@ from disnake.ext import commands
 
 from cogs.base import Base
 from config.app_config import CONFIG_PATH, config_get_keys, load_config
-from permissions.permission_check import PermissionsCheck
+from permissions.checks import PermissionsCheck
 from rubbergod import Rubbergod
 
 from .messages_cz import MessagesCZ

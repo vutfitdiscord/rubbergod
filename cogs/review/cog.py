@@ -12,7 +12,7 @@ import utils
 from buttons.embed import PaginationView
 from cogs.base import Base
 from database.review import ProgrammeDB, ReviewDB, SubjectDB, SubjectDetailsDB
-from permissions.permission_check import PermissionsCheck
+from permissions.checks import PermissionsCheck
 from rubbergod import Rubbergod
 from utils import cooldowns
 

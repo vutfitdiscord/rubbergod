@@ -61,6 +61,7 @@ class Config:
     ignored_prefixes: tuple = tuple(get_attr(toml_dict, "base", "ignored_prefixes"))
 
     # Role IDs
+    bot_admin_role: int = get_attr(toml_dict, "base", "bot_admin_role")
     mod_role: int = get_attr(toml_dict, "base", "mod_role")
     submod_role: int = get_attr(toml_dict, "base", "submod_role")
     helper_role: int = get_attr(toml_dict, "base", "helper_role")

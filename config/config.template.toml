@@ -6,6 +6,7 @@ key = ''
 admin_ids = [0]  # first ID is used for mention in case of false verification
 guild_id = 0
 
+bot_admin_role = 1201986114974658680
 mod_role = 461550034668748800
 submod_role = 591372495936815114
 helper_role = 461550323727859712

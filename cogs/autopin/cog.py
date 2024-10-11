@@ -10,7 +10,8 @@ from disnake.ext import commands
 import utils
 from cogs.base import Base
 from database.pin_map import PinMapDB
-from permissions import permission_check, room_check
+from permissions import room_check
+from permissions.checks import PermissionsCheck
 from rubbergod import Rubbergod
 from utils import cooldowns
 
@@ -46,7 +47,7 @@ class AutoPin(Base, commands.Cog):
                     return 0, res
         return 1, "Command not found"
 
-    @commands.check(permission_check.helper_plus)
+    @PermissionsCheck.is_helper_plus()
     @commands.slash_command(name="pin_mod")
     async def pin_mod(self, inter: disnake.GuildCommandInteraction):
         await inter.response.defer()

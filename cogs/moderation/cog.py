@@ -8,7 +8,7 @@ from disnake.ext import commands
 
 from cogs.base import Base
 from database.moderation import ActionType, ModerationDB
-from permissions import permission_check
+from permissions.checks import PermissionsCheck
 from rubbergod import Rubbergod
 from utils.colors import RubbergodColors
 
@@ -23,7 +23,7 @@ class Moderation(Base, commands.Cog):
         super().__init__()
         self.bot = bot
 
-    @commands.check(permission_check.submod_plus)
+    @PermissionsCheck.is_submod_plus()
     @commands.slash_command(name="slowmode")
     async def _slowmode(self, inter: disnake.AppCommandInteraction):
         await inter.response.defer(ephemeral=True)
@@ -47,7 +47,7 @@ class Moderation(Base, commands.Cog):
         await features.log(inter, prev_delay, curr_delay=delay, channel=channel, log_channel=self.log_channel)
         await inter.edit_original_response(MessagesCZ.set_success(channel=channel.mention, delay=delay))
 
-    @commands.check(permission_check.submod_plus)
+    @PermissionsCheck.is_submod_plus()
     @_slowmode.sub_command(name="remove", description=MessagesCZ.remove_brief)
     async def remove(self, inter: disnake.GuildCommandInteraction, channel: SLOWMODE_CHANNEL_TYPES = None):
         if channel is None:

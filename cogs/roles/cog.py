@@ -10,7 +10,7 @@ from disnake.ext import commands
 import utils
 from cogs.base import Base
 from database.review import SubjectDetailsDB
-from permissions import permission_check
+from permissions.checks import PermissionsCheck
 from rubbergod import Rubbergod
 
 from .messages_cz import MessagesCZ
@@ -21,7 +21,7 @@ class Roles(Base, commands.Cog):
         super().__init__()
         self.bot = bot
 
-    @commands.check(permission_check.mod_plus)
+    @PermissionsCheck.is_mod_plus()
     @commands.slash_command(name="move_category", description=MessagesCZ.move_category_brief)
     async def move_category(
         self,
@@ -35,7 +35,7 @@ class Roles(Base, commands.Cog):
             MessagesCZ.move_category_done(move_category=move_category, under_category=under_category)
         )
 
-    @commands.check(permission_check.mod_plus)
+    @PermissionsCheck.is_mod_plus()
     @commands.slash_command(name="channel", guild_ids=[Base.config.guild_id])
     async def channel(self, inter: disnake.ApplicationCommandInteraction):
         pass
@@ -91,7 +91,7 @@ class Roles(Base, commands.Cog):
             MessagesCZ.channel_create_done(channel=channel.mention, role=role.name, perms=len(role.members))
         )
 
-    @commands.check(permission_check.mod_plus)
+    @PermissionsCheck.is_mod_plus()
     @channel.sub_command(
         name="add_channels_description",
         description=MessagesCZ.channel_add_description_brief,
@@ -236,7 +236,7 @@ class Roles(Base, commands.Cog):
                 )
         await inter.edit_original_response(MessagesCZ.channel_role_to_overwrites_done)
 
-    @commands.check(permission_check.mod_plus)
+    @PermissionsCheck.is_mod_plus()
     @commands.slash_command(name="remove_exclusive_roles", description=MessagesCZ.remove_exclusive_roles)
     async def remove_exclusive_roles(
         self,

@@ -8,8 +8,7 @@ import disnake
 from disnake.ext import commands, tasks
 
 from cogs.base import Base
-from permissions import permission_check
-from permissions.permission_check import PermissionsCheck
+from permissions.checks import PermissionsCheck
 from rubbergod import Rubbergod
 from utils import cooldowns
 
@@ -24,7 +23,7 @@ class IOS(Base, commands.Cog):
         self.tasks = [self.ios_task]
 
     @cooldowns.default_cooldown
-    @commands.check(permission_check.helper_plus)
+    @PermissionsCheck.is_helper_plus()
     @commands.slash_command(name="ios", description=MessagesCZ.ios_brief, guild_ids=[Base.config.guild_id])
     async def ios(self, inter: disnake.ApplicationCommandInteraction):
         await inter.response.defer()

@@ -15,7 +15,7 @@ from database.karma import KarmaDB
 from features.leaderboard import LeaderboardPageSource
 from features.reaction_context import ReactionContext
 from permissions import room_check
-from permissions.permission_check import PermissionsCheck
+from permissions.checks import PermissionsCheck
 from rubbergod import Rubbergod
 from utils import cooldowns
 

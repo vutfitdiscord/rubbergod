@@ -8,7 +8,7 @@ from disnake.ext import commands
 from buttons.general import TrashView
 from cogs.base import Base
 from database.report import UserDB
-from permissions import permission_check
+from permissions.checks import PermissionsCheck
 from rubbergod import Rubbergod
 from utils import cooldowns
 
@@ -85,7 +85,7 @@ class Report(Base, commands.Cog):
     async def report_google_form(self, inter: disnake.ApplicationCommandInteraction):
         await inter.send(MessagesCZ.google_form, ephemeral=True)
 
-    @commands.check(permission_check.submod_plus)
+    @PermissionsCheck.is_submod_plus()
     @commands.slash_command(name="report_mod", description=MessagesCZ.report_brief)
     async def _report_mod(self, inter: disnake.ApplicationCommandInteraction): ...
 
