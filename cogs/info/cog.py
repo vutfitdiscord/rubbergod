@@ -15,10 +15,10 @@ from disnake.ext import commands, tasks
 import utils
 from buttons.embed import PaginationView
 from cogs.base import Base
-from permissions.custom_errors import ApiError
 from permissions.room_check import RoomCheck
 from rubbergod import Rubbergod
 from utils import cooldowns
+from utils.errors import ApiError
 
 from .features import create_nasa_embed, nasa_daily_image, urban_embeds
 from .messages_cz import MessagesCZ

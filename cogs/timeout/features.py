@@ -8,8 +8,8 @@ import utils
 from config.app_config import config
 from database.report import ReportDB
 from database.timeout import TimeoutDB, TimeoutUserDB
-from permissions.custom_errors import ApiError, InvalidTime
 from rubbergod import Rubbergod
+from utils.errors import ApiError, InvalidTime
 
 from .messages_cz import MessagesCZ
 

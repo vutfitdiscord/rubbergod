@@ -20,8 +20,8 @@ from config.messages import Messages
 from database import session
 from database.error import ErrorLogDB
 from database.stats import ErrorEvent
-from permissions import custom_errors
 from rubbergod import Rubbergod
+from utils import errors
 
 rubbegod_logger = logging.getLogger("rubbergod")
 
@@ -361,10 +361,10 @@ class ErrorLogger:
             return True
 
         if (
-            isinstance(error, custom_errors.NotHelperPlusError)
-            or isinstance(error, custom_errors.NotSubmodPlusError)
-            or isinstance(error, custom_errors.NotModPlusError)
-            or isinstance(error, custom_errors.NotBotAdminError)
+            isinstance(error, errors.NotHelperPlusError)
+            or isinstance(error, errors.NotSubmodPlusError)
+            or isinstance(error, errors.NotModPlusError)
+            or isinstance(error, errors.NotBotAdminError)
         ):
             await ctx.send(error.message)
             return True
@@ -377,7 +377,7 @@ class ErrorLogger:
             await ctx.send(Messages.member_not_found(member=ctx.author.mention))
             return True
 
-        if isinstance(error, custom_errors.ApiError):
+        if isinstance(error, errors.ApiError):
             await ctx.send(error.message)
             return True
 
@@ -413,7 +413,7 @@ class ErrorLogger:
                     await ctx.send(Messages.blocked_bot(user=inter.author.id))
                     return True
 
-        if isinstance(error, custom_errors.InvalidTime):
+        if isinstance(error, errors.InvalidTime):
             await inter.send(error.message, ephemeral=True)
             return True
 

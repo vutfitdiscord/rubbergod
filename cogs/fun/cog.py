@@ -16,9 +16,9 @@ from disnake.ext import commands
 
 import utils
 from cogs.base import Base
-from permissions.custom_errors import ApiError
 from rubbergod import Rubbergod
 from utils import cooldowns
+from utils.errors import ApiError
 
 from .messages_cz import MessagesCZ
 

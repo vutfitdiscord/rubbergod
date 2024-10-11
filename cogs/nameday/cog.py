@@ -10,8 +10,8 @@ from disnake.ext import commands, tasks
 import utils
 from cogs.base import Base
 from permissions import room_check
-from permissions.custom_errors import ApiError
 from rubbergod import Rubbergod
+from utils.errors import ApiError
 
 from .messages_cz import MessagesCZ
 
