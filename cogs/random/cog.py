@@ -9,9 +9,9 @@ import disnake
 from disnake.ext import commands
 
 from cogs.base import Base
-from permissions import room_check
 from rubbergod import Rubbergod
 from utils import cooldowns
+from utils.checks import PermissionsCheck
 
 from .messages_cz import MessagesCZ
 
@@ -20,7 +20,6 @@ class Random(Base, commands.Cog):
     def __init__(self, bot: Rubbergod):
         super().__init__()
         self.bot = bot
-        self.check = room_check.RoomCheck(bot)
 
     @cooldowns.short_cooldown
     @commands.slash_command(name="pick", description=MessagesCZ.pick_brief)
@@ -49,12 +48,12 @@ class Random(Base, commands.Cog):
             await inter.send(MessagesCZ.pick_empty)
             return
         option = disnake.utils.escape_mentions(random.choice(args_list))
-        await inter.send(option, ephemeral=self.check.botroom_check(inter))
+        await inter.send(option, ephemeral=PermissionsCheck.is_botroom(inter))
 
     @cooldowns.short_cooldown
     @commands.slash_command(name="flip", description=MessagesCZ.flip_brief)
     async def flip(self, inter: disnake.ApplicationCommandInteraction):
-        await inter.send(random.choice(["True", "False"]), ephemeral=self.check.botroom_check(inter))
+        await inter.send(random.choice(["True", "False"]), ephemeral=PermissionsCheck.is_botroom(inter))
 
     @cooldowns.short_cooldown
     @commands.slash_command(name="roll", description=MessagesCZ.rng_generator_format)
@@ -63,4 +62,4 @@ class Random(Base, commands.Cog):
             first, second = second, first
 
         option = str(random.randint(first, second))
-        await inter.send(option, ephemeral=self.check.botroom_check(inter))
+        await inter.send(option, ephemeral=PermissionsCheck.is_botroom(inter))

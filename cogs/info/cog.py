@@ -15,9 +15,9 @@ from disnake.ext import commands, tasks
 import utils
 from buttons.embed import PaginationView
 from cogs.base import Base
-from permissions.room_check import RoomCheck
 from rubbergod import Rubbergod
 from utils import cooldowns
+from utils.checks import PermissionsCheck
 from utils.errors import ApiError
 
 from .features import create_nasa_embed, nasa_daily_image, urban_embeds
@@ -28,7 +28,6 @@ class Info(Base, commands.Cog):
     def __init__(self, bot: Rubbergod):
         super().__init__()
         self.bot = bot
-        self.check = RoomCheck(bot)
         self.tasks = [self.send_nasa_image.start()]
 
     @cooldowns.short_cooldown
@@ -106,7 +105,7 @@ class Info(Base, commands.Cog):
     @cooldowns.default_cooldown
     @commands.slash_command(name="nasa_daily_image", description=MessagesCZ.nasa_image_brief)
     async def nasa_image(self, inter: disnake.ApplicationCommandInteraction) -> None:
-        ephemeral = self.check.botroom_check(inter)
+        ephemeral = PermissionsCheck.is_botroom(inter)
         await inter.response.defer(ephemeral=ephemeral)
         response = await nasa_daily_image(self.bot.rubbergod_session, self.config.nasa_token)
         embed, video = await create_nasa_embed(inter.author, response)

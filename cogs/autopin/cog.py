@@ -10,7 +10,6 @@ from disnake.ext import commands
 import utils
 from cogs.base import Base
 from database.pin_map import PinMapDB
-from permissions import room_check
 from rubbergod import Rubbergod
 from utils import cooldowns
 from utils.checks import PermissionsCheck
@@ -26,7 +25,6 @@ class AutoPin(Base, commands.Cog):
             minutes=self.config.autopin_warning_cooldown
         )
         self.bot = bot
-        self.check = room_check.RoomCheck(bot)
         self.pin_features = AutopinFeatures(bot)
 
     async def api(self, message: commands.Context, params: dict):

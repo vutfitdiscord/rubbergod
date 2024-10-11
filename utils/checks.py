@@ -1,10 +1,14 @@
-"""All checks for role and user permissions"""
+"""
+Contains functions to check permissions of users, channels and other.
+"""
 
 import disnake
 from disnake.ext import commands
 
 from config.app_config import config
+from config.messages import Messages
 from utils.errors import (
+    InvalidRoomError,
     NotBotAdminError,
     NotHelperPlusError,
     NotModPlusError,
@@ -38,7 +42,7 @@ class PermissionsCheck:
         """
 
         def predicate(ctx: commands.Context | disnake.ApplicationCommandInteraction) -> bool:
-            if config.bot_admin_role in ctx.author.roles:
+            if ctx.author.id in config.admin_ids:
                 return True
             if raise_exception:
                 raise NotBotAdminError
@@ -177,3 +181,74 @@ class PermissionsCheck:
             if role.id in roles:
                 return True
         return False
+
+    @classmethod
+    def is_in_modroom(
+        cls,
+        ctx: commands.Context | disnake.ApplicationCommandInteraction = None,
+        raise_exception: bool = True,
+    ) -> bool:
+        """Check if the command is invoked in modroom"""
+
+        def predicate(ctx: commands.Context | disnake.ApplicationCommandInteraction) -> bool:
+            if ctx.channel.id == config.mod_room:
+                return True
+
+            if raise_exception:
+                raise InvalidRoomError(Messages.mod_room_only(room=config.mod_room))
+            return False
+
+        if ctx:
+            # If ctx is passed, return the result of the predicate
+            return predicate(ctx)
+        else:
+            # If ctx is not passed, act as a decorator for command
+            return commands.check(predicate)
+
+    @classmethod
+    def is_in_voteroom(
+        cls,
+        ctx: commands.Context | disnake.ApplicationCommandInteraction = None,
+        raise_exception: bool = True,
+    ) -> bool:
+        """Check if the command is invoked in voteroom"""
+
+        def predicate(ctx: commands.Context | disnake.ApplicationCommandInteraction) -> bool:
+            if ctx.channel.id == config.vote_room:
+                return True
+
+            if raise_exception:
+                raise InvalidRoomError(Messages.vote_room_only(room=config.vote_room))
+            return False
+
+        if ctx:
+            # If ctx is passed, return the result of the predicate
+            return predicate(ctx)
+        else:
+            # If ctx is not passed, act as a decorator for command
+            return commands.check(predicate)
+
+    @classmethod
+    def is_botroom(cls, inter: disnake.ApplicationCommandInteraction) -> bool:
+        """
+        Check if the interaction is in allowed channel. This is used to change response type to ephemeral.
+
+        Returns
+        -------
+        bool
+            False if user is not in DMs | thread | allowed channel. Otherwise True.
+        """
+
+        # DMs with bot
+        if inter.guild is None:
+            return False
+
+        # allow threads in channels
+        if isinstance(inter.channel, disnake.Thread):
+            return False
+
+        # allowed channels
+        if inter.channel_id in config.allowed_channels:
+            return False
+
+        return True

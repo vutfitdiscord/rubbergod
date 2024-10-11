@@ -14,7 +14,6 @@ from cogs.grillbotapi.cog import GrillbotApi
 from database.karma import KarmaDB
 from features.leaderboard import LeaderboardPageSource
 from features.reaction_context import ReactionContext
-from permissions import room_check
 from rubbergod import Rubbergod
 from utils import cooldowns
 from utils.checks import PermissionsCheck
@@ -28,7 +27,6 @@ class Karma(Base, commands.Cog):
         super().__init__()
         self.bot = bot
         self.karma_helper = features.Karma(bot)
-        self.check = room_check.RoomCheck(bot)
         self.grillbot_api = GrillbotApi(bot)
         self._leaderboard_formatter = utils.general.make_pts_column_row_formatter(KarmaDB.karma.name)
         self._positive_formatter = utils.general.make_pts_column_row_formatter(KarmaDB.positive.name)
@@ -100,35 +98,35 @@ class Karma(Base, commands.Cog):
     @_karma.sub_command(description=MessagesCZ.karma_brief)
     async def me(self, inter: disnake.ApplicationCommandInteraction):
         await inter.response.send_message(
-            self.karma_helper.karma_get(inter.author), ephemeral=self.check.botroom_check(inter)
+            self.karma_helper.karma_get(inter.author), ephemeral=PermissionsCheck.is_botroom(inter)
         )
 
     @commands.user_command(name="Karma uživatele")
     async def stalk_app(self, inter: disnake.UserCommandInteraction, user: disnake.Member):
         await inter.response.send_message(
-            self.karma_helper.karma_get(inter.author, user), ephemeral=self.check.botroom_check(inter)
+            self.karma_helper.karma_get(inter.author, user), ephemeral=PermissionsCheck.is_botroom(inter)
         )
 
     @_karma.sub_command(description=MessagesCZ.stalk_brief)
     async def stalk(self, inter: disnake.ApplicationCommandInteraction, user: disnake.User):
         await inter.response.send_message(
-            self.karma_helper.karma_get(inter.author, user), ephemeral=self.check.botroom_check(inter)
+            self.karma_helper.karma_get(inter.author, user), ephemeral=PermissionsCheck.is_botroom(inter)
         )
 
     @commands.cooldown(rate=1, per=300.0, type=commands.BucketType.guild)
     @_karma.sub_command(description=MessagesCZ.getall_brief)
     async def getall(self, inter: disnake.ApplicationCommandInteraction):
-        await inter.send(MessagesCZ.getall_response, ephemeral=self.check.botroom_check(inter))
-        await self.karma_helper.emoji_list_all_values(inter, self.check.botroom_check(inter))
+        await inter.send(MessagesCZ.getall_response, ephemeral=PermissionsCheck.is_botroom(inter))
+        await self.karma_helper.emoji_list_all_values(inter, PermissionsCheck.is_botroom(inter))
 
     @_karma.sub_command(description=MessagesCZ.get_brief)
     async def get(self, inter: disnake.ApplicationCommandInteraction, emoji):
-        await self.karma_helper.emoji_get_value(inter, emoji, ephemeral=self.check.botroom_check(inter))
+        await self.karma_helper.emoji_get_value(inter, emoji, ephemeral=PermissionsCheck.is_botroom(inter))
 
     @cooldowns.long_cooldown
     @commands.message_command(name="Karma zprávy", guild_ids=[Base.config.guild_id])
     async def message_app(self, inter: disnake.MessageCommandInteraction, message: disnake.Message):
-        await self._message(inter, message, ephemeral=self.check.botroom_check(inter))
+        await self._message(inter, message, ephemeral=PermissionsCheck.is_botroom(inter))
 
     @cooldowns.long_cooldown
     @_karma.sub_command(description=MessagesCZ.message_brief)
@@ -156,7 +154,7 @@ class Karma(Base, commands.Cog):
         """
         Get karma leaderboard
         """
-        await inter.response.defer(ephemeral=self.check.botroom_check(inter))
+        await inter.response.defer(ephemeral=PermissionsCheck.is_botroom(inter))
 
         if direction == "descending":
             query = KarmaDB.leaderboard_query(KarmaDB.karma.desc())
@@ -202,7 +200,7 @@ class Karma(Base, commands.Cog):
         """
         Get the biggest positive/negative karma givers
         """
-        await inter.response.defer(ephemeral=self.check.botroom_check(inter))
+        await inter.response.defer(ephemeral=PermissionsCheck.is_botroom(inter))
 
         karma_column = KarmaDB.positive if karma == "positive" else KarmaDB.negative
         order_karma = karma_column.desc() if direction == "descending" else karma_column.asc()
@@ -233,14 +231,14 @@ class Karma(Base, commands.Cog):
     async def _karma_mod(self, inter: disnake.ApplicationCommandInteraction):
         pass
 
-    @commands.check(room_check.is_in_voteroom)
+    @PermissionsCheck.is_in_voteroom()
     @_karma_mod.sub_command(name="revote", description=MessagesCZ.revote_brief)
     async def revote(self, inter: disnake.ApplicationCommandInteraction, emoji):
         """Start a revote of the karma value for emojis."""
         await inter.response.defer(ephemeral=True)
         await self.karma_helper.emoji_revote_value(inter, emoji)
 
-    @commands.check(room_check.is_in_voteroom)
+    @PermissionsCheck.is_in_voteroom()
     @_karma_mod.sub_command(name="vote", description=MessagesCZ.vote_brief)
     async def vote(self, inter: disnake.ApplicationCommandInteraction):
         """Start a vote using emojis without a karma value."""
@@ -276,11 +274,3 @@ class Karma(Base, commands.Cog):
         items = list(KarmaDB.leaderboard_query(KarmaDB.karma.asc()))
         for chunk in utils.general.split_to_parts(items, 500):
             await self.grillbot_api.post_karma_store(chunk)
-
-    @revote.error
-    @vote.error
-    async def karma_error(self, inter: disnake.ApplicationCommandInteraction, error):
-        if isinstance(error, commands.CheckFailure):
-            vote_room = self.bot.get_channel(self.config.vote_room)
-            await inter.send(MessagesCZ.vote_room_only(room=vote_room.mention))
-            return True

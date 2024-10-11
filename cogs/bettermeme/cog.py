@@ -16,8 +16,8 @@ from database.karma import KarmaDB, KarmaEmojiDB
 from database.meme_repost import MemeRepostDB
 from features.leaderboard import LeaderboardPageSource
 from features.reaction_context import ReactionContext
-from permissions import room_check
 from rubbergod import Rubbergod
+from utils.checks import PermissionsCheck
 
 from .messages_cz import MessagesCZ
 
@@ -35,7 +35,6 @@ class BetterMeme(Base, commands.Cog):
         self.bot = bot
 
         self.better_db = BetterMemeDB()
-        self.check = room_check.RoomCheck(bot)
 
         self.repost_lock = asyncio.Lock()
 
@@ -219,7 +218,7 @@ class BetterMeme(Base, commands.Cog):
         order_by: str = commands.Param(name="order_by", choices=["total_karma", "posts"], default="posts"),
         start: int = commands.Param(default=1, gt=0, lt=100000000, description=MessagesCZ.board_start_param),
     ):
-        await inter.response.defer(ephemeral=self.check.botroom_check(inter))
+        await inter.response.defer(ephemeral=PermissionsCheck.is_botroom(inter))
 
         embed = disnake.Embed()
         page_source = LeaderboardPageSource(
