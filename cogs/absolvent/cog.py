@@ -13,8 +13,8 @@ from lxml import etree
 
 from cogs.base import Base
 from database.verification import ValidPersonDB
-from permissions.custom_errors import ApiError
 from rubbergod import Rubbergod
+from utils.errors import ApiError
 
 from .messages_cz import MessagesCZ
 

@@ -13,7 +13,7 @@ from dateutil.relativedelta import relativedelta
 from disnake.ext import commands
 
 from config.messages import Messages
-from permissions.custom_errors import InvalidTime
+from utils.errors import InvalidTime
 
 from .general import get_local_zone
 

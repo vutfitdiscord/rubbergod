@@ -4,7 +4,7 @@ import aiohttp
 import disnake
 
 import utils
-from permissions.custom_errors import ApiError
+from utils.errors import ApiError
 
 from .messages_cz import MessagesCZ
 

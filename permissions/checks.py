@@ -4,7 +4,7 @@ import disnake
 from disnake.ext import commands
 
 from config.app_config import config
-from permissions.custom_errors import (
+from utils.errors import (
     NotBotAdminError,
     NotHelperPlusError,
     NotModPlusError,

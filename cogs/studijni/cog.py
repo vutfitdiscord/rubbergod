@@ -10,9 +10,9 @@ from disnake.ext import commands
 from lxml import etree
 
 from cogs.base import Base
-from permissions.custom_errors import ApiError
 from rubbergod import Rubbergod
 from utils.embed import add_author_footer
+from utils.errors import ApiError
 
 from .messages_cz import MessagesCZ
 
