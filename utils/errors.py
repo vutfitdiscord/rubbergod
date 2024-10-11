@@ -53,3 +53,10 @@ class NotBotAdminError(commands.CommandError):
 
     def __init__(self) -> None:
         self.message = Messages.bot_admin_only
+
+
+class InvalidRoomError(commands.CommandError):
+    """An error indicating that this interaction is only possible in given room."""
+
+    def __init__(self, message: str) -> None:
+        self.message = message

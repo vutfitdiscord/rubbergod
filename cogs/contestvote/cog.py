@@ -12,7 +12,6 @@ from buttons.general import TrashView
 from cogs.base import Base
 from database.contestvote import ContestVoteDB
 from features.reaction_context import ReactionContext
-from permissions.room_check import RoomCheck
 from rubbergod import Rubbergod
 from utils import cooldowns
 from utils.checks import PermissionsCheck
@@ -28,7 +27,6 @@ class ContestVote(Base, commands.Cog):
     def __init__(self, bot: Rubbergod):
         super().__init__()
         self.bot = bot
-        self.check = RoomCheck(bot)
 
         self.emojis = {
             str("1️⃣"): self.config.contest_vote_weight_1,
@@ -58,7 +56,7 @@ class ContestVote(Base, commands.Cog):
     async def calculate_contribution(
         self, inter: disnake.ApplicationCommandInteraction, message_url: disnake.Message
     ):
-        await inter.response.defer(ephemeral=self.check.botroom_check(inter))
+        await inter.response.defer(ephemeral=PermissionsCheck.is_botroom(inter))
 
         if message_url.channel != self.contest_vote_channel:
             await inter.send(MessagesCZ.not_contest_channel)
@@ -82,7 +80,7 @@ class ContestVote(Base, commands.Cog):
         inter: disnake.ApplicationCommandInteraction,
         number_of: int = commands.Param(default=5, gt=0, le=10, description=MessagesCZ.number_of_param),
     ):
-        await inter.response.defer(ephemeral=self.check.botroom_check(inter))
+        await inter.response.defer(ephemeral=PermissionsCheck.is_botroom(inter))
         messages = await self.contest_vote_channel.history().flatten()
 
         contributions = await features.get_top_contributions(self.emojis, messages, number_of)

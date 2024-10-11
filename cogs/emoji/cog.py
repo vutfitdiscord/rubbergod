@@ -12,9 +12,9 @@ from disnake.ext import commands, tasks
 
 import utils
 from cogs.base import Base
-from permissions import room_check
 from rubbergod import Rubbergod
 from utils import cooldowns
+from utils.checks import PermissionsCheck
 
 from .messages_cz import MessagesCZ
 
@@ -22,7 +22,6 @@ from .messages_cz import MessagesCZ
 class Emoji(Base, commands.Cog):
     def __init__(self, bot: Rubbergod):
         self.bot = bot
-        self.check = room_check.RoomCheck(bot)
         self.tasks = [self.download_emojis_task.start()]
 
     async def download_emojis(self, guild: disnake.Guild):
@@ -48,7 +47,7 @@ class Emoji(Base, commands.Cog):
     @cooldowns.default_cooldown
     @commands.slash_command(name="emoji")
     async def emoji(self, inter: disnake.ApplicationCommandInteraction):
-        await inter.response.defer(ephemeral=self.check.botroom_check(inter))
+        await inter.response.defer(ephemeral=PermissionsCheck.is_botroom(inter))
 
     @cooldowns.default_cooldown
     @emoji.sub_command(name="all", description=MessagesCZ.emoji_all_brief)

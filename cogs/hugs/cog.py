@@ -10,9 +10,9 @@ from buttons.embed import PaginationView
 from cogs.base import Base
 from database.hugs import HugsTableDB
 from features.leaderboard import LeaderboardPageSource
-from permissions import room_check
 from rubbergod import Rubbergod
 from utils import cooldowns
+from utils.checks import PermissionsCheck
 from utils.general import make_pts_column_row_formatter
 
 from .messages_cz import MessagesCZ
@@ -36,7 +36,6 @@ class Hugs(Base, commands.Cog):
         super().__init__()
         self.bot = bot
         self.hugs_db = HugsTableDB()
-        self.check = room_check.RoomCheck(bot)
         self._tophuggers_formatter = make_pts_column_row_formatter(HugsTableDB.given.name)
         self._tophugged_formatter = make_pts_column_row_formatter(HugsTableDB.received.name)
 
@@ -51,7 +50,7 @@ class Hugs(Base, commands.Cog):
         Overall hugging stats.
         """
 
-        await inter.response.defer(ephemeral=self.check.botroom_check(inter))
+        await inter.response.defer(ephemeral=PermissionsCheck.is_botroom(inter))
 
         page_source = LeaderboardPageSource(
             bot=self.bot,
@@ -75,7 +74,7 @@ class Hugs(Base, commands.Cog):
         Get the biggest huggers.
         """
 
-        await inter.response.defer(ephemeral=self.check.botroom_check(inter))
+        await inter.response.defer(ephemeral=PermissionsCheck.is_botroom(inter))
 
         page_source = LeaderboardPageSource(
             bot=self.bot,
@@ -99,7 +98,7 @@ class Hugs(Base, commands.Cog):
         Get the most hugged.
         """
 
-        await inter.response.defer(ephemeral=self.check.botroom_check(inter))
+        await inter.response.defer(ephemeral=PermissionsCheck.is_botroom(inter))
 
         page_source = LeaderboardPageSource(
             bot=self.bot,
@@ -123,7 +122,7 @@ class Hugs(Base, commands.Cog):
         Get your lovely hug stats.
         """
 
-        await inter.response.defer(ephemeral=self.check.botroom_check(inter))
+        await inter.response.defer(ephemeral=PermissionsCheck.is_botroom(inter))
 
         if user is None or user == inter.author:
             user = inter.author

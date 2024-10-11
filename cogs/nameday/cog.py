@@ -9,8 +9,8 @@ from disnake.ext import commands, tasks
 
 import utils
 from cogs.base import Base
-from permissions import room_check
 from rubbergod import Rubbergod
+from utils.checks import PermissionsCheck
 from utils.errors import ApiError
 
 from .messages_cz import MessagesCZ
@@ -20,7 +20,6 @@ class Nameday(Base, commands.Cog):
     def __init__(self, bot: Rubbergod):
         super().__init__()
         self.bot = bot
-        self.check = room_check.RoomCheck(bot)
         self.tasks = [self.send_names.start()]
 
     async def _name_day_cz(self, task: bool = False) -> str:
@@ -58,13 +57,13 @@ class Nameday(Base, commands.Cog):
 
     @commands.slash_command(name="svatek", description=MessagesCZ.name_day_cz_brief)
     async def name_day_cz(self, inter: disnake.ApplicationCommandInteraction):
-        await inter.response.defer(ephemeral=self.check.botroom_check(inter))
+        await inter.response.defer(ephemeral=PermissionsCheck.is_botroom(inter))
         name_day_cz = await self._name_day_cz()
         await inter.edit_original_response(name_day_cz)
 
     @commands.slash_command(name="meniny", description=MessagesCZ.name_day_sk_brief)
     async def name_day_sk(self, inter: disnake.ApplicationCommandInteraction):
-        await inter.response.defer(ephemeral=self.check.botroom_check(inter))
+        await inter.response.defer(ephemeral=PermissionsCheck.is_botroom(inter))
         name_day_sk = await self._name_day_sk()
         await inter.edit_original_response(name_day_sk)
 

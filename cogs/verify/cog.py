@@ -11,7 +11,6 @@ from cogs.base import Base
 from database.verification import DynamicVerifyDB
 from features import verification
 from features.table_generator import TableGenerator
-from permissions import room_check
 from rubbergod import Rubbergod
 from utils import cooldowns
 from utils.checks import PermissionsCheck
@@ -77,7 +76,7 @@ class Verify(Base, commands.Cog):
             await inter.send(MessagesCZ.verify_invalid_channel, ephemeral=True)
             return True
 
-    @commands.check(room_check.is_in_modroom)
+    @PermissionsCheck.is_in_modroom()
     @commands.slash_command(name="dynamic_verify", guild_ids=[Base.config.guild_id])
     async def dynamic_verify(self, inter: disnake.ApplicationCommandInteraction):
         """This method is only group for another commands. This function does nothing."""

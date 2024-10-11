@@ -365,6 +365,7 @@ class ErrorLogger:
             or isinstance(error, errors.NotSubmodPlusError)
             or isinstance(error, errors.NotModPlusError)
             or isinstance(error, errors.NotBotAdminError)
+            or isinstance(error, errors.InvalidRoomError)
         ):
             await ctx.send(error.message)
             return True
