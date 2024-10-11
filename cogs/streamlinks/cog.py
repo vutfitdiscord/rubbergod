@@ -19,7 +19,8 @@ from database.review import SubjectDB
 from database.streamlinks import StreamLinkDB
 from features.list_message_sender import send_list_of_messages
 from features.prompt import PromptSession
-from permissions import permission_check, room_check
+from permissions import room_check
+from permissions.checks import PermissionsCheck
 from rubbergod import Rubbergod
 from utils import cooldowns
 
@@ -105,7 +106,7 @@ class StreamLinks(Base, commands.Cog):
     async def _streamlinks_mod(self, inter: disnake.ApplicationCommandInteraction):
         await inter.response.defer()
 
-    @commands.check(permission_check.helper_plus)
+    @PermissionsCheck.is_helper_plus()
     @_streamlinks_mod.sub_command(name="add", description=MessagesCZ.add_brief)
     async def streamlinks_add(
         self,
@@ -143,7 +144,7 @@ class StreamLinks(Base, commands.Cog):
         )
         await inter.edit_original_response(content=MessagesCZ.add_success)
 
-    @commands.check(permission_check.helper_plus)
+    @PermissionsCheck.is_helper_plus()
     @_streamlinks_mod.sub_command(name="update", description=MessagesCZ.update_brief)
     async def streamlinks_update(
         self,
@@ -222,7 +223,7 @@ class StreamLinks(Base, commands.Cog):
         await channel.send(embed=embed)
         await inter.edit_original_response(content=MessagesCZ.update_success)
 
-    @commands.check(permission_check.helper_plus)
+    @PermissionsCheck.is_helper_plus()
     @_streamlinks_mod.sub_command(name="remove", description=MessagesCZ.remove_brief)
     async def streamlinks_remove(
         self,

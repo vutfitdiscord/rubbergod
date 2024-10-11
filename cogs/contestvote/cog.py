@@ -12,7 +12,7 @@ from buttons.general import TrashView
 from cogs.base import Base
 from database.contestvote import ContestVoteDB
 from features.reaction_context import ReactionContext
-from permissions.permission_check import submod_plus
+from permissions.checks import PermissionsCheck
 from permissions.room_check import RoomCheck
 from rubbergod import Rubbergod
 from utils import cooldowns
@@ -149,7 +149,7 @@ class ContestVote(Base, commands.Cog):
         return ctx.channel.id == self.config.contest_vote_channel
 
     @cooldowns.default_cooldown
-    @commands.check(submod_plus)
+    @PermissionsCheck.is_submod_plus()
     @commands.slash_command(name="contest_mod")
     async def contest_mod(self, inter: disnake.ApplicationCommandInteraction):
         pass

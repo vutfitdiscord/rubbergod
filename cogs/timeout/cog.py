@@ -13,7 +13,7 @@ from buttons.embed import PaginationView
 from cogs.base import Base
 from cogs.timeoutwars.messages_cz import MessagesCZ as TimeoutWarsMessages
 from database.timeout import TimeoutDB
-from permissions import permission_check
+from permissions.checks import PermissionsCheck
 from rubbergod import Rubbergod
 from utils import cooldowns
 from utils.converters import DiscordDatetime, MembersList
@@ -28,7 +28,7 @@ class Timeout(Base, commands.Cog):
         self.bot = bot
         self.tasks = [self.refresh_timeout.start()]
 
-    @commands.check(permission_check.submod_plus)
+    @PermissionsCheck.is_submod_plus()
     @commands.slash_command(name="timeout", guild_ids=[Base.config.guild_id])
     async def _timeout(self, inter: disnake.ApplicationCommandInteraction): ...
 

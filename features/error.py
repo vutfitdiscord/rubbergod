@@ -20,7 +20,7 @@ from config.messages import Messages
 from database import session
 from database.error import ErrorLogDB, ErrorRow
 from database.stats import ErrorEvent
-from permissions import custom_errors, permission_check
+from permissions import custom_errors
 from rubbergod import Rubbergod
 
 rubbegod_logger = logging.getLogger("rubbergod")
@@ -375,10 +375,10 @@ class ErrorLogger:
             return True
 
         if (
-            isinstance(error, permission_check.NotHelperPlusError)
-            or isinstance(error, permission_check.NotSubmodPlusError)
-            or isinstance(error, permission_check.NotModPlusError)
-            or isinstance(error, permission_check.NotAdminError)
+            isinstance(error, custom_errors.NotHelperPlusError)
+            or isinstance(error, custom_errors.NotSubmodPlusError)
+            or isinstance(error, custom_errors.NotModPlusError)
+            or isinstance(error, custom_errors.NotBotAdminError)
         ):
             await ctx.send(error.message)
             return True

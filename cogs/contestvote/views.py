@@ -4,7 +4,7 @@ import disnake
 
 from buttons.base import BaseView
 from config.app_config import config
-from permissions import permission_check
+from permissions.checks import PermissionsCheck
 from rubbergod import Rubbergod
 
 
@@ -18,7 +18,7 @@ class ContestView(BaseView):
         return self.bot.get_channel(config.contest_vote_channel)
 
     async def interaction_check(self, inter: disnake.Interaction) -> bool:
-        return permission_check.submod_plus(inter)
+        return PermissionsCheck.is_submod_plus(inter)
 
     @disnake.ui.button(
         label="Přijmout návrh",

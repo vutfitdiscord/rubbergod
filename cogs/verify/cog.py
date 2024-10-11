@@ -11,7 +11,8 @@ from cogs.base import Base
 from database.verification import DynamicVerifyDB
 from features import verification
 from features.table_generator import TableGenerator
-from permissions import permission_check, room_check
+from permissions import room_check
+from permissions.checks import PermissionsCheck
 from rubbergod import Rubbergod
 from utils import cooldowns
 
@@ -130,7 +131,7 @@ class Verify(Base, commands.Cog):
         rule.remove_rule()
         await inter.response.send_message(MessagesCZ.dynamic_verify_remove_success)
 
-    @commands.check(permission_check.submod_plus)
+    @PermissionsCheck.is_submod_plus()
     @commands.user_command(name="Verify host", guild_ids=[Base.config.guild_id])
     async def verify_host(self, inter: disnake.UserCommandInteraction, member: disnake.Member):
         """add verify and host role to new member"""

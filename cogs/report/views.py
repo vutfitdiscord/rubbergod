@@ -5,7 +5,7 @@ import disnake
 from buttons.base import BaseView
 from config.app_config import config
 from database.report import AnswerDB, ReportDB
-from permissions import permission_check
+from permissions.checks import PermissionsCheck
 from rubbergod import Rubbergod
 
 from . import features as report_features
@@ -22,7 +22,7 @@ class ReportView(BaseView):
         return self.bot.get_channel(config.report_channel)
 
     async def interaction_check(self, inter: disnake.Interaction) -> bool:
-        return permission_check.submod_plus(inter, raise_exception=False)
+        return PermissionsCheck.is_submod_plus(inter, raise_exception=False)
 
     async def set_view_resolved(
         self, embed_dict: dict, author_id: str, report_id: int
@@ -279,7 +279,7 @@ class ReportAnswerOnlyView(BaseView):
             await inter.message.edit(view=None)
             await inter.send(MessagesCZ.report_already_solved(id=report_id), ephemeral=True)
             return False
-        return permission_check.submod_plus(inter)
+        return PermissionsCheck.is_submod_plus(inter)
 
     @disnake.ui.button(
         label="Send answer", emoji="✉️", style=disnake.ButtonStyle.secondary, custom_id="report:answer:only"
