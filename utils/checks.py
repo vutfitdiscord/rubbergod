@@ -9,10 +9,7 @@ from config.app_config import config
 from config.messages import Messages
 from utils.errors import (
     InvalidRoomError,
-    NotBotAdminError,
-    NotHelperPlusError,
-    NotModPlusError,
-    NotSubmodPlusError,
+    PermissionError,
 )
 
 PRIVILEGED_ROLES = [config.mod_role, config.submod_role, config.helper_role]
@@ -38,14 +35,14 @@ class PermissionsCheck:
         bool
             True if user is an admin, False otherwise.
         Exception
-            Throws `NotAdminError` if `raise_exception=True` and user doesn't have permissions.
+            Throws `PermissionError` if `raise_exception=True` and user doesn't have permissions.
         """
 
         def predicate(ctx: commands.Context | disnake.ApplicationCommandInteraction) -> bool:
             if ctx.author.id in config.admin_ids:
                 return True
             if raise_exception:
-                raise NotBotAdminError
+                raise PermissionError(message=Messages.bot_admin_only)
             return False
 
         if ctx:
@@ -71,7 +68,7 @@ class PermissionsCheck:
         bool
             True if user is an admin, False otherwise.
         Exception
-            Throws `NotModPlusError` if `raise_exception=True` and user doesn't have permissions.
+            Throws `PermissionError` if `raise_exception=True` and user doesn't have permissions.
         """
 
         def predicate(ctx: commands.Context | disnake.ApplicationCommandInteraction) -> bool:
@@ -81,7 +78,7 @@ class PermissionsCheck:
                 return True
 
             if raise_exception:
-                raise NotModPlusError
+                raise PermissionError(message=Messages.mod_plus_only)
             return False
 
         if ctx:
@@ -107,7 +104,7 @@ class PermissionsCheck:
         bool
             True if user is an admin, False otherwise.
         Exception
-            Throws `NotSubmodPlusError` if `raise_exception=True` and user doesn't have permissions.
+            Throws `PermissionError` if `raise_exception=True` and user doesn't have permissions.
         """
 
         def predicate(ctx: commands.Context | disnake.ApplicationCommandInteraction) -> bool:
@@ -117,7 +114,7 @@ class PermissionsCheck:
                 return True
 
             if raise_exception:
-                raise NotSubmodPlusError
+                raise PermissionError(message=Messages.submod_plus_only)
             return False
 
         if ctx:
@@ -143,7 +140,7 @@ class PermissionsCheck:
         bool
             True if user is an admin, False otherwise.
         Exception
-            Throws `NotHelperPlusError` if `raise_exception=True` and user doesn't have permissions.
+            Throws `PermissionError` if `raise_exception=True` and user doesn't have permissions.
         """
 
         def predicate(ctx: commands.Context | disnake.ApplicationCommandInteraction) -> bool:
@@ -153,7 +150,7 @@ class PermissionsCheck:
                 return True
 
             if raise_exception:
-                raise NotHelperPlusError
+                raise PermissionError(message=Messages.helper_plus_only)
             return False
 
         if ctx:
