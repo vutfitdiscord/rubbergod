@@ -375,11 +375,9 @@ class ErrorLogger:
             return True
 
         if (
-            isinstance(error, errors.NotHelperPlusError)
-            or isinstance(error, errors.NotSubmodPlusError)
-            or isinstance(error, errors.NotModPlusError)
-            or isinstance(error, errors.NotBotAdminError)
+            isinstance(error, errors.PermissionError)
             or isinstance(error, errors.InvalidRoomError)
+            or isinstance(error, errors.ApiError)
         ):
             await ctx.send(error.message)
             return True
@@ -390,10 +388,6 @@ class ErrorLogger:
 
         if isinstance(error, commands.MemberNotFound):
             await ctx.send(Messages.member_not_found(member=ctx.author.mention))
-            return True
-
-        if isinstance(error, errors.ApiError):
-            await ctx.send(error.message)
             return True
 
         # LEGACY COMMANDS
