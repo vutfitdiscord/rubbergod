@@ -192,7 +192,7 @@ class PermissionsCheck:
                 return True
 
             if raise_exception:
-                raise InvalidRoomError(Messages.mod_room_only(room=config.mod_room))
+                raise InvalidRoomError(Messages.specific_room_only(room=config.mod_room))
             return False
 
         if ctx:
@@ -215,7 +215,7 @@ class PermissionsCheck:
                 return True
 
             if raise_exception:
-                raise InvalidRoomError(Messages.vote_room_only(room=config.vote_room))
+                raise InvalidRoomError(Messages.specific_room_only(room=config.vote_room))
             return False
 
         if ctx:
