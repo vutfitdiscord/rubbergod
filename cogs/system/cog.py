@@ -35,13 +35,6 @@ class System(Base, commands.Cog):
         self.git = Git()
 
         self.unloadable_cogs = ["system"]
-        self.check_first_boot()
-
-    def check_first_boot(self):
-        """Check if the bot is booting for the first time. If so, set the error log."""
-        start_streak, end_streak = ErrorLogDB.get_longest_streak()
-        if not start_streak:
-            ErrorLogDB.set()
 
     @PermissionsCheck.is_bot_admin()
     @commands.slash_command(name="get_logs", description=MessagesCZ.get_logs_brief)
@@ -144,9 +137,8 @@ class System(Base, commands.Cog):
     @commands.slash_command(name="uptime", description=MessagesCZ.uptime_brief)
     async def uptime(self, inter: disnake.ApplicationCommandInteraction):
         await inter.response.defer()
-        now = datetime.now().replace(microsecond=0)
-        delta = now - boottime
-        count = self.error_log.log_error_time(set=False)
+        delta = datetime.now().replace(microsecond=0) - boottime
+        count = ErrorLogDB.days_without_error()
         embed = disnake.Embed(
             title="Uptime",
             description=f"{count} days without an accident.",

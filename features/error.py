@@ -18,7 +18,7 @@ from cogs.gif.features import ImageHandler
 from config.app_config import config
 from config.messages import Messages
 from database import session
-from database.error import ErrorLogDB, ErrorRow
+from database.error import ErrorLogDB
 from database.stats import ErrorEvent
 from permissions import custom_errors, permission_check
 from rubbergod import Rubbergod
@@ -110,21 +110,6 @@ class ErrorLogger:
             output = "".join(traceback.format_exception(type(error), error, error.__traceback__))
             rubbegod_logger.warning(output)
 
-    def log_error_time(self, set=True) -> int:
-        """Log details of last exception and return number of days since last exception"""
-        try:
-            today = datetime.date.today()
-            last_exception = ErrorLogDB.get(ErrorRow.last_error)
-            if last_exception:
-                count = (today - last_exception.date).days
-            else:
-                count = 0
-            if set:
-                ErrorLogDB.set()
-            return count
-        except Exception:
-            return 0
-
     def create_embed(
         self,
         command: str,
@@ -134,7 +119,8 @@ class ErrorLogger:
         jump_url: str | None,
         extra_fields: dict[str, str] = None,
     ):
-        count = self.log_error_time()
+        count = ErrorLogDB.days_without_error()
+        ErrorLogDB.set()
         embed = disnake.Embed(
             title=f"{count} days without an accident.\nIgnoring exception in {command}",
             color=0xFF0000,
