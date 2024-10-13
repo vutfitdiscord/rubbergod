@@ -29,5 +29,8 @@ def init_db(commit: bool = True):
     database.base.metadata.create_all(database.db)
     rubbergod_logger.info("Tables created")
 
+    # Initialize default values
+    ErrorLogDB.init()
+
     if commit:
         session.commit()
