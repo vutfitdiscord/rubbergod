@@ -275,7 +275,7 @@ async def send_to_grillbot(
     if mode == "delete":
         try:
             url = f"{config.grillbot_api_url}/user/measures/timeout/{timeout.id}"
-            async with grillbot_session.post(url) as response:
+            async with grillbot_session.delete(url) as response:
                 if response.status != 200:
                     return MessagesCZ.error_msg(url=url, status=response.status, text=await response.text())
                 return None
