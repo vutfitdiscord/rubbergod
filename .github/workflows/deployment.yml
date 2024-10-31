@@ -17,7 +17,7 @@ jobs:
         labels: '["no-deployment"]'
       timeout-minutes: 5
     outputs:
-      deploy: "${{ ! steps.check_deployment.outputs.result }}"
+      deploy: "${{ ! fromJson(steps.check_deployment.outputs.result) }}"
 
   pre_commit_ci:
     uses: vutfitdiscord/rubbergod/.github/workflows/lint.yml@main
