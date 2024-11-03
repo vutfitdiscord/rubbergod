@@ -33,7 +33,8 @@ class ContextMock:
     message: disnake.Message
 
     def __init__(self, bot: Rubbergod, arg):
-        self.channel = getattr(arg, "channel", bot.get_channel(arg.channel_id))
+        channel_id = getattr(arg, "channel_id", arg.channel.id)
+        self.channel = getattr(arg, "channel", bot.get_channel(channel_id))
         if hasattr(arg, "author"):
             self.author = arg.author
         elif hasattr(arg, "member"):
