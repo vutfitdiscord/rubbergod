@@ -48,8 +48,8 @@ class Latex(Base, commands.Cog):
                 "eq_latex": eq,
                 "eq_forecolor": foreground,
                 "eq_bkcolor": "Transparent",
-                "eq_font_family": "arev",
-                "eq_font": "12",
+                "eq_font_family": "iwona",
+                "eq_font": "25",
                 "eq_imformat": "PNG",
             }
             # Send request to create image
