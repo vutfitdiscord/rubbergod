@@ -23,7 +23,7 @@ MIT_SPECIALIZATIONS = [
     "NVER", "NSPE", "MGH", "MITP-EN",
 ]  # fmt: skip
 
-FACULTY_NAMES = ["FA", "FAST", "FAVU", "FCH", "FEKT", "FP", "FSI", "USI",]  # fmt: skip
+FACULTY_NAMES = ["FA", "FAST", "FAVU", "FCH", "FEKT", "FP", "FSI", "ÚSI",]  # fmt: skip
 
 
 class Verification(BaseFeature):
