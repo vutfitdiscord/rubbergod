@@ -62,7 +62,7 @@ async def add_field_timeout(
             author=author,
             starttime=starttime.strftime("%d.%m.%Y %H:%M"),
             endtime=endtime.strftime("%d.%m.%Y %H:%M"),
-            length=f"{length.days}d, " f"{length.seconds // 3600}h, " f"{(length.seconds // 60) % 60}m",
+            length=f"{length.days}d, {length.seconds // 3600}h, {(length.seconds // 60) % 60}m",
             timestamp=disnake.utils.format_dt(endtime, style="R"),
             reason=reason,
         ),

@@ -170,7 +170,7 @@ class ReviewManager:
                 grade_num = TierEnum.tier_to_grade_num(avg_tier)
                 grade = f"{TierEnum(round(avg_tier)).name}({round(grade_num, 1)})"
                 description = MessagesCZ.embed_description(name=name, grade=grade)
-                page = f"{idx+1}/{reviews_cnt}"
+                page = f"{idx + 1}/{reviews_cnt}"
 
                 embeds.append(self.make_embed(author, review, subject_details, description, page))
             return embeds

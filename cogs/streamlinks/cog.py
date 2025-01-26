@@ -327,7 +327,7 @@ class StreamLinks(Base, commands.Cog):
             embed,
             author,
             additional_text=[
-                f"[{streamlink.subject.upper()}] Page: {current_pos} / {links_count}" f" (#{streamlink.id})"
+                f"[{streamlink.subject.upper()}] Page: {current_pos} / {links_count} (#{streamlink.id})"
             ],
         )
 
