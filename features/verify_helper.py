@@ -49,8 +49,7 @@ class VerifyHelper:
             # student
             if "rok_studia" in relation.keys():
                 ret = (
-                    f"{relation['fakulta']['zkratka']} {relation['obor']['zkratka']} "
-                    f"{relation['rok_studia']}"
+                    f"{relation['fakulta']['zkratka']} {relation['obor']['zkratka']} {relation['rok_studia']}"
                 )
                 # do not return yet if not FIT, check for all relations if student has multiple studies
                 if relation["fakulta"]["zkratka"] == "FIT":

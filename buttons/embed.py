@@ -97,7 +97,7 @@ class PaginationView(BaseView):
         """Set footers with page numbers for each embed in list"""
         for page, embed in enumerate(self.embeds):
             utils.embed.add_author_footer(
-                embed, self.author, additional_text=[f"Page {page+1}/{self.max_page}"]
+                embed, self.author, additional_text=[f"Page {page + 1}/{self.max_page}"]
             )
 
     async def lock_callback(self, interaction: disnake.MessageInteraction):

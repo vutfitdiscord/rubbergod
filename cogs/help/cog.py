@@ -89,11 +89,11 @@ class Help(Base, commands.Cog):
         """
         for item in items:
             value = ""
-            name = f'{item["command"]}'
+            name = f"{item['command']}"
             if item["signature"] and item["signature"] != " ":
-                name += f' `{item["signature"]}`'
+                name += f" `{item['signature']}`"
             if item["aliases"]:
-                value += f'**Alias: **{", ".join(item["aliases"])}\n'
+                value += f"**Alias: **{', '.join(item['aliases'])}\n"
             value += item["description"] if item["description"] else ""
             embed.add_field(name=name, value=value if value else None, inline=False)
 
@@ -167,7 +167,7 @@ class Help(Base, commands.Cog):
         for idx, page in enumerate(pages):
             embed = self.generate_embed(page)
             if pages_total > 1:
-                footer_text = f"Strana {idx+1}/{pages_total}"
+                footer_text = f"Strana {idx + 1}/{pages_total}"
             embed.set_footer(text=footer_text, icon_url=ctx.author.display_avatar.url)
             embeds.append(embed)
 
