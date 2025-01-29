@@ -50,6 +50,7 @@ class Emoji(Base, commands.Cog):
         await inter.response.defer(ephemeral=PermissionsCheck.is_botroom(inter))
 
     @cooldowns.default_cooldown
+    @commands.guild_only()
     @emoji.sub_command(name="all", description=MessagesCZ.emoji_all_brief)
     async def get_emojis(self, inter: disnake.ApplicationCommandInteraction):
         """Get all emojis from server"""
