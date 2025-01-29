@@ -14,7 +14,7 @@ __pycache__
 .mypy_cache
 
 # Local files
-emojis.zip
+guilds/
 timeout_wars
 merlin-latest
 service_logs.txt

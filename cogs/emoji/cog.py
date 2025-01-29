@@ -23,12 +23,19 @@ class Emoji(Base, commands.Cog):
     def __init__(self, bot: Rubbergod):
         self.bot = bot
         self.tasks = [self.download_emojis_task.start()]
+        self.guild_folder = "guilds"
 
     async def download_emojis(self, guild: disnake.Guild):
         """Download all emojis from server and save them to zip file"""
+        folder_path = f"{self.guild_folder}/{guild.name}"
+        file_path = f"{folder_path}/emojis.zip"
         emojis = await guild.fetch_emojis()
         stickers = await guild.fetch_stickers()
-        with zipfile.ZipFile("emojis.zip", "w") as zip_file:
+
+        if not os.path.exists(folder_path):
+            os.makedirs(folder_path)
+
+        with zipfile.ZipFile(file_path, "w") as zip_file:
             for emoji in emojis:
                 with io.BytesIO() as image_binary:
                     if emoji.animated:
@@ -54,9 +61,10 @@ class Emoji(Base, commands.Cog):
     @emoji.sub_command(name="all", description=MessagesCZ.emoji_all_brief)
     async def get_emojis(self, inter: disnake.ApplicationCommandInteraction):
         """Get all emojis from server"""
-        if not os.path.exists("emojis.zip"):
-            await self.download_emojis(self.base_guild)
-        await inter.send(file=disnake.File("emojis.zip"))
+        file_path = f"{self.guild_folder}/{inter.guild.name}/emojis.zip"
+        if not os.path.exists(file_path):
+            await self.download_emojis(inter.guild)
+        await inter.send(file=disnake.File(file_path))
 
     @cooldowns.default_cooldown
     @emoji.sub_command(name="get", description=MessagesCZ.emoji_get_brief)
@@ -66,7 +74,8 @@ class Emoji(Base, commands.Cog):
 
     @tasks.loop(time=time(5, 0, tzinfo=utils.general.get_local_zone()))
     async def download_emojis_task(self):
-        await self.download_emojis(self.base_guild)
+        for guild in self.bot.guilds:
+            await self.download_emojis(guild)
 
     @get_emoji.error
     async def emoji_errors(self, inter: disnake.ApplicationCommandInteraction, error):
