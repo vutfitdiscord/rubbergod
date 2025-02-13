@@ -160,6 +160,10 @@ Cog containing commands that call random APIs for fun things.\
     - /dadjoke
     - /yo_mamajoke
     - /fuchs
+    - /xkcd
+**Tasks:**
+
+    - xkcd_task_update
 ---
 
 ### [Gif](gif/cog.py)
