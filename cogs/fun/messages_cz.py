@@ -10,3 +10,4 @@ class MessagesCZ(GlobalMessages):
     yo_mamajoke_brief = "Pošle náhodný Yo momma joke"
     fuchs_brief = "Pošle náhodnou fuchs reakci"
     fuchs_no_reaction = "Žádná fuchs reakce není k dispozici"
+    xkcd_brief = "Pošle náhodný XKCD komiks"

@@ -6,13 +6,13 @@ import contextlib
 import os
 import random
 import re
-from datetime import datetime
+from datetime import datetime, time
 from io import BytesIO
 from random import randint
 
 import aiohttp
 import disnake
-from disnake.ext import commands
+from disnake.ext import commands, tasks
 
 import utils
 from cogs.base import Base
@@ -20,6 +20,7 @@ from rubbergod import Rubbergod
 from utils import cooldowns
 from utils.errors import ApiError
 
+from . import features
 from .messages_cz import MessagesCZ
 
 fuchs_path = "cogs/fun/fuchs/"
@@ -30,9 +31,12 @@ class Fun(Base, commands.Cog):
     def __init__(self, bot: Rubbergod):
         super().__init__()
         self.bot = bot
+        self.xkcd_url: str = "https://xkcd.com"
+        self.total_xkcd_posts: int = 0
 
-    def custom_footer(self, author, url) -> str:
-        return f"📩 {author} | {url} • {datetime.now().strftime('%d.%m.%Y %H:%M')}"
+    async def update_xkcd_posts(self):
+        xkcd_post = await features.get_xkcd(self.bot.rubbergod_session, f"{self.xkcd_url}/info.0.json")
+        self.total_xkcd_posts = xkcd_post["num"]
 
     async def get_image(self, inter, url) -> tuple[BytesIO, str]:
         async with aiohttp.ClientSession() as session:
@@ -80,7 +84,7 @@ class Fun(Base, commands.Cog):
             fact_response = await self.get_fact("https://meowfacts.herokuapp.com/", "data")
 
         image_embed = disnake.Embed(color=disnake.Color.blue())
-        image_embed.set_footer(text=self.custom_footer(inter.author, "thecatapi.com"))
+        image_embed.set_footer(text=features.custom_footer(inter.author, "thecatapi.com"))
         image_embed.set_image(file=image_file)
         embeds: list[disnake.Embed] = [image_embed]
 
@@ -90,7 +94,7 @@ class Fun(Base, commands.Cog):
                 description=fact_response,
                 color=disnake.Color.blue(),
             )
-            fact_embed.set_footer(text=self.custom_footer(inter.author, "thecatapi.com"))
+            fact_embed.set_footer(text=features.custom_footer(inter.author, "thecatapi.com"))
             embeds.append(fact_embed)
 
         await inter.send(embeds=embeds)
@@ -109,7 +113,7 @@ class Fun(Base, commands.Cog):
             fact_response = await self.get_fact("https://dogapi.dog/api/facts/", "facts")
 
         image_embed = disnake.Embed(color=disnake.Color.blue())
-        image_embed.set_footer(text=self.custom_footer(inter.author, "thedogapi.com"))
+        image_embed.set_footer(text=features.custom_footer(inter.author, "thedogapi.com"))
         image_embed.set_image(file=image_file)
         embeds: list[disnake.Embed] = [image_embed]
 
@@ -119,7 +123,7 @@ class Fun(Base, commands.Cog):
                 description=fact_response,
                 color=disnake.Color.blue(),
             )
-            fact_embed.set_footer(text=self.custom_footer(inter.author, "thedogapi.com"))
+            fact_embed.set_footer(text=features.custom_footer(inter.author, "thedogapi.com"))
             embeds.append(fact_embed)
 
         await inter.send(embeds=embeds)
@@ -134,7 +138,7 @@ class Fun(Base, commands.Cog):
         image_file = disnake.File(image_bytes, filename=file_name)
 
         embed = disnake.Embed(color=disnake.Color.blue())
-        embed.set_footer(text=self.custom_footer(inter.author, "randomfox.ca"))
+        embed.set_footer(text=features.custom_footer(inter.author, "randomfox.ca"))
         embed.set_image(file=image_file)
 
         await inter.send(embed=embed)
@@ -149,7 +153,7 @@ class Fun(Base, commands.Cog):
         image_file = disnake.File(image_bytes, filename=file_name)
 
         embed = disnake.Embed(color=disnake.Color.blue())
-        embed.set_footer(text=self.custom_footer(inter.author, "random-d.uk"))
+        embed.set_footer(text=features.custom_footer(inter.author, "random-d.uk"))
         embed.set_image(file=image_file)
 
         await inter.send(embed=embed)
@@ -202,7 +206,7 @@ class Fun(Base, commands.Cog):
             color=disnake.Color.blue(),
             url="https://icanhazdadjoke.com/j/" + result["id"],
         )
-        embed.set_footer(text=self.custom_footer(inter.author, "icanhazdadjoke.com"))
+        embed.set_footer(text=features.custom_footer(inter.author, "icanhazdadjoke.com"))
 
         await inter.send(embed=embed)
 
@@ -224,7 +228,7 @@ class Fun(Base, commands.Cog):
             color=disnake.Color.blue(),
             url="https://www.yomama-jokes.com",
         )
-        embed.set_footer(text=self.custom_footer(inter.author, "https://www.yomama-jokes.com/"))
+        embed.set_footer(text=features.custom_footer(inter.author, "https://www.yomama-jokes.com/"))
 
         await inter.send(embed=embed)
 
@@ -256,3 +260,41 @@ class Fun(Base, commands.Cog):
 
         with open(fuchs_path + str(index) + ".png", "rb") as fp:
             await inter.send(embed=embed, file=disnake.File(fp=fp, filename=str(index) + ".png"))
+
+    @cooldowns.default_cooldown
+    @commands.slash_command(name="xkcd", description=MessagesCZ.xkcd_brief)
+    async def xkcd(
+        self,
+        inter: disnake.ApplicationCommandInteraction,
+        number: int = commands.Param(default=None, ge=1),
+        latest: bool = False,
+    ):
+        """Get random XKCD comic.
+        If `latest` is specified, get the latest comic.
+        If `number` is specified, get the comic with that number.
+        If `number` and `latest` is specified, get comic with specified number.
+        """
+        await inter.response.defer()
+        if not self.total_xkcd_posts:
+            await self.update_xkcd_posts()
+
+        if number:
+            url = f"{self.xkcd_url}/{number}"
+        elif latest:
+            url = f"{self.xkcd_url}"
+        else:
+            number = random.randint(1, self.total_xkcd_posts)
+            url = f"{self.xkcd_url}/{number}"
+
+        xkcd_post = await features.get_xkcd(self.bot.rubbergod_session, f"{url}/info.0.json")
+        embed = await features.create_xkcd_embed(xkcd_post, inter.author, url)
+        await inter.send(embed=embed)
+
+    @tasks.loop(time=time(12, 0, tzinfo=utils.general.get_local_zone()))
+    async def xkcd_task_update(self):
+        """Update number of xkcd comics every sunday"""
+        if datetime.today().isoweekday() != 7:
+            # update only on sunday
+            return
+
+        await self.update_xkcd_posts()
