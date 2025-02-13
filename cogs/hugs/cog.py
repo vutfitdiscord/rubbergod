@@ -192,7 +192,7 @@ class Hugs(Base, commands.Cog):
         if user != inter.author:
             self.hugs_db.do_hug(giver_id=inter.author.id, receiver_id=user.id)
 
-        user_str = inter.author.display_name
+        user_str = user.display_name
 
         # Convert a human-friendly intensity to an array index
         intensity -= 1
