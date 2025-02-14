@@ -2,6 +2,8 @@
 
 cd "$(dirname "$0")"
 
+HOSTNAME=$(hostname)
+
 if [ "$HOSTNAME" = "merlin.fit.vutbr.cz" ]; then
 	./leakcheck-merlin
 else
