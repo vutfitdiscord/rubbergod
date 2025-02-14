@@ -20,7 +20,7 @@ class ApiError(commands.CommandError):
 
 
 class CustomError(commands.CommandError):
-    """An error allowing to set any custom message"""
+    """An error allowing to set custom message."""
 
     def __init__(self, error: str) -> None:
         self.message = error
