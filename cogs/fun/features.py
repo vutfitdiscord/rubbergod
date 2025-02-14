@@ -4,7 +4,9 @@ from datetime import datetime
 import aiohttp
 import disnake
 
-from utils.errors import ApiError
+from utils.errors import ApiError, CustomError
+
+from .messages_cz import MessagesCZ
 
 
 def custom_footer(author: disnake.User, url: str) -> str:
@@ -15,6 +17,8 @@ async def get_xkcd(rubbergod_session: aiohttp.ClientSession, url: str) -> dict:
     try:
         async with rubbergod_session.get(url) as resp:
             if resp.status != 200:
+                if resp.status == 404:
+                    raise CustomError(MessagesCZ.xkcd_no_such_comics)
                 raise ApiError(resp.status)
             res = await resp.json()
         return res

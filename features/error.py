@@ -365,6 +365,7 @@ class ErrorLogger:
             isinstance(error, errors.PermissionError)
             or isinstance(error, errors.InvalidRoomError)
             or isinstance(error, errors.ApiError)
+            or isinstance(error, errors.CustomError)
         ):
             await ctx.send(error.message)
             return True

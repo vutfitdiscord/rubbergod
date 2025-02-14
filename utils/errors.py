@@ -19,6 +19,13 @@ class ApiError(commands.CommandError):
         self.message = Messages.api_error(error=error)
 
 
+class CustomError(commands.CommandError):
+    """An error allowing to set any custom message"""
+
+    def __init__(self, error: str) -> None:
+        self.message = error
+
+
 class PermissionError(commands.CommandError):
     """An error indicating that the user doesn't have the required permissions."""
 
