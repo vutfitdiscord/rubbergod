@@ -287,6 +287,9 @@ class Fun(Base, commands.Cog):
             url = f"{self.xkcd_url}/{number}"
 
         xkcd_post = await features.get_xkcd(self.bot.rubbergod_session, f"{url}/info.0.json")
+        if latest:
+            # Make the latest comic static
+            url += f"/{xkcd_post['num']}"
         embed = await features.create_xkcd_embed(xkcd_post, inter.author, url)
         await inter.send(embed=embed)
 
