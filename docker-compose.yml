@@ -1,11 +1,12 @@
 services:
     db:
+        image: postgres:16-alpine
+        container_name: rubbergod-postgres
         deploy:
             restart_policy:
                 condition: unless-stopped
                 delay: 5s
                 window: 20s
-        image: postgres:16-alpine
         environment:
             POSTGRES_USER: rubbergod
             POSTGRES_DB: rubbergod
@@ -16,12 +17,13 @@ services:
             - postgres_data:/var/lib/postgresql/data/
             - ./database/backup/backup.sql:/docker-entrypoint-initdb.d/backup.sql
     bot:
+        image: rubbergod-bot
+        container_name: rubbergod-bot
         deploy:
             restart_policy:
                 condition: unless-stopped
                 delay: 5s
                 window: 20s
-        image: rubbergod-bot
         build:
             context: .
             dockerfile: Dockerfile
