@@ -3,7 +3,7 @@
 ## Connecting to the DB through Docker (externally)
 
 ```bash
-docker compose exec -it db psql -U rubbergod
+docker compose exec -it rubbergod-postgres psql -U rubbergod
 ```
 
 PostgreSQL prompt will open and you can now run any SQL (or Postgre-specific) commands you want. To quit, press Ctrl+D.
@@ -71,13 +71,13 @@ That way, the module gets imported on startup and creates the table automaticall
 > For most of these operations you need the database container running.
 > ```bash
 > docker compose down       # first make sure the bot is not running
-> docker compose up -d db
+> docker compose up -d rubbergod-postgres
 > ```
 
 To backup the database, run the following command:
 
 ```bash
-docker compose exec db pg_dump -U rubbergod -d rubbergod > backup.sql
+docker compose exec rubbergod-postgres pg_dump -U rubbergod -d rubbergod > backup.sql
 ```
 
 Restore the database from the backup file automatically by running the following commands:
@@ -95,21 +95,21 @@ To manually restore the database, run the following commands:
 
 ```bash
 # drop and recreate the database must be separate commands
-docker compose exec db psql -U rubbergod -d postgres -c "DROP DATABASE rubbergod;"
-docker compose exec db psql -U rubbergod -d postgres -c "CREATE DATABASE rubbergod WITH OWNER rubbergod;"
+docker compose exec rubbergod-postgres psql -U rubbergod -d postgres -c "DROP DATABASE rubbergod;"
+docker compose exec rubbergod-postgres psql -U rubbergod -d postgres -c "CREATE DATABASE rubbergod WITH OWNER rubbergod;"
 
 # restore the database from the backup file
-docker compose exec -T db psql -U rubbergod < backup.sql
+docker compose exec -T rubbergod-postgres psql -U rubbergod < backup.sql
 ```
 
 You can drop specific table using this command:
 
 ```bash
-docker compose exec db psql -U rubbergod -c "DROP TABLE [table_name] CASCADE;"
+docker compose exec rubbergod-postgres psql -U rubbergod -c "DROP TABLE [table_name] CASCADE;"
 ```
 
 To get only specific table and it's data use this command:
 
 ```bash
-docker compose exec db pg_dump -U rubbergod -d rubbergod -t [table_name] > [table_name].sql
+docker compose exec rubbergod-postgres pg_dump -U rubbergod -d rubbergod -t [table_name] > [table_name].sql
 ```
