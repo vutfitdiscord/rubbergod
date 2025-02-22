@@ -2,6 +2,14 @@
 # Generate ssh keys for `/ios` and `/verify_db pull`
 
 SSH_DIR="/root/.ssh" # Everything runs as root inside the container
+BOT_CONTAINER_NAME="rubbergod-bot-1"
+
+function error_exit() {
+        printf "\033[0;31mERROR:\033[0m $1\n"
+        exit $2
+}
+
+docker ps | grep $BOT_CONTAINER_NAME >/dev/null || error_exit "Bot container must be set up and running" $?
 
 # Exit on error
 set -e
@@ -11,7 +19,7 @@ olddir="$(pwd)"
 cd "$(dirname "$0")"
 cd ..
 
-printf "your xlogin00: "
+printf "# your xlogin00: "
 read xlogin
 printf "\n"
 
@@ -30,7 +38,7 @@ Host merlin
 "
 
 # `ash` is not a mistake; Rubbergod Alpine does not have bash
-docker exec -i rubbergod-bot-1 ash << EOF
+docker exec -i "$BOT_CONTAINER_NAME" ash << EOF
 set -e
 mkdir -p "$SSH_DIR"
 chmod 755 "$SSH_DIR"
