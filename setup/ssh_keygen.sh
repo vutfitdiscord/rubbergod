@@ -2,7 +2,7 @@
 # Generate ssh keys for `/ios` and `/verify_db pull`
 
 SSH_DIR="/root/.ssh" # Everything runs as root inside the container
-BOT_CONTAINER_NAME="rubbergod-bot-1"
+BOT_CONTAINER_NAME="rubbergod-bot"
 
 function error_exit() {
         printf "\033[0;31mERROR:\033[0m $1\n"
