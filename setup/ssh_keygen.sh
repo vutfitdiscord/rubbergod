@@ -23,6 +23,7 @@ Host eva merlin
     HostName %h.fit.vutbr.cz
     User $xlogin
     RequestTTY no
+    StrictHostKeyChecking no
 
 Host merlin
     ProxyCommand ssh -i /root/.ssh/nc_eva_merlin %r@eva\
