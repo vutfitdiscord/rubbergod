@@ -59,7 +59,7 @@ jobs:
             trap remove_lock EXIT
 
             echo "================== Pull Changes =================="
-            cd rubbergod
+            cd /rubbergod/rubbergod
             git pull
 
             echo "================== Build Image =================="
