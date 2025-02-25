@@ -31,6 +31,8 @@ pagination_regex = re.compile(r"^\[([^\]]*)\]\s*Page:\s*(\d*)\s*\/\s*(\d*)")
 subjects: list[tuple[str]] = []
 subjects_with_stream: list[tuple[str]] = []
 
+escape = disnake.utils.escape_markdown
+
 
 async def autocomp_subjects(inter: disnake.ApplicationCommandInteraction, user_input: str):
     return [subject[0] for subject in subjects if user_input.lower() in subject[0]][:25]
@@ -95,7 +97,9 @@ class StreamLinks(Base, commands.Cog):
         messages = [f"Streamy k **{subject.upper()}**:"]
         for stream in streamlinks:
             date = stream.created_at.strftime("%d. %m. %Y")
-            messages.append(f"**{stream.member_name}** ({date}) - [{stream.description}](<{stream.link}>)\n")
+            messages.append(
+                f"**{escape(stream.member_name)}** ({date}) - [{stream.description}](<{stream.link}>)\n"
+            )
 
         await send_list_of_messages(inter, messages, ephemeral=PermissionsCheck.is_botroom(inter))
 
@@ -246,7 +250,7 @@ class StreamLinks(Base, commands.Cog):
         embed = disnake.Embed(title="Odkaz na stream byl smazán", color=disnake.Color.yellow())
         embed.add_field(name="Provedl", value=user.name)
         embed.add_field(name="Předmět", value=stream.subject.upper())
-        embed.add_field(name="Od", value=stream.member_name)
+        embed.add_field(name="Od", value=escape(stream.member_name))
         embed.add_field(name="Popis", value=stream.description[:1024])
         embed.add_field(name="Odkaz", value=f"[link]({stream.link})", inline=False)
         embed.timestamp = datetime.now(timezone.utc)
@@ -314,7 +318,7 @@ class StreamLinks(Base, commands.Cog):
             embed.set_image(url=streamlink.thumbnail_url)
 
         embed.add_field(name="Předmět", value=streamlink.subject.upper(), inline=True)
-        embed.add_field(name="Od", value=streamlink.member_name, inline=True)
+        embed.add_field(name="Od", value=escape(streamlink.member_name), inline=True)
         embed.add_field(
             name="Datum vydání",
             value=disnake.utils.format_dt(streamlink.created_at, style="d"),
