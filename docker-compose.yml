@@ -16,6 +16,9 @@ services:
             - ./logs:/var/log:Z
             - postgres_data:/var/lib/postgresql/data/
             - ./database/backup/backup.sql:/docker-entrypoint-initdb.d/backup.sql
+        networks:
+            - postgres
+
     bot:
         image: rubbergod-bot
         container_name: rubbergod-bot
@@ -34,7 +37,15 @@ services:
             - ssh_config:/root/.ssh
         depends_on:
             - db
+        networks:
+            - postgres
+            - prometheus
 
 volumes:
     postgres_data:
     ssh_config:
+
+networks:
+    postgres:
+    prometheus:
+        external: true
