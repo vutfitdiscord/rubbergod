@@ -304,6 +304,16 @@ Cog for sending name days and birthdays.\
     - send_names
 ---
 
+### [Prometheus](prometheus/cog.py)
+
+Module for tracking statistics about bot into [Grafana dashboard](prometheus/grafana_dashboard.json). You will need Grafana server and Prometheus server running alongside bot.\
+**Commands:**
+
+**Tasks:**
+
+    - latency_loop
+---
+
 ### [Random](random/cog.py)
 
 Implementing commands using random module.\

@@ -36,7 +36,7 @@ extensions = [
     'karma', 'meme', 'bettermeme', 'random', 'verify', 'fitwide', 'autopin',
     'help', 'review', 'week', 'roles', 'error', 'absolvent', 'gif', 'reactions',
     'streamlinks', 'bookmark', 'latex', 'info', 'fun', 'moderation', 'message',
-    'timeout', 'forum', 'report', 'contestvote', 'emoji', 'hugs',
+    'timeout', 'forum', 'report', 'contestvote', 'emoji', 'hugs', 'prometheus',
 ]
 
 [config]
