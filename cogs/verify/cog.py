@@ -37,7 +37,11 @@ class Verify(Base, commands.Cog):
 
     @cooldowns.default_cooldown
     @commands.check(is_valid_guild)
-    @commands.slash_command(name="verify", description=MessagesCZ.verify_brief, dm_permission=True)
+    @commands.slash_command(
+        name="verify",
+        description=MessagesCZ.verify_brief,
+        contexts=disnake.InteractionContextTypes(bot_dm=True),
+    )
     async def verify(
         self,
         inter: disnake.ApplicationCommandInteraction,
