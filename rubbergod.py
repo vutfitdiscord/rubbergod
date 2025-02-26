@@ -78,6 +78,8 @@ class Rubbergod(commands.Bot):
     def init_cogs(self) -> None:
         self.load_extension("cogs.system")
         self.logger.info("SYSTEM loaded")
+        self.load_extension("cogs.prometheus")
+        self.logger.info("PROMETHEUS loaded")
 
         for extension in config.extensions:
             self.load_extension(f"cogs.{extension}")
