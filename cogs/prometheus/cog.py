@@ -117,9 +117,8 @@ class Prometheus(Base, commands.Cog):
                 # Context Command
                 command_name = interaction.command
 
-        ON_INTERACTION_COUNTER.labels(
-            shard_id, interaction.type.name, interaction.guild.id, command_name
-        ).inc()
+        guild_id = interaction.guild.id if interaction.guild else "DM"
+        ON_INTERACTION_COUNTER.labels(shard_id, interaction.type.name, guild_id, command_name).inc()
 
     @commands.Cog.listener()
     async def on_connect(self):
