@@ -61,7 +61,7 @@ Now open the `config.toml` file in your editor. Insert the Discord API key you o
 ...
 ```
 
-> [!WARNING]
+> [!CAUTION]
 > __Be careful.__ Bad things will happen if anyone else gets a possession of this key. Do not share it with anyone, ever!
 
 On the next two lines, insert your Discord user and server ID so you get administrator rights over the bot:
@@ -86,10 +86,10 @@ Then, create the following 5 channels (or use one channel for all of them) on yo
 
 (Optional) For some features you will also need to set other config variables, usually they are divided into categories based on cogs.
 
-#### Permissions and variables
+#### Additional steps
 
-> [!CAUTION]
-> There are needed some additional steps for permissions and variables.
+> [!IMPORTANT]
+> Additional steps are needed to complete the setup:
 >
 > ```bash
 > ./init.sh
@@ -205,4 +205,4 @@ You can discuss bot-related stuff in the [`#bot-development`](https://discord.co
 
 ## License
 
-This project is licensed under the GNU GPL v.3 License.
+This project is licensed under the GNU GPL v3 License.
