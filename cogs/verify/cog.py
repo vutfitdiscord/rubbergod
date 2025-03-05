@@ -40,7 +40,7 @@ class Verify(Base, commands.Cog):
     @commands.slash_command(
         name="verify",
         description=MessagesCZ.verify_brief,
-        contexts=disnake.InteractionContextTypes(bot_dm=True),
+        contexts=disnake.InteractionContextTypes(bot_dm=True, guild=True),
     )
     async def verify(
         self,
