@@ -33,6 +33,7 @@ class PermissionsCheck:
         return cls.check_template(
             ctx,
             lambda ctx: ctx.author.id in config.admin_ids,
+            cls.is_bot_admin.__name__,
             raise_exception,
             PermissionError(Messages.bot_admin_only),
         )
@@ -49,6 +50,7 @@ class PermissionsCheck:
             lambda ctx: (
                 cls.is_bot_admin(ctx, raise_exception=False) or cls.role_check(ctx, PRIVILEGED_ROLES[:-2])
             ),
+            cls.is_mod_plus.__name__,
             raise_exception,
             PermissionError(Messages.mod_plus_only),
         )
@@ -66,6 +68,7 @@ class PermissionsCheck:
             lambda ctx: (
                 cls.is_bot_admin(ctx, raise_exception=False) or cls.role_check(ctx, PRIVILEGED_ROLES[:-1])
             ),
+            cls.is_submod_plus.__name__,
             raise_exception,
             PermissionError(Messages.submod_plus_only),
         )
@@ -82,6 +85,7 @@ class PermissionsCheck:
             lambda ctx: (
                 cls.is_bot_admin(ctx, raise_exception=False) or cls.role_check(ctx, PRIVILEGED_ROLES)
             ),
+            cls.is_helper_plus.__name__,
             raise_exception,
             PermissionError(Messages.helper_plus_only),
         )
@@ -115,6 +119,7 @@ class PermissionsCheck:
         return cls.check_template(
             ctx,
             lambda ctx: ctx.channel.id == config.mod_room,
+            cls.is_in_modroom.__name__,
             raise_exception,
             InvalidRoomError(Messages.specific_room_only(room=config.mod_room)),
         )
@@ -129,6 +134,7 @@ class PermissionsCheck:
         return cls.check_template(
             ctx,
             lambda ctx: ctx.channel.id == config.vote_room,
+            cls.is_in_voteroom.__name__,
             raise_exception,
             InvalidRoomError(Messages.specific_room_only(room=config.vote_room)),
         )
@@ -163,6 +169,7 @@ class PermissionsCheck:
         cls,
         ctx: commands.Context | disnake.ApplicationCommandInteraction,
         check: Callable,
+        check_name: str,
         raise_exception: bool,
         exception: Exception,
     ) -> bool:
@@ -185,6 +192,8 @@ class PermissionsCheck:
             if raise_exception:
                 raise exception
             return False
+
+        predicate.__name__ = check_name
 
         if ctx:
             # If ctx is passed, return the result of the predicate
