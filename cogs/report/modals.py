@@ -165,3 +165,11 @@ class Modal(disnake.ui.Modal):
         ReportDB.set_report_url(report_id, message.jump_url)
 
         await self.edit_or_send(inter, embed)
+
+        # Choose random person with the role to handle the report
+        try:
+            wolf_role_id = config.wolf_role
+            user = await utils.user.get_random_user_with_role(inter.guild, wolf_role_id)
+            await thread.send(MessagesCZ.random_selected.format(user=user.mention))
+        except ValueError as e:
+            await thread.send(MessagesCZ.couldnt_choose_random.format(error=e))

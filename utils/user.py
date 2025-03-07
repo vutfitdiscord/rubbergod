@@ -1,3 +1,4 @@
+import random
 import re
 
 import disnake
@@ -38,3 +39,15 @@ async def get_members_from_tag(guild: disnake.Guild, tag: str) -> list[disnake.M
             continue
         members.append(member)
     return members
+
+
+async def get_random_user_with_role(guild: disnake.Guild, role_id: int) -> disnake.Member:
+    role = guild.get_role(role_id)
+    if role is None:
+        raise ValueError(f"Role s ID {role_id} neexistuje <:sadge:1347543827145293865>")
+
+    members_with_role = [member for member in guild.members if role in member.roles]
+    if not members_with_role:
+        raise ValueError(f"Nikdo nemá roli {role_id} <:sadge:1347543827145293865>")
+
+    return random.choice(members_with_role)
