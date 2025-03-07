@@ -31,3 +31,5 @@ class MessagesCZ(GlobalMessages):
     report_not_found = "Report nebyl nalezen"
     report_id_missing = "Chybí ID reportu v embedu"
     missing_embed = "Ve zprávě chybí embed"
+    random_selected = "Vybral jsem nešťastníka, co má tenhle report na starosti: {user}"
+    couldnt_choose_random = "Nepodařilo se vybrat nešťastníka, co by měl tenhle report na starosti: {error}"

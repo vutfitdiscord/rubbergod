@@ -13,6 +13,7 @@ helper_role = 461550323727859712
                 # Vyucujici           Doktorand
 teacher_roles = [1020697715857948733, 591348532422639666]
 newbie_role = 1284579246400082034
+wolf_role = 1347502607740047465
 
 [verification]
 role = ''
