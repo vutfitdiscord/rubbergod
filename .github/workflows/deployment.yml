@@ -29,7 +29,7 @@ jobs:
     if: github.ref == 'refs/heads/main' && needs.check_deployment.outputs.deploy == 'true'
     steps:
       - name: Execute deployment on SSH
-        uses: appleboy/ssh-action@v1.2.1
+        uses: appleboy/ssh-action@v1.2.2
         with:
           host: ${{ secrets.PRODUCTION_HOST }}
           key: ${{ secrets.PRODUCTION_SSH_KEY }}
