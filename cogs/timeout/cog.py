@@ -89,6 +89,7 @@ class Timeout(Base, commands.Cog):
                     starttime=inter.created_at,
                     endtime=endtime.utc,
                     reason=reason,
+                    isself=False
                 )
                 await features.add_field_timeout(
                     embed=embed,
