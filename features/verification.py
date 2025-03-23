@@ -188,14 +188,14 @@ class Verification(BaseFeature):
     def transform_year(raw_year: str):
         """Parses year string originally from /etc/passwd into a role name"""
 
-        if raw_year.lower() == "dropout":
-            return "Dropout"
+        if raw_year.lower() == "exstudent":
+            return "ExStudent"
 
         year_parts = list(filter(lambda x: len(x.strip()) > 0, raw_year.split()))
 
         if year_parts[0] == "FIT":  # FIT student, or some VUT student.
             if len(year_parts) != 3:
-                # ['FIT'], ['FIT', '1r'], .... Who knows. Other faculty students, dropouts, ...
+                # ['FIT'], ['FIT', '1r'], .... Who knows. Other faculty students, ExStudents, ...
                 return None
 
             year_value_match = re.search(r"(\d*)r?", year_parts[2])

@@ -184,11 +184,11 @@ async def get_members_with_unmatching_year(
 ) -> dict[disnake.Role, dict[disnake.Role, list[disnake.Member]]]:
     verified = await get_verified_members(guild)
 
-    dropout = disnake.utils.get(guild.roles, name="Dropout")
+    ex_student = disnake.utils.get(guild.roles, name="ExStudent")
     survivor = disnake.utils.get(guild.roles, name="Survivor")
     king = disnake.utils.get(guild.roles, name="King")
 
-    dropout_alternatives = [survivor, king]
+    ex_student_alternatives = [survivor, king]
 
     years = [
         "0BIT",
@@ -201,7 +201,7 @@ async def get_members_with_unmatching_year(
         "Doktorand",
         "Vyucujici/Zamestnanec",
         "VUT",
-        "Dropout",
+        "ExStudent",
     ]
 
     year_roles = {year: disnake.utils.get(guild.roles, name=year) for year in years}
@@ -225,7 +225,7 @@ async def get_members_with_unmatching_year(
         year = Verification.transform_year(person.year)
 
         if year is None:
-            year = "Dropout"
+            year = "ExStudent"
 
         correct_role = disnake.utils.get(guild.roles, name=year)
 
@@ -239,10 +239,12 @@ async def get_members_with_unmatching_year(
                     unmatching_members[role][correct_role].append(member)
                     break
             else:
-                if correct_role == dropout and any(role in member.roles for role in dropout_alternatives):
-                    # if the desired role is dropout but the user has a dropout alternative role then skip
+                if correct_role == ex_student and any(
+                    role in member.roles for role in ex_student_alternatives
+                ):
+                    # if the desired role is ExStudent but the user has a ExStudent alternative role then skip
                     continue
-                # otherwise just add them to the dropout -> correct_role list
-                unmatching_members[dropout][correct_role].append(member)
+                # otherwise just add them to the ExStudent -> correct_role list
+                unmatching_members[ex_student][correct_role].append(member)
 
     return unmatching_members

@@ -202,7 +202,7 @@ class Absolvent(Base, commands.Cog):
             absolvent_role = disnake.utils.get(self.base_guild.roles, id=self.config.ing_role_id)
         if absolvent_role:
             for role in author.roles:
-                if "Dropout" in role.name:
+                if "ExStudent" in role.name:
                     await author.remove_roles(role, reason="Diploma verification")
                     break
             await author.add_roles(absolvent_role)
