@@ -166,8 +166,8 @@ class FitWide(Base, commands.Cog):
     @cooldowns.default_cooldown
     @PermissionsCheck.is_bot_admin()
     @PermissionsCheck.is_in_modroom()
-    @commands.slash_command(name="dropout_check", description=MessagesCZ.dropout_check_brief)
-    async def dropout_check(self, inter: disnake.ApplicationCommandInteraction, p_debug: bool = True):
+    @commands.slash_command(name="exstudent_check", description=MessagesCZ.exstudent_check_brief)
+    async def exstudent_check(self, inter: disnake.ApplicationCommandInteraction, p_debug: bool = True):
         await inter.send(MessagesCZ.role_check_start)
         message = await inter.original_response()
         guild = inter.guild
@@ -175,7 +175,7 @@ class FitWide(Base, commands.Cog):
         survivor = disnake.utils.get(guild.roles, name="Survivor")
         king = disnake.utils.get(guild.roles, name="King")
 
-        dropout_alternatives = [survivor, king]
+        ex_student_alternatives = [survivor, king]
 
         unmatching_members = await features.get_members_with_unmatching_year(guild)
 
@@ -186,7 +186,7 @@ class FitWide(Base, commands.Cog):
                 source_year = source_role.name
                 target_year = target_role.name
                 target_ids = [member.id for member in target_members]
-                if target_year == "Dropout":
+                if target_year == "ExStudent":
                     await message.reply(
                         MessagesCZ.role_check_move(
                             people_count=len(target_members), target_year=target_year, source_year=source_year
@@ -198,7 +198,7 @@ class FitWide(Base, commands.Cog):
                         continue
 
                     for member in target_members:
-                        if not (any(role in member.roles for role in dropout_alternatives)):
+                        if not (any(role in member.roles for role in ex_student_alternatives)):
                             await member.add_roles(target_role)
                         await member.remove_roles(source_role)
 
@@ -394,8 +394,8 @@ class FitWide(Base, commands.Cog):
 
         updated_person = await self.helper.check_api(person.login)
         if updated_person is None:
-            if person.year != "MUNI" and person.year != "dropout":
-                person.year = "dropout"
+            if person.year != "MUNI" and person.year != "ExStudent":
+                person.year = "ExStudent"
         else:
             ValidPersonDB.merge_person(updated_person)
 
@@ -415,7 +415,7 @@ class FitWide(Base, commands.Cog):
         message = await inter.original_response()
 
         all_persons = ValidPersonDB.get_all_vut_persons()
-        dropout_count = 0
+        exstudent_count = 0
 
         if continue_from_login:
             for index, person in enumerate(all_persons):
@@ -436,16 +436,16 @@ class FitWide(Base, commands.Cog):
             self.bot.logger.info(f"Checking {person.login}")
             updated_person = await self.helper.check_api(person.login)
             if updated_person is None:
-                if person.year != "MUNI" and person.year != "dropout":
-                    person.year = "dropout"
-                    dropout_count += 1
+                if person.year != "MUNI" and person.year != "ExStudent":
+                    person.year = "ExStudent"
+                    exstudent_count += 1
                 continue
 
             # This will have the side-effect of mixing up "0bit"/"0mit" with the others again
             # until the enrollment to the next year
             ValidPersonDB.merge_person(updated_person)
 
-        await message.reply(MessagesCZ.update_db_done(dropout_count=dropout_count))
+        await message.reply(MessagesCZ.update_db_done(exstudent_count=exstudent_count))
 
     @verify_db.sub_command(name="get_login", description=MessagesCZ.get_login_brief)
     async def get_login(self, inter: disnake.ApplicationCommandInteraction, member: disnake.User):
