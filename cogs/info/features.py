@@ -63,7 +63,7 @@ async def create_nasa_embed(author: disnake.User, response: dict) -> tuple[disna
         url=MessagesCZ.nasa_url,
         color=disnake.Color.blurple(),
     )
-    url = response["hdurl"] if response.get("hdurl", None) else response["url"]
+    url = response["hdurl"] if response.get("hdurl", None) else response.get("url", None)
     utils.embed.add_author_footer(embed, author)
     if response.get("media_type", None) != "video":
         embed.set_image(url=url)
