@@ -3,6 +3,7 @@ Cog for diploma verification. When successful, the user is given Survivor(Bc.) o
 """
 
 import asyncio
+import logging
 import re
 import unicodedata
 
@@ -22,6 +23,7 @@ from .messages_cz import MessagesCZ
 class Absolvent(Base, commands.Cog):
     def __init__(self, bot: Rubbergod):
         super().__init__()
+        self.logger = logging.getLogger("rubbergod")
         self.bot = bot
 
     @commands.slash_command(name="diplom_help", description=MessagesCZ.diplom_help_brief)
@@ -119,7 +121,7 @@ class Absolvent(Base, commands.Cog):
         master_thesis = "".join(xDoc_thesis.xpath(breadcrumb_xpath.format(3, "diplomové práce")))
         bachelor_thesis = "".join(xDoc_thesis.xpath(breadcrumb_xpath.format(3, "bakalářské práce")))
         thesis_author_without_degree_surname_first = "".join(
-            xDoc_thesis.xpath('//div[./h5/.="Authors"]//div/a/text()')
+            xDoc_thesis.xpath('//div[./h5/.="Authors"]//div//text()')
         ).strip()
         habilitation_date = "".join(xDoc_thesis.xpath('//div[./h5/.="Date of acceptance"]//div/span/text()'))
         result = "".join(xDoc_thesis.xpath('//div[./h5/.="Result of defence"]//div/span/text()'))
@@ -143,6 +145,14 @@ class Absolvent(Base, commands.Cog):
             and thesis_author_without_degree_surname_first == full_name_without_degree_surname_first
         ):
             await inter.edit_original_response(MessagesCZ.web_error)
+            self.logger.info(f"[Absolvent] Thesis verification failed for thesis: {thesis_url}")
+            self.logger.info("[Absolvent] Data parsed from the website:")
+            self.logger.info(f"Degree: {degree}")
+            self.logger.info(f"Thesis: {master_thesis} {bachelor_thesis}")
+            self.logger.info(f"diploma_year: {diploma_year}")
+            self.logger.info(f"habilitation_year: {habilitation_year}")
+            self.logger.info(f"faculty: {faculty}")
+            self.logger.info(f"result: {result}")
             return
 
         # DIPLOMA VALIDITY CHECK
