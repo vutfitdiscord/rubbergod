@@ -103,7 +103,7 @@ class VerifyHelper:
 
     async def get_mails(self, id: str) -> list[str]:
         user = await self.get_user_details(id)
-        return user["emaily"] if user else []
+        return list(set(user["emaily"])) if user else []
 
     async def log_relation_error(self, user: dict) -> None:
         name = user["login"] or user["id"]
