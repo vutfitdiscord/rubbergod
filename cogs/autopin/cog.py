@@ -60,13 +60,18 @@ class AutoPin(Base, commands.Cog):
                 await inter.send(MessagesCZ.system_message)
                 return
 
-            if len(await message.channel.pins()) == 50:
+            pin_limit = 50
+            if len(await message.channel.pins()) == pin_limit and not message.pinned:
                 await inter.send(MessagesCZ.max_pins_error)
                 return
 
             PinMapDB.add_or_update_channel(str(message.channel.id), str(message.id))
 
             if not message.pinned:
+                await message.pin()
+            else:
+                # If the message is already pinned, re-pin to promote it
+                await message.unpin()
                 await message.pin()
 
             await inter.send(MessagesCZ.add_done)
