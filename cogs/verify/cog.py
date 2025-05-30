@@ -136,7 +136,9 @@ class Verify(Base, commands.Cog):
 
     @PermissionsCheck.is_submod_plus()
     @commands.user_command(name="Verify host", guild_ids=[Base.config.guild_id])
-    async def verify_host(self, inter: disnake.UserCommandInteraction, member: disnake.Member):
+    async def verify_host(
+        self, inter: disnake.UserCommandInteraction, member: disnake.Member, zajemce: bool = False
+    ):
         """add verify and host role to new member"""
         await inter.response.defer()
         host_id = inter.guild.get_role(self.config.verification_host_id)
@@ -147,6 +149,9 @@ class Verify(Base, commands.Cog):
         try:
             await member.remove_roles(newbie_id)
             await member.add_roles(host_id, verify_id)
+            if zajemce:
+                zajemce_id = inter.guild.get_role(self.config.zajemce_role)
+                await member.add_roles(zajemce_id)
         except AttributeError:
             raise commands.errors.MemberNotFound("Member not found")
         response_message = MessagesCZ.verify_verify_success(user=member.id)
@@ -156,3 +161,8 @@ class Verify(Base, commands.Cog):
             await member.send(response_message)
         except disnake.Forbidden:
             await inter.send(MessagesCZ.blocked_bot(user=member.id))
+
+    @PermissionsCheck.is_submod_plus()
+    @commands.user_command(name="Verify zajemce", guild_ids=[Base.config.guild_id])
+    async def verify_zajemce(self, inter: disnake.UserCommandInteraction, member: disnake.Member):
+        await self.verify_host(inter, member, zajemce=True)
