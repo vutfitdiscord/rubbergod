@@ -22,7 +22,11 @@ async def get_users_from_tag(bot: Rubbergod, tag: str) -> list[disnake.User]:
     user_ids = re.findall(r"<@[!]?\d+>", tag)
     for user in user_ids:
         user = re.search(r"\d+", user)
+        if user is None:
+            continue
         user = await bot.get_or_fetch_user(int(user.group()))
+        if user is None:
+            continue
         users.append(user)
     return users
 
@@ -34,6 +38,8 @@ async def get_members_from_tag(guild: disnake.Guild, tag: str) -> list[disnake.M
     member_ids = re.findall(r"<@[!]?\d+>", tag)
     for member in member_ids:
         member = re.search(r"\d+", member)
+        if member is None:
+            continue
         member = await guild.get_or_fetch_member(int(member.group()))
         if member is None:
             continue
