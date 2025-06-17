@@ -76,6 +76,7 @@ class Config:
     verification_host_id: int = get_attr(toml_dict, "verification", "host_id")
     db_pull_merlin_key_path: str = get_attr(toml_dict, "verification", "db_pull_merlin_key_path")
     vut_api_key: str = get_attr(toml_dict, "verification", "vut_api_key")
+    new_student_year: int = get_attr(toml_dict, "verification", "new_student_year")
 
     # Verification email sender settings
     email_name: str = get_attr(toml_dict, "email", "name")

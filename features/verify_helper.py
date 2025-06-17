@@ -1,4 +1,5 @@
 import json
+from datetime import datetime
 from functools import cached_property
 from io import BytesIO
 
@@ -48,9 +49,13 @@ class VerifyHelper:
         for relation in user["vztahy"]:
             # student
             if "rok_studia" in relation.keys():
-                ret = (
-                    f"{relation['fakulta']['zkratka']} {relation['obor']['zkratka']} {relation['rok_studia']}"
-                )
+                if int(relation["zacatek_studia"]) == config.new_student_year and datetime.now().month >= 6:
+                    # new students starting in June or later are considered to be in year 0
+                    year = 0
+                else:
+                    year = relation["rok_studia"]
+
+                ret = f"{relation['fakulta']['zkratka']} {relation['obor']['zkratka']} {year}"
                 # do not return yet if not FIT, check for all relations if student has multiple studies
                 if relation["fakulta"]["zkratka"] == "FIT":
                     return ret

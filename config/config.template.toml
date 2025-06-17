@@ -22,6 +22,7 @@ role_id = 591349196267716608
 host_id = 603673568051462144
 db_pull_merlin_key_path = '/root/.ssh/etc_passwd'
 vut_api_key = ''
+new_student_year = 2025 # Set to the starting year for new students (update each academic year)
 
 [email]
 name = 'toasterrubbergod@gmail.com'
