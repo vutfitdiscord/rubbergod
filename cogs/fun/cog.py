@@ -29,6 +29,7 @@ fuchs_list = os.listdir(fuchs_path)
 zemle_path = "cogs/fun/zemle/"
 zemle_list = os.listdir(zemle_path)
 
+
 class Fun(Base, commands.Cog):
     def __init__(self, bot: Rubbergod):
         super().__init__()
@@ -305,16 +306,16 @@ class Fun(Base, commands.Cog):
             await inter.send("Žádná žemle není k dispozici.")
             return
 
-        index = random.choice(zemle_list)
+        zemle_name = random.choice(zemle_list)
         embed = disnake.Embed(
             title="Náhodná žemle",
             color=disnake.Color.blue(),
         )
-        embed.set_image(url=f"attachment://{index}")
+        embed.set_image(url=f"attachment://{zemle_name}")
         embed.set_footer(text=features.custom_footer(inter.author, "žemle"))
 
-        with open(zemle_path + index, "rb") as fp:
-            await inter.send(embed=embed, file=disnake.File(fp=fp, filename=index))
+        with open(zemle_path + zemle_name, "rb") as fp:
+            await inter.send(embed=embed, file=disnake.File(fp=fp, filename=zemle_name))
 
     @tasks.loop(time=time(12, 0, tzinfo=utils.general.get_local_zone()))
     async def xkcd_task_update(self):
