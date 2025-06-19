@@ -12,3 +12,4 @@ class MessagesCZ(GlobalMessages):
     fuchs_no_reaction = "Žádná fuchs reakce není k dispozici"
     xkcd_brief = "Pošle náhodný XKCD komiks"
     xkcd_no_such_comics = "Komiks se zadaným číslem neexistuje"
+    zemle_brief = "Pošle náhodný obrázek žemle"

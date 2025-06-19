@@ -26,6 +26,8 @@ from .messages_cz import MessagesCZ
 fuchs_path = "cogs/fun/fuchs/"
 fuchs_list = os.listdir(fuchs_path)
 
+zemle_path = "cogs/fun/zemle/"
+zemle_list = os.listdir(zemle_path)
 
 class Fun(Base, commands.Cog):
     def __init__(self, bot: Rubbergod):
@@ -292,6 +294,27 @@ class Fun(Base, commands.Cog):
             url += f"/{xkcd_post['num']}"
         embed = await features.create_xkcd_embed(xkcd_post, inter.author, url)
         await inter.send(embed=embed)
+
+    @cooldowns.default_cooldown
+    @commands.slash_command(name="zemle", description=MessagesCZ.zemle_brief)
+    async def zemle(self, inter: disnake.ApplicationCommandInteraction):
+        """Get random image of a bun"""
+        await inter.response.defer()
+
+        if len(zemle_list) == 0:
+            await inter.send("Žádná žemle není k dispozici.")
+            return
+
+        index = random.choice(zemle_list)
+        embed = disnake.Embed(
+            title="Náhodná žemle",
+            color=disnake.Color.blue(),
+        )
+        embed.set_image(url=f"attachment://{index}")
+        embed.set_footer(text=features.custom_footer(inter.author, "žemle"))
+
+        with open(zemle_path + index, "rb") as fp:
+            await inter.send(embed=embed, file=disnake.File(fp=fp, filename=index))
 
     @tasks.loop(time=time(12, 0, tzinfo=utils.general.get_local_zone()))
     async def xkcd_task_update(self):
