@@ -303,7 +303,7 @@ class Fun(Base, commands.Cog):
         await inter.response.defer()
 
         if len(zemle_list) == 0:
-            await inter.send("Žádná žemle není k dispozici.")
+            await inter.send(MessagesCZ.zemle_none)
             return
 
         zemle_name = random.choice(zemle_list)
