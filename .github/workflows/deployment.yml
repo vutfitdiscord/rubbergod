@@ -36,6 +36,10 @@ jobs:
           username: ${{ secrets.PRODUCTION_USERNAME }}
           port: 22
           script: |
+
+            # Fail on non-zero exit code
+            set -e
+
             echo "================== Lock Mutex =================="
             LOCK="/tmp/deployment.lock"
 
