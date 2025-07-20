@@ -227,9 +227,9 @@ class Verification(BaseFeature):
 
     async def finish_verify(self, inter: disnake.ModalInteraction, code: str, login: str) -> None:
         if await self.helper.has_role(inter.user, config.verification_role):
-            await inter.response.send_message(
-                MessagesCZ.verify_already_verified(user=inter.user.id, admin=config.admin_ids[0])
-            )
+            # This seems to also happen because the method is called multiple times
+            # (we assume due to people clicking twice on the submit button because of the delay).
+            # If that ever gets fixed we should perhaps send a verify_already_verified here
             return
 
         new_user = ValidPersonDB.get_user_by_login(login)
