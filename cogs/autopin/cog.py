@@ -13,6 +13,7 @@ from database.pin_map import PinMapDB
 from rubbergod import Rubbergod
 from utils import cooldowns
 from utils.checks import PermissionsCheck
+from utils.constants import PINNED_MESSAGES_LIMIT
 
 from .features import AutopinFeatures
 from .messages_cz import MessagesCZ
@@ -60,8 +61,7 @@ class AutoPin(Base, commands.Cog):
                 await inter.send(MessagesCZ.system_message)
                 return
 
-            pin_limit = 50
-            if len(await message.channel.pins()) == pin_limit and not message.pinned:
+            if len(await message.channel.pins()) == PINNED_MESSAGES_LIMIT and not message.pinned:
                 await inter.send(MessagesCZ.max_pins_error)
                 return
 
@@ -210,7 +210,7 @@ class AutoPin(Base, commands.Cog):
             ):
                 # prevent spamming max_pins_error message in channel
                 pin_count = await channel.pins()
-                if len(pin_count) == 50:
+                if len(pin_count) == PINNED_MESSAGES_LIMIT:
                     now = datetime.datetime.now(datetime.timezone.utc)
                     cooldown = datetime.timedelta(minutes=self.config.autopin_warning_cooldown)
                     if self.warning_time + cooldown < now:
