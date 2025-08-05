@@ -186,14 +186,15 @@ async def timeout_get_user(
     main_embed.add_field(name="Timeouts count", value=timeouts_count, inline=True)
     main_embed.add_field(name="Reports count", value=ReportDB.get_reports_on_user(user.id), inline=True)
     unverifies, warnings = await get_user_from_grillbot(bot.grillbot_session, guild_id, user.id)
+    grillbotUrl = f"https://grillbot.eu/web/user-measures/measures-list?filter.userId={user.id}&filter.guildId={guild_id}"
     main_embed.add_field(
         name="Unverifies count",
-        value=f"[{unverifies}](https://private.grillbot.eu/admin/unverify/logs)",
+        value=f"[{unverifies}]({grillbotUrl}&filter.type=Unverify)",
         inline=True,
     )
     main_embed.add_field(
         name="Warnings count",
-        value=f"[{warnings}](https://private.grillbot.eu/admin/userMeasures)",
+        value=f"[{warnings}]({grillbotUrl}&filter.type=Warning)",
         inline=True,
     )
 
