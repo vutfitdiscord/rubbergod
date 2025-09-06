@@ -83,11 +83,14 @@ class VerifyHelper:
             person = ValidPersonDB.get_user_by_login(str(user["id"]))
         if person is None:
             # user not found in DB, add new user
+            emails = user["emaily"] if user.get("emaily", []) else ""
+            if isinstance(emails, dict):
+                emails = list(emails.values())
             person = ValidPersonDB(
                 login=user.get("login") or str(user["id"]),
                 year=await self._parse_relation(user),
                 name=f"{user['jmeno_krestni']} {user['prijmeni']}",
-                mail=user["emaily"][0] if user.get("emaily", []) else "",
+                mail=emails[0],
                 status=VerifyStatus.Unverified.value,
             )
             session.add(person)
@@ -108,7 +111,10 @@ class VerifyHelper:
 
     async def get_mails(self, id: str) -> list[str]:
         user = await self.get_user_details(id)
-        return list(set(user["emaily"])) if user else []
+        emails = user["emaily"] if user else []
+        if isinstance(emails, dict):
+            emails = list(emails.values())
+        return list(set(emails))
 
     async def log_relation_error(self, user: dict) -> None:
         name = user["login"] or user["id"]
