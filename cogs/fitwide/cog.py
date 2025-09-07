@@ -550,9 +550,9 @@ class FitWide(Base, commands.Cog):
         ):
             if revert_role in entry.changes.before.roles and revert_role not in entry.changes.after.roles:
                 if debug:
-                    await inter.send(f"Would return role to {entry.target.nick}")
+                    await inter.send(f"Would return role to {entry.target.name}")
                 else:
-                    await entry.target.addroles(revert_role)
+                    await entry.target.add_roles(revert_role)
 
         await inter.edit_original_response("Done reverting role")
 
