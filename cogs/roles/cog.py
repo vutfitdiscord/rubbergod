@@ -237,6 +237,30 @@ class Roles(Base, commands.Cog):
         await inter.edit_original_response(MessagesCZ.channel_role_to_overwrites_done)
 
     @PermissionsCheck.is_mod_plus()
+    @commands.slash_command(name="copy_role", description=MessagesCZ.copy_role)
+    async def copy_role(
+        self,
+        inter: disnake.ApplicationCommandInteraction,
+        source_role: disnake.Role,
+        new_role_name: str,
+        rate: int = commands.Param(ge=1, default=10, description=MessagesCZ.channel_rate_param),
+    ):
+        """Give people with the source role a new role."""
+        await inter.send(MessagesCZ.copy_role_start(source_role=source_role.name, new_role=new_role_name))
+
+        members = source_role.members
+        new_role = await inter.guild.create_role(name=new_role_name)
+
+        for index, member in enumerate(members):
+            await member.add_roles(new_role)
+            if index % rate == 0:
+                await inter.edit_original_response(
+                    f"• members: {index + 1}/{len(members)}\n"
+                    f"{utils.general.create_bar(index + 1, len(members))}"
+                )
+        await inter.edit_original_response(MessagesCZ.copy_role_done)
+
+    @PermissionsCheck.is_mod_plus()
     @commands.slash_command(name="remove_exclusive_roles", description=MessagesCZ.remove_exclusive_roles)
     async def remove_exclusive_roles(
         self,

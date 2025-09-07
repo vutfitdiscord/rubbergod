@@ -17,6 +17,10 @@ class MessagesCZ(GlobalMessages):
     role_migration_allert = "Přidání/Odebrání **{channel}** bude trvat déle než je obvyklé (až 30 min)." \
                             "Prosím o strpení. Opakované klikání na reakce nemá vliv na dobu zpracování přístupu."
 
+    copy_role = "Vytvoří novou roli a přidá ji uživatelům, kteří již mají vybranou roli."
+    copy_role_start = "Probíhá kopie uživatelů role {source_role} do nové role {new_role}"
+    copy_role_done = "Úspěšně zkopírováno"
+
     remove_exclusive_roles = "Odstraní konflikty rolí, kdy má uživatel více exkluzivních rolí."
     remove_exclusive_roles_start = "Probíhá odstraňování konfliktů rolí {role1} a {role2}"
     role_no_exlusives = "Nebyly nalezeny žádné konflikty rolí"

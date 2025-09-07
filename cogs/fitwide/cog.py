@@ -247,15 +247,6 @@ class FitWide(Base, commands.Cog):
         MIT_roles = [disnake.utils.get(guild.roles, name=role_name) for role_name in MIT_names]
         VUT = disnake.utils.get(guild.roles, name="VUT")
 
-        # create 4bit-1mit and add members
-        bit4_members = BIT_roles[3].members
-        bit4 = await guild.create_role(name="4bit-1mit")
-        for index, member in enumerate(bit4_members):
-            await member.add_roles(bit4)
-            if (index % 50) == 0:
-                progress_bar = utils.general.create_bar(index, len(bit4_members))
-                await message.edit(f"Přidávání role 4bit-1mit: {progress_bar}")
-
         # give 3bit/2mit users 2bit/1mit role
         for index, member in enumerate(BIT_roles[3].members):
             await member.add_roles(BIT_roles[2])
@@ -301,11 +292,7 @@ class FitWide(Base, commands.Cog):
         info_channels = [disnake.utils.get(guild.channels, name=channel_name) for channel_name in INFO_NAMES]
 
         # increment channel names
-        overwrites = {
-            guild.default_role: disnake.PermissionOverwrite(read_messages=False),
-            bit4: disnake.PermissionOverwrite(read_messages=True, send_messages=True),
-        }
-        await general_channels[3].edit(name="4bit-1mit-general", overwrites=overwrites)
+        await general_channels[3].edit(name="4bit-1mit-general")
         await general_channels[2].edit(name="3bit-general")
         await general_channels[1].edit(name="2bit-general")
         await general_channels[0].edit(name="1bit-general")
