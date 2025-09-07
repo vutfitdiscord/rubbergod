@@ -540,6 +540,7 @@ class FitWide(Base, commands.Cog):
         time_after_str: str,
         debug: bool,
     ):
+        await inter.response.defer()
         guild = inter.guild
         time_before = parser.parse(time_before_str)
         time_after = parser.parse(time_after_str)
@@ -553,7 +554,7 @@ class FitWide(Base, commands.Cog):
                 else:
                     await entry.target.addroles(revert_role)
 
-        await inter.send("Done reverting role")
+        await inter.edit_original_response("Done reverting role")
 
     @cooldowns.default_cooldown
     @PermissionsCheck.is_in_modroom()
