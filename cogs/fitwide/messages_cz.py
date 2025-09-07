@@ -59,3 +59,4 @@ class MessagesCZ(GlobalMessages):
     gen_teacher_info_inv_catg = "Některé kategorie mají neplatné názvy. Hodilo by se je opravit: {categories}"
     gen_teacher_info_inv_roles = "Nemohu najít role pro vyučující."
     gen_teacher_info_channel_none = "Nemohu najít kanál vyucujici-info."
+    revert_roles_brief = "Vráti zvolenou roli všem kteří ji ztratili v daném časovém rozmezí"
