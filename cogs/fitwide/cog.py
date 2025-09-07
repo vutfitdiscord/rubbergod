@@ -8,6 +8,7 @@ from datetime import datetime, timezone
 from io import BytesIO
 
 import disnake
+from dateutil import parser
 from disnake.ext import commands
 
 import utils
@@ -527,6 +528,32 @@ class FitWide(Base, commands.Cog):
             return
         result.change_status(VerifyStatus.Verified.value)
         await inter.edit_original_response(MessagesCZ.action_success)
+
+    @cooldowns.default_cooldown
+    @PermissionsCheck.is_in_modroom()
+    @commands.slash_command(name="revert_roles", description=MessagesCZ.revert_roles_brief)
+    async def revert_roles(
+        self,
+        inter: disnake.ApplicationCommandInteraction,
+        revert_role: disnake.Role,
+        time_before_str: str,
+        time_after_str: str,
+        debug: bool,
+    ):
+        guild = inter.guild
+        time_before = parser.parse(time_before_str)
+        time_after = parser.parse(time_after_str)
+
+        async for entry in guild.audit_logs(
+            action=disnake.AuditLogAction.member_role_update, before=time_before, after=time_after, limit=None
+        ):
+            if revert_role in entry.changes.before.roles and revert_role not in entry.changes.after.roles:
+                if debug:
+                    await inter.send(f"Would return role to {entry.target.nick}")
+                else:
+                    await entry.target.addroles(revert_role)
+
+        await inter.send("Done reverting role")
 
     @cooldowns.default_cooldown
     @PermissionsCheck.is_in_modroom()
