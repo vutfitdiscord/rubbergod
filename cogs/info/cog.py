@@ -108,7 +108,7 @@ class Info(Base, commands.Cog):
         ephemeral = PermissionsCheck.is_botroom(inter)
         await inter.response.defer(ephemeral=ephemeral)
         response = await nasa_daily_image(self.bot.rubbergod_session, self.config.nasa_token)
-        embed, video = await create_nasa_embed(inter.author, response)
+        embed, video = await create_nasa_embed(self.bot.rubbergod_session, inter.author, response)
         await inter.edit_original_response(embed=embed)
         if video:
             await inter.send(video, ephemeral=ephemeral)
@@ -116,7 +116,7 @@ class Info(Base, commands.Cog):
     @tasks.loop(time=time(7, 0, tzinfo=utils.general.get_local_zone()))
     async def send_nasa_image(self):
         response = await nasa_daily_image(self.bot.rubbergod_session, self.config.nasa_token)
-        embed, video = await create_nasa_embed(self.bot.user, response)
+        embed, video = await create_nasa_embed(self.bot.rubbergod_session, self.bot.user, response)
         await self.space_channel.send(embed=embed)
         if video:
             await self.space_channel.send(video)

@@ -1,4 +1,5 @@
 import asyncio
+import io
 
 import aiohttp
 import disnake
@@ -53,9 +54,13 @@ async def nasa_daily_image(rubbergod_session: aiohttp.ClientSession, nasa_token:
         raise ApiError(str(error))
 
 
-async def create_nasa_embed(author: disnake.User, response: dict) -> tuple[disnake.Embed, str | None]:
+async def create_nasa_embed(
+    rubbergod_session: aiohttp.ClientSession, author: disnake.User, response: dict
+) -> tuple[disnake.Embed, str | None]:
     """
     Create embed for NASA API response
+
+    Returns tuple of embed and video url (if media type is video)
     """
     embed = disnake.Embed(
         title=response["title"],
@@ -63,9 +68,22 @@ async def create_nasa_embed(author: disnake.User, response: dict) -> tuple[disna
         url=MessagesCZ.nasa_url,
         color=disnake.Color.blurple(),
     )
-    url = response["hdurl"] if response.get("hdurl", None) else response.get("url", None)
     utils.embed.add_author_footer(embed, author)
-    if response.get("media_type", None) != "video":
-        embed.set_image(url=url)
-        return embed, None
-    return embed, url
+
+    url = response.get("url", None)
+    if response.get("media_type", None) == "video":
+        return embed, url
+
+    try:
+        async with rubbergod_session.get(url) as resp:
+            # download image
+            if resp.status != 200:
+                raise ApiError(MessagesCZ.nasa_image_error)
+
+            image_data = await resp.read()
+            nasa_image_file = disnake.File(io.BytesIO(image_data), filename="nasaImage.png")
+    except (aiohttp.ClientConnectorError, asyncio.exceptions.TimeoutError) as error:
+        raise ApiError(str(error))
+
+    embed.set_image(file=nasa_image_file)
+    return embed, None
