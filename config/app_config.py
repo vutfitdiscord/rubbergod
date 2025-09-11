@@ -71,6 +71,7 @@ class Config:
     zajemce_role: int = get_attr(toml_dict, "base", "zajemce_role")
 
     # Verification
+    verification_enabled: bool = get_attr(toml_dict, "verification", "enabled")
     verification_role: str = get_attr(toml_dict, "verification", "role")
     verification_role_id: int = get_attr(toml_dict, "verification", "role_id")
     verification_host_id: int = get_attr(toml_dict, "verification", "host_id")

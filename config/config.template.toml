@@ -17,6 +17,7 @@ wolf_role = 1347502607740047465
 zajemce_role = 577910377900408843
 
 [verification]
+enabled = false
 role = ''
 role_id = 591349196267716608
 host_id = 603673568051462144

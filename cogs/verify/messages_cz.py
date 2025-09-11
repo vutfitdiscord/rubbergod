@@ -3,6 +3,7 @@ from config.messages import Messages as GlobalMessages
 
 class MessagesCZ(GlobalMessages):
     verify_brief = "Ověření studenta pro přístup na server."
+    verify_disabled = "Ověření je v tuto chvíli vypnuté. Prosím, kontaktuj někoho z (Sub)Mod týmu."
     verify_login_parameter = "Přihlašovací FIT login (`xlogin00`), osobní 6místné VUT číslo"
     verify_login_parameter_muni = "UČO"
     verify_already_verified = "{user} Už jsi byl verifikován " \
