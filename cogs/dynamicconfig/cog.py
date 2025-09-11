@@ -104,7 +104,7 @@ class DynamicConfig(Base, commands.Cog):
 
     @config_cmd.sub_command(description=MessagesCZ.sync_template_brief)
     async def update(self, inter: disnake.ApplicationCommandInteraction):
-        template_path = self.config_dir.joinpath("config.template.toml")
+        template_path = CONFIG_PATH.parent.joinpath("config.template.toml")
         template = toml.load(template_path, _dict=dict)
         for section in template:
             if section in self.config.toml_dict:
