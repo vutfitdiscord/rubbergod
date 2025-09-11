@@ -35,8 +35,12 @@ class Verify(Base, commands.Cog):
     def is_valid_guild(ctx: disnake.ApplicationCommandInteraction) -> bool:
         return ctx.guild_id is None or ctx.guild_id == Base.config.guild_id
 
+    def is_verification_enabled(ctx: disnake.ApplicationCommandInteraction) -> bool:
+        return Base.config.verification_enabled
+
     @cooldowns.default_cooldown
     @commands.check(is_valid_guild)
+    @commands.check(is_verification_enabled)
     @commands.slash_command(
         name="verify",
         description=MessagesCZ.verify_brief,
@@ -77,6 +81,9 @@ class Verify(Base, commands.Cog):
     @verify.error
     async def on_verification_error(self, inter: disnake.ApplicationCommandInteraction, error):
         if isinstance(error, commands.CheckFailure):
+            if not self.config.verification_enabled:
+                await inter.send(MessagesCZ.verify_disabled)
+                return True
             await inter.send(MessagesCZ.verify_invalid_channel, ephemeral=True)
             return True
 

@@ -16,6 +16,7 @@ newbie_role = 1284579246400082034
 wolf_role = 1347502607740047465
 
 [verification]
+enabled = false
 role = ''
 role_id = 591349196267716608
 host_id = 603673568051462144
