@@ -1,4 +1,5 @@
 import json
+import logging
 from datetime import datetime
 from functools import cached_property
 from io import BytesIO
@@ -16,6 +17,7 @@ from rubbergod import Rubbergod
 class VerifyHelper:
     def __init__(self, bot: Rubbergod) -> None:
         self.bot = bot
+        self.logger = logging.getLogger("rubbergod")
 
     @cached_property
     def log_channel(self):
@@ -72,6 +74,16 @@ class VerifyHelper:
             await self.log_relation_error(user)
         return ret
 
+    def get_fallback_email(self, user: dict) -> str:
+        """Get fallback email based on the user's login and relations."""
+        spec = [rel.get("obor", {}) for rel in user.get("vztahy", [])]
+        if any(s.get("zkratka", "").startswith(("BIT", "MIT")) for s in spec):
+            email = f"{user['login']}@stud.fit.vutbr.cz"
+        else:
+            email = f"{user['login']}@vutbr.cz"
+        self.logger.warning(f"No emails found for user {user['login']}. Fallback to {email}.")
+        return email
+
     async def save_user_details(self, user: dict) -> ValidPersonDB:
         """Save user details to database and return the user object."""
         # search for login in database
@@ -86,6 +98,8 @@ class VerifyHelper:
             emails = user["emaily"] if user.get("emaily", []) else ""
             if isinstance(emails, dict):
                 emails = list(emails.values())
+            if not emails:
+                emails = [self.get_fallback_email(user)]
             person = ValidPersonDB(
                 login=user.get("login") or str(user["id"]),
                 year=await self._parse_relation(user),
