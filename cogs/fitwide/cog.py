@@ -144,23 +144,59 @@ class FitWide(Base, commands.Cog):
                 source_year = source_role.name
                 target_year = target_role.name
                 target_ids = [member.id for member in target_members]
-                if (
-                    # presun bakalaru do 1MIT
-                    "BIT" in source_year and target_year == "1MIT"
-                ):
-                    await message.reply(
-                        MessagesCZ.role_check_move(
-                            people_count=len(target_members), target_year=target_year, source_year=source_year
-                        )
+                if not ("BIT" in source_year and target_year == "1MIT"):
+                    continue
+                # presun bakalaru do 1MIT
+                await message.reply(
+                    MessagesCZ.role_check_move(
+                        people_count=len(target_members), target_year=target_year, source_year=source_year
                     )
-                    await features.send_masstag_messages(inter, "", target_ids)
-                    if p_debug:
-                        await message.reply(MessagesCZ.role_check_debug_mode)
-                        continue
+                )
+                await features.send_masstag_messages(inter, "", target_ids)
+                if p_debug:
+                    await message.reply(MessagesCZ.role_check_debug_mode)
+                    continue
 
-                    for member in target_members:
-                        await member.add_roles(target_role)
-                        await member.remove_roles(source_role)
+                for member in target_members:
+                    await member.add_roles(target_role)
+                    await member.remove_roles(source_role)
+
+        await message.reply(MessagesCZ.role_check_end)
+
+    @cooldowns.default_cooldown
+    @PermissionsCheck.is_bot_admin()
+    @PermissionsCheck.is_in_modroom()
+    @commands.slash_command(name="vut_check", description=MessagesCZ.vut_check_brief)
+    async def vut_check(self, inter: disnake.ApplicationCommandInteraction, p_debug: bool = True):
+        await inter.send(MessagesCZ.role_check_start)
+        message = await inter.original_response()
+        guild = inter.guild
+
+        unmatching_members = await features.get_members_with_unmatching_year(guild)
+
+        for source_role, target_data in unmatching_members.items():
+            for target_role, target_members in target_data.items():
+                if len(target_members) == 0:
+                    continue
+                source_year = source_role.name
+                target_year = target_role.name
+                target_ids = [member.id for member in target_members]
+                if source_year != "VUT" and target_year != "VUT":
+                    continue
+                # presun z/do VUT role
+                await message.reply(
+                    MessagesCZ.role_check_move(
+                        people_count=len(target_members), target_year=target_year, source_year=source_year
+                    )
+                )
+                await features.send_masstag_messages(inter, "", target_ids)
+                if p_debug:
+                    await message.reply(MessagesCZ.role_check_debug_mode)
+                    continue
+
+                for member in target_members:
+                    await member.add_roles(target_role)
+                    await member.remove_roles(source_role)
 
         await message.reply(MessagesCZ.role_check_end)
 
