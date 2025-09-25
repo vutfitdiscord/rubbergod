@@ -15,6 +15,7 @@ class MessagesCZ(GlobalMessages):
     zapis_check_brief = "Zkontroluje ročníkové role uživatelům, jestli se nezapoměli zapsat do dalšího ročníku"
     zapis_check_found = "Vypadá, že do dalšího ročníku se nezapsali (protoze v API maji {target_year}): "
     mit_check_brief = "Zkontroluje uživatele, jestli se nezapsali na MIT studium"
+    vut_check_brief = "Zkontroluje uživatele, jestli se nezapsali na/z VUT studium/a"
     exstudent_check_brief = "zkontroluje uživatelům, jestli nedropnuli"
     role_check_brief = "zkontroluje ročníkové role uživatelům"
     role_check_start = "Kontrola uživatelů ..."
