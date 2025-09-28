@@ -118,7 +118,7 @@ class PermissionsCheck:
         """Check if the command is invoked in modroom"""
         return cls.check_template(
             ctx,
-            lambda ctx: ctx.channel.id == config.mod_room,
+            lambda ctx: ctx.channel.id in [config.mod_room, config.submod_helper_room],
             cls.is_in_modroom.__name__,
             raise_exception,
             InvalidRoomError(Messages.specific_room_only(room=config.mod_room)),
