@@ -305,3 +305,15 @@ async def send_to_grillbot(
 async def autocomplete_times(inter: disnake.ApplicationCommandInteraction, input: str) -> list[str]:
     input = input.lower()
     return [endtime for endtime in TIMESTAMPS if input in endtime.lower()]
+
+
+async def send_dm_to_user(user: disnake.User, embed: disnake.Embed) -> bool:
+    """Send embed to user via DM.
+
+    Returns True if successful, False if user has blocked DMs.
+    """
+    try:
+        await user.send(embed=embed)
+        return True
+    except disnake.Forbidden:
+        return False
