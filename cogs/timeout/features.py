@@ -307,13 +307,12 @@ async def autocomplete_times(inter: disnake.ApplicationCommandInteraction, input
     return [endtime for endtime in TIMESTAMPS if input in endtime.lower()]
 
 
-async def send_dm_to_user(user: disnake.User, embed: disnake.Embed) -> bool:
+async def send_dm_to_user(user: disnake.User, embed: disnake.Embed) -> None:
     """Send embed to user via DM.
 
-    Returns True if successful, False if user has blocked DMs.
+    Silently ignores if user has blocked DMs.
     """
     try:
         await user.send(embed=embed)
-        return True
     except disnake.Forbidden:
-        return False
+        pass
