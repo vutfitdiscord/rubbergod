@@ -115,6 +115,21 @@ class Timeout(Base, commands.Cog):
             embed.add_field(name="Link", value=f"[#{inter.channel.name}]({message.jump_url})")
             await self.submod_helper_room.send(content, embed=embed)
 
+            # Send DM to each timeouted user
+            for member in timeout_members:
+                user_embed = features.create_embed(inter.author, "Timeout")
+                await features.add_field_timeout(
+                    embed=user_embed,
+                    title=member.display_name,
+                    member=member,
+                    author=inter.author,
+                    starttime=starttime_local,
+                    endtime=endtime.local,
+                    length=endtime.utc - inter.created_at,
+                    reason=reason,
+                )
+                await features.send_dm_to_user(member, user_embed)
+
         await inter.send(MessagesCZ.timeout_success, ephemeral=True)
 
     @_timeout.sub_command(name="remove", description=MessagesCZ.remove_brief)
@@ -195,6 +210,17 @@ class Timeout(Base, commands.Cog):
         content = "".join(f"{user.mention}" for user in completed_users)
         await self.submod_helper_room.send(content, embed=embed)
         await inter.channel.send(content, embed=embed)
+
+        # Send DM to each user whose timeout was removed
+        for user in completed_users:
+            user_embed = features.create_embed(inter.author, "Timeout remove")
+            user_embed.add_field(
+                name=user.display_name,
+                value=MessagesCZ.remove_reason(member=user.mention),
+                inline=False,
+            )
+            await features.send_dm_to_user(user, user_embed)
+
         await inter.send(MessagesCZ.remove_success, ephemeral=True)
 
     @_timeout.sub_command(name="list", description=MessagesCZ.list_brief)
