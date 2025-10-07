@@ -195,3 +195,6 @@ chance_random_mute = 25
 [forum]
 tags = ["prodáno/uzavřeno"]
 autoclose_forums = [1064946755231297536]
+
+[message]
+log_content_preview_limit = 100

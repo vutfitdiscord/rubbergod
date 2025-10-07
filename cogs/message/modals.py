@@ -1,8 +1,8 @@
 import disnake
 
-import utils
 from config.app_config import config
 
+from .features import create_message_log_embed, get_content_preview
 from .messages_cz import MessagesCZ
 
 
@@ -22,6 +22,7 @@ class MessageModal(disnake.ui.Modal):
         self.message = message
         self.files = files
         self.edit = edit
+        self.old_content = message.content if message and edit else None  # Store old content for logging
         components = [
             disnake.ui.TextInput(
                 label="Message content",
@@ -50,41 +51,40 @@ class MessageModal(disnake.ui.Modal):
 
     async def _log_send(self, inter: disnake.ModalInteraction, sent_message: disnake.Message) -> None:
         """Log message send operation to log channel"""
-        embed = disnake.Embed(title="📤 Message sent", color=disnake.Color.blue())
-        embed.add_field(name="Channel", value=self.channel.mention, inline=False)
-        embed.add_field(
-            name="Message link", value=f"[Jump to message]({sent_message.jump_url})", inline=False
+        content_preview = get_content_preview(sent_message.content)
+        attachments_count = len(self.files) if self.files else None
+
+        embed = await create_message_log_embed(
+            title="📤 Message sent",
+            color=disnake.Color.blue(),
+            channel=self.channel,
+            message_link=sent_message.jump_url,
+            content_preview=content_preview,
+            attachments_count=attachments_count,
+            author=inter.author,
         )
-
-        content_preview = (
-            sent_message.content[:100] + "..." if len(sent_message.content) > 100 else sent_message.content
-        )
-        if content_preview:
-            embed.add_field(name="Content preview", value=content_preview, inline=False)
-
-        if self.files:
-            embed.add_field(name="Attachments", value=f"{len(self.files)} file(s)", inline=False)
-
-        utils.embed.add_author_footer(embed, inter.author)
 
         log_channel = self.bot.get_channel(config.log_channel)
         await log_channel.send(embed=embed)
 
     async def _log_edit(self, inter: disnake.ModalInteraction) -> None:
         """Log message edit operation to log channel"""
-        embed = disnake.Embed(title="✏️ Message edited", color=disnake.Color.orange())
-        embed.add_field(name="Channel", value=self.message.channel.mention, inline=False)
-        embed.add_field(
-            name="Message link", value=f"[Jump to message]({self.message.jump_url})", inline=False
-        )
+        old_preview = get_content_preview(self.old_content)
+        new_preview = get_content_preview(self.message.content)
 
-        content_preview = (
-            self.message.content[:100] + "..." if len(self.message.content) > 100 else self.message.content
-        )
-        if content_preview:
-            embed.add_field(name="New content preview", value=content_preview, inline=False)
+        additional_fields = []
+        if old_preview:
+            additional_fields.append(("Old content preview", old_preview))
 
-        utils.embed.add_author_footer(embed, inter.author)
+        embed = await create_message_log_embed(
+            title="✏️ Message edited",
+            color=disnake.Color.orange(),
+            channel=self.message.channel,
+            message_link=self.message.jump_url,
+            content_preview=new_preview,
+            author=inter.author,
+            additional_fields=additional_fields if additional_fields else None,
+        )
 
         log_channel = self.bot.get_channel(config.log_channel)
         await log_channel.send(embed=embed)

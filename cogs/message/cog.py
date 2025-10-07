@@ -5,12 +5,12 @@ Cog for sending and managing messages sent by bot.
 import disnake
 from disnake.ext import commands
 
-import utils
 from cogs.base import Base
 from rubbergod import Rubbergod
 from utils import cooldowns
 from utils.checks import PermissionsCheck
 
+from .features import create_message_log_embed, get_content_preview
 from .messages_cz import MessagesCZ
 from .modals import MessageModal
 
@@ -71,27 +71,22 @@ class Message(Base, commands.Cog):
         original_message: disnake.Message,
     ) -> None:
         """Log message resend operation to log channel"""
-        embed = disnake.Embed(title="🔁 Message resent", color=disnake.Color.green())
-        embed.add_field(name="Target channel", value=sent_message.channel.mention, inline=False)
-        embed.add_field(
-            name="New message link", value=f"[Jump to message]({sent_message.jump_url})", inline=False
-        )
-        embed.add_field(
-            name="Original message", value=f"[Jump to original]({original_message.jump_url})", inline=False
+        content_preview = get_content_preview(sent_message.content)
+        attachments_count = len(sent_message.attachments) if sent_message.attachments else None
+
+        additional_fields = [("Original message", f"[Jump to original]({original_message.jump_url})")]
+
+        embed = await create_message_log_embed(
+            title="🔁 Message resent",
+            color=disnake.Color.green(),
+            channel=sent_message.channel,
+            message_link=sent_message.jump_url,
+            content_preview=content_preview,
+            attachments_count=attachments_count,
+            author=inter.author,
+            additional_fields=additional_fields,
         )
 
-        content_preview = (
-            sent_message.content[:100] + "..." if len(sent_message.content) > 100 else sent_message.content
-        )
-        if content_preview:
-            embed.add_field(name="Content preview", value=content_preview, inline=False)
-
-        if sent_message.attachments:
-            embed.add_field(
-                name="Attachments", value=f"{len(sent_message.attachments)} file(s)", inline=False
-            )
-
-        utils.embed.add_author_footer(embed, inter.author)
         await self.log_channel.send(embed=embed)
 
     @message.sub_command(name="edit", description=MessagesCZ.edit_brief)
