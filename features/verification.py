@@ -21,6 +21,7 @@ MIT_SPECIALIZATIONS = [
     "MPV", "MSK", "NADE", "NBIO", "NGRI", "NNET", "NVIZ", "NCPS",
     "NSEC", "NEMB", "NHPC", "NISD", "NIDE", "NISY", "NMAL", "NMAT", "NSEN",
     "NVER", "NSPE", "MGH", "MITP-EN",
+    "NEMB do 2023/24"
 ]  # fmt: skip
 
 FACULTY_NAMES = ["FA", "FAST", "FAVU", "FCH", "FEKT", "FP", "FSI", "ÚSI",]  # fmt: skip
