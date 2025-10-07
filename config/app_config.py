@@ -223,6 +223,9 @@ class Config:
     forum_tags: List[str] = get_attr(toml_dict, "forum", "tags")
     forum_autoclose_forums: List[int] = get_attr(toml_dict, "forum", "autoclose_forums")
 
+    # message
+    message_log_content_preview_limit: int = get_attr(toml_dict, "message", "log_content_preview_limit")
+
 
 config = Config()
 
