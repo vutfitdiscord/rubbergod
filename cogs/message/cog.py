@@ -5,6 +5,7 @@ Cog for sending and managing messages sent by bot.
 import disnake
 from disnake.ext import commands
 
+import utils
 from cogs.base import Base
 from rubbergod import Rubbergod
 from utils import cooldowns
@@ -60,7 +61,38 @@ class Message(Base, commands.Cog):
 
         files = [await attachment.to_file() for attachment in message_url.attachments]
         await inter.send(MessagesCZ.message_sent(channel=channel.mention), ephemeral=True)
-        await channel.send(message_url.content, files=files)
+        sent_message = await channel.send(message_url.content, files=files)
+        await self._log_resend(inter, sent_message, message_url)
+
+    async def _log_resend(
+        self,
+        inter: disnake.ApplicationCommandInteraction,
+        sent_message: disnake.Message,
+        original_message: disnake.Message,
+    ) -> None:
+        """Log message resend operation to log channel"""
+        embed = disnake.Embed(title="🔁 Message resent", color=disnake.Color.green())
+        embed.add_field(name="Target channel", value=sent_message.channel.mention, inline=False)
+        embed.add_field(
+            name="New message link", value=f"[Jump to message]({sent_message.jump_url})", inline=False
+        )
+        embed.add_field(
+            name="Original message", value=f"[Jump to original]({original_message.jump_url})", inline=False
+        )
+
+        content_preview = (
+            sent_message.content[:100] + "..." if len(sent_message.content) > 100 else sent_message.content
+        )
+        if content_preview:
+            embed.add_field(name="Content preview", value=content_preview, inline=False)
+
+        if sent_message.attachments:
+            embed.add_field(
+                name="Attachments", value=f"{len(sent_message.attachments)} file(s)", inline=False
+            )
+
+        utils.embed.add_author_footer(embed, inter.author)
+        await self.log_channel.send(embed=embed)
 
     @message.sub_command(name="edit", description=MessagesCZ.edit_brief)
     async def edit(
