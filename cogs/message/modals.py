@@ -69,6 +69,10 @@ class MessageModal(disnake.ui.Modal):
 
     async def _log_edit(self, inter: disnake.ModalInteraction) -> None:
         """Log message edit operation to log channel"""
+        # self.message is guaranteed to be not None when this method is called
+        if not self.message:
+            return
+
         old_preview = get_content_preview(self.old_content)
         new_preview = get_content_preview(self.message.content)
 
