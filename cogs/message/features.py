@@ -6,7 +6,7 @@ import utils
 from config.app_config import config
 
 
-def get_content_preview(content: str, limit: int = None) -> str:
+def get_content_preview(content: str | None, limit: int | None = None) -> str:
     """Get a preview of the message content, truncated if necessary.
 
     Args:
