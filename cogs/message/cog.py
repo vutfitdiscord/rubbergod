@@ -9,8 +9,9 @@ from cogs.base import Base
 from rubbergod import Rubbergod
 from utils import cooldowns
 from utils.checks import PermissionsCheck
+from utils.general import get_content_preview
 
-from .features import create_message_log_embed, get_content_preview
+from .features import create_message_log_embed
 from .messages_cz import MessagesCZ
 from .modals import MessageModal
 

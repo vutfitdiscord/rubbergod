@@ -1,8 +1,9 @@
 import disnake
 
 from config.app_config import config
+from utils.general import get_content_preview
 
-from .features import create_message_log_embed, get_content_preview
+from .features import create_message_log_embed
 from .messages_cz import MessagesCZ
 
 

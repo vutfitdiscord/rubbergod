@@ -3,28 +3,6 @@
 import disnake
 
 import utils
-from config.app_config import config
-
-
-def get_content_preview(content: str | None, limit: int | None = None) -> str:
-    """Get a preview of the message content, truncated if necessary.
-
-    Args:
-        content: The full message content
-        limit: Maximum length of the preview. If None, uses config value.
-
-    Returns:
-        Truncated content with "..." if it exceeds the limit, otherwise the full content
-    """
-    if limit is None:
-        limit = config.message_log_content_preview_limit
-
-    if not content:
-        return ""
-
-    if len(content) > limit:
-        return content[:limit] + "..."
-    return content
 
 
 async def create_message_log_embed(
