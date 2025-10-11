@@ -28,7 +28,7 @@ class Info(Base, commands.Cog):
     def __init__(self, bot: Rubbergod):
         super().__init__()
         self.bot = bot
-        self.tasks = [self.send_nasa_image.start()]
+        self.tasks = []
 
     @cooldowns.short_cooldown
     @commands.slash_command(name="urban", description=MessagesCZ.urban_brief)
