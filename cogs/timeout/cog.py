@@ -264,12 +264,16 @@ class Timeout(Base, commands.Cog):
             autocomplete=features.autocomplete_times,
             max_length=50,
             description=MessagesCZ.time_format,
+            default=None,
         ),
     ):
         """Set timeout for yourself.
         Guild_ids is used to prevent users from bypassing timeout
         given by moderator and using selftimeout in DMs.
         """
+        if endtime is None:
+            endtime = await DiscordDatetime().convert(inter, "random")
+
         await features.time_check(inter.created_at, endtime.utc)
 
         if inter.guild.me.top_role < inter.author.top_role:
