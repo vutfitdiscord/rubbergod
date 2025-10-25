@@ -2,9 +2,10 @@
 
 from __future__ import annotations
 
+import random
 import re
 import shlex
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 
 import disnake
 from dateutil import parser
@@ -149,31 +150,40 @@ class DiscordDatetime:
             discord_datetime.utc = datetime(9999, 12, 30, 0, 0, 0, tzinfo=timezone.utc)
             return discord_datetime
 
+        options = ["random"]
+        if time_string.lower() in options:
+            # Generate random time between 10 minutes and 24 hours
+            seconds = random.randint(600, 24 * 3600)
+            time = datetime.now(timezone.utc) + timedelta(seconds=seconds)
+            discord_datetime.local = time.astimezone(get_local_zone())
+            discord_datetime.utc = time.astimezone(timezone.utc)
+            return discord_datetime
+
         pattern = re.compile(r"(\d+)([yYMwdhms])")
         matches = pattern.findall(time_string)
 
         if matches:
             time = datetime.now(timezone.utc)
-            timedelta = None
+            duration = None
             while matches:
                 match = matches.pop()
                 value, unit = match
                 if unit.lower() in ["y", "r"]:
-                    timedelta = relativedelta(years=int(value))
+                    duration = relativedelta(years=int(value))
                 elif unit == "M":
-                    timedelta = relativedelta(months=int(value))
+                    duration = relativedelta(months=int(value))
                 elif unit == "w":
-                    timedelta = relativedelta(weeks=int(value))
+                    duration = relativedelta(weeks=int(value))
                 elif unit == "d":
-                    timedelta = relativedelta(days=int(value))
+                    duration = relativedelta(days=int(value))
                 elif unit == "h":
-                    timedelta = relativedelta(hours=int(value))
+                    duration = relativedelta(hours=int(value))
                 elif unit == "m":
-                    timedelta = relativedelta(minutes=int(value))
+                    duration = relativedelta(minutes=int(value))
                 elif unit == "s":
-                    timedelta = relativedelta(seconds=int(value))
+                    duration = relativedelta(seconds=int(value))
                 try:
-                    time = time + timedelta
+                    time = time + duration
                 except ValueError:
                     raise InvalidTime(Messages.time_format)
         else:
