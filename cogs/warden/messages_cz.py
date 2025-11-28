@@ -6,4 +6,4 @@ class MessagesCZ(GlobalMessages):
     repost_title = "Nápověda"
     repost_description = "{user}, shoda **{value}**!"
     repost_content = "_Pokud je obrázek repost, dej mu ♻️.\nJestli není, klikni tady na ❎ "\
-                     "a při {limit} takových reakcích se toho upozornění smaže._"
+                     "a při {limit} takových reakcích se toto upozornění smaže._"
