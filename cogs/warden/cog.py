@@ -4,6 +4,7 @@ Cog for repost detection.
 
 # stolen from rubbergoddess
 import asyncio
+import os
 import time
 
 import dhash
@@ -212,6 +213,15 @@ class Warden(Base, commands.Cog):
 
         desc = MessagesCZ.repost_description(user=message.author.id, value=prob)
         embed = disnake.Embed(title=title, color=0xCB410B, description=desc, url=message.jump_url)
+        
+        # Add repost image
+        image_path = os.path.join(os.path.dirname(__file__), "images", "repost.png")
+        if os.path.exists(image_path):
+            file = disnake.File(image_path, filename="repost.png")
+            embed.set_image(url="attachment://repost.png")
+        else:
+            file = None
+        
         embed.add_field(name=f"**{author}**, {timestamp}", value=link, inline=False)
 
         embed.add_field(
@@ -219,7 +229,12 @@ class Warden(Base, commands.Cog):
             value=MessagesCZ.repost_content(limit=self.config.duplicate_limit),
         )
         embed.set_footer(text=message.id)
-        send = await message.channel.send(embed=embed)
+        
+        if file:
+            send = await message.channel.send(embed=embed, file=file)
+        else:
+            send = await message.channel.send(embed=embed)
+        
         try:
             await message.add_reaction(reaction)
         except disnake.errors.NotFound:
