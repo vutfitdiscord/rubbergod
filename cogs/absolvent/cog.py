@@ -93,8 +93,9 @@ class Absolvent(Base, commands.Cog):
             await inter.edit_original_response(MessagesCZ.not_in_db)
             return
 
-        name_from_db = name_from_db.name
-        if name_from_db != name_from_user_without_diacritics:
+        # remove diacritics from both names for comparison since VUT API now returns names with accents
+        name_from_db_without_diacritics = remove_accents(name_from_db.name)
+        if name_from_db_without_diacritics != name_from_user_without_diacritics:
             await inter.edit_original_response(MessagesCZ.wrong_name)
             return
 
