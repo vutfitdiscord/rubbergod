@@ -273,6 +273,9 @@ class Verification(BaseFeature):
             await member.add_roles(verify)
             await member.add_roles(year)
 
+            # Clear host roles after successfully adding verify and year roles
+            await self.clear_host_roles(inter)
+
             try:
                 new_user.save_verified(inter.user.id)
             except Exception:
@@ -311,7 +314,7 @@ class Verification(BaseFeature):
             content=MessagesCZ.verify_send_dumbshit(user=inter.user.id, emote=str(fp))
         )
 
-    async def clear_host_roles(self, inter: disnake.ApplicationCommandInteraction):
+    async def clear_host_roles(self, inter: disnake.ApplicationCommandInteraction | disnake.ModalInteraction):
         """Removes host roles (Host, Zajemce o studium, Verify)"""
         guild = self.bot.get_guild(config.guild_id)
         member = inter.user if isinstance(inter.user, disnake.Member) else guild.get_member(inter.user.id)
