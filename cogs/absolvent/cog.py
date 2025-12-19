@@ -114,19 +114,27 @@ class Absolvent(Base, commands.Cog):
         # parse it using lxml
         xDoc_thesis = etree.fromstring(result_thesis, htmlparser)
         not_found = "".join(xDoc_thesis.xpath("/html/body/p[4]/text()"))
-        breadcrumb_xpath = (
-            "/html/body/ds-app/ds-themed-root/ds-root/div/div/main"
-            "/ds-themed-breadcrumbs/ds-breadcrumbs/nav/ol"
-            "/li[{}]/div//a[.='{}']/text()"
+
+        bachelor_thesis = "".join(
+            xDoc_thesis.xpath(
+                '//li[contains(@class, "breadcrumb-item")][3]//a[text()="bakalářské práce"]/text()'
+            )
         )
-        master_thesis = "".join(xDoc_thesis.xpath(breadcrumb_xpath.format(3, "diplomové práce")))
-        bachelor_thesis = "".join(xDoc_thesis.xpath(breadcrumb_xpath.format(3, "bakalářské práce")))
+        master_thesis = "".join(
+            xDoc_thesis.xpath(
+                '//li[contains(@class, "breadcrumb-item")][3]//a[text()="diplomové práce"]/text()'
+            )
+        )
         thesis_author_without_degree_surname_first = "".join(
-            xDoc_thesis.xpath('//div[./h5/.="Authors"]//div//text()')
+            xDoc_thesis.xpath('//div[./h2/.="Authors"]//div//text()')
         ).strip()
-        habilitation_date = "".join(xDoc_thesis.xpath('//div[./h5/.="Date of acceptance"]//div/span/text()'))
-        result = "".join(xDoc_thesis.xpath('//div[./h5/.="Result of defence"]//div/span/text()'))
-        faculty = "".join(xDoc_thesis.xpath(breadcrumb_xpath.format(4, "Fakulta informačních technologií")))
+        habilitation_date = "".join(xDoc_thesis.xpath('//div[./h2/.="Date of acceptance"]//div/span/text()'))
+        result = "".join(xDoc_thesis.xpath('//div[./h2/.="Result of defence"]//div/span/text()'))
+        faculty = "".join(
+            xDoc_thesis.xpath(
+                '//li[contains(@class, "breadcrumb-item")][4]//a[text()="Fakulta informačních technologií"]/text()'
+            )
+        )
 
         if "Page cannot be found" in not_found:
             await inter.edit_original_response(MessagesCZ.thesis_not_found_error)
