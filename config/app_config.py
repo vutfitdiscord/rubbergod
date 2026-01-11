@@ -167,7 +167,6 @@ class Config:
 
     # nasa
     space_channel: int = get_attr(toml_dict, "space", "channel")
-    nasa_token: str = get_attr(toml_dict, "space", "nasa_token")
 
     # warden
     duplicate_limit: int = get_attr(toml_dict, "warden", "duplicate_limit")

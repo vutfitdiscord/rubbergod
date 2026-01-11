@@ -145,7 +145,6 @@ token = "678a5932f6dd92ac668b20e9f89c0318"
 
 [space]
 channel = 820016159055020102
-nasa_token = ""
 
 [warden]
 duplicate_limit = 5

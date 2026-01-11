@@ -40,6 +40,19 @@ services:
         networks:
             - postgres
             - prometheus
+            - nasa_api
+
+    nasa-api:
+        image: ghcr.io/vutfitdiscord/apod-api:latest
+        container_name: nasa-api
+        deploy:
+            restart_policy:
+                condition: unless-stopped
+                delay: 5s
+                window: 20s
+        networks:
+            - nasa_api
+
 
 volumes:
     postgres_data:
@@ -47,5 +60,6 @@ volumes:
 
 networks:
     postgres:
+    nasa_api:
     prometheus:
         external: true
