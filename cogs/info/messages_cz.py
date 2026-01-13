@@ -30,4 +30,3 @@ if ("Mám průměr pod 2.0")                                           \n  retur
 
     nasa_image_brief = "Pošle obrázek dne z NASA"
     nasa_image_error = "Nepovedlo se stáhnout obrázek z NASA"
-    nasa_url = "https://apod.nasa.gov/apod/astropix.html"

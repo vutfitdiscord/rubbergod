@@ -1,5 +1,6 @@
 import asyncio
 import io
+from datetime import datetime
 
 import aiohttp
 import disnake
@@ -62,10 +63,16 @@ async def create_nasa_embed(
 
     Returns tuple of embed and video url (if media type is video)
     """
+
+    date_str = response["date"]
+    date_obj = datetime.strptime(date_str, "%Y-%m-%d")
+    formatted_date = date_obj.strftime("%y%m%d")
+    nasa_url = f"https://apod.nasa.gov/apod/ap{formatted_date}.html"
+
     embed = disnake.Embed(
         title=response["title"],
         description=response["explanation"],
-        url=MessagesCZ.nasa_url,
+        url=nasa_url,
         color=disnake.Color.blurple(),
     )
     utils.embed.add_author_footer(embed, author)
