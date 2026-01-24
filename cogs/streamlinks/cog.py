@@ -135,6 +135,9 @@ class StreamLinks(Base, commands.Cog):
             user = await self.get_user_string(user)
 
         link_data = self.get_link_data(link)
+        if not link_data:
+            link_data = {"image": None, "upload_date": None}
+
         if date is not None:
             link_data["upload_date"] = datetime.strptime(date, "%d.%m.%Y")
         else:
