@@ -264,7 +264,6 @@ class Verification(BaseFeature):
                 year = disnake.utils.get(guild.roles, name=year)
                 member = guild.get_member(inter.user.id)
 
-            # Clear host roles before adding new roles to avoid removing verify role
             await self.clear_host_roles(inter)
 
             await member.add_roles(verify)
