@@ -226,12 +226,6 @@ class Verification(BaseFeature):
         return "mail.muni.cz" if login[0] != "x" and login.isnumeric() else "stud.fit.vutbr.cz"
 
     async def finish_verify(self, inter: disnake.ModalInteraction, code: str, login: str) -> None:
-        if await self.helper.has_role(inter.user, config.verification_role):
-            await inter.response.send_message(
-                MessagesCZ.verify_already_verified(user=inter.user.id, admin=config.admin_ids[0])
-            )
-            return
-
         new_user = ValidPersonDB.get_user_by_login(login)
         if new_user is not None:
             if code != new_user.code:
@@ -269,6 +263,8 @@ class Verification(BaseFeature):
                 verify = disnake.utils.get(guild.roles, name=config.verification_role)
                 year = disnake.utils.get(guild.roles, name=year)
                 member = guild.get_member(inter.user.id)
+
+            await self.clear_host_roles(inter)
 
             await member.add_roles(verify)
             await member.add_roles(year)
@@ -311,7 +307,7 @@ class Verification(BaseFeature):
             content=MessagesCZ.verify_send_dumbshit(user=inter.user.id, emote=str(fp))
         )
 
-    async def clear_host_roles(self, inter: disnake.ApplicationCommandInteraction):
+    async def clear_host_roles(self, inter: disnake.ApplicationCommandInteraction | disnake.ModalInteraction):
         """Removes host roles (Host, Zajemce o studium, Verify)"""
         guild = self.bot.get_guild(config.guild_id)
         member = inter.user if isinstance(inter.user, disnake.Member) else guild.get_member(inter.user.id)
