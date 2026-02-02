@@ -226,12 +226,6 @@ class Verification(BaseFeature):
         return "mail.muni.cz" if login[0] != "x" and login.isnumeric() else "stud.fit.vutbr.cz"
 
     async def finish_verify(self, inter: disnake.ModalInteraction, code: str, login: str) -> None:
-        if await self.helper.has_role(inter.user, config.verification_role):
-            await inter.response.send_message(
-                MessagesCZ.verify_already_verified(user=inter.user.id, admin=config.admin_ids[0])
-            )
-            return
-
         new_user = ValidPersonDB.get_user_by_login(login)
         if new_user is not None:
             if code != new_user.code:
