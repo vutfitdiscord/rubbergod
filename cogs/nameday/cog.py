@@ -23,11 +23,11 @@ class Nameday(Base, commands.Cog):
         self.tasks = [self.send_names.start()]
 
     async def _name_day_cz(self, task: bool = False) -> str:
-        url = f"http://svatky.adresa.info/json?date={date.today().strftime('%d%m')}"
+        url = f"https://nameday.abalin.net/api/V2/date?day={date.today().strftime('%d')}&month={date.today().strftime('%m')}"
         try:
             async with self.bot.rubbergod_session.get(url) as resp:
                 names: dict = await resp.json()
-            return MessagesCZ.name_day_cz(name=", ".join(i["name"] for i in names))
+            return MessagesCZ.name_day_cz(name=names["data"]["cz"])
         except Exception as error:
             if task:
                 # tasks can't handle exceptions and will stop working
@@ -35,11 +35,11 @@ class Nameday(Base, commands.Cog):
             raise ApiError(str(error))
 
     async def _name_day_sk(self, task: bool = False) -> str:
-        url = f"http://svatky.adresa.info/json?lang=sk&date={date.today().strftime('%d%m')}"
+        url = f"https://nameday.abalin.net/api/V2/date?lang=sk&day={date.today().strftime('%d')}&month={date.today().strftime('%m')}"
         try:
             async with self.bot.rubbergod_session.get(url) as resp:
-                names_list = await resp.json()
-            return MessagesCZ.name_day_sk(name=", ".join(i["name"] for i in names_list))
+                names: dict = await resp.json()
+            return MessagesCZ.name_day_sk(name=names["data"]["sk"])
         except Exception as error:
             if task:
                 # tasks can't handle exceptions and will stop working
