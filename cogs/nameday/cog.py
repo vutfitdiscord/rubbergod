@@ -35,7 +35,7 @@ class Nameday(Base, commands.Cog):
             raise ApiError(str(error))
 
     async def _name_day_sk(self, task: bool = False) -> str:
-        url = f"https://nameday.abalin.net/api/V2/date?lang=sk&day={date.today().strftime('%d')}&month={date.today().strftime('%m')}"
+        url = f"https://nameday.abalin.net/api/V2/date?day={date.today().strftime('%d')}&month={date.today().strftime('%m')}"
         try:
             async with self.bot.rubbergod_session.get(url) as resp:
                 names: dict = await resp.json()
