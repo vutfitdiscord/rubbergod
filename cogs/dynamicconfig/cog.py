@@ -62,6 +62,20 @@ class DynamicConfig(Base, commands.Cog):
         await self.change_value(inter, key, value, True)
         load_config()
 
+    @config_cmd.sub_command(description=MessagesCZ.remove_brief)
+    async def remove(
+        self,
+        inter: disnake.ApplicationCommandInteraction,
+        key: str = commands.Param(autocomplete=autocomp_keys),
+        value: str = commands.Param(),
+    ):
+        """
+        Remove value(s) from existing config list
+        Only works on list type config values.
+        """
+        await self.remove_value(inter, key, value)
+        load_config()
+
     @config_cmd.sub_command(description=MessagesCZ.load_brief)
     async def load(self, inter: disnake.ApplicationCommandInteraction):
         """
@@ -172,6 +186,67 @@ class DynamicConfig(Base, commands.Cog):
         else:
             await inter.send(MessagesCZ.wrong_key)
             return
+        setattr(self.config, key, new_val)
+        with open(CONFIG_PATH, "w+", encoding="utf-8") as fd:
+            toml.dump(self.config.toml_dict, fd)
+        await inter.send(MessagesCZ.config_updated)
+
+    async def remove_value(self, inter: disnake.ApplicationCommandInteraction, key: str, value: str):
+        """
+        Removes value(s) from a list in config attribute specified by `key`.
+        Only works on list type config values.
+        """
+        if not hasattr(self.config, key) or key in self.config.config_static:
+            await inter.send(MessagesCZ.wrong_key)
+            return
+
+        attr = getattr(self.config, key)
+        if not isinstance(attr, list):
+            await inter.send(MessagesCZ.not_a_list)
+            return
+
+        try:
+            values_to_remove: Any = shlex.split(value)
+        except Exception as e:
+            await inter.send(e)
+            return
+
+        # Convert values_to_remove to the correct type if the list contains ints
+        if len(attr) > 0 and isinstance(attr[0], int):
+            for idx, item in enumerate(values_to_remove):
+                try:
+                    values_to_remove[idx] = int(item)
+                except ValueError:
+                    await inter.send(MessagesCZ.wrong_type)
+                    return
+
+        # Remove the values from the list
+        new_val = attr.copy()
+        removed_any = False
+        for val in values_to_remove:
+            if val in new_val:
+                new_val.remove(val)
+                removed_any = True
+
+        if not removed_any:
+            await inter.send(MessagesCZ.value_not_found)
+            return
+
+        # Find the correct section in toml_dict and update it
+        key_toml = key
+        key_split = key.split("_", 1)
+        for section in self.config.toml_dict:
+            if key_split[0] == section:
+                key_toml = key_split[1]
+            if key_toml in self.config.toml_dict[section]:
+                self.config.toml_dict[section][key_toml] = new_val
+                break
+            else:
+                key_toml = key
+        else:
+            await inter.send(MessagesCZ.wrong_key)
+            return
+
         setattr(self.config, key, new_val)
         with open(CONFIG_PATH, "w+", encoding="utf-8") as fd:
             toml.dump(self.config.toml_dict, fd)
