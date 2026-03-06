@@ -46,6 +46,8 @@ class VerifyHelper:
     async def _parse_relation(self, user: dict) -> str | None:
         """Parse user relations and return year, programee and faculty for students,
         `employee` for FIT employees, None for others."""
+        if not user["vztahy"]:
+            return "ExStudent"
         ret = None  # rule out students that are also employees or have multiple studies
         relation: dict
         for relation in user["vztahy"]:
