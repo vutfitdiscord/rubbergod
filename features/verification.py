@@ -185,10 +185,10 @@ class Verification(BaseFeature):
         await self.gen_code_and_send_mail(inter, user, mail_postfix, True)
 
     @staticmethod
-    def transform_year(raw_year: str):
+    def transform_year(raw_year: str | None):
         """Parses year string originally from /etc/passwd into a role name"""
 
-        if raw_year.lower() == "exstudent":
+        if raw_year is None or raw_year.lower() == "exstudent":
             return "ExStudent"
 
         year_parts = list(filter(lambda x: len(x.strip()) > 0, raw_year.split()))
