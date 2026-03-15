@@ -43,11 +43,11 @@ class VerifyHelper:
                 return None
             return await res.json()
 
-    async def _parse_relation(self, user: dict) -> str | None:
+    async def _parse_relation(self, user: dict) -> str:
         """Parse user relations and return year, programee and faculty for students,
-        `employee` for FIT employees, None for others."""
+        `employee` for FIT employees, `ExStudent` for others."""
         if not user["vztahy"]:
-            return None
+            return "ExStudent"
         ret = None  # rule out students that are also employees or have multiple studies
         relation: dict
         for relation in user["vztahy"]:
@@ -74,6 +74,7 @@ class VerifyHelper:
                     ret = ret or "external employee"
         if not ret:
             await self.log_relation_error(user)
+            return "ExStudent"
         return ret
 
     def get_fallback_email(self, user: dict) -> str:
