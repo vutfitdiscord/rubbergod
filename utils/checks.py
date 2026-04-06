@@ -82,9 +82,7 @@ class PermissionsCheck:
         """Check if user has permission for command helper or above."""
         return cls.check_template(
             ctx,
-            lambda ctx: (
-                cls.is_bot_admin(ctx, raise_exception=False) or cls.role_check(ctx, PRIVILEGED_ROLES)
-            ),
+            lambda ctx: cls.is_bot_admin(ctx, raise_exception=False) or cls.role_check(ctx, PRIVILEGED_ROLES),
             cls.is_helper_plus.__name__,
             raise_exception,
             PermissionError(Messages.helper_plus_only),
