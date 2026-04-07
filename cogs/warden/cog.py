@@ -36,10 +36,12 @@ class Warden(Base, commands.Cog):
         self.message_channel = None
 
     def doCheckRepost(self, message: disnake.Message):
+        has_attachments = len(message.attachments) > 0 or any(
+            len(snapshot.attachments) > 0 for snapshot in (message.message_snapshots or [])
+        )
         return (
             message.channel.id in self.config.deduplication_channels
-            and message.attachments is not None
-            and len(message.attachments) > 0
+            and has_attachments
             and not message.author.bot
         )
 

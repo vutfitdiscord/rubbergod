@@ -8,7 +8,10 @@ from database.image import ImageDB
 
 
 async def saveMessageHashes(message: disnake.Message):
-    for f in message.attachments:
+    attachments = list(message.attachments)
+    for snapshot in message.message_snapshots or []:
+        attachments.extend(snapshot.attachments)
+    for f in attachments:
         fp = BytesIO()
         await f.save(fp)
         try:
