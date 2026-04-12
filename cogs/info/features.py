@@ -44,7 +44,7 @@ async def urban_embeds(author: disnake.User, dict: dict) -> list[disnake.Embed]:
 
 
 async def nasa_daily_image(rubbergod_session: aiohttp.ClientSession) -> dict:
-    url = "http://nasa-api:8000/v1/apod"
+    url = "http://nasa-api:5000/v1/apod"
     try:
         async with rubbergod_session.get(url) as resp:
             response = await resp.json()
