@@ -10,6 +10,6 @@ toml
 beautifulsoup4
 lxml
 python-dateutil
-CairoSVG>=2.5.2
+CairoSVG>=2.9.0
 prettytable
 prometheus_client
