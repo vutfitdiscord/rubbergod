@@ -1,5 +1,5 @@
 disnake>=2.10.0
-emoji>=2.0.0
+emoji>=2.15.0
 gitpython
 sqlalchemy>=2.0.0
 psycopg2-binary
