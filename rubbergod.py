@@ -90,13 +90,13 @@ class Rubbergod(commands.Bot):
         vut_api_headers = {"Authorization": f"Bearer {config.vut_api_key}", "Author": owner_id}
 
         self.rubbergod_session = aiohttp.ClientSession(
-            timeout=aiohttp.ClientTimeout(total=10), headers=rubbergod_headers
+            timeout=aiohttp.ClientTimeout(total=120), headers=rubbergod_headers
         )
         self.grillbot_session = aiohttp.ClientSession(
-            timeout=aiohttp.ClientTimeout(total=10), headers=grillbot_headers
+            timeout=aiohttp.ClientTimeout(total=120), headers=grillbot_headers
         )
         self.vutapi_session = aiohttp.ClientSession(
-            timeout=aiohttp.ClientTimeout(total=10), headers=vut_api_headers
+            timeout=aiohttp.ClientTimeout(total=120), headers=vut_api_headers
         )
 
     async def set_presence(self):
