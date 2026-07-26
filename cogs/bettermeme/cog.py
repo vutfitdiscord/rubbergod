@@ -130,8 +130,8 @@ class BetterMeme(Base, commands.Cog):
             main_image = None
             other_attachments = []
             attachments = list(ctx.message.attachments)
-            for snapshot in ctx.message.message_snapshots or []:
-                attachments.extend(snapshot.attachments)
+            for snapshot in getattr(ctx.message, "message_snapshots", None) or []:
+                attachments.extend(getattr(snapshot, "attachments", None) or [])
             for attachment in attachments:
                 content_type = attachment.content_type
                 if content_type is not None and content_type.split("/")[0] == "image" and main_image is None:
