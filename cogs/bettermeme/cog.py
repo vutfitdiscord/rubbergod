@@ -129,7 +129,10 @@ class BetterMeme(Base, commands.Cog):
             # Get all attachments of original post
             main_image = None
             other_attachments = []
-            for attachment in ctx.message.attachments:
+            attachments = list(ctx.message.attachments)
+            for snapshot in ctx.message.message_snapshots or []:
+                attachments.extend(snapshot.attachments)
+            for attachment in attachments:
                 content_type = attachment.content_type
                 if content_type is not None and content_type.split("/")[0] == "image" and main_image is None:
                     # Set main image if its image and main image is not set
