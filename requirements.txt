@@ -4,7 +4,7 @@ gitpython
 sqlalchemy>=2.0.52
 psycopg2-binary
 requests
-pillow>=12.2.0
+pillow>=12.3.0
 dhash
 toml
 beautifulsoup4
