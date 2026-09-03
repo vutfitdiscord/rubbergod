@@ -48,8 +48,8 @@ async def nasa_daily_image(rubbergod_session: aiohttp.ClientSession) -> dict:
     try:
         async with rubbergod_session.get(url) as resp:
             response = await resp.json()
-            if "error" in response:
-                raise ApiError(response["error"])
+            if resp.status != 200:
+                raise ApiError(response.get("msg", MessagesCZ.nasa_image_error))
             return response
     except (aiohttp.ClientConnectorError, asyncio.exceptions.TimeoutError) as error:
         raise ApiError(str(error))
