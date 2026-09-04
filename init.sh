@@ -11,8 +11,14 @@ if ! command -v lockfile &>/dev/null; then
         INSTALL_PROCMAIL=${INSTALL_PROCMAIL:-Y}
 
         if [[ "$INSTALL_PROCMAIL" =~ ^[Yy]$ ]]; then
-            sudo apt-get update
-            sudo apt-get install -y procmail
+            if command -v apt-get &>/dev/null; then
+                sudo apt-get update
+                sudo apt-get install -y procmail
+            elif command -v dnf &>/dev/null; then
+                sudo dnf install -y procmail
+            else
+                echo "No supported package manager found. Please install procmail manually."
+            fi
         else
             echo "Skipping procmail installation."
         fi
