@@ -63,7 +63,7 @@ jobs:
             trap remove_lock EXIT
 
             echo "================== Pull Changes =================="
-            cd /rubbergod/rubbergod
+            cd ${{ vars.PRODUCTION_PATH }}
             git pull
 
             echo "================== Build Image =================="
