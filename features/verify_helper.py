@@ -49,6 +49,7 @@ class VerifyHelper:
         if not user["vztahy"]:
             return "ExStudent"
         ret = None  # rule out students that are also employees or have multiple studies
+        has_facultyless_employee_relation = False
         relation: dict
         for relation in user["vztahy"]:
             # student
@@ -64,6 +65,8 @@ class VerifyHelper:
                 if relation["fakulta"]["zkratka"] == "FIT":
                     return ret
             elif relation["fakulta"] is None:
+                if relation.get("pozice") == "Zaměstnanec":
+                    has_facultyless_employee_relation = True
                 # missing relation to any faculty
                 continue
             elif "fakulta" in relation.keys():
@@ -73,6 +76,8 @@ class VerifyHelper:
                 else:
                     ret = ret or "external employee"
         if not ret:
+            if has_facultyless_employee_relation:
+                return "ExStudent"
             await self.log_relation_error(user)
             return "ExStudent"
         return ret
@@ -114,6 +119,8 @@ class VerifyHelper:
             session.commit()
         else:
             relation = await self._parse_relation(user)
+            if relation == "ExStudent" and person.year in ["employee", "external employee"]:
+                return person
             if person.year != relation:
                 person.year = relation
                 session.commit()
