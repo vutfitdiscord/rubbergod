@@ -76,9 +76,8 @@ class VerifyHelper:
                 else:
                     ret = ret or "external employee"
         if not ret:
-            if has_facultyless_employee_relation:
-                return "ExStudent"
-            await self.log_relation_error(user)
+            if not has_facultyless_employee_relation:
+                await self.log_relation_error(user)
             return "ExStudent"
         return ret
 
