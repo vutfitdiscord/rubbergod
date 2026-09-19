@@ -3,8 +3,11 @@ import re
 import smtplib
 import ssl
 import string
-from datetime import datetime
+from email.mime.image import MIMEImage
+from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
+from email.utils import formatdate, make_msgid
+from pathlib import Path
 
 import disnake
 
@@ -31,12 +34,36 @@ class Verification(BaseFeature):
         super().__init__(bot)
         self.helper = VerifyHelper(bot)
 
-    def send_mail(self, receiver_email: str, contents: str, subject: str = "") -> None:
-        msg = MIMEText(contents, "plain", "utf-8")
+    def send_mail(
+        self,
+        receiver_email: str,
+        contents: str,
+        subject: str = "",
+        html_contents: str | None = None,
+    ) -> None:
+        msg = MIMEMultipart("related")
+        alternative_part = MIMEMultipart("alternative")
+        alternative_part.attach(MIMEText(contents, "plain", "utf-8"))
+
+        if html_contents:
+            alternative_part.attach(MIMEText(html_contents, "html", "utf-8"))
+        msg.attach(alternative_part)
+
+        if html_contents:
+            icon_path = Path(__file__).resolve().parents[1] / "images" / "backup" / "rubbergod_icon.png"
+            with icon_path.open("rb") as icon_file:
+                icon = MIMEImage(icon_file.read())
+            icon.add_header("Content-ID", "<rubbergod_icon>")
+            icon.add_header("Content-Disposition", "inline", filename="rubbergod_icon.png")
+            msg.attach(icon)
+
         msg["Subject"] = subject
         msg["To"] = receiver_email
-        msg["Date"] = datetime.now().isoformat()
+        msg["Date"] = formatdate(localtime=True)
         msg["From"] = config.email_addr
+        msg["Message-ID"] = make_msgid()
+        msg["Auto-Submitted"] = "auto-generated"
+        msg["X-Auto-Response-Suppress"] = "All"
 
         with smtplib.SMTP_SSL(
             config.email_smtp_server,
@@ -68,9 +95,18 @@ class Verification(BaseFeature):
             # Generate a verification code
             code = "".join(random.choices(string.ascii_uppercase + string.digits, k=6))
             mail_content = MessagesCZ.verify_mail_content(code=code)
+            mail_content_html = MessagesCZ.verify_mail_content_html(
+                code=code,
+                fit_logo_url="https://www.fit.vut.cz/img/logos/FIT_zkracene_barevne_RGB_CZ.png",
+            )
             # Save the newly generated code into the database
             user.save_sent_code(code)
-            self.send_mail(mail_address, mail_content, MessagesCZ.verify_subject)
+            self.send_mail(
+                mail_address,
+                mail_content,
+                MessagesCZ.verify_subject,
+                html_contents=mail_content_html,
+            )
 
         mail_list = await self.helper.get_mails(user.login)
         if not is_resend:
