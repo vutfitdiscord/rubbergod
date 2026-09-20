@@ -13,6 +13,14 @@ if ("Mám průměr pod 1.5")                                           \n  retur
 if ("Mám průměr pod 2.0")                                           \n  return 75
 ```"""
 
+    prerekvizity_brief = "Vypíše povinné prerekvizity předmětů zavedené od ak. r. 2025/2026."
+    prerekvizity_text = """```
+IZP  -> ISU
+IDM  -> IZLO
+IAL  -> IPP
+IMA1 -> IMA2
+```"""
+
     # Weather / Počasí
     weather_brief = "Vypíše informace o počasí ve zvoleném městě. Výchozí město je Brno."
     weather_description = "Aktuální počasí v městě {city}, {country}"

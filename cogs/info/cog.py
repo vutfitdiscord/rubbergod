@@ -127,3 +127,10 @@ class Info(Base, commands.Cog):
         Prints annual credit limit criteria
         """
         await inter.send(MessagesCZ.credit_limit_info)
+
+    @commands.slash_command(name="prerekvizity", description=MessagesCZ.prerekvizity_brief)
+    async def prerekvizity(self, inter: disnake.ApplicationCommandInteraction) -> None:
+        """
+        Prints recommended prerequisites for selected courses
+        """
+        await inter.send(MessagesCZ.prerekvizity_text)
