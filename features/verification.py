@@ -3,8 +3,12 @@ import re
 import smtplib
 import ssl
 import string
-from datetime import datetime
+from email.message import Message
+from email.mime.image import MIMEImage
+from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
+from email.utils import formatdate, make_msgid
+from pathlib import Path
 
 import disnake
 
@@ -25,18 +29,59 @@ MIT_SPECIALIZATIONS = [
 
 FACULTY_NAMES = ["FA", "FAST", "FAVU", "FCH", "FEKT", "FP", "FSI", "ÚSI",]  # fmt: skip
 
+VERIFY_MAIL_DIR = Path(__file__).resolve().parents[1] / "cogs" / "verify" / "mail"
+
+# Images attached to the HTML verification mail, referenced as `cid:<key>` from the template.
+# They are embedded on purpose, so that the mail doesn't load anything from the outside.
+VERIFY_MAIL_IMAGES = {
+    "rubbergod_icon": VERIFY_MAIL_DIR / "rubbergod_icon.png",
+    "fit_logo": VERIFY_MAIL_DIR / "fit_logo.png",
+}
+
 
 class Verification(BaseFeature):
     def __init__(self, bot: Rubbergod):
         super().__init__(bot)
         self.helper = VerifyHelper(bot)
 
-    def send_mail(self, receiver_email: str, contents: str, subject: str = "") -> None:
-        msg = MIMEText(contents, "plain", "utf-8")
+    def send_mail(
+        self,
+        receiver_email: str,
+        contents: str,
+        subject: str = "",
+        html_contents: str | None = None,
+        inline_images: dict[str, Path] | None = None,
+    ) -> None:
+        """Send a mail, optionally as multipart with an HTML variant.
+
+        `inline_images` maps a Content-ID to an image file attached to the message.
+        The HTML variant refers to them as `cid:<Content-ID>`, only used together with `html_contents`.
+        """
+        msg: Message
+        if html_contents is None:
+            msg = MIMEText(contents, "plain", "utf-8")
+        else:
+            alternative_part = MIMEMultipart("alternative")
+            alternative_part.attach(MIMEText(contents, "plain", "utf-8"))
+            alternative_part.attach(MIMEText(html_contents, "html", "utf-8"))
+
+            msg = MIMEMultipart("related")
+            msg.attach(alternative_part)
+
+            for content_id, image_path in (inline_images or {}).items():
+                image = MIMEImage(image_path.read_bytes())
+                image.add_header("Content-ID", f"<{content_id}>")
+                image.add_header("Content-Disposition", "inline", filename=image_path.name)
+                msg.attach(image)
+
         msg["Subject"] = subject
         msg["To"] = receiver_email
-        msg["Date"] = datetime.now().isoformat()
+        msg["Date"] = formatdate(localtime=True)
         msg["From"] = config.email_addr
+        # without a domain `make_msgid()` falls back to the hostname, which is a random ID in docker
+        msg["Message-ID"] = make_msgid(domain=config.email_addr.rpartition("@")[2] or None)
+        msg["Auto-Submitted"] = "auto-generated"
+        msg["X-Auto-Response-Suppress"] = "All"
 
         with smtplib.SMTP_SSL(
             config.email_smtp_server,
@@ -68,9 +113,16 @@ class Verification(BaseFeature):
             # Generate a verification code
             code = "".join(random.choices(string.ascii_uppercase + string.digits, k=6))
             mail_content = MessagesCZ.verify_mail_content(code=code)
+            mail_content_html = MessagesCZ.verify_mail_content_html(code=code)
             # Save the newly generated code into the database
             user.save_sent_code(code)
-            self.send_mail(mail_address, mail_content, MessagesCZ.verify_subject)
+            self.send_mail(
+                mail_address,
+                mail_content,
+                MessagesCZ.verify_subject,
+                html_contents=mail_content_html,
+                inline_images=VERIFY_MAIL_IMAGES,
+            )
 
         mail_list = await self.helper.get_mails(user.login)
         if not is_resend:

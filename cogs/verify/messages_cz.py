@@ -1,4 +1,8 @@
+from pathlib import Path
+
 from config.messages import Messages as GlobalMessages
+
+VERIFY_MAIL_TEMPLATE = Path(__file__).parent / "mail" / "verify_mail.html"
 
 
 class MessagesCZ(GlobalMessages):
@@ -30,6 +34,7 @@ class MessagesCZ(GlobalMessages):
     verify_mail_content = "Obdržel/a jsi kód pro ověření se k přístup na server VUT FIT.\n" \
                           "Po stisknutí na tlačítko \"Zadat kód\" vyplň ověřovací kód přesně tak jak je uveden níže.\n\n" \
                           "Ověřovací kód: {code}"
+    verify_mail_content_html = VERIFY_MAIL_TEMPLATE.read_text(encoding="utf-8")
 
     verify_verify_not_found = "{user} Login nenalezen nebo jsi neprošel krokem `/verify`. Přečti si prosím <#591386755547136020>. ({admin} pls)."
     verify_verify_wrong_code = "Špatný kód."
