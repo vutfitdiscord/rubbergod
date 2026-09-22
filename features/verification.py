@@ -3,6 +3,7 @@ import re
 import smtplib
 import ssl
 import string
+from email.message import Message
 from email.mime.image import MIMEImage
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
@@ -28,6 +29,15 @@ MIT_SPECIALIZATIONS = [
 
 FACULTY_NAMES = ["FA", "FAST", "FAVU", "FCH", "FEKT", "FP", "FSI", "ÚSI",]  # fmt: skip
 
+VERIFY_MAIL_DIR = Path(__file__).resolve().parents[1] / "cogs" / "verify" / "mail"
+
+# Images attached to the HTML verification mail, referenced as `cid:<key>` from the template.
+# They are embedded on purpose, so that the mail doesn't load anything from the outside.
+VERIFY_MAIL_IMAGES = {
+    "rubbergod_icon": VERIFY_MAIL_DIR / "rubbergod_icon.png",
+    "fit_logo": VERIFY_MAIL_DIR / "fit_logo.png",
+}
+
 
 class Verification(BaseFeature):
     def __init__(self, bot: Rubbergod):
@@ -40,28 +50,36 @@ class Verification(BaseFeature):
         contents: str,
         subject: str = "",
         html_contents: str | None = None,
+        inline_images: dict[str, Path] | None = None,
     ) -> None:
-        msg = MIMEMultipart("related")
-        alternative_part = MIMEMultipart("alternative")
-        alternative_part.attach(MIMEText(contents, "plain", "utf-8"))
+        """Send a mail, optionally as multipart with an HTML variant.
 
-        if html_contents:
+        `inline_images` maps a Content-ID to an image file attached to the message.
+        The HTML variant refers to them as `cid:<Content-ID>`, only used together with `html_contents`.
+        """
+        msg: Message
+        if html_contents is None:
+            msg = MIMEText(contents, "plain", "utf-8")
+        else:
+            alternative_part = MIMEMultipart("alternative")
+            alternative_part.attach(MIMEText(contents, "plain", "utf-8"))
             alternative_part.attach(MIMEText(html_contents, "html", "utf-8"))
-        msg.attach(alternative_part)
 
-        if html_contents:
-            icon_path = Path(__file__).resolve().parents[1] / "images" / "backup" / "rubbergod_icon.png"
-            with icon_path.open("rb") as icon_file:
-                icon = MIMEImage(icon_file.read())
-            icon.add_header("Content-ID", "<rubbergod_icon>")
-            icon.add_header("Content-Disposition", "inline", filename="rubbergod_icon.png")
-            msg.attach(icon)
+            msg = MIMEMultipart("related")
+            msg.attach(alternative_part)
+
+            for content_id, image_path in (inline_images or {}).items():
+                image = MIMEImage(image_path.read_bytes())
+                image.add_header("Content-ID", f"<{content_id}>")
+                image.add_header("Content-Disposition", "inline", filename=image_path.name)
+                msg.attach(image)
 
         msg["Subject"] = subject
         msg["To"] = receiver_email
         msg["Date"] = formatdate(localtime=True)
         msg["From"] = config.email_addr
-        msg["Message-ID"] = make_msgid()
+        # without a domain `make_msgid()` falls back to the hostname, which is a random ID in docker
+        msg["Message-ID"] = make_msgid(domain=config.email_addr.rpartition("@")[2] or None)
         msg["Auto-Submitted"] = "auto-generated"
         msg["X-Auto-Response-Suppress"] = "All"
 
@@ -95,10 +113,7 @@ class Verification(BaseFeature):
             # Generate a verification code
             code = "".join(random.choices(string.ascii_uppercase + string.digits, k=6))
             mail_content = MessagesCZ.verify_mail_content(code=code)
-            mail_content_html = MessagesCZ.verify_mail_content_html(
-                code=code,
-                fit_logo_url="https://www.fit.vut.cz/img/logos/FIT_zkracene_barevne_RGB_CZ.png",
-            )
+            mail_content_html = MessagesCZ.verify_mail_content_html(code=code)
             # Save the newly generated code into the database
             user.save_sent_code(code)
             self.send_mail(
@@ -106,6 +121,7 @@ class Verification(BaseFeature):
                 mail_content,
                 MessagesCZ.verify_subject,
                 html_contents=mail_content_html,
+                inline_images=VERIFY_MAIL_IMAGES,
             )
 
         mail_list = await self.helper.get_mails(user.login)
