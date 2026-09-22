@@ -1,4 +1,8 @@
+from pathlib import Path
+
 from config.messages import Messages as GlobalMessages
+
+VERIFY_MAIL_TEMPLATE = Path(__file__).parent / "mail" / "verify_mail.html"
 
 
 class MessagesCZ(GlobalMessages):
@@ -30,42 +34,7 @@ class MessagesCZ(GlobalMessages):
     verify_mail_content = "Obdržel/a jsi kód pro ověření se k přístup na server VUT FIT.\n" \
                           "Po stisknutí na tlačítko \"Zadat kód\" vyplň ověřovací kód přesně tak jak je uveden níže.\n\n" \
                           "Ověřovací kód: {code}"
-    verify_mail_content_html = """
-<html>
-  <body style="margin:0;padding:0;background-color:#f4f6fb;font-family:Arial,sans-serif;color:#1f2937;">
-    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="padding:24px 12px;">
-      <tr>
-        <td align="center">
-          <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:620px;background:#ffffff;border-radius:12px;overflow:hidden;border:1px solid #d8deef;">
-            <tr>
-              <td style="padding:24px;background:linear-gradient(135deg,#4f46e5,#3730a3);text-align:center;">
-                <img src="cid:rubbergod_icon" alt="Rubbergod" width="72" height="72" style="display:block;margin:0 auto 10px auto;border-radius:12px;background:#ffffff;padding:8px;" />
-                <h1 style="margin:0;color:#ffffff;font-size:24px;">FIT Discord verifikace</h1>
-              </td>
-            </tr>
-            <tr>
-              <td style="padding:28px 30px 20px 30px;">
-                <p style="margin:0 0 14px 0;line-height:1.55;">Ahoj! Obdržel/a jsi kód pro ověření přístupu na server VUT FIT.</p>
-                <p style="margin:0 0 20px 0;line-height:1.55;">Po stisknutí tlačítka <strong>Zadat kód</strong> vyplň ověřovací kód přesně tak, jak je uveden níže:</p>
-                <div style="margin:0 auto 22px auto;padding:14px 20px;max-width:240px;text-align:center;border-radius:10px;background:#eef2ff;border:1px dashed #4f46e5;font-size:32px;letter-spacing:6px;font-weight:700;color:#312e81;">
-                  {code}
-                </div>
-                <p style="margin:0;line-height:1.55;font-size:14px;color:#4b5563;">Pokud ti e-mail přišel neočekávaně, můžeš ho ignorovat.</p>
-              </td>
-            </tr>
-            <tr>
-              <td style="padding:16px 30px;background:#f9fafc;border-top:1px solid #e5e7eb;text-align:center;">
-                <img src="{fit_logo_url}" alt="VUT FIT" width="190" style="display:block;margin:0 auto 10px auto;max-width:100%;height:auto;" />
-                <p style="margin:0;font-size:12px;color:#6b7280;">Tato zpráva byla vytvořena automaticky botem Rubbergod.</p>
-              </td>
-            </tr>
-          </table>
-        </td>
-      </tr>
-    </table>
-  </body>
-</html>
-"""
+    verify_mail_content_html = VERIFY_MAIL_TEMPLATE.read_text(encoding="utf-8")
 
     verify_verify_not_found = "{user} Login nenalezen nebo jsi neprošel krokem `/verify`. Přečti si prosím <#591386755547136020>. ({admin} pls)."
     verify_verify_wrong_code = "Špatný kód."
