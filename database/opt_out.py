@@ -1,9 +1,11 @@
-﻿from __future__ import annotations
+from __future__ import annotations
 
 from sqlalchemy import Column, String
+
 from database import database, session
 
-class OptOutDb(database.Base):
+
+class OptOutDb(database.base):  # type: ignore
     __tablename__ = "opted_out"
 
     opted_out_id = Column(

@@ -1,12 +1,15 @@
-﻿"""
+"""
 Cog for collecting users who opted-out
 """
+
 import disnake
 from disnake.ext import commands
 
-from database.opt_out import OptOutDb
-from .messages_cz import MessagesCZ
 from cogs.base import Base
+from database.opt_out import OptOutDb
+
+from .messages_cz import MessagesCZ
+
 
 class OptOut(Base, commands.Cog):
     @commands.slash_command(name="opt-out", brief=MessagesCZ.opt_out_brief)

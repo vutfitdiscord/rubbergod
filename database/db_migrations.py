@@ -11,6 +11,7 @@ from database.image import ImageDB  # noqa: F401
 from database.karma import KarmaDB, KarmaEmojiDB  # noqa: F401
 from database.meme_repost import MemeRepostDB  # noqa: F401
 from database.moderation import ModerationDB  # noqa: F401
+from database.opt_out import OptOutDb  # noqa: F401
 from database.pin_map import PinMapDB  # noqa: F401
 from database.report import AnswerDB, ReportDB, UserDB  # noqa: F401
 from database.review import ReviewDB, ReviewRelevanceDB, SubjectDB, SubjectDetailsDB  # noqa: F401
@@ -19,7 +20,6 @@ from database.subscription import AlreadyNotifiedDB, SubscriptionDB  # noqa: F40
 from database.timeout import TimeoutDB, TimeoutUserDB  # noqa: F401
 from database.verification import PermitDB, ValidPersonDB  # noqa: F401
 from database.vote import VoteDB  # noqa: F401
-from database.opt_out import OptOutDb  # noqa: F401
 
 rubbergod_logger = logging.getLogger("rubbergod")
 
