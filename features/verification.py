@@ -315,19 +315,23 @@ class Verification(BaseFeature):
                 year = disnake.utils.get(guild.roles, name=year)
                 member = guild.get_member(inter.user.id)
 
-            await self.clear_host_roles(inter)
-
-            await member.add_roles(verify)
-            await member.add_roles(year)
-
             try:
+                await self.clear_host_roles(inter)
+                await member.add_roles(verify)
+                await member.add_roles(year)
                 new_user.save_verified(inter.user.id)
             except Exception:
-                return await self.log_verify_fail(
+                # The interaction is already deferred, so it must get a terminal response here,
+                # otherwise it's left hanging in the "thinking" state (e.g. on a duplicate/racing
+                # submit where save_verified raises because the user is already verified).
+                msg = MessagesCZ.verify_step_done(user=inter.user.id, admin=config.admin_ids[0])
+                await inter.edit_original_response(msg)
+                await self.log_verify_fail(
                     inter,
                     "Verify (with code) (User already verified?)",
                     str({"login": login, "year": new_user.year}),
                 )
+                return
 
             verify_success_msg = MessagesCZ.verify_verify_success(user=inter.user.id)
             try:
