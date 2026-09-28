@@ -319,11 +319,24 @@ class Verification(BaseFeature):
                 await self.clear_host_roles(inter)
                 await member.add_roles(verify)
                 await member.add_roles(year)
-                new_user.save_verified(inter.user.id)
             except Exception:
                 # The interaction is already deferred, so it must get a terminal response here,
-                # otherwise it's left hanging in the "thinking" state (e.g. on a duplicate/racing
-                # submit where save_verified raises because the user is already verified).
+                # otherwise it's left hanging in the "thinking" state.
+                msg = MessagesCZ.verify_verify_error(user=inter.user.id, admin=config.admin_ids[0])
+                await inter.edit_original_response(msg)
+                await self.log_verify_fail(
+                    inter,
+                    "Verify (with code) (Role assignment failed)",
+                    str({"login": login, "year": new_user.year}),
+                )
+                return
+
+            try:
+                new_user.save_verified(inter.user.id)
+            except Exception:
+                # Same as above: give the deferred interaction a terminal response instead of
+                # letting it hang (e.g. on a duplicate/racing submit where the user is already
+                # verified and save_verified raises).
                 msg = MessagesCZ.verify_step_done(user=inter.user.id, admin=config.admin_ids[0])
                 await inter.edit_original_response(msg)
                 await self.log_verify_fail(
