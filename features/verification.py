@@ -280,7 +280,7 @@ class Verification(BaseFeature):
         new_user = ValidPersonDB.get_user_by_login(login)
         if new_user is not None:
             if code != new_user.code:
-                await inter.response.send_message(MessagesCZ.verify_verify_wrong_code)
+                await inter.edit_original_response(MessagesCZ.verify_verify_wrong_code)
                 await self.log_verify_fail(
                     inter,
                     "Verify (with code) - Wrong code",
@@ -297,7 +297,7 @@ class Verification(BaseFeature):
                     admin=config.admin_ids[0],
                     year=str(new_user.year),
                 )
-                await inter.response.send_message(msg)
+                await inter.edit_original_response(msg)
                 await self.log_verify_fail(
                     inter, "Verify (with code) (Invalid year)", str({"login": login, "year": new_user.year})
                 )
@@ -336,10 +336,10 @@ class Verification(BaseFeature):
             except disnake.errors.Forbidden:
                 mail = new_user.get_mail(self.get_mail_postfix(login))
                 self.send_mail_verified(mail, member)
-            await inter.response.send_message(verify_success_msg)
+            await inter.edit_original_response(verify_success_msg)
         else:
             msg = MessagesCZ.verify_verify_not_found(user=inter.user.id, admin=config.admin_ids[0])
-            await inter.response.send_message(msg)
+            await inter.edit_original_response(msg)
             await self.log_verify_fail(
                 inter, "Verify (with code) - Not exists in DB", str({"login": login, "code": code})
             )
