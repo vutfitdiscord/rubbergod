@@ -1,9 +1,9 @@
 <!--
   HTML body of the verification e-mail, the plain text variant lives in
-  MessagesCZ.verify_mail_content. Both images are attached to the message
-  itself and referenced by their Content-ID, so the recipient's mail client
-  loads no external resources. The circle around the icon and its white ring
-  are baked into the PNG, Outlook ignores `border-radius`.
+  MessagesCZ.verify_mail_content. The icon is attached to the message itself
+  and referenced by its Content-ID, so the recipient's mail client loads no
+  external resources. The circle around the icon and its white ring are
+  baked into the PNG, Outlook ignores `border-radius`.
 
   The template is rendered through str.format, so any literal curly brace has
   to be doubled. The only placeholder used is the verification code.
@@ -37,7 +37,6 @@
             </tr>
             <tr>
               <td style="padding:16px 30px;background:#f9fafc;border-top:1px solid #e5e7eb;text-align:center;">
-                <img src="cid:fit_logo" alt="VUT FIT" width="190" style="display:block;margin:0 auto 10px auto;max-width:100%;height:auto;" />
                 <p style="margin:0;font-size:12px;color:#6b7280;">Tato zpráva byla vytvořena automaticky botem Rubbergod.</p>
               </td>
             </tr>
