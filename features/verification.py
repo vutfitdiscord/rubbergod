@@ -35,7 +35,6 @@ VERIFY_MAIL_DIR = Path(__file__).resolve().parents[1] / "cogs" / "verify" / "mai
 # They are embedded on purpose, so that the mail doesn't load anything from the outside.
 VERIFY_MAIL_IMAGES = {
     "rubbergod_icon": VERIFY_MAIL_DIR / "rubbergod_icon.png",
-    "fit_logo": VERIFY_MAIL_DIR / "fit_logo.png",
 }
 
 
