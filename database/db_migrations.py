@@ -19,6 +19,7 @@ from database.subscription import AlreadyNotifiedDB, SubscriptionDB  # noqa: F40
 from database.timeout import TimeoutDB, TimeoutUserDB  # noqa: F401
 from database.verification import PermitDB, ValidPersonDB  # noqa: F401
 from database.vote import VoteDB  # noqa: F401
+from database.opt_out import OptOutDb  # noqa: F401
 
 rubbergod_logger = logging.getLogger("rubbergod")
 
