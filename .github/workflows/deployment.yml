@@ -21,7 +21,7 @@ jobs:
             commit_sha: context.sha,
           });
           const labels = prs.flatMap(pr => pr.labels.map(label => label.name));
-          core.setOutput('result', labels.includes('no-deployment'));
+          return labels.includes('no-deployment');
     outputs:
       deploy: "${{ ! fromJson(steps.check_deployment.outputs.result) }}"
 
