@@ -39,6 +39,7 @@ class MessagesCZ(GlobalMessages):
     verify_verify_not_found = "{user} Login nenalezen nebo jsi neprošel krokem `/verify`. Přečti si prosím <#591386755547136020>. ({admin} pls)."
     verify_verify_wrong_code = "Špatný kód."
     verify_step_done = "{user} Tímto krokem jsi už prošel. ({admin} pls)"
+    verify_verify_error = "{user} Něco se při verifikaci pokazilo, zkus to prosím znovu. ({admin} pls)"
     verify_invalid_channel = "Tento příkaz je možné spustit pouze v DMs nebo na VUT FIT serveru."
     mail_alternative = "Alternativní maily"
     mail_changed = "Změna mailu"

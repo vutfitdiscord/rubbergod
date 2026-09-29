@@ -280,7 +280,7 @@ class Verification(BaseFeature):
         new_user = ValidPersonDB.get_user_by_login(login)
         if new_user is not None:
             if code != new_user.code:
-                await inter.response.send_message(MessagesCZ.verify_verify_wrong_code)
+                await inter.edit_original_response(MessagesCZ.verify_verify_wrong_code)
                 await self.log_verify_fail(
                     inter,
                     "Verify (with code) - Wrong code",
@@ -297,7 +297,7 @@ class Verification(BaseFeature):
                     admin=config.admin_ids[0],
                     year=str(new_user.year),
                 )
-                await inter.response.send_message(msg)
+                await inter.edit_original_response(msg)
                 await self.log_verify_fail(
                     inter, "Verify (with code) (Invalid year)", str({"login": login, "year": new_user.year})
                 )
@@ -315,19 +315,36 @@ class Verification(BaseFeature):
                 year = disnake.utils.get(guild.roles, name=year)
                 member = guild.get_member(inter.user.id)
 
-            await self.clear_host_roles(inter)
-
-            await member.add_roles(verify)
-            await member.add_roles(year)
+            try:
+                await self.clear_host_roles(inter)
+                await member.add_roles(verify)
+                await member.add_roles(year)
+            except Exception:
+                # The interaction is already deferred, so it must get a terminal response here,
+                # otherwise it's left hanging in the "thinking" state.
+                msg = MessagesCZ.verify_verify_error(user=inter.user.id, admin=config.admin_ids[0])
+                await inter.edit_original_response(msg)
+                await self.log_verify_fail(
+                    inter,
+                    "Verify (with code) (Role assignment failed)",
+                    str({"login": login, "year": new_user.year}),
+                )
+                return
 
             try:
                 new_user.save_verified(inter.user.id)
             except Exception:
-                return await self.log_verify_fail(
+                # Same as above: give the deferred interaction a terminal response instead of
+                # letting it hang (e.g. on a duplicate/racing submit where the user is already
+                # verified and save_verified raises).
+                msg = MessagesCZ.verify_step_done(user=inter.user.id, admin=config.admin_ids[0])
+                await inter.edit_original_response(msg)
+                await self.log_verify_fail(
                     inter,
                     "Verify (with code) (User already verified?)",
                     str({"login": login, "year": new_user.year}),
                 )
+                return
 
             verify_success_msg = MessagesCZ.verify_verify_success(user=inter.user.id)
             try:
@@ -336,10 +353,10 @@ class Verification(BaseFeature):
             except disnake.errors.Forbidden:
                 mail = new_user.get_mail(self.get_mail_postfix(login))
                 self.send_mail_verified(mail, member)
-            await inter.response.send_message(verify_success_msg)
+            await inter.edit_original_response(verify_success_msg)
         else:
             msg = MessagesCZ.verify_verify_not_found(user=inter.user.id, admin=config.admin_ids[0])
-            await inter.response.send_message(msg)
+            await inter.edit_original_response(msg)
             await self.log_verify_fail(
                 inter, "Verify (with code) - Not exists in DB", str({"login": login, "code": code})
             )

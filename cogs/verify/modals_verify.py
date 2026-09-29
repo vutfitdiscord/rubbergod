@@ -25,6 +25,9 @@ class VerifyModal(disnake.ui.Modal):
         )
 
     async def callback(self, inter: disnake.ModalInteraction) -> None:
+        # finish_verify does several Discord API calls (roles, DMs) before responding,
+        # which can easily exceed the 3s interaction ack window, so defer immediately.
+        await inter.response.defer()
         code = inter.text_values["code"].strip().upper()
         service = verification.Verification(inter.bot)
         await service.finish_verify(inter, code, self.login)
