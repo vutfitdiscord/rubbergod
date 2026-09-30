@@ -45,6 +45,8 @@ class MessagesCZ(GlobalMessages):
     mail_changed = "Změna mailu"
     mail_changed_desc = "Uživatel {login} změnil mail z `{old}` na `{new}`."
     invalid_login = "{user} Neplatný login. Přečti si prosím <#591386755547136020>. ({admin} pls)"
+    verify_wrong_school = "{user} Tento login už je použitý pro ověření přes {school}. " \
+                          "Použij prosím `/verify {command}`. ({admin} pls)"
     verify_subject = "FIT Discord verifikace"
     dynamic_verify_requested = "Byla zaslána žádost o verifikaci. Vyčkej prosím než ji někdo z oprávněných osob schválí."
     dynamic_verify_declined = "Tvá žádost o verifikaci byla zamítnuta."
