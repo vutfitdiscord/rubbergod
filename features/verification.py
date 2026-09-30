@@ -152,6 +152,16 @@ class Verification(BaseFeature):
 
         user = ValidPersonDB.get_user_by_login(login)
 
+        if user is not None and user.year is not None and user.year != "MUNI":
+            msg = MessagesCZ.verify_wrong_school(
+                user=inter.user.id, admin=config.admin_ids[0], school="VUT", command="vut"
+            )
+            await inter.send(content=msg)
+            await self.log_verify_fail(
+                inter, "getcode (MUNI) - Wrong school", str({"login": login, "year": user.year})
+            )
+            return False
+
         if user is not None and user.status != VerifyStatus.Unverified.value:
             if user.status == VerifyStatus.InProcess.value:
                 await self.gen_code_and_send_mail(inter, user, "mail.muni.cz", dry_run=True)
@@ -175,6 +185,15 @@ class Verification(BaseFeature):
         return True
 
     async def send_code_vut(self, login: str, inter: disnake.ApplicationCommandInteraction) -> bool:
+        existing = ValidPersonDB.get_user_by_login(login)
+        if existing is not None and existing.year == "MUNI":
+            msg = MessagesCZ.verify_wrong_school(
+                user=inter.user.id, admin=config.admin_ids[0], school="MUNI", command="muni"
+            )
+            await inter.edit_original_response(content=msg)
+            await self.log_verify_fail(inter, "getcode (xlogin) - Wrong school", str({"login": login}))
+            return False
+
         user = await self.helper.check_api(login)
         if user is None:
             await inter.send(MessagesCZ.invalid_login(user=inter.author.id, admin=config.admin_ids[0]))
