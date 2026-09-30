@@ -460,7 +460,7 @@ Cog containing information about week (odd/even) and its relation to calendar/ac
     - /week
 ---
 
-### [Opt-out](warden/cog.py)
+### [Opt-out](optout/cog.py)
 
 Cog for keeping track of opt-outs.
 **Commands:**

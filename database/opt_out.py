@@ -28,5 +28,9 @@ class OptOutDb(database.base):  # type: ignore
             session.commit()
 
     @classmethod
+    def exists(cls, opted_out_id: str) -> bool:
+        return session.query(cls).filter(cls.opted_out_id == opted_out_id).first() is not None
+
+    @classmethod
     def get_all(cls) -> list[str]:
-        return [opted_out_id for opted_out_id in session.query(cls).all()]
+        return [opted_out_id.opted_out_id for opted_out_id in session.query(cls).all()]
