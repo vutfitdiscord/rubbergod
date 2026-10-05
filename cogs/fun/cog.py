@@ -257,9 +257,9 @@ class Fun(Base, commands.Cog):
             title="Fuchs reakce",
             color=disnake.Color.blue(),
         )
-        embed.set_image(url=f"attachment://{str(index)}.png")
+        embed.set_image(url=f"attachment://{index!s}.png")
 
-        utils.embed.add_author_footer(embed, inter.author, additional_text=[f" (hláškaid: #{str(index)})"])
+        utils.embed.add_author_footer(embed, inter.author, additional_text=[f" (hláškaid: #{index!s})"])
 
         with open(fuchs_path + str(index) + ".png", "rb") as fp:
             await inter.send(embed=embed, file=disnake.File(fp=fp, filename=str(index) + ".png"))

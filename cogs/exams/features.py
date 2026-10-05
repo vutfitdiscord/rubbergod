@@ -39,8 +39,7 @@ class Features:
     async def get_message_destination(self, channel: disnake.TextChannel, message_index: int = 0):
         saved_messages = ExamsTermsMessageDB.get_message_from_channel(channel.id)
         if saved_messages and message_index < len(saved_messages):
-            if message_index < 0:
-                message_index = 0
+            message_index = max(message_index, 0)
             message_id = saved_messages[message_index].message_id
 
             dest = None

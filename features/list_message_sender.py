@@ -1,4 +1,4 @@
-from typing import Iterable, Union
+from collections.abc import Iterable
 
 import disnake
 from disnake.ext import commands
@@ -51,7 +51,7 @@ def merge_messages(message_list: Iterable, max_msg_len: int):
 
 
 async def send_list_of_messages(
-    ctx: Union[disnake.ApplicationCommandInteraction, commands.Context, disnake.abc.Messageable],
+    ctx: disnake.ApplicationCommandInteraction | commands.Context | disnake.abc.Messageable,
     message_list: Iterable,
     max_msg_len: int = 1900,
     ephemeral: bool = False,
@@ -73,10 +73,8 @@ async def send_list_of_messages(
     """
 
     assert isinstance(max_msg_len, int)
-    if max_msg_len > 2000:
-        max_msg_len = 2000
-    if max_msg_len < 2:
-        max_msg_len = 2
+    max_msg_len = min(max_msg_len, 2000)
+    max_msg_len = max(max_msg_len, 2)
 
     message_list = trim_messages(message_list, max_msg_len - 1)
     message_list = merge_messages(message_list, max_msg_len - 1)

@@ -33,7 +33,6 @@ class DynamicConfig(Base, commands.Cog):
         """
         Group of commands for dynamically changing config
         """
-        pass
 
     @config_cmd.sub_command(name="set", description=MessagesCZ.set_brief)
     async def set_value(

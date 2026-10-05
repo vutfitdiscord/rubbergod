@@ -1,6 +1,5 @@
 import datetime
 import traceback
-from typing import Optional
 
 import disnake
 
@@ -12,7 +11,7 @@ from database.stats import ErrorEvent
 class BaseView(disnake.ui.View):
     error_log = None
 
-    def __init__(self, *, timeout: Optional[float] = 180):
+    def __init__(self, *, timeout: float | None = 180):
         super().__init__(timeout=timeout)
 
     async def on_error(self, error, item: disnake.ui.Item, interaction: disnake.MessageInteraction):

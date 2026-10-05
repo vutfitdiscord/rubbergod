@@ -39,4 +39,3 @@ class ModerationDB(database.base):  # type: ignore
         )
         session.add(item)
         session.commit()
-        return

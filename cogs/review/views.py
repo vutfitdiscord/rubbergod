@@ -1,5 +1,3 @@
-from typing import List
-
 import disnake
 
 import utils
@@ -12,7 +10,7 @@ from .messages_cz import MessagesCZ
 
 
 class ReviewView(PaginationView):
-    def __init__(self, author: disnake.User, bot: Rubbergod, embeds: List[disnake.Embed], page: int = 1):
+    def __init__(self, author: disnake.User, bot: Rubbergod, embeds: list[disnake.Embed], page: int = 1):
         super().__init__(author, embeds, row=1, end_arrow=False, timeout=300, page=page)
         self.bot = bot
         self.manager = ReviewManager(bot)

@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from datetime import datetime
-from typing import List, Optional
 
 from sqlalchemy import BigInteger, Boolean, Column, DateTime
 from sqlalchemy.sql.expression import or_
@@ -18,12 +17,12 @@ class VoteDB(database.base):  # type: ignore
     is_one_of = Column(Boolean, default=False, nullable=False)
 
     @classmethod
-    def get_pending_votes(cls) -> List[VoteDB]:
+    def get_pending_votes(cls) -> list[VoteDB]:
         return session.query(VoteDB).filter(or_(VoteDB.ends_at is None, VoteDB.ends_at >= datetime.now()))
 
     @classmethod
     def add_vote(
-        cls, message_id: int, channel_id: int, ends_at: Optional[datetime], is_one_of: bool = False
+        cls, message_id: int, channel_id: int, ends_at: datetime | None, is_one_of: bool = False
     ) -> None:
         vote = VoteDB(message_id=message_id, channel_id=channel_id, ends_at=ends_at, is_one_of=is_one_of)
         session.add(vote)
