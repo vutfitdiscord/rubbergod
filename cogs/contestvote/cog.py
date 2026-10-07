@@ -29,9 +29,9 @@ class ContestVote(Base, commands.Cog):
         self.bot = bot
 
         self.emojis = {
-            str("1️⃣"): self.config.contest_vote_weight_1,
-            str("2️⃣"): self.config.contest_vote_weight_2,
-            str("3️⃣"): self.config.contest_vote_weight_3,
+            "1️⃣": self.config.contest_vote_weight_1,
+            "2️⃣": self.config.contest_vote_weight_2,
+            "3️⃣": self.config.contest_vote_weight_3,
         }
 
     @commands.Cog.listener("on_ready")

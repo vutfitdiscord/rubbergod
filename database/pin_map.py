@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from typing import List
-
 from sqlalchemy import Column, String
 
 from database import database, session
@@ -35,5 +33,5 @@ class PinMapDB(database.base):  # type: ignore
         session.commit()
 
     @classmethod
-    def get_mappings(cls) -> List[PinMapDB]:
+    def get_mappings(cls) -> list[PinMapDB]:
         return list(session.query(cls).all())

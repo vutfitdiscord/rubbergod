@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import json
 from enum import IntEnum
-from typing import List, Optional
 
 from sqlalchemy import Boolean, Column, Integer, String, asc, exists
 from sqlalchemy.orm.exc import MultipleResultsFound
@@ -25,7 +24,7 @@ class PermitDB(database.base):  # type: ignore
     discord_ID = Column(String)
 
     @classmethod
-    def get_user_by_id(cls, discord_ID: str) -> Optional[PermitDB]:
+    def get_user_by_id(cls, discord_ID: str) -> PermitDB | None:
         try:
             user = session.query(PermitDB).filter(PermitDB.discord_ID == str(discord_ID)).one_or_none()
             return user
@@ -34,22 +33,22 @@ class PermitDB(database.base):  # type: ignore
             return None
 
     @classmethod
-    def get_user_by_login(cls, login: str) -> Optional[PermitDB]:
+    def get_user_by_login(cls, login: str) -> PermitDB | None:
         user = session.query(PermitDB).filter(PermitDB.login == login).one_or_none()
         return user
 
     @classmethod
-    def get_all_users_by_id(cls, discord_ID: str) -> List[PermitDB]:
+    def get_all_users_by_id(cls, discord_ID: str) -> list[PermitDB]:
         users = session.query(PermitDB).filter(PermitDB.discord_ID == str(discord_ID)).all()
         return users
 
     @classmethod
-    def get_all_users(cls) -> List[PermitDB]:
+    def get_all_users(cls) -> list[PermitDB]:
         users = session.query(PermitDB).all()
         return users
 
     @classmethod
-    def get_all_logins(cls) -> List[PermitDB]:
+    def get_all_logins(cls) -> list[PermitDB]:
         users = session.query(PermitDB.login).all()
         return users
 
@@ -97,13 +96,13 @@ class ValidPersonDB(database.base):  # type: ignore
         session.commit()
 
     @classmethod
-    def get_all_vut_persons(cls) -> List[ValidPersonDB]:
+    def get_all_vut_persons(cls) -> list[ValidPersonDB]:
         return session.query(cls).filter(cls.year != "MUNI").all()
 
     @classmethod
     def get_user_with_status(
         cls, login: str, status: int = VerifyStatus.InProcess.value
-    ) -> Optional[ValidPersonDB]:
+    ) -> ValidPersonDB | None:
         """Finds login from database and checks if status is correct"""
         user = (
             session.query(ValidPersonDB)
@@ -121,7 +120,7 @@ class ValidPersonDB(database.base):  # type: ignore
         return person
 
     @classmethod
-    def get_user_by_login(cls, login: str) -> Optional[ValidPersonDB]:
+    def get_user_by_login(cls, login: str) -> ValidPersonDB | None:
         """Finds login from DB (without status check)"""
         user = session.query(ValidPersonDB).filter(ValidPersonDB.login == login).one_or_none()
         return user
@@ -133,7 +132,7 @@ class ValidPersonDB(database.base):  # type: ignore
         session.commit()
 
     @classmethod
-    def get_user_by_id(self, discord_ID: str) -> Optional[ValidPersonDB]:
+    def get_user_by_id(self, discord_ID: str) -> ValidPersonDB | None:
         """Returns user specified by discord ID"""
         return (
             session.query(ValidPersonDB)
@@ -173,11 +172,11 @@ class DynamicVerifyDB(database.base):  # type: ignore
     mod_check = Column(Boolean, default=True, nullable=False)
     role_ids = Column(String, nullable=False, default="[]")
 
-    def get_role_ids(self) -> List[int]:
+    def get_role_ids(self) -> list[int]:
         data = json.loads(self.role_ids)
         return [int(item) for item in data]
 
-    def set_role_ids(self, roles: List[int]) -> None:
+    def set_role_ids(self, roles: list[int]) -> None:
         self.role_ids = json.dumps(roles)
 
     def update_rule(self) -> None:
@@ -193,9 +192,9 @@ class DynamicVerifyDB(database.base):  # type: ignore
         return session.query(exists().where(cls.id == rule and cls.enabled)).scalar()
 
     @classmethod
-    def get_rule(cls, rule: str) -> Optional[DynamicVerifyDB]:
+    def get_rule(cls, rule: str) -> DynamicVerifyDB | None:
         return session.query(cls).filter(cls.id == rule).one_or_none()
 
     @classmethod
-    def get_rules(cls, limit: int = None) -> List[DynamicVerifyDB]:
+    def get_rules(cls, limit: int = None) -> list[DynamicVerifyDB]:
         return session.query(cls).order_by(asc("id")).limit(limit).all()

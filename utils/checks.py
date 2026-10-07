@@ -2,7 +2,7 @@
 Contains functions to check permissions of users, channels and other.
 """
 
-from typing import Callable
+from collections.abc import Callable
 
 import disnake
 from disnake.ext import commands

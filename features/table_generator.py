@@ -1,5 +1,4 @@
 from textwrap import wrap
-from typing import Optional
 
 from prettytable import PrettyTable
 
@@ -21,7 +20,7 @@ class TableGenerator:
     def generate_table(self, matrix: list[list[str]]) -> str:
         """Generates table from matrix, wraps long strings."""
 
-        def wrap_text(elem: str) -> Optional[list[str]]:
+        def wrap_text(elem: str) -> list[str] | None:
             if len(elem) > self.column_width:
                 return wrap(elem[self.column_width :], width=self.column_width)
             return []
@@ -34,7 +33,7 @@ class TableGenerator:
                 # Wrap long strings
                 new_row[idx] = wrap_text(row[idx])  # type: ignore
                 # Get number of rows to add to table because of wrapping
-                new_row_cnt = len(new_row[idx]) if len(new_row[idx]) > new_row_cnt else new_row_cnt
+                new_row_cnt = max(new_row_cnt, len(new_row[idx]))
                 # Cut long strings
                 row[idx] = row[idx][: self.column_width]
 

@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from enum import Enum
-from typing import Any, List
+from typing import Any
 from urllib.parse import parse_qs, urlparse
 
 import requests
@@ -56,7 +56,7 @@ class VutSports:
             parsed_url = urlparse(schedule_url)
             subject_id = int(parse_qs(parsed_url.query)["predmet_id"][0])
 
-            if subject_id in output_dict.keys():
+            if subject_id in output_dict:
                 saved_semester = output_dict.get(subject_id).get("semester")  # type: ignore
                 if (saved_semester == Semester.ZS and semester == Semester.LS) or (
                     saved_semester == Semester.LS and semester == Semester.ZS
@@ -71,7 +71,7 @@ class VutSports:
                 }
 
     @staticmethod
-    def get_sports() -> List[SportData]:
+    def get_sports() -> list[SportData]:
         session = requests.Session()
 
         data = VutSports.get_page(session, 1)

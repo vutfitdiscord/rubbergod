@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from typing import List
-
 from sqlalchemy import Column, String
 
 from database import database, session
@@ -21,7 +19,7 @@ class ExamsTermsMessageDB(database.base):  # type: ignore
         return item
 
     @classmethod
-    def get_message_from_channel(cls, channel_id: str) -> List[ExamsTermsMessageDB]:
+    def get_message_from_channel(cls, channel_id: str) -> list[ExamsTermsMessageDB]:
         return session.query(cls).filter(cls.channel_id == str(channel_id)).all()
 
     @classmethod
@@ -30,7 +28,7 @@ class ExamsTermsMessageDB(database.base):  # type: ignore
         session.commit()
 
     @classmethod
-    def remove_from_channel(cls, channel_id: str) -> List[int]:
+    def remove_from_channel(cls, channel_id: str) -> list[int]:
         messages = cls.get_message_from_channel(channel_id)
         message_ids = [int(m.message_id) for m in messages]
 

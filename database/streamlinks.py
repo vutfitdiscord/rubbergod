@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from datetime import datetime
-from typing import List, Optional
 
 from sqlalchemy import BIGINT, Column, DateTime, String, desc, exists
 
@@ -50,21 +49,21 @@ class StreamLinkDB(database.base):  # type: ignore
         session.commit()
 
     @classmethod
-    def exists_link(cls, link: str) -> Optional[StreamLinkDB]:
+    def exists_link(cls, link: str) -> StreamLinkDB | None:
         return session.query(exists().where(cls.link == link)).scalar()
 
     @classmethod
-    def exists(cls, id: int) -> Optional[StreamLinkDB]:
+    def exists(cls, id: int) -> StreamLinkDB | None:
         return session.query(exists().where(cls.id == id)).scalar()
 
     @classmethod
-    def get_stream_by_id(cls, id: int) -> Optional[StreamLinkDB]:
+    def get_stream_by_id(cls, id: int) -> StreamLinkDB | None:
         return session.query(cls).filter(cls.id == id).first()
 
     @classmethod
-    def get_streamlinks_of_subject(cls, subject: str) -> List[StreamLinkDB]:
+    def get_streamlinks_of_subject(cls, subject: str) -> list[StreamLinkDB]:
         return list(session.query(cls).filter(cls.subject == subject).order_by(desc("created_at")).all())
 
     @classmethod
-    def get_subjects_with_stream(cls) -> List[tuple[str]]:
+    def get_subjects_with_stream(cls) -> list[tuple[str]]:
         return session.query(StreamLinkDB.subject).distinct().all()

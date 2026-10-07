@@ -1,5 +1,3 @@
-from typing import List, Union
-
 import disnake
 
 from database.verification import DynamicVerifyDB
@@ -9,7 +7,7 @@ from .messages_cz import MessagesCZ
 
 
 class DynamicVerifyEditModal(disnake.ui.Modal):
-    def __init__(self, guild: disnake.Guild, rule: Union[DynamicVerifyDB, None] = None):
+    def __init__(self, guild: disnake.Guild, rule: DynamicVerifyDB | None = None):
         self.rule = rule
 
         selected_roles = rule.get_role_ids() if rule is not None else []
@@ -149,7 +147,7 @@ class DynamicVerifyEditModal(disnake.ui.Modal):
 
     async def get_rule_id(
         self, inter: disnake.ModalInteraction, manager: features_dynamic_verify.DynamicVerifyManager
-    ) -> Union[str, None]:
+    ) -> str | None:
         rule_id = str(inter.text_values["id"]).strip()
 
         if rule_id == "None":
@@ -165,7 +163,7 @@ class DynamicVerifyEditModal(disnake.ui.Modal):
 
         return rule_id
 
-    async def get_bool_state(self, inter: disnake.ModalInteraction, state_id: str) -> Union[bool, None]:
+    async def get_bool_state(self, inter: disnake.ModalInteraction, state_id: str) -> bool | None:
         state = str(inter.text_values[state_id]).strip()
 
         if state.lower() == "true":
@@ -176,7 +174,7 @@ class DynamicVerifyEditModal(disnake.ui.Modal):
             await inter.response.send_message(MessagesCZ.dynamic_verify_invalid_state)
             return None
 
-    async def get_roles(self, inter: disnake.ModalInteraction) -> Union[List[disnake.Role], None]:
+    async def get_roles(self, inter: disnake.ModalInteraction) -> list[disnake.Role] | None:
         role_data = str(inter.text_values["roles"]).strip().split(",")
         role_data = [role.strip() for role in role_data]
         roles = []
