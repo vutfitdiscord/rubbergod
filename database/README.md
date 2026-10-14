@@ -45,7 +45,6 @@ class MemeRepostDB(database.base):
     def find_by_id(cls, id: str) -> Optional[MemeRepostDB]:
         return session.query(cls).filter(original_message_id == id).one_or_none()
 
-
     # example of method for deleting a row
     # calling:
     #     item = MemeRepostDB.find(id)

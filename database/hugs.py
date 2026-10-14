@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from collections import namedtuple
-from typing import Optional, Tuple, Union
+from typing import Union
 
 import disnake
 from sqlalchemy import BIGINT, Column, Integer
@@ -31,7 +31,7 @@ class HugsTableDB(database.base):  # type: ignore
         hugs = self._get_member(int(member_id))
         return UserHugStats(hugs.given, hugs.received) if hugs else UserHugStats(0, 0)
 
-    def get_member_position(self, member_stats: UserHugStats) -> Tuple[int, int]:
+    def get_member_position(self, member_stats: UserHugStats) -> tuple[int, int]:
         if member_stats.given > 0:
             give_position = (
                 1 + session.query(HugsTableDB).filter(HugsTableDB.given > member_stats.given).count()
@@ -70,7 +70,7 @@ class HugsTableDB(database.base):  # type: ignore
             session.commit()
 
     @classmethod
-    def _get_member(cls, member_id: int) -> Optional[HugsTableDB]:
+    def _get_member(cls, member_id: int) -> HugsTableDB | None:
         return session.query(cls).filter(cls.member_id == int(member_id)).one_or_none()
 
     @classmethod

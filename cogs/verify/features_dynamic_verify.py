@@ -25,7 +25,7 @@ class DynamicVerifyManager(BaseFeature):
     async def request_access(self, rule_id: str, inter: disnake.AppCommandInteraction) -> None:
         rule = self.verify_db.get_rule(rule_id)
         if rule is None:
-            return None
+            return
         if rule.mod_check:
             await self.request_verification(rule, inter)
             await inter.send(MessagesCZ.dynamic_verify_requested, ephemeral=True)
@@ -36,7 +36,7 @@ class DynamicVerifyManager(BaseFeature):
         guild = inter.guild if inter.guild is not None else await self.bot.get_guild(config.guild_id)
         rule = self.verify_db.get_rule(rule_id)
         if rule is None:
-            return None
+            return
         role_ids = rule.get_role_ids()
         roles = [guild.get_role(role_id) for role_id in role_ids]
         await self.log_attempt(rule, inter, user_id)

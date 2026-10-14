@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from typing import Optional
-
 from sqlalchemy import Column, DateTime, ForeignKeyConstraint, Integer, PrimaryKeyConstraint, String, Text
 
 from database import database, session
@@ -16,7 +14,7 @@ class Event(database.base):  # type: ignore
     cog = Column(String)  # can be cog or event in button, select etc.
 
     @classmethod
-    def get(cls, name: str, cog: str) -> Optional[Event]:
+    def get(cls, name: str, cog: str) -> Event | None:
         return session.query(cls).filter(cls.name == name, cls.cog == cog).one_or_none()
 
     @classmethod

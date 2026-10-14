@@ -156,7 +156,7 @@ On startup the bot automatically syncs commands. Restarting the bot too frequent
 Furthermore, if you want to enable command sync debugging info -- what exact update is being sent to the API and when --, you can also set the `sync_commands_debug` to `True` (info will be sent to `stderr`).
 
 ```python
-command_sync_flags=commands.CommandSyncFlags(sync_commands=True, sync_commands_debug=False),
+command_sync_flags = (commands.CommandSyncFlags(sync_commands=True, sync_commands_debug=False),)
 ```
 
 Database-related tips can be found in [database README](database/README.md).

@@ -65,7 +65,6 @@ class Review(Base, commands.Cog):
     @commands.slash_command(name="review")
     async def reviews(self, inter: disnake.ApplicationCommandInteraction):
         """Group of commands for reviews."""
-        pass
 
     @reviews.sub_command(name="get", description=MessagesCZ.review_get_brief)
     async def get(

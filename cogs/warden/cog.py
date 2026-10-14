@@ -154,7 +154,6 @@ class Warden(Base, commands.Cog):
     async def scan_message(self, ctx: Rubbergod, link):
         """Scan message attachments in whole database"""
         # TODO: implement
-        pass
 
     async def checkDuplicate(self, message: disnake.Message):
         """Check if uploaded files are known"""
@@ -200,7 +199,7 @@ class Warden(Base, commands.Cog):
         else:
             title = "To je možná repost"
             reaction = "🤷🏻"
-        prob = "{:.1f} %".format((1 - hamming / 128) * 100)
+        prob = f"{(1 - hamming / 128) * 100:.1f} %"
         timestamp = utils.general.id_to_datetime(original.attachment_id).strftime("%Y-%m-%d %H:%M:%S")
 
         src_chan = self.bot.get_guild(self.config.guild_id).get_channel(original.channel_id)

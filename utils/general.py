@@ -1,7 +1,7 @@
 import math
 import time
+from collections.abc import Callable
 from datetime import datetime, tzinfo
-from typing import Callable
 
 import disnake
 from disnake import Emoji, PartialEmoji
@@ -82,10 +82,8 @@ def get_emoji(guild: disnake.Guild, name: str) -> disnake.Emoji | None:
 def clear_link_escape(link: str) -> str:
     """Removes < and > escapes from link."""
 
-    if link.startswith("<"):
-        link = link[1:]
-    if link.endswith(">"):
-        link = link[:-1]
+    link = link.removeprefix("<")
+    link = link.removesuffix(">")
 
     return link
 
@@ -94,8 +92,9 @@ def make_pts_column_row_formatter(pts_column_name: str) -> Callable[[Table], str
     """For leaderboards with one column of points."""
 
     def formatter(entry: Table, **kwargs):
-        return Messages.base_leaderboard_format_str.format_map(kwargs) + " {} pts".format(
-            getattr(entry, pts_column_name)
+        return (
+            Messages.base_leaderboard_format_str.format_map(kwargs)
+            + f" {getattr(entry, pts_column_name)} pts"
         )
 
     return formatter
@@ -124,8 +123,6 @@ def create_bar(value: int, total: int) -> str:
 
 class PCommandOnCooldown(commands.CommandError):
     """commands.CommandOnCooldown requires usage of disnake for cooldowns, so we use a custom exception"""
-
-    pass
 
 
 class PersistentCooldown:

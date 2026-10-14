@@ -1,6 +1,6 @@
 import math
+from collections.abc import Callable, Iterable
 from functools import cached_property, lru_cache
-from typing import Callable, Iterable, Union
 
 import disnake
 from sqlalchemy.orm.query import Query
@@ -67,8 +67,8 @@ class LeaderboardPageSource(DatabaseIteratorPageSource):
     def __init__(
         self,
         bot: disnake.Client,
-        author: Union[disnake.Member, disnake.User],
-        row_formatter: Union[str, Callable],
+        author: disnake.Member | disnake.User,
+        row_formatter: str | Callable,
         query: Query,
         title: str,
         emote_name: str,
@@ -122,7 +122,7 @@ class LeaderboardPageSource(DatabaseIteratorPageSource):
             emote = self.get_default_emoji(emote_name) or f":{emote_name}:"
         return f"{emote} {board_name} {emote}"
 
-    def _get_member_name(self, member_id: Union[str, int]) -> str:
+    def _get_member_name(self, member_id: str | int) -> str:
         guild = self.bot.get_guild(config.guild_id)
         member = guild.get_member(int(member_id))
         if not member:
@@ -148,7 +148,7 @@ class LeaderboardPageSource(DatabaseIteratorPageSource):
         kwargs = {"position": position, "member_name": member_name, "entry": entry}
         return self.row_formatter(**kwargs)
 
-    def format_page(self, page: DatabasePage) -> Union[str, disnake.Embed, dict]:
+    def format_page(self, page: DatabasePage) -> str | disnake.Embed | dict:
         board_lines = []
 
         for i, entry in enumerate(page):  # type: int, Table
@@ -183,7 +183,6 @@ class LeaderboardPageSource(DatabaseIteratorPageSource):
             page_num = last_page - 1
 
         # if page is negative, set it to 0, happens with empty board
-        if page_num < 0:
-            page_num = 0
+        page_num = max(page_num, 0)
 
         return page_num

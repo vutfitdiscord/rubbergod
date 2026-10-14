@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from typing import List, Optional
-
 from sqlalchemy import Column, Integer, String
 
 from database import database, session
@@ -26,7 +24,7 @@ class SubscriptionDB(database.base):  # type: ignore
         session.commit()
 
     @classmethod
-    def get(cls, user_id: str, forum_id: str, tag: str) -> Optional[SubscriptionDB]:
+    def get(cls, user_id: str, forum_id: str, tag: str) -> SubscriptionDB | None:
         return (
             session.query(cls)
             .filter((cls.user_id == user_id) & (cls.forum_id == forum_id) & (cls.tag == tag))
@@ -34,17 +32,17 @@ class SubscriptionDB(database.base):  # type: ignore
         )
 
     @classmethod
-    def get_tags(cls, user_id: str, forum_id: str) -> List[SubscriptionDB]:
+    def get_tags(cls, user_id: str, forum_id: str) -> list[SubscriptionDB]:
         tags = session.query(cls.tag).filter((cls.user_id == user_id) & (cls.forum_id == forum_id)).all()
         # from list of sets to list of strings
         return [tag[0] for tag in tags]
 
     @classmethod
-    def get_user(cls, user_id: str) -> List[SubscriptionDB]:
+    def get_user(cls, user_id: str) -> list[SubscriptionDB]:
         return session.query(cls).filter(cls.user_id == user_id).all()
 
     @classmethod
-    def get_channel(cls, forum_id: str) -> List[SubscriptionDB]:
+    def get_channel(cls, forum_id: str) -> list[SubscriptionDB]:
         return session.query(cls).filter(cls.forum_id == forum_id).all()
 
     def remove(self) -> None:
@@ -60,7 +58,7 @@ class AlreadyNotifiedDB(database.base):  # type: ignore
     thread_id = Column(String)
 
     @classmethod
-    def get(cls, thread_id: str) -> List[str]:
+    def get(cls, thread_id: str) -> list[str]:
         users = session.query(cls.user_id).filter(cls.thread_id == thread_id).all()
         # from list of sets to list of strings
         return [user[0] for user in users]

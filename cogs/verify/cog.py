@@ -89,7 +89,6 @@ class Verify(Base, commands.Cog):
     @commands.slash_command(name="dynamic_verify", guild_ids=[Base.config.guild_id])
     async def dynamic_verify(self, inter: disnake.ApplicationCommandInteraction):
         """This method is only group for another commands. This function does nothing."""
-        pass
 
     @dynamic_verify.sub_command(name="create", description=MessagesCZ.dynamic_verify_create_brief)
     async def dynamic_verify_create(self, inter: disnake.ApplicationCommandInteraction):

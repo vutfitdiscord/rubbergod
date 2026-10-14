@@ -1,6 +1,5 @@
 from datetime import timedelta
 from pathlib import Path
-from typing import Dict, List
 
 import toml
 
@@ -35,7 +34,7 @@ class Config:
 
     def __new__(cls):
         if not hasattr(cls, "instance"):
-            cls.instance = super(Config, cls).__new__(cls)
+            cls.instance = super().__new__(cls)
         return cls.instance
 
     @classmethod
@@ -49,7 +48,7 @@ class Config:
     key: str = get_attr(toml_dict, "base", "key")
 
     # Base information
-    admin_ids: List[int] = get_attr(toml_dict, "base", "admin_ids")
+    admin_ids: list[int] = get_attr(toml_dict, "base", "admin_ids")
     guild_id: int = get_attr(toml_dict, "base", "guild_id")
 
     # Database
@@ -65,7 +64,7 @@ class Config:
     mod_role: int = get_attr(toml_dict, "base", "mod_role")
     submod_role: int = get_attr(toml_dict, "base", "submod_role")
     helper_role: int = get_attr(toml_dict, "base", "helper_role")
-    teacher_roles: List[int] = get_attr(toml_dict, "base", "teacher_roles")
+    teacher_roles: list[int] = get_attr(toml_dict, "base", "teacher_roles")
     newbie_role: int = get_attr(toml_dict, "base", "newbie_role")
     wolf_role: int = get_attr(toml_dict, "base", "wolf_role")
     zajemce_role: int = get_attr(toml_dict, "base", "zajemce_role")
@@ -87,14 +86,14 @@ class Config:
     email_pass: str = get_attr(toml_dict, "email", "pass")
 
     # Extensions loaded on bot start
-    extensions: List[str] = get_attr(toml_dict, "cogs", "extensions")
+    extensions: list[str] = get_attr(toml_dict, "cogs", "extensions")
 
     # Config: static values -> cannot be got/set by command
-    config_static: List[str] = get_attr(toml_dict, "config", "static")
+    config_static: list[str] = get_attr(toml_dict, "config", "static")
 
     # Karma
     karma_ban_role_id: int = get_attr(toml_dict, "karma", "ban_role_id")
-    karma_banned_channels: List[int] = get_attr(toml_dict, "karma", "banned_channels")
+    karma_banned_channels: list[int] = get_attr(toml_dict, "karma", "banned_channels")
     karma_grillbot_leaderboard_size: int = get_attr(toml_dict, "karma", "grillbot_leaderboard_size")
     karma_vote_minimum: int = get_attr(toml_dict, "karma", "vote_minimum")
     karma_vote_minutes: int = get_attr(toml_dict, "karma", "vote_minutes")
@@ -106,13 +105,13 @@ class Config:
     contest_vote_weight_2: int = get_attr(toml_dict, "contestvote", "weight_2")
     contest_vote_weight_3: int = get_attr(toml_dict, "contestvote", "weight_3")
     contest_vote_max_contributions: int = get_attr(toml_dict, "contestvote", "max_contributions")
-    contest_vote_no_limit_users: List[int] = get_attr(toml_dict, "contestvote", "no_limit_users")
-    contest_vote_banned_users: List[int] = get_attr(toml_dict, "contestvote", "banned_users")
+    contest_vote_no_limit_users: list[int] = get_attr(toml_dict, "contestvote", "no_limit_users")
+    contest_vote_banned_users: list[int] = get_attr(toml_dict, "contestvote", "banned_users")
 
     # Pin emoji count to pin
     autopin_count: int = get_attr(toml_dict, "autopin", "count")
-    autopin_banned_channels: List[int] = get_attr(toml_dict, "autopin", "banned_channels")
-    autopin_banned_users: List[int] = get_attr(toml_dict, "autopin", "banned_users")
+    autopin_banned_channels: list[int] = get_attr(toml_dict, "autopin", "banned_channels")
+    autopin_banned_users: list[int] = get_attr(toml_dict, "autopin", "banned_users")
     autopin_warning_cooldown: int = get_attr(toml_dict, "autopin", "warning_cooldown")
 
     # Special channel IDs
@@ -133,22 +132,22 @@ class Config:
     meme_repost_image_extensions: list = get_attr(toml_dict, "bettermeme", "image_extensions")
 
     # Bot rooms
-    allowed_channels: List[int] = eval_channels(
+    allowed_channels: list[int] = eval_channels(
         toml_dict, get_attr(toml_dict, "channels", "allowed_channels")
     )
 
     # Roles
-    role_channels: List[int] = get_attr(toml_dict, "role", "channels")
+    role_channels: list[int] = get_attr(toml_dict, "role", "channels")
 
     # Subjects and reviews
-    review_forbidden_roles: List[int] = get_attr(toml_dict, "review", "forbidden_roles")
+    review_forbidden_roles: list[int] = get_attr(toml_dict, "review", "forbidden_roles")
     subject_bit_id: int = get_attr(toml_dict, "review", "bit_id")
     subject_mit_id_start: int = get_attr(toml_dict, "review", "mit_id_start")
     subject_mit_id_end: int = get_attr(toml_dict, "review", "mit_id_end")
-    subject_mit_id_rnd: List[int] = get_attr(toml_dict, "review", "mit_id_rnd")
+    subject_mit_id_rnd: list[int] = get_attr(toml_dict, "review", "mit_id_rnd")
 
     # memes
-    hug_emojis: List[str] = get_attr(toml_dict, "meme", "hug_emojis")
+    hug_emojis: list[str] = get_attr(toml_dict, "meme", "hug_emojis")
     upgraded_pocitani_thread_id: int = get_attr(toml_dict, "meme", "upgraded_pocitani_thread_id")
     upgraded_pocitani_start_num: int = get_attr(toml_dict, "meme", "upgraded_pocitani_start_num")
 
@@ -156,9 +155,9 @@ class Config:
     uhoh_string: str = get_attr(toml_dict, "meme", "uhoh_string")
 
     # grillbot
-    grillbot_ids: List[int] = get_attr(toml_dict, "grillbot", "ids")
+    grillbot_ids: list[int] = get_attr(toml_dict, "grillbot", "ids")
     grillbot_api_url: str = get_attr(toml_dict, "grillbot", "api_url")
-    grillbot_api_supported_methods: List[str] = get_attr(toml_dict, "grillbot", "api_supported_methods")
+    grillbot_api_supported_methods: list[str] = get_attr(toml_dict, "grillbot", "api_supported_methods")
     grillbot_api_key: str = get_attr(toml_dict, "grillbot", "api_key")
     grillbot_api_karma_sync_interval: int = get_attr(toml_dict, "grillbot", "karma_sync_interval")
 
@@ -170,8 +169,8 @@ class Config:
 
     # warden
     duplicate_limit: int = get_attr(toml_dict, "warden", "duplicate_limit")
-    deduplication_channels: List[int] = get_attr(toml_dict, "warden", "deduplication_channels")
-    repost_ignore_users: List[int] = get_attr(toml_dict, "warden", "repost_ignore_users")
+    deduplication_channels: list[int] = get_attr(toml_dict, "warden", "deduplication_channels")
+    repost_ignore_users: list[int] = get_attr(toml_dict, "warden", "repost_ignore_users")
 
     # week command
     starting_week: int = get_attr(toml_dict, "week", "starting_week")
@@ -191,7 +190,7 @@ class Config:
     # exams
     exams_page_size: int = get_attr(toml_dict, "exams", "page_size")
     exams_paginator_duration: int = get_attr(toml_dict, "exams", "paginator_duration")
-    exams_term_channels: List[str] = get_attr(toml_dict, "exams", "term_channels")
+    exams_term_channels: list[str] = get_attr(toml_dict, "exams", "term_channels")
     exams_terms_update_interval: float = get_attr(toml_dict, "exams", "terms_update_interval")
     exams_subscribe_default_guild: bool = get_attr(toml_dict, "exams", "subscribe_default_guild")
 
@@ -199,9 +198,9 @@ class Config:
     enable_room_check: bool = get_attr(toml_dict, "random", "enable_room_check")
 
     # icons
-    icon_roles: List[int] = get_attr(toml_dict, "icons", "icon_roles")
+    icon_roles: list[int] = get_attr(toml_dict, "icons", "icon_roles")
     icon_role_prefix: str = get_attr(toml_dict, "icons", "role_prefix")
-    icon_rules: Dict[int, Dict[str, List[int]]] = {
+    icon_rules: dict[int, dict[str, list[int]]] = {
         int(k): v for k, v in get_attr(toml_dict, "icons", "rule").items()
     }
     icon_ui_cooldown: float = get_attr(toml_dict, "icons", "ui_cooldown")
@@ -219,8 +218,8 @@ class Config:
     timeout_wars_chance_random_mute: int = get_attr(toml_dict, "timeout_wars", "chance_random_mute")
 
     # forum
-    forum_tags: List[str] = get_attr(toml_dict, "forum", "tags")
-    forum_autoclose_forums: List[int] = get_attr(toml_dict, "forum", "autoclose_forums")
+    forum_tags: list[str] = get_attr(toml_dict, "forum", "tags")
+    forum_autoclose_forums: list[int] = get_attr(toml_dict, "forum", "autoclose_forums")
 
     # message
     message_log_content_preview_limit: int = get_attr(toml_dict, "message", "log_content_preview_limit")

@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import datetime
 import math
-from typing import List, Optional
 
 from sqlalchemy import (
     Boolean,
@@ -35,11 +34,11 @@ class ReviewDB(database.base):  # type: ignore
     relevance = relationship("ReviewRelevanceDB", cascade="all, delete")
 
     @classmethod
-    def get_review_by_id(cls, id: int) -> Optional[ReviewDB]:
+    def get_review_by_id(cls, id: int) -> ReviewDB | None:
         return session.query(cls).filter(cls.id == id).one_or_none()
 
     @classmethod
-    def get_subject_reviews(cls, subject: str) -> List[ReviewDB]:
+    def get_subject_reviews(cls, subject: str) -> list[ReviewDB]:
         # return object with 'ReviewDB' and 'total' properties
         return (
             session.query(
@@ -54,7 +53,7 @@ class ReviewDB(database.base):  # type: ignore
         )
 
     @classmethod
-    def get_review_by_author_subject(cls, author_id: int, subject: str) -> Optional[ReviewDB]:
+    def get_review_by_author_subject(cls, author_id: int, subject: str) -> ReviewDB | None:
         return session.query(cls).filter(cls.subject == subject, cls.member_ID == str(author_id)).first()
 
     @classmethod
@@ -97,7 +96,7 @@ class ReviewRelevanceDB(database.base):  # type: ignore
         return session.query(cls).filter(cls.review == review_id, cls.vote == vote).count()
 
     @classmethod
-    def get_vote_by_author(cls, review_id: int, author_id: str) -> Optional[ReviewRelevanceDB]:
+    def get_vote_by_author(cls, review_id: int, author_id: str) -> ReviewRelevanceDB | None:
         return session.query(cls).filter(cls.review == review_id, cls.member_ID == author_id).first()
 
     @classmethod
@@ -118,11 +117,11 @@ class SubjectDB(database.base):  # type: ignore
     reviews = relationship("ReviewDB")
 
     @classmethod
-    def get(cls, shortcut: str) -> Optional[SubjectDB]:
+    def get(cls, shortcut: str) -> SubjectDB | None:
         return session.query(cls).filter(cls.shortcut == shortcut).first()
 
     @classmethod
-    def lookup(cls, shortcut: str) -> List[str]:
+    def lookup(cls, shortcut: str) -> list[str]:
         subjects = session.scalars(
             session.query(cls.shortcut).filter(cls.shortcut.ilike(f"{shortcut}%")).limit(25)
         ).all()
@@ -153,7 +152,7 @@ class SubjectDetailsDB(database.base):  # type: ignore
     degree = Column(String)
 
     @classmethod
-    def get(cls, shortcut: str) -> Optional[SubjectDetailsDB]:
+    def get(cls, shortcut: str) -> SubjectDetailsDB | None:
         return session.query(cls).filter(cls.shortcut.ilike(shortcut)).one_or_none()
 
     def update(self) -> None:
@@ -177,11 +176,11 @@ class SubjectDetailsDB(database.base):  # type: ignore
         )
 
     @classmethod
-    def get_tierboard(cls, type: str, sem: str, degree: str, year: str, offset: int = 0) -> List[Row]:
+    def get_tierboard(cls, type: str, sem: str, degree: str, year: str, offset: int = 0) -> list[Row]:
         subquery = cls.gen_tierboard_subquery(type, sem, degree, year)
         return (
             session.query(subquery.c.shortcut, subquery.c.avg_tier)
-            .filter(subquery.c.avg_tier != None)  # noqa: E711
+            .filter(subquery.c.avg_tier != None)
             .order_by(asc("avg_tier"))
             .offset(offset)
             .limit(10)
@@ -194,7 +193,7 @@ class SubjectDetailsDB(database.base):  # type: ignore
         return math.ceil(
             (
                 session.query(subquery.c.shortcut, subquery.c.avg_tier)
-                .filter(subquery.c.avg_tier != None)  # noqa: E711
+                .filter(subquery.c.avg_tier != None)
                 .order_by(asc("avg_tier"))
                 .count()
             )
@@ -210,18 +209,18 @@ class ProgrammeDB(database.base):  # type: ignore
     link = Column(String)
 
     @classmethod
-    def get(cls, shortcut: str) -> Optional[ProgrammeDB]:
+    def get(cls, shortcut: str) -> ProgrammeDB | None:
         return session.query(cls).filter(cls.shortcut == shortcut).first()
 
     @classmethod
-    def lookup(cls, shortcut: str) -> List[str]:
+    def lookup(cls, shortcut: str) -> list[str]:
         programmes = session.scalars(
             session.query(cls.shortcut).filter(cls.shortcut.ilike(f"{shortcut}%")).limit(25)
         ).all()
         return programmes
 
     @classmethod
-    def get_all(cls) -> List[ProgrammeDB]:
+    def get_all(cls) -> list[ProgrammeDB]:
         return session.query(cls.shortcut).all()
 
     @classmethod

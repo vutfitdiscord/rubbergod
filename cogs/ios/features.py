@@ -48,7 +48,7 @@ def filter_year(resources: dict[RESOURCE_TYPE, dict]) -> dict[RESOURCE_TYPE, dic
     }
 
     # keep only people with "BIT" or "FEKT" in their person.year
-    out_res: dict[RESOURCE_TYPE, dict] = {res_type: {} for res_type in resources.keys()}
+    out_res: dict[RESOURCE_TYPE, dict] = {res_type: {} for res_type in resources}
     for res_type, res_data in resources.items():
         for login, data in res_data.items():
             if not people.get(login) or "BIT" in people[login].year or "FEKT" in people[login].year:

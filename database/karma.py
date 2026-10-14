@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from typing import List, Optional
-
 from sqlalchemy import Column, Integer, String, func
 from sqlalchemy.orm import Query
 from sqlalchemy.sql.operators import ColumnOperators
@@ -32,13 +30,13 @@ class KarmaDB(database.base):  # type: ignore
     negative = Column(Integer, default=0)
 
     @classmethod
-    def get_karma_object(cls, member_id: str) -> Optional[KarmaDB]:
+    def get_karma_object(cls, member_id: str) -> KarmaDB | None:
         return session.query(cls).filter(cls.member_ID == str(member_id)).one_or_none()
 
     @classmethod
     def update_karma(
         cls, member_id: str, giver_id: str, emoji_value: int, remove: bool = False
-    ) -> List[KarmaDB]:
+    ) -> list[KarmaDB]:
         member_getter = cls.update_karma_get(member_id, emoji_value)
         member_giver = cls.update_karma_give(giver_id, emoji_value, remove)
 
@@ -173,7 +171,7 @@ class KarmaEmojiDB(database.base):  # type: ignore
         return val if val is not None else 0
 
     @classmethod
-    def emoji_value_raw(cls, emoji_id: str) -> Optional[int]:
+    def emoji_value_raw(cls, emoji_id: str) -> int | None:
         """Returns the value of an emoji.
         If the emoji has not been voted for, returns None."""
         emoji = session.query(cls).filter(cls.emoji_ID == utils.general.str_emoji_id(emoji_id)).one_or_none()

@@ -9,7 +9,6 @@ import os
 import random
 from datetime import datetime, timezone
 from functools import cached_property
-from typing import Union
 
 import disnake
 from disnake.ext import commands, tasks
@@ -62,7 +61,7 @@ class TimeoutWars(Base, commands.Cog):
             writer = csv.writer(f, delimiter=";")
             writer.writerow([timeout_users, reacted_users, original_message_author, reason, datetime.now()])
 
-    async def send_embed_log(self, original_message, user: Union[list, disnake.Member], reason=None):
+    async def send_embed_log(self, original_message, user: list | disnake.Member, reason=None):
         """Embed template for Timeout wars"""
         embed = disnake.Embed(title="Moderace lidu", color=disnake.Color.yellow())
 
