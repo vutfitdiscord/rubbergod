@@ -30,6 +30,10 @@ class VoteDB(database.base):  # type: ignore
         session.commit()
 
     @classmethod
-    def remove(cls, message_id: str) -> None:
-        session.query(VoteDB).filter(VoteDB.message_id == message_id).delete()
+    def remove(cls, message_id: int | str) -> None:
+        try:
+            msg_id = int(message_id)
+        except (ValueError, TypeError):
+            return
+        session.query(VoteDB).filter(VoteDB.message_id == msg_id).delete()
         session.commit()

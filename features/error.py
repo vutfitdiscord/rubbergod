@@ -120,8 +120,12 @@ class ErrorLogger:
         jump_url: str | None,
         extra_fields: dict[str, str] = None,
     ):
-        count = ErrorLogDB.days_without_error()
-        ErrorLogDB.set()
+        try:
+            count = ErrorLogDB.days_without_error()
+            ErrorLogDB.set()
+        except Exception:
+            session.rollback()
+            count = 0
         embed = disnake.Embed(
             title=f"{count} days without an accident.\nIgnoring exception in {command}",
             color=0xFF0000,
@@ -348,7 +352,7 @@ class ErrorLogger:
         if isinstance(error, disnake.errors.DiscordServerError):
             return True
 
-        if isinstance(error, (sqlalchemy.exc.InternalError, sqlalchemy.exc.PendingRollbackError)):
+        if isinstance(error, sqlalchemy.exc.SQLAlchemyError):
             # rollback transaction that caused the error but continue with the log
             session.rollback()
             return False

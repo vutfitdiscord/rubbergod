@@ -29,8 +29,8 @@ class ReviewView(PaginationView):
             self.clear_items()
 
     @property
-    def review_id(self):
-        return self.embed.footer.text.split("|")[-1][5:]
+    def review_id(self) -> int:
+        return int(self.embed.footer.text.split("|")[-1].split(":")[-1].strip())
 
     @disnake.ui.button(emoji="👍", style=disnake.ButtonStyle.success, row=0)
     async def like(self, button: disnake.ui.Button, interaction: disnake.MessageInteraction):

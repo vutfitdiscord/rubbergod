@@ -36,8 +36,11 @@ class ReviewDB(database.base):  # type: ignore
     relevance = relationship("ReviewRelevanceDB", cascade="all, delete")
 
     @classmethod
-    def get_review_by_id(cls, id: int) -> Optional[ReviewDB]:
-        return session.query(cls).filter(cls.id == id).one_or_none()
+    def get_review_by_id(cls, id: int | str) -> Optional[ReviewDB]:
+        try:
+            return session.get(cls, int(id))
+        except (ValueError, TypeError):
+            return None
 
     @classmethod
     def get_subject_reviews(cls, subject: str) -> List[ReviewDB]:
@@ -98,18 +101,20 @@ class ReviewRelevanceDB(database.base):  # type: ignore
         return session.query(cls).filter(cls.review == review_id, cls.vote == vote).count()
 
     @classmethod
-    def get_vote_by_author(cls, review_id: int, author_id: str) -> Optional[ReviewRelevanceDB]:
-        return session.query(cls).filter(cls.review == review_id, cls.member_ID == author_id).first()
+    def get_vote_by_author(cls, review_id: int | str, author_id: str) -> Optional[ReviewRelevanceDB]:
+        return (
+            session.query(cls).filter(cls.review == int(review_id), cls.member_ID == str(author_id)).first()
+        )
 
     @classmethod
-    def add_vote(cls, review_id: int, vote: bool, author_id: str) -> None:
-        relevance = cls(member_ID=author_id, vote=vote, review=review_id)
+    def add_vote(cls, review_id: int | str, vote: bool, author_id: str) -> None:
+        relevance = cls(member_ID=str(author_id), vote=vote, review=int(review_id))
         session.merge(relevance)
         session.commit()
 
     @classmethod
-    def remove_vote(cls, review_id: int, author_id: str) -> None:
-        session.query(cls).filter(cls.review == review_id, cls.member_ID == author_id).delete()
+    def remove_vote(cls, review_id: int | str, author_id: str) -> None:
+        session.query(cls).filter(cls.review == int(review_id), cls.member_ID == str(author_id)).delete()
 
 
 class SubjectDB(database.base):  # type: ignore
