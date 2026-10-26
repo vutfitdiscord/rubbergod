@@ -48,7 +48,7 @@ class ErrorLogDB(database.base):  # type: ignore
 
     @classmethod
     def get(cls, id: ErrorRow) -> ErrorLogDB:
-        return session.query(cls).get(id)
+        return session.get(cls, id)
 
     @classmethod
     def set(cls) -> None:

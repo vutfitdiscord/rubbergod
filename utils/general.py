@@ -134,8 +134,9 @@ class PersistentCooldown:
         self.limit = limit * 1000  # convert to ms
 
     async def check_cooldown(self, inter: disnake.ApplicationCommandInteraction) -> bool:
-        current_cooldown = session.query(cooldown.CooldownDB).get(
-            dict(command_name=self.command_name, user_id=str(inter.user.id))
+        current_cooldown = session.get(
+            cooldown.CooldownDB,
+            dict(command_name=self.command_name, user_id=str(inter.user.id)),
         )
         now = int(time.time() * 1000)
         if current_cooldown is None:

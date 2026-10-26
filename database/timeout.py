@@ -94,7 +94,7 @@ class TimeoutDB(database.base):  # type: ignore
 
     @classmethod
     def get_timeout_user(cls, user_id: str) -> TimeoutDB:
-        return session.query(TimeoutDB).get(str(user_id))
+        return session.get(TimeoutDB, str(user_id))
 
     @classmethod
     def remove_timeout(cls, user_id: str, permanent: bool = False) -> TimeoutDB | None:
@@ -158,7 +158,7 @@ class TimeoutUserDB(database.base):  # type: ignore
 
     @classmethod
     def get_user(cls, user_id: str) -> TimeoutUserDB:
-        return session.query(cls).get(str(user_id))
+        return session.get(cls, str(user_id))
 
     def get_all_timeouts(self, isself: bool = False, descending: bool = True) -> list[TimeoutDB]:
         if descending:
