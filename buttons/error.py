@@ -15,9 +15,19 @@ class ErrorView(BaseView):
     async def create_traceback_file(self, inter: disnake.MessageInteraction) -> disnake.File | None:
         if not inter.message.embeds:
             return None
-        id = inter.message.embeds[0].footer.text.split(":")[1].strip()  # get error id from footer
-        traceback = ErrorEvent.get_traceback(id).traceback
-        with BytesIO(bytes(traceback, "utf-8")) as file_binary:
+        footer_text = inter.message.embeds[0].footer.text
+        if not footer_text or ":" not in footer_text:
+            return None
+        raw_id = footer_text.split(":")[-1].strip()
+        try:
+            error_id = int(raw_id)
+        except ValueError:
+            return None
+
+        event = ErrorEvent.get_traceback(error_id)
+        if not event or not event.traceback:
+            return None
+        with BytesIO(bytes(event.traceback, "utf-8")) as file_binary:
             file = disnake.File(fp=file_binary, filename="traceback.txt")
         return file
 

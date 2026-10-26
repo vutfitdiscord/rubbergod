@@ -75,8 +75,12 @@ class ErrorEvent(database.base):  # type: ignore
         return error
 
     @classmethod
-    def get_traceback(cls, id: int) -> ErrorEvent:
-        return session.query(cls).filter(cls.id == id).one_or_none()
+    def get_traceback(cls, id: int | str) -> Optional[ErrorEvent]:
+        try:
+            error_id = int(id)
+        except (ValueError, TypeError):
+            return None
+        return session.get(cls, error_id)
 
 
 # TODO: add new table that will log command usage

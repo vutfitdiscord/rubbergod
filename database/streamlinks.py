@@ -54,12 +54,18 @@ class StreamLinkDB(database.base):  # type: ignore
         return session.query(exists().where(cls.link == link)).scalar()
 
     @classmethod
-    def exists(cls, id: int) -> Optional[StreamLinkDB]:
-        return session.query(exists().where(cls.id == id)).scalar()
+    def exists(cls, id: int | str) -> Optional[StreamLinkDB]:
+        try:
+            return session.query(exists().where(cls.id == int(id))).scalar()
+        except (ValueError, TypeError):
+            return None
 
     @classmethod
-    def get_stream_by_id(cls, id: int) -> Optional[StreamLinkDB]:
-        return session.query(cls).filter(cls.id == id).first()
+    def get_stream_by_id(cls, id: int | str) -> Optional[StreamLinkDB]:
+        try:
+            return session.get(cls, int(id))
+        except (ValueError, TypeError):
+            return None
 
     @classmethod
     def get_streamlinks_of_subject(cls, subject: str) -> List[StreamLinkDB]:
