@@ -14,24 +14,24 @@ class PinMapDB(database.base):  # type: ignore
     message_id = Column(String)
 
     @classmethod
-    def find_channel_by_id(cls, channel_id: str) -> PinMapDB:
-        return session.query(cls).filter(cls.channel_id == channel_id).one_or_none()
+    def find_channel_by_id(cls, channel_id: str | int) -> PinMapDB:
+        return session.query(cls).filter(cls.channel_id == str(channel_id)).one_or_none()
 
     @classmethod
-    def add_or_update_channel(cls, channel_id: str, message_id: str) -> None:
+    def add_or_update_channel(cls, channel_id: str | int, message_id: str | int) -> None:
         item: PinMapDB = cls.find_channel_by_id(channel_id)
 
         if item is None:
-            item = cls(channel_id=channel_id, message_id=message_id)
+            item = cls(channel_id=str(channel_id), message_id=str(message_id))
             session.add(item)
         else:
-            item.message_id = message_id
+            item.message_id = str(message_id)
 
         session.commit()
 
     @classmethod
-    def remove_channel(cls, channel_id: str) -> None:
-        session.query(cls).filter(cls.channel_id == channel_id).delete()
+    def remove_channel(cls, channel_id: str | int) -> None:
+        session.query(cls).filter(cls.channel_id == str(channel_id)).delete()
         session.commit()
 
     @classmethod

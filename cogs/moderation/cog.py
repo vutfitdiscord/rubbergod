@@ -132,8 +132,8 @@ class Moderation(Base, commands.Cog):
 
         flags = disnake.MessageFlags(suppress_notifications=True)
         ModerationDB.add_action_log(
-            target_id=target.id,
-            author_id=entry.user.id,
+            target_id=str(target.id),
+            author_id=str(entry.user.id),
             datetime=entry.created_at,
             reason=entry.reason,
             action_type=action_type,

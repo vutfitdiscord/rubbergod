@@ -65,7 +65,7 @@ class ErrorEvent(database.base):  # type: ignore
             event_name=event_name,
             cog=cog,
             datetime=datetime,
-            user_id=user_id,
+            user_id=str(user_id),
             args=args,
             exception=exception,
             traceback=traceback,

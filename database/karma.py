@@ -129,7 +129,7 @@ class KarmaDB(database.base):  # type: ignore
 
         # transferring to user that is not in the database
         if to_user_karma is None:
-            to_user_karma = cls(member_ID=to_user)
+            to_user_karma = cls(member_ID=str(to_user))
             session.add(to_user_karma)
 
         log_karma = KarmaData(from_user_karma.karma, from_user_karma.positive, from_user_karma.negative)
@@ -181,7 +181,7 @@ class KarmaEmojiDB(database.base):  # type: ignore
 
     @classmethod
     def set_emoji_value(cls, emoji_id: str, value: int) -> None:
-        emoji = cls(emoji_ID=utils.general.str_emoji_id(emoji_id), value=str(value))
+        emoji = cls(emoji_ID=utils.general.str_emoji_id(emoji_id), value=int(value))
         session.merge(emoji)
         session.commit()
 

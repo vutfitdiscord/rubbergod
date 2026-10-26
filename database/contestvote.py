@@ -25,7 +25,7 @@ class ContestVoteDB(database.base):  # type: ignore
 
     @classmethod
     def delete_contribution(cls, contribution_id: int) -> None:
-        session.query(cls).filter_by(contribution_id=contribution_id).delete()
+        session.query(cls).filter_by(contribution_id=int(contribution_id)).delete()
         session.commit()
 
     @classmethod
@@ -34,7 +34,7 @@ class ContestVoteDB(database.base):  # type: ignore
 
     @classmethod
     def get_contribution_author(cls, contribution_id: int) -> str | None:
-        contribution = session.query(cls).filter_by(contribution_id=contribution_id).first()
+        contribution = session.query(cls).filter_by(contribution_id=int(contribution_id)).first()
         if contribution:
             return contribution.user_id
         return None

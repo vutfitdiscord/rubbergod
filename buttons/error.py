@@ -15,7 +15,7 @@ class ErrorView(BaseView):
     async def create_traceback_file(self, inter: disnake.MessageInteraction) -> disnake.File | None:
         if not inter.message.embeds:
             return None
-        footer_text = inter.message.embeds[0].footer.text
+        footer_text = inter.message.embeds[-1].footer.text
         if not footer_text or ":" not in footer_text:
             return None
         raw_id = footer_text.split(":")[-1].strip()

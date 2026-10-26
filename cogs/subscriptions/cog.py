@@ -55,7 +55,7 @@ class Subscriptions(Base, commands.Cog):
         if SubscriptionDB.get(str(inter.author.id), str(channel.id), tag):
             await inter.edit_original_message(MessagesCZ.already_subscribed)
             return
-        SubscriptionDB.add(inter.author.id, channel.id, tag)
+        SubscriptionDB.add(str(inter.author.id), str(channel.id), tag)
         await inter.edit_original_response(MessagesCZ.subscription_added(channel=channel.mention, tag=tag))
 
     @subscription.sub_command(name="remove", description=MessagesCZ.remove_brief)

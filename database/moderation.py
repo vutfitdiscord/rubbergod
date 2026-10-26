@@ -28,11 +28,16 @@ class ModerationDB(database.base):  # type: ignore
 
     @classmethod
     def add_action_log(
-        cls, target_id: str, author_id: str, datetime: datetime, reason: str, action_type: ActionType
+        cls,
+        target_id: str | int,
+        author_id: str | int,
+        datetime: datetime,
+        reason: str,
+        action_type: ActionType,
     ) -> None:
         item = cls(
-            target_id=target_id,
-            author_id=author_id,
+            target_id=str(target_id),
+            author_id=str(author_id),
             datetime=datetime,
             reason=reason,
             action_type=action_type,

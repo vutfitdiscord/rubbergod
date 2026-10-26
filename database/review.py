@@ -97,8 +97,8 @@ class ReviewRelevanceDB(database.base):  # type: ignore
     review = Column(Integer, ForeignKey("bot_review.id", ondelete="CASCADE"))
 
     @classmethod
-    def get_votes_count(cls, review_id: int, vote: bool) -> int:
-        return session.query(cls).filter(cls.review == review_id, cls.vote == vote).count()
+    def get_votes_count(cls, review_id: int | str, vote: bool) -> int:
+        return session.query(cls).filter(cls.review == int(review_id), cls.vote == vote).count()
 
     @classmethod
     def get_vote_by_author(cls, review_id: int | str, author_id: str) -> Optional[ReviewRelevanceDB]:

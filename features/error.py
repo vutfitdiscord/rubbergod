@@ -123,9 +123,10 @@ class ErrorLogger:
         try:
             count = ErrorLogDB.days_without_error()
             ErrorLogDB.set()
-        except Exception:
+        except sqlalchemy.exc.SQLAlchemyError:
             session.rollback()
-            count = 0
+            count = ErrorLogDB.days_without_error()
+            ErrorLogDB.set()
         embed = disnake.Embed(
             title=f"{count} days without an accident.\nIgnoring exception in {command}",
             color=0xFF0000,
@@ -254,7 +255,7 @@ class ErrorLogger:
             event_name=event,
             cog="System",  # log all events under system cog as it is hard to find actual cog
             datetime=datetime.datetime.now(),
-            user_id=author.id if author else "rubbergod",
+            user_id=str(author.id) if author else "rubbergod",
             args=str(args),
             exception=type(error).__name__,
             traceback="\n".join(
@@ -356,6 +357,10 @@ class ErrorLogger:
             # rollback transaction that caused the error but continue with the log
             session.rollback()
             return False
+
+        if isinstance(getattr(error, "original", None), sqlalchemy.exc.SQLAlchemyError):
+            # rollback transaction when SQLAlchemyError is wrapped in CommandInvokeError
+            session.rollback()
 
         if isinstance(error, commands.CommandNotFound):
             slash_comms = [command.name for command in self.bot.slash_commands]
