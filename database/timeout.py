@@ -70,7 +70,7 @@ class TimeoutDB(database.base):  # type: ignore
             start=start,
             end=end,
             reason=reason,
-            guild_id=guild_id,
+            guild_id=str(guild_id),
             isself=isself,
         )
 
@@ -87,7 +87,7 @@ class TimeoutDB(database.base):  # type: ignore
         reason: str,
     ) -> None:
         """Update the timeout if user has already timeout."""
-        timeout.mod_id = mod_id
+        timeout.mod_id = str(mod_id)
         timeout.end = end
         timeout.reason = reason
         session.commit()

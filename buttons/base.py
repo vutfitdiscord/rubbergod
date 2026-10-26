@@ -43,7 +43,7 @@ class BaseView(disnake.ui.View):
             event_name="on_button_error",
             cog=self.__class__.__name__,
             datetime=datetime.datetime.now(),
-            user_id=interaction.author.id,
+            user_id=str(interaction.author.id),
             args=str(item),
             exception=type(error).__name__,
             traceback="\n".join(traceback.format_exception(type(error), error, error.__traceback__)),
