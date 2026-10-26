@@ -194,28 +194,35 @@ class ErrorLogger:
         embed = self.create_embed(
             parsed_ctx["command"], parsed_ctx["args"][:1000], ctx.author, ctx.guild, parsed_ctx["url"]
         )
-        error_log = ErrorEvent.log(
-            event_name=parsed_ctx["command"],
-            cog=parsed_ctx["cog"],
-            datetime=datetime.datetime.now(),
-            user_id=str(ctx.author.id),
-            args=parsed_ctx["args"],
-            exception=type(error).__name__,
-            traceback="\n".join(traceback.format_exception(type(error), error, error.__traceback__)),
-        )
-        utils.embed.add_author_footer(embed, author=ctx.author, additional_text=[f"ID: {error_log.id}"])
+        try:
+            error_log = ErrorEvent.log(
+                event_name=parsed_ctx["command"],
+                cog=parsed_ctx["cog"],
+                datetime=datetime.datetime.now(),
+                user_id=str(ctx.author.id),
+                args=parsed_ctx["args"],
+                exception=type(error).__name__,
+                traceback="\n".join(traceback.format_exception(type(error), error, error.__traceback__)),
+            )
+        except sqlalchemy.exc.SQLAlchemyError:
+            session.rollback()
+            error_log = None
+
+        additional_text = [f"ID: {error_log.id}"] if error_log else []
+        view = ErrorView() if error_log else disnake.utils.MISSING
+        utils.embed.add_author_footer(embed, author=ctx.author, additional_text=additional_text)
 
         # send context of command with personal information to logging channel
         if parsed_ctx["command"] == "/diplom":
-            await self.log_channel.send(embed=embed, view=ErrorView())
+            await self.log_channel.send(embed=embed, view=view)
             embed.remove_field(0)  # remove args from embed for sending to bot dev channel
 
         # send context of verify command with personal information to logging channel only
         if parsed_ctx["command"] == "/verify":
-            await self.log_channel.send(embed=embed, view=ErrorView())
+            await self.log_channel.send(embed=embed, view=view)
             return
 
-        await self.bot_dev_channel.send(embed=embed, view=ErrorView())
+        await self.bot_dev_channel.send(embed=embed, view=view)
 
     async def handle_event_error(self, event: str, args):
         """Handle error in events"""
@@ -256,19 +263,26 @@ class ErrorLogger:
                     jump_url=None,
                 )
             ]
-        error_log = ErrorEvent.log(
-            event_name=event,
-            cog="System",  # log all events under system cog as it is hard to find actual cog
-            datetime=datetime.datetime.now(),
-            user_id=str(author.id) if author else "rubbergod",
-            args=str(args),
-            exception=type(error).__name__,
-            traceback="\n".join(
-                traceback.format_exception(type(error) if error else None, error, error.__traceback__)
-            ),
-        )
-        utils.embed.add_author_footer(embeds[-1], author=author, additional_text=[f"ID: {error_log.id}"])
-        await self.bot_dev_channel.send(embeds=embeds, view=ErrorView())
+        try:
+            error_log = ErrorEvent.log(
+                event_name=event,
+                cog="System",  # log all events under system cog as it is hard to find actual cog
+                datetime=datetime.datetime.now(),
+                user_id=str(author.id) if author else "rubbergod",
+                args=str(args),
+                exception=type(error).__name__,
+                traceback="\n".join(
+                    traceback.format_exception(type(error) if error else None, error, error.__traceback__)
+                ),
+            )
+        except sqlalchemy.exc.SQLAlchemyError:
+            session.rollback()
+            error_log = None
+
+        additional_text = [f"ID: {error_log.id}"] if error_log else []
+        view = ErrorView() if error_log else disnake.utils.MISSING
+        utils.embed.add_author_footer(embeds[-1], author=author, additional_text=additional_text)
+        await self.bot_dev_channel.send(embeds=embeds, view=view)
 
     async def handle_reaction_error(self, arg: disnake.RawReactionActionEvent):
         """Handle error in on_raw_reaction_add/remove events"""
