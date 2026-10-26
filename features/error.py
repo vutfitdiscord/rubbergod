@@ -125,8 +125,13 @@ class ErrorLogger:
             ErrorLogDB.set()
         except sqlalchemy.exc.SQLAlchemyError:
             session.rollback()
-            count = ErrorLogDB.days_without_error()
-            ErrorLogDB.set()
+            try:
+                count = ErrorLogDB.days_without_error()
+                ErrorLogDB.set()
+            except sqlalchemy.exc.SQLAlchemyError:
+                # database is unusable, still report the original error
+                session.rollback()
+                count = 0
         embed = disnake.Embed(
             title=f"{count} days without an accident.\nIgnoring exception in {command}",
             color=0xFF0000,
