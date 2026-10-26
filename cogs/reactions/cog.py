@@ -62,7 +62,11 @@ class Reactions(Base, commands.Cog):
             if cog:
                 try:
                     await cog.handle_reaction(ctx)
-                except sqlalchemy.exc.SQLAlchemyError:
+                except sqlalchemy.exc.InternalError:
                     session.rollback()
+                except sqlalchemy.exc.SQLAlchemyError:
+                    # rollback but let the error propagate so it gets logged
+                    session.rollback()
+                    raise
                 except disnake.errors.DiscordServerError:
                     pass
