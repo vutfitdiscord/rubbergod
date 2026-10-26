@@ -3,9 +3,11 @@ import traceback
 from typing import Optional
 
 import disnake
+import sqlalchemy
 
 import utils
 from config.app_config import config
+from database import session
 from database.stats import ErrorEvent
 
 
@@ -39,20 +41,24 @@ class BaseView(disnake.ui.View):
                 "Item": item,
             },
         )
-        error_log = ErrorEvent.log(
-            event_name="on_button_error",
-            cog=self.__class__.__name__,
-            datetime=datetime.datetime.now(),
-            user_id=str(interaction.author.id),
-            args=str(item),
-            exception=type(error).__name__,
-            traceback="\n".join(traceback.format_exception(type(error), error, error.__traceback__)),
-        )
+        try:
+            error_log = ErrorEvent.log(
+                event_name="on_button_error",
+                cog=self.__class__.__name__,
+                datetime=datetime.datetime.now(),
+                user_id=str(interaction.author.id),
+                args=str(item),
+                exception=type(error).__name__,
+                traceback="\n".join(traceback.format_exception(type(error), error, error.__traceback__)),
+            )
+        except sqlalchemy.exc.SQLAlchemyError:
+            session.rollback()
+            error_log = None
 
-        utils.embed.add_author_footer(
-            embed, author=interaction.author, additional_text=[f"ID: {error_log.id}"]
-        )
-        await channel_out.send(embed=embed, view=ErrorView())
+        additional_text = [f"ID: {error_log.id}"] if error_log else []
+        view = ErrorView() if error_log else disnake.utils.MISSING
+        utils.embed.add_author_footer(embed, author=interaction.author, additional_text=additional_text)
+        await channel_out.send(embed=embed, view=view)
 
         # remove interactions because of error
         await interaction.message.edit(view=None)
