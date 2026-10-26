@@ -15,6 +15,7 @@ from sqlalchemy import (
     asc,
     desc,
     func,
+    select,
 )
 from sqlalchemy.engine import Row
 from sqlalchemy.orm import Query, relationship
@@ -123,10 +124,8 @@ class SubjectDB(database.base):  # type: ignore
 
     @classmethod
     def lookup(cls, shortcut: str) -> List[str]:
-        subjects = session.scalars(
-            session.query(cls.shortcut).filter(cls.shortcut.ilike(f"{shortcut}%")).limit(25)
-        ).all()
-        return subjects
+        stmt = select(cls.shortcut).where(cls.shortcut.ilike(f"{shortcut}%")).limit(25)
+        return list(session.scalars(stmt).all())
 
     @classmethod
     def get_all(cls) -> list[tuple[str]]:
@@ -215,10 +214,8 @@ class ProgrammeDB(database.base):  # type: ignore
 
     @classmethod
     def lookup(cls, shortcut: str) -> List[str]:
-        programmes = session.scalars(
-            session.query(cls.shortcut).filter(cls.shortcut.ilike(f"{shortcut}%")).limit(25)
-        ).all()
-        return programmes
+        stmt = select(cls.shortcut).where(cls.shortcut.ilike(f"{shortcut}%")).limit(25)
+        return list(session.scalars(stmt).all())
 
     @classmethod
     def get_all(cls) -> List[ProgrammeDB]:
