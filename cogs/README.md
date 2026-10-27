@@ -465,5 +465,5 @@ Cog containing information about week (odd/even) and its relation to calendar/ac
 Cog for keeping track of opt-outs.
 **Commands:**
 
-    - opt-out add
-    - opt-out remove
+    - /opt-out add
+    - /opt-out remove

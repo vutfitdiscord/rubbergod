@@ -12,11 +12,11 @@ from .messages_cz import MessagesCZ
 
 
 class OptOut(Base, commands.Cog):
-    @commands.slash_command(name="opt-out", brief=MessagesCZ.opt_out_brief)
+    @commands.slash_command(name="opt-out", description=MessagesCZ.opt_out_description)
     async def _opt_out(self, inter: disnake.ApplicationCommandInteraction):
         await inter.response.defer()
 
-    @_opt_out.sub_command(name="add", brief=MessagesCZ.add_brief)
+    @_opt_out.sub_command(name="add", description=MessagesCZ.add_description)
     async def _opt_out_add(self, inter: disnake.ApplicationCommandInteraction):
         if OptOutDb.exists(str(inter.author.id)):
             await inter.edit_original_response(content=MessagesCZ.add_already_done)
@@ -24,7 +24,7 @@ class OptOut(Base, commands.Cog):
             OptOutDb.create(str(inter.author.id))
             await inter.edit_original_response(content=MessagesCZ.add_response)
 
-    @_opt_out.sub_command(name="remove", brief=MessagesCZ.remove_brief)
+    @_opt_out.sub_command(name="remove", description=MessagesCZ.remove_description)
     async def _opt_out_remove(self, inter: disnake.ApplicationCommandInteraction):
         if OptOutDb.exists(str(inter.author.id)):
             OptOutDb.remove(str(inter.author.id))
