@@ -7,12 +7,13 @@ from typing import TYPE_CHECKING
 import aiohttp
 import disnake
 from disnake import AllowedMentions, Intents, TextChannel
-from disnake.ext import commands
+from disnake.ext import commands, tasks
 
 import database.db_migrations as migrations
 from config.app_config import config
 from config.messages import Messages
 from features.git import Git
+from features.health import HealthCheck
 
 if TYPE_CHECKING:
     from features.error import ErrorLogger
@@ -22,9 +23,12 @@ class Rubbergod(commands.Bot):
     is_initialized = False
     logger: logging.Logger
     err_logger: ErrorLogger
+    healthcheck: HealthCheck
 
     def __init__(self):
         self.logger = logging.getLogger("rubbergod")
+        self.healthcheck = HealthCheck()
+        self.healthcheck.mark_unhealthy()
 
         intents = Intents.none()
         intents.guilds = True
@@ -49,6 +53,13 @@ class Rubbergod(commands.Bot):
         # Create missing tables at start
         migrations.init_db()
 
+    @tasks.loop(seconds=10)
+    async def heartbeat_loop(self) -> None:
+        if self.is_initialized and self.is_ready() and not self.is_closed():
+            self.healthcheck.mark_healthy()
+        else:
+            self.healthcheck.mark_unhealthy()
+
     async def on_ready(self) -> None:
         """If RubberGod is ready"""
         # Inspired from https://github.com/sinus-x/rubbergoddess/blob/master/rubbergoddess.py
@@ -64,6 +75,16 @@ class Rubbergod(commands.Bot):
         await self.application_info()
         await self.set_presence()
         self.logger.info("Ready")
+
+        self.healthcheck.mark_healthy()
+        if not self.heartbeat_loop.is_running():
+            self.heartbeat_loop.start()
+
+    async def close(self) -> None:
+        self.healthcheck.mark_unhealthy()
+        if self.heartbeat_loop.is_running():
+            self.heartbeat_loop.cancel()
+        await super().close()
 
     async def on_button_click(self, inter: disnake.MessageInteraction):
         if inter.component.custom_id in [Messages.trash_delete_id, "bookmark:delete"]:
