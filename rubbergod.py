@@ -55,7 +55,13 @@ class Rubbergod(commands.Bot):
 
     @tasks.loop(seconds=10)
     async def heartbeat_loop(self) -> None:
-        if self.is_initialized and self.is_ready() and not self.is_closed():
+        if (
+            self.is_initialized
+            and self.is_ready()
+            and not self.is_closed()
+            and self.ws is not None
+            and self.ws.open
+        ):
             self.healthcheck.mark_healthy()
         else:
             self.healthcheck.mark_unhealthy()

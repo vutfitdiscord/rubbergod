@@ -19,7 +19,7 @@ services:
         networks:
             - postgres
         healthcheck:
-            test: ["CMD-SHELL", "pg_isready -U rubbergod -d rubbergod"]
+            test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -U rubbergod -d rubbergod"]
             interval: 5s
             timeout: 5s
             retries: 5

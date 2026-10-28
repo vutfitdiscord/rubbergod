@@ -86,7 +86,7 @@ jobs:
 
             echo "================== Check Services Health =================="
             docker compose ps
-            for id in $(docker compose ps -q); do
+            for id in $(docker compose ps --all -q); do
                 name=$(docker inspect --format '{{.Name}}' "$id")
                 health=$(docker inspect --format '{{if .State.Health}}{{.State.Health.Status}}{{else}}none{{end}}' "$id")
                 running=$(docker inspect --format '{{.State.Running}}' "$id")
