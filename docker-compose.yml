@@ -18,6 +18,12 @@ services:
             - ./database/backup/backup.sql:/docker-entrypoint-initdb.d/backup.sql
         networks:
             - postgres
+        healthcheck:
+            test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -U rubbergod -d rubbergod"]
+            interval: 5s
+            timeout: 5s
+            retries: 5
+            start_period: 10s
 
     bot:
         image: rubbergod-bot
@@ -36,11 +42,18 @@ services:
             - .:/rubbergod:z
             - ssh_config:/root/.ssh
         depends_on:
-            - db
+            db:
+                condition: service_healthy
         networks:
             - postgres
             - prometheus
             - nasa_api
+        healthcheck:
+            test: ["CMD", "python3", "healthcheck.py"]
+            interval: 10s
+            timeout: 5s
+            retries: 5
+            start_period: 30s
 
     nasa-api:
         image: ghcr.io/vutfitdiscord/apod-api:latest
@@ -52,6 +65,12 @@ services:
                 window: 20s
         networks:
             - nasa_api
+        healthcheck:
+            test: ["CMD", "python3", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:5000/')"]
+            interval: 10s
+            timeout: 5s
+            retries: 5
+            start_period: 10s
 
 
 volumes:

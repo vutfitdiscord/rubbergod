@@ -76,7 +76,27 @@ jobs:
             docker build . --tag rubbergod-bot
 
             echo "================== Restart Services =================="
-            docker compose down && docker compose up -d
+            docker compose down
+            if ! docker compose up -d --wait --wait-timeout 120; then
+                echo "Failed to start services or services failed health checks!"
+                docker compose ps
+                docker compose logs --tail 50
+                exit 1
+            fi
+
+            echo "================== Check Services Health =================="
+            docker compose ps
+            for id in $(docker compose ps --all -q); do
+                name=$(docker inspect --format '{{.Name}}' "$id")
+                health=$(docker inspect --format '{{if .State.Health}}{{.State.Health.Status}}{{else}}none{{end}}' "$id")
+                running=$(docker inspect --format '{{.State.Running}}' "$id")
+                echo "Container $name (running: $running, health: $health)"
+                if [ "$running" != "true" ] || { [ "$health" != "none" ] && [ "$health" != "healthy" ]; }; then
+                    echo "Error: Container $name is not healthy/running!"
+                    docker compose logs --tail 50
+                    exit 1
+                fi
+            done
 
             echo "================== Clean Up Images =================="
             echo "y" | docker image prune -a
