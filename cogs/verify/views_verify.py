@@ -2,9 +2,11 @@ import disnake
 
 from buttons.base import BaseView
 from config.app_config import config
+from config.messages import Messages
 from database.verification import ValidPersonDB
 from features import verification
 from rubbergod import Rubbergod
+from utils.checks import PermissionsCheck
 
 from .messages_cz import MessagesCZ
 from .modals_verify import VerifyModal
@@ -84,3 +86,49 @@ class MailDropdown(disnake.ui.StringSelect):
         # Resend code to new mail
         service = verification.Verification(inter.bot)
         await service.resend_code(self.login, inter)
+
+
+class SchoolChangeView(BaseView):
+    """Mod actions attached to the log of a school mismatch during verification."""
+
+    def __init__(self, login: str, requested_school: str):
+        super().__init__(timeout=None)
+        self.add_item(
+            disnake.ui.Button(
+                label="Schválit změnu školy",
+                style=disnake.ButtonStyle.success,
+                custom_id=f"verify:school:approve:{requested_school}:{login}",
+            )
+        )
+        self.add_item(
+            disnake.ui.Button(
+                label="Vymazat školu",
+                style=disnake.ButtonStyle.danger,
+                custom_id=f"verify:school:clear::{login}",
+            )
+        )
+
+
+async def handle_school_change(inter: disnake.MessageInteraction) -> None:
+    """Handle buttons of `SchoolChangeView` (persistent across restarts, state is in custom_id)."""
+    _, _, action, school, login = inter.component.custom_id.split(":", 4)
+    if not PermissionsCheck.is_mod_plus(inter, raise_exception=False):
+        await inter.response.send_message(Messages.mod_plus_only, ephemeral=True)
+        return
+
+    service = verification.Verification(inter.bot)
+    # only MUNI is stored explicitly, for VUT the school is refreshed from the VUT API on verify
+    new_school = school if action == "approve" and school == "MUNI" else None
+    if not service.reset_school(login, new_school):
+        await inter.response.send_message(
+            MessagesCZ.verify_school_change_missing(login=login), ephemeral=True
+        )
+        return
+
+    if action == "approve":
+        text = MessagesCZ.verify_school_change_approved(login=login, school=school)
+    else:
+        text = MessagesCZ.verify_school_change_cleared(login=login)
+    embed = inter.message.embeds[0]
+    embed.add_field(name="Vyřešeno", value=f"{inter.author.mention}: {text}", inline=False)
+    await inter.response.edit_message(embed=embed, view=None)

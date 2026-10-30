@@ -13,7 +13,7 @@ from pathlib import Path
 import disnake
 
 from cogs.verify.messages_cz import MessagesCZ
-from cogs.verify.views_verify import VerifyView, VerifyWithResendButtonView
+from cogs.verify.views_verify import SchoolChangeView, VerifyView, VerifyWithResendButtonView
 from config.app_config import config
 from database.verification import ValidPersonDB, VerifyStatus
 from features.base_feature import BaseFeature
@@ -157,9 +157,7 @@ class Verification(BaseFeature):
                 user=inter.user.id, admin=config.admin_ids[0], school="VUT", command="vut"
             )
             await inter.send(content=msg)
-            await self.log_verify_fail(
-                inter, "getcode (MUNI) - Wrong school", str({"login": login, "year": user.year})
-            )
+            await self.log_wrong_school(inter, "getcode (MUNI) - Wrong school", login, user.year, "MUNI")
             return False
 
         if user is not None and user.status != VerifyStatus.Unverified.value:
@@ -191,7 +189,7 @@ class Verification(BaseFeature):
                 user=inter.user.id, admin=config.admin_ids[0], school="MUNI", command="muni"
             )
             await inter.edit_original_response(content=msg)
-            await self.log_verify_fail(inter, "getcode (xlogin) - Wrong school", str({"login": login}))
+            await self.log_wrong_school(inter, "getcode (xlogin) - Wrong school", login, existing.year, "VUT")
             return False
 
         user = await self.helper.check_api(login)
@@ -386,6 +384,40 @@ class Verification(BaseFeature):
         embed.add_field(name="Verify phase", value=phase)
         embed.add_field(name="Data", value=data, inline=False)
         await self.bot.get_channel(config.log_channel).send(embed=embed)
+
+    async def log_wrong_school(
+        self,
+        inter: disnake.ApplicationCommandInteraction,
+        phase: str,
+        login: str,
+        stored_school: str | None,
+        requested_school: str,
+    ):
+        """Log a school mismatch and let mods approve the change or clear the stored school."""
+        embed = disnake.Embed(title="Neúspěšný pokus o verify", color=disnake.Colour.yellow())
+        embed.add_field(name="User", value=inter.author.mention)
+        embed.add_field(name="Verify phase", value=phase)
+        embed.add_field(
+            name="Data",
+            value=MessagesCZ.verify_school_mismatch_log(
+                login=login, stored=stored_school, requested=requested_school
+            ),
+            inline=False,
+        )
+        await self.bot.get_channel(config.log_channel).send(
+            embed=embed, view=SchoolChangeView(login, requested_school)
+        )
+
+    def reset_school(self, login: str, new_school: str | None) -> bool:
+        """Set (or clear, when `new_school` is None) the school of a login and allow it to reverify.
+
+        Returns False if the login does not exist.
+        """
+        user = ValidPersonDB.get_user_by_login(login)
+        if user is None:
+            return False
+        user.reset_school(new_school)
+        return True
 
     async def send_xlogin_info(self, inter: disnake.ApplicationCommandInteraction):
         guild = self.bot.get_guild(config.guild_id)
