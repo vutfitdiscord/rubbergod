@@ -19,15 +19,31 @@ async def autocomp_available_tags(inter: disnake.ApplicationCommandInteraction, 
     if "channel" not in inter.filled_options:
         return []
 
-    channel_id = inter.filled_options["channel"]
-    channel: disnake.ForumChannel = await inter.bot.fetch_channel(channel_id)
-    return [tag.name for tag in channel.available_tags if user_input in tag.name][:25]
+    try:
+        channel_id = int(inter.filled_options["channel"])
+    except (ValueError, TypeError):
+        return []
+
+    channel = inter.bot.get_channel(channel_id)
+    if not isinstance(channel, disnake.ForumChannel):
+        try:
+            channel = await inter.bot.fetch_channel(channel_id)
+        except (disnake.HTTPException, ValueError):
+            return []
+
+    if not isinstance(channel, disnake.ForumChannel):
+        return []
+
+    return [tag.name for tag in channel.available_tags if user_input.lower() in tag.name.lower()][:25]
 
 
 async def autocomp_subscribed_tags(inter: disnake.ApplicationCommandInteraction, user_input: str):
+    if "channel" not in inter.filled_options:
+        return []
+
     channel_id = str(inter.filled_options["channel"])
     tags = SubscriptionDB.get_tags(str(inter.author.id), channel_id)
-    return [tag for tag in tags if user_input in tag][:25]
+    return [tag for tag in tags if user_input.lower() in tag.lower()][:25]
 
 
 class Subscriptions(Base, commands.Cog):
