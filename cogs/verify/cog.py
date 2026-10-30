@@ -18,6 +18,7 @@ from utils.checks import PermissionsCheck
 from .features_dynamic_verify import DynamicVerifyManager, load_rules_cache, rules_cache
 from .messages_cz import MessagesCZ
 from .modals_dynamic_verify import DynamicVerifyEditModal
+from .views_verify import handle_school_change
 
 
 async def dynamic_verify_rules_autocomplete(inter: disnake.ApplicationCommandInteraction, user_input: str):
@@ -174,3 +175,8 @@ class Verify(Base, commands.Cog):
     @commands.user_command(name="Verify zajemce", guild_ids=[Base.config.guild_id])
     async def verify_zajemce(self, inter: disnake.UserCommandInteraction, member: disnake.Member):
         await self.verify_host(inter, member, zajemce=True)
+
+    @commands.Cog.listener()
+    async def on_button_click(self, inter: disnake.MessageInteraction):
+        if inter.component.custom_id and inter.component.custom_id.startswith("verify:school:"):
+            await handle_school_change(inter)

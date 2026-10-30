@@ -47,6 +47,13 @@ class MessagesCZ(GlobalMessages):
     invalid_login = "{user} Neplatný login. Přečti si prosím <#591386755547136020>. ({admin} pls)"
     verify_wrong_school = "{user} Tento login už je použitý pro ověření přes {school}. " \
                           "Použij prosím `/verify {command}`. ({admin} pls)"
+    verify_school_mismatch_log = (
+        "Login `{login}` má v databázi uloženou školu `{stored}`, ale uživatel se ověřuje přes `{requested}`.\n"
+        "Můžeš změnu školy schválit, nebo školu u loginu vymazat, aby se mohl ověřit znovu."
+    )
+    verify_school_change_approved = "Změna školy pro `{login}` schválena ({school}), uživatel se může znovu ověřit."
+    verify_school_change_cleared = "Škola pro `{login}` vymazána, uživatel se může znovu ověřit."
+    verify_school_change_missing = "Login `{login}` už v databázi neexistuje."
     verify_subject = "FIT Discord verifikace"
     dynamic_verify_requested = "Byla zaslána žádost o verifikaci. Vyčkej prosím než ji někdo z oprávněných osob schválí."
     dynamic_verify_declined = "Tvá žádost o verifikaci byla zamítnuta."

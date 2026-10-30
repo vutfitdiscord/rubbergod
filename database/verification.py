@@ -158,6 +158,19 @@ class ValidPersonDB(database.base):  # type: ignore
         self.status = 2
         session.commit()
 
+    def reset_school(self, school: Optional[str]) -> None:
+        """Set or clear the school (`year`) and make the login ready for a new verification.
+
+        Removes the existing Discord association, as the person is verifying again.
+        """
+        permit = PermitDB.get_user_by_login(self.login)
+        if permit is not None:
+            session.delete(permit)
+        self.year = school
+        self.code = None
+        self.status = VerifyStatus.Unverified.value
+        session.commit()
+
     def change_status(self, status: int) -> None:
         """Changes status of specified login"""
         self.status = status
