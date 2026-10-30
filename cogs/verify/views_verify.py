@@ -117,7 +117,7 @@ async def handle_school_change(inter: disnake.MessageInteraction) -> None:
         return
 
     service = verification.Verification(inter.bot)
-    # only MUNI is stored explicitly, for VUT the school is refreshed from the VUT API on verify
+    # MUNI is stored explicitly, VUT is filled in from the VUT API below
     new_school = school if action == "approve" and school == "MUNI" else None
     if not service.reset_school(login, new_school):
         await inter.response.send_message(
@@ -125,10 +125,15 @@ async def handle_school_change(inter: disnake.MessageInteraction) -> None:
         )
         return
 
+    await inter.response.defer()
+    if action == "approve" and school != "MUNI":
+        # store the new VUT relation right away, otherwise the school stays empty until the next verify
+        await service.helper.check_api(login)
+
     if action == "approve":
         text = MessagesCZ.verify_school_change_approved(login=login, school=school)
     else:
         text = MessagesCZ.verify_school_change_cleared(login=login)
     embed = inter.message.embeds[0]
     embed.add_field(name="Vyřešeno", value=f"{inter.author.mention}: {text}", inline=False)
-    await inter.response.edit_message(embed=embed, view=None)
+    await inter.edit_original_response(embed=embed, view=None)
