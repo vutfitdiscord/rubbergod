@@ -167,20 +167,23 @@ class Review(Base, commands.Cog):
         """Updates subjects from web"""
         programme_details_link = "https://www.fit.vut.cz/study/"
         reply = ""
-        # bachelor
-        url = f"{programme_details_link}program/{self.config.subject_bit_id}/.cs"
-        if not self.manager.update_subject_types(url, False, overwrite):
-            reply += MessagesCZ.subject_update_error(url=url)
-        # engineer
-        ids_list = list(range(self.config.subject_mit_id_start, self.config.subject_mit_id_end))
-        for id in ids_list + self.config.subject_mit_id_rnd:
-            url = f"{programme_details_link}field/{id}/.cs"
-            if not self.manager.update_subject_types(url, True, overwrite):
+        try:
+            # bachelor
+            url = f"{programme_details_link}program/{self.config.subject_bit_id}/.cs"
+            if not self.manager.update_subject_types(url, False, overwrite):
                 reply += MessagesCZ.subject_update_error(url=url)
-        # sports
-        self.manager.update_sport_subjects()
-        load_autocomplete_cache()
-        reply += MessagesCZ.subject_update_success
+            # engineer
+            ids_list = list(range(self.config.subject_mit_id_start, self.config.subject_mit_id_end))
+            for id in ids_list + self.config.subject_mit_id_rnd:
+                url = f"{programme_details_link}field/{id}/.cs"
+                if not self.manager.update_subject_types(url, True, overwrite):
+                    reply += MessagesCZ.subject_update_error(url=url)
+            # sports
+            self.manager.update_sport_subjects()
+            reply += MessagesCZ.subject_update_success
+        finally:
+            load_autocomplete_cache()
+
         await inter.edit_original_response(reply)
 
     @commands.slash_command(name="wtf", description=MessagesCZ.shortcut_brief)
