@@ -15,14 +15,15 @@ from rubbergod import Rubbergod
 from utils import cooldowns
 from utils.checks import PermissionsCheck
 
-from .features_dynamic_verify import DynamicVerifyManager
+from .features_dynamic_verify import DynamicVerifyManager, load_rules_cache, rules_cache
 from .messages_cz import MessagesCZ
 from .modals_dynamic_verify import DynamicVerifyEditModal
 
 
 async def dynamic_verify_rules_autocomplete(inter: disnake.ApplicationCommandInteraction, user_input: str):
-    service = DynamicVerifyManager(inter.bot)
-    return service.get_rules_list()
+    inp = user_input.lower()
+    matched = {name: id for name, id in rules_cache.items() if inp in name.lower() or inp in id.lower()}
+    return dict(list(matched.items())[:25])
 
 
 class Verify(Base, commands.Cog):
@@ -31,6 +32,7 @@ class Verify(Base, commands.Cog):
         self.bot = bot
         self.verification = verification.Verification(bot)
         self.dynamic_verify_manager = DynamicVerifyManager(bot)
+        load_rules_cache()
 
     def is_valid_guild(ctx: disnake.ApplicationCommandInteraction) -> bool:
         return ctx.guild_id is None or ctx.guild_id == Base.config.guild_id
@@ -137,6 +139,7 @@ class Verify(Base, commands.Cog):
             await inter.response.send_message(MessagesCZ.dynamic_verify_missing_rule(rule_id=rule_id))
             return
         rule.remove_rule()
+        load_rules_cache()
         await inter.response.send_message(MessagesCZ.dynamic_verify_remove_success)
 
     @PermissionsCheck.is_submod_plus()

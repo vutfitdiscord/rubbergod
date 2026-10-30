@@ -141,6 +141,7 @@ class DynamicVerifyEditModal(disnake.ui.Modal):
         rule.set_role_ids([role.id for role in roles])
 
         rule.update_rule()
+        features_dynamic_verify.load_rules_cache()
         await inter.response.send_message(
             MessagesCZ.dynamic_verify_edit_success
             if self.is_edit()

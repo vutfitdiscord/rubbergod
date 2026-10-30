@@ -20,19 +20,26 @@ from .features import ReviewManager, TierEnum
 from .messages_cz import MessagesCZ
 from .views import ReviewView
 
+subjects: list[str] = []
+subjects_programmes: list[str] = []
+
 
 async def autocomp_subjects_programmes(
     inter: disnake.ApplicationCommandInteraction, user_input: str
 ) -> list[str]:
-    input = user_input.lower()
-    subjects = SubjectDB.lookup(input)
-    programmes = ProgrammeDB.lookup(input)
-    subjects_programmes = sorted(subjects + programmes)
-    return subjects_programmes[:25]
+    return [item for item in subjects_programmes if user_input.lower() in item.lower()][:25]
 
 
 async def autocomp_subjects(inter: disnake.ApplicationCommandInteraction, user_input: str) -> list[str]:
-    return SubjectDB.lookup(user_input.lower())
+    return [item for item in subjects if user_input.lower() in item.lower()][:25]
+
+
+def load_autocomplete_cache() -> None:
+    """Load subjects and programmes into memory for autocomplete (call again after DB changes)."""
+    global subjects, subjects_programmes
+    subjects = [s[0] for s in SubjectDB.get_all()]
+    programmes = [p[0] for p in ProgrammeDB.get_all()]
+    subjects_programmes = sorted(set(subjects + programmes))
 
 
 class Review(Base, commands.Cog):
@@ -40,6 +47,7 @@ class Review(Base, commands.Cog):
         super().__init__()
         self.bot = bot
         self.manager = ReviewManager(bot)
+        load_autocomplete_cache()
 
     async def check_member(self, inter: disnake.ApplicationCommandInteraction):
         """Check if user is allowed to add/remove new review."""
@@ -171,6 +179,7 @@ class Review(Base, commands.Cog):
                 reply += MessagesCZ.subject_update_error(url=url)
         # sports
         self.manager.update_sport_subjects()
+        load_autocomplete_cache()
         reply += MessagesCZ.subject_update_success
         await inter.edit_original_response(reply)
 

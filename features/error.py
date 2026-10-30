@@ -232,6 +232,12 @@ class ErrorLogger:
         if error is None:
             return  # Not sure how this could happen
         author = getattr(arg, "author", self.bot.user)
+        if event == "on_application_command_autocomplete":
+            if isinstance(error, disnake.NotFound) and getattr(error, "code", None) == 10062:
+                # autocomplete must be answered within 3 seconds, expired interaction is not a bug
+                command = getattr(getattr(arg, "data", None), "name", "unknown")
+                rubbegod_logger.warning(f"Autocomplete for /{command} timed out (unknown interaction)")
+                return
         if await self.ignore_errors(ContextMock(self.bot, arg), error):
             # error was handled
             return

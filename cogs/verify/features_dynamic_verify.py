@@ -10,6 +10,15 @@ from rubbergod import Rubbergod
 from .messages_cz import MessagesCZ
 from .views_dynamic_verify import DynamicVerifyRequestView
 
+# rule name -> rule id of all rules, used for autocomplete
+rules_cache: dict[str, str] = {}
+
+
+def load_rules_cache() -> None:
+    """Load all rules into memory for autocomplete (call again after rules are changed)."""
+    rules_cache.clear()
+    rules_cache.update({rule.name: rule.id for rule in DynamicVerifyDB.get_rules()})
+
 
 class DynamicVerifyManager(BaseFeature):
     def __init__(self, bot: Rubbergod) -> None:
@@ -82,10 +91,6 @@ class DynamicVerifyManager(BaseFeature):
 
         channel = self.bot.get_channel(config.log_channel)
         await channel.send(embed=embed)
-
-    def get_rules_list(self) -> dict[str, str]:
-        rules = self.verify_db.get_rules(25)
-        return {rule.name: rule.id for rule in rules}
 
     def get_rule(self, rule_id: str) -> DynamicVerifyDB | None:
         return self.verify_db.get_rule(rule_id)
