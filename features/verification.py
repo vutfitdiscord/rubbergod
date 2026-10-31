@@ -15,6 +15,7 @@ import disnake
 from cogs.verify.messages_cz import MessagesCZ
 from cogs.verify.views_verify import SchoolChangeView, VerifyView, VerifyWithResendButtonView
 from config.app_config import config
+from database import session
 from database.verification import ValidPersonDB, VerifyStatus
 from features.base_feature import BaseFeature
 from features.verify_helper import VerifyHelper
@@ -179,6 +180,10 @@ class Verification(BaseFeature):
         user = ValidPersonDB.get_user_with_status(login, status=VerifyStatus.Unverified.value)
         if user is None:
             user = ValidPersonDB.add_user(login, "MUNI", status=VerifyStatus.Unverified.value)
+        elif user.year is None:
+            # record with a cleared school, restore it so the code can be validated
+            user.year = "MUNI"
+            session.commit()
         await self.gen_code_and_send_mail(inter, user, "mail.muni.cz")
         return True
 
@@ -405,7 +410,7 @@ class Verification(BaseFeature):
             inline=False,
         )
         await self.bot.get_channel(config.log_channel).send(
-            embed=embed, view=SchoolChangeView(login, requested_school)
+            embed=embed, view=SchoolChangeView(login, requested_school, stored_school)
         )
 
     def reset_school(self, login: str, new_school: str | None) -> bool:

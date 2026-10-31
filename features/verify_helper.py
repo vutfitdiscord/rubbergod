@@ -120,8 +120,18 @@ class VerifyHelper:
             relation = await self._parse_relation(user)
             if relation == "ExStudent" and person.year in ["employee", "external employee"]:
                 return person
+            changed = False
             if person.year != relation:
                 person.year = relation
+                changed = True
+            if not person.mail:
+                # mail was cleared (e.g. school change), refresh it from the API
+                emails = user["emaily"] if user.get("emaily", []) else ""
+                if isinstance(emails, dict):
+                    emails = list(emails.values())
+                person.mail = emails[0] if emails else self.get_fallback_email(user)
+                changed = True
+            if changed:
                 session.commit()
         return person
 

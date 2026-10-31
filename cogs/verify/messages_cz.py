@@ -54,6 +54,7 @@ class MessagesCZ(GlobalMessages):
     verify_school_change_approved = "Změna školy pro `{login}` schválena ({school}), uživatel se může znovu ověřit."
     verify_school_change_cleared = "Škola pro `{login}` vymazána, uživatel se může znovu ověřit."
     verify_school_change_missing = "Login `{login}` už v databázi neexistuje."
+    verify_school_change_stale = "Tato žádost je zastaralá, škola loginu `{login}` se mezitím změnila."
     verify_subject = "FIT Discord verifikace"
     dynamic_verify_requested = "Byla zaslána žádost o verifikaci. Vyčkej prosím než ji někdo z oprávněných osob schválí."
     dynamic_verify_declined = "Tvá žádost o verifikaci byla zamítnuta."

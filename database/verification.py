@@ -167,6 +167,8 @@ class ValidPersonDB(database.base):  # type: ignore
         if permit is not None:
             session.delete(permit)
         self.year = school
+        # the saved address belongs to the old school, force it to be repopulated for the new one
+        self.mail = None
         self.code = None
         self.status = VerifyStatus.Unverified.value
         session.commit()
