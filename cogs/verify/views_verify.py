@@ -91,29 +91,35 @@ class MailDropdown(disnake.ui.StringSelect):
 class SchoolChangeView(BaseView):
     """Mod actions attached to the log of a school mismatch during verification."""
 
-    def __init__(self, login: str, requested_school: str):
+    def __init__(self, login: str, requested_school: str, stored_school: str | None):
         super().__init__(timeout=None)
         self.add_item(
             disnake.ui.Button(
                 label="Schválit změnu školy",
                 style=disnake.ButtonStyle.success,
-                custom_id=f"verify:school:approve:{requested_school}:{login}",
+                custom_id=f"verify:school:approve:{requested_school}:{stored_school or ''}:{login}",
             )
         )
         self.add_item(
             disnake.ui.Button(
                 label="Vymazat školu",
                 style=disnake.ButtonStyle.danger,
-                custom_id=f"verify:school:clear::{login}",
+                custom_id=f"verify:school:clear:{requested_school}:{stored_school or ''}:{login}",
             )
         )
 
 
 async def handle_school_change(inter: disnake.MessageInteraction) -> None:
     """Handle buttons of `SchoolChangeView` (persistent across restarts, state is in custom_id)."""
-    _, _, action, school, login = inter.component.custom_id.split(":", 4)
+    _, _, action, school, stored, login = inter.component.custom_id.split(":", 5)
     if not PermissionsCheck.is_mod_plus(inter, raise_exception=False):
         await inter.response.send_message(Messages.mod_plus_only, ephemeral=True)
+        return
+
+    # reject stale requests: resolving any request changes the stored school, which invalidates the rest
+    current = ValidPersonDB.get_user_by_login(login)
+    if current is not None and (current.year or "") != stored:
+        await inter.response.send_message(MessagesCZ.verify_school_change_stale(login=login), ephemeral=True)
         return
 
     service = verification.Verification(inter.bot)
