@@ -131,7 +131,7 @@ class Verification(BaseFeature):
                 mail=mail_address,
                 subject=MessagesCZ.verify_subject,
             )
-            view = VerifyWithResendButtonView(user.login, mail_list)
+            view = VerifyWithResendButtonView(user.login, mail_list, generation=user.generation or 0)
             await inter.edit_original_response(content=success_message, view=view)
         else:
             success_message = MessagesCZ.verify_resend_success(
@@ -139,7 +139,7 @@ class Verification(BaseFeature):
                 mail=mail_address,
                 subject=MessagesCZ.verify_subject,
             )
-            view = VerifyView(user.login, mail_list)
+            view = VerifyView(user.login, mail_list, generation=user.generation or 0)
             await inter.edit_original_response(content=success_message, view=view)
 
     async def send_code_muni(self, login: str, inter: disnake.ApplicationCommandInteraction) -> bool:
@@ -158,7 +158,9 @@ class Verification(BaseFeature):
                 user=inter.user.id, admin=config.admin_ids[0], school="VUT", command="vut"
             )
             await inter.send(content=msg)
-            await self.log_wrong_school(inter, "getcode (MUNI) - Wrong school", login, user.year, "MUNI")
+            await self.log_wrong_school(
+                inter, "getcode (MUNI) - Wrong school", login, user.year, "MUNI", user.generation or 0
+            )
             return False
 
         if user is not None and user.status != VerifyStatus.Unverified.value:
@@ -193,8 +195,15 @@ class Verification(BaseFeature):
             msg = MessagesCZ.verify_wrong_school(
                 user=inter.user.id, admin=config.admin_ids[0], school="MUNI", command="muni"
             )
-            await inter.edit_original_response(content=msg)
-            await self.log_wrong_school(inter, "getcode (xlogin) - Wrong school", login, existing.year, "VUT")
+            await inter.send(content=msg)
+            await self.log_wrong_school(
+                inter,
+                "getcode (xlogin) - Wrong school",
+                login,
+                existing.year,
+                "VUT",
+                existing.generation or 0,
+            )
             return False
 
         user = await self.helper.check_api(login)
@@ -397,8 +406,9 @@ class Verification(BaseFeature):
         login: str,
         stored_school: str | None,
         requested_school: str,
+        generation: int,
     ):
-        """Log a school mismatch and let mods approve the change or clear the stored school."""
+        """Log a school mismatch and let mods approve or reject the change."""
         embed = disnake.Embed(title="Neúspěšný pokus o verify", color=disnake.Colour.yellow())
         embed.add_field(name="User", value=inter.author.mention)
         embed.add_field(name="Verify phase", value=phase)
@@ -410,7 +420,8 @@ class Verification(BaseFeature):
             inline=False,
         )
         await self.bot.get_channel(config.log_channel).send(
-            embed=embed, view=SchoolChangeView(login, requested_school, stored_school)
+            embed=embed,
+            view=SchoolChangeView(login, requested_school, generation, inter.author.id),
         )
 
     def reset_school(self, login: str, new_school: str | None) -> bool:

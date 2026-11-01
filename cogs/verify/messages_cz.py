@@ -45,16 +45,25 @@ class MessagesCZ(GlobalMessages):
     mail_changed = "Změna mailu"
     mail_changed_desc = "Uživatel {login} změnil mail z `{old}` na `{new}`."
     invalid_login = "{user} Neplatný login. Přečti si prosím <#591386755547136020>. ({admin} pls)"
-    verify_wrong_school = "{user} Tento login už je použitý pro ověření přes {school}. " \
-                          "Použij prosím `/verify {command}`. ({admin} pls)"
+    verify_wrong_school = (
+        "{user} Tento login už je použitý pro ověření přes {school}. "
+        "Žádost o změnu školy byla odeslána modům."
+    )
     verify_school_mismatch_log = (
         "Login `{login}` má v databázi uloženou školu `{stored}`, ale uživatel se ověřuje přes `{requested}`.\n"
-        "Můžeš změnu školy schválit, nebo školu u loginu vymazat, aby se mohl ověřit znovu."
+        "Můžeš žádost schválit (škola bude vymazána a uživatel se bude moci znovu ověřit) nebo zamítnout."
     )
-    verify_school_change_approved = "Změna školy pro `{login}` schválena ({school}), uživatel se může znovu ověřit."
+    verify_school_change_approved = "Změna školy pro `{login}` schválena, uživatel se může znovu ověřit."
+    verify_school_change_rejected = "Žádost o změnu školy pro `{login}` byla zamítnuta."
     verify_school_change_cleared = "Škola pro `{login}` vymazána, uživatel se může znovu ověřit."
     verify_school_change_missing = "Login `{login}` už v databázi neexistuje."
     verify_school_change_stale = "Tato žádost je zastaralá, škola loginu `{login}` se mezitím změnila."
+    verify_school_change_user_cleared = (
+        "Tvá žádost o změnu školy pro login `{login}` byla schválena. "
+        "Škola byla vymazána a nyní se můžeš znovu ověřit pomocí `/verify`."
+    )
+    verify_school_change_user_rejected = "Tvá žádost o změnu školy pro login `{login}` byla zamítnuta."
+    verify_view_outdated = "Tento formulář je již neplatný. Začni prosím znovu příkazem `/verify`."
     verify_subject = "FIT Discord verifikace"
     dynamic_verify_requested = "Byla zaslána žádost o verifikaci. Vyčkej prosím než ji někdo z oprávněných osob schválí."
     dynamic_verify_declined = "Tvá žádost o verifikaci byla zamítnuta."

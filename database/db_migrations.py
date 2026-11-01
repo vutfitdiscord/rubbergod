@@ -33,5 +33,19 @@ def init_db(commit: bool = True):
     # Initialize default values
     ErrorLogDB.init()
 
+    try:
+        from sqlalchemy import text
+
+        with database.db.connect() as conn:
+            conn.execute(
+                text(
+                    "ALTER TABLE bot_valid_persons "
+                    "ADD COLUMN IF NOT EXISTS generation INTEGER NOT NULL DEFAULT 0;"
+                )
+            )
+            conn.commit()
+    except Exception as exc:
+        rubbergod_logger.warning(f"Could not ensure generation column exists: {exc}")
+
     if commit:
         session.commit()

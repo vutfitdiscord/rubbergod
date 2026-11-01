@@ -80,6 +80,7 @@ class ValidPersonDB(database.base):  # type: ignore
     code = Column(String)
     status = Column(Integer, default=VerifyStatus.Unverified.value)
     mail = Column(String)
+    generation = Column(Integer, default=0, nullable=False, server_default="0")
 
     def get_mail(self, fallback_domain: str) -> str:
         if self.mail is not None and len(self.mail) > 0:
@@ -171,6 +172,12 @@ class ValidPersonDB(database.base):  # type: ignore
         self.mail = None
         self.code = None
         self.status = VerifyStatus.Unverified.value
+        self.generation = (self.generation or 0) + 1
+        session.commit()
+
+    def bump_generation(self) -> None:
+        """Increment generation to invalidate pending requests."""
+        self.generation = (self.generation or 0) + 1
         session.commit()
 
     def change_status(self, status: int) -> None:
