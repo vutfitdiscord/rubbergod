@@ -33,11 +33,21 @@ ANUBIS_USER_AGENT = "Mozilla/5.0 (X11; Linux x86_64; rv:132.0) Gecko/20100101 Fi
 CHALLENGE_RE = re.compile(r'<script id="anubis_challenge" type="application/json">(.*?)</script>', re.S)
 PASS_CHALLENGE_URL = "/.within.website/x/cmd/anubis/api/pass-challenge"
 
+# The difficulty is server-supplied. Anything above this is either malicious or
+# a server misconfiguration (difficulty 16 already means ~2^64 hashes).
+MAX_DIFFICULTY = 16
+# Upper bound for solving, so a spiked difficulty can't keep a worker thread
+# hashing long after the Discord interaction has expired. The deadline is
+# enforced inside the worker, so the thread always terminates on its own.
+SOLVE_TIME_LIMIT = 60.0
 
-def solve_proof_of_work(data: str, difficulty: int) -> tuple[str, int]:
+
+def solve_proof_of_work(data: str, difficulty: int, deadline: float) -> tuple[str, int]:
     """Find a nonce so sha256(data + nonce) starts with difficulty zero nibbles.
 
+    :param deadline: monotonic time after which the search is aborted
     :returns: tuple of the hex digest (response) and the nonce
+    :raises ApiError: when the deadline is exceeded
     """
     prefix = "0" * difficulty
     nonce = 0
@@ -46,6 +56,8 @@ def solve_proof_of_work(data: str, difficulty: int) -> tuple[str, int]:
         if digest.startswith(prefix):
             return digest, nonce
         nonce += 1
+        if nonce % 4096 == 0 and time.monotonic() > deadline:
+            raise ApiError("Anubis: proof-of-work exceeded the time limit")
 
 
 async def anubis_get(session: aiohttp.ClientSession, url: str) -> str:
@@ -70,14 +82,14 @@ async def anubis_get(session: aiohttp.ClientSession, url: str) -> str:
     algorithm = challenge.get("method", "fast")
     if algorithm not in ("fast", "slow"):
         raise ApiError(f"Anubis: unsupported challenge algorithm '{algorithm}'")
+    difficulty = challenge["difficulty"]
+    if not 1 <= difficulty <= MAX_DIFFICULTY:
+        raise ApiError(f"Anubis: refusing challenge with difficulty {difficulty}")
 
-    logger.info(
-        f"[Anubis] Solving challenge {challenge['id']} "
-        f"(difficulty {challenge['difficulty']}) for {response.url}"
-    )
+    logger.info(f"[Anubis] Solving challenge {challenge['id']} (difficulty {difficulty}) for {response.url}")
     started = time.monotonic()
     response_hex, nonce = await asyncio.to_thread(
-        solve_proof_of_work, challenge["randomData"], challenge["difficulty"]
+        solve_proof_of_work, challenge["randomData"], difficulty, started + SOLVE_TIME_LIMIT
     )
     elapsed = time.monotonic() - started
     logger.info(f"[Anubis] Challenge solved in {elapsed:.2f}s (nonce {nonce})")
@@ -92,6 +104,12 @@ async def anubis_get(session: aiohttp.ClientSession, url: str) -> str:
     }
     pass_url = f"{response.url.origin()}{PASS_CHALLENGE_URL}"
     async with session.get(pass_url, headers=headers, params=params) as response:
+        # a rejected solution returns an error page instead of a redirect;
+        # check the pass-challenge response itself so that a genuine 404 of
+        # the target page (in the redirect chain) is still returned to caller
+        pass_response = response.history[0] if response.history else response
+        if pass_response.status >= 400:
+            raise ApiError(f"Anubis: challenge submission failed (HTTP {pass_response.status})")
         html = await response.text()
 
     if CHALLENGE_RE.search(html) is not None:
