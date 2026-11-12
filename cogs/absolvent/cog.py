@@ -15,6 +15,7 @@ from lxml import etree
 from cogs.base import Base
 from database.verification import ValidPersonDB
 from rubbergod import Rubbergod
+from utils.anubis import anubis_get
 from utils.errors import ApiError
 
 from .messages_cz import MessagesCZ
@@ -104,10 +105,9 @@ class Absolvent(Base, commands.Cog):
 
         thesis_url = f"http://hdl.handle.net/11012/{thesis_web_id}?locale-attribute=cs"
 
-        # download the page
+        # download the page, solving the Anubis anti-bot challenge if needed
         try:
-            async with self.bot.rubbergod_session.get(thesis_url) as response:
-                result_thesis = await response.text()
+            result_thesis = await anubis_get(self.bot.rubbergod_session, thesis_url)
         except (aiohttp.ClientConnectorError, asyncio.TimeoutError) as error:
             raise ApiError(str(error))
 
