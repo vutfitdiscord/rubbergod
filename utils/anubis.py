@@ -42,6 +42,15 @@ MAX_DIFFICULTY = 16
 SOLVE_TIME_LIMIT = 60.0
 
 
+def _check_deadline(deadline: float) -> None:
+    """Abort when the solve budget has been exceeded.
+
+    :raises ApiError: when the deadline has passed
+    """
+    if time.monotonic() > deadline:
+        raise ApiError("Anubis: proof-of-work exceeded the time limit")
+
+
 def solve_proof_of_work(data: str, difficulty: int, deadline: float) -> tuple[str, int]:
     """Find a nonce so sha256(data + nonce) starts with difficulty zero nibbles.
 
@@ -49,15 +58,21 @@ def solve_proof_of_work(data: str, difficulty: int, deadline: float) -> tuple[st
     :returns: tuple of the hex digest (response) and the nonce
     :raises ApiError: when the deadline is exceeded
     """
+    # the worker can start late after waiting in the executor queue, so the
+    # deadline has to be checked before the first hash as well
+    _check_deadline(deadline)
     prefix = "0" * difficulty
     nonce = 0
     while True:
         digest = hashlib.sha256(f"{data}{nonce}".encode()).hexdigest()
         if digest.startswith(prefix):
+            # reject solutions found after the budget expired but before the
+            # next periodic check
+            _check_deadline(deadline)
             return digest, nonce
         nonce += 1
-        if nonce % 4096 == 0 and time.monotonic() > deadline:
-            raise ApiError("Anubis: proof-of-work exceeded the time limit")
+        if nonce % 4096 == 0:
+            _check_deadline(deadline)
 
 
 async def anubis_get(session: aiohttp.ClientSession, url: str) -> str:
