@@ -49,24 +49,16 @@ jobs:
             echo "================== Lock Mutex =================="
             LOCK="/tmp/deployment.lock"
 
-            remove_lock()
-            {
-                rm -f "$LOCK"
-            }
-
             acquire_failed()
             {
-                echo "Failed to acquire lock, perphaps a stale deployment is running requiring manual fix?"
+                echo "Failed to acquire lock within timeout; another deployment may still be running."
                 exit 1
             }
 
-            # !IMPORTANT: For this to work, the remote server has to have `procmail` installed.
-            # Try to lock 5 times with a 60s sleep time between retries
-            # Remove any lock older than 10min (600s) and then wait 30s
-            lockfile -60 -r 5 -l 600 -s 30 "$LOCK" || acquire_failed
-
-            # Remove lock on exit
-            trap remove_lock EXIT
+            # Acquire exclusive advisory lock, waiting up to 300s (5 minutes).
+            # The kernel releases the lock automatically when the process exits.
+            exec 200>"$LOCK"
+            flock -w 300 200 || acquire_failed
 
             echo "================== Pull Changes =================="
             cd ${{ vars.PRODUCTION_PATH }}
