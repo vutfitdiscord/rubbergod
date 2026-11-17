@@ -186,7 +186,9 @@ async def timeout_get_user(
     main_embed.add_field(name="Timeouts count", value=timeouts_count, inline=True)
     main_embed.add_field(name="Reports count", value=ReportDB.get_reports_on_user(user.id), inline=True)
     unverifies, warnings = await get_user_from_grillbot(bot.grillbot_session, guild_id, user.id)
-    grillbotUrl = f"https://grillbot.eu/web/user-measures/measures-list?filter.userId={user.id}&filter.guildId={guild_id}"
+    grillbotUrl = (
+        f"https://grillbot.eu/web/infractions/list?filter.userId={user.id}&filter.guildId={guild_id}"
+    )
     main_embed.add_field(
         name="Unverifies count",
         value=f"[{unverifies}]({grillbotUrl}&filter.type=Unverify)",
@@ -275,7 +277,7 @@ async def send_to_grillbot(
     mod_id = timeout.user_id if timeout.mod_id == "1" else timeout.mod_id
     if mode == "delete":
         try:
-            url = f"{config.grillbot_api_url}/user/measures/timeout/{timeout.id}"
+            url = f"{config.grillbot_api_url}/user/infractions/timeout/{timeout.id}"
             async with grillbot_session.delete(url) as response:
                 if response.status != 200:
                     return MessagesCZ.error_msg(url=url, status=response.status, text=await response.text())
@@ -284,7 +286,7 @@ async def send_to_grillbot(
             return str(error)
 
     try:
-        url = f"{config.grillbot_api_url}/user/measures/timeout/create"
+        url = f"{config.grillbot_api_url}/user/infractions/timeout"
         data = {
             "timeoutId": f"{timeout.id}",
             "createdAtUtc": f"{timeout.start.replace(tzinfo=timezone.utc).isoformat()}",
