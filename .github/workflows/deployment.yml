@@ -57,8 +57,8 @@ jobs:
 
             # Acquire exclusive advisory lock, waiting up to 300s (5 minutes).
             # The kernel releases the lock automatically when the process exits.
-            exec 200>"$LOCK"
-            flock -w 300 200 || acquire_failed
+            exec 9>"$LOCK"
+            flock -w 300 9 || acquire_failed
 
             echo "================== Pull Changes =================="
             cd ${{ vars.PRODUCTION_PATH }}
