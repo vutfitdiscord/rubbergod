@@ -162,6 +162,19 @@ async def set_member_timeout(
         await member.timeout(until=endtime, reason=reason)
 
 
+async def apply_timeout_update(member: disnake.Member, timeout: TimeoutDB) -> None:
+    """Apply or extend a member's Discord timeout from an active TimeoutDB record."""
+    now = datetime.now(timezone.utc)
+    end = timeout.end.replace(tzinfo=timezone.utc)
+    if end <= now:
+        return
+
+    if (end - now) > timedelta(days=28):
+        await member.timeout(duration=timedelta(days=28), reason=timeout.reason)
+    elif member.current_timeout is None or member.current_timeout < end:
+        await member.timeout(until=end, reason=timeout.reason)
+
+
 async def timeout_get_user(
     author: disnake.User,
     guild_id: int,
