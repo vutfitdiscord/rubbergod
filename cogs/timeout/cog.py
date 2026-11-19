@@ -321,11 +321,7 @@ class Timeout(Base, commands.Cog):
                 TimeoutDB.remove_timeout(timeout.user_id)
                 continue
 
-            end = timeout.end.astimezone(tz=timezone.utc)
-            if (end - datetime.now(timezone.utc)).days > 28:
-                await member.timeout(duration=timedelta(days=28), reason=timeout.reason)
-            elif member.current_timeout < end:
-                await member.timeout(until=end, reason=timeout.reason)
+            await features.apply_timeout_update(member, timeout)
 
     @tasks.loop(time=time(12, 0, tzinfo=utils.general.get_local_zone()))
     async def refresh_timeout(self):
@@ -340,6 +336,21 @@ class Timeout(Base, commands.Cog):
         counts = await TimeoutDB.get_timeouts_counts()
         embed = await features.embed_update_list(counts, self.bot.user)
         await self.log_channel.send(embed=embed)
+
+    @commands.Cog.listener()
+    async def on_member_join(self, member: disnake.Member):
+        """Check timeout db on user join and apply or update active timeout."""
+        if member.guild.id != Base.config.guild_id:
+            return
+
+        timeout = TimeoutDB.get_active_timeout(str(member.id))
+        if timeout is None:
+            return
+
+        if member.guild.me.top_role <= member.top_role:
+            return
+
+        await features.apply_timeout_update(member, timeout)
 
     @commands.Cog.listener()
     async def on_automod_action_execution(self, execution: disnake.AutoModActionExecution):
