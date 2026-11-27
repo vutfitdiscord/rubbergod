@@ -81,11 +81,6 @@ class Absolvent(Base, commands.Cog):
 
         # CHECK WHETHER THE PROVIDED NAME MATCHES THE ONE STORED FOR FIT VUT VERIFICATION
 
-        def remove_accents(input_str):
-            nfkd_form = unicodedata.normalize("NFKD", input_str)
-            only_ascii = nfkd_form.encode("ASCII", "ignore").decode("ASCII")
-            return only_ascii
-
         # get name for bot database for the current command caller
         name_from_db = ValidPersonDB.get_user_by_id(inter.author.id)
 
@@ -93,12 +88,7 @@ class Absolvent(Base, commands.Cog):
             await inter.edit_original_response(MessagesCZ.not_in_db)
             return
 
-        # Compare normalized word multisets (without accents) to handle both
-        # "First [Middle] Last" (VUT API) and "Last First [Middle]" (legacy DB)
-        # regardless of how middle names or multiple surnames were split.
-        name_from_user_words = sorted(remove_accents(f"{name} {surname}").split())
-        name_from_db_words = sorted(remove_accents(name_from_db.name).split())
-        if name_from_db_words != name_from_user_words:
+        if not self._db_name_matches(name_from_db.name, name, surname):
             await inter.edit_original_response(MessagesCZ.wrong_name)
             return
 
@@ -206,6 +196,39 @@ class Absolvent(Base, commands.Cog):
                     break
             await author.add_roles(absolvent_role)
             await self.append_response(inter, original_msg, MessagesCZ.diplom_success)
+
+    @staticmethod
+    def _remove_accents(input_str: str) -> str:
+        nfkd_form = unicodedata.normalize("NFKD", input_str)
+        return nfkd_form.encode("ASCII", "ignore").decode("ASCII")
+
+    @classmethod
+    def _db_name_matches(cls, db_name: str, name: str, surname: str) -> bool:
+        """Check whether the DB name matches the user-supplied name regardless of word order,
+        accents, casing, or single-letter abbreviated initials (e.g. 'L.' for 'Lukáš')."""
+        db_words = cls._remove_accents(db_name).casefold().split()
+        user_words = cls._remove_accents(f"{name} {surname}").casefold().split()
+        if len(db_words) != len(user_words):
+            return False
+
+        # Match exact words first, then match any abbreviated initial (e.g. "l.") by prefix
+        remaining_db: list[str] = []
+        remaining_user = list(user_words)
+        for word in db_words:
+            if word in remaining_user:
+                remaining_user.remove(word)
+            else:
+                remaining_db.append(word)
+
+        for db_word in remaining_db:
+            if len(db_word) != 2 or not db_word[0].isalpha() or db_word[1] != ".":
+                return False
+            match = next((u for u in remaining_user if u.startswith(db_word[0])), None)
+            if match is None:
+                return False
+            remaining_user.remove(match)
+
+        return not remaining_user
 
     @staticmethod
     def _parse_thesis_author(thesis_author: str) -> tuple[str, str] | None:
