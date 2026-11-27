@@ -75,7 +75,8 @@ class Absolvent(Base, commands.Cog):
             await inter.edit_original_response(MessagesCZ.wrong_diploma_format)
             return
         diploma_year = diploma.group(1)
-        full_name_without_degree_surname_first = f"{surname}, {name}"
+        name = " ".join(name.split())
+        surname = " ".join(surname.split())
 
         # CHECK WHETHER THE PROVIDED NAME MATCHES THE ONE STORED FOR FIT VUT VERIFICATION
 
@@ -84,18 +85,19 @@ class Absolvent(Base, commands.Cog):
             only_ascii = nfkd_form.encode("ASCII", "ignore").decode("ASCII")
             return only_ascii
 
-        # get "surname name" for bot database for the current command caller
+        # get name for bot database for the current command caller
         name_from_db = ValidPersonDB.get_user_by_id(inter.author.id)
-        # remove diacritics from the user-supplied name
-        name_from_user_without_diacritics = remove_accents(f"{surname} {name}")
 
-        if name_from_db is None:
+        if name_from_db is None or not name_from_db.name:
             await inter.edit_original_response(MessagesCZ.not_in_db)
             return
 
-        # remove diacritics from both names for comparison since VUT API now returns names with accents
-        name_from_db_without_diacritics = remove_accents(name_from_db.name)
-        if name_from_db_without_diacritics != name_from_user_without_diacritics:
+        # Compare normalized word multisets (without accents) to handle both
+        # "First [Middle] Last" (VUT API) and "Last First [Middle]" (legacy DB)
+        # regardless of how middle names or multiple surnames were split.
+        name_from_user_words = sorted(remove_accents(f"{name} {surname}").split())
+        name_from_db_words = sorted(remove_accents(name_from_db.name).split())
+        if name_from_db_words != name_from_user_words:
             await inter.edit_original_response(MessagesCZ.wrong_name)
             return
 
@@ -146,12 +148,23 @@ class Absolvent(Base, commands.Cog):
             return
         habilitation_year = habilitation.group(1)
 
+        thesis_name_split = self._parse_thesis_author(thesis_author_without_degree_surname_first)
+        user_full_words = f"{name} {surname}".split()
+        if thesis_name_split is not None:
+            thesis_given, thesis_surname = thesis_name_split
+            author_matches = f"{thesis_given} {thesis_surname}".split() == user_full_words
+        else:
+            author_matches = thesis_author_without_degree_surname_first.split() in (
+                user_full_words,
+                f"{surname} {name}".split(),
+            )
+
         if not (
             ((degree == "Ing." and master_thesis != "") or (degree == "Bc." and bachelor_thesis != ""))
             and diploma_year == habilitation_year
             and faculty != ""
             and result == "práce byla úspěšně obhájena"
-            and thesis_author_without_degree_surname_first == full_name_without_degree_surname_first
+            and author_matches
         ):
             await inter.edit_original_response(MessagesCZ.web_error)
             self.logger.info(f"[Absolvent] Thesis verification failed for thesis: {thesis_url}")
@@ -167,47 +180,14 @@ class Absolvent(Base, commands.Cog):
         # DIPLOMA VALIDITY CHECK
         original_msg = await self.append_response(inter, original_msg, MessagesCZ.status_diploma)
 
-        diplom_url1 = "https://www.vut.cz/overeni-diplomu"
-        diplom_url2 = "https://www.vut.cz/overeni-diplomu?aid_redir=1"
-        diplom_url3 = "https://www.vut.cz/overeni-diplomu"
-        data = {}
-
-        try:
-            # load initial cookies + download the HTML-security codes in hidden input fields
-            await self.bot.rubbergod_session.get(diplom_url1)
-            async with self.bot.rubbergod_session.get(diplom_url2) as response:
-                result2 = await response.text()
-        except (aiohttp.ClientConnectorError, asyncio.TimeoutError) as error:
-            raise ApiError(str(error))
-
-        # parse it using lxml
-        xDoc2 = etree.fromstring(result2, htmlparser)
-        # get all hidden server-generated inputs
-        inputs = xDoc2.xpath("//*[@id='over_studenta']/input[@type='hidden']")
-        for input in inputs:
-            data[input.attrib["name"]] = input.attrib["value"]
-
-        # add user-supplied values
-        data["data[form_el_cislo]"] = diploma_number
-        data["data[form_el_jmeno]"] = name
-        data["data[form_el_prijmeni]"] = surname
-        data["data[form_el_overit]"] = "Ověřit"
-
-        # send the POST to check the diploma validity
-        async with self.bot.rubbergod_session.post(diplom_url3, data=data) as response:
-            result3 = await response.text()
-        xDoc3 = etree.fromstring(result3, htmlparser)
-        # parse the success text (in czech)
-        absolventText = "".join(
-            xDoc3.xpath(
-                "//*[@id='main']/div[contains(@class,'alert-success')]/div[@class='alert-text']/div//text()"
+        diploma_verified = await self._verify_diploma(diploma_number, name, surname, htmlparser)
+        if not diploma_verified and thesis_name_split is not None and thesis_name_split != (name, surname):
+            thesis_given, thesis_surname = thesis_name_split
+            diploma_verified = await self._verify_diploma(
+                diploma_number, thesis_given, thesis_surname, htmlparser
             )
-        )
-        if not (
-            absolventText != ""
-            and "úspěšně ověřen" in absolventText
-            and absolventText.endswith(", Fakulta informačních technologií")
-        ):
+
+        if not diploma_verified:
             await inter.edit_original_response(MessagesCZ.diploma_error)
             return
 
@@ -226,6 +206,59 @@ class Absolvent(Base, commands.Cog):
                     break
             await author.add_roles(absolvent_role)
             await self.append_response(inter, original_msg, MessagesCZ.diplom_success)
+
+    @staticmethod
+    def _parse_thesis_author(thesis_author: str) -> tuple[str, str] | None:
+        """Split a DSpace 'Surname, GivenNames' author string into (given_names, surname)."""
+        if "," not in thesis_author:
+            return None
+        thesis_surname, thesis_given = thesis_author.split(",", 1)
+        return " ".join(thesis_given.split()), " ".join(thesis_surname.split())
+
+    async def _verify_diploma(
+        self,
+        diploma_number: str,
+        first_name: str,
+        last_name: str,
+        htmlparser: etree.HTMLParser,
+    ) -> bool:
+        """Submit the VUT diploma verification form and return whether it succeeded for FIT."""
+        diplom_url1 = "https://www.vut.cz/overeni-diplomu"
+        diplom_url2 = "https://www.vut.cz/overeni-diplomu?aid_redir=1"
+        diplom_url3 = "https://www.vut.cz/overeni-diplomu"
+        data = {}
+
+        try:
+            # load initial cookies + download the HTML-security codes in hidden input fields
+            await self.bot.rubbergod_session.get(diplom_url1)
+            async with self.bot.rubbergod_session.get(diplom_url2) as response:
+                result2 = await response.text()
+        except (aiohttp.ClientConnectorError, asyncio.TimeoutError) as error:
+            raise ApiError(str(error))
+
+        xDoc2 = etree.fromstring(result2, htmlparser)
+        inputs = xDoc2.xpath("//*[@id='over_studenta']/input[@type='hidden']")
+        for hidden_input in inputs:
+            data[hidden_input.attrib["name"]] = hidden_input.attrib["value"]
+
+        data["data[form_el_cislo]"] = diploma_number
+        data["data[form_el_jmeno]"] = first_name
+        data["data[form_el_prijmeni]"] = last_name
+        data["data[form_el_overit]"] = "Ověřit"
+
+        async with self.bot.rubbergod_session.post(diplom_url3, data=data) as response:
+            result3 = await response.text()
+        xDoc3 = etree.fromstring(result3, htmlparser)
+        absolvent_text = "".join(
+            xDoc3.xpath(
+                "//*[@id='main']/div[contains(@class,'alert-success')]/div[@class='alert-text']/div//text()"
+            )
+        )
+        return (
+            absolvent_text != ""
+            and "úspěšně ověřen" in absolvent_text
+            and absolvent_text.endswith(", Fakulta informačních technologií")
+        )
 
     async def append_response(self, inter: disnake.ApplicationCommandInteraction, old: str, new: str) -> str:
         """Append new string to the original message and send"""
